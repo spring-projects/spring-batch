@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.integration.launch.JobLaunchingGatewayTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:02" hostname="Michaels-MacBook-Pro-3.local" time="0.784">
+  <properties/>
+  <testcase name="testExceptionRaised" classname="org.springframework.batch.integration.launch.JobLaunchingGatewayTests" time="0.784"/>
+  <system-out><![CDATA[2017-03-23 10:05:02,536 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:03,111 DEBUG Test worker [org.springframework.batch.integration.launch.JobLaunchingGateway] - <org.springframework.batch.integration.launch.JobLaunchingGateway@6e937e46 received message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={}, headers={id=6b6062d0-1d11-cf98-07b7-63696850f89b, timestamp=1490281502333}]>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

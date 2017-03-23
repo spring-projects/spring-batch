@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customers>
+	<customer>
+		<name>customer1</name>
+		<credit>10</credit>
+	</customer>
+	<customer>
+		<name>customer2</name>
+		<credit>20</credit>
+	</customer>
+	<customer>
+		<name>customer3</name>
+		<credit>30</credit>
+	</customer>
+	<customer>
+		<name>customer4</name>
+		<credit>40</credit>
+	</customer>
+	<customer>
+		<name>customer5</name>
+		<credit>50</credit>
+	</customer>
+</customers>

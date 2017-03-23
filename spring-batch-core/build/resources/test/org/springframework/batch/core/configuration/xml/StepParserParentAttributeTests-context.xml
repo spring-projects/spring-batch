@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="s1" parent="baseStep" next="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5" />
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
+		</step>
+		<step id="s2" parent="standalone2" next="s3" />
+		<step id="s3" parent="baseStep" next="s4">
+			<tasklet ref="dummyTasklet">
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
+		</step>
+		<step id="s4" parent="standalone4" next="s5" />
+		<step id="s5" parent="baseStep" next="s6">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5" />
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
+		</step>
+		<step id="s6" parent="standalone6" next="s7" />
+		<step id="s7" parent="baseStep" next="s8">
+			<tasklet ref="dummyTasklet">
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
+		</step>
+		<step id="s8" parent="standalone8" next="s9" />
+		<step id="s9" parent="standalone9" next="s10" />
+		<step id="s10" parent="standalone10" next="s11"/>
+		<step id="s11" parent="dummyStep" next="s12"/>
+		<step id="s12" parent="dummyStep" next="s13">
+			<tasklet ref="dummyTasklet"/>
+		</step>
+		<step id="s13" parent="dummyStepWithTaskletOnParent" next="s14"/>
+		<step id="s14" parent="standaloneStepWithTaskletAndDummyParent"/>
+	</job>
+
+	<step id="standalone2" parent="baseStep">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="5"/>
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
+	</step>
+
+	<step id="standalone4"  parent="baseStep">
+		<tasklet ref="dummyTasklet">
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
+	</step>
+
+	<step id="standalone6" parent="baseStep">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="5" />
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
+	</step>
+
+	<step id="standalone8" parent="baseStep">
+		<tasklet ref="dummyTasklet">
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
+	</step>
+
+	<beans:bean id="standalone9" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<beans:property name="tasklet" ref="dummyTasklet"/>
+		<beans:property name="jobRepository" ref="jobRepository"/>
+		<beans:property name="transactionManager" ref="transactionManager"/>
+	</beans:bean>
+
+	<beans:bean id="standalone10" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
+		<beans:property name="tasklet" ref="dummyTasklet"/>
+		<beans:property name="jobRepository" ref="jobRepository"/>
+		<beans:property name="transactionManager" ref="transactionManager"/>
+	</beans:bean>
+
+	<step id="baseStep" abstract="true">
+		<tasklet>
+			<transaction-attributes timeout="10"/>
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+				</listener>
+			</listeners>
+		</tasklet>
+	</step>
+
+	<beans:bean id="dummyStep" class="org.springframework.batch.core.configuration.xml.DummyStep"/>
+
+	<beans:bean id="dummyStepWithTaskletOnParent" parent="standaloneStepWithTasklet"
+	            class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
+
+	<step id="standaloneStepWithTasklet">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+
+	<step id="standaloneStepWithTaskletAndDummyParent" parent="dummyStep">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+
+	<job id="jobWithoutRepo">
+		<step id="defaultRepoStep" next="defaultRepoStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="defaultRepoStepWithParent" parent="defaultRepoStandaloneStep" next="overrideRepoStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="overrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+
+	<job id="jobWithRepo" job-repository="dummyJobRepository">
+		<step id="injectedRepoStep" next="injectedRepoStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedOverrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+
+	<job id="jobWithRepoOnParent" parent="baseJobWithRepo">
+		<step id="injectedRepoFromParentStep" next="injectedRepoFromParentStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoFromParentStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoFromParentStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedOverrideRepoFromParentStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+
+	<step id="defaultRepoStandaloneStep">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+
+	<step id="specifiedRepoStandaloneStep" job-repository="dummyJobRepository2">
+		<tasklet transaction-manager="dummyTxMgr" ref="dummyTasklet"/>
+	</step>
+
+	<job id="baseJobWithRepo" job-repository="dummyJobRepository2" abstract="true"/>
+
+	<beans:bean id="dummyJobRepository" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
+	<beans:bean id="dummyJobRepository2" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
+
+	<job id="defaultTxMgrTestJob">
+		<step id="defaultTxMgrStep" next="specifiedTxMgrStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="specifiedTxMgrStep" next="defaultTxMgrWithParentStep"><tasklet ref="dummyTasklet" transaction-manager="dummyTxMgr"/></step>
+		<step id="defaultTxMgrWithParentStep" parent="specifiedRepoStandaloneStep" next="overrideTxMgrOnParentStep"/>
+		<step id="overrideTxMgrOnParentStep" parent="specifiedRepoStandaloneStep"><tasklet transaction-manager="dummyTxMgr2"/></step>
+	</job>
+
+	<beans:bean id="dummyTxMgr" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
+	<beans:bean id="dummyTxMgr2" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
+
+
+	<step id="baseStepWithLists" abstract="true">
+		<tasklet>
+			<chunk>
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+				</skippable-exception-classes>
+				<retryable-exception-classes>
+					<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+				</retryable-exception-classes>
+				<streams>
+					<stream ref="stream1"/>
+				</streams>
+				<retry-listeners>
+					<listener>
+						<beans:bean class="org.springframework.retry.listener.RetryListenerSupport"/>
+					</listener>
+				</retry-listeners>
+			</chunk>
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+				</listener>
+			</listeners>
+			<no-rollback-exception-classes>
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="stepWithListsMerge" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes merge="true">
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+				<retryable-exception-classes merge="true">
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</retryable-exception-classes>
+				<streams merge="true">
+					<stream ref="stream2"/>
+				</streams>
+				<retry-listeners merge="true">
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</listener>
+				</retry-listeners>
+			</chunk>
+			<listeners merge="true">
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				</listener>
+			</listeners>
+			<no-rollback-exception-classes merge="true">
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="stepWithListsNoMerge" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+				<retryable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</retryable-exception-classes>
+				<streams>
+					<stream ref="stream2"/>
+				</streams>
+				<retry-listeners>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</listener>
+				</retry-listeners>
+			</chunk>
+			<listeners>
+				<listener>
+					<beans:bean class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
+				</listener>
+			</listeners>
+			<no-rollback-exception-classes>
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="stepWithListsOverrideWithEmpty" parent="baseStepWithLists">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="10">
+				<skippable-exception-classes/>
+				<retryable-exception-classes/>
+				<streams/>
+				<retry-listeners/>
+			</chunk>
+			<listeners/>
+			<no-rollback-exception-classes/>
+		</tasklet>
+	</step>
+
+	<beans:bean id="stream1" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+	<beans:bean id="stream2" class="org.springframework.batch.item.support.CompositeItemStream"/>
+
+</beans:beans>

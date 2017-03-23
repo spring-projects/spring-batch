@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.StopJobParserTests$TestDecider"/>
+
+	<job id="job">
+		<step id="s1" parent="step1">
+			<stop on="COMPLETED" restart="decision"/>
+		</step>
+		<decision id="decision" decider="decider">
+			<next on="FOO" to="s2"/>
+			<end on="*" exit-code="FAILED"/>
+		</decision>
+		<step id="s2" parent="step2"/>
+	</job>
+
+</beans:beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.GracefulShutdownFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:58" hostname="Michaels-MacBook-Pro-3.local" time="1.117">
+  <properties/>
+  <testcase name="testLaunchJob" classname="org.springframework.batch.sample.GracefulShutdownFunctionalTests" time="1.117"/>
+  <system-out><![CDATA[10:05:58,501  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:05:58,503  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@4006c1b4, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@5bb3b799, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@9952784, org.springframework.test.context.support.DirtiesContextTestExecutionListener@78ca0315, org.springframework.test.context.transaction.TransactionalTestExecutionListener@e3776d9, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@48fe07f9]
+10:05:58,515  INFO SimpleAsyncTaskExecutor-2 SimpleJobLauncher:139 - Job: [SimpleJob: [name=infiniteLoopJob]] launched with the following parameters: [{timestamp=1490281558509}]
+10:05:58,528  INFO SimpleAsyncTaskExecutor-2 SimpleStepHandler:146 - Executing step: [infiniteStep]
+10:05:59,519  INFO Test worker GracefulShutdownFunctionalTests:70 - Checking for end time in JobExecution: count=0
+10:05:59,542  INFO SimpleAsyncTaskExecutor-2 SimpleJobRepository:281 - Parent JobExecution is stopped, so passing message on to StepExecution
+10:05:59,543  INFO SimpleAsyncTaskExecutor-2 ThreadStepInterruptionPolicy:60 - Step interrupted through StepExecution
+10:05:59,543  INFO SimpleAsyncTaskExecutor-2 AbstractStep:223 - Encountered interruption executing step infiniteStep in job infiniteLoopJob : Job interrupted status detected.
+10:05:59,545  INFO SimpleAsyncTaskExecutor-2 SimpleJobRepository:281 - Parent JobExecution is stopped, so passing message on to StepExecution
+10:05:59,547  INFO SimpleAsyncTaskExecutor-2 AbstractJob:326 - Encountered interruption executing job: Job interrupted by step execution
+10:05:59,550  INFO SimpleAsyncTaskExecutor-2 SimpleJobLauncher:142 - Job: [SimpleJob: [name=infiniteLoopJob]] completed with the following parameters: [{timestamp=1490281558509}] and the following status: [STOPPED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

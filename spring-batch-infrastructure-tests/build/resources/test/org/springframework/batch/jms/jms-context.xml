@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:/data-source-context.xml" />
+
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="receiveTimeout" value="100" />
+		<!-- This is important... -->
+		<property name="sessionTransacted" value="true" />
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+		<property name="sessionCacheSize" value="5"/>
+	</bean>
+
+	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
+		<property name="brokerURL" value="vm://localhost?jms.prefetchPolicy.all=0"/>
+	</bean>
+
+	<bean id="txAwareConnectionFactory"
+		class="org.springframework.jms.connection.TransactionAwareConnectionFactoryProxy">
+		<property name="targetConnectionFactory" ref="connectionFactory" />
+		<property name="synchedLocalTransactionAllowed" value="true" />
+	</bean>
+
+	<bean id="container" class="org.springframework.batch.container.jms.BatchMessageListenerContainer"
+		lazy-init="true">
+		<property name="recoveryInterval" value="500" />
+		<!-- We aren't adding a listener here (want to do it in unit test)
+		so need to set autoStartup=false -->
+		<property name="autoStartup" value="false" />
+		<!-- We need the transaction manager, but only because we can't
+		intercept the MessageListenerContainer in the right place
+		(it tries to open a JMS session before receiveAndExecute()
+		so the JMS session commits after every item, not after every chunk) -->
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="connectionFactory" ref="txAwareConnectionFactory" />
+		<property name="destinationName" value="queue" />
+		<!-- This is important... it forces the container to acknowledge message receipt,
+			and avoid duplicate messages in the sunny day case -->
+		<property name="sessionTransacted" value="true" />
+		<property name="adviceChain">
+			<list>
+				<!-- Need another transaction manager here so that rollbacks are processed correctly -->
+				<bean class="org.springframework.transaction.interceptor.TransactionInterceptor">
+					<property name="transactionManager" ref="transactionManager" />
+					<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED" />
+				</bean>
+				<bean class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor">
+					<property name="repeatOperations" ref="batchTemplate" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="batchTemplate" class="org.springframework.batch.repeat.support.RepeatTemplate">
+		<property name="completionPolicy">
+			<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+				<constructor-arg value="2" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transactionalBatchTemplate"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="proxyInterfaces" value="org.springframework.batch.repeat.RepeatOperations"/>
+		<property name="proxyTargetClass" value="false" />
+		<property name="transactionAttributes" value="*=PROPAGATION_REQUIRED"/>
+		<property name="target">
+			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+				<property name="completionPolicy">
+					<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+						<constructor-arg value="2" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
+		destroy-method="stop">
+		<property name="brokerName" value="broker" />
+		<property name="useJmx" value="false"/>
+		<property name="transportConnectorURIs">
+			<list>
+				<value>vm://localhost?jms.prefetchPolicy.all=0</value>
+			</list>
+		</property>
+		<property name="persistenceAdapter">
+			<bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
+			<!-- bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="createTablesOnStartup" value="true" />
+			</bean-->
+		</property>
+	</bean>
+
+</beans>

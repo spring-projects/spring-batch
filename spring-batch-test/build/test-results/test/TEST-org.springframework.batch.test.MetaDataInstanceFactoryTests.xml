@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.test.MetaDataInstanceFactoryTests" tests="11" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:52" hostname="Michaels-MacBook-Pro-3.local" time="0.005">
+  <properties/>
+  <testcase name="testCreateJobExecution" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateStepExecutionStringLong" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobExecutionStringLongLong" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.001"/>
+  <testcase name="testCreateJobExecutionLong" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobExecutionStringLongLongJobParameters" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobInstanceStringLong" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobExecutionWithStepExecutions" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobInstance" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.001"/>
+  <testcase name="testCreateStepExecutionJobExecutionStringLong" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <testcase name="testCreateJobExecutionStringLongLongString" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.001"/>
+  <testcase name="testCreateStepExecution" classname="org.springframework.batch.test.MetaDataInstanceFactoryTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:10" hostname="Michaels-MacBook-Pro-3.local" time="0.02">
+  <properties/>
+  <testcase name="testUnsupportedDatabaseType" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.004"/>
+  <testcase name="testDb2" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.002"/>
+  <testcase name="testDerby" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.003"/>
+  <testcase name="testInvalidDatabaseType" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.0"/>
+  <testcase name="testMysql" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testHsql" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testMsSqlServer" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testSupportedDatabaseType" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.0"/>
+  <testcase name="testNullIncrementerName" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.0"/>
+  <testcase name="testDb2zos" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testPostgres" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testOracle" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <testcase name="testSqlite" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.002"/>
+  <testcase name="testSybase" classname="org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactoryTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

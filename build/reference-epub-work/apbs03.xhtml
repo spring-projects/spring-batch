@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>BATCH_JOB_EXECUTION_PARAMS</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apbs02.xhtml" title="BATCH_JOB_INSTANCE"/><link rel="next" href="apbs04.xhtml" title="BATCH_JOB_EXECUTION"/></head><body><header/><section class="section" title="BATCH_JOB_EXECUTION_PARAMS" epub:type="division" id="metaDataBatchJobParams"><div class="titlepage"><div><div><h2 class="title" style="clear: both">BATCH_JOB_EXECUTION_PARAMS</h2></div></div></div><p>The BATCH_JOB_EXECUTION_PARAMS table holds all information relevant to the
+    <code class="classname">JobParameters</code> object. It contains 0 or more
+    key/value pairs passed to a <code class="classname">Job</code> and serve as a record of the parameters
+    a job was run with. For each parameter that contributes to the generation of a job's identity,
+    the IDENTIFYING flag is set to true.  It should be noted that the table has been
+    denormalized. Rather than creating a separate table for each type, there
+    is one table with a column indicating the type:</p><pre class="programlisting">CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
+	JOB_EXECUTION_ID BIGINT NOT NULL ,
+	TYPE_CD VARCHAR(6) NOT NULL ,
+	KEY_NAME VARCHAR(100) NOT NULL ,
+	STRING_VAL VARCHAR(250) ,
+	DATE_VAL DATETIME DEFAULT NULL ,
+	LONG_VAL BIGINT ,
+	DOUBLE_VAL DOUBLE PRECISION ,
+	IDENTIFYING CHAR(1) NOT NULL ,
+	constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
+	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+);</pre><p>Below are descriptions for each column:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>JOB_EXECUTION_ID: Foreign Key from the BATCH_JOB_EXECUTION table
+        that indicates the job execution the parameter entry belongs to. It
+        should be noted that multiple rows (i.e key/value pairs) may exist for
+        each execution.</p></li><li class="listitem" epub:type="list-item"><p>TYPE_CD: String representation of the type of value stored,
+        which can be either a string, date, long, or double. Because the type
+        must be known, it cannot be null.</p></li><li class="listitem" epub:type="list-item"><p>KEY_NAME: The parameter key.</p></li><li class="listitem" epub:type="list-item"><p>STRING_VAL: Parameter value, if the type is string.</p></li><li class="listitem" epub:type="list-item"><p>DATE_VAL: Parameter value, if the type is date.</p></li><li class="listitem" epub:type="list-item"><p>LONG_VAL: Parameter value, if the type is a long.</p></li><li class="listitem" epub:type="list-item"><p>DOUBLE_VAL: Parameter value, if the type is double.</p></li><li class="listitem" epub:type="list-item"><p>IDENTIFYING: Flag indicating if the parameter contributed to the identity of the related <code class="classname">JobInstance</code>.</p></li></ul></div><p>It is worth noting that there is no primary key for this table. This
+    is simply because the framework has no use for one, and thus doesn't
+    require it. If a user so chooses, one may be added with a database
+    generated key, without causing any issues to the framework itself.</p></section><footer/></body></html>

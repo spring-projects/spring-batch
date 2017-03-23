@@ -1,0 +1,3 @@
+org.springframework.batch.core.test.football
+org.springframework.batch.core.test.timeout
+org.springframework.batch.sample.domain.football.internal

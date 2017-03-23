@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="ioSampleJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+					commit-interval="5" />
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader"
+		abstract="true">
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean
+						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value="," />
+						<property name="names" value="name,credit" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="targetType"
+							value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemReader" parent="itemReaderParent" scope="step"
+		autowire-candidate="false">
+		<property name="resource" value="data/restartFileSample/input/restartFile.csv" />
+	</bean>
+
+	<bean id="itemProcessor"
+		class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
+
+	<bean id="itemWriter"
+		class="org.springframework.batch.sample.RestartFileSampleFunctionalTests$CustomerCreditFlatFileItemWriter">
+		<property name="resource" ref="outputResource" />
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="name,credit" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg value="build/test-outputs/restartFileOutput.csv" />
+	</bean>
+</beans>

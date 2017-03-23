@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.item.MessagingGatewayIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.item.MessagingGatewayIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.item.html">org.springframework.batch.integration.item</a> &gt; MessagingGatewayIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.033s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testProcessor</td>
+<td>0.018s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testWriter</td>
+<td>0.015s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:58,484  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/item/MessagingGatewayIntegrationTests-context.xml]&gt;
+2017-03-23 10:04:58,523  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:04:58,524 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:04:58,524 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:04:58,530  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@450b9b08: startup date [Thu Mar 23 10:04:58 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:58,543  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:04:58,543  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:04:58,544  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,574  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,772  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,827 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.gateway.GatewayProxyFactoryBean$MethodInvocationGateway] - &lt;started processor&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.gateway.GatewayCompletableFutureProxyFactoryBean] - &lt;started processor&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'requests' channel&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.requests' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'transforms' channel&gt;
+2017-03-23 10:04:58,882  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.transforms' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#1&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.gateway.GatewayProxyFactoryBean$MethodInvocationGateway] - &lt;started writer&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.gateway.GatewayCompletableFutureProxyFactoryBean] - &lt;started writer&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {splitter} as a subscriber to the 'inputs' channel&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.inputs' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#2&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'outputs' channel&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.outputs' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#3&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,883  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:04:58,893  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {bridge:null} as a subscriber to the 'replies' channel&gt;
+2017-03-23 10:04:58,893  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@450b9b08.replies' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,894  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.endpoint.EventDrivenConsumer@22aae0e0&gt;
+2017-03-23 10:04:58,894 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=foo, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=941e46ae-9b29-1cce-ce42-1b1cb88d3285, timestamp=1490281498894}]&gt;
+2017-03-23 10:04:58,894 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@44d6408] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=foo, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=941e46ae-9b29-1cce-ce42-1b1cb88d3285, timestamp=1490281498894}]&gt;
+2017-03-23 10:04:58,895 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'transforms', message: GenericMessage [payload=foo: 0, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=ec09a9b5-6ca5-3336-2833-78fbd5095c93, timestamp=1490281498895}]&gt;
+2017-03-23 10:04:58,896 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@2e58f7d8] (org.springframework.integration.config.ServiceActivatorFactoryBean#1) received message: GenericMessage [payload=foo: 0, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=ec09a9b5-6ca5-3336-2833-78fbd5095c93, timestamp=1490281498895}]&gt;
+2017-03-23 10:04:58,897 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'replies', message: GenericMessage [payload=foo: 0: 1, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=43d27ec6-094c-2c05-e394-3d56e201ed65, timestamp=1490281498897}]&gt;
+2017-03-23 10:04:58,897 DEBUG Test worker [org.springframework.integration.handler.BridgeHandler] - &lt;org.springframework.integration.handler.BridgeHandler@5b80af13 received message: GenericMessage [payload=foo: 0: 1, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=43d27ec6-094c-2c05-e394-3d56e201ed65, timestamp=1490281498897}]&gt;
+2017-03-23 10:04:58,897 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'replies', message: GenericMessage [payload=foo: 0: 1, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=43d27ec6-094c-2c05-e394-3d56e201ed65, timestamp=1490281498897}]&gt;
+2017-03-23 10:04:58,897 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'transforms', message: GenericMessage [payload=foo: 0, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=ec09a9b5-6ca5-3336-2833-78fbd5095c93, timestamp=1490281498895}]&gt;
+2017-03-23 10:04:58,897 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=foo, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@4a5647c6, id=941e46ae-9b29-1cce-ce42-1b1cb88d3285, timestamp=1490281498894}]&gt;
+2017-03-23 10:04:58,898 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=filter, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, id=d13cbf6d-1fbc-75bd-3a45-05c1c51b2d27, timestamp=1490281498898}]&gt;
+2017-03-23 10:04:58,898 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@44d6408] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=filter, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, id=d13cbf6d-1fbc-75bd-3a45-05c1c51b2d27, timestamp=1490281498898}]&gt;
+2017-03-23 10:04:58,899 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;handler 'ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@44d6408] (org.springframework.integration.config.ServiceActivatorFactoryBean#0)' produced no reply for request Message: GenericMessage [payload=filter, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, id=d13cbf6d-1fbc-75bd-3a45-05c1c51b2d27, timestamp=1490281498898}]&gt;
+2017-03-23 10:04:58,899 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=filter, headers={replyChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, errorChannel=org.springframework.messaging.core.GenericMessagingTemplate$TemporaryReplyChannel@2390abd2, id=d13cbf6d-1fbc-75bd-3a45-05c1c51b2d27, timestamp=1490281498898}]&gt;
+2017-03-23 10:04:58,912 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'inputs', message: GenericMessage [payload=[foo, bar, spam], headers={id=c5abe52a-1480-22c7-be7e-afe34c736206, timestamp=1490281498912}]&gt;
+2017-03-23 10:04:58,912 DEBUG Test worker [org.springframework.integration.splitter.MethodInvokingSplitter] - &lt;org.springframework.integration.config.SplitterFactoryBean#0 received message: GenericMessage [payload=[foo, bar, spam], headers={id=c5abe52a-1480-22c7-be7e-afe34c736206, timestamp=1490281498912}]&gt;
+2017-03-23 10:04:58,923 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'outputs', message: GenericMessage [payload=foo, headers={sequenceNumber=1, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=da134955-82da-e96e-1887-0c4194b1e6ff, sequenceSize=3, timestamp=1490281498923}]&gt;
+2017-03-23 10:04:58,923 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2) received message: GenericMessage [payload=foo, headers={sequenceNumber=1, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=da134955-82da-e96e-1887-0c4194b1e6ff, sequenceSize=3, timestamp=1490281498923}]&gt;
+2017-03-23 10:04:58,924 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;handler 'ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2)' produced no reply for request Message: GenericMessage [payload=foo, headers={sequenceNumber=1, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=da134955-82da-e96e-1887-0c4194b1e6ff, sequenceSize=3, timestamp=1490281498923}]&gt;
+2017-03-23 10:04:58,924 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'outputs', message: GenericMessage [payload=foo, headers={sequenceNumber=1, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=da134955-82da-e96e-1887-0c4194b1e6ff, sequenceSize=3, timestamp=1490281498923}]&gt;
+2017-03-23 10:04:58,924 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'outputs', message: GenericMessage [payload=bar, headers={sequenceNumber=2, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=9fc928a3-b496-e8fc-6724-61ed619f69c6, sequenceSize=3, timestamp=1490281498924}]&gt;
+2017-03-23 10:04:58,924 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2) received message: GenericMessage [payload=bar, headers={sequenceNumber=2, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=9fc928a3-b496-e8fc-6724-61ed619f69c6, sequenceSize=3, timestamp=1490281498924}]&gt;
+2017-03-23 10:04:58,925 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;handler 'ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2)' produced no reply for request Message: GenericMessage [payload=bar, headers={sequenceNumber=2, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=9fc928a3-b496-e8fc-6724-61ed619f69c6, sequenceSize=3, timestamp=1490281498924}]&gt;
+2017-03-23 10:04:58,925 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'outputs', message: GenericMessage [payload=bar, headers={sequenceNumber=2, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=9fc928a3-b496-e8fc-6724-61ed619f69c6, sequenceSize=3, timestamp=1490281498924}]&gt;
+2017-03-23 10:04:58,925 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'outputs', message: GenericMessage [payload=spam, headers={sequenceNumber=3, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=f1b870cd-c439-4b84-603a-fd95ca68c8c2, sequenceSize=3, timestamp=1490281498925}]&gt;
+2017-03-23 10:04:58,925 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2) received message: GenericMessage [payload=spam, headers={sequenceNumber=3, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=f1b870cd-c439-4b84-603a-fd95ca68c8c2, sequenceSize=3, timestamp=1490281498925}]&gt;
+2017-03-23 10:04:58,925 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;handler 'ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5e7b3d88] (org.springframework.integration.config.ServiceActivatorFactoryBean#2)' produced no reply for request Message: GenericMessage [payload=spam, headers={sequenceNumber=3, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=f1b870cd-c439-4b84-603a-fd95ca68c8c2, sequenceSize=3, timestamp=1490281498925}]&gt;
+2017-03-23 10:04:58,926 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'outputs', message: GenericMessage [payload=spam, headers={sequenceNumber=3, correlationId=c5abe52a-1480-22c7-be7e-afe34c736206, id=f1b870cd-c439-4b84-603a-fd95ca68c8c2, sequenceSize=3, timestamp=1490281498925}]&gt;
+2017-03-23 10:04:58,926 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'inputs', message: GenericMessage [payload=[foo, bar, spam], headers={id=c5abe52a-1480-22c7-be7e-afe34c736206, timestamp=1490281498912}]&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

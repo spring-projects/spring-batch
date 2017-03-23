@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="org.springframework.batch.sample.domain.trade.CustomerCredit"
+		table="CUSTOMER">
+		<id name="id">
+			<!-- To make the job fail on flush we need assigned IDs -->
+			<generator class="assigned" />
+		</id>
+		<property name="name" />
+		<property name="credit" />
+	</class>
+
+</hibernate-mapping>

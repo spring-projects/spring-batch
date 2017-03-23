@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="step1" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="tasklet" ref="nameStoringTasklet"/>
+	</bean>
+	<bean id="step2" parent="step1"/>
+	<bean id="step3" parent="step1"/>
+	<bean id="step4" parent="step1"/>
+
+	<bean id="nameStoringTasklet" class="org.springframework.batch.core.configuration.xml.NameStoringTasklet">
+		<property name="stepNamesList" ref="stepNamesList"/>
+	</bean>
+
+	<bean id="failingStep" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<property name="jobRepository" ref="jobRepository"/>
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="tasklet" ref="failingTasklet"/>
+	</bean>
+
+	<bean id="failingTasklet" class="org.springframework.batch.core.configuration.xml.FailingTasklet">
+		<property name="stepNamesList" ref="stepNamesList"/>
+	</bean>
+
+	<bean id="stepNamesList" class="java.util.ArrayList"/>
+
+	<bean id="reader" class="org.springframework.batch.core.configuration.xml.DummyItemReader"/>
+	<bean id="writer" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
+	<bean id="processor" class="org.springframework.batch.core.configuration.xml.DummyItemProcessor"/>
+
+	<bean id="dummyTasklet" class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
+
+</beans>

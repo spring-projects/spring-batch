@@ -1,0 +1,23 @@
+<mapping>
+	<class name="org.springframework.batch.item.xml.domain.Trade">
+	
+		<map-to xml="trade" />
+
+		<field name="isin">
+			<bind-xml name="isin" node="element" />
+		</field>
+		
+		<field name="quantity">
+			<bind-xml name="quantity" node="element" />
+		</field>
+		
+		<field name="price">
+			<bind-xml name="price" node="element" />
+		</field>
+		
+		<field name="customer">
+			<bind-xml name="customer" node="element" />
+		</field>
+		
+	</class>
+</mapping>

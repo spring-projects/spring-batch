@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Chapter 7. Scaling and Parallel Processing</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s13.xhtml" title="Creating Custom ItemReaders and ItemWriters"/><link rel="next" href="ch07s02.xhtml" title="Parallel Steps"/></head><body><header/><section class="chapter" title="Chapter 7. Scaling and Parallel Processing" epub:type="chapter" id="scalability"><div class="titlepage"><div><div><h1 class="title">Chapter 7. Scaling and Parallel Processing</h1></div></div></div><p>Many batch processing problems can be solved with single threaded,
+  single process jobs, so it is always a good idea to properly check if that
+  meets your needs before thinking about more complex implementations. Measure
+  the performance of a realistic job and see if the simplest implementation
+  meets your needs first: you can read and write a file of several hundred
+  megabytes in well under a minute, even with standard hardware.</p><p>When you are ready to start implementing a job with some parallel
+  processing, Spring Batch offers a range of options, which are described in
+  this chapter, although some features are covered elsewhere. At a high level
+  there are two modes of parallel processing: single process, multi-threaded;
+  and multi-process. These break down into categories as well, as
+  follows:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>Multi-threaded Step (single process)</p></li><li class="listitem" epub:type="list-item"><p>Parallel Steps (single process)</p></li><li class="listitem" epub:type="list-item"><p>Remote Chunking of Step (multi process)</p></li><li class="listitem" epub:type="list-item"><p>Partitioning a Step (single or multi process)</p></li></ul></div><p>Next we review the single-process options first, and then the
+  multi-process options.</p><section class="section" title="Multi-threaded Step" epub:type="subchapter" id="multithreadedStep"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Multi-threaded Step</h2></div></div></div><p>The simplest way to start parallel processing is to add a
+    <code class="classname">TaskExecutor</code> to your Step configuration, e.g. as an
+    attribute of the <code class="literal">tasklet</code>:</p><pre class="programlisting">&lt;step id="loading"&gt;
+    &lt;tasklet task-executor="taskExecutor"&gt;...&lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>In this example the taskExecutor is a reference to another bean
+    definition, implementing the <code class="classname">TaskExecutor</code>
+    interface. <code class="classname">TaskExecutor</code> is a standard Spring
+    interface, so consult the Spring User Guide for details of available
+    implementations. The simplest multi-threaded
+    <code class="classname">TaskExecutor</code> is a
+    <code class="classname">SimpleAsyncTaskExecutor</code>.</p><p>The result of the above configuration will be that the Step
+    executes by reading, processing and writing each chunk of items
+    (each commit interval) in a separate thread of execution.  Note
+    that this means there is no fixed order for the items to be
+    processed, and a chunk might contain items that are
+    non-consecutive compared to the single-threaded case. In addition
+    to any limits placed by the task executor (e.g. if it is backed by
+    a thread pool), there is a throttle limit in the tasklet
+    configuration which defaults to 4.  You may need to increase this
+    to ensure that a thread pool is fully utilised, e.g.</p><pre class="programlisting">&lt;step id="loading"&gt; &lt;tasklet
+    task-executor="taskExecutor"
+    throttle-limit="20"&gt;...&lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>Note also that there may be limits placed on concurrency by
+    any pooled resources used in your step, such as
+    a <code class="classname">DataSource</code>.  Be sure to make the pool in
+    those resources at least as large as the desired number of
+    concurrent threads in the step.</p><p>There are some practical limitations of using multi-threaded Steps
+    for some common Batch use cases. Many participants in a Step (e.g. readers
+    and writers) are stateful, and if the state is not segregated by thread,
+    then those components are not usable in a multi-threaded Step. In
+    particular most of the off-the-shelf readers and writers from Spring Batch
+    are not designed for multi-threaded use. It is, however, possible to work
+    with stateless or thread safe readers and writers, and there is a sample
+    (parallelJob) in the Spring Batch Samples that show the use of a process
+    indicator (see <a class="xref" href="ch06s12.xhtml" title="Preventing State Persistence">the section called “Preventing State Persistence”</a>) to keep
+    track of items that have been processed in a database input table.</p><p>Spring Batch provides some implementations of
+	  <code class="classname">ItemWriter</code> and
+	<code class="classname">ItemReader</code>.  Usually they say in the
+	Javadocs if they are thread safe or not, or what you have to do to
+	avoid problems in a concurrent environment.  If there is no
+	information in Javadocs, you can check the implementation to see
+	if there is any state.  If a reader is not thread safe, it may
+	still be efficient to use it in your own synchronizing delegator.
+	You can synchronize the call to <code class="literal">read()</code> and as
+	long as the processing and writing is the most expensive part of
+	the chunk your step may still complete much faster than in a
+	single threaded configuration.
+</p></section></section><footer/></body></html>

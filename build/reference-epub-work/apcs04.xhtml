@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Asynchronous Chunk Processing</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apcs03.xhtml" title="Typical Repeat-Retry Pattern"/><link rel="next" href="apcs05.xhtml" title="Asynchronous Item Processing"/></head><body><header/><section class="section" title="Asynchronous Chunk Processing" epub:type="division" id="asyncChunkProcessing"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Asynchronous Chunk Processing</h2></div></div></div><p>The inner batches or chunks in the typical example
+			above can be executed concurrently by configuring the outer batch to
+			use an <code class="classname">AsyncTaskExecutor</code>.  The outer batch waits for all the
+			chunks to complete before completing.</p><pre class="programlisting">
+1   |  REPEAT(until=exhausted, concurrent, exception=not critical) {
+|
+2   |    TX {
+3   |      REPEAT(size=5) {
+|
+4   |        RETRY(stateful, exception=deadlock loser) {
+4.1 |          input;
+5   |        } PROCESS {
+|          output;
+6   |        } RECOVER {
+|          recover;
+|        }
+|
+|      }
+|    }
+|
+|  }
+		</pre></section><footer/></body></html>

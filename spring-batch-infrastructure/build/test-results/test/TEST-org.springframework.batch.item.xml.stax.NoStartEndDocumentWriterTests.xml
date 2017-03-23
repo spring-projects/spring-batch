@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.xml.stax.NoStartEndDocumentWriterTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:22" hostname="Michaels-MacBook-Pro-3.local" time="0.019">
+  <properties/>
+  <testcase name="testClose" classname="org.springframework.batch.item.xml.stax.NoStartEndDocumentWriterTests" time="0.017"/>
+  <testcase name="testNoStartEnd" classname="org.springframework.batch.item.xml.stax.NoStartEndDocumentWriterTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

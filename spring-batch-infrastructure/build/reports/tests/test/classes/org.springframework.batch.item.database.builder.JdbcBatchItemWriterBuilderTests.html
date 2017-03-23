@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilderTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilderTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.item.database.builder.html">org.springframework.batch.item.database.builder</a> &gt; JdbcBatchItemWriterBuilderTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">7</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.736s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testAssertUpdates</td>
+<td>0.088s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testBasicMap</td>
+<td>0.098s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testBasicPojo</td>
+<td>0.206s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testBuildAssertions</td>
+<td>0.100s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testCustomJdbcTemplate</td>
+<td>0.112s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testCustomPSqlParameterSourceProvider</td>
+<td>1.052s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testCustomPreparedStatementSetter</td>
+<td>0.080s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:03:06,443 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@613c9955: startup date [Thu Mar 23 10:03:06 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:06,640 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:06,709 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:07,291 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:07,297 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 6 ms.&gt;
+2017-03-23 10:03:07,383 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@613c9955: startup date [Thu Mar 23 10:03:06 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,384 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:07,448 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@459baf22: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,454 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:07,484 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:07,625 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:07,627 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 2 ms.&gt;
+2017-03-23 10:03:07,651 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@459baf22: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,651 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:07,655 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@1907fd00: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,661 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:07,687 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:07,732 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:07,734 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 1 ms.&gt;
+2017-03-23 10:03:07,750 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@1907fd00: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,750 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:07,754 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@678c0f3c: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,760 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:07,787 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:07,835 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:07,837 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 1 ms.&gt;
+2017-03-23 10:03:07,848 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@678c0f3c: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,849 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:07,854 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@3438e666: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,860 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:07,889 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:07,937 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:07,940 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 2 ms.&gt;
+2017-03-23 10:03:07,962 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@3438e666: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,962 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:07,968 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@7d4a2aa4: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:07,973 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:07,991 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:08,026 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:08,027 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 1 ms.&gt;
+2017-03-23 10:03:08,050 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@7d4a2aa4: startup date [Thu Mar 23 10:03:07 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:08,051 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+2017-03-23 10:03:08,055 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@2170a10d: startup date [Thu Mar 23 10:03:08 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:08,060 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:03:08,084 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'&gt;
+2017-03-23 10:03:08,115 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executing SQL script from Byte array resource [resource loaded from byte array]&gt;
+2017-03-23 10:03:08,116 INFO Test worker [org.springframework.jdbc.datasource.init.ScriptUtils] - &lt;Executed SQL script from Byte array resource [resource loaded from byte array] in 1 ms.&gt;
+2017-03-23 10:03:08,131 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - &lt;Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@2170a10d: startup date [Thu Mar 23 10:03:08 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:03:08,132 INFO Test worker [org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory] - &lt;Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:04:29 AM</p>
+</div>
+</div>
+</body>
+</html>

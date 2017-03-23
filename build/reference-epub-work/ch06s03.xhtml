@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>ItemProcessor</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s02.xhtml" title="ItemWriter"/><link rel="next" href="ch06s04.xhtml" title="ItemStream"/></head><body><header/><section class="section" title="ItemProcessor" epub:type="subchapter" id="itemProcessor"><div class="titlepage"><div><div><h2 class="title" style="clear: both">ItemProcessor</h2></div></div></div><p>The <code class="classname">ItemReader</code> and
+    <code class="classname">ItemWriter</code> interfaces are both very useful for
+    their specific tasks, but what if you want to insert business logic before
+    writing? One option for both reading and writing is to use the composite
+    pattern: create an <code class="classname">ItemWriter</code> that contains another
+    <code class="classname">ItemWriter</code>, or an <code class="classname">ItemReader</code>
+    that contains another <code class="classname">ItemReader</code>. For
+    example:</p><pre class="programlisting">public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+
+    ItemWriter&lt;T&gt; itemWriter;
+
+    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
+        this.itemWriter = itemWriter;
+    }
+
+    public void write(List&lt;? extends T&gt; items) throws Exception {
+        //Add business logic here
+       itemWriter.write(item);
+    }
+
+    public void setDelegate(ItemWriter&lt;T&gt; itemWriter){
+        this.itemWriter = itemWriter;
+    }
+}</pre><p>The class above contains another <code class="classname">ItemWriter</code>
+    to which it delegates after having provided some business logic. This
+    pattern could easily be used for an <code class="classname">ItemReader</code> as
+    well, perhaps to obtain more reference data based upon the input that was
+    provided by the main <code class="classname">ItemReader</code>. It is also useful
+    if you need to control the call to <code class="classname">write</code> yourself.
+    However, if you only want to 'transform' the item passed in for writing
+    before it is actually written, there isn't much need to call
+    <code class="methodname">write</code> yourself: you just want to modify the item.
+    For this scenario, Spring Batch provides the
+    <code class="classname">ItemProcessor</code> interface:</p><pre class="programlisting">public interface ItemProcessor&lt;I, O&gt; {
+
+    O process(I item) throws Exception;
+}</pre><p>An <code class="classname">ItemProcessor</code> is very simple; given one
+    object, transform it and return another. The provided object may or may
+    not be of the same type. The point is that business logic may be applied
+    within process, and is completely up to the developer to create. An
+    <code class="classname">ItemProcessor</code> can be wired directly into a step,
+    For example, assuming an <code class="classname">ItemReader</code> provides a
+    class of type Foo, and it needs to be converted to type Bar before being
+    written out. An <code class="classname">ItemProcessor</code> can be written that
+    performs the conversion:</p><pre class="programlisting">public class Foo {}
+
+public class Bar {
+    public Bar(Foo foo) {}
+}
+
+public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
+    public Bar process(Foo foo) throws Exception {
+        //Perform simple transformation, convert a Foo to a Bar
+        return new Bar(foo);
+    }
+}
+
+public class BarWriter implements ItemWriter&lt;Bar&gt;{
+    public void write(List&lt;? extends Bar&gt; bars) throws Exception {
+        //write bars
+    }
+}</pre><p>In the very simple example above, there is a class
+    <code class="classname">Foo</code>, a class <code class="classname">Bar</code>, and a
+    class <code class="classname">FooProcessor</code> that adheres to the
+    <code class="classname">ItemProcessor</code> interface. The transformation is
+    simple, but any type of transformation could be done here. The
+    <code class="classname">BarWriter</code> will be used to write out
+    <code class="classname">Bar</code> objects, throwing an exception if any other
+    type is provided. Similarly, the <code class="classname">FooProcessor</code> will
+    throw an exception if anything but a <code class="classname">Foo</code> is
+    provided. The <code class="classname">FooProcessor</code> can then be injected
+    into a <code class="classname">Step</code>:</p><pre class="programlisting">&lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="fooReader" processor="fooProcessor" writer="barWriter"
+                   commit-interval="2"/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;</pre><section class="section" title="Chaining ItemProcessors" epub:type="division" id="chainingItemProcessors"><div class="titlepage"><div><div><h3 class="title">Chaining ItemProcessors</h3></div></div></div><p>Performing a single transformation is useful in many scenarios,
+      but what if you want to 'chain' together multiple
+      <code class="classname">ItemProcessor</code>s? This can be accomplished using
+      the composite pattern mentioned previously. To update the previous,
+      single transformation, example, <code class="classname">Foo</code> will be
+      transformed to <code class="classname">Bar</code>, which will be transformed to
+      <code class="classname">Foobar</code> and written out:</p><pre class="programlisting">public class Foo {}
+
+public class Bar {
+    public Bar(Foo foo) {}
+}
+
+public class Foobar{
+    public Foobar(Bar bar) {}
+}
+
+public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
+    public Bar process(Foo foo) throws Exception {
+        //Perform simple transformation, convert a Foo to a Bar
+        return new Bar(foo);
+    }
+}
+
+public class BarProcessor implements ItemProcessor&lt;Bar,FooBar&gt;{
+    public FooBar process(Bar bar) throws Exception {
+        return new Foobar(bar);
+    }
+}
+
+public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
+    public void write(List&lt;? extends FooBar&gt; items) throws Exception {
+        //write items
+    }
+}</pre><p>A <code class="classname">FooProcessor</code> and
+      <code class="classname">BarProcessor</code> can be 'chained' together to give
+      the resultant <code class="classname">Foobar</code>:</p><pre class="programlisting">CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor =
+                                      new CompositeItemProcessor&lt;Foo,Foobar&gt;();
+List itemProcessors = new ArrayList();
+itemProcessors.add(new FooTransformer());
+itemProcessors.add(new BarTransformer());
+compositeProcessor.setDelegates(itemProcessors);</pre><p>Just as with the previous example, the composite processor can be
+      configured into the <code class="classname">Step</code>:</p><pre class="programlisting">&lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter"
+                   commit-interval="2"/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;
+
+&lt;bean id="compositeItemProcessor"
+      class="org.springframework.batch.item.support.CompositeItemProcessor"&gt;
+    &lt;property name="delegates"&gt;
+        &lt;list&gt;
+            &lt;bean class="..FooProcessor" /&gt;
+            &lt;bean class="..BarProcessor" /&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre></section><section class="section" title="Filtering Records" epub:type="division" id="filiteringRecords"><div class="titlepage"><div><div><h3 class="title">Filtering Records</h3></div></div></div><p>One typical use for an item processor is to filter out records
+      before they are passed to the ItemWriter. Filtering is an action
+      distinct from skipping; skipping indicates that a record is invalid
+      whereas filtering simply indicates that a record should not be
+      written.</p><p>For example, consider a batch job that reads a file containing
+      three different types of records: records to insert, records to update,
+      and records to delete. If record deletion is not supported by the
+      system, then we would not want to send any "delete" records to the
+      <code class="classname">ItemWriter</code>. But, since these records are not
+      actually bad records, we would want to filter them out, rather than
+      skip. As a result, the ItemWriter would receive only "insert" and
+      "update" records.</p><p>To filter a record, one simply returns "null" from the
+      <code class="classname">ItemProcessor</code>. The framework will detect that the
+      result is "null" and avoid adding that item to the list of records
+      delivered to the <code class="classname">ItemWriter</code>. As usual, an
+      exception thrown from the <code class="classname">ItemProcessor</code> will
+      result in a skip.</p></section><section class="section" title="Fault Tolerance" epub:type="division" id="faultTolerant"><div class="titlepage"><div><div><h3 class="title">Fault Tolerance</h3></div></div></div><p>When a chunk is rolled back, items that have been cached
+          during reading may be reprocessed.  If a step is configured to
+          be fault tolerant (uses skip or retry processing typically),
+          any ItemProcessor used should be implemented in a way that is
+          idempotent.  Typically that would consist of performing no changes
+          on the input item for the ItemProcessor and only updating the
+          instance that is the result.</p></section></section><footer/></body></html>

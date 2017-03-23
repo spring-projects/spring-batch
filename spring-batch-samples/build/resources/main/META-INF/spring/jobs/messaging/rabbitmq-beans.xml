@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <rabbit:connection-factory id="rabbitConnectionFactory" port="${rabbitmq.port}" host="${rabbitmq.host}"/>
+    <rabbit:admin connection-factory="rabbitConnectionFactory"/>
+
+    <rabbit:queue name="${rabbitmq.inbound.queue}"/>
+    <rabbit:queue name="${rabbitmq.outbound.queue}"/>
+
+    <beans:bean id="inboundAmqpTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate"
+                p:connectionFactory-ref="rabbitConnectionFactory" p:routingKey="${rabbitmq.inbound.queue}"
+                p:queue="${rabbitmq.inbound.queue}"/>
+
+    <beans:bean id="outboundAmqpTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate"
+                p:connectionFactory-ref="rabbitConnectionFactory" p:routingKey="${rabbitmq.outbound.queue}"/>
+</beans:beans>

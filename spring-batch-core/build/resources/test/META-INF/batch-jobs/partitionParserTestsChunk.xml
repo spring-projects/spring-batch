@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="partitionParserTestsChunk" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1">
+		<chunk item-count="3">
+			<reader ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$ItemReader"/>
+			<writer ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$ItemWriter"/>
+		</chunk>
+	    <partition>
+	    	<plan partitions="10" />
+	    </partition>
+	</step>
+</job>

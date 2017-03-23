@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- test schema used for checking namespace discovery -->
+<xsd:schema xmlns="http://www.springframework.org/schema/batch/test"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.springframework.org/schema/batch/test"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <!-- simple element -->
+    <xsd:element name="test" type="xsd:string"/>
+</xsd:schema>

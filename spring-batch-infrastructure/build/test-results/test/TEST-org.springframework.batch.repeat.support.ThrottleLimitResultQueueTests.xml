@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.repeat.support.ThrottleLimitResultQueueTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:25" hostname="Michaels-MacBook-Pro-3.local" time="0.107">
+  <properties/>
+  <testcase name="testTakeWithoutExpecting" classname="org.springframework.batch.repeat.support.ThrottleLimitResultQueueTests" time="0.0"/>
+  <testcase name="testPutTake" classname="org.springframework.batch.repeat.support.ThrottleLimitResultQueueTests" time="0.0"/>
+  <testcase name="testThrottleLimit" classname="org.springframework.batch.repeat.support.ThrottleLimitResultQueueTests" time="0.106"/>
+  <testcase name="testPutWithoutExpecting" classname="org.springframework.batch.repeat.support.ThrottleLimitResultQueueTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

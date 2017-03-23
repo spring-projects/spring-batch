@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Chapter 3. The Domain Language of Batch</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch02s03.xhtml" title="Provide builders for the ItemReaders and ItemWriters"/><link rel="next" href="ch03s02.xhtml" title="Step"/></head><body><header/><section class="chapter" title="Chapter 3. The Domain Language of Batch" epub:type="chapter" id="domain"><div class="titlepage"><div><div><h1 class="title">Chapter 3. The Domain Language of Batch</h1></div></div></div>
+  
+
+  <p>To any experienced batch architect, the overall concepts of batch
+  processing used in Spring Batch should be familiar and comfortable. There
+  are "Jobs" and "Steps" and developer supplied processing units called
+  ItemReaders and ItemWriters. However, because of the Spring patterns,
+  operations, templates, callbacks, and idioms, there are opportunities for
+  the following:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item">
+        <p>significant improvement in adherence to a clear separation of
+        concerns</p>
+      </li><li class="listitem" epub:type="list-item">
+        <p>clearly delineated architectural layers and services provided as
+        interfaces</p>
+      </li><li class="listitem" epub:type="list-item">
+        <p>simple and default implementations that allow for quick adoption
+        and ease of use out-of-the-box</p>
+      </li><li class="listitem" epub:type="list-item">
+        <p>significantly enhanced extensibility</p>
+      </li></ul></div>
+
+  <p>The diagram below is simplified version of the batch reference
+  architecture that has been used for decades. It provides an overview of the
+  components that make up the domain language of batch processing. This
+  architecture framework is a blueprint that has been proven through decades
+  of implementations on the last several generations of platforms
+  (COBOL/Mainframe, C++/Unix, and now Java/anywhere). JCL and COBOL developers
+  are likely to be as comfortable with the concepts as C++, C# and Java
+  developers. Spring Batch provides a physical implementation of the layers,
+  components and technical services commonly found in robust, maintainable
+  systems used to address the creation of simple to complex batch
+  applications, with the infrastructure and extensions to address very complex
+  processing needs.</p>
+
+  <div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/spring-batch-reference-model.png"/><div class="caption"><p>Figure 2.1: Batch Stereotypes</p></div></div>
+
+  <p>The diagram above highlights the key concepts that make up the domain
+  language of batch. A Job has one to many steps, which has exactly one
+  ItemReader, ItemProcessor, and ItemWriter. A job needs to be launched
+  (JobLauncher), and meta data about the currently running process needs to be
+  stored (JobRepository).</p>
+
+  <section class="section" title="Job" epub:type="subchapter" id="domainJob"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Job</h2></div></div></div>
+    
+
+    <p>This section describes stereotypes relating to the concept of a
+    batch job. A <code class="classname">Job</code> is an entity that encapsulates an
+    entire batch process. As is common with other Spring projects, a
+    <code class="classname">Job</code> will be wired together via an XML configuration
+    file or Java based configuration. This configuration may be referred to as
+    the "job configuration". However, <code class="classname">Job</code> is just the
+    top of an overall hierarchy:</p>
+
+    <div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/job-heirarchy.png"/></div>
+
+    <p>In Spring Batch, a Job is simply a container for Steps. It combines
+    multiple steps that belong logically together in a flow and allows for
+    configuration of properties global to all steps, such as restartability.
+    The job configuration contains:</p>
+
+    <div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item">
+        <p>The simple name of the job</p>
+      </li><li class="listitem" epub:type="list-item">
+        <p>Definition and ordering of Steps</p>
+      </li><li class="listitem" epub:type="list-item">
+        <p>Whether or not the job is restartable</p>
+      </li></ul></div>
+
+    <p>A default simple implementation of the <code class="classname">Job</code>
+    interface is provided by Spring Batch in the form of the
+    <code class="classname">SimpleJob</code> class which creates some standard
+    functionality on top of <code class="classname">Job</code>, however the batch
+    namespace abstracts away the need to instantiate it directly. Instead, the
+    <code class="code">&lt;job&gt;</code> tag can be used:</p>
+
+    <pre class="programlisting">&lt;job id="footballJob"&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
+&lt;/job&gt;</pre>
+
+    <section class="section" title="JobInstance" epub:type="division" id="domainJobInstance"><div class="titlepage"><div><div><h3 class="title">JobInstance</h3></div></div></div>
+      
+
+      <p>A <code class="classname">JobInstance</code> refers to the concept of a
+      logical job run. Let's consider a batch job that should be run once at
+      the end of the day, such as the 'EndOfDay' job from the diagram above.
+      There is one 'EndOfDay' <code class="classname">Job</code>, but each individual
+      run of the <code class="classname">Job</code> must be tracked separately. In the
+      case of this job, there will be one logical
+      <code class="classname">JobInstance</code> per day. For example, there will be a
+      January 1st run, and a January 2nd run. If the January 1st run fails the
+      first time and is run again the next day, it is still the January 1st
+      run. (Usually this corresponds with the data it is processing as well,
+      meaning the January 1st run processes data for January 1st, etc).
+      Therefore, each <code class="classname">JobInstance</code> can have multiple
+      executions (<code class="classname">JobExecution</code> is discussed in more
+      detail below) and only one <code class="classname">JobInstance</code>
+      corresponding to a particular <code class="classname">Job</code> and
+      identifying <code class="classname">JobParameter</code>s can be running at a given
+      time.</p>
+
+      <p>The definition of a <code class="classname">JobInstance</code> has
+      absolutely no bearing on the data the will be loaded. It is entirely up
+      to the <code class="classname">ItemReader</code> implementation used to
+      determine how data will be loaded. For example, in the EndOfDay
+      scenario, there may be a column on the data that indicates the
+      'effective date' or 'schedule date' to which the data belongs. So, the
+      January 1st run would only load data from the 1st, and the January 2nd
+      run would only use data from the 2nd. Because this determination will
+      likely be a business decision, it is left up to the
+      <code class="classname">ItemReader</code> to decide. What using the same
+      <code class="classname">JobInstance</code> will determine, however, is whether
+      or not the 'state' (i.e. the <code class="classname">ExecutionContext</code>,
+      which is discussed below) from previous executions will be used. Using a
+      new <code class="classname">JobInstance</code> will mean 'start from the
+      beginning' and using an existing instance will generally mean 'start
+      from where you left off'.</p>
+    </section>
+
+    <section class="section" title="JobParameters" epub:type="division" id="domainJobParameters"><div class="titlepage"><div><div><h3 class="title">JobParameters</h3></div></div></div>
+      
+
+      <p>Having discussed <code class="classname">JobInstance</code> and how it
+      differs from <code class="classname">Job</code>, the natural question to ask is:
+      "how is one <code class="classname">JobInstance</code> distinguished from
+      another?" The answer is: <code class="classname">JobParameters</code>.
+      <code class="classname">JobParameters</code> is a set of parameters used to
+      start a batch job. They can be used for identification or even as
+      reference data during the run:</p>
+
+      <div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/job-stereotypes-parameters.png"/></div>
+
+      <p>In the example above, where there are two instances, one for
+      January 1st, and another for January 2nd, there is really only one Job,
+      one that was started with a job parameter of 01-01-2008 and another that
+      was started with a parameter of 01-02-2008. Thus, the contract can be
+      defined as: <code class="classname">JobInstance</code> =
+      <code class="classname">Job</code> + identifying <code class="classname">JobParameters</code>. This
+      allows a developer to effectively control how a
+      <code class="classname">JobInstance</code> is defined, since they control what
+      parameters are passed in.</p>
+    </section>
+	<div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; ">
+		<p>Not all job parameters are required to contribute to the identification
+		of a <code class="classname">JobInstance</code>.  By default they do, however the framework
+		allows the submission of a <code class="classname">Job</code> with parameters that do
+		not contribute to the identity of a <code class="classname">JobInstance</code> as well.</p>
+	</td></tr></table></div>
+
+    <section class="section" title="JobExecution" epub:type="division" id="domainJobExecution"><div class="titlepage"><div><div><h3 class="title">JobExecution</h3></div></div></div>
+      
+
+      <p>A <code class="classname">JobExecution</code> refers to the technical
+      concept of a single attempt to run a <code class="classname">Job</code>. An
+      execution may end in failure or success, but the
+      <code class="classname">JobInstance</code> corresponding to a given execution
+      will not be considered complete unless the execution completes
+      successfully. Using the EndOfDay <code class="classname">Job</code> described
+      above as an example, consider a <code class="classname">JobInstance</code> for
+      01-01-2008 that failed the first time it was run. If it is run again
+      with the same identifying job parameters as the first run (01-01-2008), a new
+      <code class="classname">JobExecution</code> will be created. However, there will
+      still be only one <code class="classname">JobInstance</code>.</p>
+
+      <p>A <code class="classname">Job</code> defines what a job is and how it is
+      to be executed, and <code class="classname">JobInstance</code> is a purely
+      organizational object to group executions together, primarily to enable
+      correct restart semantics. A <code class="classname">JobExecution</code>,
+      however, is the primary storage mechanism for what actually happened
+      during a run, and as such contains many more properties that must be
+      controlled and persisted:</p>
+
+      <div class="table" id="d5e438"><div class="table-title">Table 3.1. JobExecution Properties</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col class="c1"/><col class="c2"/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">status</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">BatchStatus</code> object that
+              indicates the status of the execution. While running, it's
+              BatchStatus.STARTED, if it fails, it's BatchStatus.FAILED, and
+              if it finishes successfully, it's BatchStatus.COMPLETED</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">startTime</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              current system time when the execution was started.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">endTime</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              current system time when the execution finished, regardless of
+              whether or not it was successful.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">exitStatus</td><td style="border-bottom: 0.5pt solid ; ">The <code class="classname">ExitStatus</code> indicating the
+              result of the run. It is most important because it contains an
+              exit code that will be returned to the caller. See chapter 5 for
+              more details.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">createTime</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              current system time when the <code class="classname">JobExecution</code>
+              was first persisted. The job may not have been started yet (and
+              thus has no start time), but it will always have a createTime,
+              which is required by the framework for managing job level
+              <code class="classname">ExecutionContext</code>s.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">lastUpdated</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              last time a <code class="classname">JobExecution</code> was
+              persisted.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">executionContext</td><td style="border-bottom: 0.5pt solid ; ">The 'property bag' containing any user data that needs to
+              be persisted between executions.</td></tr><tr><td style="border-right: 0.5pt solid ; ">failureExceptions</td><td>The list of exceptions encountered during the execution
+              of a <code class="classname">Job</code>. These can be useful if more
+              than one exception is encountered during the failure of a
+              <code class="classname">Job</code>.</td></tr></tbody></table>
+      </div></div>
+
+      <p>These properties are important because they will be persisted and
+      can be used to completely determine the status of an execution. For
+      example, if the EndOfDay job for 01-01 is executed at 9:00 PM, and fails
+      at 9:30, the following entries will be made in the batch meta data
+      tables:</p>
+
+      <div class="table" id="d5e480"><div class="table-title">Table 3.2. BATCH_JOB_INSTANCE</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_INST_ID</td><td style="border-bottom: 0.5pt solid ; ">JOB_NAME</td></tr><tr><td style="border-right: 0.5pt solid ; ">1</td><td>EndOfDayJob</td></tr></tbody></table>
+      </div></div>
+
+      <div class="table" id="d5e490"><div class="table-title">Table 3.3. BATCH_JOB_EXECUTION_PARAMS</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/><col/><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_EXECUTION_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">TYPE_CD</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">KEY_NAME</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">DATE_VAL</td><td style="border-bottom: 0.5pt solid ; ">IDENTIFYING</td></tr><tr><td style="border-right: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; ">DATE</td><td style="border-right: 0.5pt solid ; ">schedule.Date</td><td style="border-right: 0.5pt solid ; ">2008-01-01</td><td>TRUE</td></tr></tbody></table>
+      </div></div>
+
+      <div class="table" id="d5e506"><div class="table-title">Table 3.4. BATCH_JOB_EXECUTION</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/><col/><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_EXEC_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_INST_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">START_TIME</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">END_TIME</td><td style="border-bottom: 0.5pt solid ; ">STATUS</td></tr><tr><td style="border-right: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; ">2008-01-01 21:00</td><td style="border-right: 0.5pt solid ; ">2008-01-01 21:30</td><td>FAILED</td></tr></tbody></table>
+      </div></div>
+
+      <div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; ">
+        <p>column names may have been abbreviated or removed for clarity
+        and formatting</p>
+      </td></tr></table></div>
+
+      <p>Now that the job has failed, let's assume that it took the entire
+      course of the night for the problem to be determined, so that the 'batch
+      window' is now closed. Assuming the window starts at 9:00 PM, the job
+      will be kicked off again for 01-01, starting where it left off and
+      completing successfully at 9:30. Because it's now the next day, the
+      01-02 job must be run as well, which is kicked off just afterwards at
+      9:31, and completes in its normal one hour time at 10:30. There is no
+      requirement that one <code class="classname">JobInstance</code> be kicked off
+      after another, unless there is potential for the two jobs to attempt to
+      access the same data, causing issues with locking at the database level.
+      It is entirely up to the scheduler to determine when a
+      <code class="classname">Job</code> should be run. Since they're separate
+      <code class="classname">JobInstance</code>s, Spring Batch will make no attempt
+      to stop them from being run concurrently. (Attempting to run the same
+      <code class="classname">JobInstance</code> while another is already running will
+      result in a <code class="classname">JobExecutionAlreadyRunningException</code>
+      being thrown). There should now be an extra entry in both the
+      <code class="classname">JobInstance</code> and
+      <code class="classname">JobParameters</code> tables, and two extra entries in
+      the <code class="classname">JobExecution</code> table:</p>
+
+      <div class="table" id="d5e533"><div class="table-title">Table 3.5. BATCH_JOB_INSTANCE</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_INST_ID</td><td style="border-bottom: 0.5pt solid ; ">JOB_NAME</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">1</td><td style="border-bottom: 0.5pt solid ; ">EndOfDayJob</td></tr><tr><td style="border-right: 0.5pt solid ; ">2</td><td>EndOfDayJob</td></tr></tbody></table>
+      </div></div>
+
+      <div class="table" id="d5e546"><div class="table-title">Table 3.6. BATCH_JOB_EXECUTION_PARAMS</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/><col/><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_EXECUTION_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">TYPE_CD</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">KEY_NAME</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">DATE_VAL</td><td style="border-bottom: 0.5pt solid ; ">IDENTIFYING</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">DATE</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">schedule.Date</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-01 00:00:00</td><td style="border-bottom: 0.5pt solid ; ">TRUE</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">DATE</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">schedule.Date</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-01 00:00:00</td><td style="border-bottom: 0.5pt solid ; ">TRUE</td></tr><tr><td style="border-right: 0.5pt solid ; ">3</td><td style="border-right: 0.5pt solid ; ">DATE</td><td style="border-right: 0.5pt solid ; ">schedule.Date</td><td style="border-right: 0.5pt solid ; ">2008-01-02 00:00:00</td><td>TRUE</td></tr></tbody></table>
+      </div></div>
+
+      <div class="table" id="d5e574"><div class="table-title">Table 3.7. BATCH_JOB_EXECUTION</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/><col/><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_EXEC_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">JOB_INST_ID</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">START_TIME</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">END_TIME</td><td style="border-bottom: 0.5pt solid ; ">STATUS</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-01 21:00</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-01 21:30</td><td style="border-bottom: 0.5pt solid ; ">FAILED</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">1</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-02 21:00</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">2008-01-02 21:30</td><td style="border-bottom: 0.5pt solid ; ">COMPLETED</td></tr><tr><td style="border-right: 0.5pt solid ; ">3</td><td style="border-right: 0.5pt solid ; ">2</td><td style="border-right: 0.5pt solid ; ">2008-01-02 21:31</td><td style="border-right: 0.5pt solid ; ">2008-01-02 22:29</td><td>COMPLETED</td></tr></tbody></table>
+      </div></div>
+
+      <div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; ">
+        <p>column names may have been abbreviated or removed for clarity
+        and formatting</p>
+      </td></tr></table></div>
+    </section>
+  </section>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section><footer/></body></html>

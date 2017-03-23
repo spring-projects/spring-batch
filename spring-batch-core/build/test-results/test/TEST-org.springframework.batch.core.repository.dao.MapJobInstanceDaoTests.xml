@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" tests="13" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:35" hostname="Michaels-MacBook-Pro-3.local" time="0.008">
+  <properties/>
+  <testcase name="testWildcardRange" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.003"/>
+  <testcase name="testWildcardPrefix" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testWildcardSuffix" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.001"/>
+  <testcase name="testGetLastInstancesPaged" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.001"/>
+  <testcase name="testCreateDuplicateInstance" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testGetMissingById" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testCreateAndRetrieve" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.001"/>
+  <testcase name="testGetJobNames" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testCreateAndRetrieveWithNullParameter" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testGetLastInstances" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.001"/>
+  <testcase name="testCreationAddsVersion" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <testcase name="testGetLastInstancesPastEnd" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.001"/>
+  <testcase name="testCreateAndGetById" classname="org.springframework.batch.core.repository.dao.MapJobInstanceDaoTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

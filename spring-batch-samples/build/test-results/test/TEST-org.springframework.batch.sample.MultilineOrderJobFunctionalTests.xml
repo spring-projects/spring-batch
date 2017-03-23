@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.MultilineOrderJobFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:35" hostname="Michaels-MacBook-Pro-3.local" time="0.029">
+  <properties/>
+  <testcase name="testJobLaunch" classname="org.springframework.batch.sample.MultilineOrderJobFunctionalTests" time="0.029"/>
+  <system-out><![CDATA[10:06:35,257  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:06:35,258  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@6c5d6510, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@504220b5, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@d163dbc, org.springframework.test.context.support.DirtiesContextTestExecutionListener@23521413, org.springframework.test.context.transaction.TransactionalTestExecutionListener@24a0808c, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@65a65b25]
+10:06:35,258  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:35,267  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:35,277  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:35,283  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/multilineOrderJob.xml]
+10:06:35,294  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/multilineOrderInputTokenizers.xml]
+10:06:35,300  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/multilineOrderOutputAggregators.xml]
+10:06:35,309  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/multilineOrderValidator.xml]
+10:06:35,316  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:35,324  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@596161f0: startup date [Thu Mar 23 10:06:35 CDT 2017]; root of context hierarchy
+10:06:35,375  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:35,393  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:35,406  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:35,409  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 2 ms.
+10:06:35,409  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:35,412  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 2 ms.
+10:06:35,412  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:35,418  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 5 ms.
+10:06:35,429  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:35,430  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:35,568  INFO Test worker GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@6dd08264: startup date [Thu Mar 23 10:05:49 CDT 2017]; root of context hierarchy
+10:06:35,575  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=multilineOrderJob]] launched with the following parameters: [{random=521827}]
+10:06:35,578  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:35,582 DEBUG Test worker OrderItemReader:89 - STARTING NEW RECORD
+10:06:35,583 DEBUG Test worker OrderItemReader:114 - MAPPING CUSTOMER
+10:06:35,583 DEBUG Test worker OrderItemReader:122 - MAPPING BILLING ADDRESS
+10:06:35,584 DEBUG Test worker OrderItemReader:126 - MAPPING SHIPPING ADDRESS
+10:06:35,584 DEBUG Test worker OrderItemReader:130 - MAPPING BILLING INFO
+10:06:35,584 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,585 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,585 DEBUG Test worker OrderItemReader:134 - MAPPING SHIPPING INFO
+10:06:35,585 DEBUG Test worker OrderItemReader:93 - END OF RECORD
+10:06:35,585  INFO Test worker OrderItemReader:69 - Mapped: Order [customer=Customer [companyName=null, firstName=Peter, lastName=Smith], orderId=13100345, totalItems=2, totalPrice=267.34]
+10:06:35,586 DEBUG Test worker OrderItemReader:89 - STARTING NEW RECORD
+10:06:35,586 DEBUG Test worker OrderItemReader:106 - MAPPING CUSTOMER
+10:06:35,586 DEBUG Test worker OrderItemReader:122 - MAPPING BILLING ADDRESS
+10:06:35,587 DEBUG Test worker OrderItemReader:130 - MAPPING BILLING INFO
+10:06:35,587 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,588 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,588 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,588 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,589 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:06:35,589 DEBUG Test worker OrderItemReader:134 - MAPPING SHIPPING INFO
+10:06:35,590 DEBUG Test worker OrderItemReader:93 - END OF RECORD
+10:06:35,590  INFO Test worker OrderItemReader:69 - Mapped: Order [customer=Customer [companyName=Acme Factory of England, firstName=null, lastName=null], orderId=13100346, totalItems=36, totalPrice=14043.74]
+10:06:35,590 DEBUG Test worker OrderItemReader:80 - FINISHED
+10:06:35,591  INFO Test worker OrderItemReader:69 - Mapped: null
+10:06:35,596  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=multilineOrderJob]] completed with the following parameters: [{random=521827}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

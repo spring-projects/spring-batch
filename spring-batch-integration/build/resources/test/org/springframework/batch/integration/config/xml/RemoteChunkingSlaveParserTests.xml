@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/batch-integration
+		 http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
+
+	<batch-int:remote-chunking-slave id="remote-chunking-slave" input-channel="requests" output-channel="replies"
+									 item-processor="itemProcessor" item-writer="itemWriter"/>
+
+	<bean id="itemProcessor" class="org.springframework.batch.integration.config.xml.RemoteChunkingParserTests$Processor"/>
+
+	<bean id="itemWriter" class="org.springframework.batch.integration.config.xml.RemoteChunkingParserTests$Writer"/>
+
+	<int:channel id="requests"/>
+	<int:channel id="replies"/>
+</beans>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Executing System Commands</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch11s05.xhtml" title="Multi-Line Records"/><link rel="next" href="ch11s07.xhtml" title="Handling Step Completion When No Input is Found"/></head><body><header/><section class="section" title="Executing System Commands" epub:type="subchapter" id="executingSystemCommands"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Executing System Commands</h2></div></div></div>
+    
+
+    <p>Many batch jobs may require that an external command be called from
+    within the batch job. Such a process could be kicked off separately by the
+    scheduler, but the advantage of common meta-data about the run would be
+    lost. Furthermore, a multi-step job would also need to be split up into
+    multiple jobs as well.</p>
+
+    <p>Because the need is so common, Spring Batch provides a
+    <code class="classname">Tasklet</code> implementation for calling system
+    commands:</p>
+
+    <pre class="programlisting">&lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
+    &lt;property name="command" value="echo hello" /&gt;
+    &lt;!-- 5 second timeout for the command to complete --&gt;
+    &lt;property name="timeout" value="5000" /&gt;
+&lt;/bean&gt;</pre>
+  </section><footer/></body></html>

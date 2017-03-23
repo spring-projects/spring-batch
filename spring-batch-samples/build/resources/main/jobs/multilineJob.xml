@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="multilineJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="1">
+					<streams>
+						<stream ref="fileItemReader" />
+					</streams>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader"
+		class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
+		<property name="itemReader" ref="fileItemReader" />
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource"
+			value="file:build/test-outputs/20070122.testStream.multilineStep.txt" />
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
+
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
+			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileDescriptor" />
+				<property name="fieldSetMapper">
+					<bean
+						class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
+						<property name="delegate" ref="tradeLineMapper" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="tradeLineMapper"
+		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+
+	<bean id="fixedFileDescriptor"
+		class="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer">
+		<property name="tokenizers">
+			<map>
+				<entry key="BEGIN*" value-ref="beginRecordTokenizer" />
+				<entry key="END*" value-ref="endRecordTokenizer" />
+				<entry key="*" value-ref="tradeRecordTokenizer" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="beginRecordTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="columns" value="1-5" />
+	</bean>
+
+	<bean id="endRecordTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="columns" value="1-3" />
+	</bean>
+
+	<bean id="tradeRecordTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN,Quantity,Price,Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+</beans>

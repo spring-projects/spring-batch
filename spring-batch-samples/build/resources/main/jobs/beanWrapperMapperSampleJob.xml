@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="beanWrapperMapperJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1" next="step2">
+			<tasklet>
+				<chunk reader="tradeFileItemReader" processor="processor" writer="tradeWriter"
+		               commit-interval="1"/>
+			</tasklet>
+		</step>
+		<step id="step2">
+			<tasklet>
+				<chunk reader="personFileItemReader" writer="personWriter"
+				       commit-interval="1"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<!-- INFRASTRUCTURE SETUP -->
+
+	<bean id="tradeFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
+			value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="tradeTokenizer" />
+				<property name="fieldSetMapper" ref="tradeFieldSetMapper" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="personFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
+			value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="personTokenizer" />
+				<property name="fieldSetMapper" ref="personFieldSetMapper" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="tradeTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN,Quantity,price, CUSTOMER" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+
+	<bean id="personTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names"
+			value="Title, FirstName, LastName, Age, Address.AddrLine1, children[0].name, children[1].name" />
+		<property name="columns" value="1-5, 6-20, 21-40, 41-45, 46-55, 56-65, 66-75" />
+	</bean>
+
+	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+            <bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+		</property>
+	</bean>
+
+	<bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="tradeFieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+		<property name="prototypeBeanName" value="trade" />
+	</bean>
+
+	<bean id="personFieldSetMapper" class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+		<property name="prototypeBeanName" value="person" />
+	</bean>
+
+	<bean id="trade" class="org.springframework.batch.sample.domain.trade.Trade" scope="prototype" />
+
+	<bean id="person" class="org.springframework.batch.sample.domain.person.Person" scope="prototype" />
+
+	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="fixedValidator" />
+	</bean>
+
+	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+		<property name="dao" ref="tradeDao" />
+	</bean>
+
+	<bean id="personWriter" class="org.springframework.batch.sample.domain.person.internal.PersonWriter" />
+</beans>

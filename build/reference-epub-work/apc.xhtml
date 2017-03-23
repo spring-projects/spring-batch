@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Appendix C. Batch Processing and Transactions</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apbs10.xhtml" title="Recommendations for Indexing Meta Data Tables"/><link rel="next" href="apcs02.xhtml" title="Simple Stateless Retry"/></head><body><header/><section class="appendix" title="Appendix C. Batch Processing and Transactions" epub:type="appendix" id="transactions"><div class="titlepage"><div><div><h1 class="title">Appendix C. Batch Processing and Transactions</h1></div></div></div><section class="section" title="Simple Batching with No Retry" epub:type="division" id="transactionsNoRetry"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Simple Batching with No Retry</h2></div></div></div><p>Consider the following simple example of a nested batch with no
+			retries.  This is a very common scenario for batch processing, where
+			an input source is processed until exhausted, but we commit
+			periodically at the end of a "chunk" of processing.</p><pre class="programlisting">
+1   |  REPEAT(until=exhausted) {
+|
+2   |    TX {
+3   |      REPEAT(size=5) {
+3.1 |        input;
+3.2 |        output;
+|      }
+|    }
+|
+|  }
+		</pre><p>The input operation (3.1) could be a message-based receive
+		(e.g. JMS), or a file-based read, but to recover and continue
+		processing with a chance of completing the whole job, it must be
+		transactional.  The same applies to the operation at (3.2) - it must
+		be either transactional or idempotent.</p><p>If the chunk at REPEAT(3) fails because of a database exception at
+		(3.2), then TX(2) will roll back the whole chunk.</p></section></section><footer/></body></html>

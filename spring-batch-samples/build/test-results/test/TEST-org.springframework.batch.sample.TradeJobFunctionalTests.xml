@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.TradeJobFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:40" hostname="Michaels-MacBook-Pro-3.local" time="0.063">
+  <properties/>
+  <testcase name="testLaunchJob" classname="org.springframework.batch.sample.TradeJobFunctionalTests" time="0.063"/>
+  <system-out><![CDATA[10:06:39,823  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:06:39,823  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@667d9b24, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@728a9243, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@43911040, org.springframework.test.context.support.DirtiesContextTestExecutionListener@76ffc0c9, org.springframework.test.context.transaction.TransactionalTestExecutionListener@7cd1c189, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@5a6f5cda]
+10:06:39,825  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:39,833  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:39,843  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:39,848  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/tradeJob.xml]
+10:06:39,860  WARN Test worker DefaultListableBeanFactory:811 - Overriding user-defined bean definition for bean 'jobRepository' with a framework-generated bean definition: replacing [Generic bean: class [org.springframework.batch.core.repository.support.JobRepositoryFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [simple-job-launcher-context.xml]] with [Generic bean: class [org.springframework.batch.core.repository.support.JobRepositoryFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null]
+10:06:39,862  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:39,869  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@113744c7: startup date [Thu Mar 23 10:06:39 CDT 2017]; root of context hierarchy
+10:06:39,913  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'fileItemReader' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.file.FlatFileItemReader]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/tradeJob.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [jobs/tradeJob.xml]]
+10:06:39,918  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:39,941  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:39,959  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:39,962  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 2 ms.
+10:06:39,962  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:39,965  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 3 ms.
+10:06:39,965  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:39,969  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 4 ms.
+10:06:39,988  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:39,989  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:40,227  INFO Test worker GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@a2f0081: startup date [Thu Mar 23 10:05:59 CDT 2017]; root of context hierarchy
+10:06:40,235  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=tradeJob]] launched with the following parameters: [{random=162242}]
+10:06:40,238  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:40,254 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1]
+10:06:40,255 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH45,quantity=978,price=98.34,customer=customer1]
+10:06:40,256 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]
+10:06:40,257 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH46,quantity=112,price=18.12,customer=customer2]
+10:06:40,259 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH47,quantity=245,price=12.78,customer=customer2]
+10:06:40,260 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH47,quantity=245,price=12.78,customer=customer2]
+10:06:40,262 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH48,quantity=108,price=109.25,customer=customer3]
+10:06:40,263 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH48,quantity=108,price=109.25,customer=customer3]
+10:06:40,265 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH49,quantity=854,price=123.39,customer=customer4]
+10:06:40,266 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH49,quantity=854,price=123.39,customer=customer4]
+10:06:40,272  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:40,282  INFO Test worker SimpleStepHandler:146 - Executing step: [step3]
+10:06:40,289  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=tradeJob]] completed with the following parameters: [{random=162242}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

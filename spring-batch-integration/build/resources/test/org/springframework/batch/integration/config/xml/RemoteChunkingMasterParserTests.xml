@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:batch="http://www.springframework.org/schema/batch"
+	   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/batch
+		 http://www.springframework.org/schema/batch/spring-batch.xsd
+		 http://www.springframework.org/schema/batch-integration
+		 http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+		 http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<batch:job id="processingJob">
+		<batch:step id="process">
+			<batch:tasklet>
+				<batch:chunk reader="itemReader" writer="itemWriter" commit-interval="6"/>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<batch:job-repository/>
+
+	<bean id="itemReader" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<batch-int:remote-chunking-master id="itemWriter" message-template="messagingTemplate" step="process" reply-channel="replies"/>
+
+	<bean id="messagingTemplate" class="org.springframework.integration.core.MessagingTemplate"/>
+
+	<int:channel id="replies">
+		<int:queue/>
+	</int:channel>
+
+	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		  p:location="classpath:batch-${ENVIRONMENT:hsql}.properties"/>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		  p:driverClassName="${batch.jdbc.driver}" p:url="${batch.jdbc.url}"
+		  p:username="${batch.jdbc.user}" p:password="${batch.jdbc.password}"/>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		  p:dataSource-ref="dataSource"/>
+</beans>

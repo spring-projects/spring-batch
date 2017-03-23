@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<step id="step1" next="step2">
+			<chunk item-count="5" skip-limit="2">
+				<reader ref="generatingItemReader1" />
+				<processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
+				<writer ref="sysoutItemWriter" />
+				<skippable-exception-classes>
+					<include class="java.lang.Exception" />
+					<exclude class="java.lang.RuntimeException" />
+				</skippable-exception-classes>
+			</chunk>
+		</step>
+		<step id="step2" next="step3">
+			<chunk item-count="5" retry-limit="2">
+				<reader ref="generatingItemReader2" />
+                <processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
+				<writer ref="sysoutItemWriter" />
+				<retryable-exception-classes>
+					<include class="java.lang.Exception" />
+					<exclude class="java.lang.RuntimeException" />
+				</retryable-exception-classes>
+			</chunk>
+		</step>
+		<step id="step3">
+			<chunk item-count="5">
+				<reader ref="generatingItemReader3" />
+                <processor ref="problemProcessor" >
+                    <properties>
+                        <property name="runId" value="#{jobParameters['run']}"/>
+                    </properties>
+                </processor>
+				<writer ref="sysoutItemWriter" />
+				<no-rollback-exception-classes>
+					<include class="java.lang.Exception" />
+				</no-rollback-exception-classes>
+			</chunk>
+		</step>
+	</job>
+	                
+	<bean id="generatingItemReader1" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>One</value>
+				<value>Two</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="generatingItemReader2" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>Three</value>
+				<value>Four</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="generatingItemReader3" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>Five</value>
+				<value>Six</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="problemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.ExceptionHandlingParsingTests$ProblemProcessor" scope="step"/>
+
+    <bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+		<property name="targetObject">
+			<util:constant static-field="java.lang.System.out"/>
+		</property>
+		<property name="targetMethod" value="println"/>
+	</bean>
+</beans>

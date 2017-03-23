@@ -1,0 +1,1 @@
+<?xml version='1.0' encoding='UTF-8'?><ns:testroot xmlns:ns="http://www.springframework.org/test"><preHeader>PRE-HEADER</preHeader><ns:group><subGroup><postHeader>POST-HEADER</postHeader><StaxEventItemWriter-testString/><StaxEventItemWriter-testString/><preFooter>PRE-FOOTER</preFooter></subGroup></ns:group><postFooter>POST-FOOTER</postFooter></ns:testroot>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <beans:import resource="classpath:/META-INF/spring/config-beans.xml"/>
+    <beans:import resource="classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml"/>
+    <beans:import resource="classpath:/META-INF/spring/jobs/amqp/amqp-example-job-beans.xml"/>
+
+    <batch:job id="amqp-example-job">
+        <batch:step id="processQueue">
+            <batch:tasklet>
+                <batch:chunk reader="amqpItemReader" processor="amqpItemProcessor" writer="amqpItemWriter" commit-interval="10"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+</beans:beans>

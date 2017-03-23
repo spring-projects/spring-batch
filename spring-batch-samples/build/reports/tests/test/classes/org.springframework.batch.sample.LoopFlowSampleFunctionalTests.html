@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.sample.LoopFlowSampleFunctionalTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.sample.LoopFlowSampleFunctionalTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.sample.html">org.springframework.batch.sample</a> &gt; LoopFlowSampleFunctionalTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.072s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testJobLaunch</td>
+<td>0.072s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:06:34,324  INFO Thread-36 GenericApplicationContextFactory$ResourceXmlApplicationContext:985 - Closing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-samples/build/resources/main/jobs/adhocLoopJob.xml
+10:06:34,330  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:06:34,331  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@2d90d1de, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@3d039d21, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@137c6647, org.springframework.test.context.support.DirtiesContextTestExecutionListener@5748cded, org.springframework.test.context.transaction.TransactionalTestExecutionListener@7c7df8fb, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@5db688c0]
+10:06:34,331  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:34,338  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:34,349  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:34,356  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/loopFlowSample.xml]
+10:06:34,367  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:34,376  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@2d88936f: startup date [Thu Mar 23 10:06:34 CDT 2017]; root of context hierarchy
+10:06:34,412  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:34,431  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:34,445  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:34,447  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 2 ms.
+10:06:34,448  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:34,450  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 2 ms.
+10:06:34,450  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:34,452  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 2 ms.
+10:06:34,464  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:34,465  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:34,540  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=loopFlowSample]] launched with the following parameters: [{random=336821}]
+10:06:34,545  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:34,551  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,558  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,559  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,563  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,565  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,568  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,570  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,575  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,577  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,583  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,584  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,589  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,590  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,596  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,598  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,601  INFO Test worker SimpleStepHandler:119 - Duplicate step [step2] detected in execution of job=[loopFlowSample]. If either step fails, both will be executed again on restart.
+10:06:34,603  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:06:34,606  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=loopFlowSample]] completed with the following parameters: [{random=336821}] and the following status: [COMPLETED]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:06:44 AM</p>
+</div>
+</div>
+</body>
+</html>

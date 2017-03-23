@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" tests="20" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.039">
+  <properties/>
+  <testcase name="testAnnotationsIsListener" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.0"/>
+  <testcase name="testProxyWithNoTarget" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.004"/>
+  <testcase name="testWrongSignatureNamedMethod" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testProxiedAnnotationsIsListener" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.004"/>
+  <testcase name="testInterfaceIsListener" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testEmptySignatureNamedMethod" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testFactoryMethod" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.003"/>
+  <testcase name="testVanillaInterfaceWithProxy" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testNonListener" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.002"/>
+  <testcase name="testVanillaInterface" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testAnnotationsWithOrdered" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.003"/>
+  <testcase name="testProxiedAnnotationsFactoryMethod" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testAnnotatingInterfaceResultsInOneCall" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.0"/>
+  <testcase name="testAllThreeTypes" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.0"/>
+  <testcase name="testRightSignatureAnnotation" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testStepAndChunk" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.011"/>
+  <testcase name="testRightSignatureNamedMethod" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testEmptySignatureAnnotation" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.0"/>
+  <testcase name="testWrongSignatureAnnotation" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.001"/>
+  <testcase name="testMixedIsListener" classname="org.springframework.batch.core.listener.StepListenerFactoryBeanTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

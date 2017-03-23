@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="simple-job-launcher-context.xml" />
+
+	<bean class="org.springframework.jmx.export.MBeanExporter">
+		<property name="beans">
+			<map>
+				<entry key="spring:service=batch,bean=jobOperator">
+					<bean class="org.springframework.aop.framework.ProxyFactoryBean">
+						<property name="target" ref="jobOperator" />
+						<property name="interceptorNames" value="exceptionTranslator" />
+					</bean>
+				</entry>
+				<entry key="spring:service=batch,bean=notificationPublisher" value-ref="notificationPublisher" />
+				<entry key="spring:service=batch,bean=jobLoader" value-ref="loader" />
+			</map>
+		</property>
+		<property name="assembler">
+			<bean class="org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler">
+				<property name="interfaceMappings">
+					<map>
+						<entry key="spring:service=batch,bean=jobOperator" value="org.springframework.batch.core.launch.JobOperator" />
+						<entry key="spring:service=batch,bean=jobLoader" value="org.springframework.batch.sample.launch.JobLoader" />
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	 
+	<bean id="notificationPublisher" class="org.springframework.batch.sample.jmx.JobExecutionNotificationPublisher" />
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobExplorer">
+			<bean class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobRegistry" ref="jobRegistry" />
+		<property name="jobLauncher">
+			<bean parent="jobLauncher">
+				<property name="taskExecutor">
+					<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="exceptionTranslator" class="org.springframework.batch.core.launch.support.RuntimeExceptionTranslator" />
+
+	<bean id="loader" class="org.springframework.batch.sample.launch.DefaultJobLoader">
+		<property name="registry" ref="jobRegistry" />
+	</bean>
+</beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>BATCH_STEP_EXECUTION_CONTEXT</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apbs06.xhtml" title="BATCH_JOB_EXECUTION_CONTEXT"/><link rel="next" href="apbs08.xhtml" title="Archiving"/></head><body><header/><section class="section" title="BATCH_STEP_EXECUTION_CONTEXT" epub:type="division" id="metaDataBatchStepExecutionContext"><div class="titlepage"><div><div><h2 class="title" style="clear: both">BATCH_STEP_EXECUTION_CONTEXT</h2></div></div></div><p>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
+    relevant to an <code class="classname">Step</code>'s
+    <code class="classname">ExecutionContext</code>. There is exactly one
+    <code class="classname">ExecutionContext</code> per
+    <code class="classname">StepExecution</code>, and it contains all of the data that
+    needs to persisted for a particular step execution. This data typically
+    represents the state that must be retrieved after a failure so that a
+    <code class="classname">JobInstance</code> can 'start from where it left
+    off'.</p><pre class="programlisting">CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+  STEP_EXECUTION_ID BIGINT PRIMARY KEY,
+  SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+  SERIALIZED_CONTEXT CLOB,
+  constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+  references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+) ;</pre><p>Below are descriptions for each column:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>STEP_EXECUTION_ID: Foreign key representing the
+        <code class="classname">StepExecution</code> to which the context belongs.
+        There may be more than one row associated to a given execution.</p></li><li class="listitem" epub:type="list-item"><p>SHORT_CONTEXT: A string version of the
+        SERIALIZED_CONTEXT.</p></li><li class="listitem" epub:type="list-item"><p>SERIALIZED_CONTEXT: The entire context, serialized.</p></li></ul></div></section><footer/></body></html>

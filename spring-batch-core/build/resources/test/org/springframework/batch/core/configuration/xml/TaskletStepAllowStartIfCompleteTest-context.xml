@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<batch:job id="simpleJob">
+		<batch:step id="simpleJob.step1"  allow-start-if-complete="true" next="simpleJob.step2">
+			<batch:tasklet>
+				<bean class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+					<property name="targetObject">
+						<bean class="java.lang.String">
+							<constructor-arg value="hello world"/>
+						</bean>
+					</property>
+					<property name="targetMethod" value="length"/>
+				</bean>
+			</batch:tasklet>
+		</batch:step>
+		<batch:step id="simpleJob.step2">
+			<batch:tasklet>
+				<bean class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+					<property name="targetObject">
+						<bean class="java.lang.String" scope="step">
+							<constructor-arg value="#{jobParameters['value']}"/>
+						</bean>
+					</property>
+					<property name="targetMethod" value="length"/>
+				</bean>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+</beans>

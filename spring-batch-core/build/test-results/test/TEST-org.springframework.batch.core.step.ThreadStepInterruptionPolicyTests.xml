@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.ThreadStepInterruptionPolicyTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:49" hostname="Michaels-MacBook-Pro-3.local" time="0.0">
+  <properties/>
+  <testcase name="testCheckInterruptedComplete" classname="org.springframework.batch.core.step.ThreadStepInterruptionPolicyTests" time="0.0"/>
+  <testcase name="testCheckInterruptedNotComplete" classname="org.springframework.batch.core.step.ThreadStepInterruptionPolicyTests" time="0.0"/>
+  <system-out><![CDATA[10:02:49,005  INFO Test worker step.ThreadStepInterruptionPolicy:60 - Step interrupted through StepExecution
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

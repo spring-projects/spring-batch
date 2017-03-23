@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<step id="step1" next="step2">
+			<listeners>
+				<listener ref="springStepListener" />
+			</listeners>
+			<batchlet ref="step1Ref" />
+		</step>
+		<step id="step2" next="step3">
+			<listeners>
+				<listener ref="jsrStepListener" />
+			</listeners>
+			<batchlet ref="step1Ref" />
+		</step>
+		<step id="step3">
+			<listeners>
+				<listener ref="springStepListener" />
+				<listener ref="jsrStepListener" />
+			</listeners>
+			<batchlet ref="step1Ref" />
+		</step>
+	</job>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+
+	<bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
+
+	<bean id="springStepListener" class="org.springframework.batch.core.jsr.configuration.xml.StepListenerParsingTests.SpringStepListener"/>
+
+	<bean id="jsrStepListener" class="org.springframework.batch.core.jsr.configuration.xml.StepListenerParsingTests.JsrStepListener"/>
+</beans>

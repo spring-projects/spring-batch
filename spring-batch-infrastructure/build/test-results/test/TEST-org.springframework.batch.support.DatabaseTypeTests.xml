@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.support.DatabaseTypeTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:26" hostname="Michaels-MacBook-Pro-3.local" time="0.01">
+  <properties/>
+  <testcase name="testFromMetaDataForDB2" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForDB2VSE" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForDB2ZOS" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForDerby" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForMySql" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForOracle" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <testcase name="testFromMetaDataForSybase" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForDB2AS400" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.002"/>
+  <testcase name="testInvalidProductName" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <testcase name="testFromProductName" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <testcase name="testFromMetaDataForHsql" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <testcase name="testBadMetaData" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <testcase name="testFromMetaDataForPostgres" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.001"/>
+  <testcase name="testFromMetaDataForSqlServer" classname="org.springframework.batch.support.DatabaseTypeTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

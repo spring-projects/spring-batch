@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.CompositeItemWriterSampleFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:51" hostname="Michaels-MacBook-Pro-3.local" time="0.275">
+  <properties/>
+  <testcase name="testJobLaunch" classname="org.springframework.batch.sample.CompositeItemWriterSampleFunctionalTests" time="0.275"/>
+  <system-out><![CDATA[10:05:50,516  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:05:50,517  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@48dfe74d, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@13496219, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@7fa47c6e, org.springframework.test.context.support.DirtiesContextTestExecutionListener@77b5ae3b, org.springframework.test.context.transaction.TransactionalTestExecutionListener@40e7ca0f, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@186621a0]
+10:05:50,519  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:05:50,536  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:05:50,577  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:05:50,596  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/compositeItemWriterSampleJob.xml]
+10:05:50,626  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:05:50,646  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@44fd69ce: startup date [Thu Mar 23 10:05:50 CDT 2017]; root of context hierarchy
+10:05:50,770  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:05:50,804  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:50,846  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:05:50,853  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 7 ms.
+10:05:50,854  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:05:50,866  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 11 ms.
+10:05:50,867  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:05:50,882  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 15 ms.
+10:05:50,913  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:05:50,915  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:05:51,353  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=compositeItemWriterJob]] launched with the following parameters: [{random=32043}]
+10:05:51,376  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:05:51,404 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]
+10:05:51,406 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]
+10:05:51,416 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]
+10:05:51,418 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]
+10:05:51,431 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]
+10:05:51,433 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]
+10:05:51,438 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]
+10:05:51,440 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]
+10:05:51,447 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]
+10:05:51,449 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]
+10:05:51,468  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=compositeItemWriterJob]] completed with the following parameters: [{random=32043}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

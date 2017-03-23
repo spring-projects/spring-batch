@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:01" hostname="Michaels-MacBook-Pro-3.local" time="0.158">
+  <properties/>
+  <testcase name="testHandlerRefStep" classname="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" time="0.053"/>
+  <testcase name="testCustomHandlerRefStep" classname="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" time="0.01"/>
+  <testcase name="testDefaultHandlerStep" classname="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" time="0.02"/>
+  <testcase name="testNestedPartitionStepStepReference" classname="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" time="0.04"/>
+  <testcase name="testNestedPartitionStep" classname="org.springframework.batch.core.configuration.xml.PartitionStepParserTests" time="0.032"/>
+  <system-out><![CDATA[10:02:01,073  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/configuration/xml/PartitionStepParserTests-context.xml" for test class [org.springframework.batch.core.configuration.xml.PartitionStepParserTests]
+10:02:01,073  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@1277eec declaringClass = 'org.springframework.batch.core.configuration.xml.PartitionStepParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/PartitionStepParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:02:01,075  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.PartitionStepParserTests]: PartitionStepParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:02:01,077  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:01,078  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:01,079  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@226267ac, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@6d627521, org.springframework.test.context.support.DirtiesContextTestExecutionListener@4718315b, org.springframework.test.context.transaction.TransactionalTestExecutionListener@46ae3f0e, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@77c06f70]
+10:02:01,080  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/PartitionStepParserTests-context.xml]
+10:02:01,091  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:01,104  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@975d7d4: startup date [Thu Mar 23 10:02:01 CDT 2017]; root of context hierarchy
+10:02:01,125  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:01,268  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:02:01,307  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:02:01,321  INFO Test worker job.SimpleStepHandler:146 - Executing step: [j5s1]
+10:02:01,331  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+10:02:01,351  INFO Test worker job.SimpleStepHandler:146 - Executing step: [j3s1]
+10:02:01,389  INFO Test worker job.SimpleStepHandler:146 - Executing step: [j4s1]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

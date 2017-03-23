@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.support.CompositeItemStreamTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.004">
+  <properties/>
+  <testcase name="testClose" classname="org.springframework.batch.item.support.CompositeItemStreamTests" time="0.001"/>
+  <testcase name="testRegisterAndOpen" classname="org.springframework.batch.item.support.CompositeItemStreamTests" time="0.001"/>
+  <testcase name="testMark" classname="org.springframework.batch.item.support.CompositeItemStreamTests" time="0.001"/>
+  <testcase name="testCloseDoesNotUnregister" classname="org.springframework.batch.item.support.CompositeItemStreamTests" time="0.0"/>
+  <testcase name="testRegisterTwice" classname="org.springframework.batch.item.support.CompositeItemStreamTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

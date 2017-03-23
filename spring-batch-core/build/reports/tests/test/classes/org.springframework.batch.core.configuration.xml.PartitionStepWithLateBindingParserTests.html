@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.configuration.xml.PartitionStepWithLateBindingParserTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.configuration.xml.PartitionStepWithLateBindingParserTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.configuration.xml.html">org.springframework.batch.core.configuration.xml</a> &gt; PartitionStepWithLateBindingParserTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.069s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testExplicitHandlerStep</td>
+<td>0.069s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:02:01,848  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location &quot;classpath:org/springframework/batch/core/configuration/xml/PartitionStepWithLateBindingParserTests-context.xml&quot; for test class [org.springframework.batch.core.configuration.xml.PartitionStepWithLateBindingParserTests]
+10:02:01,848  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@6e29c4f9 declaringClass = 'org.springframework.batch.core.configuration.xml.PartitionStepWithLateBindingParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/PartitionStepWithLateBindingParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:02:01,849  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.PartitionStepWithLateBindingParserTests]: PartitionStepWithLateBindingParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:02:01,851  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:01,852  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:01,852  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@7b48d04d, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@3460f439, org.springframework.test.context.support.DirtiesContextTestExecutionListener@586c4d69, org.springframework.test.context.transaction.TransactionalTestExecutionListener@277d42d9, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@1a8a34c3]
+10:02:01,853  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/PartitionStepWithLateBindingParserTests-context.xml]
+10:02:01,864  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:01,871  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@29f8ca97: startup date [Thu Mar 23 10:02:01 CDT 2017]; root of context hierarchy
+10:02:01,883  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'handler' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/configuration/xml/PartitionStepWithLateBindingParserTests-context.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [org/springframework/batch/core/configuration/xml/PartitionStepWithLateBindingParserTests-context.xml]]
+10:02:01,887  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:01,959  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

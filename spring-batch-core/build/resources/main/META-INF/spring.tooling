@@ -1,0 +1,4 @@
+# Tooling related information for the beans namespace
+http\://www.springframework.org/schema/batch@name=batch Namespace
+http\://www.springframework.org/schema/batch@prefix=batch
+http\://www.springframework.org/schema/batch@icon=org/springframework/batch/core/configuration/xml/spring-batch.gif

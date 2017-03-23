@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.integration.SmokeTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:25" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testDummyWithSimpleAssert" classname="org.springframework.batch.integration.SmokeTests" time="0.0"/>
+  <testcase name="testVanillaSendAndReceive" classname="org.springframework.batch.integration.SmokeTests" time="0.002"/>
+  <system-out><![CDATA[2017-03-23 10:05:25,248  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/integration/SmokeTests-context.xml]>
+2017-03-23 10:05:25,273  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - <No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.>
+2017-03-23 10:05:25,273 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.>
+2017-03-23 10:05:25,274 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.>
+2017-03-23 10:05:25,275  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Refreshing org.springframework.context.support.GenericApplicationContext@566445dc: startup date [Thu Mar 23 10:05:25 CDT 2017]; root of context hierarchy>
+2017-03-23 10:05:25,283  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.>
+2017-03-23 10:05:25,283  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.>
+2017-03-23 10:05:25,284  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:25,308 DEBUG task-scheduler-4 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:25,313  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:25,395 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:25,399  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:25,438 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - <No global channel interceptors.>
+2017-03-23 10:05:25,449 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:25,449 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase -2147483648>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {service-activator} as a subscriber to the 'smokein' channel>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@566445dc.smokein' has 1 subscriber(s).>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started org.springframework.batch.integration.SmokeTests.AnnotatedEndpoint#0.process.serviceActivator>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 0>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@566445dc.errorChannel' has 1 subscriber(s).>
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started _org.springframework.integration.errorLogger>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'smokein', message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5cbc3458] (org.springframework.batch.integration.SmokeTests.AnnotatedEndpoint#0.process.serviceActivator.handler) received message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - <preSend on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - <postSend (sent=true) on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'smokein', message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]>
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - <postReceive on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
+		<property name="fragmentRootElementName" value="customer" />
+		<property name="resource" value="data/iosample/input/input.xml" />
+		<property name="unmarshaller" ref="customerCreditMarshaller" />
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
+		<property name="resource" ref="outputResource" />
+		<property name="marshaller" ref="customerCreditMarshaller" />
+		<property name="rootTagName" value="customers" />
+		<property name="overwriteOutput" value="true" />
+	</bean>
+
+	<bean id="customerCreditMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+		<property name="aliases">
+			<util:map id="aliases">
+				<entry key="customer"
+					value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+				<entry key="price" value="java.math.BigDecimal" />
+				<entry key="name" value="java.lang.String" />
+			</util:map>
+		</property>
+	</bean>
+
+	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg value="build/test-outputs/output.xml" />
+	</bean>
+</beans>

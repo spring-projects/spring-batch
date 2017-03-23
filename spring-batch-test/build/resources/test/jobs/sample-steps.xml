@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+  		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+
+	<batch:step id="s1" parent="taskletStep">
+		<batch:tasklet ref="tasklet1">
+			<batch:listeners>
+				<batch:listener ref="tasklet1"/>
+			</batch:listeners>
+		</batch:tasklet>
+	</batch:step>
+
+	<bean id="tasklet1" class="org.springframework.batch.test.sample.SampleTasklet">
+		<constructor-arg value="1" />
+	</bean>
+
+	<batch:step id="s2" parent="taskletStep">
+		<batch:tasklet ref="tasklet2">
+			<batch:listeners>
+				<batch:listener ref="tasklet2"/>
+			</batch:listeners>
+		</batch:tasklet>
+	</batch:step>
+
+	<bean id="tasklet2" class="org.springframework.batch.test.sample.SampleTasklet">
+		<constructor-arg value="2" />
+	</bean>
+
+	<batch:step id="s3" parent="taskletStep">
+		<batch:tasklet ref="tasklet3">
+			<batch:listeners>
+				<batch:listener ref="tasklet3"/>
+			</batch:listeners>
+		</batch:tasklet>
+	</batch:step>
+
+	<bean id="tasklet3" class="org.springframework.batch.test.sample.LoggingTasklet">
+		<constructor-arg value="3" />
+	</bean>
+
+</beans>

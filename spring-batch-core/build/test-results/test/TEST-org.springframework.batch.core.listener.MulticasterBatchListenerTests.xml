@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.listener.MulticasterBatchListenerTests" tests="27" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.014">
+  <properties/>
+  <testcase name="testAfterChunkFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.003"/>
+  <testcase name="testOnReadErrorFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testAfterReadFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testOnReadError" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeChunk" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeWrite" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testOnSkipInWrite" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.002"/>
+  <testcase name="testOnSkipInWriteFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testOnSkipInProcess" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeReadFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testAfterWriteFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testOnSkipInReadFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testOnWriteError" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeRead" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeStep" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testOnSkipInRead" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testRegister" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testAfterStepFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testOnSkipInProcessFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testAfterChunk" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testAfterWrite" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeChunkFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeStepFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testSetListeners" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.001"/>
+  <testcase name="testOnWriteErrorFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testAfterRead" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <testcase name="testBeforeWriteFails" classname="org.springframework.batch.core.listener.MulticasterBatchListenerTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

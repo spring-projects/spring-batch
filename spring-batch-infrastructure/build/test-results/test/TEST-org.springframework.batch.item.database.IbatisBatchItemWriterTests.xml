@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.IbatisBatchItemWriterTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:54" hostname="Michaels-MacBook-Pro-3.local" time="0.052">
+  <properties/>
+  <testcase name="testWriteAndFlush" classname="org.springframework.batch.item.database.IbatisBatchItemWriterTests" time="0.05"/>
+  <testcase name="testWriteAndFlushWithEmptyUpdate" classname="org.springframework.batch.item.database.IbatisBatchItemWriterTests" time="0.001"/>
+  <testcase name="testWriteAndFlushWithFailure" classname="org.springframework.batch.item.database.IbatisBatchItemWriterTests" time="0.001"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.database.IbatisBatchItemWriterTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

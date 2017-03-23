@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.SpringBeanJobTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:44" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testBeanNameWithParentBeanDefinition" classname="org.springframework.batch.core.SpringBeanJobTests" time="0.002"/>
+  <testcase name="testBeanNameWithBeanDefinition" classname="org.springframework.batch.core.SpringBeanJobTests" time="0.001"/>
+  <testcase name="testBeanName" classname="org.springframework.batch.core.SpringBeanJobTests" time="0.0"/>
+  <system-out><![CDATA[10:02:44,411  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@76b65d86: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+10:02:44,413  INFO Test worker support.GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@76b65d86: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+10:02:44,413  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@388fe84: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+10:02:44,414  INFO Test worker support.GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@388fe84: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+10:02:44,414  INFO Test worker support.StaticApplicationContext:581 - Refreshing org.springframework.context.support.StaticApplicationContext@631b3c3a: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+10:02:44,414  INFO Test worker support.StaticApplicationContext:985 - Closing org.springframework.context.support.StaticApplicationContext@631b3c3a: startup date [Thu Mar 23 10:02:44 CDT 2017]; root of context hierarchy
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.validator.SpringValidatorTests" tests="6" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:22" hostname="Michaels-MacBook-Pro-3.local" time="0.007">
+  <properties/>
+  <testcase name="testNullValidator" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.003"/>
+  <testcase name="testValidateUnsupportedType" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.0"/>
+  <testcase name="testValidateFailure" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.001"/>
+  <testcase name="testValidateFailureWithErrors" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.0"/>
+  <testcase name="testValidateFailureWithFields" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.003"/>
+  <testcase name="testValidateSuccessfully" classname="org.springframework.batch.item.validator.SpringValidatorTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

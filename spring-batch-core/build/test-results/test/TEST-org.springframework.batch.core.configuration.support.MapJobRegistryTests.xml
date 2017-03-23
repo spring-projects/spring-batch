@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.support.MapJobRegistryTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:53" hostname="Michaels-MacBook-Pro-3.local" time="0.014">
+  <properties/>
+  <testcase name="testRealDuplicateConfiguration" classname="org.springframework.batch.core.configuration.support.MapJobRegistryTests" time="0.011"/>
+  <testcase name="testReplaceDuplicateConfiguration" classname="org.springframework.batch.core.configuration.support.MapJobRegistryTests" time="0.001"/>
+  <testcase name="testUnregister" classname="org.springframework.batch.core.configuration.support.MapJobRegistryTests" time="0.0"/>
+  <testcase name="testGetJobConfigurations" classname="org.springframework.batch.core.configuration.support.MapJobRegistryTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

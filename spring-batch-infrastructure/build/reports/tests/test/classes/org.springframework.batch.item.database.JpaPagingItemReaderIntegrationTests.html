@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.item.database.html">org.springframework.batch.item.database</a> &gt; JpaPagingItemReaderIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">9</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">3.811s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testInvalidRestore</td>
+<td>0.482s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testMultipleRestarts</td>
+<td>0.662s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testNormalProcessing</td>
+<td>0.208s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestart</td>
+<td>0.397s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestartOnSecondPage</td>
+<td>0.546s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestoreFromEmptyData</td>
+<td>0.216s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRollbackAndRestart</td>
+<td>0.497s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRollbackOnFirstChunkAndRestart</td>
+<td>0.604s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testTransacted</td>
+<td>0.199s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:00,532 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]&gt;
+2017-03-23 10:04:00,533 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]&gt;
+2017-03-23 10:04:00,533 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@80d565c, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@11da4825, org.springframework.test.context.support.DirtiesContextTestExecutionListener@6d953707, org.springframework.test.context.transaction.TransactionalTestExecutionListener@32b95ca8, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@50644315]&gt;
+2017-03-23 10:04:00,533 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:00,545 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@133ca25c: startup date [Thu Mar 23 10:04:00 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:00,548 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:00,576 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:00,613 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@137d7926, testMethod = testRollbackOnFirstChunkAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@6a189db4]; rollback [true]&gt;
+2017-03-23 10:04:00,615 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:00.615 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:00.623 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:00.885 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:00.902 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:00,903 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:00,921 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:00.921 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:00.930 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:01.194 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:01.210 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:01,211 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:01,215 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@137d7926, testMethod = testRollbackOnFirstChunkAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:01,216 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@133ca25c: startup date [Thu Mar 23 10:04:00 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:01,216 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@3950ad53&gt;
+2017-03-23 10:04:01,217 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:01,227 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@301e2a65: startup date [Thu Mar 23 10:04:01 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:01,232 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:01,269 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:01,288 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@2597ca38, testMethod = testRestartOnSecondPage@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@782c8420]; rollback [true]&gt;
+2017-03-23 10:04:01,290 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:01.290 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:01.299 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:01.545 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:01.559 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:01,561 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:01,568 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:01.569 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:01.577 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:01.815 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:01.827 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:01,829 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:01,833 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@2597ca38, testMethod = testRestartOnSecondPage@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:01,833 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@301e2a65: startup date [Thu Mar 23 10:04:01 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:01,833 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@6d2db6b4&gt;
+2017-03-23 10:04:01,834 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:01,844 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@69e9206c: startup date [Thu Mar 23 10:04:01 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:01,846 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:01,871 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:01,887 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@5a789c06, testMethod = testInvalidRestore@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@6d961423]; rollback [true]&gt;
+2017-03-23 10:04:01,888 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:01.888 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:01.895 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:02.111 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:02.122 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:02,123 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:02,128 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:02.128 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:02.134 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:02.350 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:02.363 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:02,364 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:02,368 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@5a789c06, testMethod = testInvalidRestore@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:02,368 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@69e9206c: startup date [Thu Mar 23 10:04:01 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:02,368 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@3f29f811&gt;
+2017-03-23 10:04:02,369 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:02,377 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@2247b14f: startup date [Thu Mar 23 10:04:02 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:02,379 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:02,401 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:02,416 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@58739598, testMethod = testMultipleRestarts@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@2410dcfe]; rollback [true]&gt;
+2017-03-23 10:04:02,417 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:02.417 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:02.424 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:02.630 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:02.641 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:02,642 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:02,646 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:02.647 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:02.651 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:02.845 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:02.856 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:02,858 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:02,862 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:02.862 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:02.868 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:03.062 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:03.073 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:03,073 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:03,077 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@58739598, testMethod = testMultipleRestarts@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:03,077 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@2247b14f: startup date [Thu Mar 23 10:04:02 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,077 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@1cd0a380&gt;
+2017-03-23 10:04:03,078 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:03,086 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@268100fc: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,088 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:03,111 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:03,126 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@2d96bef3, testMethod = testNormalProcessing@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@67674216]; rollback [true]&gt;
+2017-03-23 10:04:03,128 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:03.128 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:03.134 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:03.316 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:03.328 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:03,329 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:03,334 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@2d96bef3, testMethod = testNormalProcessing@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:03,334 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@268100fc: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,334 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@7f7c176e&gt;
+2017-03-23 10:04:03,334 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:03,342 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@a810f2b: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,344 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:03,365 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:03,379 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@12f6e9b8, testMethod = testRestoreFromEmptyData@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@fc2c6fd]; rollback [true]&gt;
+2017-03-23 10:04:03,380 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:03.380 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:03.386 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:03.577 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:03.588 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:03,589 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:03,593 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@12f6e9b8, testMethod = testRestoreFromEmptyData@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:03,593 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@a810f2b: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,593 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@59eb3a05&gt;
+2017-03-23 10:04:03,594 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:03,602 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@68fbb5bf: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:03,604 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:03,622 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:03,635 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@7672c475, testMethod = testRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@5d207657]; rollback [true]&gt;
+2017-03-23 10:04:03,636 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:03.636 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:03.641 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:03.816 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:03.826 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:03,827 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:03,832 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:03.832 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:03.836 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:04.016 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:04.026 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:04,027 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:04,031 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@7672c475, testMethod = testRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:04,031 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@68fbb5bf: startup date [Thu Mar 23 10:04:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,031 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@a63f138&gt;
+2017-03-23 10:04:04,032 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:04,039 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@68742a09: startup date [Thu Mar 23 10:04:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,041 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:04,059 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:04,071 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@74818640, testMethod = testRollbackAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@346c694]; rollback [true]&gt;
+2017-03-23 10:04:04,072 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:04.073 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:04.077 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:04.259 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:04.363 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:04,364 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:04,370 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:04.370 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:04.375 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:04.554 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:04.564 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:04,565 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:04,567 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@6a025cfe testClass = JpaPagingItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.JpaPagingItemReaderIntegrationTests@74818640, testMethod = testRollbackAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@d081036 testClass = JpaPagingItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:04,568 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@68742a09: startup date [Thu Mar 23 10:04:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,568 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@4ba0bd60&gt;
+2017-03-23 10:04:04,568 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/data-source-context.xml]&gt;
+2017-03-23 10:04:04,575 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@3590cf70: startup date [Thu Mar 23 10:04:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,577 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:04,594 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:04,607 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:04.607 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:04.612 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:04.783 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:04.793 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:04,794 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+2017-03-23 10:04:04,805 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@3590cf70: startup date [Thu Mar 23 10:04:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,805 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.springframework.jdbc.datasource.DriverManagerDataSource@7fb15b83&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:04:29 AM</p>
+</div>
+</div>
+</body>
+</html>

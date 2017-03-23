@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="simple" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="#{stepExecutionContext[foo]}" />
+	</bean>
+
+	<bean id="compound" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="#{stepExecutionContext[foo]}-bar" />
+	</bean>
+
+	<bean id="value" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="foo" />
+		<property name="parent" value="#{stepExecutionContext[parent]}" />
+	</bean>
+
+	<bean id="nested" class="org.springframework.batch.core.scope.TestCollaborator">
+		<property name="name" value="foo" />
+		<property name="parent">
+			<bean class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+				<property name="name" value="#{stepExecutionContext[foo]}" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="list" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="foo" />
+		<property name="list">
+			<list>
+				<value>#{stepExecutionContext[foo]}</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ref" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="foo" />
+		<property name="parent" ref="#{stepExecutionContext[foo]}" />
+	</bean>
+
+	<bean id="scopedRef" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="foo" />
+		<property name="parent" ref="spam" />
+	</bean>
+
+	<bean id="bar" class="org.springframework.batch.core.scope.TestCollaborator">
+		<property name="name" value="bar" />
+	</bean>
+
+	<bean id="spam" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+		<property name="name" value="#{stepExecutionContext[foo]}" />
+	</bean>
+
+	<bean class="org.springframework.batch.core.scope.StepScope" />
+
+</beans>

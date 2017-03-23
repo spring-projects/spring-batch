@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.configuration.annotation.html">org.springframework.batch.core.configuration.annotation</a> &gt; StepScopeConfigurationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">10</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.413s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testIntentionallyBlowUpOnMissingContextWithInterface</td>
+<td>0.146s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testIntentionallyBlowUpOnMissingContextWithProxyTargetClass</td>
+<td>0.169s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testIntentionallyBlowupWithForcedInterface</td>
+<td>0.153s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepScopeWithDefaults</td>
+<td>0.142s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepScopeWithProxyTargetClass</td>
+<td>0.159s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepScopeWithProxyTargetClassInjected</td>
+<td>0.192s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepScopeXmlImportUsingNamespace</td>
+<td>0.297s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testXmlStepScopeWithInheritence</td>
+<td>0.033s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testXmlStepScopeWithInterface</td>
+<td>0.038s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testXmlStepScopeWithProxyTargetClass</td>
+<td>0.084s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:01:50,203  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@13a7c849: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,233  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,238  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,245  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:50,277  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:50,280  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:50,287  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 7 ms.
+10:01:50,343  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@13a7c849: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,344  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:50,349  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@4e3e5879: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,370  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,374  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,382  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:50,409  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:50,432  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:50,440  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 7 ms.
+10:01:50,497  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@4e3e5879: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,497  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:50,499  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@6f501dc0: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,500  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsProxyTargetClass-context.xml]
+10:01:50,528  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests.SimpleHolder#0' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests.SimpleHolder]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsProxyTargetClass-context.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsProxyTargetClass-context.xml]]
+10:01:50,582  INFO Test worker support.ClassPathXmlApplicationContext:985 - Closing org.springframework.context.support.ClassPathXmlApplicationContext@6f501dc0: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,583  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@68199ccd: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,584  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInterface-context.xml]
+10:01:50,612  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests.SimpleCallable#0' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.configuration.annotation.StepScopeConfigurationTests.SimpleCallable]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInterface-context.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInterface-context.xml]]
+10:01:50,620  INFO Test worker support.ClassPathXmlApplicationContext:985 - Closing org.springframework.context.support.ClassPathXmlApplicationContext@68199ccd: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,623  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@6ef37e8c: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,639  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,642  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,647  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:50,671  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:50,691  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:50,699  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 8 ms.
+10:01:50,761  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@6ef37e8c: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,762  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:50,764  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4e56470a: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,764  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritence-context.xml]
+10:01:50,795  INFO Test worker support.ClassPathXmlApplicationContext:985 - Closing org.springframework.context.support.ClassPathXmlApplicationContext@4e56470a: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,800  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@7599a237: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,817  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,821  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:50,825  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:50,849  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:50,870  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:50,880  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 10 ms.
+10:01:50,963  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@7599a237: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,964  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:50,970  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@47bab534: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:50,988  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsXmlImportUsingNamespace-context.xml]
+10:01:51,058  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,063  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,072  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:51,103  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:51,123  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:51,130  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 6 ms.
+10:01:51,261  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@47bab534: startup date [Thu Mar 23 10:01:50 CDT 2017]; root of context hierarchy
+10:01:51,262  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:51,268  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@74dbe3a4: startup date [Thu Mar 23 10:01:51 CDT 2017]; root of context hierarchy
+10:01:51,292  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,296  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,302  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:51,334  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:51,359  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:51,366  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 7 ms.
+10:01:51,455  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@74dbe3a4: startup date [Thu Mar 23 10:01:51 CDT 2017]; root of context hierarchy
+10:01:51,456  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+10:01:51,460  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@30e6d5af: startup date [Thu Mar 23 10:01:51 CDT 2017]; root of context hierarchy
+10:01:51,477  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,484  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:51,488  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:51,511  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:51,547  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:51,557  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 9 ms.
+10:01:51,615  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@30e6d5af: startup date [Thu Mar 23 10:01:51 CDT 2017]; root of context hierarchy
+10:01:51,615  INFO Test worker embedded.EmbeddedDatabaseFactory:217 - Shutting down embedded database: url='jdbc:hsqldb:mem:testdb'
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

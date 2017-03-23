@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.data.GemfireItemWriterTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:04" hostname="Michaels-MacBook-Pro-3.local" time="0.493">
+  <properties/>
+  <testcase name="testBasicDelete" classname="org.springframework.batch.item.data.GemfireItemWriterTests" time="0.483"/>
+  <testcase name="testBasicWrite" classname="org.springframework.batch.item.data.GemfireItemWriterTests" time="0.003"/>
+  <testcase name="testWriteWithCustomItemKeyMapper" classname="org.springframework.batch.item.data.GemfireItemWriterTests" time="0.003"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.data.GemfireItemWriterTests" time="0.002"/>
+  <testcase name="testWriteNoTransactionNoItems" classname="org.springframework.batch.item.data.GemfireItemWriterTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

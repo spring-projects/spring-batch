@@ -1,0 +1,75 @@
+dn: cn=Bjorn Jensen,ou=Accounting,dc=airius,dc=com
+telephonenumber: +1 408 555 1212
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+sn: Jensen
+cn: Bjorn Jensen
+
+dn: cn=Barbara Jensen,ou=Product Development,dc=airius,dc=com
+telephonenumber: +1 408 555 1212
+uid: bjensen
+description: Babs is a big sailing fan, and travels extensively in search of perfect sailing conditions.
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+title: Product Manager, Rod and Reel Division
+sn: Jensen
+cn: Barbara Jensen
+cn: Barbara J Jensen
+cn: Babs Jensen
+
+dn: cn=Gern Jensen,ou=Product Testing,dc=airius,dc=com
+telephonenumber: +1 408 555 1212
+uid: gernj
+description:: V2hhdCBhIGNhcmVmdWwgcmVhZGVyIHlvdSBhcmUhICBUaGlzIHZhbHVlIGlzIGJhc2UtNjQtZW5j
+b2RlZCBiZWNhdXNlIGl0IGhhcyBhIGNvbnRyb2wgY2hhcmFjdGVyIGluIGl0IChhIENSKS4NICBC
+eSB0aGUgd2F5LCB5b3Ugc2hvdWxkIHJlYWxseSBnZXQgb3V0IG1vcmUu
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+sn: Jensen
+cn: Gern Jensen
+cn: Gern O Jensen
+
+dn:: b3U95Za25qWt6YOoLG89QWlyaXVz
+ou:: 5Za25qWt6YOo
+ou:: 44GI44GE44GO44KH44GG44G2
+ou: Sales
+description: Japanese office
+objectclass: top
+objectclass: organizationalUnit
+
+dn:: dWlkPXJvZ2FzYXdhcmEsb3U95Za25qWt6YOoLG89QWlyaXVz
+givenname:: 44Ot44OJ44OL44O8
+givenname:: 44KN44Gp44Gr44O8
+givenname: Rodney
+sn:: 5bCP56yg5Y6f
+sn:: 44GK44GM44GV44KP44KJ
+sn: Ogasawara
+userpassword: {SHA}O3HSv1MusyL4kTjP+HKI5uxuNoM=
+mail: rogasawara@airius.co.jp
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+uid: rogasawara
+preferredlanguage: ja
+cn:: 5bCP56yg5Y6fIOODreODieODi+ODvA==
+cn:: 44GK44GM44GV44KP44KJIOOCjeOBqeOBq+ODvA==
+cn: Rodney Ogasawara
+title:: 5Za25qWt6YOoIOmDqOmVtw==
+title:: 44GI44GE44GO44KH44GG44G2IOOBtuOBoeOCh+OBhg==
+title: Sales, Director
+
+dn: cn=Horatio Jensen,ou=Product Testing,dc=airius,dc=com
+telephonenumber: +1 408 555 1212
+uid: hjensen
+jpegphoto:< file:///usr/local/directory/photos/hjensen.jpg
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+sn: Jensen
+cn: Horatio Jensen
+cn: Horatio N Jensen
+

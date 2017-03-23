@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Flat Files</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s05.xhtml" title="The Delegate Pattern and Registering with the Step"/><link rel="next" href="ch06s07.xhtml" title="XML Item Readers and Writers"/></head><body><header/><section class="section" title="Flat Files" epub:type="subchapter" id="flatFiles"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Flat Files</h2></div></div></div><p>One of the most common mechanisms for interchanging bulk data has
+    always been the flat file. Unlike XML, which has an agreed upon standard
+    for defining how it is structured (XSD), anyone reading a flat file must
+    understand ahead of time exactly how the file is structured. In general,
+    all flat files fall into two types: Delimited and Fixed Length. Delimited
+    files are those in which fields are separated by a delimiter, such as a
+    comma. Fixed Length files have fields that are a set length.</p><section class="section" title="The FieldSet" epub:type="division" id="fieldSet"><div class="titlepage"><div><div><h3 class="title">The FieldSet</h3></div></div></div><p>When working with flat files in Spring Batch, regardless of
+      whether it is for input or output, one of the most important classes is
+      the <code class="classname">FieldSet</code>. Many architectures and libraries
+      contain abstractions for helping you read in from a file, but they
+      usually return a String or an array of Strings. This really only gets
+      you halfway there. A <code class="classname">FieldSet</code> is Spring Batch’s
+      abstraction for enabling the binding of fields from a file resource. It
+      allows developers to work with file input in much the same way as they
+      would work with database input. A <code class="classname">FieldSet</code> is
+      conceptually very similar to a Jdbc <code class="classname">ResultSet</code>.
+      FieldSets only require one argument, a <code class="classname">String</code>
+      array of tokens. Optionally, you can also configure in the names of the
+      fields so that the fields may be accessed either by index or name as
+      patterned after <code class="classname">ResultSet</code>:</p><pre class="programlisting">String[] tokens = new String[]{"foo", "1", "true"};
+FieldSet fs = new DefaultFieldSet(tokens);
+String name = fs.readString(0);
+int value = fs.readInt(1);
+boolean booleanValue = fs.readBoolean(2);</pre><p>There are many more options on the <code class="classname">FieldSet</code>
+      interface, such as <code class="classname">Date</code>, long,
+      <code class="classname">BigDecimal</code>, etc. The biggest advantage of the
+      <code class="classname">FieldSet</code> is that it provides consistent parsing
+      of flat file input. Rather than each batch job parsing differently in
+      potentially unexpected ways, it can be consistent, both when handling
+      errors caused by a format exception, or when doing simple data
+      conversions.</p></section><section class="section" title="FlatFileItemReader" epub:type="division" id="flatFileItemReader"><div class="titlepage"><div><div><h3 class="title">FlatFileItemReader</h3></div></div></div><p>A flat file is any type of file that contains at most
+      two-dimensional (tabular) data. Reading flat files in the Spring Batch
+      framework is facilitated by the class
+      <code class="classname">FlatFileItemReader</code>, which provides basic
+      functionality for reading and parsing flat files. The two most important
+      required dependencies of <code class="classname">FlatFileItemReader</code> are
+      <code class="classname">Resource</code> and <code class="classname">LineMapper.
+      </code>The <code class="classname">LineMapper</code> interface will be
+      explored more in the next sections. The resource property represents a
+      Spring Core <code class="classname">Resource</code>. Documentation explaining
+      how to create beans of this type can be found in <a class="ulink" href="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/resources.html" target="_top"><em class="citetitle">Spring
+      Framework, Chapter 5.Resources</em></a>. Therefore, this
+      guide will not go into the details of creating
+      <code class="classname">Resource</code> objects. However, a simple example of a
+      file system resource can be found below:
+      </p><pre class="programlisting">Resource resource = new FileSystemResource("resources/trades.csv");</pre><p>In complex batch environments the directory structures are often
+      managed by the EAI infrastructure where drop zones for external
+      interfaces are established for moving files from ftp locations to batch
+      processing locations and vice versa. File moving utilities are beyond
+      the scope of the spring batch architecture but it is not unusual for
+      batch job streams to include file moving utilities as steps in the job
+      stream. It is sufficient that the batch architecture only needs to know
+      how to locate the files to be processed. Spring Batch begins the process
+      of feeding the data into the pipe from this starting point. However,
+      <a class="ulink" href="http://projects.spring.io/spring-integration/" target="_top"><em class="citetitle">Spring
+      Integration</em></a> provides many of these types of
+      services.</p><p>The other properties in <code class="classname">FlatFileItemReader</code>
+      allow you to further specify how your data will be interpreted: </p><div class="table" id="d5e2230"><div class="table-title">Table 6.1. FlatFileItemReader Properties</div><div class="table-contents"><table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col style="text-align: center; "/><col/><col/></colgroup><thead><tr><th style="text-align: center; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">Property</th><th style="text-align: center; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">Type</th><th style="text-align: center; border-bottom: 0.5pt solid ; ">Description</th></tr></thead><tbody><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">comments</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">String[]</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Specifies line prefixes that indicate
+                comment rows</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">encoding</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">String</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Specifies what text encoding to use -
+                default is "ISO-8859-1"</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">lineMapper</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">LineMapper</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Converts a <code class="classname">String</code>
+                to an <code class="classname">Object</code> representing the
+                item.</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">linesToSkip</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">int</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Number of lines to ignore at the top of
+                the file</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">recordSeparatorPolicy</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">RecordSeparatorPolicy</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Used to determine where the line endings
+                are and do things like continue over a line ending if inside a
+                quoted string.</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">resource</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">Resource</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">The resource from which to read.</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">skippedLinesCallback</td><td style="text-align: left; border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">LineCallbackHandler</td><td style="text-align: left; border-bottom: 0.5pt solid ; ">Interface which passes the raw line
+                content of the lines in the file to be skipped. If linesToSkip
+                is set to 2, then this interface will be called twice.</td></tr><tr><td style="text-align: left; border-right: 0.5pt solid ; ">strict</td><td style="text-align: left; border-right: 0.5pt solid ; ">boolean</td><td style="text-align: left; ">In strict mode, the reader will throw an
+                exception on ExecutionContext if the input resource does not
+                exist.</td></tr></tbody></table></div></div><section class="section" title="LineMapper" epub:type="division" id="lineMapper"><div class="titlepage"><div><div><h4 class="title">LineMapper</h4></div></div></div><p>As with <code class="classname">RowMapper</code>, which takes a low
+        level construct such as <code class="classname">ResultSet</code> and returns
+        an <code class="classname">Object</code>, flat file processing requires the
+        same construct to convert a <code class="classname">String</code> line into an
+        <code class="classname">Object</code>:
+        </p><pre class="programlisting">public interface LineMapper&lt;T&gt; {
+
+    T mapLine(String line, int lineNumber) throws Exception;
+
+}</pre><p>The basic contract is that, given the current line and the line
+        number with which it is associated, the mapper should return a
+        resulting domain object. This is similar to
+        <code class="classname">RowMapper</code> in that each line is associated with
+        its line number, just as each row in a
+        <code class="classname">ResultSet</code> is tied to its row number. This
+        allows the line number to be tied to the resulting domain object for
+        identity comparison or for more informative logging. However, unlike
+        <code class="classname">RowMapper</code>, the
+        <code class="classname">LineMapper</code> is given a raw line which, as
+        discussed above, only gets you halfway there. The line must be
+        tokenized into a <code class="classname">FieldSet</code>, which can then be
+        mapped to an object, as described below.</p></section><section class="section" title="LineTokenizer" epub:type="division" id="lineTokenizer"><div class="titlepage"><div><div><h4 class="title">LineTokenizer</h4></div></div></div><p>An abstraction for turning a line of input into a line into a
+        <code class="classname">FieldSet</code> is necessary because there can be many
+        formats of flat file data that need to be converted to a
+        <code class="classname">FieldSet</code>. In Spring Batch, this interface is
+        the <code class="classname">LineTokenizer</code>:</p><pre class="programlisting">public interface LineTokenizer {
+
+    FieldSet tokenize(String line);
+
+}</pre><p>The contract of a <code class="classname">LineTokenizer</code> is such
+        that, given a line of input (in theory the
+        <code class="classname">String</code> could encompass more than one line), a
+        <code class="classname">FieldSet</code> representing the line will be
+        returned. This <code class="classname">FieldSet</code> can then be passed to a
+        <code class="classname">FieldSetMapper</code>. Spring Batch contains the
+        following <code class="classname">LineTokenizer</code> implementations:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">DelmitedLineTokenizer</code> - Used for
+            files where fields in a record are separated by a delimiter. The
+            most common delimiter is a comma, but pipes or semicolons are
+            often used as well.</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">FixedLengthTokenizer</code> - Used for files
+            where fields in a record are each a 'fixed width'. The width of
+            each field must be defined for each record type.</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">PatternMatchingCompositeLineTokenizer</code>
+            - Determines which among a list of
+            <code class="classname">LineTokenizer</code>s should be used on a
+            particular line by checking against a pattern.</p></li></ul></div></section><section class="section" title="FieldSetMapper" epub:type="division" id="fieldSetMapper"><div class="titlepage"><div><div><h4 class="title">FieldSetMapper</h4></div></div></div><p>The <code class="classname">FieldSetMapper</code> interface defines a
+        single method, <code class="methodname">mapFieldSet</code>, which takes a
+        <code class="classname">FieldSet</code> object and maps its contents to an
+        object. This object may be a custom DTO, a domain object, or a simple
+        array, depending on the needs of the job. The
+        <code class="classname">FieldSetMapper</code> is used in conjunction with the
+        <code class="classname">LineTokenizer</code> to translate a line of data from
+        a resource into an object of the desired type:</p><pre class="programlisting">public interface FieldSetMapper&lt;T&gt; {
+
+    T mapFieldSet(FieldSet fieldSet);
+
+}</pre><p>The pattern used is the same as the
+        <code class="classname">RowMapper</code> used by
+        <code class="classname">JdbcTemplate</code>.</p></section><section class="section" title="DefaultLineMapper" epub:type="division" id="defaultLineMapper"><div class="titlepage"><div><div><h4 class="title">DefaultLineMapper</h4></div></div></div><p>Now that the basic interfaces for reading in flat files have
+        been defined, it becomes clear that three basic steps are
+        required:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>Read one line from the file.</p></li><li class="listitem" epub:type="list-item"><p>Pass the string line into the
+              <code class="methodname">LineTokenizer#tokenize</code>() method, in
+              order to retrieve a <code class="classname">FieldSet</code>.</p></li><li class="listitem" epub:type="list-item"><p>Pass the <code class="classname">FieldSet</code> returned from
+              tokenizing to a <code class="classname">FieldSetMapper</code>, returning
+              the result from the <code class="methodname">ItemReader#read</code>()
+              method.</p></li></ol></div><p>The two interfaces described above represent two separate tasks:
+        converting a line into a <code class="classname">FieldSet</code>, and mapping
+        a <code class="classname">FieldSet</code> to a domain object. Because the
+        input of a <code class="classname">LineTokenizer</code> matches the input of
+        the <code class="classname">LineMapper</code> (a line), and the output of a
+        <code class="classname">FieldSetMapper</code> matches the output of the
+        <code class="classname">LineMapper</code>, a default implementation that uses
+        both a <code class="classname">LineTokenizer</code> and
+        <code class="classname">FieldSetMapper</code> is provided. The
+        <code class="classname">DefaultLineMapper</code> represents the behavior most
+        users will need:</p><pre class="programlisting">public class DefaultLineMapper&lt;T&gt; implements LineMapper&lt;T&gt;, InitializingBean {
+
+    private LineTokenizer tokenizer;
+
+    private FieldSetMapper&lt;T&gt; fieldSetMapper;
+
+    public T mapLine(String line, int lineNumber) throws Exception {
+        <span class="bold"><strong>return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));</strong></span>
+    }
+
+    public void setLineTokenizer(LineTokenizer tokenizer) {
+        this.tokenizer = tokenizer;
+    }
+
+    public void setFieldSetMapper(FieldSetMapper&lt;T&gt; fieldSetMapper) {
+        this.fieldSetMapper = fieldSetMapper;
+    }
+}</pre><p>The above functionality is provided in a default implementation,
+        rather than being built into the reader itself (as was done in
+        previous versions of the framework) in order to allow users greater
+        flexibility in controlling the parsing process, especially if access
+        to the raw line is needed.</p></section><section class="section" title="Simple Delimited File Reading Example" epub:type="division" id="simpleDelimitedFileReadingExample"><div class="titlepage"><div><div><h4 class="title">Simple Delimited File Reading Example</h4></div></div></div><p>The following example will be used to illustrate this using an
+        actual domain scenario. This particular batch job reads in football
+        players from the following file:
+        </p><pre class="programlisting">ID,lastName,firstName,position,birthYear,debutYear
+"AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
+"AbduRa00,Abdullah,Rabih,rb,1975,1999",
+"AberWa00,Abercrombie,Walter,rb,1959,1982",
+"AbraDa00,Abramowicz,Danny,wr,1945,1967",
+"AdamBo00,Adams,Bob,te,1946,1969",
+"AdamCh00,Adams,Charlie,wr,1979,2003"        </pre><p>The contents of this file will be mapped to the following
+        <code class="classname">Player</code> domain object:
+        </p><pre class="programlisting">public class Player implements Serializable {
+
+    private String ID;
+    private String lastName;
+    private String firstName;
+    private String position;
+    private int birthYear;
+    private int debutYear;
+
+    public String toString() {
+        return "PLAYER:ID=" + ID + ",Last Name=" + lastName +
+            ",First Name=" + firstName + ",Position=" + position +
+            ",Birth Year=" + birthYear + ",DebutYear=" +
+            debutYear;
+    }
+
+    // setters and getters...
+}</pre><p>In order to map a <code class="classname">FieldSet</code> into a
+        <code class="classname">Player</code> object, a
+        <code class="classname">FieldSetMapper</code> that returns players needs to be
+        defined:</p><pre class="programlisting">protected static class PlayerFieldSetMapper implements FieldSetMapper&lt;Player&gt; {
+    public Player mapFieldSet(FieldSet fieldSet) {
+        Player player = new Player();
+
+        player.setID(fieldSet.readString(0));
+        player.setLastName(fieldSet.readString(1));
+        player.setFirstName(fieldSet.readString(2));
+        player.setPosition(fieldSet.readString(3));
+        player.setBirthYear(fieldSet.readInt(4));
+        player.setDebutYear(fieldSet.readInt(5));
+
+        return player;
+    }
+}</pre><p>The file can then be read by correctly constructing a
+        <code class="classname">FlatFileItemReader</code> and calling
+        <code class="methodname">read</code>:</p><pre class="programlisting">FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
+itemReader.setResource(new FileSystemResource("resources/players.csv"));
+//DelimitedLineTokenizer defaults to comma as its delimiter
+DefaultLineMapper&lt;Player&gt; lineMapper = new DefaultLineMapper&lt;Player&gt;();
+lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
+lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
+itemReader.setLineMapper(lineMapper);
+itemReader.open(new ExecutionContext());
+Player player = itemReader.read();</pre><p>Each call to <code class="methodname">read</code> will return a new
+        Player object from each line in the file. When the end of the file is
+        reached, null will be returned.</p></section><section class="section" title="Mapping Fields by Name" epub:type="division" id="mappingFieldsByName"><div class="titlepage"><div><div><h4 class="title">Mapping Fields by Name</h4></div></div></div><p>There is one additional piece of functionality that is allowed
+        by both <code class="classname">DelimitedLineTokenizer</code> and
+        <code class="classname">FixedLengthTokenizer</code> that is similar in
+        function to a Jdbc <code class="classname">ResultSet</code>. The names of the
+        fields can be injected into either of these
+        <code class="classname">LineTokenizer</code> implementations to increase the
+        readability of the mapping function. First, the column names of all
+        fields in the flat file are injected into the tokenizer:</p><pre class="programlisting">tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"});          </pre><p>A <code class="classname">FieldSetMapper</code> can use this information
+        as follows:</p><pre class="programlisting">public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
+    public Player mapFieldSet(FieldSet fs) {
+
+       if(fs == null){
+           return null;
+       }
+
+       Player player = new Player();
+       player.setID(fs.readString(<span class="bold"><strong>"ID"</strong></span>));
+       player.setLastName(fs.readString(<span class="bold"><strong>"lastName"</strong></span>));
+       player.setFirstName(fs.readString(<span class="bold"><strong>"firstName"</strong></span>));
+       player.setPosition(fs.readString(<span class="bold"><strong>"position"</strong></span>));
+       player.setDebutYear(fs.readInt(<span class="bold"><strong>"debutYear"</strong></span>));
+       player.setBirthYear(fs.readInt(<span class="bold"><strong>"birthYear"</strong></span>));
+
+       return player;
+   }
+}</pre></section><section class="section" title="Automapping FieldSets to Domain Objects" epub:type="division" id="beanWrapperFieldSetMapper"><div class="titlepage"><div><div><h4 class="title">Automapping FieldSets to Domain Objects</h4></div></div></div><p>For many, having to write a specific
+        <code class="classname">FieldSetMapper</code> is equally as cumbersome as
+        writing a specific <code class="classname">RowMapper</code> for a
+        <code class="classname">JdbcTemplate</code>. Spring Batch makes this easier by
+        providing a <code class="classname">FieldSetMapper</code> that automatically
+        maps fields by matching a field name with a setter on the object using
+        the JavaBean specification. Again using the football example, the
+        <code class="classname">BeanWrapperFieldSetMapper</code> configuration looks
+        like the following:</p><pre class="programlisting">&lt;bean id="fieldSetMapper"
+      class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"&gt;
+    &lt;property name="prototypeBeanName" value="player" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="player"
+      class="org.springframework.batch.sample.domain.Player"
+      scope="prototype" /&gt;</pre><p>For each entry in the <code class="classname">FieldSet</code>, the
+        mapper will look for a corresponding setter on a new instance of the
+        <code class="classname">Player</code> object (for this reason, prototype scope
+        is required) in the same way the Spring container will look for
+        setters matching a property name. Each available field in the
+        <code class="classname">FieldSet</code> will be mapped, and the resultant
+        <code class="classname">Player</code> object will be returned, with no code
+        required.</p></section><section class="section" title="Fixed Length File Formats" epub:type="division" id="fixedLengthFileFormats"><div class="titlepage"><div><div><h4 class="title">Fixed Length File Formats</h4></div></div></div><p>So far only delimited files have been discussed in much detail,
+        however, they represent only half of the file reading picture. Many
+        organizations that use flat files use fixed length formats. An example
+        fixed length file is below:</p><pre class="programlisting">UK21341EAH4121131.11customer1
+UK21341EAH4221232.11customer2
+UK21341EAH4321333.11customer3
+UK21341EAH4421434.11customer4
+UK21341EAH4521535.11customer5</pre><p>While this looks like one large field, it actually represent 4
+        distinct fields:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>ISIN: Unique identifier for the item being order - 12
+            characters long.</p></li><li class="listitem" epub:type="list-item"><p>Quantity: Number of this item being ordered - 3 characters
+            long.</p></li><li class="listitem" epub:type="list-item"><p>Price: Price of the item - 5 characters long.</p></li><li class="listitem" epub:type="list-item"><p>Customer: Id of the customer ordering the item - 9
+            characters long.</p></li></ol></div><p>When configuring the
+        <code class="classname">FixedLengthLineTokenizer</code>, each of these lengths
+        must be provided in the form of ranges:</p><pre class="programlisting">&lt;bean id="fixedLengthLineTokenizer"
+      class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
+    &lt;property name="names" value="ISIN,Quantity,Price,Customer" /&gt;
+    &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
+&lt;/bean&gt;</pre><p>Because the <code class="classname">FixedLengthLineTokenizer</code> uses
+        the same <code class="classname">LineTokenizer</code> interface as discussed
+        above, it will return the same <code class="classname">FieldSet</code> as if a
+        delimiter had been used. This allows the same approaches to be used in
+        handling its output, such as using the
+        <code class="classname">BeanWrapperFieldSetMapper</code>.</p><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>Supporting the above syntax for ranges requires that a
+            specialized property editor,
+            <code class="classname">RangeArrayPropertyEditor</code>, be configured in
+            the <code class="classname">ApplicationContext</code>. However, this bean
+            is automatically declared in an
+            <code class="classname">ApplicationContext</code> where the batch
+            namespace is used.</p></td></tr></table></div></section><section class="section" title="Multiple Record Types within a Single File" epub:type="division" id="prefixMatchingLineMapper"><div class="titlepage"><div><div><h4 class="title">Multiple Record Types within a Single File</h4></div></div></div><p>All of the file reading examples up to this point have all made
+        a key assumption for simplicity's sake: all of the records in a file
+        have the same format. However, this may not always be the case. It is
+        very common that a file might have records with different formats that
+        need to be tokenized differently and mapped to different objects. The
+        following excerpt from a file illustrates this:</p><pre class="programlisting">USER;Smith;Peter;;T;20014539;F
+LINEA;1044391041ABC037.49G201XX1383.12H
+LINEB;2134776319DEF422.99M005LI</pre><p>In this file we have three types of records, "USER", "LINEA",
+        and "LINEB". A "USER" line corresponds to a User object. "LINEA" and
+        "LINEB" both correspond to Line objects, though a "LINEA" has more
+        information than a "LINEB".</p><p>The <code class="classname">ItemReader </code>will read each line
+        individually, but we must specify different
+        <code class="classname">LineTokenizer</code> and
+        <code class="classname">FieldSetMapper</code> objects so that the
+        <code class="classname">ItemWriter</code> will receive the correct items. The
+        <code class="classname">PatternMatchingCompositeLineMapper</code> makes this
+        easy by allowing maps of patterns to
+        <code class="classname">LineTokenizer</code>s and patterns to
+        <code class="classname">FieldSetMapper</code>s to be configured:</p><pre class="programlisting">&lt;bean id="orderFileLineMapper"
+      class="org.spr...PatternMatchingCompositeLineMapper"&gt;
+    &lt;property name="tokenizers"&gt;
+        &lt;map&gt;
+            &lt;entry key="USER*" value-ref="userTokenizer" /&gt;
+            &lt;entry key="LINEA*" value-ref="lineATokenizer" /&gt;
+            &lt;entry key="LINEB*" value-ref="lineBTokenizer" /&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+    &lt;property name="fieldSetMappers"&gt;
+        &lt;map&gt;
+            &lt;entry key="USER*" value-ref="userFieldSetMapper" /&gt;
+            &lt;entry key="LINE*" value-ref="lineFieldSetMapper" /&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre><p>In this example, "LINEA" and "LINEB" have separate
+        <code class="classname">LineTokenizer</code>s but they both use the same
+        <code class="classname">FieldSetMapper</code>.</p><p>The <code class="classname">PatternMatchingCompositeLineMapper</code>
+        makes use of the <code class="classname">PatternMatcher</code>'s
+        <code class="classname">match</code> method in order to select the correct
+        delegate for each line. The <code class="classname">PatternMatcher</code>
+        allows for two wildcard characters with special meaning: the question
+        mark ("?") will match exactly one character, while the asterisk ("*")
+        will match zero or more characters. Note that in the configuration
+        above, all patterns end with an asterisk, making them effectively
+        prefixes to lines. The <code class="classname">PatternMatcher</code> will
+        always match the most specific pattern possible, regardless of the
+        order in the configuration. So if "LINE*" and "LINEA*" were both
+        listed as patterns, "LINEA" would match pattern "LINEA*", while
+        "LINEB" would match pattern "LINE*". Additionally, a single asterisk
+        ("*") can serve as a default by matching any line not matched by any
+        other pattern.</p><pre class="programlisting">&lt;entry key="*" value-ref="defaultLineTokenizer" /&gt;</pre><p>There is also a
+        <code class="classname">PatternMatchingCompositeLineTokenizer</code> that can
+        be used for tokenization alone.</p><p>It is also common for a flat file to contain records that each
+        span multiple lines. To handle this situation, a more complex strategy
+        is required. A demonstration of this common pattern can be found in
+        <a class="xref" href="ch11s05.xhtml" title="Multi-Line Records">the section called “Multi-Line Records”</a>.</p></section><section class="section" title="Exception Handling in Flat Files" epub:type="division" id="exceptionHandlingInFlatFiles"><div class="titlepage"><div><div><h4 class="title">Exception Handling in Flat Files</h4></div></div></div><p>There are many scenarios when tokenizing a line may cause
+        exceptions to be thrown. Many flat files are imperfect and contain
+        records that aren't formatted correctly. Many users choose to skip
+        these erroneous lines, logging out the issue, original line, and line
+        number. These logs can later be inspected manually or by another batch
+        job. For this reason, Spring Batch provides a hierarchy of exceptions
+        for handling parse exceptions:
+        <code class="classname">FlatFileParseException</code> and
+        <code class="classname">FlatFileFormatException</code>.
+        <code class="classname">FlatFileParseException</code> is thrown by the
+        <code class="classname">FlatFileItemReader</code> when any errors are
+        encountered while trying to read a file.
+        <code class="classname">FlatFileFormatException</code> is thrown by
+        implementations of the <code class="classname">LineTokenizer</code> interface,
+        and indicates a more specific error encountered while
+        tokenizing.</p><section class="section" title="IncorrectTokenCountException" epub:type="division" id="incorrectTokenCountException"><div class="titlepage"><div><div><h5 class="title">IncorrectTokenCountException</h5></div></div></div><p>Both <code class="classname">DelimitedLineTokenizer</code> and
+          <code class="classname">FixedLengthLineTokenizer</code> have the ability to
+          specify column names that can be used for creating a
+          <code class="classname">FieldSet</code>. However, if the number of column
+          names doesn't match the number of columns found while tokenizing a
+          line the <code class="classname">FieldSet</code> can't be created, and a
+          <code class="classname">IncorrectTokenCountException</code> is thrown, which
+          contains the number of tokens encountered, and the number
+          expected:</p><pre class="programlisting">tokenizer.setNames(new String[] {"A", "B", "C", "D"});
+
+try {
+    tokenizer.tokenize("a,b,c");
+}
+catch(IncorrectTokenCountException e){
+    assertEquals(4, e.getExpectedCount());
+    assertEquals(3, e.getActualCount());
+}</pre><p>Because the tokenizer was configured with 4 column names, but
+          only 3 tokens were found in the file, an
+          <code class="classname">IncorrectTokenCountException</code> was
+          thrown.</p></section><section class="section" title="IncorrectLineLengthException" epub:type="division" id="incorrectLineLengthException"><div class="titlepage"><div><div><h5 class="title">IncorrectLineLengthException</h5></div></div></div><p>Files formatted in a fixed length format have additional
+          requirements when parsing because, unlike a delimited format, each
+          column must strictly adhere to its predefined width. If the total
+          line length doesn't add up to the widest value of this column, an
+          exception is thrown:</p><pre class="programlisting">tokenizer.setColumns(new Range[] { new Range(1, 5),
+                                   new Range(6, 10),
+                                   new Range(11, 15) });
+try {
+    tokenizer.tokenize("12345");
+    fail("Expected IncorrectLineLengthException");
+}
+catch (IncorrectLineLengthException ex) {
+    assertEquals(15, ex.getExpectedLength());
+    assertEquals(5, ex.getActualLength());
+}</pre><p>The configured ranges for the tokenizer above are: 1-5, 6-10,
+          and 11-15, thus the total length of the line expected is 15.
+          However, in this case a line of length 5 was passed in, causing an
+          <code class="classname">IncorrectLineLengthException</code> to be thrown.
+          Throwing an exception here rather than only mapping the first column
+          allows the processing of the line to fail earlier, and with more
+          information than it would if it failed while trying to read in
+          column 2 in a <code class="classname">FieldSetMapper</code>. However, there
+          are scenarios where the length of the line isn't always constant.
+          For this reason, validation of line length can be turned off via the
+          'strict' property:</p><pre class="programlisting">tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+<span class="bold"><strong>tokenizer.setStrict(false);</strong></span>
+FieldSet tokens = tokenizer.tokenize("12345");
+assertEquals("12345", tokens.readString(0));
+assertEquals("", tokens.readString(1));</pre><p>The above example is almost identical to the one before it,
+          except that tokenizer.setStrict(false) was called. This setting
+          tells the tokenizer to not enforce line lengths when tokenizing the
+          line. A <code class="classname">FieldSet</code> is now correctly created and
+          returned. However, it will only contain empty tokens for the
+          remaining values.</p></section></section></section><section class="section" title="FlatFileItemWriter" epub:type="division" id="flatFileItemWriter"><div class="titlepage"><div><div><h3 class="title">FlatFileItemWriter</h3></div></div></div><p>Writing out to flat files has the same problems and issues that
+      reading in from a file must overcome. A step must be able to write out
+      in either delimited or fixed length formats in a transactional
+      manner.</p><section class="section" title="LineAggregator" epub:type="division" id="lineAggregator"><div class="titlepage"><div><div><h4 class="title">LineAggregator</h4></div></div></div><p>Just as the <code class="classname">LineTokenizer</code> interface is
+        necessary to take an item and turn it into a
+        <code class="classname">String</code>, file writing must have a way to
+        aggregate multiple fields into a single string for writing to a file.
+        In Spring Batch this is the
+        <code class="classname">LineAggregator</code>:</p><pre class="programlisting">public interface LineAggregator&lt;T&gt; {
+
+    public String aggregate(T item);
+
+}</pre><p>The <code class="classname">LineAggregator</code> is the opposite of a
+        <code class="classname">LineTokenizer</code>.
+        <code class="classname">LineTokenizer</code> takes a
+        <code class="classname">String</code> and returns a
+        <code class="classname">FieldSet</code>, whereas
+        <code class="classname">LineAggregator</code> takes an
+        <code class="classname">item</code> and returns a
+        <code class="classname">String</code>.</p><section class="section" title="PassThroughLineAggregator" epub:type="division" id="PassThroughLineAggregator"><div class="titlepage"><div><div><h5 class="title">PassThroughLineAggregator</h5></div></div></div><p>The most basic implementation of the LineAggregator interface
+          is the <code class="classname">PassThroughLineAggregator</code>, which
+          simply assumes that the object is already a string, or that its
+          string representation is acceptable for writing:</p><pre class="programlisting">public class PassThroughLineAggregator&lt;T&gt; implements LineAggregator&lt;T&gt; {
+
+    public String aggregate(T item) {
+        return item.toString();
+    }
+}</pre><p>The above implementation is useful if direct control of
+          creating the string is required, but the advantages of a
+          <code class="classname">FlatFileItemWriter</code>, such as transaction and
+          restart support, are necessary.</p></section></section><section class="section" title="Simplified File Writing Example" epub:type="division" id="SimplifiedFileWritingExample"><div class="titlepage"><div><div><h4 class="title">Simplified File Writing Example</h4></div></div></div><p>Now that the <code class="classname">LineAggregator</code> interface and
+        its most basic implementation,
+        <code class="classname">PassThroughLineAggregator</code>, have been defined,
+        the basic flow of writing can be explained:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>The object to be written is passed to the
+            <code class="classname">LineAggregator</code> in order to obtain a
+            <code class="classname">String</code>.</p></li><li class="listitem" epub:type="list-item"><p>The returned <code class="classname">String</code> is written to the
+            configured file.</p></li></ol></div><p>The following excerpt from the
+        <code class="classname">FlatFileItemWriter</code> expresses this in
+        code:</p><pre class="programlisting">public void write(T item) throws Exception {
+    write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
+}</pre><p>A simple configuration would look like the following:</p><pre class="programlisting">&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
+    &lt;property name="resource" value="file:target/test-outputs/output.txt" /&gt;
+    &lt;property name="lineAggregator"&gt;
+        &lt;bean class="org.spr...PassThroughLineAggregator"/&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre></section><section class="section" title="FieldExtractor" epub:type="division" id="FieldExtractor"><div class="titlepage"><div><div><h4 class="title">FieldExtractor</h4></div></div></div><p>The above example may be useful for the most basic uses of a
+        writing to a file. However, most users of the
+        <code class="classname">FlatFileItemWriter</code> will have a domain object
+        that needs to be written out, and thus must be converted into a line.
+        In file reading, the following was required:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>Read one line from the file.</p></li><li class="listitem" epub:type="list-item"><p>Pass the string line into the
+              <code class="methodname">LineTokenizer#tokenize</code>() method, in
+              order to retrieve a <code class="classname">FieldSet</code></p></li><li class="listitem" epub:type="list-item"><p>Pass the <code class="classname">FieldSet</code> returned from
+              tokenizing to a <code class="classname">FieldSetMapper</code>, returning
+              the result from the <code class="methodname">ItemReader#read</code>()
+              method</p></li></ol></div><p>File writing has similar, but inverse steps:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>Pass the item to be written to the writer</p></li><li class="listitem" epub:type="list-item"><p>convert the fields on the item into an array</p></li><li class="listitem" epub:type="list-item"><p>aggregate the resulting array into a line</p></li></ol></div><p>Because there is no way for the framework to know which fields
+        from the object need to be written out, a
+        <code class="classname">FieldExtractor</code> must be written to accomplish
+        the task of turning the item into an array:</p><pre class="programlisting">public interface FieldExtractor&lt;T&gt; {
+
+    Object[] extract(T item);
+
+}</pre><p>Implementations of the <code class="classname">FieldExtractor</code>
+        interface should create an array from the fields of the provided
+        object, which can then be written out with a delimiter between the
+        elements, or as part of a field-width line.</p><section class="section" title="PassThroughFieldExtractor" epub:type="division" id="PassThroughFieldExtractor"><div class="titlepage"><div><div><h5 class="title">PassThroughFieldExtractor</h5></div></div></div><p>There are many cases where a collection, such as an array,
+          <code class="classname">Collection</code>, or
+          <code class="classname">FieldSet</code>, needs to be written out.
+          "Extracting" an array from a one of these collection types is very
+          straightforward: simply convert the collection to an array.
+          Therefore, the <code class="classname">PassThroughFieldExtractor</code>
+          should be used in this scenario. It should be noted, that if the
+          object passed in is not a type of collection, then the
+          <code class="classname">PassThroughFieldExtractor</code> will return an
+          array containing solely the item to be extracted.</p></section><section class="section" title="BeanWrapperFieldExtractor" epub:type="division" id="BeanWrapperFieldExtractor"><div class="titlepage"><div><div><h5 class="title">BeanWrapperFieldExtractor</h5></div></div></div><p>As with the <code class="classname">BeanWrapperFieldSetMapper</code>
+          described in the file reading section, it is often preferable to
+          configure how to convert a domain object to an object array, rather
+          than writing the conversion yourself. The
+          <code class="classname">BeanWrapperFieldExtractor</code> provides just this
+          type of functionality:</p><pre class="programlisting">BeanWrapperFieldExtractor&lt;Name&gt; extractor = new BeanWrapperFieldExtractor&lt;Name&gt;();
+extractor.setNames(new String[] { "first", "last", "born" });
+
+String first = "Alan";
+String last = "Turing";
+int born = 1912;
+
+Name n = new Name(first, last, born);
+Object[] values = extractor.extract(n);
+
+assertEquals(first, values[0]);
+assertEquals(last, values[1]);
+assertEquals(born, values[2]);</pre><p>This extractor implementation has only one required property,
+          the names of the fields to map. Just as the
+          <code class="classname">BeanWrapperFieldSetMapper</code> needs field names
+          to map fields on the <code class="classname">FieldSet</code> to setters on
+          the provided object, the
+          <code class="classname">BeanWrapperFieldExtractor</code> needs names to map
+          to getters for creating an object array. It is worth noting that the
+          order of the names determines the order of the fields within the
+          array.</p></section></section><section class="section" title="Delimited File Writing Example" epub:type="division" id="delimitedFileWritingExample"><div class="titlepage"><div><div><h4 class="title">Delimited File Writing Example</h4></div></div></div><p>The most basic flat file format is one in which all fields are
+        separated by a delimiter. This can be accomplished using a
+        <code class="classname">DelimitedLineAggregator</code>. The example below
+        writes out a simple domain object that represents a credit to a
+        customer account:</p><pre class="programlisting">public class CustomerCredit {
+
+    private int id;
+    private String name;
+    private BigDecimal credit;
+
+    //getters and setters removed for clarity
+}</pre><p>Because a domain object is being used, an implementation of the
+        FieldExtractor interface must be provided, along with the delimiter to
+        use:</p><pre class="programlisting">&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+    &lt;property name="resource" ref="outputResource" /&gt;
+    &lt;property name="lineAggregator"&gt;
+        &lt;bean class="org.spr...DelimitedLineAggregator"&gt;
+            &lt;property name="delimiter" value=","/&gt;
+            &lt;property name="fieldExtractor"&gt;
+                &lt;bean class="org.spr...BeanWrapperFieldExtractor"&gt;
+                    &lt;property name="names" value="name,credit"/&gt;
+                &lt;/bean&gt;
+            &lt;/property&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre><p>In this case, the
+        <code class="classname">BeanWrapperFieldExtractor</code> described earlier in
+        this chapter is used to turn the name and credit fields within
+        <code class="classname">CustomerCredit</code> into an object array, which is
+        then written out with commas between each field.</p></section><section class="section" title="Fixed Width File Writing Example" epub:type="division" id="fixedWidthFileWritingExample"><div class="titlepage"><div><div><h4 class="title">Fixed Width File Writing Example</h4></div></div></div><p>Delimited is not the only type of flat file format. Many prefer
+        to use a set width for each column to delineate between fields, which
+        is usually referred to as 'fixed width'. Spring Batch supports this in
+        file writing via the <code class="classname">FormatterLineAggregator</code>.
+        Using the same <code class="classname">CustomerCredit</code> domain object
+        described above, it can be configured as follows:</p><pre class="programlisting">&lt;bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+    &lt;property name="resource" ref="outputResource" /&gt;
+    &lt;property name="lineAggregator"&gt;
+        &lt;bean class="org.spr...FormatterLineAggregator"&gt;
+            &lt;property name="fieldExtractor"&gt;
+                &lt;bean class="org.spr...BeanWrapperFieldExtractor"&gt;
+                    &lt;property name="names" value="name,credit" /&gt;
+                &lt;/bean&gt;
+            &lt;/property&gt;
+            &lt;property name="format" value="%-9s%-2.0f" /&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre><p>Most of the above example should look familiar. However, the
+        value of the format property is new:</p><pre class="programlisting">&lt;property name="format" value="%-9s%-2.0f" /&gt;</pre><p>The underlying implementation is built using the same
+        <code class="classname">Formatter</code> added as part of Java 5. The Java
+        <code class="classname">Formatter</code> is based on the
+        <code class="methodname">printf</code> functionality of the C programming
+        language. Most details on how to configure a formatter can be found in
+        the javadoc of <a class="ulink" href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html" target="_top"><em class="citetitle">Formatter</em></a>.</p></section><section class="section" title="Handling File Creation" epub:type="division" id="handlingFileCreation"><div class="titlepage"><div><div><h4 class="title">Handling File Creation</h4></div></div></div><p><code class="classname">FlatFileItemReader</code> has a very simple
+        relationship with file resources. When the reader is initialized, it
+        opens the file if it exists, and throws an exception if it does not.
+        File writing isn't quite so simple. At first glance it seems like a
+        similar straight forward contract should exist for
+        <code class="classname">FlatFileItemWriter</code>: if the file already exists,
+        throw an exception, and if it does not, create it and start writing.
+        However, potentially restarting a <code class="classname">Job</code> can cause
+        issues. In normal restart scenarios, the contract is reversed: if the
+        file exists, start writing to it from the last known good position,
+        and if it does not, throw an exception. However, what happens if the
+        file name for this job is always the same? In this case, you would
+        want to delete the file if it exists, unless it's a restart. Because
+        of this possibility, the <code class="classname">FlatFileItemWriter</code>
+        contains the property, <code class="methodname">shouldDeleteIfExists</code>.
+        Setting this property to true will cause an existing file with the
+        same name to be deleted when the writer is opened.</p></section></section></section><footer/></body></html>

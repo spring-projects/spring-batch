@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.configuration.annotation.MapJobRepositoryConfigurationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.configuration.annotation.MapJobRepositoryConfigurationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.configuration.annotation.html">org.springframework.batch.core.configuration.annotation</a> &gt; MapJobRepositoryConfigurationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.873s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testMultipleDataSources</td>
+<td>0.152s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testOneDataSource</td>
+<td>0.407s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRoseyScenario</td>
+<td>0.314s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:01:49,324  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@3ff7723d: startup date [Thu Mar 23 10:01:49 CDT 2017]; root of context hierarchy
+10:01:49,357  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,362  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,367  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:49,408  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:49,435  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:01:49,441  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 5 ms.
+10:01:49,442  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:49,457  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 14 ms.
+10:01:49,523  INFO Test worker support.JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:01:49,524  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:01:49,533  INFO Test worker support.SimpleJobLauncher:139 - Job: [SimpleJob: [name=job]] launched with the following parameters: [{}]
+10:01:49,542  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:01:49,554  INFO Test worker support.SimpleJobLauncher:142 - Job: [SimpleJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED]
+10:01:49,726  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@3ff7723d: startup date [Thu Mar 23 10:01:49 CDT 2017]; root of context hierarchy
+10:01:49,730  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@52c9a80f: startup date [Thu Mar 23 10:01:49 CDT 2017]; root of context hierarchy
+10:01:49,745  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,750  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,753  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:49,784  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:badDatabase', username='sa'
+10:01:49,808  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:01:49,809  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:01:49,816  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 7 ms.
+10:01:49,817  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:01:49,823  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 6 ms.
+10:01:49,883  INFO Test worker annotation.AnnotationConfigApplicationContext:581 - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@4d4442fb: startup date [Thu Mar 23 10:01:49 CDT 2017]; root of context hierarchy
+10:01:49,918  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,921  WARN Test worker annotation.ConfigurationClassEnhancer:350 - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:01:49,925  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:50,018  WARN Test worker annotation.DefaultBatchConfigurer:85 - No datasource was provided...using a Map based JobRepository
+10:01:50,041  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:01:50,098  INFO Test worker support.SimpleJobLauncher:139 - Job: [SimpleJob: [name=job]] launched with the following parameters: [{}]
+10:01:50,134  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:01:50,180  INFO Test worker support.SimpleJobLauncher:142 - Job: [SimpleJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED]
+10:01:50,192  INFO Test worker annotation.AnnotationConfigApplicationContext:985 - Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@4d4442fb: startup date [Thu Mar 23 10:01:49 CDT 2017]; root of context hierarchy
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

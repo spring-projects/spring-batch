@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="ft-step">
+			<tasklet>
+				<chunk reader="reader" processor="processor" writer="writer"
+						commit-interval="10">
+					<streams>
+						<stream ref="reader"/>
+					</streams>
+				</chunk>
+				<listeners>
+					 <listener after-step-method="destroy">
+							<beans:bean class="org.springframework.batch.core.configuration.xml.TestListener"/>
+					</listener>
+					<listener ref="listener"/>
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+
+	<beans:bean id="processor" class="org.springframework.batch.core.configuration.xml.TestProcessor"/>
+
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+
+	<beans:bean id="listener2" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+
+</beans:beans>

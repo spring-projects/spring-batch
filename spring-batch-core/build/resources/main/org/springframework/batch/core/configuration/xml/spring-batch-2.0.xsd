@@ -1,0 +1,833 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="2.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the configuration elements for Spring Batch Core.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="job">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a job composed of a set of steps and
+				transitions between steps. The job will be exposed in
+				the enclosing bean factory as a component of type Job
+				that can be launched using a JobLauncher.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="flowGroup" />
+				<xsd:element name="listeners">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						List of all listeners for the job
+						]]>
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="1" maxOccurs="unbounded" />
+						</xsd:sequence>
+						<xsd:attributeGroup ref="mergeAttribute" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attributeGroup ref="jobRepositoryAttribute" />
+			<xsd:attribute name="incrementer" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[ 
+						A reference to a JobParametersIncrementer bean definition.  This will be 
+						used to provide new parameters to a Job instance that is starting in a 
+						sequence.
+						]]>
+					</xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref" />
+						<tool:expected-type type="org.springframework.batch.core.JobParametersIncrementer" />
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="restartable" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Whether the job should be retartable or not in case of failure.  Set this to false
+					if the Job should not be restarted.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attributeGroup ref="parentAttribute" />
+			<xsd:attributeGroup ref="abstractAttribute" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="step">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a stage in job processing backed by a
+				Step. The id attribute must be specified since this
+				step definition will be referred to from other elements
+				to form a Job flow.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="1">
+				<xsd:element name="tasklet">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:extension base="taskletType">
+								<xsd:attributeGroup ref="jobRepositoryAttribute"/>
+							</xsd:extension>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attributeGroup ref="parentAttribute"/>
+			<xsd:attributeGroup ref="abstractAttribute" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="job-listener">
+		<xsd:annotation>
+			<xsd:documentation>
+				A reference to a JobExecutionListener (or a POJO
+				if using before-job-method / after-job-method or
+				source level annotations).
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jobExecutionListenerType">
+					<xsd:attribute name="id" type="xsd:ID" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="step-listener">
+		<xsd:annotation>
+			<xsd:documentation>
+				A bean definition for a step listener (or POJO if using *-method attributes or source level
+				annotations)
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="stepListenerType">
+					<xsd:attribute name="id" type="xsd:ID" use="optional" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="job-repository">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			Configures a JobRepository using a relational database.  This is 
+			needed by many other components (principally Job and Step implementations).
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
+						<xsd:annotation>
+							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
+							The bean name of the DataSource that is to be used. This attribute 
+							is not required, and only needs to be specified explicitly
+							if the bean name of the desired DataSource is not 'dataSource'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="javax.sql.DataSource" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
+						<xsd:annotation>
+							<xsd:documentation
+								source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							The bean name of the TransactionManager that is to be used. This attribute 
+							is not required, and only needs to be specified explicitly
+							if the bean name of the desired TransactionManager is not 'transactionManager'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type
+										type="org.springframework.transaction.PlatformTransactionManager" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="isolation-level-for-create" default="SERIALIZABLE" type="isolationType">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The isolation level to use for creation of job execution entities.
+							The default is SERIALIZABLE, which prevents accidental 
+							concurrent execution of the same job (REPEATABLE_READ 
+							would work as well).
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="table-prefix" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The the table prefix to use for all the batch meta-data tables.
+							Defaults to "BATCH_".
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:group name="flowGroup">
+		<xsd:choice>
+			<xsd:element name="step">
+				<xsd:annotation>
+					<xsd:documentation>
+						Defines a stage in job processing backed by a
+						Step. The id attribute must be specified. The
+						step requires either a chunk definition,
+						a tasklet reference, or a reference to a 
+						(possibly abstract) parent step.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="tasklet" type="taskletType"/>
+						<xsd:group ref="transitions" />
+					</xsd:choice>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attributeGroup ref="parentAttribute"/>
+					<xsd:attributeGroup ref="nextAttribute" />
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="split">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should split here into two or more subflows.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="flow">
+							<xsd:annotation>
+								<xsd:documentation>
+									A subflow within a job, having the same format as a job, but without a separate identity.
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded" />
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:group ref="transitions" />
+					</xsd:choice>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+							The task executor responsible for executing the task.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attributeGroup ref="nextAttribute" />
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="decision">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should query a decider to determine where execution should go next.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="decider" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+								The decider is a reference to a JobExecutionDecider that can produce a status to base
+								the next
+								transition on.
+							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<xsd:complexType name="taskletType">
+		<xsd:all>
+			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that should not cause rollback if possible.  This list
+					is only a hint and has to be interpreted by the step to make sense in context.  
+					Separate each attribute with a comma or a newline.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
+		<xsd:attribute name="ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+				The tasklet is a reference to another bean definition that implements the Tasklet interface.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="start-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The maximum number of times a Step may be started.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Set to true to allow a step to be started even if it is already complete.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="transaction-manager" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+				The bean name of the TransactionManager that is to be used. This attribute 
+				is not required, and only needs to be specified explicitly
+				if the bean name of the desired TransactionManager is not 'transactionManager'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type
+							type="org.springframework.transaction.PlatformTransactionManager" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="transaction-attributesType">
+		<xsd:attribute name="propagation">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.transaction.annotation.Propagation"><![CDATA[
+				The transaction propagation behavior.
+				]]></xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="REQUIRED" />
+					<xsd:enumeration value="SUPPORTS" />
+					<xsd:enumeration value="MANDATORY" />
+					<xsd:enumeration value="REQUIRES_NEW" />
+					<xsd:enumeration value="NOT_SUPPORTED" />
+					<xsd:enumeration value="NEVER" />
+					<xsd:enumeration value="NESTED" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="isolation" type="isolationType">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.transaction.annotation.Isolation"><![CDATA[
+				The transaction isolation level.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="timeout" type="xsd:integer">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The transaction timeout value (in seconds).
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:simpleType name="isolationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DEFAULT" />
+			<xsd:enumeration value="READ_UNCOMMITTED" />
+			<xsd:enumeration value="READ_COMMITTED" />
+			<xsd:enumeration value="REPEATABLE_READ" />
+			<xsd:enumeration value="SERIALIZABLE" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="chunkTaskletType">
+		<xsd:all>
+			<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of all listeners for the step definition
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded" />
+					</xsd:sequence>
+					<xsd:attributeGroup ref="mergeAttribute" />
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="streams" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of all streams to be included for the step definition
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="stream" minOccurs="1" maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:attribute name="ref" type="xsd:string">
+									<xsd:annotation>
+										<xsd:documentation><![CDATA[
+										A reference to an ItemStream bean definition
+										]]>
+										</xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref" />
+											<tool:expected-type type="org.springframework.batch.item.ItemStream" />
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attributeGroup ref="mergeAttribute" />
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that are skippable.  Exceptions that are already marked as no-rollback
+					are automatically skippable (but it doesn't hurt to add them again here).
+					Separate each attribute with a comma or a newline.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that are retryable.
+					Separate each attribute with a newline or a comma.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="fatal-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that are fatal.
+					Separate each attribute with a newline or a comma.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The number of items that will be processed before commit is called for the transaction.  
+				Either set this or the chunk-completion-policy but not both.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="reader" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The bean name of the item reader that is to be used for the process.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+					<tool:expected-type type="org.springframework.batch.item.ItemReader" />
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="processor" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The bean name of the item processor that is to be used for the process.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+					<tool:expected-type type="org.springframework.batch.item.ItemProcessor" />
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="writer" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The bean name of the item writer that is to be used for the process.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+					<tool:expected-type type="org.springframework.batch.item.ItemWriter" />
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="skip-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The maximum number of items that will be allowed to be skipped.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="retry-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The maximum number of times the processing of an item will be retried.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="cache-capacity" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The capacity of the cache in the retry policy.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Whether the reader is a transactional queue. If it is then items read should not be cached 
+				in the event of a rollback since they will be returned to the queue.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+				The task executor responsible for executing the task.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				This limits the number of tasks queued for concurrent 
+				processing to prevent thread pools from being overwhelmed. 
+				Default is 4.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="chunk-completion-policy" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.batch.repeat.CompletionPolicy"><![CDATA[
+				A transaction will be committed when this policy decides to
+				complete. Defaults to a SimpleCompletionPolicy with chunk size
+				equal to the commit-interval attribute.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="java:org.springframework.batch.repeat.CompletionPolicy" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:attributeGroup name="nextAttribute">
+		<xsd:attribute name="next" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A shortcut for specifying the next step to execute after this one, if there is only one choice.    The next
+				attribute is a synonym for &lt;next on="*"/&gt; plus &lt;fail on="FAILED"/&gt; in a transition.
+				If this attribute is specified, then there should be no nested transition elements]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:complexType name="listenerType">
+		<xsd:attribute name="ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					A reference to a listener, a POJO with a
+					listener-annotated method, or a POJO with
+					a method
+					referenced by a *-method attribute.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					A class name used to create a listener from the default constructor.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="direct">
+						<tool:expected-type type="java.lang.Class" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="jobExecutionListenerType">
+		<xsd:complexContent>
+			<xsd:extension base="listenerType">
+				<xsd:attribute name="before-job-method" type="xsd:string" />
+				<xsd:attribute name="after-job-method" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="stepListenerType">
+		<xsd:complexContent>
+			<xsd:extension base="listenerType">
+				<xsd:attribute name="before-step-method" type="xsd:string" />
+				<xsd:attribute name="after-step-method" type="xsd:string" />
+				<xsd:attribute name="before-chunk-method" type="xsd:string" />
+				<xsd:attribute name="after-chunk-method" type="xsd:string" />
+				<xsd:attribute name="before-read-method" type="xsd:string" />
+				<xsd:attribute name="after-read-method" type="xsd:string" />
+				<xsd:attribute name="on-read-error-method" type="xsd:string" />
+				<xsd:attribute name="before-process-method" type="xsd:string" />
+				<xsd:attribute name="after-process-method" type="xsd:string" />
+				<xsd:attribute name="on-process-error-method" type="xsd:string" />
+				<xsd:attribute name="before-write-method" type="xsd:string" />
+				<xsd:attribute name="after-write-method" type="xsd:string" />
+				<xsd:attribute name="on-write-error-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-read-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-process-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-write-method" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="stepListenersType">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			The listeners for a step definition of any type relevant for a step (extensions of StepListener),
+			]]>
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attributeGroup ref="mergeAttribute" />
+	</xsd:complexType>
+
+	<xsd:group name="transitions">
+		<xsd:choice>
+			<xsd:element name="next">
+				<xsd:annotation>
+					<xsd:documentation>
+						Defines a transition from this step to the
+						next one depending on the value of the exit
+						status.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status
+								code. Use * and ? as wildcard characters. When a
+								step finishes the most
+								specific match will be chosen to select the next step. Hint:
+								always include a default
+								transition with on=&quot;*&quot;.</xsd:documentation>
+						</xsd:annotation></xsd:attribute>
+					<xsd:attribute name="to" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>
+								The name of the step to go to next.  Must resolve to one of the other steps in this job.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>		
+			<xsd:element name="stop">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should be stop at this point and provides pointer where execution should continue when
+						the job is restarted.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation></xsd:attribute>
+					<xsd:attribute name="restart" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>The name of the step to start on when the stopped job is restarted.  
+							Must resolve to one of the other steps in this job.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>		
+			<xsd:element name="end">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should end at this point, without the possibility of restart.  
+						BatchStatus will be COMPLETED.  ExitStatus is configurable.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="COMPLETED">
+						<xsd:annotation>
+							<xsd:documentation>The exit code value to end on, defaults to COMPLETED.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>			
+			<xsd:element name="fail">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should fail at this point.  BatchStatus will be FAILED.  ExitStatus is configurable.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="FAILED">
+						<xsd:annotation>
+							<xsd:documentation>The exit code value to end on, defaults to FAILED.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>			
+		</xsd:choice>
+	</xsd:group>
+		
+	<xsd:attributeGroup name="jobRepositoryAttribute">
+		<xsd:attribute name="job-repository" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
+				The bean name of the JobRepository that is to be used. This attribute 
+				is not required, and only needs to be specified explicitly
+				if the bean name of the desired JobRepository is not 'jobRepository'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type
+							type="org.springframework.batch.core.repository.JobRepository" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="parentAttribute">
+		<xsd:attribute name="parent" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					The name of the parent bean from which the configuration should inherit.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref"/>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="abstractAttribute">
+		<xsd:attribute name="abstract" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Is this bean "abstract", that is, not meant to be instantiated itself
+					but rather just serving as parent for concrete child bean definitions?
+					The default is "false". Specify "true" to tell the bean factory to not
+					try to instantiate that particular bean in any case.
+				
+					Note: This attribute will not be inherited by child bean definitions.
+					Hence, it needs to be specified per abstract bean definition.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="mergeAttribute">
+		<xsd:attribute name="merge" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Should this list be merged with the corresponding list provided 
+					by the parent?  If not, it will overwrite the parent list.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+</xsd:schema>

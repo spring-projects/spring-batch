@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	xmlns:p="http://www.springframework.org/schema/p">
+
+	<!--
+		The tasklet used in this job does nothing. The sample shows how to use
+		a method invoking adapter and also how to configure step scope with
+		non-default settings. Proxy target class (true) is needed because the
+		target method is not defined in an interface.
+	-->
+
+	<bean class="org.springframework.batch.core.scope.StepScope"
+		p:proxyTargetClass="true" />
+
+	<job id="loopJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet ref="adapter">
+				<transaction-attributes propagation="REQUIRED"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="adapter"
+		class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+		<property name="targetObject" ref="value" />
+		<property name="targetMethod" value="execute" />
+		<property name="arguments">
+			<list>
+      			<value>foo2</value>
+      			<value type="int">3</value>
+      			<value type="double">3.14</value>
+   			</list>
+		</property>
+	</bean>
+
+	<bean id="value"
+		class="org.springframework.batch.sample.TaskletJobFunctionalTests$TestBean"
+		scope="step">
+		<property name="value" value="#{jobParameters[value]}" />
+	</bean>
+</beans>

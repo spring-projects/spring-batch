@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" tests="7" skipped="1" failures="0" errors="0" timestamp="2017-03-23T15:04:27" hostname="Michaels-MacBook-Pro-3.local" time="0.685">
+  <properties/>
+  <testcase name="testConcurrentTransactionalMap" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.012"/>
+  <testcase name="testConcurrentTransactionalSet" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.01"/>
+  <testcase name="testTransactionalContains" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.003"/>
+  <testcase name="testConcurrentTransactionalList" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.001">
+    <skipped/>
+  </testcase>
+  <testcase name="testConcurrentTransactionalAppendOnlyMap" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.281"/>
+  <testcase name="testConcurrentTransactionalAppendOnlySet" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.023"/>
+  <testcase name="testConcurrentTransactionalAppendOnlyList" classname="org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests" time="0.353"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
+log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
+log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+]]></system-err>
+</testsuite>

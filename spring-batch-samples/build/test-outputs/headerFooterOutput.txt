@@ -1,0 +1,5 @@
+header from input: names
+[john]
+[joe]
+[jane]
+footer - number of items written: 3

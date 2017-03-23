@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Multi-File Input</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s07.xhtml" title="XML Item Readers and Writers"/><link rel="next" href="ch06s09.xhtml" title="Database"/></head><body><header/><section class="section" title="Multi-File Input" epub:type="subchapter" id="multiFileInput"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Multi-File Input</h2></div></div></div><p>It is a common requirement to process multiple files within a single
+    <code class="classname">Step</code>. Assuming the files all have the same
+    formatting, the <code class="classname">MultiResourceItemReader</code> supports
+    this type of input for both XML and flat file processing. Consider the
+    following files in a directory:</p><pre class="programlisting">file-1.txt  file-2.txt  ignored.txt</pre><p>file-1.txt and file-2.txt are formatted the same and for business
+    reasons should be processed together. The
+    <code class="classname">MuliResourceItemReader</code> can be used to read in both
+    files by using wildcards:</p><pre class="programlisting">&lt;bean id="multiResourceReader" class="org.spr...MultiResourceItemReader"&gt;
+    &lt;property name="resources" value="classpath:data/input/file-*.txt" /&gt;
+    &lt;property name="delegate" ref="flatFileItemReader" /&gt;
+&lt;/bean&gt;</pre><p>The referenced delegate is a simple
+    <code class="classname">FlatFileItemReader</code>. The above configuration will
+    read input from both files, handling rollback and restart scenarios. It
+    should be noted that, as with any <code class="classname">ItemReader</code>,
+    adding extra input (in this case a file) could cause potential issues when
+    restarting. It is recommended that batch jobs work with their own
+    individual directories until completed successfully.</p></section><footer/></body></html>

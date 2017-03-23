@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.HibernateItemWriterTests" tests="6" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:51" hostname="Michaels-MacBook-Pro-3.local" time="0.049">
+  <properties/>
+  <testcase name="testWriteAndFlushSunnyDayHibernate3" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.046"/>
+  <testcase name="testWriteAndFlushSunnyDayHibernate4" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.0"/>
+  <testcase name="testAfterPropertiesSetWithDelegate" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.001"/>
+  <testcase name="testWriteAndFlushWithFailureHibernate3" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.001"/>
+  <testcase name="testWriteAndFlushWithFailureHibernate4" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.0"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.database.HibernateItemWriterTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

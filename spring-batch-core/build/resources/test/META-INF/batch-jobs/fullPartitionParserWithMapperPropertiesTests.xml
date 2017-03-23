@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="fullPartitionParserWithMapperPropertiesTests" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1">
+		<batchlet ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$MyBatchlet">
+			<properties>
+				<property name="artifactName" value="#{partitionPlan['batchletName']}"/>
+			</properties>
+		</batchlet>
+	    <partition>
+	    	<mapper ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PropertyPartitionMapper"/>
+	    	<collector ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionCollector">
+				<properties>
+					<property name="artifactName" value="#{partitionPlan['collectorName']}"/>
+				</properties>
+	    	</collector>
+	    	<analyzer ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionAnalyzer">
+				<properties>
+					<property name="artifactName" value="analyzer"/>
+				</properties>
+	    	</analyzer>
+	    	<reducer ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionReducer">
+				<properties>
+					<property name="artifactName" value="reducer"/>
+				</properties>
+	    	</reducer>
+	    </partition>
+	</step>
+</job>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Controlling Step Flow</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch05s02.xhtml" title="TaskletStep"/><link rel="next" href="ch05s04.xhtml" title="Late Binding of Job and Step Attributes"/></head><body><header/><section class="section" title="Controlling Step Flow" epub:type="subchapter" id="controllingStepFlow"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Controlling Step Flow</h2></div></div></div><p>With the ability to group steps together within an owning job comes
+    the need to be able to control how the job 'flows' from one step to
+    another. The failure of a <code class="classname">Step</code> doesn't necessarily
+    mean that the <code class="classname">Job</code> should fail. Furthermore, there
+    may be more than one type of 'success' which determines which
+    <code class="classname">Step</code> should be executed next. Depending upon how a
+    group of Steps is configured, certain steps may not even be processed at
+    all.</p><section class="section" title="Sequential Flow" epub:type="division" id="SequentialFlow"><div class="titlepage"><div><div><h3 class="title">Sequential Flow</h3></div></div></div><p>The simplest flow scenario is a job where all of the steps execute
+      sequentially:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/sequential-flow.png" width="108"/></div><p>This can be achieved using the 'next' attribute of the step
+      element:</p><pre class="programlisting">&lt;job id="job"&gt;
+    &lt;step id="stepA" parent="s1" next="stepB" /&gt;
+    &lt;step id="stepB" parent="s2" next="stepC"/&gt;
+    &lt;step id="stepC" parent="s3" /&gt;
+&lt;/job&gt;</pre><p>In the scenario above, 'step A' will execute
+      first because it is the first <code class="classname">Step</code> listed. If
+      'step A' completes normally, then 'step B' will execute, and so on.
+      However, if 'step A' fails, then the entire <code class="classname">Job</code>
+      will fail and 'step B' will not execute.</p><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>With the Spring Batch namespace, the first step listed in the
+        configuration will <span class="emphasis"><em>always</em></span> be the first step
+        executed by the <code class="classname">Job</code>. The order of the other
+        step elements does not matter, but the first step must always appear
+        first in the xml.</p></td></tr></table></div></section><section class="section" title="Conditional Flow" epub:type="division" id="conditionalFlow"><div class="titlepage"><div><div><h3 class="title">Conditional Flow</h3></div></div></div><p>In the example above, there are only two possibilities:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>The <code class="classname">Step</code> is successful and the next
+          <code class="classname">Step</code> should be executed.</p></li><li class="listitem" epub:type="list-item"><p>The <code class="classname">Step</code> failed and thus the
+          <code class="classname">Job</code> should fail.</p></li></ol></div><p>In many cases, this may be sufficient. However, what about a
+      scenario in which the failure of a <code class="classname">Step</code> should
+      trigger a different <code class="classname">Step</code>, rather than causing
+      failure? </p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/conditional-flow.png" width="270"/></div><p id="nextElement">In order to handle more complex scenarios, the
+      Spring Batch namespace allows transition elements to be defined within
+      the step element. One such transition is the "next" element. Like the
+      "next" attribute, the "next" element will tell the
+      <code class="classname">Job</code> which <code class="classname">Step</code> to execute
+      next. However, unlike the attribute, any number of "next" elements are
+      allowed on a given <code class="classname">Step</code>, and there is no default
+      behavior the case of failure. This means that if transition elements are
+      used, then all of the behavior for the <code class="classname">Step</code>'s
+      transitions must be defined explicitly. Note also that a single step
+      cannot have both a "next" attribute and a transition element.</p><p>The next element specifies a pattern to match and the step to
+      execute next:</p><pre class="programlisting">&lt;job id="job"&gt;
+    &lt;step id="stepA" parent="s1"&gt;
+        &lt;next on="*" to="stepB" /&gt;
+        &lt;next on="FAILED" to="stepC" /&gt;
+    &lt;/step&gt;
+    &lt;step id="stepB" parent="s2" next="stepC" /&gt;
+    &lt;step id="stepC" parent="s3" /&gt;
+&lt;/job&gt;</pre><p>The "on" attribute of a transition element uses a simple
+      pattern-matching scheme to match the <code class="classname">ExitStatus</code>
+      that results from the execution of the <code class="classname">Step</code>. Only
+      two special characters are allowed in the pattern:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>"*" will zero or more characters</p></li><li class="listitem" epub:type="list-item"><p>"?" will match exactly one character</p></li></ul></div><p>For example, "c*t" will match "cat" and "count", while "c?t" will
+      match "cat" but not "count".</p><p>While there is no limit to the number of transition elements on a
+      <code class="classname">Step</code>, if the <code class="classname">Step</code>'s
+      execution results in an <code class="classname">ExitStatus</code> that is not
+      covered by an element, then the framework will throw an exception and
+      the <code class="classname">Job</code> will fail. The framework will
+	  automatically order transitions from most specific to
+      least specific. This means that even if the elements were swapped for
+      "stepA" in the example above, an <code class="classname">ExitStatus</code> of
+      "FAILED" would still go to "stepC".</p><section class="section" title="Batch Status vs. Exit Status" epub:type="division" id="batchStatusVsExitStatus"><div class="titlepage"><div><div><h4 class="title">Batch Status vs. Exit Status</h4></div></div></div><p>When configuring a <code class="classname">Job</code> for conditional
+        flow, it is important to understand the difference between
+        <code class="classname">BatchStatus</code> and
+        <code class="classname">ExitStatus</code>. <code class="classname">BatchStatus</code>
+        is an enumeration that is a property of both
+        <code class="classname">JobExecution</code> and
+        <code class="classname">StepExecution</code> and is used by the framework to
+        record the status of a <code class="classname">Job</code> or
+        <code class="classname">Step</code>. It can be one of the following values:
+        COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED or
+        UNKNOWN. Most of them are self explanatory: COMPLETED is the status
+        set when a step or job has completed successfully, FAILED is set when
+        it fails, and so on. The example above contains the following 'next'
+        element:</p><pre class="programlisting">&lt;next on="FAILED" to="stepB" /&gt;</pre><p>At first glance, it would appear that the 'on' attribute
+        references the <code class="classname">BatchStatus</code> of the
+        <code class="classname">Step</code> to which it belongs. However, it actually
+        references the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Step</code>. As the name implies,
+        <code class="classname">ExitStatus</code> represents the status of a
+        <code class="classname">Step</code> after it finishes execution. More
+        specifically, the 'next' element above references the exit code of the
+        <code class="classname">ExitStatus</code>. To write it in English, it says:
+        "go to stepB if the exit code is FAILED". By default, the exit code is
+        always the same as the <code class="classname">BatchStatus</code> for the
+        Step, which is why the entry above works. However, what if the exit
+        code needs to be different? A good example comes from the skip sample
+        job within the samples project:</p><pre class="programlisting">&lt;step id="step1" parent="s1"&gt;
+    &lt;end on="FAILED" /&gt;
+    &lt;next on="COMPLETED WITH SKIPS" to="errorPrint1" /&gt;
+    &lt;next on="*" to="step2" /&gt;
+&lt;/step&gt;</pre><p>The above step has three possibilities:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>The <code class="classname">Step</code> failed, in which case the
+            job should fail.</p></li><li class="listitem" epub:type="list-item"><p>The <code class="classname">Step</code> completed
+            successfully.</p></li><li class="listitem" epub:type="list-item"><p>The <code class="classname">Step</code> completed successfully, but
+            with an exit code of 'COMPLETED WITH SKIPS'. In this case, a
+            different step should be run to handle the errors.</p></li></ol></div><p>The above configuration will work. However, something needs to
+        change the exit code based on the condition of the execution having
+        skipped records:</p><pre class="programlisting">public class SkipCheckingListener extends StepExecutionListenerSupport {
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        String exitCode = stepExecution.getExitStatus().getExitCode();
+        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp;
+              stepExecution.getSkipCount() &gt; 0) {
+            return new ExitStatus("COMPLETED WITH SKIPS");
+        }
+        else {
+            return null;
+        }
+    }
+}</pre><p>The above code is a <code class="classname">StepExecutionListener</code>
+        that first checks to make sure the <code class="classname">Step</code> was
+        successful, and next if the skip count on the
+        <code class="classname">StepExecution</code> is higher than 0. If both
+        conditions are met, a new <code class="classname">ExitStatus</code> with an
+        exit code of "COMPLETED WITH SKIPS" is returned.</p></section></section><section class="section" title="Configuring for Stop" epub:type="division" id="configuringForStop"><div class="titlepage"><div><div><h3 class="title">Configuring for Stop</h3></div></div></div><p>After the discussion of <a class="link" href="ch05s03.xhtml#batchStatusVsExitStatus" title="Batch Status vs. Exit Status"><code class="classname">BatchStatus</code> and
+      <code class="classname">ExitStatus</code></a>, one might wonder how the
+      <code class="classname">BatchStatus</code> and <code class="classname">ExitStatus</code>
+      are determined for the <code class="classname">Job</code>. While these statuses
+      are determined for the <code class="classname">Step</code> by the code that is
+      executed, the statuses for the <code class="classname">Job</code> will be
+      determined based on the configuration.</p><p>So far, all of the job configurations discussed have had at least
+      one final <code class="classname">Step</code> with no transitions. For example,
+      after the following step executes, the <code class="classname">Job</code> will
+      end:</p><pre class="programlisting">&lt;step id="stepC" parent="s3"/&gt;</pre><p>If no transitions are defined for a <code class="classname">Step</code>,
+      then the <code class="classname">Job</code>'s statuses will be defined as
+      follows:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>If the <code class="classname">Step</code> ends with
+          <code class="classname">ExitStatus</code> FAILED, then the
+          <code class="classname">Job</code>'s <code class="classname">BatchStatus</code> and
+          <code class="classname">ExitStatus</code> will both be FAILED.</p></li><li class="listitem" epub:type="list-item"><p>Otherwise, the <code class="classname">Job</code>'s
+          <code class="classname">BatchStatus</code> and
+          <code class="classname">ExitStatus</code> will both be COMPLETED.</p></li></ul></div><p>While this method of terminating a batch job is sufficient for
+      some batch jobs, such as a simple sequential step job, custom defined
+      job-stopping scenarios may be required. For this purpose, Spring Batch
+      provides three transition elements to stop a <code class="classname">Job</code>
+      (in addition to the <a class="link" href="ch05s03.xhtml#nextElement">"next" element</a>
+      that we discussed previously). Each of these stopping elements will stop
+      a <code class="classname">Job</code> with a particular
+      <code class="classname">BatchStatus</code>. It is important to note that the
+      stop transition elements will have no effect on either the
+      <code class="classname">BatchStatus</code> or <code class="classname">ExitStatus</code>
+      of any <code class="classname">Step</code>s in the <code class="classname">Job</code>:
+      these elements will only affect the final statuses of the
+      <code class="classname">Job</code>. For example, it is possible for every step
+      in a job to have a status of FAILED but the job to have a status of
+      COMPLETED, or vise versa.</p><section class="section" title="The 'End' Element" epub:type="division" id="endElement"><div class="titlepage"><div><div><h4 class="title">The 'End' Element</h4></div></div></div><p>The 'end' element instructs a <code class="classname">Job</code> to stop
+        with a <code class="classname">BatchStatus</code> of COMPLETED. A
+        <code class="classname">Job</code> that has finished with status COMPLETED
+        cannot be restarted (the framework will throw a
+        <code class="classname">JobInstanceAlreadyCompleteException</code>). The 'end'
+        element also allows for an optional 'exit-code' attribute that can be
+        used to customize the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Job</code>. If no 'exit-code' attribute is given, then
+        the <code class="classname">ExitStatus</code> will be "COMPLETED" by default,
+        to match the <code class="classname">BatchStatus</code>.</p><p>In the following scenario, if step2 fails, then the
+        <code class="classname">Job</code> will stop with a
+        <code class="classname">BatchStatus</code> of COMPLETED and an
+        <code class="classname">ExitStatus</code> of "COMPLETED" and step3 will not
+        execute; otherwise, execution will move to step3. Note that if step2
+        fails, the <code class="classname">Job</code> will not be restartable (because
+        the status is COMPLETED).</p><pre class="programlisting">&lt;step id="step1" parent="s1" next="step2"&gt;
+
+&lt;step id="step2" parent="s2"&gt;
+    &lt;end on="FAILED"/&gt;
+    &lt;next on="*" to="step3"/&gt;
+&lt;/step&gt;
+
+&lt;step id="step3" parent="s3"&gt;</pre></section><section class="section" title="The 'Fail' Element" epub:type="division" id="failElement"><div class="titlepage"><div><div><h4 class="title">The 'Fail' Element</h4></div></div></div><p>The 'fail' element instructs a <code class="classname">Job</code> to
+        stop with a <code class="classname">BatchStatus</code> of FAILED. Unlike the
+        'end' element, the 'fail' element will not prevent the
+        <code class="classname">Job</code> from being restarted. The 'fail' element
+        also allows for an optional 'exit-code' attribute that can be used to
+        customize the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Job</code>. If no 'exit-code' attribute is given, then
+        the <code class="classname">ExitStatus</code> will be "FAILED" by default, to
+        match the <code class="classname">BatchStatus</code>.</p><p>In the following scenario, if step2 fails, then the
+        <code class="classname">Job</code> will stop with a
+        <code class="classname">BatchStatus</code> of FAILED and an
+        <code class="classname">ExitStatus</code> of "EARLY TERMINATION" and step3
+        will not execute; otherwise, execution will move to step3.
+        Additionally, if step2 fails, and the <code class="classname">Job</code> is
+        restarted, then execution will begin again on step2.</p><pre class="programlisting">&lt;step id="step1" parent="s1" next="step2"&gt;
+
+&lt;step id="step2" parent="s2"&gt;
+    &lt;fail on="FAILED" exit-code="EARLY TERMINATION"/&gt;
+    &lt;next on="*" to="step3"/&gt;
+&lt;/step&gt;
+
+&lt;step id="step3" parent="s3"&gt;</pre></section><section class="section" title="The 'Stop' Element" epub:type="division" id="stopElement"><div class="titlepage"><div><div><h4 class="title">The 'Stop' Element</h4></div></div></div><p>The 'stop' element instructs a <code class="classname">Job</code> to
+        stop with a <code class="classname">BatchStatus</code> of STOPPED. Stopping a
+        <code class="classname">Job</code> can provide a temporary break in processing
+        so that the operator can take some action before restarting the
+        <code class="classname">Job</code>. The 'stop' element requires a 'restart'
+        attribute that specifies the step where execution should pick up when
+        the <code class="classname">Job is restarted</code>.</p><p>In the following scenario, if step1 finishes with COMPLETE, then
+        the job will then stop. Once it is restarted, execution will begin on
+        step2.</p><pre class="programlisting">&lt;step id="step1" parent="s1"&gt;
+    &lt;stop on="COMPLETED" restart="step2"/&gt;
+&lt;/step&gt;
+
+&lt;step id="step2" parent="s2"/&gt;</pre></section></section><section class="section" title="Programmatic Flow Decisions" epub:type="division" id="programmaticFlowDecisions"><div class="titlepage"><div><div><h3 class="title">Programmatic Flow Decisions</h3></div></div></div><p>In some situations, more information than the
+      <code class="classname">ExitStatus</code> may be required to decide which step
+      to execute next. In this case, a
+      <code class="classname">JobExecutionDecider</code> can be used to assist in the
+      decision.</p><pre class="programlisting">public class MyDecider implements JobExecutionDecider {
+    public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+        if (someCondition) {
+            return "FAILED";
+        }
+        else {
+            return "COMPLETED";
+        }
+    }
+}</pre><p>In the job configuration, a "decision" tag will specify the
+      decider to use as well as all of the transitions.</p><pre class="programlisting">&lt;job id="job"&gt;
+    &lt;step id="step1" parent="s1" next="decision" /&gt;
+
+    &lt;decision id="decision" decider="decider"&gt;
+        &lt;next on="FAILED" to="step2" /&gt;
+        &lt;next on="COMPLETED" to="step3" /&gt;
+    &lt;/decision&gt;
+
+    &lt;step id="step2" parent="s2" next="step3"/&gt;
+    &lt;step id="step3" parent="s3" /&gt;
+&lt;/job&gt;
+
+&lt;beans:bean id="decider" class="com.MyDecider"/&gt;</pre></section><section class="section" title="Split Flows" epub:type="division" id="split-flows"><div class="titlepage"><div><div><h3 class="title">Split Flows</h3></div></div></div><p>Every scenario described so far has involved a
+      <code class="classname">Job</code> that executes its
+      <code class="classname">Step</code>s one at a time in a linear fashion. In
+      addition to this typical style, the Spring Batch namespace also allows
+      for a job to be configured with parallel flows using the 'split'
+      element. As is seen below, the 'split' element contains one or more
+      'flow' elements, where entire separate flows can be defined. A 'split'
+      element may also contain any of the previously discussed transition
+      elements such as the 'next' attribute or the 'next', 'end', 'fail', or
+      'pause' elements.</p><pre class="programlisting">&lt;split id="split1" next="step4"&gt;
+    &lt;flow&gt;
+        &lt;step id="step1" parent="s1" next="step2"/&gt;
+        &lt;step id="step2" parent="s2"/&gt;
+    &lt;/flow&gt;
+    &lt;flow&gt;
+        &lt;step id="step3" parent="s3"/&gt;
+    &lt;/flow&gt;
+&lt;/split&gt;
+&lt;step id="step4" parent="s4"/&gt;</pre></section><section class="section" title="Externalizing Flow Definitions and Dependencies Between Jobs" epub:type="division" id="external-flows"><div class="titlepage"><div><div><h3 class="title">Externalizing Flow Definitions and Dependencies Between
+      Jobs</h3></div></div></div><p>Part of the flow in a job can be externalized as a separate bean
+      definition, and then re-used. There are two ways to do this, and the
+      first is to simply declare the flow as a reference to one defined
+      elsewhere:</p><pre class="programlisting">&lt;job id="job"&gt;
+    &lt;flow id="job1.flow1" parent="flow1" next="step3"/&gt;
+    &lt;step id="step3" parent="s3"/&gt;
+&lt;/job&gt;
+
+&lt;flow id="flow1"&gt;
+    &lt;step id="step1" parent="s1" next="step2"/&gt;
+    &lt;step id="step2" parent="s2"/&gt;
+&lt;/flow&gt;</pre><p>The effect of defining an external flow like this is simply to
+      insert the steps from the external flow into the job as if they had been
+      declared inline. In this way many jobs can refer to the same template
+      flow and compose such templates into different logical flows. This is
+      also a good way to separate the integration testing of the individual
+      flows.</p><p>The other form of an externalized flow is to use a
+      <code class="classname">JobStep</code>. A <code class="classname">JobStep</code> is
+      similar to a <code class="classname">FlowStep</code>, but actually creates and
+      launches a separate job execution for the steps in the flow specified.
+      Here is an example:</p><pre class="programlisting">&lt;job id="jobStepJob" restartable="true"&gt;
+   &lt;step id="jobStepJob.step1"&gt;
+      &lt;job ref="<span class="bold"><strong>job</strong></span>" job-launcher="jobLauncher"
+          job-parameters-extractor="jobParametersExtractor"/&gt;
+   &lt;/step&gt;
+&lt;/job&gt;
+
+&lt;job id="<span class="bold"><strong>job</strong></span>" restartable="true"&gt;...&lt;/job&gt;
+
+&lt;bean id="jobParametersExtractor" class="org.spr...DefaultJobParametersExtractor"&gt;
+   &lt;property name="keys" value="input.file"/&gt;
+&lt;/bean&gt;</pre><p>The job parameters extractor is a strategy that determines how a
+      the <code class="classname">ExecutionContext</code> for the
+      <code class="classname">Step</code> is converted into
+      <code class="classname">JobParameters</code> for the Job that is executed. The
+      <code class="classname">JobStep</code> is useful when you want to have some more
+      granular options for monitoring and reporting on jobs and steps. Using
+      <code class="classname">JobStep</code> is also often a good answer to the
+      question: "How do I create dependencies between jobs?". It is a good way
+      to break up a large system into smaller modules and control the flow of
+      jobs.</p></section></section><footer/></body></html>

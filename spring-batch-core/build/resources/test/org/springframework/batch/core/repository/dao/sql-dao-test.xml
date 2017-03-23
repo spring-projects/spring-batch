@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="data-source-context.xml" />
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository">
+		<constructor-arg ref="jobInstanceDao" />
+		<constructor-arg ref="jobExecutionDao" />
+		<constructor-arg ref="stepExecutionDao" />
+		<constructor-arg ref="executionContextDao" />
+	</bean>
+
+	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.JdbcExecutionContextDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="serializer" ref="serializer"/>
+	</bean>
+
+	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="jobIncrementer" ref="jobIncrementer" />
+	</bean>
+
+	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcJobExecutionDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
+	</bean>
+
+	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcStepExecutionDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" />
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="serializer" class="org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer"/>
+</beans>

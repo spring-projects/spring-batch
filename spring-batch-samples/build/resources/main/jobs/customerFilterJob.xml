@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="customerFilterJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="uploadCustomer">
+			<tasklet>
+				<chunk reader="customerFileUploadReader" processor="customerUpdateProcessor"
+					writer="customerUpdateWriter" commit-interval="1" />
+				<listeners>
+					<listener ref="customerTokenizer" />
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="customerUpdateWriter"
+		class="org.springframework.batch.sample.domain.trade.CustomerUpdateWriter">
+		<property name="customerDao" ref="customerDao" />
+	</bean>
+
+	<bean name="customerFileUploadReader"
+		class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/customerFilterJob/input/customers.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="customerTokenizer" />
+				<property name="fieldSetMapper" ref="customerMapper" />
+			</bean>
+		</property>
+		<!-- skip the header -->
+		<property name="linesToSkip" value="1" />
+	</bean>
+
+	<bean name="customerMapper"
+		class="org.springframework.batch.sample.domain.trade.CustomerUpdateFieldSetMapper" />
+
+	<bean name="customerTokenizer"
+		class="org.springframework.batch.sample.domain.trade.CompositeCustomerUpdateLineTokenizer">
+		<property name="customerTokenizer">
+			<bean
+				class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+				<property name="columns" value="1,2-18,19-26" />
+			</bean>
+		</property>
+		<property name="footerTokenizer">
+			<bean
+				class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+				<property name="columns" value="1,2-8" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean name="customerUpdateProcessor"
+		class="org.springframework.batch.sample.domain.trade.CustomerUpdateProcessor">
+		<property name="customerDao" ref="customerDao" />
+		<property name="invalidCustomerLogger">
+			<bean
+				class="org.springframework.batch.sample.domain.trade.internal.CommonsLoggingInvalidCustomerLogger" />
+		</property>
+	</bean>
+
+	<bean name="customerDao"
+		class="org.springframework.batch.sample.domain.trade.internal.JdbcCustomerDao">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="${batch.database.incrementer.parent}">
+				<property name="incrementerName" value="CUSTOMER_SEQ"/>
+			</bean>
+		</property>
+	</bean>
+</beans>

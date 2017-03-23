@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:21" hostname="Michaels-MacBook-Pro-3.local" time="0.569">
+  <properties/>
+  <testcase name="testSunnyDay" classname="org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests" time="0.129"/>
+  <testcase name="testRollback" classname="org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests" time="0.137"/>
+  <system-out><![CDATA[2017-03-23 10:05:21,416  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/integration/retry/RepeatTransactionalPollingIntegrationTests-context.xml]>
+2017-03-23 10:05:21,444  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - <No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.>
+2017-03-23 10:05:21,444 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.>
+2017-03-23 10:05:21,445 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.>
+2017-03-23 10:05:21,451  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Refreshing org.springframework.context.support.GenericApplicationContext@67893c70: startup date [Thu Mar 23 10:05:21 CDT 2017]; root of context hierarchy>
+2017-03-23 10:05:21,464  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.>
+2017-03-23 10:05:21,464  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.>
+2017-03-23 10:05:21,465  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:21,485  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:21,634  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:21,673 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - <No global channel interceptors.>
+2017-03-23 10:05:21,712  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 0>
+2017-03-23 10:05:21,712  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {service-activator} as a subscriber to the 'requests' channel>
+2017-03-23 10:05:21,712  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.requests' has 1 subscriber(s).>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started org.springframework.integration.config.ConsumerEndpointFactoryBean#0>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {outbound-channel-adapter} as a subscriber to the 'replies' channel>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.replies' has 1 subscriber(s).>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started org.springframework.integration.config.ConsumerEndpointFactoryBean#1>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.errorChannel' has 1 subscriber(s).>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started _org.springframework.integration.errorLogger>
+2017-03-23 10:05:21,713  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 1073741823>
+2017-03-23 10:05:21,714  INFO Test worker [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <started org.springframework.integration.config.SourcePollingChannelAdapterFactoryBean#0>
+2017-03-23 10:05:21,720  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 0>
+2017-03-23 10:05:21,724  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 1073741823>
+2017-03-23 10:05:21,821 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 0>
+2017-03-23 10:05:21,822 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=a, headers={id=e6210831-e910-be52-e70f-734bc9a6186a, timestamp=1490281521822}]>
+2017-03-23 10:05:21,822 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=a, headers={id=e6210831-e910-be52-e70f-734bc9a6186a, timestamp=1490281521822}]>
+2017-03-23 10:05:21,822 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@506f9215] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=a, headers={id=e6210831-e910-be52-e70f-734bc9a6186a, timestamp=1490281521822}]>
+2017-03-23 10:05:21,823 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: a>
+2017-03-23 10:05:21,823 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=a: 0, headers={id=2c83c1c2-0227-ae2c-cd87-4e527c08ef5b, timestamp=1490281521823}]>
+2017-03-23 10:05:21,823 DEBUG task-scheduler-1 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=a: 0, headers={id=2c83c1c2-0227-ae2c-cd87-4e527c08ef5b, timestamp=1490281521823}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: a: 0>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=a: 0, headers={id=2c83c1c2-0227-ae2c-cd87-4e527c08ef5b, timestamp=1490281521823}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=a, headers={id=e6210831-e910-be52-e70f-734bc9a6186a, timestamp=1490281521822}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 1>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=b, headers={id=37828316-a5cc-283a-24cb-6c44ea14bb7a, timestamp=1490281521824}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=b, headers={id=37828316-a5cc-283a-24cb-6c44ea14bb7a, timestamp=1490281521824}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@506f9215] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=b, headers={id=37828316-a5cc-283a-24cb-6c44ea14bb7a, timestamp=1490281521824}]>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: b>
+2017-03-23 10:05:21,824 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=b: 1, headers={id=a47341fa-6c0d-80f5-2922-97c5b12f7746, timestamp=1490281521824}]>
+2017-03-23 10:05:21,825 DEBUG task-scheduler-1 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=b: 1, headers={id=a47341fa-6c0d-80f5-2922-97c5b12f7746, timestamp=1490281521824}]>
+2017-03-23 10:05:21,826 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: b: 1>
+2017-03-23 10:05:21,826 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=b: 1, headers={id=a47341fa-6c0d-80f5-2922-97c5b12f7746, timestamp=1490281521824}]>
+2017-03-23 10:05:21,826 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=b, headers={id=37828316-a5cc-283a-24cb-6c44ea14bb7a, timestamp=1490281521824}]>
+2017-03-23 10:05:21,836 DEBUG task-scheduler-6 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:21,836 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 2>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=c, headers={id=a5e785d7-6f51-f671-3d24-4a30a466c84b, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=c, headers={id=a5e785d7-6f51-f671-3d24-4a30a466c84b, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@506f9215] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=c, headers={id=a5e785d7-6f51-f671-3d24-4a30a466c84b, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: c>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=c: 2, headers={id=26259661-9023-ac1e-a0a1-92e24b12c4d0, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=c: 2, headers={id=26259661-9023-ac1e-a0a1-92e24b12c4d0, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: c: 2>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=c: 2, headers={id=26259661-9023-ac1e-a0a1-92e24b12c4d0, timestamp=1490281521837}]>
+2017-03-23 10:05:21,837 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=c, headers={id=a5e785d7-6f51-f671-3d24-4a30a466c84b, timestamp=1490281521837}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 3>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=d, headers={id=31b3af36-1489-7317-80e5-289d8d898a24, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=d, headers={id=31b3af36-1489-7317-80e5-289d8d898a24, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@506f9215] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=d, headers={id=31b3af36-1489-7317-80e5-289d8d898a24, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: d>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=d: 3, headers={id=92944a84-76be-c8c9-3294-6f26abdc2ce0, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=d: 3, headers={id=92944a84-76be-c8c9-3294-6f26abdc2ce0, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: d: 3>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=d: 3, headers={id=92944a84-76be-c8c9-3294-6f26abdc2ce0, timestamp=1490281521838}]>
+2017-03-23 10:05:21,838 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=d, headers={id=31b3af36-1489-7317-80e5-289d8d898a24, timestamp=1490281521838}]>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 1073741823>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <stopped org.springframework.integration.config.SourcePollingChannelAdapterFactoryBean#0>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 0>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {service-activator} as a subscriber to the 'requests' channel>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.requests' has 0 subscriber(s).>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#0>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {outbound-channel-adapter} as a subscriber to the 'replies' channel>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.replies' has 0 subscriber(s).>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#1>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@67893c70.errorChannel' has 0 subscriber(s).>
+2017-03-23 10:05:21,843  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped _org.springframework.integration.errorLogger>
+2017-03-23 10:05:21,844  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Closing org.springframework.context.support.GenericApplicationContext@67893c70: startup date [Thu Mar 23 10:05:21 CDT 2017]; root of context hierarchy>
+2017-03-23 10:05:21,844  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 1073741823>
+2017-03-23 10:05:21,844  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 0>
+2017-03-23 10:05:21,845  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/integration/retry/RepeatTransactionalPollingIntegrationTests-context.xml]>
+2017-03-23 10:05:21,873  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - <No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.>
+2017-03-23 10:05:21,874 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.>
+2017-03-23 10:05:21,875 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - <SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.>
+2017-03-23 10:05:21,877  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Refreshing org.springframework.context.support.GenericApplicationContext@70d0a483: startup date [Thu Mar 23 10:05:21 CDT 2017]; root of context hierarchy>
+2017-03-23 10:05:21,889  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.>
+2017-03-23 10:05:21,889  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - <No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.>
+2017-03-23 10:05:21,890  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:21,933  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:22,064  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:05:22,103 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - <No global channel interceptors.>
+2017-03-23 10:05:22,145  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 0>
+2017-03-23 10:05:22,145  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {service-activator} as a subscriber to the 'requests' channel>
+2017-03-23 10:05:22,145  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.requests' has 1 subscriber(s).>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started org.springframework.integration.config.ConsumerEndpointFactoryBean#0>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {outbound-channel-adapter} as a subscriber to the 'replies' channel>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.replies' has 1 subscriber(s).>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started org.springframework.integration.config.ConsumerEndpointFactoryBean#1>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.errorChannel' has 1 subscriber(s).>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <started _org.springframework.integration.errorLogger>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 1073741823>
+2017-03-23 10:05:22,146  INFO Test worker [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <started org.springframework.integration.config.SourcePollingChannelAdapterFactoryBean#0>
+2017-03-23 10:05:22,149  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 0>
+2017-03-23 10:05:22,149  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Starting beans in phase 1073741823>
+2017-03-23 10:05:22,250 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 0>
+2017-03-23 10:05:22,251 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=a, headers={id=bd19d1ff-776d-d937-bea9-8b8170cb3e04, timestamp=1490281522251}]>
+2017-03-23 10:05:22,251 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=a, headers={id=bd19d1ff-776d-d937-bea9-8b8170cb3e04, timestamp=1490281522251}]>
+2017-03-23 10:05:22,251 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@53d7f4b5] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=a, headers={id=bd19d1ff-776d-d937-bea9-8b8170cb3e04, timestamp=1490281522251}]>
+2017-03-23 10:05:22,252 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: a>
+2017-03-23 10:05:22,252 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=a: 0, headers={id=f06ce8b0-79b0-80b0-a15c-1f99a66ad596, timestamp=1490281522252}]>
+2017-03-23 10:05:22,252 DEBUG task-scheduler-1 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=a: 0, headers={id=f06ce8b0-79b0-80b0-a15c-1f99a66ad596, timestamp=1490281522252}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: a: 0>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=a: 0, headers={id=f06ce8b0-79b0-80b0-a15c-1f99a66ad596, timestamp=1490281522252}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=a, headers={id=bd19d1ff-776d-d937-bea9-8b8170cb3e04, timestamp=1490281522251}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 1>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=b, headers={id=943c731e-0d77-af2a-cde8-8905cc2cc6fc, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=b, headers={id=943c731e-0d77-af2a-cde8-8905cc2cc6fc, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@53d7f4b5] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=b, headers={id=943c731e-0d77-af2a-cde8-8905cc2cc6fc, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: b>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'replies', message: GenericMessage [payload=b: 1, headers={id=e8272a0e-ca1f-1e2a-f486-2aa405420176, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.handler.MethodInvokingMessageHandler] - <org.springframework.integration.handler.MethodInvokingMessageHandler#0 received message: GenericMessage [payload=b: 1, headers={id=e8272a0e-ca1f-1e2a-f486-2aa405420176, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handled: b: 1>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'replies', message: GenericMessage [payload=b: 1, headers={id=e8272a0e-ca1f-1e2a-f486-2aa405420176, timestamp=1490281522253}]>
+2017-03-23 10:05:22,253 DEBUG task-scheduler-1 [org.springframework.integration.channel.DirectChannel] - <postSend (sent=true) on channel 'requests', message: GenericMessage [payload=b, headers={id=943c731e-0d77-af2a-cde8-8905cc2cc6fc, timestamp=1490281522253}]>
+2017-03-23 10:05:22,260 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - <Received no Message during the poll, returning 'false'>
+2017-03-23 10:05:22,266 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 2>
+2017-03-23 10:05:22,266 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}]>
+2017-03-23 10:05:22,266 DEBUG task-scheduler-2 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}]>
+2017-03-23 10:05:22,267 DEBUG task-scheduler-2 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@53d7f4b5] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}]>
+2017-03-23 10:05:22,267 DEBUG task-scheduler-2 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: fail>
+2017-03-23 10:05:22,267 DEBUG task-scheduler-2 [org.springframework.integration.channel.PublishSubscribeChannel] - <preSend on channel 'errorChannel', message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}], headers={id=4abe20ab-ecac-299e-f62c-0b5b035ddb08, timestamp=1490281522267}]>
+2017-03-23 10:05:22,267 DEBUG task-scheduler-2 [org.springframework.integration.handler.LoggingHandler] - <_org.springframework.integration.errorLogger.handler received message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}], headers={id=4abe20ab-ecac-299e-f62c-0b5b035ddb08, timestamp=1490281522267}]>
+2017-03-23 10:05:22,268 ERROR task-scheduler-2 [org.springframework.integration.handler.LoggingHandler] - <org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}]
+	at org.springframework.integration.handler.MethodInvokingMessageProcessor.processMessage(MethodInvokingMessageProcessor.java:96)
+	at org.springframework.integration.handler.ServiceActivatingHandler.handleRequestMessage(ServiceActivatingHandler.java:89)
+	at org.springframework.integration.handler.AbstractReplyProducingMessageHandler.handleMessageInternal(AbstractReplyProducingMessageHandler.java:109)
+	at org.springframework.integration.handler.AbstractMessageHandler.handleMessage(AbstractMessageHandler.java:133)
+	at org.springframework.integration.dispatcher.AbstractDispatcher.tryOptimizedDispatch(AbstractDispatcher.java:116)
+	at org.springframework.integration.dispatcher.UnicastingDispatcher.doDispatch(UnicastingDispatcher.java:132)
+	at org.springframework.integration.dispatcher.UnicastingDispatcher.dispatch(UnicastingDispatcher.java:105)
+	at org.springframework.integration.channel.AbstractSubscribableChannel.doSend(AbstractSubscribableChannel.java:73)
+	at org.springframework.integration.channel.AbstractMessageChannel.send(AbstractMessageChannel.java:423)
+	at org.springframework.integration.channel.AbstractMessageChannel.send(AbstractMessageChannel.java:373)
+	at org.springframework.messaging.core.GenericMessagingTemplate.doSend(GenericMessagingTemplate.java:115)
+	at org.springframework.messaging.core.GenericMessagingTemplate.doSend(GenericMessagingTemplate.java:45)
+	at org.springframework.messaging.core.AbstractMessageSendingTemplate.send(AbstractMessageSendingTemplate.java:105)
+	at org.springframework.integration.endpoint.SourcePollingChannelAdapter.handleMessage(SourcePollingChannelAdapter.java:216)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint.doPoll(AbstractPollingEndpoint.java:262)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$$Lambda$23/837989557.call(Unknown Source)
+	at sun.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:333)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor$1.doInIteration(RepeatOperationsInterceptor.java:92)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor.invoke(RepeatOperationsInterceptor.java:77)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:282)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:213)
+	at com.sun.proxy.$Proxy47.call(Unknown Source)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller.lambda$run$0(AbstractPollingEndpoint.java:340)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller$$Lambda$24/791029434.run(Unknown Source)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor.lambda$execute$0(ErrorHandlingTaskExecutor.java:53)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor$$Lambda$25/1527022783.run(Unknown Source)
+	at org.springframework.core.task.SyncTaskExecutor.execute(SyncTaskExecutor.java:50)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor.execute(ErrorHandlingTaskExecutor.java:51)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller.run(AbstractPollingEndpoint.java:334)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:81)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: Planned failure
+	at org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests.process(RepeatTransactionalPollingIntegrationTests.java:56)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.springframework.expression.spel.support.ReflectiveMethodExecutor.execute(ReflectiveMethodExecutor.java:113)
+	at org.springframework.expression.spel.ast.MethodReference.getValueInternal(MethodReference.java:102)
+	at org.springframework.expression.spel.ast.MethodReference.access$000(MethodReference.java:49)
+	at org.springframework.expression.spel.ast.MethodReference$MethodValueRef.getValue(MethodReference.java:347)
+	at org.springframework.expression.spel.ast.CompoundExpression.getValueInternal(CompoundExpression.java:88)
+	at org.springframework.expression.spel.ast.SpelNodeImpl.getTypedValue(SpelNodeImpl.java:131)
+	at org.springframework.expression.spel.standard.SpelExpression.getValue(SpelExpression.java:330)
+	at org.springframework.integration.util.AbstractExpressionEvaluator.evaluateExpression(AbstractExpressionEvaluator.java:169)
+	at org.springframework.integration.util.MessagingMethodInvokerHelper.processInternal(MessagingMethodInvokerHelper.java:336)
+	at org.springframework.integration.util.MessagingMethodInvokerHelper.process(MessagingMethodInvokerHelper.java:155)
+	at org.springframework.integration.handler.MethodInvokingMessageProcessor.processMessage(MethodInvokingMessageProcessor.java:93)
+	... 49 more
+>
+2017-03-23 10:05:22,269 DEBUG task-scheduler-2 [org.springframework.integration.channel.PublishSubscribeChannel] - <postSend (sent=true) on channel 'errorChannel', message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=e0d13bb6-605b-9dd3-0514-459852831dd3, timestamp=1490281522266}], headers={id=4abe20ab-ecac-299e-f62c-0b5b035ddb08, timestamp=1490281522267}]>
+2017-03-23 10:05:22,280 DEBUG task-scheduler-3 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Polling: 3>
+2017-03-23 10:05:22,280 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <Poll resulted in Message: GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}]>
+2017-03-23 10:05:22,280 DEBUG task-scheduler-3 [org.springframework.integration.channel.DirectChannel] - <preSend on channel 'requests', message: GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}]>
+2017-03-23 10:05:22,281 DEBUG task-scheduler-3 [org.springframework.integration.handler.ServiceActivatingHandler] - <ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@53d7f4b5] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}]>
+2017-03-23 10:05:22,281 DEBUG task-scheduler-3 [org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests] - <Handling: fail>
+2017-03-23 10:05:22,281 DEBUG task-scheduler-3 [org.springframework.integration.channel.PublishSubscribeChannel] - <preSend on channel 'errorChannel', message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}], headers={id=88e82eff-36e9-5734-b76a-bff9d2c47cc3, timestamp=1490281522281}]>
+2017-03-23 10:05:22,281 DEBUG task-scheduler-3 [org.springframework.integration.handler.LoggingHandler] - <_org.springframework.integration.errorLogger.handler received message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}], headers={id=88e82eff-36e9-5734-b76a-bff9d2c47cc3, timestamp=1490281522281}]>
+2017-03-23 10:05:22,282 ERROR task-scheduler-3 [org.springframework.integration.handler.LoggingHandler] - <org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}]
+	at org.springframework.integration.handler.MethodInvokingMessageProcessor.processMessage(MethodInvokingMessageProcessor.java:96)
+	at org.springframework.integration.handler.ServiceActivatingHandler.handleRequestMessage(ServiceActivatingHandler.java:89)
+	at org.springframework.integration.handler.AbstractReplyProducingMessageHandler.handleMessageInternal(AbstractReplyProducingMessageHandler.java:109)
+	at org.springframework.integration.handler.AbstractMessageHandler.handleMessage(AbstractMessageHandler.java:133)
+	at org.springframework.integration.dispatcher.AbstractDispatcher.tryOptimizedDispatch(AbstractDispatcher.java:116)
+	at org.springframework.integration.dispatcher.UnicastingDispatcher.doDispatch(UnicastingDispatcher.java:132)
+	at org.springframework.integration.dispatcher.UnicastingDispatcher.dispatch(UnicastingDispatcher.java:105)
+	at org.springframework.integration.channel.AbstractSubscribableChannel.doSend(AbstractSubscribableChannel.java:73)
+	at org.springframework.integration.channel.AbstractMessageChannel.send(AbstractMessageChannel.java:423)
+	at org.springframework.integration.channel.AbstractMessageChannel.send(AbstractMessageChannel.java:373)
+	at org.springframework.messaging.core.GenericMessagingTemplate.doSend(GenericMessagingTemplate.java:115)
+	at org.springframework.messaging.core.GenericMessagingTemplate.doSend(GenericMessagingTemplate.java:45)
+	at org.springframework.messaging.core.AbstractMessageSendingTemplate.send(AbstractMessageSendingTemplate.java:105)
+	at org.springframework.integration.endpoint.SourcePollingChannelAdapter.handleMessage(SourcePollingChannelAdapter.java:216)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint.doPoll(AbstractPollingEndpoint.java:262)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$$Lambda$23/837989557.call(Unknown Source)
+	at sun.reflect.GeneratedMethodAccessor38.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:333)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:190)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor$1.doInIteration(RepeatOperationsInterceptor.java:92)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor.invoke(RepeatOperationsInterceptor.java:77)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:282)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:213)
+	at com.sun.proxy.$Proxy47.call(Unknown Source)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller.lambda$run$0(AbstractPollingEndpoint.java:340)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller$$Lambda$24/791029434.run(Unknown Source)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor.lambda$execute$0(ErrorHandlingTaskExecutor.java:53)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor$$Lambda$25/1527022783.run(Unknown Source)
+	at org.springframework.core.task.SyncTaskExecutor.execute(SyncTaskExecutor.java:50)
+	at org.springframework.integration.util.ErrorHandlingTaskExecutor.execute(ErrorHandlingTaskExecutor.java:51)
+	at org.springframework.integration.endpoint.AbstractPollingEndpoint$Poller.run(AbstractPollingEndpoint.java:334)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:81)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:180)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:293)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.RuntimeException: Planned failure
+	at org.springframework.batch.integration.retry.RepeatTransactionalPollingIntegrationTests.process(RepeatTransactionalPollingIntegrationTests.java:56)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.springframework.expression.spel.support.ReflectiveMethodExecutor.execute(ReflectiveMethodExecutor.java:113)
+	at org.springframework.expression.spel.ast.MethodReference.getValueInternal(MethodReference.java:102)
+	at org.springframework.expression.spel.ast.MethodReference.access$000(MethodReference.java:49)
+	at org.springframework.expression.spel.ast.MethodReference$MethodValueRef.getValue(MethodReference.java:347)
+	at org.springframework.expression.spel.ast.CompoundExpression.getValueInternal(CompoundExpression.java:88)
+	at org.springframework.expression.spel.ast.SpelNodeImpl.getTypedValue(SpelNodeImpl.java:131)
+	at org.springframework.expression.spel.standard.SpelExpression.getValue(SpelExpression.java:330)
+	at org.springframework.integration.util.AbstractExpressionEvaluator.evaluateExpression(AbstractExpressionEvaluator.java:169)
+	at org.springframework.integration.util.MessagingMethodInvokerHelper.processInternal(MessagingMethodInvokerHelper.java:336)
+	at org.springframework.integration.util.MessagingMethodInvokerHelper.process(MessagingMethodInvokerHelper.java:155)
+	at org.springframework.integration.handler.MethodInvokingMessageProcessor.processMessage(MethodInvokingMessageProcessor.java:93)
+	... 49 more
+>
+2017-03-23 10:05:22,283 DEBUG task-scheduler-3 [org.springframework.integration.channel.PublishSubscribeChannel] - <postSend (sent=true) on channel 'errorChannel', message: ErrorMessage [payload=org.springframework.messaging.MessageHandlingException: nested exception is java.lang.RuntimeException: Planned failure, failedMessage=GenericMessage [payload=fail, headers={id=335ded07-8d1b-466c-c4c2-340f6a6cc7c8, timestamp=1490281522280}], headers={id=88e82eff-36e9-5734-b76a-bff9d2c47cc3, timestamp=1490281522281}]>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 1073741823>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.endpoint.SourcePollingChannelAdapter] - <stopped org.springframework.integration.config.SourcePollingChannelAdapterFactoryBean#0>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 0>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {service-activator} as a subscriber to the 'requests' channel>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.requests' has 0 subscriber(s).>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#0>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {outbound-channel-adapter} as a subscriber to the 'replies' channel>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.channel.DirectChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.replies' has 0 subscriber(s).>
+2017-03-23 10:05:22,283  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#1>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - <Channel 'org.springframework.context.support.GenericApplicationContext@70d0a483.errorChannel' has 0 subscriber(s).>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - <stopped _org.springframework.integration.errorLogger>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Closing org.springframework.context.support.GenericApplicationContext@70d0a483: startup date [Thu Mar 23 10:05:21 CDT 2017]; root of context hierarchy>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 1073741823>
+2017-03-23 10:05:22,284  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - <Stopping beans in phase 0>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

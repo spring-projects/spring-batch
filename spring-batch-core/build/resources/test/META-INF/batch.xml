@@ -1,0 +1,6 @@
+<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+	<ref id="testBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport" />
+    <ref id="restartBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.RestartBatchlet" />
+    <ref id="failingBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.FailingBatchlet" />
+    <ref id="exitStatusSettingStepListener" class="org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener" />
+</batch-artifacts>

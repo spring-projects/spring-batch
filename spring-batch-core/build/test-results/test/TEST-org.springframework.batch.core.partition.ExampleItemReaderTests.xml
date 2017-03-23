@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.partition.ExampleItemReaderTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.005">
+  <properties/>
+  <testcase name="testOpen" classname="org.springframework.batch.core.partition.ExampleItemReaderTests" time="0.002"/>
+  <testcase name="testRead" classname="org.springframework.batch.core.partition.ExampleItemReaderTests" time="0.001"/>
+  <testcase name="testFailAndRestart" classname="org.springframework.batch.core.partition.ExampleItemReaderTests" time="0.002"/>
+  <system-out><![CDATA[10:02:33,862  INFO Test worker partition.ExampleItemReader:69 - Processing input index=0, item=Hello, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=1, item=world!, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=2, item=Go, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=3, item=on, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=4, item=punk, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=5, item=make, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,863  INFO Test worker partition.ExampleItemReader:69 - Processing input index=6, item=my, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,864  INFO Test worker partition.ExampleItemReader:69 - Processing input index=7, item=day!, in (org.springframework.batch.core.partition.ExampleItemReader@11ce74c1)
+10:02:33,864  INFO Test worker partition.ExampleItemReader:69 - Processing input index=0, item=Hello, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,864  INFO Test worker partition.ExampleItemReader:69 - Processing input index=1, item=world!, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,864  INFO Test worker partition.ExampleItemReader:69 - Processing input index=2, item=Go, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,864  INFO Test worker partition.ExampleItemReader:69 - Processing input index=3, item=on, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,865  INFO Test worker partition.ExampleItemReader:69 - Processing input index=4, item=punk, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,865  INFO Test worker partition.ExampleItemReader:69 - Processing input index=5, item=make, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,865  INFO Test worker partition.ExampleItemReader:69 - Processing input index=6, item=my, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,865  INFO Test worker partition.ExampleItemReader:69 - Processing input index=7, item=day!, in (org.springframework.batch.core.partition.ExampleItemReader@66af48ac)
+10:02:33,865  INFO Test worker partition.ExampleItemReader:69 - Processing input index=0, item=Hello, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,866  INFO Test worker partition.ExampleItemReader:69 - Processing input index=1, item=world!, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,866  INFO Test worker partition.ExampleItemReader:69 - Processing input index=2, item=Go, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,866  INFO Test worker partition.ExampleItemReader:69 - Processing input index=3, item=on, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,866  INFO Test worker partition.ExampleItemReader:69 - Processing input index=4, item=punk, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,866  INFO Test worker partition.ExampleItemReader:75 - Throwing exception index=4, item=punk, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,867  INFO Test worker partition.ExampleItemReader:69 - Processing input index=4, item=punk, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,867  INFO Test worker partition.ExampleItemReader:69 - Processing input index=5, item=make, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,867  INFO Test worker partition.ExampleItemReader:69 - Processing input index=6, item=my, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+10:02:33,867  INFO Test worker partition.ExampleItemReader:69 - Processing input index=7, item=day!, in (org.springframework.batch.core.partition.ExampleItemReader@9cceff2)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

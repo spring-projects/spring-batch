@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.sample.BeanWrapperMapperSampleJobFunctionalTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.sample.BeanWrapperMapperSampleJobFunctionalTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.sample.html">org.springframework.batch.sample</a> &gt; BeanWrapperMapperSampleJobFunctionalTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.361s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testJobLaunch</td>
+<td>0.361s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:05:48,108  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:05:48,112  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@5d67f308, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@462a3404, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@3134549d, org.springframework.test.context.support.DirtiesContextTestExecutionListener@cbcd104, org.springframework.test.context.transaction.TransactionalTestExecutionListener@6e218c28, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@79bc0ffc]
+10:05:48,118  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:05:48,151  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:05:48,200  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:05:48,218  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/beanWrapperMapperSampleJob.xml]
+10:05:48,299  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:05:48,342  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@6a3f3cea: startup date [Thu Mar 23 10:05:48 CDT 2017]; root of context hierarchy
+10:05:48,446  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:05:48,473  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:48,500  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:05:48,519  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 18 ms.
+10:05:48,519  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:05:48,533  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 13 ms.
+10:05:48,534  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:05:48,552  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 18 ms.
+10:05:48,581  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:05:48,583  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:05:49,009  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=beanWrapperMapperJob]] launched with the following parameters: [{random=10669}]
+10:05:49,030  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:05:49,183 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]
+10:05:49,186 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]
+10:05:49,194 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]
+10:05:49,196 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]
+10:05:49,205 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]
+10:05:49,209 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]
+10:05:49,220 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]
+10:05:49,222 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]
+10:05:49,230 DEBUG Test worker TradeWriter:55 - Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]
+10:05:49,233 DEBUG Test worker JdbcTradeDao:58 - Processing: Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]
+10:05:49,285  INFO Test worker SimpleStepHandler:146 - Executing step: [step2]
+10:05:49,313 DEBUG Test worker PersonWriter:31 - Processing: [Person [address=Address [addressee=null, city=null, country=null, state=null, zipCode=null], age=12345, children=[Child [name=1234567890], Child [name=1234567890]], firstName=123456789012345, last_name=12345678901234567890, title=12345]]
+10:05:49,322 DEBUG Test worker PersonWriter:31 - Processing: [Person [address=Address [addressee=null, city=null, country=null, state=null, zipCode=null], age=29, children=[Child [name=Peter], Child [name=Charles]], firstName=Tomas, last_name=Slanina, title=Mr]]
+10:05:49,330 DEBUG Test worker PersonWriter:31 - Processing: [Person [address=Address [addressee=null, city=null, country=null, state=null, zipCode=null], age=31, children=[Child [name=], Child [name=]], firstName=George W., last_name=Bush, title=Mr]]
+10:05:49,351  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=beanWrapperMapperJob]] completed with the following parameters: [{random=10669}] and the following status: [COMPLETED]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:06:44 AM</p>
+</div>
+</div>
+</body>
+</html>

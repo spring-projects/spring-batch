@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.002">
+  <properties/>
+  <testcase name="promoteEntriesKeyNotFound" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.001"/>
+  <testcase name="promoteEntriesKeyNotFoundInStep" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="promoteEntryStatusNotFound" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="promoteEntriesKeyNotFoundStrict" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="promoteEntryStatusWildcardFound" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="promoteEntryNullStatuses" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="promoteEntryStatusFound" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.0"/>
+  <testcase name="keysMustBeSet" classname="org.springframework.batch.core.listener.ExecutionContextPromotionListenerTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

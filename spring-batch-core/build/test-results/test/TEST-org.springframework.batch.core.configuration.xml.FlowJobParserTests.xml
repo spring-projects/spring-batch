@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.FlowJobParserTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:57" hostname="Michaels-MacBook-Pro-3.local" time="0.183">
+  <properties/>
+  <testcase name="testFlowInSplit" classname="org.springframework.batch.core.configuration.xml.FlowJobParserTests" time="0.06"/>
+  <testcase name="testFlowJob" classname="org.springframework.batch.core.configuration.xml.FlowJobParserTests" time="0.059"/>
+  <testcase name="testFlowJobWithNoSteps" classname="org.springframework.batch.core.configuration.xml.FlowJobParserTests" time="0.023"/>
+  <testcase name="testFlowJobWithNestedTransitions" classname="org.springframework.batch.core.configuration.xml.FlowJobParserTests" time="0.04"/>
+  <system-out><![CDATA[10:01:57,305  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/configuration/xml/FlowJobParserTests-context.xml" for test class [org.springframework.batch.core.configuration.xml.FlowJobParserTests]
+10:01:57,306  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@1b12b3fa declaringClass = 'org.springframework.batch.core.configuration.xml.FlowJobParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/FlowJobParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:01:57,306  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.FlowJobParserTests]: FlowJobParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:01:57,311  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:01:57,313  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:01:57,313  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@20eb084f, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@598cd9b8, org.springframework.test.context.support.DirtiesContextTestExecutionListener@76a8fda8, org.springframework.test.context.transaction.TransactionalTestExecutionListener@2eb55314, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@56e49ffd]
+10:01:57,315  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/FlowJobParserTests-context.xml]
+10:01:57,331  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:01:57,343  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@691acd80: startup date [Thu Mar 23 10:01:57 CDT 2017]; root of context hierarchy
+10:01:57,363  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:57,616  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:57,627  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:57,639  INFO Test worker job.SimpleStepHandler:119 - Duplicate step [s2] detected in execution of job=[job4]. If either step fails, both will be executed again on restart.
+10:01:57,644  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:57,656  INFO Test worker job.SimpleStepHandler:119 - Duplicate step [s3] detected in execution of job=[job4]. If either step fails, both will be executed again on restart.
+10:01:57,661  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:57,674  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+10:01:57,688  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:57,700  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:57,718  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s4]
+10:01:57,734  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:57,743  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:57,757  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:57,767  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:57,783  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job2.s1]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

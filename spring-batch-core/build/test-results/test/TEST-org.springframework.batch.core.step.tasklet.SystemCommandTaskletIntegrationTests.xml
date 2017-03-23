@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:46" hostname="Michaels-MacBook-Pro-3.local" time="2.07">
+  <properties/>
+  <testcase name="testWorkingDirectory" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.004"/>
+  <testcase name="testExecute" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.505"/>
+  <testcase name="testTimeoutNotSet" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.001"/>
+  <testcase name="testExecuteTimeout" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.505"/>
+  <testcase name="testInterruption" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.012"/>
+  <testcase name="testExecuteFailure" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.502"/>
+  <testcase name="testExecuteException" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.506"/>
+  <testcase name="testCommandNotSet" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.0"/>
+  <testcase name="testStopped" classname="org.springframework.batch.core.step.tasklet.SystemCommandTaskletIntegrationTests" time="0.035"/>
+  <system-out><![CDATA[10:02:46,879  INFO Test worker tasklet.SystemCommandTaskletIntegrationTests:93 - Executing command: /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk/Contents/Home/jre/bin/java --version
+10:02:47,385  INFO Test worker tasklet.SystemCommandTaskletIntegrationTests:146 - Executing command: sleep 3
+Job interrupted while executing system command 'sleep 5'
+10:02:47,903  INFO Test worker tasklet.SystemCommandTaskletIntegrationTests:109 - Executing command: /Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk/Contents/Home/jre/bin/java org.springframework.batch.sample.tasklet.UnknownClass
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

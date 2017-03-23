@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.launch.JobLaunchingMessageHandlerIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.launch.JobLaunchingMessageHandlerIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.launch.html">org.springframework.batch.integration.launch</a> &gt; JobLaunchingMessageHandlerIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.038s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testNoReply</td>
+<td>1.020s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testReply</td>
+<td>0.018s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:05:03,123  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/launch/JobLaunchingMessageHandlerIntegrationTests-context.xml]&gt;
+2017-03-23 10:05:03,148  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]&gt;
+2017-03-23 10:05:03,158  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:05:03,159 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:05:03,159 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:05:03,161  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@a7a8ecf: startup date [Thu Mar 23 10:05:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:03,172  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:05:03,172  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:05:03,172  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,198  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,204  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;No TaskExecutor has been set, defaulting to synchronous executor.&gt;
+2017-03-23 10:05:03,303 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:03,315  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,350 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:05:03,388  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:05:03,388  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'requests' channel&gt;
+2017-03-23 10:05:03,389  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@a7a8ecf.requests' has 1 subscriber(s).&gt;
+2017-03-23 10:05:03,389  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:05:03,389  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:03,389  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@a7a8ecf.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:05:03,389  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:05:03,406 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={dontclash=12}, headers={replyChannel=response, id=2b762e4d-a4f0-35a3-9775-7e36f2434374, timestamp=1490281503406}]&gt;
+2017-03-23 10:05:03,406 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@41915b4a] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={dontclash=12}, headers={replyChannel=response, id=2b762e4d-a4f0-35a3-9775-7e36f2434374, timestamp=1490281503406}]&gt;
+2017-03-23 10:05:03,409  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [org.springframework.batch.integration.JobSupport@213bae62] launched with the following parameters: [{dontclash=12}]&gt;
+2017-03-23 10:05:03,409  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [org.springframework.batch.integration.JobSupport@213bae62] completed with the following parameters: [{dontclash=12}] and the following status: [STARTING]&gt;
+2017-03-23 10:05:03,409 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;preSend on channel 'response', message: GenericMessage [payload=JobExecution: id=0, version=0, startTime=null, endTime=null, lastUpdated=Thu Mar 23 10:05:03 CDT 2017, status=STARTING, exitStatus=exitCode=UNKNOWN;exitDescription=, job=[JobInstance: id=0, version=0, Job=[testJob]], jobParameters=[{dontclash=12}], headers={replyChannel=response, id=9f082b81-0203-0091-d3af-e23658f1eab1, timestamp=1490281503409}]&gt;
+2017-03-23 10:05:03,409 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postSend (sent=true) on channel 'response', message: GenericMessage [payload=JobExecution: id=0, version=0, startTime=null, endTime=null, lastUpdated=Thu Mar 23 10:05:03 CDT 2017, status=STARTING, exitStatus=exitCode=UNKNOWN;exitDescription=, job=[JobInstance: id=0, version=0, Job=[testJob]], jobParameters=[{dontclash=12}], headers={replyChannel=response, id=9f082b81-0203-0091-d3af-e23658f1eab1, timestamp=1490281503409}]&gt;
+2017-03-23 10:05:03,410 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={dontclash=12}, headers={replyChannel=response, id=2b762e4d-a4f0-35a3-9775-7e36f2434374, timestamp=1490281503406}]&gt;
+2017-03-23 10:05:03,410 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postReceive on channel 'response', message: GenericMessage [payload=JobExecution: id=0, version=0, startTime=null, endTime=null, lastUpdated=Thu Mar 23 10:05:03 CDT 2017, status=STARTING, exitStatus=exitCode=UNKNOWN;exitDescription=, job=[JobInstance: id=0, version=0, Job=[testJob]], jobParameters=[{dontclash=12}], headers={replyChannel=response, id=9f082b81-0203-0091-d3af-e23658f1eab1, timestamp=1490281503409}]&gt;
+2017-03-23 10:05:03,410  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@a7a8ecf: startup date [Thu Mar 23 10:05:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:03,410  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Stopping beans in phase 0&gt;
+2017-03-23 10:05:03,410  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Removing {service-activator} as a subscriber to the 'requests' channel&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@a7a8ecf.requests' has 0 subscriber(s).&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@a7a8ecf.errorChannel' has 0 subscriber(s).&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;stopped _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:05:03,411  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/launch/JobLaunchingMessageHandlerIntegrationTests-context.xml]&gt;
+2017-03-23 10:05:03,434  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]&gt;
+2017-03-23 10:05:03,443  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:05:03,443 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:05:03,444 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:05:03,445  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@b1029bc: startup date [Thu Mar 23 10:05:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:03,455  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:05:03,455  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:05:03,456  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,483  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,489  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;No TaskExecutor has been set, defaulting to synchronous executor.&gt;
+2017-03-23 10:05:03,552 DEBUG task-scheduler-7 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:03,606  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:03,641 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:05:03,685  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'requests' channel&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@b1029bc.requests' has 1 subscriber(s).&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@b1029bc.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:05:03,686  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:05:03,700 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={}, headers={id=482513c1-f824-2687-8385-ed8b2ff1306f, timestamp=1490281503700}]&gt;
+2017-03-23 10:05:03,700 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@2e81e043] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=JobLaunchRequest: testJob, parameters={}, headers={id=482513c1-f824-2687-8385-ed8b2ff1306f, timestamp=1490281503700}]&gt;
+2017-03-23 10:05:03,703  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [org.springframework.batch.integration.JobSupport@56dd0cd9] launched with the following parameters: [{}]&gt;
+2017-03-23 10:05:03,703  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [org.springframework.batch.integration.JobSupport@56dd0cd9] completed with the following parameters: [{}] and the following status: [STARTING]&gt;
+2017-03-23 10:05:04,307 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:04,567 DEBUG task-scheduler-7 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@b1029bc: startup date [Thu Mar 23 10:05:03 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Stopping beans in phase 0&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Removing {service-activator} as a subscriber to the 'requests' channel&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@b1029bc.requests' has 0 subscriber(s).&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;stopped org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@b1029bc.errorChannel' has 0 subscriber(s).&gt;
+2017-03-23 10:05:04,707  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;stopped _org.springframework.integration.errorLogger&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

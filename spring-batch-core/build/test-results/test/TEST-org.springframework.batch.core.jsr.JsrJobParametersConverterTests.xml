@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:18" hostname="Michaels-MacBook-Pro-3.local" time="0.005">
+  <properties/>
+  <testcase name="testProperties" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.001"/>
+  <testcase name="testStringJobParameters" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.001"/>
+  <testcase name="testNullProperties" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.0"/>
+  <testcase name="testJobParametersWithRunId" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.0"/>
+  <testcase name="testPropertiesWithRunId" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.0"/>
+  <testcase name="testNullJobParameters" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.001"/>
+  <testcase name="testNonStringJobParameters" classname="org.springframework.batch.core.jsr.JsrJobParametersConverterTests" time="0.001"/>
+  <system-out><![CDATA[10:02:18,567  INFO Test worker embedded.EmbeddedDatabaseFactory:185 - Starting embedded database: url='jdbc:hsqldb:mem:testdb', username='sa'
+10:02:18,567  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:02:18,570  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 3 ms.
+10:02:18,570  INFO Test worker init.ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:02:18,573  INFO Test worker init.ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 3 ms.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

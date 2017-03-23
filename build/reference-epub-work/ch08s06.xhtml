@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Declarative Iteration</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch08s05.xhtml" title="Parallel Processing"/><link rel="next" href="ch09.xhtml" title="Chapter 9. Retry"/></head><body><header/><section class="section" title="Declarative Iteration" epub:type="subchapter" id="declarativeIteration"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Declarative Iteration</h2></div></div></div><p>Sometimes there is some business processing that you know you want
+    to repeat every time it happens. The classic example of this is the
+    optimization of a message pipeline - it is more efficient to process a
+    batch of messages, if they are arriving frequently, than to bear the cost
+    of a separate transaction for every message. Spring Batch provides an AOP
+    interceptor that wraps a method call in a
+    <code class="classname">RepeatOperations</code> for just this purpose. The
+    <code class="classname">RepeatOperationsInterceptor</code> executes the
+    intercepted method and repeats according to the
+    <code class="classname">CompletionPolicy</code> in the provided
+    <code class="classname">RepeatTemplate</code>.</p><p>Here is an example of declarative iteration using the Spring AOP
+    namespace to repeat a service call to a method called
+    <code class="methodname">processMessage</code> (for more detail on how to
+    configure AOP interceptors see the Spring User Guide):</p><pre class="programlisting">&lt;aop:config&gt;
+    &lt;aop:pointcut id="transactional"
+        expression="execution(* com..*Service.processMessage(..))" /&gt;
+    &lt;aop:advisor pointcut-ref="transactional"
+        advice-ref="retryAdvice" order="-1"/&gt;
+&lt;/aop:config&gt;
+
+&lt;bean id="retryAdvice" class="org.spr...RepeatOperationsInterceptor"/&gt;</pre><p>The example above uses a default
+    <code class="classname">RepeatTemplate</code> inside the interceptor. To change
+    the policies, listeners etc. you only need to inject an instance of
+    <code class="classname">RepeatTemplate</code> into the interceptor.</p><p>If the intercepted method returns <code class="code">void</code> then the
+    interceptor always returns ExitStatus.CONTINUABLE (so there is a danger of
+    an infinite loop if the <code class="classname">CompletionPolicy</code> does not
+    have a finite end point). Otherwise it returns
+    <code class="code">ExitStatus.CONTINUABLE</code> until the return value from the
+    intercepted method is null, at which point it returns
+    <code class="code">ExitStatus.FINISHED</code>. So the business logic inside the target
+    method can signal that there is no more work to do by returning
+    <code class="code">null</code>, or by throwing an exception that is re-thrown by the
+    <code class="classname">ExceptionHandler</code> in the provided
+    <code class="classname">RepeatTemplate</code>.</p></section><footer/></body></html>

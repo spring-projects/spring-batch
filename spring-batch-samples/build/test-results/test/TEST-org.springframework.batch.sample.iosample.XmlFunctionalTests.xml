@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.iosample.XmlFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:19" hostname="Michaels-MacBook-Pro-3.local" time="0.249">
+  <properties/>
+  <testcase name="testUpdateCredit" classname="org.springframework.batch.sample.iosample.XmlFunctionalTests" time="0.249"/>
+  <system-out><![CDATA[10:06:19,246  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DependencyInjectionTestExecutionListener@36b8dd11, org.springframework.batch.test.StepScopeTestExecutionListener@605012e4]
+10:06:19,247  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:19,256  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:19,267  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:19,274  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:19,282  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/ioSampleJob.xml]
+10:06:19,292  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/iosample/xml.xml]
+10:06:19,312  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@62d884d1: startup date [Thu Mar 23 10:06:19 CDT 2017]; root of context hierarchy
+10:06:19,361  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:19,384  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:19,400  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:19,403  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 3 ms.
+10:06:19,404  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:19,408  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 4 ms.
+10:06:19,408  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:19,413  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 5 ms.
+10:06:19,424  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:19,425  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:19,939  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=ioSampleJob]] launched with the following parameters: [{random=398514}]
+10:06:19,947  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:20,111  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=ioSampleJob]] completed with the following parameters: [{random=398514}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

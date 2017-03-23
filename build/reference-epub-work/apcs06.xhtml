@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Interactions Between Batching and Transaction Propagation</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apcs05.xhtml" title="Asynchronous Item Processing"/><link rel="next" href="apcs07.xhtml" title="Special Case: Transactions with Orthogonal Resources"/></head><body><header/><section class="section" title="Interactions Between Batching and Transaction Propagation" epub:type="division" id="transactionPropagation"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Interactions Between Batching and Transaction Propagation</h2></div></div></div><p>There is a tighter coupling between batch-retry and TX management
+			than we would ideally like.  In particular a stateless retry cannot
+			be used to retry database operations with a transaction manager that
+			doesn't support NESTED propagation.
+		</p><p>For a simple example using retry without repeat, consider this:</p><pre class="programlisting">
+1   |  TX {
+|
+1.1 |    input;
+2.2 |    database access;
+2   |    RETRY {
+3   |      TX {
+3.1 |        database access;
+|      }
+|    }
+|
+|  }
+		</pre><p>Again, and for the same reason, the inner transaction TX(3) can
+			cause the outer transaction TX(1) to fail, even if the RETRY(2) is
+			eventually successful.</p><p>Unfortunately the same effect percolates from the retry block up to
+			the surrounding repeat batch if there is one:</p><pre class="programlisting">
+1   |  TX {
+|
+2   |    REPEAT(size=5) {
+2.1 |      input;
+2.2 |      database access;
+3   |      RETRY {
+4   |        TX {
+4.1 |          database access;
+|        }
+|      }
+|    }
+|
+|  }
+		</pre><p>Now if TX(3) rolls back it can pollute the whole batch at TX(1) and
+			force it to roll back at the end.</p><p>What about non-default propagation?</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>In the last example PROPAGATION_REQUIRES_NEW at TX(3) will
+					prevent the outer TX(1) from being polluted if both transactions
+					are eventually successful.  But if TX(3) commits and TX(1) rolls
+					back, then TX(3) stays committed, so we violate the transaction
+					contract for TX(1).  If TX(3) rolls back, TX(1) does not necessarily (but it probably
+					will in practice because the retry will throw a roll back
+					exception).</p></li><li class="listitem" epub:type="list-item"><p>PROPAGATION_NESTED at TX(3) works as we require in the retry
+					case (and for a batch with skips): TX(3) can commit, but
+					subsequently be rolled back by the outer transaction TX(1).  If
+					TX(3) rolls back, again TX(1) will roll back in practice.  This
+					option is only available on some platforms, e.g. not Hibernate or
+					JTA, but it is the only one that works consistently.</p></li></ul></div><p>So NESTED is best if the retry block contains any database access.</p></section><footer/></body></html>

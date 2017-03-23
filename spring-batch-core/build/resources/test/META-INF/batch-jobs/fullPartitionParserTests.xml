@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="fullPartitionParserTests" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+	<step id="step1">
+		<batchlet ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$MyBatchlet"/>
+	    <partition>
+	    	<mapper ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionMapper"/>
+	    	<collector ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionCollector"/>
+	    	<analyzer ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionAnalyzer"/>
+	    	<reducer ref="org.springframework.batch.core.jsr.configuration.xml.PartitionParserTests$PartitionReducer"/>
+	    </partition>
+	</step>
+</job>

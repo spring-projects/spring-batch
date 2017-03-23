@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+	<!--  Initialise the database before every test case: -->
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="${batch.drop.script}"/>
+        <jdbc:script location="${batch.schema.script}"/>
+        <jdbc:script location="${batch.business.schema.script}"/>
+    </jdbc:initialize-database>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+		<property name="maxActive" value="${batch.jdbc.pool.size}"/>
+		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
+		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
+	<bean id="environment"
+		class="org.springframework.batch.support.SystemPropertyInitializer">
+		<property name="defaultValue" value="hsql"/>
+		<property name="keyName" value="ENVIRONMENT"/>
+	</bean>
+
+	<!--  Use this to set additional properties on beans at run time -->
+	<bean id="overrideProperties" class="org.springframework.beans.factory.config.PropertyOverrideConfigurer"
+		depends-on="environment">
+		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
+		<!-- Allow system properties (-D) to override those from file -->
+		<property name="localOverride" value="true" />
+		<property name="properties">
+			<bean class="java.lang.System" factory-method="getProperties" />
+		</property>
+		<property name="ignoreInvalidKeys" value="true" />
+		<property name="order" value="2" />
+	</bean>
+
+	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		depends-on="environment">
+		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
+		<property name="columnName" value="ID" />
+	</bean>
+
+	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
+		<property name="incrementerName" value="DUMMY"/>
+	</bean>
+
+	<bean id="lobHandler" class="${batch.lob.handler.class}"/>
+</beans>

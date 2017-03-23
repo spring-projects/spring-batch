@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.configuration.xml.JobExecutionListenerMethodAttributeParserTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.configuration.xml.JobExecutionListenerMethodAttributeParserTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.configuration.xml.html">org.springframework.batch.core.configuration.xml</a> &gt; JobExecutionListenerMethodAttributeParserTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.022s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testListeners</td>
+<td>0.022s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:01:58,583  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location &quot;classpath:org/springframework/batch/core/configuration/xml/JobExecutionListenerMethodAttributeParserTests-context.xml&quot; for test class [org.springframework.batch.core.configuration.xml.JobExecutionListenerMethodAttributeParserTests]
+10:01:58,583  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@ff7fdb6 declaringClass = 'org.springframework.batch.core.configuration.xml.JobExecutionListenerMethodAttributeParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/JobExecutionListenerMethodAttributeParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:01:58,584  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.JobExecutionListenerMethodAttributeParserTests]: JobExecutionListenerMethodAttributeParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:01:58,586  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:01:58,587  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:01:58,587  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@6b216bea, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@51b2e271, org.springframework.test.context.support.DirtiesContextTestExecutionListener@65768cac, org.springframework.test.context.transaction.TransactionalTestExecutionListener@6c6f55b8, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@cf10de4]
+10:01:58,588  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/JobExecutionListenerMethodAttributeParserTests-context.xml]
+10:01:58,602  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:01:58,616  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@4a96c761: startup date [Thu Mar 23 10:01:58 CDT 2017]; root of context hierarchy
+10:01:58,638  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:58,745  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

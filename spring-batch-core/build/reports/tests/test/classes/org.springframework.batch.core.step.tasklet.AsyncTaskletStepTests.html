@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.step.tasklet.html">org.springframework.batch.core.step.tasklet</a> &gt; AsyncTaskletStepTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">4</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.031s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testStepExecutionFails</td>
+<td>0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepExecutionFailsOnLastItem</td>
+<td>0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepExecutionFailsWithProcessor</td>
+<td>0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepExecutionUpdates</td>
+<td>0.020s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:02:46,579  INFO SimpleAsyncTaskExecutor-1 tasklet.AsyncTaskletStepTests:63 - Items: [one, two]
+10:02:46,580  INFO SimpleAsyncTaskExecutor-2 tasklet.AsyncTaskletStepTests:63 - Items: [three, fail]
+10:02:46,581 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step stepName in job JOB
+java.lang.RuntimeException: Planned
+	at org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests$1.write(AsyncTaskletStepTests.java:66)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.writeItems(SimpleChunkProcessor.java:175)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.doWrite(SimpleChunkProcessor.java:151)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.write(SimpleChunkProcessor.java:274)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.process(SimpleChunkProcessor.java:199)
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:75)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:406)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:330)
+	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:133)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$2.doInChunkContext(TaskletStep.java:272)
+	at org.springframework.batch.core.scope.context.StepContextRepeatCallback.doInIteration(StepContextRepeatCallback.java:81)
+	at org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate$ExecutingRunnable.run(TaskExecutorRepeatTemplate.java:262)
+	at org.springframework.core.task.SimpleAsyncTaskExecutor$ConcurrencyThrottlingRunnable.run(SimpleAsyncTaskExecutor.java:268)
+	at java.lang.Thread.run(Thread.java:745)
+10:02:46,583  INFO SimpleAsyncTaskExecutor-1 tasklet.AsyncTaskletStepTests:180 - Item: one
+10:02:46,583  INFO SimpleAsyncTaskExecutor-1 tasklet.AsyncTaskletStepTests:180 - Item: barf
+10:02:46,584 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step stepName in job JOB
+java.lang.RuntimeException: Planned processor error
+	at org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests$3.process(AsyncTaskletStepTests.java:183)
+	at org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests$3.process(AsyncTaskletStepTests.java:177)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.doProcess(SimpleChunkProcessor.java:126)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.transform(SimpleChunkProcessor.java:293)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.process(SimpleChunkProcessor.java:192)
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:75)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:406)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:330)
+	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:133)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$2.doInChunkContext(TaskletStep.java:272)
+	at org.springframework.batch.core.scope.context.StepContextRepeatCallback.doInIteration(StepContextRepeatCallback.java:81)
+	at org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate$ExecutingRunnable.run(TaskExecutorRepeatTemplate.java:262)
+	at org.springframework.core.task.SimpleAsyncTaskExecutor$ConcurrencyThrottlingRunnable.run(SimpleAsyncTaskExecutor.java:268)
+	at java.lang.Thread.run(Thread.java:745)
+10:02:46,585  INFO SimpleAsyncTaskExecutor-1 tasklet.AsyncTaskletStepTests:63 - Items: [one, fail]
+10:02:46,585 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step stepName in job JOB
+java.lang.RuntimeException: Planned
+	at org.springframework.batch.core.step.tasklet.AsyncTaskletStepTests$1.write(AsyncTaskletStepTests.java:66)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.writeItems(SimpleChunkProcessor.java:175)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.doWrite(SimpleChunkProcessor.java:151)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.write(SimpleChunkProcessor.java:274)
+	at org.springframework.batch.core.step.item.SimpleChunkProcessor.process(SimpleChunkProcessor.java:199)
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:75)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:406)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:330)
+	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:133)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$2.doInChunkContext(TaskletStep.java:272)
+	at org.springframework.batch.core.scope.context.StepContextRepeatCallback.doInIteration(StepContextRepeatCallback.java:81)
+	at org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate$ExecutingRunnable.run(TaskExecutorRepeatTemplate.java:262)
+	at org.springframework.core.task.SimpleAsyncTaskExecutor$ConcurrencyThrottlingRunnable.run(SimpleAsyncTaskExecutor.java:268)
+	at java.lang.Thread.run(Thread.java:745)
+10:02:46,586  INFO SimpleAsyncTaskExecutor-1 tasklet.AsyncTaskletStepTests:63 - Items: [1, 2]
+10:02:46,600  INFO SimpleAsyncTaskExecutor-3 tasklet.AsyncTaskletStepTests:63 - Items: [5, 6]
+10:02:46,600  INFO SimpleAsyncTaskExecutor-6 tasklet.AsyncTaskletStepTests:63 - Items: [9, 10]
+10:02:46,586  INFO SimpleAsyncTaskExecutor-2 tasklet.AsyncTaskletStepTests:63 - Items: [3, 4]
+10:02:46,601  INFO SimpleAsyncTaskExecutor-4 tasklet.AsyncTaskletStepTests:63 - Items: [11, 12]
+10:02:46,602  INFO SimpleAsyncTaskExecutor-8 tasklet.AsyncTaskletStepTests:63 - Items: [13, 14]
+10:02:46,602  INFO SimpleAsyncTaskExecutor-9 tasklet.AsyncTaskletStepTests:63 - Items: [15, 16]
+10:02:46,602  INFO SimpleAsyncTaskExecutor-10 tasklet.AsyncTaskletStepTests:63 - Items: [19, 20]
+10:02:46,603  INFO SimpleAsyncTaskExecutor-11 tasklet.AsyncTaskletStepTests:63 - Items: [21, 22]
+10:02:46,600  INFO SimpleAsyncTaskExecutor-5 tasklet.AsyncTaskletStepTests:63 - Items: [7, 8]
+10:02:46,603  INFO SimpleAsyncTaskExecutor-12 tasklet.AsyncTaskletStepTests:63 - Items: [23, 24]
+10:02:46,602  INFO SimpleAsyncTaskExecutor-7 tasklet.AsyncTaskletStepTests:63 - Items: [17, 18]
+10:02:46,603  INFO SimpleAsyncTaskExecutor-13 tasklet.AsyncTaskletStepTests:63 - Items: [25]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:50 AM</p>
+</div>
+</div>
+</body>
+</html>

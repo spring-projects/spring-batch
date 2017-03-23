@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+    
+    <job id="pattern.replay" xmlns="http://www.springframework.org/schema/batch">
+        <step id="pattern.replay.1" next="pattern.replay.2">
+            <tasklet ref="tasklet1" allow-start-if-complete="true"/>
+        </step>
+        <step id="pattern.replay.2" next="pattern.replay.3">
+            <tasklet ref="tasklet2" allow-start-if-complete="true"/>
+        </step>
+        <step id="pattern.replay.3">
+            <tasklet ref="tasklet3" allow-start-if-complete="true"/>
+            <stop on="*" restart="pattern.replay.1" />
+            <fail on="FAILED" />
+        </step>
+    </job>
+
+    <bean id="tasklet1" class="org.springframework.batch.core.step.RestartLoopTests$DefaultTasklet"/>
+    <bean id="tasklet2" class="org.springframework.batch.core.step.RestartLoopTests$DefaultTasklet"/>
+    <bean id="tasklet3" class="org.springframework.batch.core.step.RestartLoopTests$DefaultTasklet"/>
+
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+</beans>

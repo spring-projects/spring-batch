@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.job.flow.FlowJobTests" tests="24" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:11" hostname="Michaels-MacBook-Pro-3.local" time="0.179">
+  <properties/>
+  <testcase name="testEndStateStoppedWithRestart" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.02"/>
+  <testcase name="testUnknownStatusStopsJob" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.009"/>
+  <testcase name="testTwoSteps" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.009"/>
+  <testcase name="testGetSteps" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.002"/>
+  <testcase name="testGetStepNamesWithPrefix" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.002"/>
+  <testcase name="testBasicFlow" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.007"/>
+  <testcase name="testInterruptedSplitException" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.012"/>
+  <testcase name="testGetStepExistsWithPrefix" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.002"/>
+  <testcase name="testStoppingStep" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.005"/>
+  <testcase name="testGetStepExists" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.001"/>
+  <testcase name="testFailedStep" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.004"/>
+  <testcase name="testBranching" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.007"/>
+  <testcase name="testGetPartitionedStep" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.034"/>
+  <testcase name="testGetStepNotStepState" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.0"/>
+  <testcase name="testInterruptedSplit" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.006"/>
+  <testcase name="testDecisionFlowWithExceptionInDecider" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.007"/>
+  <testcase name="testEndStateStopped" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.003"/>
+  <testcase name="testGetStepSplitFlow" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.002"/>
+  <testcase name="testGetStepNestedFlow" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.001"/>
+  <testcase name="testInterrupted" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.006"/>
+  <testcase name="testDecisionFlow" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.012"/>
+  <testcase name="testGetStepNotExists" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.002"/>
+  <testcase name="testFailedStepRestarted" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.014"/>
+  <testcase name="testInterruptedException" classname="org.springframework.batch.core.job.flow.FlowJobTests" time="0.006"/>
+  <system-out><![CDATA[10:02:11,760  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,768  INFO Test worker job.SimpleStepHandler:217 - Step already complete or not restartable, so no action to execute: StepExecution: id=1, version=1, name=step1, status=COMPLETED, exitStatus=COMPLETED, readCount=0, filterCount=0, writeCount=0 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=0, rollbackCount=0, exitDescription=
+10:02:11,773  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step2]
+10:02:11,782  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,783  INFO Test worker job.AbstractJob:326 - Encountered interruption executing job: Step requested termination: StepExecution: id=1, version=1, name=step1, status=UNKNOWN, exitStatus=EXECUTING, readCount=0, filterCount=0, writeCount=0 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=0, rollbackCount=0, exitDescription=
+10:02:11,789  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,793  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step2]
+10:02:11,804  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step]
+10:02:11,814  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,816  INFO Test worker job.AbstractJob:326 - Encountered interruption executing job: Stopped
+10:02:11,824  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,829  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step2]
+10:02:11,833  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,836  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step3]
+10:02:11,850  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,867  INFO Test worker concurrent.ThreadPoolTaskExecutor:165 - Initializing ExecutorService 
+10:02:11,868 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step step1 in job partitionJob
+java.lang.IllegalArgumentException
+	at java.util.concurrent.ThreadPoolExecutor.<init>(ThreadPoolExecutor.java:1307)
+	at org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor.initializeExecutor(ThreadPoolTaskExecutor.java:222)
+	at org.springframework.scheduling.concurrent.ExecutorConfigurationSupport.initialize(ExecutorConfigurationSupport.java:170)
+	at org.springframework.batch.core.jsr.partition.JsrPartitionHandler.handle(JsrPartitionHandler.java:182)
+	at org.springframework.batch.core.jsr.step.PartitionStep.doExecute(PartitionStep.java:76)
+	at org.springframework.batch.core.step.AbstractStep.execute(AbstractStep.java:200)
+	at org.springframework.batch.core.job.SimpleStepHandler.handleStep(SimpleStepHandler.java:148)
+	at org.springframework.batch.core.job.flow.JobFlowExecutor.executeStep(JobFlowExecutor.java:64)
+	at org.springframework.batch.core.job.flow.support.state.StepState.handle(StepState.java:67)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.resume(SimpleFlow.java:169)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.start(SimpleFlow.java:144)
+	at org.springframework.batch.core.job.flow.FlowJob.doExecute(FlowJob.java:134)
+	at org.springframework.batch.core.job.AbstractJob.execute(AbstractJob.java:306)
+	at org.springframework.batch.core.job.flow.FlowJobTests.testGetPartitionedStep(FlowJobTests.java:581)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at sun.reflect.GeneratedMethodAccessor64.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy3.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	at sun.reflect.GeneratedMethodAccessor63.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:147)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:129)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:404)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:63)
+	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:46)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+10:02:11,876  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,878  INFO Test worker job.AbstractJob:326 - Encountered interruption executing job: Job interrupted by step execution
+10:02:11,884  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,885 ERROR Test worker job.AbstractJob:335 - Encountered fatal error executing job
+org.springframework.batch.core.JobExecutionException: Flow execution ended unexpectedly
+	at org.springframework.batch.core.job.flow.FlowJob.doExecute(FlowJob.java:140)
+	at org.springframework.batch.core.job.AbstractJob.execute(AbstractJob.java:306)
+	at org.springframework.batch.core.job.flow.FlowJobTests.testDecisionFlowWithExceptionInDecider(FlowJobTests.java:528)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at sun.reflect.GeneratedMethodAccessor64.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy3.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	at sun.reflect.GeneratedMethodAccessor63.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:147)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:129)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:404)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:63)
+	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:46)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.springframework.batch.core.job.flow.FlowExecutionException: Ended flow=job at state=decision with exception
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.resume(SimpleFlow.java:178)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.start(SimpleFlow.java:144)
+	at org.springframework.batch.core.job.flow.FlowJob.doExecute(FlowJob.java:134)
+	... 46 more
+Caused by: java.lang.RuntimeException: Foo
+	at org.springframework.batch.core.job.flow.FlowJobTests$8.decide(FlowJobTests.java:505)
+	at org.springframework.batch.core.job.flow.support.state.DecisionState.handle(DecisionState.java:43)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.resume(SimpleFlow.java:169)
+	... 48 more
+10:02:11,889  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,897  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,898  INFO Test worker job.AbstractJob:326 - Encountered interruption executing job: Job interrupted by step execution
+10:02:11,903  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,906  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step3]
+10:02:11,919  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,927  INFO Test worker job.SimpleStepHandler:217 - Step already complete or not restartable, so no action to execute: StepExecution: id=1, version=1, name=step1, status=COMPLETED, exitStatus=COMPLETED, readCount=0, filterCount=0, writeCount=0 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=0, rollbackCount=0, exitDescription=
+10:02:11,934  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:11,934  INFO Test worker job.AbstractJob:326 - Encountered interruption executing job: Stopped
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/integration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                                 http://www.springframework.org/schema/integration
+                                 http://www.springframework.org/schema/integration/spring-integration.xsd
+                                 http://www.springframework.org/schema/context
+                                 http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                                 http://www.springframework.org/schema/tx
+                                 http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	<annotation-config/>
+	<channel id="requests" />
+	<channel id="replies">
+		<queue/>
+	</channel>
+	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<tx:annotation-driven />
+	<beans:bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+		<beans:property name="chunkProcessor">
+			<beans:bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
+				<beans:property name="itemWriter">
+					<beans:bean class="org.springframework.batch.integration.chunk.TestItemWriter" />
+				</beans:property>
+				<beans:property name="itemProcessor">
+					<beans:bean class="org.springframework.batch.item.support.PassThroughItemProcessor" />
+				</beans:property>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+	<service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+</beans:beans>

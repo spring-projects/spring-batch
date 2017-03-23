@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="testing">
+  <title>Unit Testing</title>
+
+  <para>Just as with other application styles, it is extremely important to
+  unit test any code written as part of a batch job as well. The Spring core
+  documentation covers how to unit and integration test with Spring in great
+  detail, so it won't be repeated here. It is important, however, to think
+  about how to 'end to end' test a batch job, which is what this chapter will
+  focus on. The spring-batch-test project includes classes that will help
+  facilitate this end-to-end test approach.</para>
+
+  <section id="creatingUnitTestClass">
+    <title>Creating a Unit Test Class</title>
+
+    <para>In order for the unit test to run a batch job, the framework must
+    load the job's ApplicationContext. Two annotations are used to trigger
+    this:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><classname>@RunWith(SpringJUnit4ClassRunner.class)</classname>:
+        Indicates that the class should use Spring's JUnit facilities</para>
+      </listitem>
+
+      <listitem>
+        <para><classname>@ContextConfiguration(locations = {...})</classname>:
+        Indicates which XML files contain the ApplicationContext.</para>
+      </listitem>
+    </itemizedlist>
+
+    <programlisting language="java">@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
+                                    "/jobs/skipSampleJob.xml" })
+public class SkipSampleFunctionalTests { ... }</programlisting>
+  </section>
+
+  <section id="endToEndTesting">
+    <title>End-To-End Testing of Batch Jobs</title>
+
+    <para>'End To End' testing can be defined as testing the complete run of a
+    batch job from beginning to end. This allows for a test that sets up a
+    test condition, executes the job, and verifies the end result.</para>
+
+    <para>In the example below, the batch job reads from the database and
+    writes to a flat file. The test method begins by setting up the database
+    with test data. It clears the CUSTOMER table and then inserts 10 new
+    records. The test then launches the <classname>Job </classname>using the
+    <methodname>launchJob()</methodname> method. The
+    <methodname>launchJob</methodname>() method is provided by the
+    <classname>JobLauncherTestUtils</classname> class. Also provided by the
+    utils class is <classname>launchJob(JobParameters)</classname>, which
+    allows the test to give particular parameters. The
+    <methodname>launchJob()</methodname> method returns the
+    <classname>JobExecution</classname> object which is useful for asserting
+    particular information about the <classname>Job</classname> run. In the
+    case below, the test verifies that the <classname>Job</classname> ended
+    with status "COMPLETED".</para>
+
+    <programlisting language="java">@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
+                                    "/jobs/skipSampleJob.xml" })
+public class SkipSampleFunctionalTests {
+
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+
+    private SimpleJdbcTemplate simpleJdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+    }
+
+    @Test
+    public void testJob() throws Exception {
+        simpleJdbcTemplate.update("delete from CUSTOMER");
+        for (int i = 1; i &lt;= 10; i++) {
+            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
+                                      i, "customer" + i);
+        }
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob().getStatus();
+
+
+        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
+    }
+}</programlisting>
+  </section>
+
+  <section id="testingIndividualSteps">
+    <title>Testing Individual Steps</title>
+
+    <para>For complex batch jobs, test cases in the end-to-end testing
+    approach may become unmanageable. It these cases, it may be more useful to
+    have test cases to test individual steps on their own. The
+    <classname>AbstractJobTests</classname> class contains a method
+    <methodname>launchStep</methodname> that takes a step name and runs just
+    that particular <classname>Step</classname>. This approach allows for more
+    targeted tests by allowing the test to set up data for just that step and
+    to validate its results directly.</para>
+
+    <programlisting language="java">JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");</programlisting>
+  </section>
+
+  <section>
+    <title>Testing Step-Scoped Components</title>
+
+    <para>Often the components that are configured for your steps at runtime
+    use step scope and late binding to inject context from the step or job
+    execution. These are tricky to test as standalone components unless you
+    have a way to set the context as if they were in a step execution. That is
+    the goal of two components in Spring Batch: the
+    <classname>StepScopeTestExecutionListener</classname> and the
+    <classname>StepScopeTestUtils</classname>.</para>
+
+    <para>The listener is declared at the class level, and its job is to
+    create a step execution context for each test method. For example:</para>
+
+    <programlisting language="java">@ContextConfiguration
+@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class,
+    StepScopeTestExecutionListener.class })
+@RunWith(SpringJUnit4ClassRunner.class)
+public class StepScopeTestExecutionListenerIntegrationTests {
+
+    // This component is defined step-scoped, so it cannot be injected unless
+    // a step is active...
+    @Autowired
+    private ItemReader&lt;String&gt; reader;
+
+    public StepExecution getStepExection() {
+        StepExecution execution = MetaDataInstanceFactory.createStepExecution();
+        execution.getExecutionContext().putString("input.data", "foo,bar,spam");
+        return execution;
+    }
+
+    @Test
+    public void testReader() {
+        // The reader is initialized and bound to the input data
+        assertNotNull(reader.read());
+    }
+
+}</programlisting>
+
+    <para>There are two <classname>TestExecutionListeners</classname>, one
+    from the regular Spring Test framework and handles dependency injection
+    from the configured application context, injecting the reader, and the
+    other is the Spring Batch
+    <classname>StepScopeTestExecutionListener</classname>. It works by looking
+    for a factory method in the test case for a
+    <classname>StepExecution</classname>, and using that as the context for
+    the test method, as if that execution was active in a Step at runtime. The
+    factory method is detected by its signature (it just has to return a
+    <classname>StepExecution</classname>). If a factory method is not provided
+    then a default <classname>StepExecution</classname> is created.</para>
+
+    <para>The listener approach is convenient if you want the duration of the
+    step scope to be the execution of the test method. For a more flexible,
+    but more invasive approach you can use the
+    <classname>StepScopeTestUtils</classname>. For example, to count the
+    number of items available in the reader above:</para>
+
+    <programlisting language="java">int count = StepScopeTestUtils.doInStepScope(stepExecution,
+    new Callable&lt;Integer&gt;() {
+      public Integer call() throws Exception {
+
+        int count = 0;
+
+        while (reader.read() != null) {
+           count++;
+        }
+        return count;
+    }
+});</programlisting>
+  </section>
+
+  <section id="validatingOutputFiles">
+    <title>Validating Output Files</title>
+
+    <para>When a batch job writes to the database, it is easy to query the
+    database to verify that the output is as expected. However, if the batch
+    job writes to a file, it is equally important that the output be verified.
+    Spring Batch provides a class <classname>AssertFile</classname> to
+    facilitate the verification of output files. The method
+    <methodname>assertFileEquals</methodname> takes two
+    <classname>File</classname> objects (or two
+    <classname>Resource</classname> objects) and asserts, line by line, that
+    the two files have the same content. Therefore, it is possible to create a
+    file with the expected output and to compare it to the actual
+    result:</para>
+
+    <programlisting language="java">private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
+private static final String OUTPUT_FILE = "target/test-outputs/output.txt";
+
+AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
+                            new FileSystemResource(OUTPUT_FILE));</programlisting>
+  </section>
+
+  <section id="mockingDomainObjects">
+    <title>Mocking Domain Objects</title>
+
+    <para>Another common issue encountered while writing unit and integration
+    tests for Spring Batch components is how to mock domain objects. A good
+    example is a <classname>StepExecutionListener</classname>, as illustrated
+    below:</para>
+
+    <programlisting language="java">public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        if (stepExecution.getReadCount() == 0) {
+            throw new NoWorkFoundException("Step has not processed any items");
+        }
+        return stepExecution.getExitStatus();
+    }
+}</programlisting>
+
+    <para>The above listener is provided by the framework and checks a
+    <classname>StepExecution</classname> for an empty read count, thus
+    signifying that no work was done. While this example is fairly simple, it
+    serves to illustrate the types of problems that may be encountered when
+    attempting to unit test classes that implement interfaces requiring Spring
+    Batch domain objects. Consider the above listener's unit test:</para>
+
+    <programlisting language="java">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+@Test
+public void testAfterStep() {
+    <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
+                new JobExecution(new JobInstance(1L, new JobParameters(),
+                                 "NoProcessingJob")));</emphasis>
+
+    stepExecution.setReadCount(0);
+
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
+    }
+}</programlisting>
+
+    <para>Because the Spring Batch domain model follows good object orientated
+    principles, the StepExecution requires a
+    <classname>JobExecution</classname>, which requires a
+    <classname>JobInstance</classname> and
+    <classname>JobParameters</classname> in order to create a valid
+    <classname>StepExecution</classname>. While this is good in a solid domain
+    model, it does make creating stub objects for unit testing verbose. To
+    address this issue, the Spring Batch test module includes a factory for
+    creating domain objects: <classname>MetaDataInstanceFactory</classname>.
+    Given this factory, the unit test can be updated to be more
+    concise:</para>
+
+    <programlisting language="java">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+@Test
+public void testAfterStep() {
+    <emphasis role="bold">StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();</emphasis>
+
+    stepExecution.setReadCount(0);
+
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
+    }
+}</programlisting>
+
+    <para>The above method for creating a simple
+    <classname>StepExecution</classname> is just one convenience method
+    available within the factory. A full method listing can be found in its
+    <ulink
+    url="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
+  </section>
+</chapter>

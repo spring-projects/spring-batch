@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+
+    <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+        <step id="step1" next="step2">
+            <batchlet ref="step1Ref"/>
+        </step>
+        <split id="step2" next="step3">
+            <flow id="step2a">
+                <step id="step2aStep1">
+                    <batchlet ref="step1Ref"/>
+                </step>
+            </flow>
+        </split>
+        <step id="step3">
+            <batchlet ref="step1Ref"/>
+        </step>
+    </job>
+
+    <bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
+</beans>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Advanced Meta-Data Usage</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch04s05.xhtml" title="Running a Job"/><link rel="next" href="ch05.xhtml" title="Chapter 5. Configuring a Step"/></head><body><header/><section class="section" title="Advanced Meta-Data Usage" epub:type="subchapter" id="advancedMetaData"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Advanced Meta-Data Usage</h2></div></div></div><p>So far, both the JobLauncher and JobRepository interfaces have been
+    discussed. Together, they represent simple launching of a job, and basic
+    CRUD operations of batch domain objects:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/job-repository.png" width="324"/></div><p>A <code class="classname">JobLauncher</code> uses the
+    <code class="classname">JobRepository</code> to create new
+    <code class="classname">JobExecution</code> objects and run them.
+    <code class="classname">Job</code> and <code class="classname">Step</code> implementations
+    later use the same <code class="classname">JobRepository</code> for basic updates
+    of the same executions during the running of a <code class="classname">Job</code>.
+    The basic operations suffice for simple scenarios, but in a large batch
+    environment with hundreds of batch jobs and complex scheduling
+    requirements, more advanced access of the meta data is required:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/job-repository-advanced.png"/></div><p>The <code class="classname">JobExplorer</code> and
+    <code class="classname">JobOperator</code> interfaces, which will be discussed
+    below, add additional functionality for querying and controlling the meta
+    data.</p><section class="section" title="Querying the Repository" epub:type="division" id="queryingRepository"><div class="titlepage"><div><div><h3 class="title">Querying the Repository</h3></div></div></div><p>The most basic need before any advanced features is the ability to
+      query the repository for existing executions. This functionality is
+      provided by the <code class="classname">JobExplorer</code> interface:</p><pre class="programlisting">public interface JobExplorer {
+
+    List&lt;JobInstance&gt; getJobInstances(String jobName, int start, int count);
+
+    JobExecution getJobExecution(Long executionId);
+
+    StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
+
+    JobInstance getJobInstance(Long instanceId);
+
+    List&lt;JobExecution&gt; getJobExecutions(JobInstance jobInstance);
+
+    Set&lt;JobExecution&gt; findRunningJobExecutions(String jobName);
+}</pre><p>As is evident from the method signatures above,
+      <code class="classname">JobExplorer</code> is a read-only version of the
+      <code class="classname">JobRepository</code>, and like the
+      <code class="classname">JobRepository</code>, it can be easily configured via a
+      factory bean:</p><pre class="programlisting">&lt;bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
+      p:dataSource-ref="dataSource" /&gt;</pre><p><a class="link" href="ch04s03.xhtml#repositoryTablePrefix" title="Changing the Table Prefix">Earlier in this
+      chapter</a>, it was mentioned that the table prefix of the
+      <code class="classname">JobRepository</code> can be modified to allow for
+      different versions or schemas. Because the
+      <code class="classname">JobExplorer</code> is working with the same tables, it
+      too needs the ability to set a prefix:</p><pre class="programlisting">&lt;bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
+      p:dataSource-ref="dataSource" <span class="bold"><strong>p:tablePrefix="BATCH_" </strong></span>/&gt;</pre></section><section class="section" title="JobRegistry" epub:type="division" id="d5e1215"><div class="titlepage"><div><div><h3 class="title">JobRegistry</h3></div></div></div><p>A JobRegistry (and its parent interface JobLocator) is not
+      mandatory, but it can be useful if you want to keep track of which jobs
+      are available in the context. It is also useful for collecting jobs
+      centrally in an application context when they have been created
+      elsewhere (e.g. in child contexts). Custom JobRegistry implementations
+      can also be used to manipulate the names and other properties of the
+      jobs that are registered. There is only one implementation provided by
+      the framework and this is based on a simple map from job name to job
+      instance. It is configured simply like this:</p><pre class="programlisting">&lt;bean id="jobRegistry" class="org.spr...MapJobRegistry" /&gt;</pre><p>There are two ways to populate a JobRegistry automatically: using
+      a bean post processor and using a registrar lifecycle component. These
+      two mechanisms are described in the following sections.</p><section class="section" title="JobRegistryBeanPostProcessor" epub:type="division" id="d5e1220"><div class="titlepage"><div><div><h4 class="title">JobRegistryBeanPostProcessor</h4></div></div></div><p>This is a bean post-processor that can register all jobs as they
+        are created:</p><pre class="programlisting">&lt;bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor"&gt;
+    &lt;property name="jobRegistry" ref="jobRegistry"/&gt;
+&lt;/bean&gt;</pre><p>Athough it is not strictly necessary the post-processor in the
+        example has been given an id so that it can be included in child
+        contexts (e.g. as a parent bean definition) and cause all jobs created
+        there to also be regsistered automatically.</p></section><section class="section" title="AutomaticJobRegistrar" epub:type="division" id="d5e1225"><div class="titlepage"><div><div><h4 class="title">AutomaticJobRegistrar</h4></div></div></div><p>This is a lifecycle component that creates child contexts and
+        registers jobs from those contexts as they are created. One advantage
+        of doing this is that, while the job names in the child contexts still
+        have to be globally unique in the registry, their dependencies can
+        have "natural" names. So for example, you can create a set of XML
+        configuration files each having only one <code class="classname">Job</code>,
+        but all having different definitions of an
+        <code class="classname">ItemReader</code> with the same bean name, e.g.
+        "reader". If all those files were imported into the same context, the
+        reader definitions would clash and override one another, but with the
+        automatic regsistrar this is avoided. This makes it easier to
+        integrate jobs contributed from separate modules of an
+        application.</p><pre class="programlisting">&lt;bean class="org.spr...AutomaticJobRegistrar"&gt;
+   &lt;property name="applicationContextFactories"&gt;
+      &lt;bean class="org.spr...ClasspathXmlApplicationContextsFactoryBean"&gt;
+         &lt;property name="resources" value="classpath*:/config/job*.xml" /&gt;
+      &lt;/bean&gt;
+   &lt;/property&gt;
+   &lt;property name="jobLoader"&gt;
+      &lt;bean class="org.spr...DefaultJobLoader"&gt;
+         &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
+      &lt;/bean&gt;
+   &lt;/property&gt;
+&lt;/bean&gt;</pre><p>The registrar has two mandatory properties, one is an array of
+        <code class="classname">ApplicationContextFactory</code> (here created from a
+        convenient factory bean), and the other is a
+        <code class="classname">JobLoader</code>. The <code class="classname">JobLoader</code>
+        is responsible for managing the lifecycle of the child contexts and
+        registering jobs in the <code class="classname">JobRegistry</code>.</p><p>The <code class="classname">ApplicationContextFactory</code> is
+        responsible for creating the child context and the most common usage
+        would be as above using a
+        <code class="classname">ClassPathXmlApplicationContextFactory</code>. One of
+        the features of this factory is that by default it copies some of the
+        configuration down from the parent context to the child. So for
+        instance you don't have to re-define the
+        <code class="classname">PropertyPlaceholderConfigurer</code> or AOP
+        configuration in the child, if it should be the same as the
+        parent.</p><p>The <code class="classname">AutomaticJobRegistrar</code> can be used in
+        conjunction with a <code class="classname">JobRegistryBeanPostProcessor</code>
+        if desired (as long as the <code class="classname">DefaultJobLoader</code> is
+        used as well). For instance this might be desirable if there are jobs
+        defined in the main parent context as well as in the child
+        locations.</p></section></section><section class="section" title="JobOperator" epub:type="division" id="JobOperator"><div class="titlepage"><div><div><h3 class="title">JobOperator</h3></div></div></div><p>As previously discussed, the <code class="classname">JobRepository</code>
+      provides CRUD operations on the meta-data, and the
+      <code class="classname">JobExplorer</code> provides read-only operations on the
+      meta-data. However, those operations are most useful when used together
+      to perform common monitoring tasks such as stopping, restarting, or
+      summarizing a Job, as is commonly done by batch operators. Spring Batch
+      provides for these types of operations via the
+      <code class="classname">JobOperator</code> interface:</p><pre class="programlisting">public interface JobOperator {
+
+    List&lt;Long&gt; getExecutions(long instanceId) throws NoSuchJobInstanceException;
+
+    List&lt;Long&gt; getJobInstances(String jobName, int start, int count)
+          throws NoSuchJobException;
+
+    Set&lt;Long&gt; getRunningExecutions(String jobName) throws NoSuchJobException;
+
+    String getParameters(long executionId) throws NoSuchJobExecutionException;
+
+    Long start(String jobName, String parameters)
+          throws NoSuchJobException, JobInstanceAlreadyExistsException;
+
+    Long restart(long executionId)
+          throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+                  NoSuchJobException, JobRestartException;
+
+    Long startNextInstance(String jobName)
+          throws NoSuchJobException, JobParametersNotFoundException, JobRestartException,
+                 JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
+
+    boolean stop(long executionId)
+          throws NoSuchJobExecutionException, JobExecutionNotRunningException;
+
+    String getSummary(long executionId) throws NoSuchJobExecutionException;
+
+    Map&lt;Long, String&gt; getStepExecutionSummaries(long executionId)
+          throws NoSuchJobExecutionException;
+
+    Set&lt;String&gt; getJobNames();
+
+}</pre><p>The above operations represent methods from many different
+      interfaces, such as <code class="classname">JobLauncher</code>,
+      <code class="classname">JobRepository</code>,
+      <code class="classname">JobExplorer</code>, and
+      <code class="classname">JobRegistry</code>. For this reason, the provided
+      implementation of <code class="classname">JobOperator</code>,
+      <code class="classname">SimpleJobOperator</code>, has many dependencies:</p><pre class="programlisting">&lt;bean id="jobOperator" class="org.spr...SimpleJobOperator"&gt;
+    &lt;property name="jobExplorer"&gt;
+        &lt;bean class="org.spr...JobExplorerFactoryBean"&gt;
+            &lt;property name="dataSource" ref="dataSource" /&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
+    &lt;property name="jobLauncher" ref="jobLauncher" /&gt;
+&lt;/bean&gt;</pre><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; ">
+        If you set the table prefix on the job repository, don't forget to set it on the job explorer as well.
+      </td></tr></table></div></section><section class="section" title="JobParametersIncrementer" epub:type="division" id="JobParametersIncrementer"><div class="titlepage"><div><div><h3 class="title">JobParametersIncrementer</h3></div></div></div><p>Most of the methods on <code class="classname">JobOperator</code> are
+      self-explanatory, and more detailed explanations can be found on the
+      <a class="ulink" href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html" target="_top">javadoc
+      of the interface</a>. However, the
+      <code class="methodname">startNextInstance</code> method is worth noting. This
+      method will always start a new instance of a <code class="classname">Job</code>.
+      This can be extremely useful if there are serious issues in a
+      <code class="classname">JobExecution</code> and the <code class="classname">Job</code>
+      needs to be started over again from the beginning. Unlike
+      <code class="classname">JobLauncher</code> though, which requires a new
+      <code class="classname">JobParameters</code> object that will trigger a new
+      <code class="classname">JobInstance</code> if the parameters are different from
+      any previous set of parameters, the
+      <code class="methodname">startNextInstance</code> method will use the
+      <code class="classname">JobParametersIncrementer</code> tied to the
+      <code class="classname">Job</code> to force the <code class="classname">Job</code> to a
+      new instance:</p><pre class="programlisting">public interface JobParametersIncrementer {
+
+    JobParameters getNext(JobParameters parameters);
+
+}</pre><p>The contract of <code class="classname">JobParametersIncrementer</code> is
+      that, given a <a class="link" href=""><code class="classname">JobParameters</code></a>
+      object, it will return the 'next' <code class="classname">JobParameters</code>
+      object by incrementing any necessary values it may contain. This
+      strategy is useful because the framework has no way of knowing what
+      changes to the <code class="classname">JobParameters</code> make it the 'next'
+      instance. For example, if the only value in
+      <code class="classname">JobParameters</code> is a date, and the next instance
+      should be created, should that value be incremented by one day? Or one
+      week (if the job is weekly for instance)? The same can be said for any
+      numerical values that help to identify the <code class="classname">Job</code>,
+      as shown below:</p><pre class="programlisting">public class SampleIncrementer implements JobParametersIncrementer {
+
+    public JobParameters getNext(JobParameters parameters) {
+        if (parameters==null || parameters.isEmpty()) {
+            return new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
+        }
+        long id = parameters.getLong("run.id",1L) + 1;
+        return new JobParametersBuilder().addLong("run.id", id).toJobParameters();
+    }
+}</pre><p>In this example, the value with a key of 'run.id' is used to
+      discriminate between <code class="classname">JobInstances</code>. If the
+      <code class="classname">JobParameters</code> passed in is null, it can be
+      assumed that the <code class="classname">Job</code> has never been run before
+      and thus its initial state can be returned. However, if not, the old
+      value is obtained, incremented by one, and returned. An incrementer can
+      be associated with <code class="classname">Job</code> via the 'incrementer'
+      attribute in the namespace:</p><pre class="programlisting">&lt;job id="footballJob" <span class="bold"><strong>incrementer="sampleIncrementer"</strong></span>&gt;
+    ...
+&lt;/job&gt;</pre></section><section class="section" title="Stopping a Job" epub:type="division" id="stoppingAJob"><div class="titlepage"><div><div><h3 class="title">Stopping a Job</h3></div></div></div><p>One of the most common use cases of
+      <code class="classname">JobOperator</code> is gracefully stopping a
+      <code class="classname">Job:</code></p><pre class="programlisting">Set&lt;Long&gt; executions = jobOperator.getRunningExecutions("sampleJob");
+jobOperator.stop(executions.iterator().next());</pre><p>The shutdown is not immediate, since there is no way to force
+      immediate shutdown, especially if the execution is currently in
+      developer code that the framework has no control over, such as a
+      business service. However, as soon as control is returned back to the
+      framework, it will set the status of the current
+      <code class="classname">StepExecution</code> to
+      <code class="classname">BatchStatus.STOPPED</code>, save it, then do the same
+      for the <code class="classname">JobExecution</code> before finishing.</p></section><section class="section" title="Aborting a Job" epub:type="division" id="d5e1303"><div class="titlepage"><div><div><h3 class="title">Aborting a Job</h3></div></div></div><p>A job execution which is <code class="classname">FAILED</code> can be
+      restarted (if the Job is restartable). A job execution whose status is
+      <code class="classname">ABANDONED</code> will not be restarted by the framework.
+      The <code class="classname">ABANDONED</code> status is also used in step
+      executions to mark them as skippable in a restarted job execution: if a
+      job is executing and encounters a step that has been marked
+      <code class="classname">ABANDONED</code> in the previous failed job execution, it
+      will move on to the next step (as determined by the job flow definition
+      and the step execution exit status).</p><p>If the process died (<code class="literal">"kill -9"</code> or server
+      failure) the job is, of course, not running, but the JobRepository has
+      no way of knowing because no-one told it before the process died. You
+      have to tell it manually that you know that the execution either failed
+      or should be considered aborted (change its status to
+      <code class="classname">FAILED</code> or <code class="classname">ABANDONED</code>) - it's
+      a business decision and there is no way to automate it. Only change the
+      status to <code class="classname">FAILED</code> if it is not restartable, or if
+      you know the restart data is valid. There is a utility in Spring Batch
+      Admin <code class="classname">JobService</code> to abort a job execution.</p></section></section><footer/></body></html>

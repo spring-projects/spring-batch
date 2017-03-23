@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<step id="nonSkippableStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4"/>
+		</tasklet>
+	</step>
+
+	<step id="skippableStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+				</skippable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+
+	<step id="skippableFatalStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+
+	<step id="retryable" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="5" retry-limit="2">
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+				<retryable-exception-classes>
+					<include class="java.lang.Exception"/>
+				</retryable-exception-classes>
+			</chunk>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackDefault" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<!-- this is a subclass of IllegalStateException (no-rollback) -->
+					<include class="java.util.FormatterClosedException"/>
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				<include class="java.lang.IllegalStateException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackPathology" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<include class="java.lang.IllegalStateException"/>
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				<include class="java.lang.RuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackSkippable" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.SkippableException"/>
+					<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<include class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackFatal" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
+				<skippable-exception-classes>
+					<include class="java.lang.Exception"/>
+					<exclude class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.SkippableException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+					<exclude class="org.springframework.batch.core.step.item.FatalSkippableException"/>
+				</skippable-exception-classes>
+			</chunk>
+			<no-rollback-exception-classes>
+				<include class="org.springframework.batch.core.step.item.FatalRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<step id="noRollbackTasklet" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet ref="tasklet">
+			<no-rollback-exception-classes>
+				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>
+			</no-rollback-exception-classes>
+		</tasklet>
+	</step>
+
+	<bean id="reader" class="org.springframework.batch.core.step.item.SkipReaderStub">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+				<value>4</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.core.step.item.SkipWriterStub">
+		<property name="failures">
+			<list>
+				<value>3</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="tasklet" class="org.springframework.batch.core.step.item.ExceptionThrowingTaskletStub"/>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+</beans>

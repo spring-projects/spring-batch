@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.JobParameterTests" tests="12" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.002">
+  <properties/>
+  <testcase name="testLongParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.001"/>
+  <testcase name="testEqualsWithNullAndDifferentType" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testDateParameterToString" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testNullStringParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testHashcodeWithNull" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testDoubleParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testHashcode" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testStringParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testDateParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testEquals" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testNullDateParameter" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <testcase name="testEqualsWithNull" classname="org.springframework.batch.core.JobParameterTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

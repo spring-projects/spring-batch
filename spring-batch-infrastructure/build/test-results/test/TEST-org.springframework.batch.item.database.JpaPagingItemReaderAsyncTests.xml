@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.JpaPagingItemReaderAsyncTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:59" hostname="Michaels-MacBook-Pro-3.local" time="0.71">
+  <properties/>
+  <testcase name="testAsyncReader" classname="org.springframework.batch.item.database.JpaPagingItemReaderAsyncTests" time="0.71"/>
+  <system-out><![CDATA[2017-03-23 10:03:58,963 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - <Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]>
+2017-03-23 10:03:58,963 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - <Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]>
+2017-03-23 10:03:58,964 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - <Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@56a9a683, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@33f730f, org.springframework.test.context.support.DirtiesContextTestExecutionListener@1d9cc79b, org.springframework.test.context.transaction.TransactionalTestExecutionListener@4da20d9f, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@56a42716]>
+2017-03-23 10:03:58,964 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml]>
+2017-03-23 10:03:58,970 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Refreshing org.springframework.context.support.GenericApplicationContext@2efb91c6: startup date [Thu Mar 23 10:03:58 CDT 2017]; root of context hierarchy>
+2017-03-23 10:03:58,978 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:03:59,020 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
+2017-03-23 10:03:59,045 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - <Building JPA container EntityManagerFactory for persistence unit 'bar'>
+[info 2017/03/23 10:03:59.056 CDT <Test worker> tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:03:59.086 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:03:59.324 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:03:59.375 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:03:59,377 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - <Initialized JPA EntityManagerFactory for persistence unit 'bar'>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

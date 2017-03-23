@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Passing Data to Future Steps</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch11s07.xhtml" title="Handling Step Completion When No Input is Found"/><link rel="next" href="ch12.xhtml" title="Chapter 12. JSR-352 Support"/></head><body><header/><section class="section" title="Passing Data to Future Steps" epub:type="subchapter" id="passingDataToFutureSteps"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Passing Data to Future Steps</h2></div></div></div>
+    
+
+    <p>It is often useful to pass information from one step to another.
+    This can be done using the <code class="classname">ExecutionContext</code>. The
+    catch is that there are two <code class="classname">ExecutionContext</code>s: one
+    at the <code class="classname">Step</code> level and one at the
+    <code class="classname">Job</code> level. The <code class="classname">Step</code>
+    <code class="classname">ExecutionContext</code> lives only as long as the step
+    while the <code class="classname">Job</code>
+    <code class="classname">ExecutionContext</code> lives through the whole
+    <code class="classname">Job</code>. On the other hand, the
+    <code class="classname">Step</code> <code class="classname">ExecutionContext</code> is
+    updated every time the <code class="classname">Step</code> commits a chunk while
+    the <code class="classname">Job</code> <code class="classname">ExecutionContext</code> is
+    updated only at the end of each <code class="classname">Step</code>.</p>
+
+    <p>The consequence of this separation is that all data must be placed
+    in the <code class="classname">Step</code> <code class="classname">ExecutionContext</code>
+    while the <code class="classname">Step</code> is executing. This will ensure that
+    the data will be stored properly while the <code class="classname">Step</code> is
+    on-going. If data is stored to the <code class="classname">Job</code>
+    <code class="classname">ExecutionContext</code>, then it will not be persisted
+    during <code class="classname">Step</code> execution and if the
+    <code class="classname">Step</code> fails, that data will be lost.</p>
+
+    <pre class="programlisting">public class SavingItemWriter implements ItemWriter&lt;Object&gt; {
+    private StepExecution stepExecution;
+
+    public void write(List&lt;? extends Object&gt; items) throws Exception {
+        // ...
+
+        ExecutionContext stepContext = this.stepExecution.getExecutionContext();
+        stepContext.put("someKey", someObject);
+    }
+
+    @BeforeStep
+    public void saveStepExecution(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+}</pre>
+
+    <p>To make the data available to future <code class="classname">Step</code>s,
+    it will have to be "promoted" to the <code class="classname">Job</code>
+    <code class="classname">ExecutionContext</code> after the step has finished.
+    Spring Batch provides the
+    <code class="classname">ExecutionContextPromotionListener</code> for this purpose.
+    The listener must be configured with the keys related to the data in the
+    <code class="classname">ExecutionContext</code> that must be promoted. It can
+    also, optionally, be configured with a list of exit code patterns for
+    which the promotion should occur ("COMPLETED" is the default). As with all
+    listeners, it must be registered on the
+    <code class="classname">Step</code>.</p>
+
+    <pre class="programlisting">&lt;job id="job1"&gt;
+    &lt;step id="step1"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="reader" writer="savingWriter" commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
+        &lt;listeners&gt;
+            <span class="bold"><strong>&lt;listener ref="promotionListener"/&gt;</strong></span>
+        &lt;/listeners&gt;
+    &lt;/step&gt;
+
+    &lt;step id="step2"&gt;
+       ...
+    &lt;/step&gt;
+&lt;/job&gt;
+
+<span class="bold"><strong>&lt;beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener"&gt;
+    &lt;beans:property name="keys" value="someKey"/&gt;
+&lt;/beans:bean&gt;</strong></span></pre>
+
+    <p>Finally, the saved values must be retrieved from the
+    <code class="classname">Job</code> <code class="classname">ExeuctionContext</code>:</p>
+
+    <pre class="programlisting">public class RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
+    private Object someObject;
+
+    public void write(List&lt;? extends Object&gt; items) throws Exception {
+        // ...
+    }
+
+    @BeforeStep
+    public void retrieveInterstepData(StepExecution stepExecution) {
+        JobExecution jobExecution = stepExecution.getJobExecution();
+        ExecutionContext jobContext = jobExecution.getExecutionContext();
+        this.someObject = jobContext.get("someKey");
+    }
+}</pre>
+  </section><footer/></body></html>

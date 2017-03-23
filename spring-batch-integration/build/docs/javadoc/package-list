@@ -1,0 +1,6 @@
+org.springframework.batch.integration.async
+org.springframework.batch.integration.chunk
+org.springframework.batch.integration.config.xml
+org.springframework.batch.integration.launch
+org.springframework.batch.integration.partition
+org.springframework.batch.integration.step

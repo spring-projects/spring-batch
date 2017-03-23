@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.tasklet.ChunkOrientedStepIntegrationTests" tests="1" skipped="1" failures="0" errors="0" timestamp="2017-03-23T15:02:46" hostname="Michaels-MacBook-Pro-3.local" time="0.0">
+  <properties/>
+  <testcase name="testStatusForCommitFailedException" classname="org.springframework.batch.core.step.tasklet.ChunkOrientedStepIntegrationTests" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[10:02:46,614  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:46,615  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:46,615  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@12d063cb, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@67c5052b, org.springframework.test.context.support.DirtiesContextTestExecutionListener@6e183e21, org.springframework.test.context.transaction.TransactionalTestExecutionListener@123b5336, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@364b481]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

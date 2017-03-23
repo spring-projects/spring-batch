@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Special Case: Transactions with Orthogonal Resources</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apcs06.xhtml" title="Interactions Between Batching and Transaction Propagation"/><link rel="next" href="apcs08.xhtml" title="Stateless Retry Cannot Recover"/></head><body><header/><section class="section" title="Special Case: Transactions with Orthogonal Resources" epub:type="division" id="specialTransactionOrthonogonal"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Special Case: Transactions with Orthogonal Resources</h2></div></div></div><p>Default propagation is always OK for simple cases where there are no
+			nested database transactions.  Consider this (where the SESSION and
+			TX are not global XA resources, so their resources are orthogonal):
+		</p><pre class="programlisting">
+0   |  SESSION {
+1   |    input;
+2   |    RETRY {
+3   |      TX {
+3.1 |        database access;
+|      }
+|    }
+|  }
+		</pre><p>Here there is a transactional message SESSION(0), but it doesn't
+			participate in other transactions with
+			<code class="classname">PlatformTransactionManager</code>, so doesn't propagate when TX(3)
+			starts.  There is no database access outside the RETRY(2) block. If
+			TX(3) fails and then eventually succeeds on a retry, SESSION(0) can
+			commit (it can do this independent of a TX block).  This is similar
+			to the vanilla "best-efforts-one-phase-commit" scenario - the worst
+			that can happen is a duplicate message when the RETRY(2) succeeds
+			and the SESSION(0) cannot commit, e.g. because the message system is
+			unavailable.</p></section><footer/></body></html>

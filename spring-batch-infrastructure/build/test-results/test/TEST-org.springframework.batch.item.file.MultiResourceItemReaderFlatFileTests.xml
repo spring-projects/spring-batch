@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:13" hostname="Michaels-MacBook-Pro-3.local" time="0.009">
+  <properties/>
+  <testcase name="testResetAndRestart" classname="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" time="0.007"/>
+  <testcase name="testRestart" classname="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" time="0.001"/>
+  <testcase name="testReopen" classname="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" time="0.0"/>
+  <testcase name="testEmptyInput" classname="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" time="0.001"/>
+  <testcase name="testRead" classname="org.springframework.batch.item.file.MultiResourceItemReaderFlatFileTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

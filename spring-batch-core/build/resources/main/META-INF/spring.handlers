@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/batch=org.springframework.batch.core.configuration.xml.CoreNamespaceHandler
+http\://xmlns.jcp.org/xml/ns/javaee=org.springframework.batch.core.jsr.configuration.xml.JsrNamespaceHandler

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Creating Custom ItemReaders and ItemWriters</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s12.xhtml" title="Preventing State Persistence"/><link rel="next" href="ch07.xhtml" title="Chapter 7. Scaling and Parallel Processing"/></head><body><header/><section class="section" title="Creating Custom ItemReaders and ItemWriters" epub:type="subchapter" id="customReadersWriters"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Creating Custom ItemReaders and
+    ItemWriters</h2></div></div></div><p>So far in this chapter the basic contracts that exist for reading
+    and writing in Spring Batch and some common implementations have been
+    discussed. However, these are all fairly generic, and there are many
+    potential scenarios that may not be covered by out of the box
+    implementations. This section will show, using a simple example, how to
+    create a custom <code class="classname">ItemReader</code> and
+    <code class="classname">ItemWriter</code> implementation and implement their
+    contracts correctly. The <code class="classname">ItemReader</code> will also
+    implement <code class="classname">ItemStream</code>, in order to illustrate how to
+    make a reader or writer restartable.</p><section class="section" title="Custom ItemReader Example" epub:type="division" id="customReader"><div class="titlepage"><div><div><h3 class="title">Custom ItemReader Example</h3></div></div></div><p>For the purpose of this example, a simple
+      <code class="classname">ItemReader</code> implementation that reads from a
+      provided list will be created. We'll start out by implementing the most
+      basic contract of <code class="classname">ItemReader</code>,
+      <code class="methodname">read</code>:</p><pre class="programlisting">public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
+
+    List&lt;T&gt; items;
+
+    public CustomItemReader(List&lt;T&gt; items) {
+        this.items = items;
+    }
+
+    public T read() throws Exception, UnexpectedInputException,
+       NoWorkFoundException, ParseException {
+
+        if (!items.isEmpty()) {
+            return items.remove(0);
+        }
+        return null;
+    }
+}</pre><p>This very simple class takes a list of items, and returns them one
+      at a time, removing each from the list. When the list is empty, it
+      returns null, thus satisfying the most basic requirements of an
+      <code class="classname">ItemReader</code>, as illustrated below:</p><pre class="programlisting">List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+items.add("1");
+items.add("2");
+items.add("3");
+
+ItemReader itemReader = new CustomItemReader&lt;String&gt;(items);
+assertEquals("1", itemReader.read());
+assertEquals("2", itemReader.read());
+assertEquals("3", itemReader.read());
+assertNull(itemReader.read());</pre><section class="section" title="Making the ItemReader Restartable" epub:type="division" id="restartableReader"><div class="titlepage"><div><div><h4 class="title">Making the <code class="classname">ItemReader</code>
+        Restartable</h4></div></div></div><p>The final challenge now is to make the
+        <code class="classname">ItemReader</code> restartable. Currently, if the power
+        goes out, and processing begins again, the
+        <code class="classname">ItemReader</code> must start at the beginning. This is
+        actually valid in many scenarios, but it is sometimes preferable that
+        a batch job starts where it left off. The key discriminant is often
+        whether the reader is stateful or stateless. A stateless reader does
+        not need to worry about restartability, but a stateful one has to try
+        and reconstitute its last known state on restart. For this reason, we
+        recommend that you keep custom readers stateless if possible, so you
+        don't have to worry about restartability.</p><p>If you do need to store state, then the
+        <code class="classname">ItemStream</code> interface should be used:</p><pre class="programlisting">public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
+
+    List&lt;T&gt; items;
+    int currentIndex = 0;
+    private static final String CURRENT_INDEX = "current.index";
+
+    public CustomItemReader(List&lt;T&gt; items) {
+        this.items = items;
+    }
+
+    public T read() throws Exception, UnexpectedInputException,
+        ParseException {
+
+        if (currentIndex &lt; items.size()) {
+            return items.get(currentIndex++);
+        }
+
+        return null;
+    }
+
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        if(executionContext.containsKey(CURRENT_INDEX)){
+            currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
+        }
+        else{
+            currentIndex = 0;
+        }
+    }
+
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+        executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
+    }
+
+    public void close() throws ItemStreamException {}
+}</pre><p>On each call to the <code class="classname">ItemStream</code>
+        <code class="methodname">update</code> method, the current index of the
+        <code class="classname">ItemReader</code> will be stored in the provided
+        <code class="classname">ExecutionContext</code> with a key of 'current.index'.
+        When the <code class="classname">ItemStream</code> <code class="classname">open</code>
+        method is called, the <code class="classname">ExecutionContext</code> is
+        checked to see if it contains an entry with that key. If the key is
+        found, then the current index is moved to that location. This is a
+        fairly trivial example, but it still meets the general
+        contract:</p><pre class="programlisting">ExecutionContext executionContext = new ExecutionContext();
+((ItemStream)itemReader).open(executionContext);
+assertEquals("1", itemReader.read());
+((ItemStream)itemReader).update(executionContext);
+
+List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+items.add("1");
+items.add("2");
+items.add("3");
+itemReader = new CustomItemReader&lt;String&gt;(items);
+
+((ItemStream)itemReader).open(executionContext);
+assertEquals("2", itemReader.read());</pre><p>Most ItemReaders have much more sophisticated restart logic. The
+        <code class="classname">JdbcCursorItemReader</code>, for example, stores the
+        row id of the last processed row in the Cursor.</p><p>It is also worth noting that the key used within the
+        <code class="classname">ExecutionContext</code> should not be trivial. That is
+        because the same <code class="classname">ExecutionContext</code> is used for
+        all <code class="classname">ItemStream</code>s within a
+        <code class="classname">Step</code>. In most cases, simply prepending the key
+        with the class name should be enough to guarantee uniqueness. However,
+        in the rare cases where two of the same type of
+        <code class="classname">ItemStream</code> are used in the same step (which can
+        happen if two files are need for output) then a more unique name will
+        be needed. For this reason, many of the Spring Batch
+        <code class="classname">ItemReader</code> and
+        <code class="classname">ItemWriter</code> implementations have a
+        <code class="methodname">setName</code>() property that allows this key name
+        to be overridden.</p></section></section><section class="section" title="Custom ItemWriter Example" epub:type="division" id="customWriter"><div class="titlepage"><div><div><h3 class="title">Custom ItemWriter Example</h3></div></div></div><p>Implementing a Custom <code class="classname">ItemWriter</code> is similar
+      in many ways to the <code class="classname">ItemReader</code> example above, but
+      differs in enough ways as to warrant its own example. However, adding
+      restartability is essentially the same, so it won't be covered in this
+      example. As with the <code class="classname">ItemReader</code> example, a
+      <code class="classname">List</code> will be used in order to keep the example as
+      simple as possible:</p><pre class="programlisting">public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+
+    List&lt;T&gt; output = TransactionAwareProxyFactory.createTransactionalList();
+
+    public void write(List&lt;? extends T&gt; items) throws Exception {
+        output.addAll(items);
+    }
+
+    public List&lt;T&gt; getOutput() {
+        return output;
+    }
+}</pre><section class="section" title="Making the ItemWriter Restartable" epub:type="division" id="restartableWriter"><div class="titlepage"><div><div><h4 class="title">Making the <code class="classname">ItemWriter</code>
+        Restartable</h4></div></div></div><p>To make the ItemWriter restartable we would follow the same
+        process as for the <code class="classname">ItemReader</code>, adding and
+        implementing the <code class="classname">ItemStream</code> interface to
+        synchronize the execution context. In the example we might have to
+        count the number of items processed and add that as a footer record.
+        If we needed to do that, we could implement
+        <code class="classname">ItemStream</code> in our
+        <code class="classname">ItemWriter</code> so that the counter was
+        reconstituted from the execution context if the stream was
+        re-opened.</p><p>In many realistic cases, custom ItemWriters also delegate to
+        another writer that itself is restartable (e.g. when writing to a
+        file), or else it writes to a transactional resource so doesn't need
+        to be restartable because it is stateless. When you have a stateful
+        writer you should probably also be sure to implement
+        <code class="classname">ItemStream</code> as well as
+        <code class="classname">ItemWriter</code>. Remember also that the client of
+        the writer needs to be aware of the <code class="classname">ItemStream</code>,
+        so you may need to register it as a stream in the configuration
+        xml.</p></section></section></section><footer/></body></html>

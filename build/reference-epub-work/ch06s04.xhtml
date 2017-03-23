@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>ItemStream</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s03.xhtml" title="ItemProcessor"/><link rel="next" href="ch06s05.xhtml" title="The Delegate Pattern and Registering with the Step"/></head><body><header/><section class="section" title="ItemStream" epub:type="subchapter" id="itemStream"><div class="titlepage"><div><div><h2 class="title" style="clear: both">ItemStream</h2></div></div></div><p>Both <code class="classname">ItemReader</code>s and
+    <code class="classname">ItemWriter</code>s serve their individual purposes well,
+    but there is a common concern among both of them that necessitates another
+    interface. In general, as part of the scope of a batch job, readers and
+    writers need to be opened, closed, and require a mechanism for persisting
+    state:</p><pre class="programlisting">public interface ItemStream {
+
+    void open(ExecutionContext executionContext) throws ItemStreamException;
+
+    void update(ExecutionContext executionContext) throws ItemStreamException;
+
+    void close() throws ItemStreamException;
+}</pre><p>Before describing each method, we should mention the
+    <code class="classname">ExecutionContext</code>. Clients of an
+    <code class="classname">ItemReader</code> that also implement
+    <code class="classname">ItemStream</code> should call
+    <code class="methodname">open</code> before any calls to
+    <code class="methodname">read</code> in order to open any resources such as files
+    or to obtain connections. A similar restriction applies to an
+    <code class="classname">ItemWriter</code> that implements
+    <code class="classname">ItemStream</code>. As mentioned in Chapter 2, if expected
+    data is found in the <code class="classname">ExecutionContext</code>, it may be
+    used to start the <code class="classname">ItemReader</code> or
+    <code class="classname">ItemWriter</code> at a location other than its initial
+    state. Conversely, <code class="methodname">close</code> will be called to ensure
+    that any resources allocated during <code class="methodname">open</code> will be
+    released safely. <code class="methodname">update</code> is called primarily to
+    ensure that any state currently being held is loaded into the provided
+    <code class="classname">ExecutionContext</code>. This method will be called before
+    committing, to ensure that the current state is persisted in the database
+    before commit.</p><p>In the special case where the client of an
+    <code class="classname">ItemStream</code> is a <code class="classname">Step</code> (from
+    the Spring Batch Core), an <code class="classname">ExecutionContext</code> is
+    created for each <code class="classname">StepExecution</code> to allow users to
+    store the state of a particular execution, with the expectation that it
+    will be returned if the same <code class="classname">JobInstance</code> is started
+    again. For those familiar with Quartz, the semantics are very similar to a
+    Quartz <code class="classname">JobDataMap</code>.</p></section><footer/></body></html>

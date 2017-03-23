@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Chapter 8. Repeat</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch07s04.xhtml" title="Partitioning"/><link rel="next" href="ch08s02.xhtml" title="Completion Policies"/></head><body><header/><section class="chapter" title="Chapter 8. Repeat" epub:type="chapter" id="repeat"><div class="titlepage"><div><div><h1 class="title">Chapter 8. Repeat</h1></div></div></div><section class="section" title="RepeatTemplate" epub:type="subchapter" id="repeatTemplate"><div class="titlepage"><div><div><h2 class="title" style="clear: both">RepeatTemplate</h2></div></div></div><p>Batch processing is about repetitive actions - either as a simple
+    optimization, or as part of a job. To strategize and generalize the
+    repetition as well as to provide what amounts to an iterator framework,
+    Spring Batch has the <code class="classname">RepeatOperations</code> interface.
+    The <code class="classname">RepeatOperations</code> interface looks like
+    this:</p><pre class="programlisting">public interface RepeatOperations {
+
+    RepeatStatus iterate(RepeatCallback callback) throws RepeatException;
+
+}</pre><p>The callback is a simple interface that allows you to insert
+    some business logic to be repeated:</p><pre class="programlisting">public interface RepeatCallback {
+
+    RepeatStatus doInIteration(RepeatContext context) throws Exception;
+
+}</pre><p>The callback is executed repeatedly until the implementation
+    decides that the iteration should end. The return value in these
+    interfaces is an enumeration that can either be
+    <code class="code">RepeatStatus.CONTINUABLE</code> or
+    <code class="code">RepeatStatus.FINISHED</code>. A <code class="classname">RepeatStatus</code>
+    conveys information to the caller of the repeat operations about whether
+    there is any more work to do. Generally speaking, implementations of
+    <code class="classname">RepeatOperations</code> should inspect the
+    <code class="classname">RepeatStatus</code> and use it as part of the decision to
+    end the iteration. Any callback that wishes to signal to the caller that
+    there is no more work to do can return
+    <code class="code">RepeatStatus.FINISHED</code>.</p><p>The simplest general purpose implementation of
+    <code class="classname">RepeatOperations</code> is
+    <code class="classname">RepeatTemplate</code>. It could be used like this:</p><pre class="programlisting">RepeatTemplate template = new RepeatTemplate();
+
+template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
+
+template.iterate(new RepeatCallback() {
+
+    public ExitStatus doInIteration(RepeatContext context) {
+        // Do stuff in batch...
+        return ExitStatus.CONTINUABLE;
+    }
+
+});</pre><p>In the example we return <code class="code">RepeatStatus.CONTINUABLE</code> to
+    show that there is more work to do. The callback can also return
+    <code class="code">ExitStatus.FINISHED</code> if it wants to signal to the caller that
+    there is no more work to do. Some iterations can be terminated by
+    considerations intrinsic to the work being done in the callback, others
+    are effectively infinite loops as far as the callback is concerned and the
+    completion decision is delegated to an external policy as in the case
+    above.</p><section class="section" title="RepeatContext" epub:type="division" id="repeatContext"><div class="titlepage"><div><div><h3 class="title">RepeatContext</h3></div></div></div><p>The method parameter for the <code class="classname">RepeatCallback</code>
+      is a <code class="classname">RepeatContext</code>. Many callbacks will simply
+      ignore the context, but if necessary it can be used as an attribute bag
+      to store transient data for the duration of the iteration. After the
+      <code class="methodname">iterate</code> method returns, the context will no
+      longer exist.</p><p>A <code class="classname">RepeatContext</code> will have a parent context
+      if there is a nested iteration in progress. The parent context is
+      occasionally useful for storing data that need to be shared between
+      calls to <code class="methodname">iterate</code>. This is the case for instance
+      if you want to count the number of occurrences of an event in the
+      iteration and remember it across subsequent calls.</p></section><section class="section" title="RepeatStatus" epub:type="division" id="repeatStatus"><div class="titlepage"><div><div><h3 class="title">RepeatStatus</h3></div></div></div><p><code class="classname">RepeatStatus</code> is an enumeration used by
+      Spring Batch to indicate whether processing has finished. These are
+      possible <code class="classname">RepeatStatus</code> values:</p><div class="table" id="d5e3224"><div class="table-title">Table 8.1. ExitStatus Properties</div><div class="table-contents"><table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col/><col/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; "><span class="bold"><strong>Value</strong></span></td><td style="border-bottom: 0.5pt solid ; "><span class="bold"><strong>Description</strong></span></td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">CONTINUABLE</td><td style="border-bottom: 0.5pt solid ; ">There is more work to do.</td></tr><tr><td style="border-right: 0.5pt solid ; ">FINISHED</td><td>No more repetitions should take place.</td></tr></tbody></table></div></div><p><code class="classname">RepeatStatus</code> values can also be combined
+      with a logical AND operation using the <code class="methodname">and</code>()
+      method in <code class="classname">RepeatStatus</code>. The effect of this is to
+      do a logical AND on the continuable flag. In other words, if either
+      status is <code class="code">FINISHED</code>, then the result will be
+      <code class="code">FINISHED</code>.</p></section></section></section><footer/></body></html>

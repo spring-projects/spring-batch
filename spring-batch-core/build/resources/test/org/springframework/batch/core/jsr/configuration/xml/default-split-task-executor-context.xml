@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+
+    <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+        <step id="step1" next="step2">
+            <batchlet ref="step1Ref"/>
+        </step>
+        <split id="step2" next="step3">
+            <flow id="step2a">
+                <step id="step2aStep1">
+                    <batchlet ref="step1Ref"/>
+                </step>
+            </flow>
+            <flow id="step2b">
+                <step id="step2bStep1" next="step2bStep2">
+                    <batchlet ref="step1Ref"/>
+                </step>
+                <step id="step2bStep2">
+                    <chunk checkpoint-policy="item" item-count="3">
+                        <reader ref="generatingItemReader1"/>
+                        <processor ref="countingItemProcessor"/>
+                        <writer ref="sysoutItemWriter"/>
+                    </chunk>
+                </step>
+            </flow>
+        </split>
+        <step id="step3">
+            <batchlet ref="step1Ref"/>
+        </step>
+    </job>
+
+    <bean id="step1Ref" class="org.springframework.batch.core.step.tasklet.TaskletSupport"/>
+
+    <bean id="generatingItemReader1" class="org.springframework.batch.item.support.ListItemReader">
+        <constructor-arg>
+            <list>
+                <value>One</value>
+                <value>Two</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="countingItemProcessor" class="org.springframework.batch.core.jsr.configuration.xml.CountingItemProcessor"/>
+
+    <bean id="sysoutItemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+        <property name="targetObject">
+            <util:constant static-field="java.lang.System.out"/>
+        </property>
+        <property name="targetMethod" value="println"/>
+    </bean>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+</beans>

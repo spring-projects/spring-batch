@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Validating Output Files</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch10s04.xhtml" title="Testing Step-Scoped Components"/><link rel="next" href="ch10s06.xhtml" title="Mocking Domain Objects"/></head><body><header/><section class="section" title="Validating Output Files" epub:type="subchapter" id="validatingOutputFiles"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Validating Output Files</h2></div></div></div><p>When a batch job writes to the database, it is easy to query the
+    database to verify that the output is as expected. However, if the batch
+    job writes to a file, it is equally important that the output be verified.
+    Spring Batch provides a class <code class="classname">AssertFile</code> to
+    facilitate the verification of output files. The method
+    <code class="methodname">assertFileEquals</code> takes two
+    <code class="classname">File</code> objects (or two
+    <code class="classname">Resource</code> objects) and asserts, line by line, that
+    the two files have the same content. Therefore, it is possible to create a
+    file with the expected output and to compare it to the actual
+    result:</p><pre class="programlisting">private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
+private static final String OUTPUT_FILE = "target/test-outputs/output.txt";
+
+AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
+                            new FileSystemResource(OUTPUT_FILE));</pre></section><footer/></body></html>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.support.CompositeItemProcessorTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.011">
+  <properties/>
+  <testcase name="testItemProcessorGenerics" classname="org.springframework.batch.item.support.CompositeItemProcessorTests" time="0.011"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.support.CompositeItemProcessorTests" time="0.0"/>
+  <testcase name="testFilteredItemInFirstProcessor" classname="org.springframework.batch.item.support.CompositeItemProcessorTests" time="0.0"/>
+  <testcase name="testTransform" classname="org.springframework.batch.item.support.CompositeItemProcessorTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

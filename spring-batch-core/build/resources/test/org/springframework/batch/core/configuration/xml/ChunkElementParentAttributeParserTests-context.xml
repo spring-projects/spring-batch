@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="s1" parent="baseStep" next="s2">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
+					<skippable-exception-classes merge="true">
+						<include class="java.lang.NullPointerException"/>
+						<exclude class="org.springframework.dao.CannotAcquireLockException"/>
+					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.PessimisticLockingFailureException"/>
+						<exclude class="org.springframework.dao.CannotSerializeTransactionException"/>
+					</retryable-exception-classes>
+		        	<streams merge="true">
+		        		<stream ref="stream1"/>
+		        	</streams>
+					<retry-listeners merge="true">
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
+
+		<step id="s2" parent="baseStep" next="s3">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5" retry-limit="3">
+					<skippable-exception-classes>
+						<include class="java.lang.IllegalArgumentException"/>
+						<exclude class="org.springframework.dao.ConcurrencyFailureException"/>
+					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+					</retryable-exception-classes>
+		        	<streams>
+		        		<stream ref="stream1"/>
+		        	</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
+
+		<step id="s3" parent="baseStep" next="s4">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5">
+					<streams>
+						<stream ref="stream1"/>
+					</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
+
+		<step id="s4" parent="baseStep">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="5">
+					<retryable-exception-classes merge="true">
+						<include class="java.lang.RuntimeException"/>
+					</retryable-exception-classes>
+					<streams>
+						<stream ref="stream1"/>
+					</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<step id="baseStep" abstract="true">
+		<tasklet>
+				<chunk retry-limit="6" skip-limit="7">
+					<skippable-exception-classes>
+						<include class="java.lang.ArithmeticException"/>
+						<exclude class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="java.io.IOException"/>
+					</retryable-exception-classes>
+					<streams>
+						<stream ref="stream2"/>
+					</streams>
+					<retry-listeners>
+						<listener>
+							<beans:bean class="org.springframework.retry.listener.RetryListenerSupport"/>
+						</listener>
+					</retry-listeners>
+				</chunk>
+		</tasklet>
+	</step>
+
+	<beans:bean id="stream1" class="org.springframework.batch.item.support.CompositeItemStream"/>
+	<beans:bean id="stream2" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+
+</beans:beans>

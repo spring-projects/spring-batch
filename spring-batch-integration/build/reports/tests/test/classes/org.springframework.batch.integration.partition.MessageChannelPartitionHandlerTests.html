@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.partition.MessageChannelPartitionHandlerTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.partition.MessageChannelPartitionHandlerTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.partition.html">org.springframework.batch.integration.partition</a> &gt; MessageChannelPartitionHandlerTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">6</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">3.508s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">messageReceiveTimeout</td>
+<td>0.512s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testHandleNoReply</td>
+<td>0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testHandleWithJobRepositoryPolling</td>
+<td>2.568s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testHandleWithJobRepositoryPollingTimeout</td>
+<td>0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testHandleWithReplyChannel</td>
+<td>0.033s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testNoPartitions</td>
+<td>0.388s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:05:07,320 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:07,616 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:08,167 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=null, stepName=null], headers={sequenceNumber=0, correlationId=5:null, id=95ca4a80-fef9-e265-2cf0-b7d5273c215a, sequenceSize=1, timestamp=1490281508167}]&gt;
+2017-03-23 10:05:08,172 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=null, stepName=null], headers={sequenceNumber=0, correlationId=5:null, id=7dda2037-6b1e-9302-a6de-873069da55a1, sequenceSize=1, timestamp=1490281508172}]&gt;
+2017-03-23 10:05:08,172 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Received replies: Mock for Message, hashCode: 1308181085&gt;
+2017-03-23 10:05:08,206 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=null, stepName=null], headers={sequenceNumber=0, replyChannel=Mock for PollableChannel, hashCode: 1134310406, correlationId=5:null, id=da8338ba-130b-bd34-5a22-3e56f8d54e59, sequenceSize=1, timestamp=1490281508205}]&gt;
+2017-03-23 10:05:08,206 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Received replies: Mock for Message, hashCode: 881090302&gt;
+2017-03-23 10:05:08,241 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;MessageChannelPartitionHandler is configured to poll the job repository for slave results&gt;
+2017-03-23 10:05:08,241 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=2, stepName=step1], headers={sequenceNumber=0, correlationId=5:step1, id=58f77c07-69fe-59a8-19f3-5deda3dfae05, sequenceSize=3, timestamp=1490281508241}]&gt;
+2017-03-23 10:05:08,241 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=3, stepName=step1], headers={sequenceNumber=1, correlationId=5:step1, id=0fc94f4a-a200-90cb-c875-b3de55cb5046, sequenceSize=3, timestamp=1490281508241}]&gt;
+2017-03-23 10:05:08,242 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=4, stepName=step1], headers={sequenceNumber=2, correlationId=5:step1, id=e394d6db-3fba-a2f5-6611-1873ce5af1bf, sequenceSize=3, timestamp=1490281508242}]&gt;
+2017-03-23 10:05:08,246 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:08,325 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:08,632 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:08,748 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:09,252 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:09,330 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:09,649 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:09,757 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:10,262 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:10,335 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:10,665 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:10,767 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+2017-03-23 10:05:10,777 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;MessageChannelPartitionHandler is configured to poll the job repository for slave results&gt;
+2017-03-23 10:05:10,777 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=2, stepName=step1], headers={sequenceNumber=0, correlationId=5:step1, id=2d0554d5-ea9f-020a-4d90-b8a1957f9e14, sequenceSize=3, timestamp=1490281510777}]&gt;
+2017-03-23 10:05:10,777 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=3, stepName=step1], headers={sequenceNumber=1, correlationId=5:step1, id=9a1fb831-8687-0202-b791-c59c2c48846e, sequenceSize=3, timestamp=1490281510777}]&gt;
+2017-03-23 10:05:10,778 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=5, stepExecutionId=4, stepName=step1], headers={sequenceNumber=2, correlationId=5:step1, id=53fcedc7-81fa-a85f-840f-fb8185ec7eb4, sequenceSize=3, timestamp=1490281510778}]&gt;
+2017-03-23 10:05:10,778 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 3 partitions to finish&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

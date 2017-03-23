@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:16" hostname="Michaels-MacBook-Pro-3.local" time="0.216">
+  <properties/>
+  <testcase name="testReadRetryOnce" classname="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests" time="0.085"/>
+  <testcase name="testReadRetryExhausted" classname="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests" time="0.06"/>
+  <testcase name="testReadRetryExceptionInListener" classname="org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests" time="0.071"/>
+  <system-out><![CDATA[10:02:16,499  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@10d437a4: startup date [Thu Mar 23 10:02:16 CDT 2017]; root of context hierarchy
+10:02:16,500  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerRetryOnce.xml]
+10:02:16,507  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryListenerTestBase-context.xml]
+10:02:16,515  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'job1' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JsrFlowFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JobFactoryBean]; scope=; abstract=false; lazyInit=true; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null]
+10:02:16,516  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'readRetryListener' with a different definition: replacing [Generic bean: class [readRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryReadListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerRetryOnce.xml]]
+10:02:16,516  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'processRetryListener' with a different definition: replacing [Generic bean: class [processRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryProcessListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerRetryOnce.xml]]
+10:02:16,516  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'writeRetryListener' with a different definition: replacing [Generic bean: class [writeRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryWriteListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerRetryOnce.xml]]
+10:02:16,523  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'stepContextFactory' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.JsrStepContextFactoryBean]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in null]
+10:02:16,525  INFO Test worker support.JsrAutowiredAnnotationBeanPostProcessor:111 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:16,559  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:02:16,576  INFO Test worker support.SimpleJobLauncher:139 - Job: [JsrFlowJob: [name=job1]] launched with the following parameters: [{}]
+10:02:16,579  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:16,580  INFO Test worker xml.RetryListenerTests:231 - one
+10:02:16,581  INFO Test worker xml.RetryListenerTests:237 - three
+10:02:16,583  INFO Test worker support.SimpleJobLauncher:142 - Job: [JsrFlowJob: [name=job1]] completed with the following parameters: [{}] and the following status: [COMPLETED]
+10:02:16,584  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4a67b02: startup date [Thu Mar 23 10:02:16 CDT 2017]; root of context hierarchy
+10:02:16,584  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerExhausted.xml]
+10:02:16,590  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryListenerTestBase-context.xml]
+10:02:16,597  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'job1' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JsrFlowFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JobFactoryBean]; scope=; abstract=false; lazyInit=true; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null]
+10:02:16,598  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'readRetryListener' with a different definition: replacing [Generic bean: class [readRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryReadListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerExhausted.xml]]
+10:02:16,598  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'processRetryListener' with a different definition: replacing [Generic bean: class [processRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryProcessListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerExhausted.xml]]
+10:02:16,598  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'writeRetryListener' with a different definition: replacing [Generic bean: class [writeRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryWriteListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerExhausted.xml]]
+10:02:16,602  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'stepContextFactory' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.JsrStepContextFactoryBean]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in null]
+10:02:16,604  INFO Test worker support.JsrAutowiredAnnotationBeanPostProcessor:111 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:16,619  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:02:16,636  INFO Test worker support.SimpleJobLauncher:139 - Job: [JsrFlowJob: [name=job1]] launched with the following parameters: [{}]
+10:02:16,639  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:16,641 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step step1 in job job1
+org.springframework.retry.RetryException: Non-skippable exception in recoverer while reading; nested exception is java.lang.IllegalArgumentException
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor$2.recover(JsrFaultTolerantChunkProcessor.java:177)
+	at org.springframework.retry.support.RetryTemplate.handleRetryExhausted(RetryTemplate.java:512)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:350)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:179)
+	at org.springframework.batch.core.step.item.BatchRetryTemplate.execute(BatchRetryTemplate.java:222)
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor.provide(JsrFaultTolerantChunkProcessor.java:186)
+	at org.springframework.batch.core.jsr.step.item.JsrChunkProcessor$1.doInIteration(JsrChunkProcessor.java:92)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.core.jsr.step.item.JsrChunkProcessor.process(JsrChunkProcessor.java:88)
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:75)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:406)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:330)
+	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:133)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$2.doInChunkContext(TaskletStep.java:272)
+	at org.springframework.batch.core.scope.context.StepContextRepeatCallback.doInIteration(StepContextRepeatCallback.java:81)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.core.step.tasklet.TaskletStep.doExecute(TaskletStep.java:257)
+	at org.springframework.batch.core.step.AbstractStep.execute(AbstractStep.java:200)
+	at org.springframework.batch.core.job.SimpleStepHandler.handleStep(SimpleStepHandler.java:148)
+	at org.springframework.batch.core.job.flow.JobFlowExecutor.executeStep(JobFlowExecutor.java:64)
+	at org.springframework.batch.core.job.flow.support.state.StepState.handle(StepState.java:67)
+	at org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState.handle(JsrStepState.java:53)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.resume(SimpleFlow.java:169)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.start(SimpleFlow.java:144)
+	at org.springframework.batch.core.jsr.job.flow.JsrFlowJob.doExecute(JsrFlowJob.java:82)
+	at org.springframework.batch.core.job.AbstractJob.execute(AbstractJob.java:306)
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher$1.run(SimpleJobLauncher.java:141)
+	at org.springframework.core.task.SyncTaskExecutor.execute(SyncTaskExecutor.java:50)
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher.run(SimpleJobLauncher.java:134)
+	at org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests.testReadRetryExhausted(RetryListenerTests.java:61)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at sun.reflect.GeneratedMethodAccessor64.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy3.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	at sun.reflect.GeneratedMethodAccessor63.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:147)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:129)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:404)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:63)
+	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:46)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.lang.IllegalArgumentException
+	at org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$AlwaysFailItemReader.readItem(RetryListenerTests.java:153)
+	at org.springframework.batch.jsr.item.ItemReaderAdapter.read(ItemReaderAdapter.java:54)
+	at org.springframework.batch.core.jsr.step.item.JsrChunkProcessor.doProvide(JsrChunkProcessor.java:163)
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor$1.doWithRetry(JsrFaultTolerantChunkProcessor.java:135)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:286)
+	... 74 more
+10:02:16,644  INFO Test worker support.SimpleJobLauncher:142 - Job: [JsrFlowJob: [name=job1]] completed with the following parameters: [{}] and the following status: [FAILED]
+10:02:16,644  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@5cf7528b: startup date [Thu Mar 23 10:02:16 CDT 2017]; root of context hierarchy
+10:02:16,645  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerListenerException.xml]
+10:02:16,651  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryListenerTestBase-context.xml]
+10:02:16,662  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'job1' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JsrFlowFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.JobFactoryBean]; scope=; abstract=false; lazyInit=true; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null]
+10:02:16,663  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'readRetryListener' with a different definition: replacing [Generic bean: class [readRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$ExceptionThrowingRetryReadListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerListenerException.xml]]
+10:02:16,664  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'processRetryListener' with a different definition: replacing [Generic bean: class [processRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryProcessListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerListenerException.xml]]
+10:02:16,664  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'writeRetryListener' with a different definition: replacing [Generic bean: class [writeRetryListener]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$TestRetryWriteListener]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/RetryReadListenerListenerException.xml]]
+10:02:16,667  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'stepContextFactory' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.jsr.JsrStepContextFactoryBean]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in null]
+10:02:16,671  INFO Test worker support.JsrAutowiredAnnotationBeanPostProcessor:111 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:16,687  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:02:16,706  INFO Test worker support.SimpleJobLauncher:139 - Job: [JsrFlowJob: [name=job1]] launched with the following parameters: [{}]
+10:02:16,708  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:16,712 ERROR Test worker step.AbstractStep:229 - Encountered an error executing step step1 in job job1
+org.springframework.retry.RetryException: Non-skippable exception in recoverer while reading; nested exception is javax.batch.operations.BatchRuntimeException: javax.batch.operations.BatchRuntimeException: java.lang.IllegalStateException
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor$2.recover(JsrFaultTolerantChunkProcessor.java:177)
+	at org.springframework.retry.support.RetryTemplate.handleRetryExhausted(RetryTemplate.java:512)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:350)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:179)
+	at org.springframework.batch.core.step.item.BatchRetryTemplate.execute(BatchRetryTemplate.java:222)
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor.provide(JsrFaultTolerantChunkProcessor.java:186)
+	at org.springframework.batch.core.jsr.step.item.JsrChunkProcessor$1.doInIteration(JsrChunkProcessor.java:92)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.core.jsr.step.item.JsrChunkProcessor.process(JsrChunkProcessor.java:88)
+	at org.springframework.batch.core.step.item.ChunkOrientedTasklet.execute(ChunkOrientedTasklet.java:75)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:406)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$ChunkTransactionCallback.doInTransaction(TaskletStep.java:330)
+	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:133)
+	at org.springframework.batch.core.step.tasklet.TaskletStep$2.doInChunkContext(TaskletStep.java:272)
+	at org.springframework.batch.core.scope.context.StepContextRepeatCallback.doInIteration(StepContextRepeatCallback.java:81)
+	at org.springframework.batch.repeat.support.RepeatTemplate.getNextResult(RepeatTemplate.java:374)
+	at org.springframework.batch.repeat.support.RepeatTemplate.executeInternal(RepeatTemplate.java:215)
+	at org.springframework.batch.repeat.support.RepeatTemplate.iterate(RepeatTemplate.java:144)
+	at org.springframework.batch.core.step.tasklet.TaskletStep.doExecute(TaskletStep.java:257)
+	at org.springframework.batch.core.step.AbstractStep.execute(AbstractStep.java:200)
+	at org.springframework.batch.core.job.SimpleStepHandler.handleStep(SimpleStepHandler.java:148)
+	at org.springframework.batch.core.job.flow.JobFlowExecutor.executeStep(JobFlowExecutor.java:64)
+	at org.springframework.batch.core.job.flow.support.state.StepState.handle(StepState.java:67)
+	at org.springframework.batch.core.jsr.job.flow.support.state.JsrStepState.handle(JsrStepState.java:53)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.resume(SimpleFlow.java:169)
+	at org.springframework.batch.core.job.flow.support.SimpleFlow.start(SimpleFlow.java:144)
+	at org.springframework.batch.core.jsr.job.flow.JsrFlowJob.doExecute(JsrFlowJob.java:82)
+	at org.springframework.batch.core.job.AbstractJob.execute(AbstractJob.java:306)
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher$1.run(SimpleJobLauncher.java:141)
+	at org.springframework.core.task.SyncTaskExecutor.execute(SyncTaskExecutor.java:50)
+	at org.springframework.batch.core.launch.support.SimpleJobLauncher.run(SimpleJobLauncher.java:134)
+	at org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests.testReadRetryExceptionInListener(RetryListenerTests.java:95)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	at sun.reflect.GeneratedMethodAccessor64.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	at com.sun.proxy.$Proxy3.processTestClass(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	at sun.reflect.GeneratedMethodAccessor63.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:483)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:147)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:129)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:404)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:63)
+	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:46)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: javax.batch.operations.BatchRuntimeException: javax.batch.operations.BatchRuntimeException: java.lang.IllegalStateException
+	at org.springframework.batch.core.listener.MulticasterBatchListener.onRetryReadException(MulticasterBatchListener.java:356)
+	at org.springframework.batch.core.jsr.step.item.JsrFaultTolerantChunkProcessor$1.doWithRetry(JsrFaultTolerantChunkProcessor.java:149)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:286)
+	... 74 more
+Caused by: javax.batch.operations.BatchRuntimeException: java.lang.IllegalStateException
+	at org.springframework.batch.core.jsr.RetryReadListenerAdapter.onRetryReadException(RetryReadListenerAdapter.java:41)
+	at org.springframework.batch.core.listener.CompositeRetryReadListener.onRetryReadException(CompositeRetryReadListener.java:59)
+	at org.springframework.batch.core.listener.MulticasterBatchListener.onRetryReadException(MulticasterBatchListener.java:354)
+	... 76 more
+Caused by: java.lang.IllegalStateException
+	at org.springframework.batch.core.jsr.configuration.xml.RetryListenerTests$ExceptionThrowingRetryReadListener.onRetryReadException(RetryListenerTests.java:109)
+	at org.springframework.batch.core.jsr.RetryReadListenerAdapter.onRetryReadException(RetryReadListenerAdapter.java:39)
+	... 78 more
+10:02:16,715  INFO Test worker support.SimpleJobLauncher:142 - Job: [JsrFlowJob: [name=job1]] completed with the following parameters: [{}] and the following status: [FAILED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

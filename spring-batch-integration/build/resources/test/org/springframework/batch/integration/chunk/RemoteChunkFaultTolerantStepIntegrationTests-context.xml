@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="2" skip-limit="2">
+					<skippable-exception-classes>
+						<include class="java.lang.IllegalStateException" />
+					</skippable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.integration.chunk.TestItemReader" scope="step">
+		<property name="items">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>#{jobParameters['item.three']}</value>
+				<value>4</value>
+				<value>5</value>
+				<value>6</value>
+				<value>7</value>
+				<value>8</value>
+				<value>9</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.integration.chunk.TestItemWriter" />
+
+	<bean id="chunkWriter" class="org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter" scope="step">
+		<property name="messagingOperations" ref="messagingGateway" />
+		<property name="replyChannel" ref="replies" />
+		<property name="maxWaitTimeouts" value="10" />
+	</bean>
+
+	<bean id="messagingGateway" class="org.springframework.integration.core.MessagingTemplate">
+		<property name="defaultChannel" ref="requests" />
+		<property name="receiveTimeout" value="1000" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="thread">
+					<bean class="org.springframework.context.support.SimpleThreadScope" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<integration:channel id="requests" />
+	<!-- If we use a direct channel for requests then the replies can come in on a thread-local -->
+	<integration:channel id="replies" scope="thread">
+		<integration:queue />
+	</integration:channel>
+	<integration:service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" />
+
+	<bean id="chunkHandler" class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
+		<property name="chunkWriter" ref="chunkWriter" />
+		<property name="step" ref="step" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="retryAdvice" class="org.springframework.retry.interceptor.RetryOperationsInterceptor">
+		<property name="retryOperations">
+			<bean class="org.springframework.retry.support.RetryTemplate">
+				<property name="retryPolicy">
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
+						<constructor-arg value="10" />
+						<constructor-arg>
+							<map>
+								<entry key="java.lang.Exception" value="true" />
+								<entry key="java.lang.Error" value="true" />
+							</map>
+						</constructor-arg>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- Simulate JMS rollback and redelivery using a direct channel and a retry -->
+	<aop:config>
+		<aop:advisor advice-ref="retryAdvice"
+			pointcut="execution(* org.springframework.messaging.MessageChannel+.send(..)) and bean(requests)" />
+	</aop:config>
+
+</beans>

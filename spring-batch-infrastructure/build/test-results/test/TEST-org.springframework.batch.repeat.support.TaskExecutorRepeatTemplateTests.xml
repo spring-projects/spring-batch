@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" tests="16" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:25" hostname="Michaels-MacBook-Pro-3.local" time="0.013">
+  <properties/>
+  <testcase name="testSetThrottleLimit" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.003"/>
+  <testcase name="testNestedSessionTerminatesBeforeIteration" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <testcase name="testExceptionHandlerCalledOnAbnormalCompletion" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testExecute" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.002"/>
+  <testcase name="testEarlyCompletionWithContext" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <testcase name="testContextClosedOnAbnormalCompletion" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testEarlyCompletionWithContextTerminated" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <testcase name="testEarlyCompletionWithException" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testOuterContextPreserved" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testEarlyCompletionWithPolicy" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <testcase name="testContextClosedOnNormalCompletion" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testEarlyCompletionWithSessionAndException" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <testcase name="testExceptionUnwrapping" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testResult" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.002"/>
+  <testcase name="testExceptionThrownOnLastItem" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.0"/>
+  <testcase name="testNestedSession" classname="org.springframework.batch.repeat.support.TaskExecutorRepeatTemplateTests" time="0.001"/>
+  <system-out><![CDATA[Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH47,quantity=245,price=12.78]]'
+Executing trade '[Trade: [isin=UK21341EAH48,quantity=108,price=109.25]]'
+Executing trade '[Trade: [isin=UK21341EAH49,quantity=854,price=123.39]]'
+Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH45,quantity=978,price=98.34]]'
+Executing trade '[Trade: [isin=UK21341EAH46,quantity=112,price=18.12]]'
+Executing trade '[Trade: [isin=UK21341EAH47,quantity=245,price=12.78]]'
+Executing trade '[Trade: [isin=UK21341EAH48,quantity=108,price=109.25]]'
+Executing trade '[Trade: [isin=UK21341EAH49,quantity=854,price=123.39]]'
+]]></system-out>
+  <system-err><![CDATA[FINISHED
+]]></system-err>
+</testsuite>

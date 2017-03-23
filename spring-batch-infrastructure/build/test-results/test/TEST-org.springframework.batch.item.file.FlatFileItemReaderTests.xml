@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.FlatFileItemReaderTests" tests="18" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:12" hostname="Michaels-MacBook-Pro-3.local" time="0.041">
+  <properties/>
+  <testcase name="testCurrentItemCount" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.002"/>
+  <testcase name="testItemCountAwareMultiLine" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.008"/>
+  <testcase name="testMappingExceptionWrapping" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.013"/>
+  <testcase name="testDirectoryResource" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testCustomRecordSeparatorMultilineBlankLineAfterEnd" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.001"/>
+  <testcase name="testNonExistentResource" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.001"/>
+  <testcase name="testCustomRecordSeparatorPolicyEndOfFile" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.001"/>
+  <testcase name="testItemCountAware" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testCurrentItemCountFromContext" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testCustomRecordSeparatorBlankLine" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testRuntimeFileCreation" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testRestartWithSkippedLines" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testOpenBadIOInput" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.007"/>
+  <testcase name="testMaxAndCurrentItemCount" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testStrictness" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testMaxItemCount" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.001"/>
+  <testcase name="testMaxItemCountFromContext" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.0"/>
+  <testcase name="testRestartWithCustomRecordSeparatorPolicy" classname="org.springframework.batch.item.file.FlatFileItemReaderTests" time="0.002"/>
+  <system-out><![CDATA[2017-03-23 10:04:12,195 WARN Test worker [org.springframework.batch.item.file.FlatFileItemReader] - <Input resource is not readable file [/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-infrastructure/build/data]>
+2017-03-23 10:04:12,198 WARN Test worker [org.springframework.batch.item.file.FlatFileItemReader] - <Input resource does not exist NonExistentResource>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

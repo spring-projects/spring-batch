@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.MultilineJobFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:35" hostname="Michaels-MacBook-Pro-3.local" time="0.025">
+  <properties/>
+  <testcase name="testJobLaunch" classname="org.springframework.batch.sample.MultilineJobFunctionalTests" time="0.025"/>
+  <system-out><![CDATA[10:06:35,000  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:06:35,001  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@accbaaa, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@5c77a2a2, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@7cf46198, org.springframework.test.context.support.DirtiesContextTestExecutionListener@69a2aee9, org.springframework.test.context.transaction.TransactionalTestExecutionListener@6d4509d, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@67d78057]
+10:06:35,001  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:35,010  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:35,022  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:35,027  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/multilineJob.xml]
+10:06:35,038  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:35,046  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@38f0d594: startup date [Thu Mar 23 10:06:35 CDT 2017]; root of context hierarchy
+10:06:35,086  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:35,104  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:35,117  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:35,118  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 1 ms.
+10:06:35,119  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:35,121  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 2 ms.
+10:06:35,121  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:35,124  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 3 ms.
+10:06:35,136  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:35,136  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:35,222  INFO Test worker GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@6a3f3cea: startup date [Thu Mar 23 10:05:48 CDT 2017]; root of context hierarchy
+10:06:35,232  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=multilineJob]] launched with the following parameters: [{random=903276}]
+10:06:35,235  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:35,240 DEBUG Test worker AggregateItemReader:80 - Start of new record detected
+10:06:35,241 DEBUG Test worker AggregateItemReader:91 - Mapping: org.springframework.batch.sample.domain.multiline.AggregateItem@6dc2db88
+10:06:35,241 DEBUG Test worker AggregateItemReader:91 - Mapping: org.springframework.batch.sample.domain.multiline.AggregateItem@16db7bb8
+10:06:35,242 DEBUG Test worker AggregateItemReader:86 - End of record detected
+10:06:35,244 DEBUG Test worker AggregateItemReader:80 - Start of new record detected
+10:06:35,244 DEBUG Test worker AggregateItemReader:91 - Mapping: org.springframework.batch.sample.domain.multiline.AggregateItem@32a73e6c
+10:06:35,245 DEBUG Test worker AggregateItemReader:91 - Mapping: org.springframework.batch.sample.domain.multiline.AggregateItem@4b15a8d0
+10:06:35,245 DEBUG Test worker AggregateItemReader:91 - Mapping: org.springframework.batch.sample.domain.multiline.AggregateItem@1cb95a86
+10:06:35,246 DEBUG Test worker AggregateItemReader:86 - End of record detected
+10:06:35,248 DEBUG Test worker AggregateItemReader:73 - Exhausted ItemReader
+10:06:35,251  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=multilineJob]] completed with the following parameters: [{random=903276}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

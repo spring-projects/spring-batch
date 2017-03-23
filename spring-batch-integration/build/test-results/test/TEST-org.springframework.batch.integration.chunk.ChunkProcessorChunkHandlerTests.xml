@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandlerTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:42" hostname="Michaels-MacBook-Pro-3.local" time="0.002">
+  <properties/>
+  <testcase name="testVanillaHandleChunk" classname="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandlerTests" time="0.002"/>
+  <system-out><![CDATA[2017-03-23 10:04:42,461 DEBUG Test worker [org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler] - <Handling chunk: ChunkRequest: jobId=12, sequence=0, contribution=[StepContribution: read=0, written=0, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING], item count=2>
+2017-03-23 10:04:42,461 DEBUG Test worker [org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler] - <Completed chunk handling with [StepContribution: read=0, written=0, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING]>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

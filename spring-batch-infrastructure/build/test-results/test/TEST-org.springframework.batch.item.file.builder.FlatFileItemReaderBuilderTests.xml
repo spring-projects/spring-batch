@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" tests="12" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:11" hostname="Michaels-MacBook-Pro-3.local" time="0.132">
+  <properties/>
+  <testcase name="testSimpleFixedLength" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.053"/>
+  <testcase name="testDelimitedIncludedFields" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.006"/>
+  <testcase name="testPrototypeBean" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.052"/>
+  <testcase name="testAdvancedFixedLength" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.003"/>
+  <testcase name="testFixedLengthFieldSetFactory" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.002"/>
+  <testcase name="testBeanWrapperFieldSetMapperStrict" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.002"/>
+  <testcase name="testComments" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.001"/>
+  <testcase name="testCustomLineTokenizerFieldSetMapper" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.002"/>
+  <testcase name="testAdvancedDelimited" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.003"/>
+  <testcase name="testDelimitedFieldSetFactory" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.002"/>
+  <testcase name="testStrict" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.003"/>
+  <testcase name="testSimpleDelimited" classname="org.springframework.batch.item.file.builder.FlatFileItemReaderBuilderTests" time="0.001"/>
+  <system-out><![CDATA[2017-03-23 10:04:12,033 INFO Test worker [org.springframework.context.annotation.AnnotationConfigApplicationContext] - <Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@4b9d714d: startup date [Thu Mar 23 10:04:12 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:12,043 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
+2017-03-23 10:04:12,102 WARN Test worker [org.springframework.batch.item.file.FlatFileItemReader] - <Input resource does not exist file [/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-infrastructure/this/file/does/not/exist]>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

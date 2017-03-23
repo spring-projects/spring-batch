@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <beans:bean id="amqpItemReader" class="org.springframework.batch.item.amqp.AmqpItemReader">
+        <beans:constructor-arg ref="inboundAmqpTemplate"/>
+    </beans:bean>
+
+    <beans:bean id="amqpItemProcessor" class="org.springframework.batch.sample.rabbitmq.processor.MessageProcessor"/>
+
+    <beans:bean id="amqpItemWriter" class="org.springframework.batch.item.amqp.AmqpItemWriter">
+        <beans:constructor-arg ref="outboundAmqpTemplate"/>
+    </beans:bean>
+</beans:beans>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.launch.JobLaunchingMessageHandlerTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.launch.JobLaunchingMessageHandlerTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.launch.html">org.springframework.batch.integration.launch</a> &gt; JobLaunchingMessageHandlerTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.001s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testSimpleDelivery</td>
+<td>0.001s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:05:04,723  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [job-execution-context.xml]&gt;
+2017-03-23 10:05:04,753  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:05:04,754 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:05:04,754 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:05:04,755  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@161f756b: startup date [Thu Mar 23 10:05:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:04,759  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:05:04,759  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:05:04,760  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:04,786  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:04,851  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:04,899 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:05:04,939  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:05:04,939  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:04,939  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@161f756b.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:05:04,939  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

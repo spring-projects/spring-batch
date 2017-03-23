@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.test.JobLauncherTestUtilsTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:46" hostname="Michaels-MacBook-Pro-3.local" time="2.101">
+  <properties/>
+  <testcase name="testStepExecutionWithJavaConfig" classname="org.springframework.batch.test.JobLauncherTestUtilsTests" time="2.101"/>
+  <system-out><![CDATA[10:06:47,202  INFO Test worker annotation.AnnotationConfigApplicationContext - Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@317a22e0: startup date [Thu Mar 23 10:06:47 CDT 2017]; root of context hierarchy
+10:06:47,849  WARN Test worker annotation.ConfigurationClassEnhancer - @Bean method ScopeConfiguration.stepScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:06:47,894  WARN Test worker annotation.ConfigurationClassEnhancer - @Bean method ScopeConfiguration.jobScope is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+10:06:47,921  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:48,466  WARN Test worker annotation.DefaultBatchConfigurer - No datasource was provided...using a Map based JobRepository
+10:06:48,532  INFO Test worker support.SimpleJobLauncher - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:48,610  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=888242}]
+10:06:48,652  INFO Test worker job.SimpleStepHandler - Executing step: [step1]
+10:06:48,700  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=888242}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>XML Item Readers and Writers</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s06.xhtml" title="Flat Files"/><link rel="next" href="ch06s08.xhtml" title="Multi-File Input"/></head><body><header/><section class="section" title="XML Item Readers and Writers" epub:type="subchapter" id="xmlReadingWriting"><div class="titlepage"><div><div><h2 class="title" style="clear: both">XML Item Readers and Writers</h2></div></div></div><p>Spring Batch provides transactional infrastructure for both reading
+    XML records and mapping them to Java objects as well as writing Java
+    objects as XML records.</p><div class="note" title="Constraints on streaming XML" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Constraints on streaming XML</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>The StAX API is used for I/O as other standard XML parsing APIs do
+      not fit batch processing requirements (DOM loads the whole input into
+      memory at once and SAX controls the parsing process allowing the user
+      only to provide callbacks).</p></td></tr></table></div><p>Lets take a closer look how XML input and output works in Spring
+    Batch. First, there are a few concepts that vary from file reading and
+    writing but are common across Spring Batch XML processing. With XML
+    processing, instead of lines of records (FieldSets) that need to be
+    tokenized, it is assumed an XML resource is a collection of 'fragments'
+    corresponding to individual records:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/xmlinput.png" width="351"/><div class="caption"><p>Figure 3.1: XML Input</p></div></div><p>The 'trade' tag is defined as the 'root element' in the scenario
+    above. Everything between '&lt;trade&gt;' and '&lt;/trade&gt;' is
+    considered one 'fragment'. Spring Batch uses Object/XML Mapping (OXM) to
+    bind fragments to objects. However, Spring Batch is not tied to any
+    particular XML binding technology. Typical use is to delegate to <a class="ulink" href="http://docs.spring.io/spring-ws/site/reference/html/oxm.html" target="_top"><em class="citetitle">Spring
+    OXM</em></a>, which provides uniform abstraction for the most
+    popular OXM technologies. The dependency on Spring OXM is optional and you
+    can choose to implement Spring Batch specific interfaces if desired. The
+    relationship to the technologies that OXM supports can be shown as the
+    following:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/oxm-fragments.png" width="324"/><div class="caption"><p>Figure 3.2: OXM Binding</p></div></div><p>Now with an introduction to OXM and how one can use XML fragments to
+    represent records, let's take a closer look at readers and writers.</p><section class="section" title="StaxEventItemReader" epub:type="division" id="StaxEventItemReader"><div class="titlepage"><div><div><h3 class="title">StaxEventItemReader</h3></div></div></div><p>The <code class="classname">StaxEventItemReader</code> configuration
+      provides a typical setup for the processing of records from an XML input
+      stream. First, lets examine a set of XML records that the
+      <code class="classname">StaxEventItemReader</code> can process.</p><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;records&gt;
+    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+        &lt;isin&gt;XYZ0001&lt;/isin&gt;
+        &lt;quantity&gt;5&lt;/quantity&gt;
+        &lt;price&gt;11.39&lt;/price&gt;
+        &lt;customer&gt;Customer1&lt;/customer&gt;
+    &lt;/trade&gt;
+    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+        &lt;isin&gt;XYZ0002&lt;/isin&gt;
+        &lt;quantity&gt;2&lt;/quantity&gt;
+        &lt;price&gt;72.99&lt;/price&gt;
+        &lt;customer&gt;Customer2c&lt;/customer&gt;
+    &lt;/trade&gt;
+    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+        &lt;isin&gt;XYZ0003&lt;/isin&gt;
+        &lt;quantity&gt;9&lt;/quantity&gt;
+        &lt;price&gt;99.99&lt;/price&gt;
+        &lt;customer&gt;Customer3&lt;/customer&gt;
+    &lt;/trade&gt;
+&lt;/records&gt;</pre><p>To be able to process the XML records the following is needed:
+      </p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>Root Element Name - Name of the root element of the fragment
+            that constitutes the object to be mapped. The example
+            configuration demonstrates this with the value of trade.</p></li><li class="listitem" epub:type="list-item"><p>Resource - Spring Resource that represents the file to be
+            read.</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">Unmarshaller</code> - Unmarshalling
+            facility provided by Spring OXM for mapping the XML fragment to an
+            object.</p></li></ul></div><pre class="programlisting">&lt;bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader"&gt;
+    &lt;property name="fragmentRootElementName" value="trade" /&gt;
+    &lt;property name="resource" value="data/iosample/input/input.xml" /&gt;
+    &lt;property name="unmarshaller" ref="tradeMarshaller" /&gt;
+&lt;/bean&gt;</pre><p>Notice that in this example we have chosen to use an
+      <code class="classname">XStreamMarshaller</code> which accepts an alias passed
+      in as a map with the first key and value being the name of the fragment
+      (i.e. root element) and the object type to bind. Then, similar to a
+      <code class="classname">FieldSet</code>, the names of the other elements that
+      map to fields within the object type are described as key/value pairs in
+      the map. In the configuration file we can use a Spring configuration
+      utility to describe the required alias as follows:</p><pre class="programlisting">&lt;bean id="tradeMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
+    &lt;property name="aliases"&gt;
+<span class="bold"><strong>        &lt;util:map id="aliases"&gt;
+            &lt;entry key="trade"
+                   value="org.springframework.batch.sample.domain.Trade" /&gt;
+            &lt;entry key="price" value="java.math.BigDecimal" /&gt;
+            &lt;entry key="name" value="java.lang.String" /&gt;
+        &lt;/util:map&gt;</strong></span>
+    &lt;/property&gt;
+&lt;/bean&gt;</pre><p>On input the reader reads the XML resource until it recognizes
+      that a new fragment is about to start (by matching the tag name by
+      default). The reader creates a standalone XML document from the fragment
+      (or at least makes it appear so) and passes the document to a
+      deserializer (typically a wrapper around a Spring OXM
+      <code class="classname">Unmarshaller</code>) to map the XML to a Java
+      object.</p><p>In summary, this procedure is analogous to the following scripted
+      Java code which uses the injection provided by the Spring
+      configuration:</p><pre class="programlisting">StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
+Resource resource = new ByteArrayResource(xmlResource.getBytes())
+
+Map aliases = new HashMap();
+aliases.put("trade","org.springframework.batch.sample.domain.Trade");
+aliases.put("price","java.math.BigDecimal");
+aliases.put("customer","java.lang.String");
+XStreamMarshaller unmarshaller = new XStreamMarshaller();
+unmarshaller.setAliases(aliases);
+xmlStaxEventItemReader.setUnmarshaller(unmarshaller);
+xmlStaxEventItemReader.setResource(resource);
+xmlStaxEventItemReader.setFragmentRootElementName("trade");
+xmlStaxEventItemReader.open(new ExecutionContext());
+
+boolean hasNext = true
+
+CustomerCredit credit = null;
+
+while (hasNext) {
+    credit = xmlStaxEventItemReader.read();
+    if (credit == null) {
+        hasNext = false;
+    }
+    else {
+        System.out.println(credit);
+    }
+}</pre></section><section class="section" title="StaxEventItemWriter" epub:type="division" id="StaxEventItemWriter"><div class="titlepage"><div><div><h3 class="title">StaxEventItemWriter</h3></div></div></div><p>Output works symmetrically to input. The
+      <code class="classname">StaxEventItemWriter</code> needs a
+      <code class="classname">Resource</code>, a marshaller, and a <code class="literal">rootTagName</code>. A Java
+      object is passed to a marshaller (typically a standard Spring OXM
+      <code class="classname">Marshaller</code>) which writes to a
+      <code class="classname">Resource</code> using a custom event writer that filters
+      the <code class="classname">StartDocument</code> and
+      <code class="classname">EndDocument</code> events produced for each fragment by
+      the OXM tools. We'll show this in an example using the
+      <code class="classname">MarshallingEventWriterSerializer</code>. The Spring
+      configuration for this setup looks as follows:</p><pre class="programlisting">&lt;bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter"&gt;
+    &lt;property name="resource" ref="outputResource" /&gt;
+    &lt;property name="marshaller" ref="customerCreditMarshaller" /&gt;
+    &lt;property name="rootTagName" value="customers" /&gt;
+    &lt;property name="overwriteOutput" value="true" /&gt;
+&lt;/bean&gt;</pre><p>The configuration sets up the three required properties and
+      optionally sets the overwriteOutput=true, mentioned earlier in the
+      chapter for specifying whether an existing file can be overwritten. It
+      should be noted the marshaller used for the writer is the exact same as
+      the one used in the reading example from earlier in the chapter:</p><pre class="programlisting">&lt;bean id="customerCreditMarshaller"
+      class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
+    &lt;property name="aliases"&gt;
+        &lt;util:map id="aliases"&gt;
+            &lt;entry key="customer"
+                   value="org.springframework.batch.sample.domain.CustomerCredit" /&gt;
+            &lt;entry key="credit" value="java.math.BigDecimal" /&gt;
+            &lt;entry key="name" value="java.lang.String" /&gt;
+        &lt;/util:map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</pre><p>To summarize with a Java example, the following code illustrates
+      all of the points discussed, demonstrating the programmatic setup of the
+      required properties:</p><pre class="programlisting">StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
+FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
+
+Map aliases = new HashMap();
+aliases.put("customer","org.springframework.batch.sample.domain.CustomerCredit");
+aliases.put("credit","java.math.BigDecimal");
+aliases.put("name","java.lang.String");
+Marshaller marshaller = new XStreamMarshaller();
+marshaller.setAliases(aliases);
+
+staxItemWriter.setResource(resource);
+staxItemWriter.setMarshaller(marshaller);
+staxItemWriter.setRootTagName("trades");
+staxItemWriter.setOverwriteOutput(true);
+
+ExecutionContext executionContext = new ExecutionContext();
+staxItemWriter.open(executionContext);
+CustomerCredit Credit = new CustomerCredit();
+trade.setPrice(11.39);
+credit.setName("Customer1");
+staxItemWriter.write(trade);</pre></section></section><footer/></body></html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>The Delegate Pattern and Registering with the Step</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s04.xhtml" title="ItemStream"/><link rel="next" href="ch06s06.xhtml" title="Flat Files"/></head><body><header/><section class="section" title="The Delegate Pattern and Registering with the Step" epub:type="subchapter" id="delegatePatternAndRegistering"><div class="titlepage"><div><div><h2 class="title" style="clear: both">The Delegate Pattern and Registering with the Step</h2></div></div></div><p>Note that the <code class="classname">CompositeItemWriter</code> is an
+    example of the delegation pattern, which is common in Spring Batch. The
+    delegates themselves might implement callback interfaces <code class="classname">StepListener</code>.
+    If they do, and they are being used in conjunction with Spring Batch Core
+    as part of a <code class="classname">Step</code> in a <code class="classname">Job</code>,
+    then they almost certainly need to be registered manually with the
+    <code class="classname">Step</code>. A reader, writer, or processor that is
+    directly wired into the Step will be registered automatically if it
+    implements <code class="classname">ItemStream</code> or a
+    <code class="classname">StepListener</code> interface. But because the delegates
+    are not known to the <code class="classname">Step</code>, they need to be injected
+    as listeners or streams (or both if appropriate):</p><pre class="programlisting">&lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
+                   commit-interval="2"&gt;
+                    &lt;streams&gt;
+                    &lt;stream ref="barWriter" /&gt;
+                &lt;/streams&gt;
+            &lt;/chunk&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;
+
+&lt;bean id="compositeItemWriter" class="...CustomCompositeItemWriter"&gt;
+    &lt;property name="delegate" ref="barWriter" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="barWriter" class="...BarWriter" /&gt;</pre></section><footer/></body></html>

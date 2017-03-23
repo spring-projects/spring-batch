@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.FlatFileParseExceptionTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:12" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testMessageInputLineCount" classname="org.springframework.batch.item.file.FlatFileParseExceptionTests" time="0.0"/>
+  <testcase name="testExceptionString" classname="org.springframework.batch.item.file.FlatFileParseExceptionTests" time="0.0"/>
+  <testcase name="testExceptionStringThrowable" classname="org.springframework.batch.item.file.FlatFileParseExceptionTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

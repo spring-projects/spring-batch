@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" tests="15" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:35" hostname="Michaels-MacBook-Pro-3.local" time="0.036">
+  <properties/>
+  <testcase name="testAddStepExecutions" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.006"/>
+  <testcase name="testPersistentCopy" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testSaveAndGetNonExistentExecution" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.001"/>
+  <testcase name="testGetStepExecutionsWhenNoneExist" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.001"/>
+  <testcase name="testSaveExecutionWithIdAlreadySet" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.001"/>
+  <testcase name="testSaveExecutionAssignsIdAndVersion" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testGetForNotExistingJobExecution" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.001"/>
+  <testcase name="testUpdateExecution" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testSaveAndFindExecution" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.004"/>
+  <testcase name="testSaveEmptyCollection" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.001"/>
+  <testcase name="testSaveNullCollectionThrowsException" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testSaveAndGetExecutions" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.005"/>
+  <testcase name="testSaveExecutionWithVersionAlreadySet" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testSaveAndGetExecution" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <testcase name="testConcurrentModificationException" classname="org.springframework.batch.core.repository.dao.MapStepExecutionDaoTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.explore.support.MapJobExplorerIntegrationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:10" hostname="Michaels-MacBook-Pro-3.local" time="0.511">
+  <properties/>
+  <testcase name="testRunningJobExecution" classname="org.springframework.batch.core.explore.support.MapJobExplorerIntegrationTests" time="0.511"/>
+  <system-out><![CDATA[10:02:10,679  INFO SimpleAsyncTaskExecutor-1 support.SimpleJobLauncher:139 - Job: [SimpleJob: [name=job]] launched with the following parameters: [{test=org.springframework.batch.core.explore.support.MapJobExplorerIntegrationTests}]
+10:02:10,682  INFO SimpleAsyncTaskExecutor-1 job.SimpleStepHandler:146 - Executing step: [step]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

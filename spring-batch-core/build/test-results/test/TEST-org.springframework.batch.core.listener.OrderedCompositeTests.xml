@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.listener.OrderedCompositeTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.007">
+  <properties/>
+  <testcase name="testAddMultipleOrdered" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.001"/>
+  <testcase name="testAdd" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.001"/>
+  <testcase name="testAddDuplicateOrdered" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.001"/>
+  <testcase name="testAddOrdered" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.0"/>
+  <testcase name="testSetSameObject" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.0"/>
+  <testcase name="testAddAnnotationOrdered" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.002"/>
+  <testcase name="testSetItems" classname="org.springframework.batch.core.listener.OrderedCompositeTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

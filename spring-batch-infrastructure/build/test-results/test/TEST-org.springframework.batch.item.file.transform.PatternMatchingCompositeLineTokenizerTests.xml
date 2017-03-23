@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testNoTokenizers" classname="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" time="0.0"/>
+  <testcase name="testEmptyKeyDoesNotMatchWhenAlternativeAvailable" classname="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" time="0.001"/>
+  <testcase name="testEmptyKeyMatchesAnyLine" classname="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" time="0.001"/>
+  <testcase name="testMatchWithPrefix" classname="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" time="0.001"/>
+  <testcase name="testNoMatch" classname="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizerTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

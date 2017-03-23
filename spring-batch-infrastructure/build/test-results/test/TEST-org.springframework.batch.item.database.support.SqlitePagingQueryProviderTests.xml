@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:11" hostname="Michaels-MacBook-Pro-3.local" time="0.002">
+  <properties/>
+  <testcase name="testGenerateRemainingPagesQuery" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateFirstPageQuery" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateFirstPageQueryWithGroupBy" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateJumpToItemQueryForFirstPage" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateRemainingPagesQueryWithGroupBy" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateJumpToItemQuery" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateJumpToItemQueryForFirstPageWithGroupBy" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.001"/>
+  <testcase name="testGenerateJumpToItemQueryWithGroupBy" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateRemainingPagesQueryWithMultipleSortKeys" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateFirstPageQueryWithMultipleSortKeys" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testQueryContainsSortKey" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testQueryContainsSortKeyDesc" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.0"/>
+  <testcase name="testGenerateJumpToItemQueryWithMultipleSortKeys" classname="org.springframework.batch.item.database.support.SqlitePagingQueryProviderTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

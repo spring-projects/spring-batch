@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<step id="step1">
+			<listeners>
+				<listener ref="skipListener" />
+			</listeners>
+			<chunk checkpoint-policy="item" item-count="1" skip-limit="4">
+				<reader ref="skipErrorGeneratingReader" />
+				<processor ref="skipErrorGeneratingProcessor" />
+				<writer ref="skipErrorGeneratingWriter" />
+				<skippable-exception-classes>
+					<include class="java.lang.Exception" />
+					<exclude class="java.lang.RuntimeException" />
+				</skippable-exception-classes>
+			</chunk>
+		</step>
+	</job>
+	                
+	<bean id="skipErrorGeneratingReader" class="org.springframework.batch.core.jsr.configuration.xml.ItemSkipParsingTests$SkipErrorGeneratingReader"/>
+	
+	<bean id="skipErrorGeneratingProcessor" class="org.springframework.batch.core.jsr.configuration.xml.ItemSkipParsingTests$SkipErrorGeneratingProcessor"/>
+	
+	<bean id="skipErrorGeneratingWriter" class="org.springframework.batch.core.jsr.configuration.xml.ItemSkipParsingTests$SkipErrorGeneratingWriter"/>
+	
+	<bean id="skipListener" class="org.springframework.batch.core.jsr.configuration.xml.ItemSkipParsingTests$TestSkipListener"/>
+</beans>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Mocking Domain Objects</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch10s05.xhtml" title="Validating Output Files"/><link rel="next" href="ch11.xhtml" title="Chapter 11. Common Batch Patterns"/></head><body><header/><section class="section" title="Mocking Domain Objects" epub:type="subchapter" id="mockingDomainObjects"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Mocking Domain Objects</h2></div></div></div><p>Another common issue encountered while writing unit and integration
+    tests for Spring Batch components is how to mock domain objects. A good
+    example is a <code class="classname">StepExecutionListener</code>, as illustrated
+    below:</p><pre class="programlisting">public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        if (stepExecution.getReadCount() == 0) {
+            throw new NoWorkFoundException("Step has not processed any items");
+        }
+        return stepExecution.getExitStatus();
+    }
+}</pre><p>The above listener is provided by the framework and checks a
+    <code class="classname">StepExecution</code> for an empty read count, thus
+    signifying that no work was done. While this example is fairly simple, it
+    serves to illustrate the types of problems that may be encountered when
+    attempting to unit test classes that implement interfaces requiring Spring
+    Batch domain objects. Consider the above listener's unit test:</p><pre class="programlisting">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+@Test
+public void testAfterStep() {
+    <span class="bold"><strong>StepExecution stepExecution = new StepExecution("NoProcessingStep",
+                new JobExecution(new JobInstance(1L, new JobParameters(),
+                                 "NoProcessingJob")));</strong></span>
+
+    stepExecution.setReadCount(0);
+
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
+    }
+}</pre><p>Because the Spring Batch domain model follows good object orientated
+    principles, the StepExecution requires a
+    <code class="classname">JobExecution</code>, which requires a
+    <code class="classname">JobInstance</code> and
+    <code class="classname">JobParameters</code> in order to create a valid
+    <code class="classname">StepExecution</code>. While this is good in a solid domain
+    model, it does make creating stub objects for unit testing verbose. To
+    address this issue, the Spring Batch test module includes a factory for
+    creating domain objects: <code class="classname">MetaDataInstanceFactory</code>.
+    Given this factory, the unit test can be updated to be more
+    concise:</p><pre class="programlisting">private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+@Test
+public void testAfterStep() {
+    <span class="bold"><strong>StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();</strong></span>
+
+    stepExecution.setReadCount(0);
+
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
+    }
+}</pre><p>The above method for creating a simple
+    <code class="classname">StepExecution</code> is just one convenience method
+    available within the factory. A full method listing can be found in its
+    <a class="ulink" href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html" target="_top">Javadoc</a>.</p></section><footer/></body></html>

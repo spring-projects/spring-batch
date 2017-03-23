@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="footballJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="playerload" next="gameLoad">
+			<tasklet>
+				<chunk reader="playerFileItemReader" writer="playerWriter"
+	                   commit-interval="${job.commit.interval}" />
+			</tasklet>
+		</step>
+		<step id="gameLoad" next="playerSummarization">
+			<tasklet>
+				<chunk reader="gameFileItemReader" writer="gameWriter"
+	                   commit-interval="${job.commit.interval}" />
+			</tasklet>
+		</step>
+		<step id="playerSummarization" parent="summarizationStep" />
+	</job>
+
+	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="playerSummarizationSource" writer="summaryWriter"
+                   commit-interval="${job.commit.interval}" />
+		</tasklet>
+	</step>
+
+	<bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
+		<property name="playerDao">
+			<bean class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gameWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="summaryWriter" class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/footballjob/input/${player.file.name}" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="ID,lastName,firstName,position,birthYear,debutYear" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.sample.domain.football.internal.PlayerFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/footballjob/input/${games.file.name}" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.sample.domain.football.internal.GameFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
+		</property>
+		<property name="sql">
+			<value>
+				SELECT GAMES.player_id, GAMES.year_no, SUM(COMPLETES),
+				SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+				SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+				SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+				from GAMES, PLAYERS where PLAYERS.player_id =
+				GAMES.player_id group by GAMES.player_id, GAMES.year_no
+			</value>
+		</property>
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
+	</bean>
+
+	<aop:config>
+		<aop:aspect id="moduleLogging" ref="logAdvice">
+			<aop:after
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(..)) and args(item)"
+				method="doStronglyTypedLogging" />
+		</aop:aspect>
+		<aop:aspect ref="eventAdvice">
+			<aop:before
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="before" />
+			<aop:after
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="after" />
+			<aop:after-throwing throwing="t"
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="onError" />
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="footballProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<value>
+				games.file.name=games-small.csv
+				player.file.name=player-small1.csv
+				job.commit.interval=2
+			</value>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+	</bean>
+</beans>

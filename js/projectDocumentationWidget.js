@@ -95,7 +95,7 @@ Spring.SnippetView = Backbone.View.extend({
     this.combinedTemplate = _.template(
     	"<div class=\"highlight\"><pre><code>" +
         downloadTemplate.find("code:first").html() +
-        "{@ if (repository) { @}" +
+        "{@ if (typeof(repository) != \"undefined\") { @}" +
         repositoryTemplate.find("code:first").html() +
         "{@ } @}" +
         "</code></pre></div>"
@@ -107,9 +107,7 @@ Spring.SnippetView = Backbone.View.extend({
 
     var html = $(this.combinedTemplate(this.model));
     this.$el.html(html);
-    if (ZeroClipboard.detectFlashSupport()) {
-    	Spring.buildCopyButton(html.find(":first"), "snippet");
-    }
+    Spring.buildCopyButton(html.find(":first"), "snippet");
     return this;
   },
 

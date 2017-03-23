@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.domain.trade.internal.TradeProcessorTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:57" hostname="Michaels-MacBook-Pro-3.local" time="0.017">
+  <properties/>
+  <testcase name="testProcess" classname="org.springframework.batch.sample.domain.trade.internal.TradeProcessorTests" time="0.017"/>
+  <system-out><![CDATA[10:05:57,064 DEBUG Test worker TradeWriter:55 - Trade: [isin=,quantity=0,price=0,customer=]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

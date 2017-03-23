@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.DuplicateTransitionJobParserTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:56" hostname="Michaels-MacBook-Pro-3.local" time="0.045">
+  <properties/>
+  <testcase name="testDuplicateTransition" classname="org.springframework.batch.core.configuration.xml.DuplicateTransitionJobParserTests" time="0.021"/>
+  <testcase name="testNextAttributeWithNestedElement" classname="org.springframework.batch.core.configuration.xml.DuplicateTransitionJobParserTests" time="0.024"/>
+  <system-out><![CDATA[10:01:56,741  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@7efbe5ae: startup date [Thu Mar 23 10:01:56 CDT 2017]; root of context hierarchy
+10:01:56,742  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/DuplicateTransitionJobParserTests-context.xml]
+10:01:56,752  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:01:56,763  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@35bcd6: startup date [Thu Mar 23 10:01:56 CDT 2017]; root of context hierarchy
+10:01:56,763  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/NextAttributeMultipleFinalJobParserTests-context.xml]
+10:01:56,777  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

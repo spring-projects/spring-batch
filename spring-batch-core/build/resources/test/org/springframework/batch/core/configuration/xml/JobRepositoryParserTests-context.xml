@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-3.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
+		<beans:property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<beans:property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
+	</beans:bean>
+	<beans:bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	    <beans:property name="dataSource" ref="dataSource" />
+	</beans:bean>
+	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<beans:property name="dataSource" ref="dataSource"/>
+	</beans:bean>
+	<beans:bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
+	<beans:bean id="serializer" class="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer"/>
+
+	<job-repository id="jobRepo1" data-source="dataSource" jdbc-operations="jdbcTemplate" transaction-manager="transactionManager" lob-handler="lobHandler" max-varchar-length="100" serializer="serializer"/>
+
+</beans:beans>

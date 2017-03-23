@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:p="http://www.springframework.org/schema/p"
+             xmlns:test="http://www.springframework.org/schema/batch/test"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="job1">
+		<step id="step1">
+			<tasklet ref="tasklet"/>
+		</step>
+	</job>
+
+	<job id="job2">
+		<step id="step2">
+			<tasklet>
+				<beans:bean class="org.springframework.batch.core.configuration.xml.TestTasklet" p:name="foo"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<job id="job3">
+		<step id="step3">
+			<beans:bean class="org.springframework.batch.core.configuration.xml.TestTasklet" p:name="foobar"/>
+		</step>
+	</job>
+
+	<job id="job4">
+		<step id="step4">
+			<test:test/>
+		</step>
+	</job>
+
+	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet" p:name="bar"/>
+
+	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<beans:property name="transactionManager" ref="transactionManager" />
+	</beans:bean>
+
+</beans:beans>

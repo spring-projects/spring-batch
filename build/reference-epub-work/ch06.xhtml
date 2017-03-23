@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Chapter 6. ItemReaders and ItemWriters</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch05s04.xhtml" title="Late Binding of Job and Step Attributes"/><link rel="next" href="ch06s02.xhtml" title="ItemWriter"/></head><body><header/><section class="chapter" title="Chapter 6. ItemReaders and ItemWriters" epub:type="chapter" id="readersAndWriters"><div class="titlepage"><div><div><h1 class="title">Chapter 6. ItemReaders and ItemWriters</h1></div></div></div><p>All batch processing can be described in its most simple form as
+  reading in large amounts of data, performing some type of calculation or
+  transformation, and writing the result out. Spring Batch provides three key
+  interfaces to help perform bulk reading and writing:
+  <code class="classname">ItemReader</code>, <code class="classname">ItemProcessor</code> and
+  <code class="classname">ItemWriter</code>.</p><section class="section" title="ItemReader" epub:type="subchapter" id="itemReader"><div class="titlepage"><div><div><h2 class="title" style="clear: both">ItemReader</h2></div></div></div><p>Although a simple concept, an <code class="classname">ItemReader</code> is
+    the means for providing data from many different types of input. The most
+    general examples include: </p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>Flat File- Flat File Item Readers read lines of data from a
+          flat file that typically describe records with fields of data
+          defined by fixed positions in the file or delimited by some special
+          character (e.g. Comma).</p></li><li class="listitem" epub:type="list-item"><p>XML - XML ItemReaders process XML independently of
+          technologies used for parsing, mapping and validating objects. Input
+          data allows for the validation of an XML file against an XSD
+          schema.</p></li><li class="listitem" epub:type="list-item"><p>Database - A database resource is accessed to return
+          resultsets which can be mapped to objects for processing. The
+          default SQL ItemReaders invoke a <code class="classname">RowMapper</code> to
+          return objects, keep track of the current row if restart is
+          required, store basic statistics, and provide some transaction
+          enhancements that will be explained later.</p></li></ul></div><p>There are many more possibilities, but we'll focus on the
+    basic ones for this chapter. A complete list of all available ItemReaders
+    can be found in Appendix A.</p><p><code class="classname">ItemReader</code> is a basic interface for generic
+    input operations:</p><pre class="programlisting">public interface ItemReader&lt;T&gt; {
+
+    T read() throws Exception, UnexpectedInputException, ParseException;
+
+}</pre><p>The <code class="methodname">read</code> method defines the most essential
+    contract of the <code class="classname">ItemReader</code>; calling it returns one
+    Item or null if no more items are left. An item might represent a line in
+    a file, a row in a database, or an element in an XML file. It is generally
+    expected that these will be mapped to a usable domain object (i.e. Trade,
+    Foo, etc) but there is no requirement in the contract to do so.</p><p>It is expected that implementations of the
+    <code class="classname">ItemReader</code> interface will be forward only. However,
+    if the underlying resource is transactional (such as a JMS queue) then
+    calling read may return the same logical item on subsequent calls in a
+    rollback scenario. It is also worth noting that a lack of items to process
+    by an <code class="classname">ItemReader</code> will not cause an exception to be
+    thrown. For example, a database <code class="classname">ItemReader</code> that is
+    configured with a query that returns 0 results will simply return null on
+    the first invocation of <code class="methodname">read</code>.</p></section></section><footer/></body></html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.BeanDefinitionOverrideTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:54" hostname="Michaels-MacBook-Pro-3.local" time="0.105">
+  <properties/>
+  <testcase name="testAllowBeanOverride" classname="org.springframework.batch.core.configuration.xml.BeanDefinitionOverrideTests" time="0.053"/>
+  <testcase name="testAllowBeanOverrideFalse" classname="org.springframework.batch.core.configuration.xml.BeanDefinitionOverrideTests" time="0.051"/>
+  <system-out><![CDATA[10:01:54,177  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@79768373: startup date [Thu Mar 23 10:01:54 CDT 2017]; root of context hierarchy
+10:01:54,178  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml]
+10:01:54,230  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4bc87838: startup date [Thu Mar 23 10:01:54 CDT 2017]; root of context hierarchy
+10:01:54,231  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

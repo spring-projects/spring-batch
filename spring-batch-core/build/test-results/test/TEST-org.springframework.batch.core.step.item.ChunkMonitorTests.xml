@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.item.ChunkMonitorTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:44" hostname="Michaels-MacBook-Pro-3.local" time="0.007">
+  <properties/>
+  <testcase name="testResetOffsetAutomatically" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.001"/>
+  <testcase name="testUpdateOnBoundary" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.001"/>
+  <testcase name="testClose" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.0"/>
+  <testcase name="testOpenWithErrorInReader" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.001"/>
+  <testcase name="testOpen" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.001"/>
+  <testcase name="testIncrementOffset" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.0"/>
+  <testcase name="testResetOffsetManually" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.0"/>
+  <testcase name="testUpdateWithNoStream" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.002"/>
+  <testcase name="testUpdateVanilla" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.0"/>
+  <testcase name="testOpenWithNullReader" classname="org.springframework.batch.core.step.item.ChunkMonitorTests" time="0.001"/>
+  <system-out><![CDATA[10:02:44,720  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,720  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,721  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,721  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,721  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,722  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,723  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,723  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,724  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,725  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,725  WARN Test worker item.ChunkMonitor:155 - ItemStream was opened in a different thread.  Restart data could be compromised.
+10:02:44,725  WARN Test worker item.ChunkMonitor:118 - No ItemReader set (must be concurrent step), so ignoring offset data.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource" />
+		<property name="initScripts">
+			<list>
+				<value>org/springframework/batch/core/schema-drop-hsqldb.sql</value>
+				<value>org/springframework/batch/core/schema-hsqldb.sql</value>
+				<value>foo.sql</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="incrementerParent" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer"
+		abstract="true">
+		<property name="dataSource" ref="dataSource" />
+		<property name="columnName" value="ID" />
+	</bean>
+	<bean id="jobIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_JOB_SEQ" />
+	</bean>
+	<bean id="jobExecutionIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_JOB_EXECUTION_SEQ" />
+	</bean>
+	<bean id="stepIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_STEP_SEQ" />
+	</bean>
+	<bean id="stepExecutionIncrementer" parent="incrementerParent">
+		<property name="incrementerName" value="BATCH_STEP_EXECUTION_SEQ" />
+	</bean>
+</beans>

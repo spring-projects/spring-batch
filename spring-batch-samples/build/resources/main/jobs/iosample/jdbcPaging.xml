@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcPagingItemReader" scope="step">
+		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
+		</property>
+		<property name="queryProvider">
+			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="sortKeys">
+					<map>
+						<entry key="id" value="ASCENDING"/>
+					</map>
+				</property>
+				<!-- Intentionally put sort key second in the query list as a test -->
+				<property name="selectClause" value="select NAME, ID, CREDIT" />
+				<property name="fromClause" value="FROM CUSTOMER" />
+				<property name="whereClause" value="WHERE CREDIT > :credit" />
+			</bean>
+		</property>
+		<property name="pageSize" value="2" />
+		<property name="parameterValues">
+			<map>
+				<entry key="statusCode" value="PE" />
+				<entry key="credit" value="#{jobParameters[credit]}" />
+				<entry key="type" value="COLLECTION" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="assertUpdates" value="true" />
+		<property name="itemSqlParameterSourceProvider">
+			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
+		</property>
+		<property name="sql" value="UPDATE CUSTOMER set credit = :credit where id = :id" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+</beans>

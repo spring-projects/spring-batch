@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Java Config</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch04.xhtml" title="Chapter 4. Configuring and Running a Job"/><link rel="next" href="ch04s03.xhtml" title="Configuring a JobRepository"/></head><body><header/><section class="section" title="Java Config" epub:type="subchapter" id="javaConfig"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Java Config</h2></div></div></div><p>Spring 3 brought the ability to configure applications via java instead
+  	of XML.  As of Spring Batch 2.2.0, batch jobs can be configured using the same
+  	java config.  There are two components for the java based configuration:
+  	the <code class="classname">@EnableBatchConfiguration</code> annotation and two builders.</p><p>The <code class="classname">@EnableBatchProcessing</code> works similarly to the other
+  	<code class="classname">@Enable*</code> annotations in the Spring family.  In this case,
+  	<code class="classname">@EnableBatchProcessing</code> provides a base configuration for
+  	building batch jobs.  Within this base configuration, an instance of
+  	<code class="classname">StepScope</code> is created in addition to a number of beans made
+  	available to be autowired:
+  	</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">JobRepository</code> - bean name "jobRepository"</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">JobLauncher</code> - bean name "jobLauncher"</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">JobRegistry</code> - bean name "jobRegistry"</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">PlatformTransactionManager</code> - bean name "transactionManager"</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">JobBuilderFactory</code> - bean name "jobBuilders"</p></li><li class="listitem" epub:type="list-item"><p><code class="classname">StepBuilderFactory</code> - bean name "stepBuilders"</p></li></ul></div><p>The core interface for this configuration is the <code class="classname">BatchConfigurer</code>.
+    The default implementation provides the beans mentioned above and requires a
+    <code class="classname">DataSource</code> as a bean within the context to be provided.  This data
+    source will be used by the <code class="classname">JobRepository</code>.
+    </p><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>Only one configuration class needs to have the
+    	<code class="classname">@EnableBatchProcessing</code> annotation.  Once you have a class
+    	annotated with it, you will have all of the above available.</p></td></tr></table></div><p>With the base configuration in place, a user can use the provided builder factories
+	to configure a job.  Below is an example of a two step job configured via the
+	<code class="classname">JobBuilderFactory</code> and the <code class="classname">StepBuilderFactory</code>.</p><pre class="programlisting">@Configuration
+@EnableBatchProcessing
+@Import(DataSourceConfiguration.class)
+public class AppConfig {
+
+    @Autowired
+    private JobBuilderFactory jobs;
+
+    @Autowired
+    private StepBuilderFactory steps;
+
+    @Bean
+    public Job job(@Qualifier("step1") Step step1, @Qualifier("step2") Step step2) {
+        return jobs.get("myJob").start(step1).next(step2).build();
+    }
+
+    @Bean
+    protected Step step1(ItemReader&lt;Person&gt; reader, ItemProcessor&lt;Person, Person&gt; processor, ItemWriter&lt;Person&gt; writer) {
+        return steps.get("step1")
+            .&lt;Person, Person&gt; chunk(10)
+            .reader(reader)
+            .processor(processor)
+            .writer(writer)
+            .build();
+    }
+
+    @Bean
+    protected Step step2(Tasklet tasklet) {
+        return steps.get("step2")
+            .tasklet(tasklet)
+            .build();
+    }
+}</pre></section><footer/></body></html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" tests="22" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:09" hostname="Michaels-MacBook-Pro-3.local" time="0.021">
+  <properties/>
+  <testcase name="testGetParametersWithVeryRoundDouble" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.001"/>
+  <testcase name="testGetPropertiesWithNullValues" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithBogusDate" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.001"/>
+  <testcase name="testGetParametersWithBogusLong" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithDoubleAndLongAndNumberFormat" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.004"/>
+  <testcase name="testNullArgs" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersMixed" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testEmptyArgs" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithBogusDouble" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithNumberFormat" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithDoubleValueDeclaredAsLong" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testRoundTripWithNumberFormat" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.005"/>
+  <testcase name="testGetParametersWithDateFormat" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.001"/>
+  <testcase name="testRoundTrip" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetProperties" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.002"/>
+  <testcase name="testGetParametersWithDouble" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersIdentifyingWithIdentifyingKey" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersNonIdentifying" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersWithRoundDouble" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParametersIdentifyingByDefault" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testGetParameters" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.0"/>
+  <testcase name="testRoundTripWithIdentifyingAndNonIdentifying" classname="org.springframework.batch.core.converter.DefaultJobParametersConverterTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

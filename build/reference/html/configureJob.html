@@ -1,0 +1,662 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>4.&nbsp;Configuring and Running a Job</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="Spring Batch - Reference Documentation"><link rel="up" href="index.html" title="Spring Batch - Reference Documentation"><link rel="prev" href="domain.html" title="3.&nbsp;The Domain Language of Batch"><link rel="next" href="configureStep.html" title="5.&nbsp;Configuring a Step"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.&nbsp;Configuring and Running a Job</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="domain.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="configureStep.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="configureJob" href="#configureJob"></a>4.&nbsp;Configuring and Running a Job</h1></div></div></div><p>In the <a class="link" href="domain.html" title="3.&nbsp;The Domain Language of Batch">domain section</a> , the overall
+  architecture design was discussed, using the following diagram as a
+  guide:</p><div class="mediaobject" align="center"><img src="images/spring-batch-reference-model.png" align="middle"></div><p>While the <code class="classname">Job</code> object may seem like a simple
+  container for steps, there are many configuration options of which a
+  developers must be aware . Furthermore, there are many considerations for
+  how a <code class="classname">Job</code> will be run and how its meta-data will be
+  stored during that run. This chapter will explain the various configuration
+  options and runtime concerns of a <code class="classname">Job</code> .</p><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configuringAJob" href="#configuringAJob"></a>4.1&nbsp;Configuring a Job</h2></div></div></div><p>There are multiple implementations of the <a class="link" href="">
+    <code class="classname">Job</code> </a> interface, however, the namespace
+    abstracts away the differences in configuration. It has only three
+    required dependencies: a name, <code class="classname">JobRepository</code> , and
+    a list of <code class="classname">Step</code>s.</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerload"</span>          <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"gameLoad"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"gameLoad"</span>            <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"playerSummarization"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerSummarization"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>The examples here use a parent bean definition to create the steps;
+    see the section on <a class="link" href="configureStep.html" title="5.&nbsp;Configuring a Step">step configuration</a>
+    for more options declaring specific step details inline. The XML namespace
+    defaults to referencing a repository with an id of 'jobRepository', which
+    is a sensible default. However, this can be overridden explicitly:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span> <span class="bold"><strong>job-repository="specialRepository"</strong></span>&gt;
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerload"</span>          <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"gameLoad"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"gameLoad"</span>            <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"playerSummarization"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerSummarization"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>In addition to steps a job configuration can contain other elements
+    that help with parallelisation (<code class="literal">&lt;split/&gt;</code>),
+    declarative flow control (<code class="literal">&lt;decision/&gt;</code>) and
+    externalization of flow definitions
+    (<code class="literal">&lt;flow/&gt;</code>).</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="restartability" href="#restartability"></a>4.1.1&nbsp;Restartability</h3></div></div></div><p>One key issue when executing a batch job concerns the behavior of
+      a <code class="classname">Job</code> when it is restarted. The launching of a
+      <code class="classname">Job</code> is considered to be a 'restart' if a
+      <code class="classname">JobExecution</code> already exists for the particular
+      <code class="classname">JobInstance</code>. Ideally, all jobs should be able to
+      start up where they left off, but there are scenarios where this is not
+      possible. <span class="bold"><strong>It is entirely up to the developer to
+      ensure that a new <code class="classname">JobInstance</code> is created in this
+      scenario</strong></span>. However, Spring Batch does provide some help. If a
+      <code class="classname">Job</code> should never be restarted, but should always
+      be run as part of a new <code class="classname">JobInstance</code>, then the
+      restartable property may be set to 'false':</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span> <span class="bold"><strong>restartable="false"</strong></span>&gt;
+    ...
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>To phrase it another way, setting restartable to false means "this
+      Job does not support being started again". Restarting a Job that is not
+      restartable will cause a <code class="classname">JobRestartException</code> to
+      be thrown:</p><pre class="programlisting">Job job = <span class="hl-keyword">new</span> SimpleJob();
+job.setRestartable(false);
+
+JobParameters jobParameters = <span class="hl-keyword">new</span> JobParameters();
+
+JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
+jobRepository.saveOrUpdate(firstExecution);
+
+<span class="hl-keyword">try</span> {
+    jobRepository.createJobExecution(job, jobParameters);
+    fail();
+}
+<span class="hl-keyword">catch</span> (JobRestartException e) {
+    <span class="hl-comment">// expected</span>
+}</pre><p>This snippet of JUnit code shows how attempting to create a
+      <code class="classname">JobExecution</code> the first time for a non restartable
+      <code class="classname">job</code> will cause no issues. However, the second
+      attempt will throw a <code class="classname">JobRestartException</code>.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="interceptingJobExecution" href="#interceptingJobExecution"></a>4.1.2&nbsp;Intercepting Job Execution</h3></div></div></div><p>During the course of the execution of a
+      <code class="classname">Job</code>, it may be useful to be notified of various
+      events in its lifecycle so that custom code may be executed. The
+      <code class="classname">SimpleJob</code> allows for this by calling a
+      <code class="classname">JobListener</code> at the appropriate time:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> JobExecutionListener {
+
+    <span class="hl-keyword">void</span> beforeJob(JobExecution jobExecution);
+
+    <span class="hl-keyword">void</span> afterJob(JobExecution jobExecution);
+
+}</pre><p><code class="classname">JobListener</code>s can be added to a
+      <code class="classname">SimpleJob</code> via the listeners element on the
+      job:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerload"</span>          <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"gameLoad"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"gameLoad"</span>            <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"playerSummarization"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerSummarization"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span>
+<span class="bold"><strong>    &lt;listeners&gt;
+        &lt;listener ref="sampleListener"/&gt;
+    &lt;/listeners&gt;
+</strong></span><span class="hl-tag">&lt;/job&gt;</span></pre><p>It should be noted that <code class="methodname">afterJob</code> will be
+      called regardless of the success or failure of the
+      <code class="classname">Job</code>. If success or failure needs to be determined
+      it can be obtained from the <code class="classname">JobExecution</code>:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">void</span> afterJob(JobExecution jobExecution){
+    <span class="hl-keyword">if</span>( jobExecution.getStatus() == BatchStatus.COMPLETED ){
+        <span class="hl-comment">//job success</span>
+    }
+    <span class="hl-keyword">else</span> <span class="hl-keyword">if</span>(jobExecution.getStatus() == BatchStatus.FAILED){
+        <span class="hl-comment">//job failure</span>
+    }
+}</pre><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeJob</code></p></li><li class="listitem"><p><code class="classname">@AfterJob</code></p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="inheritingFromAParentJob" href="#inheritingFromAParentJob"></a>4.1.3&nbsp;Inheriting from a Parent Job</h3></div></div></div><p>If a group of <code class="classname">Job</code>s share similar, but not
+      identical, configurations, then it may be helpful to define a "parent"
+      <code class="classname">Job</code> from which the concrete
+      <code class="classname">Job</code>s may inherit properties. Similar to class
+      inheritance in Java, the "child" <code class="classname">Job</code> will combine
+      its elements and attributes with the parent's.</p><p>In the following example, "baseJob" is an abstract
+      <code class="classname">Job</code> definition that defines only a list of
+      listeners. The <code class="classname">Job</code> "job1" is a concrete
+      definition that inherits the list of listeners from "baseJob" and merges
+      it with its own list of listeners to produce a
+      <code class="classname">Job</code> with two listeners and one
+      <code class="classname">Step</code>, "step1".</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"baseJob"</span> <span class="hl-attribute">abstract</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+        <span class="hl-tag">&lt;listener</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"listenerOne"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"baseJob"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"standaloneStep"</span><span class="hl-tag">/&gt;</span>
+
+    <span class="hl-tag">&lt;listeners</span> <span class="hl-attribute">merge</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;listener</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"listenerTwo"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>Please see the section on <a class="link" href="configureStep.html#InheritingFromParentStep" title="5.1.2&nbsp;Inheriting from a Parent Step">Inheriting from a Parent Step</a>
+      for more detailed information.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d5e953" href="#d5e953"></a>4.1.4&nbsp;JobParametersValidator</h3></div></div></div><p>A job declared in the XML namespace or using any subclass of
+      AbstractJob can optionally declare a validator for the job parameters at
+      runtime. This is useful when for instance you need to assert that a job
+      is started with all its mandatory parameters. There is a
+      DefaultJobParametersValidator that can be used to constrain combinations
+      of simple mandatory and optional parameters, and for more complex
+      constraints you can implement the interface yourself. The configuration
+      of a validator is supported through the XML namespace through a child
+      element of the job, e.g:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"baseJob3"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"standaloneStep"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;validator</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"paremetersValidator"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>The validator can be specified as a reference (as above) or as a
+      nested bean definition in the beans namespace.</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="javaConfig" href="#javaConfig"></a>4.2&nbsp;Java Config</h2></div></div></div><p>Spring 3 brought the ability to configure applications via java instead
+  	of XML.  As of Spring Batch 2.2.0, batch jobs can be configured using the same
+  	java config.  There are two components for the java based configuration:
+  	the <code class="classname">@EnableBatchConfiguration</code> annotation and two builders.</p><p>The <code class="classname">@EnableBatchProcessing</code> works similarly to the other
+  	<code class="classname">@Enable*</code> annotations in the Spring family.  In this case,
+  	<code class="classname">@EnableBatchProcessing</code> provides a base configuration for
+  	building batch jobs.  Within this base configuration, an instance of
+  	<code class="classname">StepScope</code> is created in addition to a number of beans made
+  	available to be autowired:
+  	</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">JobRepository</code> - bean name "jobRepository"</p></li><li class="listitem"><p><code class="classname">JobLauncher</code> - bean name "jobLauncher"</p></li><li class="listitem"><p><code class="classname">JobRegistry</code> - bean name "jobRegistry"</p></li><li class="listitem"><p><code class="classname">PlatformTransactionManager</code> - bean name "transactionManager"</p></li><li class="listitem"><p><code class="classname">JobBuilderFactory</code> - bean name "jobBuilders"</p></li><li class="listitem"><p><code class="classname">StepBuilderFactory</code> - bean name "stepBuilders"</p></li></ul></div><p>The core interface for this configuration is the <code class="classname">BatchConfigurer</code>.
+    The default implementation provides the beans mentioned above and requires a
+    <code class="classname">DataSource</code> as a bean within the context to be provided.  This data
+    source will be used by the <code class="classname">JobRepository</code>.
+    </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>Only one configuration class needs to have the
+    	<code class="classname">@EnableBatchProcessing</code> annotation.  Once you have a class
+    	annotated with it, you will have all of the above available.</p></td></tr></table></div><p>With the base configuration in place, a user can use the provided builder factories
+	to configure a job.  Below is an example of a two step job configured via the
+	<code class="classname">JobBuilderFactory</code> and the <code class="classname">StepBuilderFactory</code>.</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Configuration</span></em>
+<em><span class="hl-annotation" style="color: gray">@EnableBatchProcessing</span></em>
+<em><span class="hl-annotation" style="color: gray">@Import(DataSourceConfiguration.class)</span></em>
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> AppConfig {
+
+    <em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+    <span class="hl-keyword">private</span> JobBuilderFactory jobs;
+
+    <em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+    <span class="hl-keyword">private</span> StepBuilderFactory steps;
+
+    <em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+    <span class="hl-keyword">public</span> Job job(<em><span class="hl-annotation" style="color: gray">@Qualifier("step1")</span></em> Step step1, <em><span class="hl-annotation" style="color: gray">@Qualifier("step2")</span></em> Step step2) {
+        <span class="hl-keyword">return</span> jobs.get(<span class="hl-string">"myJob"</span>).start(step1).next(step2).build();
+    }
+
+    <em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+    <span class="hl-keyword">protected</span> Step step1(ItemReader&lt;Person&gt; reader, ItemProcessor&lt;Person, Person&gt; processor, ItemWriter&lt;Person&gt; writer) {
+        <span class="hl-keyword">return</span> steps.get(<span class="hl-string">"step1"</span>)
+            .&lt;Person, Person&gt; chunk(<span class="hl-number">10</span>)
+            .reader(reader)
+            .processor(processor)
+            .writer(writer)
+            .build();
+    }
+
+    <em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+    <span class="hl-keyword">protected</span> Step step2(Tasklet tasklet) {
+        <span class="hl-keyword">return</span> steps.get(<span class="hl-string">"step2"</span>)
+            .tasklet(tasklet)
+            .build();
+    }
+}</pre></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configuringJobRepository" href="#configuringJobRepository"></a>4.3&nbsp;Configuring a JobRepository</h2></div></div></div><p>As described in earlier, the <a class="link" href="">
+        <code class="classname">JobRepository</code>
+      </a> is used for basic CRUD operations of the various persisted
+    domain objects within Spring Batch, such as
+    <code class="classname">JobExecution</code> and
+    <code class="classname">StepExecution</code>. It is required by many of the major
+    framework features, such as the <code class="classname">JobLauncher</code>,
+    <code class="classname">Job</code>, and <code class="classname">Step</code>. The batch
+    namespace abstracts away many of the implementation details of the
+    <code class="classname">JobRepository</code> implementations and their
+    collaborators. However, there are still a few configuration options
+    available:</p><pre class="programlisting"><span class="hl-tag">&lt;job-repository</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRepository"</span>
+    <span class="hl-attribute">data-source</span>=<span class="hl-value">"dataSource"</span>
+    <span class="hl-attribute">transaction-manager</span>=<span class="hl-value">"transactionManager"</span>
+    <span class="hl-attribute">isolation-level-for-create</span>=<span class="hl-value">"SERIALIZABLE"</span>
+    <span class="hl-attribute">table-prefix</span>=<span class="hl-value">"BATCH_"</span>
+	<span class="hl-attribute">max-varchar-length</span>=<span class="hl-value">"1000"</span><span class="hl-tag">/&gt;</span></pre><p>None of the configuration options listed above are required except
+    the id. If they are not set, the defaults shown above will be used. They
+    are shown above for awareness purposes. The
+    <code class="literal">max-varchar-length</code> defaults to 2500, which is the
+    length of the long <code class="literal">VARCHAR</code> columns in the <a class="link" href="metaDataSchema.html#metaDataSchemaOverview" title="B.1&nbsp;Overview">sample schema scripts</a></p>
+
+     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-byte characters you shouldn't need to change it.
+
+    <div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="txConfigForJobRepository" href="#txConfigForJobRepository"></a>4.3.1&nbsp;Transaction Configuration for the JobRepository</h3></div></div></div><p>If the namespace is used, transactional advice will be
+      automatically created around the repository. This is to ensure that the
+      batch meta data, including state that is necessary for restarts after a
+      failure, is persisted correctly. The behavior of the framework is not
+      well defined if the repository methods are not transactional. The
+      isolation level in the <code class="code">create*</code> method attributes is
+      specified separately to ensure that when jobs are launched, if two
+      processes are trying to launch the same job at the same time, only one
+      will succeed. The default isolation level for that method is
+      SERIALIZABLE, which is quite aggressive: READ_COMMITTED would work just
+      as well; READ_UNCOMMITTED would be fine if two processes are not likely
+      to collide in this way. However, since a call to the
+      <code class="classname">create*</code> method is quite short, it is unlikely
+      that the SERIALIZED will cause problems, as long as the database
+      platform supports it. However, this can be overridden:</p><p>
+        </p><pre class="programlisting"><span class="hl-tag">&lt;job-repository</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRepository"</span>
+                <span class="bold"><strong>isolation-level-for-create="REPEATABLE_READ"</strong></span> /&gt;</pre><p>
+      </p><p>If the namespace or factory beans aren't used then it is also
+      essential to configure the transactional behavior of the repository
+      using AOP:</p><p>
+        </p><pre class="programlisting"><span class="hl-tag">&lt;aop:config&gt;</span>
+    <span class="hl-tag">&lt;aop:advisor</span>
+           <span class="hl-attribute">pointcut</span>=<span class="hl-value">"execution(* org.springframework.batch.core..*Repository+.*(..))"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;advice-ref="txAdvice" /&gt;</span>
+<span class="hl-tag">&lt;/aop:config&gt;</span>
+
+<span class="hl-tag">&lt;tx:advice</span> <span class="hl-attribute">id</span>=<span class="hl-value">"txAdvice"</span> <span class="hl-attribute">transaction-manager</span>=<span class="hl-value">"transactionManager"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tx:attributes&gt;</span>
+        <span class="hl-tag">&lt;tx:method</span> <span class="hl-attribute">name</span>=<span class="hl-value">"*"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;/tx:attributes&gt;</span>
+<span class="hl-tag">&lt;/tx:advice&gt;</span></pre><p>
+      </p><p>This fragment can be used as is, with almost no changes. Remember
+      also to include the appropriate namespace declarations and to make sure
+      spring-tx and spring-aop (or the whole of spring) are on the
+      classpath.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="repositoryTablePrefix" href="#repositoryTablePrefix"></a>4.3.2&nbsp;Changing the Table Prefix</h3></div></div></div><p>Another modifiable property of the
+      <code class="classname">JobRepository</code> is the table prefix of the
+      meta-data tables. By default they are all prefaced with BATCH_.
+      BATCH_JOB_EXECUTION and BATCH_STEP_EXECUTION are two examples. However,
+      there are potential reasons to modify this prefix. If the schema names
+      needs to be prepended to the table names, or if more than one set of
+      meta data tables is needed within the same schema, then the table prefix
+      will need to be changed:</p><pre class="programlisting"><span class="hl-tag">&lt;job-repository</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRepository"</span>
+                <span class="bold"><strong>table-prefix="SYSTEM.TEST_"</strong></span> /&gt;</pre><p>Given the above changes, every query to the meta data tables will
+      be prefixed with "SYSTEM.TEST_". BATCH_JOB_EXECUTION will be referred to
+      as SYSTEM.TEST_JOB_EXECUTION.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>Only the table prefix is configurable. The table and column
+        names are not.</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="inMemoryRepository" href="#inMemoryRepository"></a>4.3.3&nbsp;In-Memory Repository</h3></div></div></div><p>There are scenarios in which you may not want to persist your
+      domain objects to the database. One reason may be speed; storing domain
+      objects at each commit point takes extra time. Another reason may be
+      that you just don't need to persist status for a particular job. For
+      this reason, Spring batch provides an in-memory Map version of the job
+      repository:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRepository"</span>
+  <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"transactionManager"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"transactionManager"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Note that the in-memory repository is volatile and so does not
+      allow restart between JVM instances. It also cannot guarantee that two
+      job instances with the same parameters are launched simultaneously, and
+      is not suitable for use in a multi-threaded Job, or a locally
+      partitioned Step. So use the database version of the repository wherever
+      you need those features.</p><p>However it does require a transaction manager to be defined
+      because there are rollback semantics within the repository, and because
+      the business logic might still be transactional (e.g. RDBMS access). For
+      testing purposes many people find the
+      <code class="classname">ResourcelessTransactionManager</code> useful.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="nonStandardDatabaseTypesInRepository" href="#nonStandardDatabaseTypesInRepository"></a>4.3.4&nbsp;Non-standard Database Types in a Repository</h3></div></div></div><p>If you are using a database platform that is not in the list of
+      supported platforms, you may be able to use one of the supported types,
+      if the SQL variant is close enough. To do this you can use the raw
+      <code class="classname">JobRepositoryFactoryBean</code> instead of the namespace
+      shortcut and use it to set the database type to the closest
+      match:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRepository"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org...JobRepositoryFactoryBean"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"databaseType"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"db2"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"dataSource"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"dataSource"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>(The <code class="classname">JobRepositoryFactoryBean</code> tries to
+      auto-detect the database type from the <code class="classname">DataSource</code>
+      if it is not specified.) The major differences between platforms are
+      mainly accounted for by the strategy for incrementing primary keys, so
+      often it might be necessary to override the
+      <code class="literal">incrementerFactory</code> as well (using one of the standard
+      implementations from the Spring Framework).</p><p>If even that doesn't work, or you are not using an RDBMS, then the
+      only option may be to implement the various <code class="classname">Dao</code>
+      interfaces that the <code class="classname">SimpleJobRepository</code> depends
+      on and wire one up manually in the normal Spring way.</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configuringJobLauncher" href="#configuringJobLauncher"></a>4.4&nbsp;Configuring a JobLauncher</h2></div></div></div><p>The most basic implementation of the
+    <code class="classname">JobLauncher</code> interface is the
+    <code class="classname">SimpleJobLauncher</code>. Its only required dependency is
+    a <code class="classname">JobRepository</code>, in order to obtain an
+    execution:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobLauncher"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.launch.support.SimpleJobLauncher"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRepository"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRepository"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Once a <a class="link" href="domain.html#jobExecution"><code class="classname">JobExecution</code></a> is
+    obtained, it is passed to the execute method of
+    <code class="classname">Job</code>, ultimately returning the
+    <code class="classname">JobExecution</code> to the caller:</p><div class="mediaobject" align="center"><img src="images/job-launcher-sequence-sync.png" align="middle"></div><p>The sequence is straightforward and works well when launched from a
+    scheduler. However, issues arise when trying to launch from an HTTP
+    request. In this scenario, the launching needs to be done asynchronously
+    so that the <code class="classname">SimpleJobLauncher</code> returns immediately
+    to its caller. This is because it is not good practice to keep an HTTP
+    request open for the amount of time needed by long running processes such
+    as batch. An example sequence is below:</p><div class="mediaobject" align="center"><img src="images/job-launcher-sequence-async.png" align="middle"></div><p>The <code class="classname">SimpleJobLauncher</code> can easily be
+    configured to allow for this scenario by configuring a
+    <code class="classname">TaskExecutor</code>:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobLauncher"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.launch.support.SimpleJobLauncher"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRepository"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRepository"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"taskExecutor"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.core.task.SimpleAsyncTaskExecutor"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;/property&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Any implementation of the spring <code class="classname">TaskExecutor</code>
+    interface can be used to control how jobs are asynchronously
+    executed.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runningAJob" href="#runningAJob"></a>4.5&nbsp;Running a Job</h2></div></div></div><p>At a minimum, launching a batch job requires two things: the
+    <code class="classname">Job</code> to be launched and a
+    <code class="classname">JobLauncher</code>. Both can be contained within the same
+    context or different contexts. For example, if launching a job from the
+    command line, a new JVM will be instantiated for each Job, and thus every
+    job will have its own <code class="classname">JobLauncher</code>. However, if
+    running from within a web container within the scope of an
+    <code class="classname">HttpRequest</code>, there will usually be one
+    <code class="classname">JobLauncher</code>, configured for asynchronous job
+    launching, that multiple requests will invoke to launch their jobs.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="runningJobsFromCommandLine" href="#runningJobsFromCommandLine"></a>4.5.1&nbsp;Running Jobs from the Command Line</h3></div></div></div><p>For users that want to run their jobs from an enterprise
+      scheduler, the command line is the primary interface. This is because
+      most schedulers (with the exception of Quartz unless using the
+      <code class="classname">NativeJob</code>) work directly with operating system
+      processes, primarily kicked off with shell scripts. There are many ways
+      to launch a Java process besides a shell script, such as Perl, Ruby, or
+      even 'build tools' such as ant or maven. However, because most people
+      are familiar with shell scripts, this example will focus on them.</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="commandLineJobRunner" href="#commandLineJobRunner"></a>The CommandLineJobRunner</h4></div></div></div><p>Because the script launching the job must kick off a Java
+        Virtual Machine, there needs to be a class with a main method to act
+        as the primary entry point. Spring Batch provides an implementation
+        that serves just this purpose:
+        <code class="classname">CommandLineJobRunner</code>. It's important to note
+        that this is just one way to bootstrap your application, but there are
+        many ways to launch a Java process, and this class should in no way be
+        viewed as definitive. The <code class="classname">CommandLineJobRunner</code>
+        performs four tasks:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Load the appropriate
+            <code class="classname">ApplicationContext</code></p></li><li class="listitem"><p>Parse command line arguments into
+            <code class="classname">JobParameters</code></p></li><li class="listitem"><p>Locate the appropriate job based on arguments</p></li><li class="listitem"><p>Use the <code class="classname">JobLauncher</code> provided in the
+            application context to launch the job.</p></li></ul></div><p>All of these tasks are accomplished using only the arguments
+        passed in. The following are required arguments:</p><div class="table"><a name="d5e1113" href="#d5e1113"></a><p class="title"><b>Table&nbsp;4.1.&nbsp;CommandLineJobRunner arguments</b></p><div class="table-contents"><table summary="CommandLineJobRunner arguments" style="border-collapse: collapse;border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col><col></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">jobPath</td><td style="border-bottom: 0.5pt solid ; ">The location of the XML file that will be used to
+                create an <code class="classname">ApplicationContext</code>. This file
+                should contain everything needed to run the complete
+                <code class="classname">Job</code></td></tr><tr><td style="border-right: 0.5pt solid ; ">jobName</td><td style="">The name of the job to be run.</td></tr></tbody></table></div></div><br class="table-break"><p>These arguments must be passed in with the path first and the
+        name second. All arguments after these are considered to be
+        JobParameters and must be in the format of 'name=value':</p><pre class="screen"><code class="prompt">bash$</code> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05</pre><p>In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from the <a class="link" href="domain.html" title="3.&nbsp;The Domain Language of Batch">domain section</a>. The first argument is
+        'endOfDayJob.xml', which is the Spring
+        <code class="classname">ApplicationContext</code> containing the
+        <code class="classname">Job</code>. The second argument, 'endOfDay' represents
+        the job name. The final argument, 'schedule.date(date)=2007/05/05'
+        will be converted into <code class="classname">JobParameters</code>. An
+        example of the XML configuration is below:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"endOfDay"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"simpleStep"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-comment">&lt;!-- Launcher details removed for clarity --&gt;</span>
+<span class="hl-tag">&lt;beans:bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobLauncher"</span>
+         <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.launch.support.SimpleJobLauncher"</span><span class="hl-tag"> /&gt;</span></pre><p>This example is overly simplistic, since there are many more
+        requirements to a run a batch job in Spring Batch in general, but it
+        serves to show the two main requirements of the
+        <code class="classname">CommandLineJobRunner</code>:
+        <code class="classname">Job</code> and
+        <code class="classname">JobLauncher</code></p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="exitCodes" href="#exitCodes"></a>ExitCodes</h4></div></div></div><p>When launching a batch job from the command-line, an enterprise
+        scheduler is often used. Most schedulers are fairly dumb and work only
+        at the process level. This means that they only know about some
+        operating system process such as a shell script that they're invoking.
+        In this scenario, the only way to communicate back to the scheduler
+        about the success or failure of a job is through return codes. A
+        return code is a number that is returned to a scheduler by the process
+        that indicates the result of the run. In the simplest case: 0 is
+        success and 1 is failure. However, there may be more complex
+        scenarios: If job A returns 4 kick off job B, and if it returns 5 kick
+        off job C. This type of behavior is configured at the scheduler level,
+        but it is important that a processing framework such as Spring Batch
+        provide a way to return a numeric representation of the 'Exit Code'
+        for a particular batch job. In Spring Batch this is encapsulated
+        within an <code class="classname">ExitStatus</code>, which is covered in more
+        detail in Chapter 5. For the purposes of discussing exit codes, the
+        only important thing to know is that an
+        <code class="classname">ExitStatus</code> has an exit code property that is
+        set by the framework (or the developer) and is returned as part of the
+        <code class="classname">JobExecution</code> returned from the
+        <code class="classname">JobLauncher</code>. The
+        <code class="classname">CommandLineJobRunner</code> converts this string value
+        to a number using the <code class="classname">ExitCodeMapper</code>
+        interface:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> ExitCodeMapper {
+
+    <span class="hl-keyword">public</span> <span class="hl-keyword">int</span> intValue(String exitCode);
+
+}</pre><p>The essential contract of an
+        <code class="classname">ExitCodeMapper</code> is that, given a string exit
+        code, a number representation will be returned. The default
+        implementation used by the job runner is the SimpleJvmExitCodeMapper
+        that returns 0 for completion, 1 for generic errors, and 2 for any job
+        runner errors such as not being able to find a
+        <code class="classname">Job</code> in the provided context. If anything more
+        complex than the 3 values above is needed, then a custom
+        implementation of the <code class="classname">ExitCodeMapper</code> interface
+        must be supplied. Because the
+        <code class="classname">CommandLineJobRunner</code> is the class that creates
+        an <code class="classname">ApplicationContext</code>, and thus cannot be
+        'wired together', any values that need to be overwritten must be
+        autowired. This means that if an implementation of
+        <code class="classname">ExitCodeMapper</code> is found within the BeanFactory,
+        it will be injected into the runner after the context is created. All
+        that needs to be done to provide your own
+        <code class="classname">ExitCodeMapper</code> is to declare the implementation
+        as a root level bean and ensure that it is part of the
+        <code class="classname">ApplicationContext</code> that is loaded by the
+        runner.</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="runningJobsFromWebContainer" href="#runningJobsFromWebContainer"></a>4.5.2&nbsp;Running Jobs from within a Web Container</h3></div></div></div><p>Historically, offline processing such as batch jobs have been
+      launched from the command-line, as described above. However, there are
+      many cases where launching from an <code class="classname">HttpRequest</code> is
+      a better option. Many such use cases include reporting, ad-hoc job
+      running, and web application support. Because a batch job by definition
+      is long running, the most important concern is ensuring to launch the
+      job asynchronously:</p><div class="mediaobject" align="center"><img src="images/launch-from-request.png" align="middle"></div><p>The controller in this case is a Spring MVC controller. More
+      information on Spring MVC can be found here: <a class="ulink" href="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html" target="_top">http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html</a>.
+      The controller launches a <code class="classname">Job</code> using a
+      <code class="classname">JobLauncher</code> that has been configured to launch
+      <a class="link" href="">asynchronously</a>, which
+      immediately returns a <code class="classname">JobExecution</code>. The
+      <code class="classname">Job</code> will likely still be running, however, this
+      nonblocking behaviour allows the controller to return immediately, which
+      is required when handling an <code class="classname">HttpRequest</code>. An
+      example is below:</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Controller</span></em>
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> JobLauncherController {
+
+    <em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+    JobLauncher jobLauncher;
+
+    <em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+    Job job;
+
+    <em><span class="hl-annotation" style="color: gray">@RequestMapping("/jobLauncher.html")</span></em>
+    <span class="hl-keyword">public</span> <span class="hl-keyword">void</span> handle() <span class="hl-keyword">throws</span> Exception{
+        jobLauncher.run(job, <span class="hl-keyword">new</span> JobParameters());
+    }
+}</pre></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="advancedMetaData" href="#advancedMetaData"></a>4.6&nbsp;Advanced Meta-Data Usage</h2></div></div></div><p>So far, both the JobLauncher and JobRepository interfaces have been
+    discussed. Together, they represent simple launching of a job, and basic
+    CRUD operations of batch domain objects:</p><div class="mediaobject" align="center"><img src="images/job-repository.png" align="middle"></div><p>A <code class="classname">JobLauncher</code> uses the
+    <code class="classname">JobRepository</code> to create new
+    <code class="classname">JobExecution</code> objects and run them.
+    <code class="classname">Job</code> and <code class="classname">Step</code> implementations
+    later use the same <code class="classname">JobRepository</code> for basic updates
+    of the same executions during the running of a <code class="classname">Job</code>.
+    The basic operations suffice for simple scenarios, but in a large batch
+    environment with hundreds of batch jobs and complex scheduling
+    requirements, more advanced access of the meta data is required:</p><div class="mediaobject" align="center"><img src="images/job-repository-advanced.png" align="middle"></div><p>The <code class="classname">JobExplorer</code> and
+    <code class="classname">JobOperator</code> interfaces, which will be discussed
+    below, add additional functionality for querying and controlling the meta
+    data.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="queryingRepository" href="#queryingRepository"></a>4.6.1&nbsp;Querying the Repository</h3></div></div></div><p>The most basic need before any advanced features is the ability to
+      query the repository for existing executions. This functionality is
+      provided by the <code class="classname">JobExplorer</code> interface:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> JobExplorer {
+
+    List&lt;JobInstance&gt; getJobInstances(String jobName, <span class="hl-keyword">int</span> start, <span class="hl-keyword">int</span> count);
+
+    JobExecution getJobExecution(Long executionId);
+
+    StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
+
+    JobInstance getJobInstance(Long instanceId);
+
+    List&lt;JobExecution&gt; getJobExecutions(JobInstance jobInstance);
+
+    Set&lt;JobExecution&gt; findRunningJobExecutions(String jobName);
+}</pre><p>As is evident from the method signatures above,
+      <code class="classname">JobExplorer</code> is a read-only version of the
+      <code class="classname">JobRepository</code>, and like the
+      <code class="classname">JobRepository</code>, it can be easily configured via a
+      factory bean:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobExplorer"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...JobExplorerFactoryBean"</span>
+      <span class="hl-attribute">p:dataSource-ref</span>=<span class="hl-value">"dataSource"</span><span class="hl-tag"> /&gt;</span></pre><p><a class="link" href="configureJob.html#repositoryTablePrefix" title="4.3.2&nbsp;Changing the Table Prefix">Earlier in this
+      chapter</a>, it was mentioned that the table prefix of the
+      <code class="classname">JobRepository</code> can be modified to allow for
+      different versions or schemas. Because the
+      <code class="classname">JobExplorer</code> is working with the same tables, it
+      too needs the ability to set a prefix:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobExplorer"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...JobExplorerFactoryBean"</span>
+      <span class="hl-attribute">p:dataSource-ref</span>=<span class="hl-value">"dataSource"</span> <span class="bold"><strong>p:tablePrefix="BATCH_" </strong></span>/&gt;</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d5e1215" href="#d5e1215"></a>4.6.2&nbsp;JobRegistry</h3></div></div></div><p>A JobRegistry (and its parent interface JobLocator) is not
+      mandatory, but it can be useful if you want to keep track of which jobs
+      are available in the context. It is also useful for collecting jobs
+      centrally in an application context when they have been created
+      elsewhere (e.g. in child contexts). Custom JobRegistry implementations
+      can also be used to manipulate the names and other properties of the
+      jobs that are registered. There is only one implementation provided by
+      the framework and this is based on a simple map from job name to job
+      instance. It is configured simply like this:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRegistry"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...MapJobRegistry"</span><span class="hl-tag"> /&gt;</span></pre><p>There are two ways to populate a JobRegistry automatically: using
+      a bean post processor and using a registrar lifecycle component. These
+      two mechanisms are described in the following sections.</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="d5e1220" href="#d5e1220"></a>JobRegistryBeanPostProcessor</h4></div></div></div><p>This is a bean post-processor that can register all jobs as they
+        are created:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobRegistryBeanPostProcessor"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...JobRegistryBeanPostProcessor"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRegistry"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRegistry"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Athough it is not strictly necessary the post-processor in the
+        example has been given an id so that it can be included in child
+        contexts (e.g. as a parent bean definition) and cause all jobs created
+        there to also be regsistered automatically.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="d5e1225" href="#d5e1225"></a>AutomaticJobRegistrar</h4></div></div></div><p>This is a lifecycle component that creates child contexts and
+        registers jobs from those contexts as they are created. One advantage
+        of doing this is that, while the job names in the child contexts still
+        have to be globally unique in the registry, their dependencies can
+        have "natural" names. So for example, you can create a set of XML
+        configuration files each having only one <code class="classname">Job</code>,
+        but all having different definitions of an
+        <code class="classname">ItemReader</code> with the same bean name, e.g.
+        "reader". If all those files were imported into the same context, the
+        reader definitions would clash and override one another, but with the
+        automatic regsistrar this is avoided. This makes it easier to
+        integrate jobs contributed from separate modules of an
+        application.</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...AutomaticJobRegistrar"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"applicationContextFactories"</span><span class="hl-tag">&gt;</span>
+      <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...ClasspathXmlApplicationContextsFactoryBean"</span><span class="hl-tag">&gt;</span>
+         <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resources"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"classpath*:/config/job*.xml"</span><span class="hl-tag"> /&gt;</span>
+      <span class="hl-tag">&lt;/bean&gt;</span>
+   <span class="hl-tag">&lt;/property&gt;</span>
+   <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobLoader"</span><span class="hl-tag">&gt;</span>
+      <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...DefaultJobLoader"</span><span class="hl-tag">&gt;</span>
+         <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRegistry"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRegistry"</span><span class="hl-tag"> /&gt;</span>
+      <span class="hl-tag">&lt;/bean&gt;</span>
+   <span class="hl-tag">&lt;/property&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>The registrar has two mandatory properties, one is an array of
+        <code class="classname">ApplicationContextFactory</code> (here created from a
+        convenient factory bean), and the other is a
+        <code class="classname">JobLoader</code>. The <code class="classname">JobLoader</code>
+        is responsible for managing the lifecycle of the child contexts and
+        registering jobs in the <code class="classname">JobRegistry</code>.</p><p>The <code class="classname">ApplicationContextFactory</code> is
+        responsible for creating the child context and the most common usage
+        would be as above using a
+        <code class="classname">ClassPathXmlApplicationContextFactory</code>. One of
+        the features of this factory is that by default it copies some of the
+        configuration down from the parent context to the child. So for
+        instance you don't have to re-define the
+        <code class="classname">PropertyPlaceholderConfigurer</code> or AOP
+        configuration in the child, if it should be the same as the
+        parent.</p><p>The <code class="classname">AutomaticJobRegistrar</code> can be used in
+        conjunction with a <code class="classname">JobRegistryBeanPostProcessor</code>
+        if desired (as long as the <code class="classname">DefaultJobLoader</code> is
+        used as well). For instance this might be desirable if there are jobs
+        defined in the main parent context as well as in the child
+        locations.</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="JobOperator" href="#JobOperator"></a>4.6.3&nbsp;JobOperator</h3></div></div></div><p>As previously discussed, the <code class="classname">JobRepository</code>
+      provides CRUD operations on the meta-data, and the
+      <code class="classname">JobExplorer</code> provides read-only operations on the
+      meta-data. However, those operations are most useful when used together
+      to perform common monitoring tasks such as stopping, restarting, or
+      summarizing a Job, as is commonly done by batch operators. Spring Batch
+      provides for these types of operations via the
+      <code class="classname">JobOperator</code> interface:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> JobOperator {
+
+    List&lt;Long&gt; getExecutions(<span class="hl-keyword">long</span> instanceId) <span class="hl-keyword">throws</span> NoSuchJobInstanceException;
+
+    List&lt;Long&gt; getJobInstances(String jobName, <span class="hl-keyword">int</span> start, <span class="hl-keyword">int</span> count)
+          <span class="hl-keyword">throws</span> NoSuchJobException;
+
+    Set&lt;Long&gt; getRunningExecutions(String jobName) <span class="hl-keyword">throws</span> NoSuchJobException;
+
+    String getParameters(<span class="hl-keyword">long</span> executionId) <span class="hl-keyword">throws</span> NoSuchJobExecutionException;
+
+    Long start(String jobName, String parameters)
+          <span class="hl-keyword">throws</span> NoSuchJobException, JobInstanceAlreadyExistsException;
+
+    Long restart(<span class="hl-keyword">long</span> executionId)
+          <span class="hl-keyword">throws</span> JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+                  NoSuchJobException, JobRestartException;
+
+    Long startNextInstance(String jobName)
+          <span class="hl-keyword">throws</span> NoSuchJobException, JobParametersNotFoundException, JobRestartException,
+                 JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
+
+    <span class="hl-keyword">boolean</span> stop(<span class="hl-keyword">long</span> executionId)
+          <span class="hl-keyword">throws</span> NoSuchJobExecutionException, JobExecutionNotRunningException;
+
+    String getSummary(<span class="hl-keyword">long</span> executionId) <span class="hl-keyword">throws</span> NoSuchJobExecutionException;
+
+    Map&lt;Long, String&gt; getStepExecutionSummaries(<span class="hl-keyword">long</span> executionId)
+          <span class="hl-keyword">throws</span> NoSuchJobExecutionException;
+
+    Set&lt;String&gt; getJobNames();
+
+}</pre><p>The above operations represent methods from many different
+      interfaces, such as <code class="classname">JobLauncher</code>,
+      <code class="classname">JobRepository</code>,
+      <code class="classname">JobExplorer</code>, and
+      <code class="classname">JobRegistry</code>. For this reason, the provided
+      implementation of <code class="classname">JobOperator</code>,
+      <code class="classname">SimpleJobOperator</code>, has many dependencies:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobOperator"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...SimpleJobOperator"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobExplorer"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...JobExplorerFactoryBean"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"dataSource"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"dataSource"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;/bean&gt;</span>
+    <span class="hl-tag">&lt;/property&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRepository"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRepository"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobRegistry"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobRegistry"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"jobLauncher"</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"jobLauncher"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+        If you set the table prefix on the job repository, don't forget to set it on the job explorer as well.
+      </td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="JobParametersIncrementer" href="#JobParametersIncrementer"></a>4.6.4&nbsp;JobParametersIncrementer</h3></div></div></div><p>Most of the methods on <code class="classname">JobOperator</code> are
+      self-explanatory, and more detailed explanations can be found on the
+      <a class="ulink" href="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html" target="_top">javadoc
+      of the interface</a>. However, the
+      <code class="methodname">startNextInstance</code> method is worth noting. This
+      method will always start a new instance of a <code class="classname">Job</code>.
+      This can be extremely useful if there are serious issues in a
+      <code class="classname">JobExecution</code> and the <code class="classname">Job</code>
+      needs to be started over again from the beginning. Unlike
+      <code class="classname">JobLauncher</code> though, which requires a new
+      <code class="classname">JobParameters</code> object that will trigger a new
+      <code class="classname">JobInstance</code> if the parameters are different from
+      any previous set of parameters, the
+      <code class="methodname">startNextInstance</code> method will use the
+      <code class="classname">JobParametersIncrementer</code> tied to the
+      <code class="classname">Job</code> to force the <code class="classname">Job</code> to a
+      new instance:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> JobParametersIncrementer {
+
+    JobParameters getNext(JobParameters parameters);
+
+}</pre><p>The contract of <code class="classname">JobParametersIncrementer</code> is
+      that, given a <a class="link" href=""><code class="classname">JobParameters</code></a>
+      object, it will return the 'next' <code class="classname">JobParameters</code>
+      object by incrementing any necessary values it may contain. This
+      strategy is useful because the framework has no way of knowing what
+      changes to the <code class="classname">JobParameters</code> make it the 'next'
+      instance. For example, if the only value in
+      <code class="classname">JobParameters</code> is a date, and the next instance
+      should be created, should that value be incremented by one day? Or one
+      week (if the job is weekly for instance)? The same can be said for any
+      numerical values that help to identify the <code class="classname">Job</code>,
+      as shown below:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">class</span> SampleIncrementer <span class="hl-keyword">implements</span> JobParametersIncrementer {
+
+    <span class="hl-keyword">public</span> JobParameters getNext(JobParameters parameters) {
+        <span class="hl-keyword">if</span> (parameters==null || parameters.isEmpty()) {
+            <span class="hl-keyword">return</span> <span class="hl-keyword">new</span> JobParametersBuilder().addLong(<span class="hl-string">"run.id"</span>, <span class="hl-number">1L</span>).toJobParameters();
+        }
+        <span class="hl-keyword">long</span> id = parameters.getLong(<span class="hl-string">"run.id"</span>,<span class="hl-number">1L</span>) + <span class="hl-number">1</span>;
+        <span class="hl-keyword">return</span> <span class="hl-keyword">new</span> JobParametersBuilder().addLong(<span class="hl-string">"run.id"</span>, id).toJobParameters();
+    }
+}</pre><p>In this example, the value with a key of 'run.id' is used to
+      discriminate between <code class="classname">JobInstances</code>. If the
+      <code class="classname">JobParameters</code> passed in is null, it can be
+      assumed that the <code class="classname">Job</code> has never been run before
+      and thus its initial state can be returned. However, if not, the old
+      value is obtained, incremented by one, and returned. An incrementer can
+      be associated with <code class="classname">Job</code> via the 'incrementer'
+      attribute in the namespace:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span> <span class="bold"><strong>incrementer="sampleIncrementer"</strong></span>&gt;
+    ...
+<span class="hl-tag">&lt;/job&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="stoppingAJob" href="#stoppingAJob"></a>4.6.5&nbsp;Stopping a Job</h3></div></div></div><p>One of the most common use cases of
+      <code class="classname">JobOperator</code> is gracefully stopping a
+      <code class="classname">Job:</code></p><pre class="programlisting">Set&lt;Long&gt; executions = jobOperator.getRunningExecutions(<span class="hl-string">"sampleJob"</span>);
+jobOperator.stop(executions.iterator().next());</pre><p>The shutdown is not immediate, since there is no way to force
+      immediate shutdown, especially if the execution is currently in
+      developer code that the framework has no control over, such as a
+      business service. However, as soon as control is returned back to the
+      framework, it will set the status of the current
+      <code class="classname">StepExecution</code> to
+      <code class="classname">BatchStatus.STOPPED</code>, save it, then do the same
+      for the <code class="classname">JobExecution</code> before finishing.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d5e1303" href="#d5e1303"></a>4.6.6&nbsp;Aborting a Job</h3></div></div></div><p>A job execution which is <code class="classname">FAILED</code> can be
+      restarted (if the Job is restartable). A job execution whose status is
+      <code class="classname">ABANDONED</code> will not be restarted by the framework.
+      The <code class="classname">ABANDONED</code> status is also used in step
+      executions to mark them as skippable in a restarted job execution: if a
+      job is executing and encounters a step that has been marked
+      <code class="classname">ABANDONED</code> in the previous failed job execution, it
+      will move on to the next step (as determined by the job flow definition
+      and the step execution exit status).</p><p>If the process died (<code class="literal">"kill -9"</code> or server
+      failure) the job is, of course, not running, but the JobRepository has
+      no way of knowing because no-one told it before the process died. You
+      have to tell it manually that you know that the execution either failed
+      or should be considered aborted (change its status to
+      <code class="classname">FAILED</code> or <code class="classname">ABANDONED</code>) - it's
+      a business decision and there is no way to automate it. Only change the
+      status to <code class="classname">FAILED</code> if it is not restartable, or if
+      you know the restart data is valid. There is a utility in Spring Batch
+      Admin <code class="classname">JobService</code> to abort a job execution.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="domain.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="configureStep.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.&nbsp;The Domain Language of Batch&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;5.&nbsp;Configuring a Step</td></tr></table></div></body></html>

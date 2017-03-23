@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.listener.CompositeItemWriteListenerTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:33" hostname="Michaels-MacBook-Pro-3.local" time="0.012">
+  <properties/>
+  <testcase name="testBeforeWrite" classname="org.springframework.batch.core.listener.CompositeItemWriteListenerTests" time="0.01"/>
+  <testcase name="testOnWriteError" classname="org.springframework.batch.core.listener.CompositeItemWriteListenerTests" time="0.0"/>
+  <testcase name="testAfterWrite" classname="org.springframework.batch.core.listener.CompositeItemWriteListenerTests" time="0.0"/>
+  <testcase name="testSetListeners" classname="org.springframework.batch.core.listener.CompositeItemWriteListenerTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="itemReader"
+		class="org.springframework.batch.item.file.MultiResourceItemReader" scope="step">
+		<property name="delegate">
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
+				<property name="lineMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+						<property name="lineTokenizer">
+							<bean
+								class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+								<property name="delimiter" value="," />
+								<property name="names" value="name,credit" />
+							</bean>
+						</property>
+						<property name="fieldSetMapper">
+							<bean
+								class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+								<property name="targetType"
+									value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+							</bean>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+		<property name="resources" value="#{jobParameters['input.file.path']}" />
+	</bean>
+
+	<bean id="itemWriter"
+		class="org.springframework.batch.item.file.MultiResourceItemWriter" scope="step">
+		<property name="resource"
+			value="#{jobParameters['output.file.path']}" />
+		<property name="itemCountLimitPerResource" value="6" />
+		<property name="delegate" ref="delegateWriter" />
+	</bean>
+
+	<bean id="delegateWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="name,credit" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

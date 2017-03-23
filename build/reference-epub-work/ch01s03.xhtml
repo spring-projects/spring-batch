@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Spring Batch Architecture</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch01s02.xhtml" title="Usage Scenarios"/><link rel="next" href="ch01s04.xhtml" title="General Batch Principles and Guidelines"/></head><body><header/><section class="section" title="Spring Batch Architecture" epub:type="subchapter" id="springBatchArchitecture"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Spring Batch Architecture</h2></div></div></div><p/><p>Spring Batch is designed with extensibility and a diverse group of
+    end users in mind. The figure below shows a sketch of the layered
+    architecture that supports the extensibility and ease of use for end-user
+    developers. </p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/spring-batch-layers.png" width="216"/><div class="caption"><p>Figure 1.1: Spring Batch Layered
+        Architecture</p></div></div><p>This layered architecture highlights three major high level
+    components: Application, Core, and Infrastructure. The application
+    contains all batch jobs and custom code written by developers using Spring
+    Batch. The Batch Core contains the core runtime classes necessary to
+    launch and control a batch job. It includes things such as a
+    <code class="classname">JobLauncher</code>, <code class="classname">Job</code>, and
+    <code class="classname">Step</code> implementations. Both Application and Core are
+    built on top of a common infrastructure. This infrastructure contains
+    common readers and writers, and services such as the
+    <code class="classname">RetryTemplate</code>, which are used both by application
+    developers(<code class="classname">ItemReader</code> and
+    <code class="classname">ItemWriter</code>) and the core framework itself.
+    (retry)</p></section><footer/></body></html>

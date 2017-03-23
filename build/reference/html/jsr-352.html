@@ -1,0 +1,309 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>12.&nbsp;JSR-352 Support</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="Spring Batch - Reference Documentation"><link rel="up" href="index.html" title="Spring Batch - Reference Documentation"><link rel="prev" href="patterns.html" title="11.&nbsp;Common Batch Patterns"><link rel="next" href="springBatchIntegration.html" title="13.&nbsp;Spring Batch Integration"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">12.&nbsp;JSR-352 Support</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="patterns.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="springBatchIntegration.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="jsr-352" href="#jsr-352"></a>12.&nbsp;JSR-352 Support</h1></div></div></div><p>As of Spring Batch 3.0 support for JSR-352 has been fully implemented. This section is not a replacement for
+        the spec itself and instead, intends to explain how the JSR-352 specific concepts apply to Spring Batch.
+        Additional information on JSR-352 can be found via the
+        JCP here: <a class="ulink" href="https://jcp.org/en/jsr/detail?id=352" target="_top">https://jcp.org/en/jsr/detail?id=352</a></p><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrGeneralNotes" href="#jsrGeneralNotes"></a>12.1&nbsp;General Notes Spring Batch and JSR-352</h2></div></div></div><p>Spring Batch and JSR-352 are structurally the same.  They both have jobs that are made up of steps.  They
+            both have readers, processors, writers, and listeners.  However, their interactions are subtly different.
+            For example, the <code class="code">org.springframework.batch.core.SkipListener#onSkipInWrite(S item, Throwable t)</code>
+            within Spring Batch receives two parameters: the item that was skipped and the Exception that caused the
+            skip.  The JSR-352 version of the same method
+            (<code class="classname">javax.batch.api.chunk.listener.SkipWriteListener#onSkipWriteItem(List&lt;Object&gt; items, Exception ex)</code>)
+            also receives two parameters.  However the first one is a <code class="classname">List</code> of all the items
+            within the current chunk with the second being the <code class="classname">Exception</code> that caused the skip.
+            Because of these differences, it is important to note that there are two paths to execute a job within
+            Spring Batch: either a traditional Spring Batch job or a JSR-352 based job.  While the use of Spring Batch
+            artifacts (readers, writers, etc) will work within a job configured via JSR-352's JSL and executed via the
+            <code class="classname">JsrJobOperator</code>, they will behave according to the rules of JSR-352.  It is also
+            important to note that batch artifacts that have been developed against the JSR-352 interfaces will not work
+            within a traditional Spring Batch job.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrSetup" href="#jsrSetup"></a>12.2&nbsp;Setup</h2></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrSetupContexts" href="#jsrSetupContexts"></a>12.2.1&nbsp;Application Contexts</h3></div></div></div><p>All JSR-352 based jobs within Spring Batch consist of two application contexts.  A parent context, that
+			contains beans related to the infrastructure of Spring Batch such as the <code class="classname">JobRepository</code>,
+			<code class="classname">PlatformTransactionManager</code>, etc and a child context that consists of the configuration
+			of the job to be run.  The parent context is defined via the <code class="classname">baseContext.xml</code> provided
+			by the framework.  This context may be overridden via the <code class="classname">JSR-352-BASE-CONTEXT</code> system
+			property.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The base context is not processed by the JSR-352 processors for things like property injection so
+				no components requiring that additional processing should be configured there.
+			</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrSetupLaunching" href="#jsrSetupLaunching"></a>12.2.2&nbsp;Launching a JSR-352 based job</h3></div></div></div><p>JSR-352 requires a very simple path to executing a batch job.  The following code is all that is needed to
+				execute your first batch job:
+			</p><pre class="programlisting">JobOperator operator = BatchRuntime.getJobOperator();
+				jobOperator.start(<span class="hl-string">"myJob"</span>, <span class="hl-keyword">new</span> Properties());</pre><p>While that is convenient for developers, the devil is in the details.  Spring Batch bootstraps a bit of
+				infrastructure behind the scenes that a developer may want to override.  The following is bootstrapped the
+				first time <code class="code">BatchRuntime.getJobOperator()</code> is called:
+				</p><div class="informaltable"><table style="border-collapse: collapse;border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col align="left"><col align="left"><col align="left"></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<span class="bold"><strong>Bean Name</strong></span>
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<span class="bold"><strong>Default Configuration</strong></span>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									<span class="bold"><strong>Notes</strong></span>
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									dataSource
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									Apache DBCP BasicDataSource with configured values.
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									By default, HSQLDB is bootstrapped.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">transactionManager</code>
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.jdbc.datasource.DataSourceTransactionManager</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									References the dataSource bean defined above.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									A Datasource initializer
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									This is configured to execute the scripts configured via the
+									<code class="code">batch.drop.script</code> and <code class="code">batch.schema.script</code> properties.  By
+									default, the schema scripts for HSQLDB are executed.  This behavior can be disabled via
+									<code class="code">batch.data.source.init</code> property.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									jobRepository
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									A JDBC based <code class="code">SimpleJobRepository</code>.
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									This <code class="code">JobRepository</code> uses the previously mentioned data source and transaction
+									manager.  The schema's table prefix is configurable (defaults to BATCH_) via the
+									<code class="code">batch.table.prefix</code> property.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									jobLauncher
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.batch.core.launch.support.SimpleJobLauncher</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									Used to launch jobs.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									batchJobOperator
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.batch.core.launch.support.SimpleJobOperator</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									The <code class="code">JsrJobOperator</code> wraps this to provide most of it's functionality.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									jobExplorer
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.batch.core.explore.support.JobExplorerFactoryBean</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									Used to address lookup functionality provided by the <code class="code">JsrJobOperator</code>.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									jobParametersConverter
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.batch.core.jsr.JsrJobParametersConverter</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									JSR-352 specific implementation of the <code class="code">JobParametersConverter</code>.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									jobRegistry
+								</td><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.batch.core.configuration.support.MapJobRegistry</code>
+								</td><td style="border-bottom: 0.5pt solid ; " align="left">
+									Used by the <code class="code">SimpleJobOperator</code>.
+								</td></tr><tr><td style="border-right: 0.5pt solid ; " align="left">
+									placeholderProperties
+								</td><td style="border-right: 0.5pt solid ; " align="left">
+									<code class="code">org.springframework.beans.factory.config.PropertyPlaceholderConfigure</code>
+								</td><td style="" align="left">
+									Loads the properties file <code class="code">batch-${ENVIRONMENT:hsql}.properties</code> to configure
+									the properties mentioned above.  ENVIRONMENT is a System property (defaults to hsql)
+									that can be used to specify any of the supported databases Spring Batch currently
+									supports.
+								</td></tr></tbody></table></div><p>
+			</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>None of the above beans are optional for executing JSR-352 based jobs.  All may be overriden to
+				provide customized functionality as needed.
+			</p></td></tr></table></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="dependencyInjection" href="#dependencyInjection"></a>12.3&nbsp;Dependency Injection</h2></div></div></div><p>JSR-352 is based heavily on the Spring Batch programming model.  As such, while not explicitly requiring a
+            formal dependency injection implementation, DI of some kind implied.  Spring Batch supports all three
+            methods for loading batch artifacts defined by JSR-352:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Implementation Specific Loader - Spring Batch is built upon Spring and so supports Spring
+                    dependency injection within JSR-352 batch jobs.</p></li><li class="listitem"><p>Archive Loader - JSR-352 defines the existing of a batch.xml file that provides mappings between a
+                    logical name and a class name.  This file must be found within the /META-INF/ directory if it is
+                    used.</p></li><li class="listitem"><p>Thread Context Class Loader - JSR-352 allows configurations to specify batch artifact
+                    implementations in their JSL by providing the fully qualified class name inline.  Spring Batch
+                    supports this as well in JSR-352 configured jobs.</p></li></ul></div><p>To use Spring dependency injection within a JSR-352 based batch job consists of configuring batch
+            artifacts using a Spring application context as beans.  Once the beans have been defined, a job can refer to
+            them as it would any bean defined within the batch.xml.</p><pre class="programlisting"><span class="hl-directive" style="color: maroon">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="hl-tag">&lt;beans</span> <span class="hl-attribute">xmlns</span>=<span class="hl-value">"http://www.springframework.org/schema/beans"</span>
+          <span class="hl-attribute">xmlns:xsi</span>=<span class="hl-value">"http://www.w3.org/2001/XMLSchema-instance"</span>
+          <span class="hl-attribute">xsi:schemaLocation</span>=<span class="hl-value">"http://www.springframework.org/schema/beans
+                              http://www.springframework.org/schema/beans/spring-beans.xsd
+                              http://xmlns.jcp.org/xml/ns/javaee
+                              http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"</span><span class="hl-tag">&gt;</span>
+
+    <span class="hl-comment">&lt;!-- javax.batch.api.Batchlet implementation --&gt;</span>
+    <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"fooBatchlet"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"io.spring.FooBatchlet"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"prop"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"bar"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/bean&gt;</span>
+
+    <span class="hl-comment">&lt;!-- Job is defined using the JSL schema provided in JSR-352 --&gt;</span>
+    <span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"fooJob"</span> <span class="hl-attribute">xmlns</span>=<span class="hl-value">"http://xmlns.jcp.org/xml/ns/javaee"</span> <span class="hl-attribute">version</span>=<span class="hl-value">"1.0"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;batchlet</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooBatchlet"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;/step&gt;</span>
+    <span class="hl-tag">&lt;/job&gt;</span>
+<span class="hl-tag">&lt;/beans&gt;</span>
+        </pre><p>The assembly of Spring contexts (imports, etc) works with JSR-352 jobs just as it would with any other
+            Spring based application.  The only difference with a JSR-352 based job is that the entry point for the
+            context definition will be the job definition found in /META-INF/batch-jobs/.</p><p>To use the thread context class loader approach, all you need to do is provide the fully qualified class
+            name as the ref.  It is important to note that when using this approach or the batch.xml approach, the class
+            referenced requires a no argument constructor which will be used to create the bean.</p><pre class="programlisting"><span class="hl-directive" style="color: maroon">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"fooJob"</span> <span class="hl-attribute">xmlns</span>=<span class="hl-value">"http://xmlns.jcp.org/xml/ns/javaee"</span> <span class="hl-attribute">version</span>=<span class="hl-value">"1.0"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag"> &gt;</span>
+        <span class="hl-tag">&lt;batchlet</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"io.spring.FooBatchlet"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+        </pre></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrJobProperties" href="#jsrJobProperties"></a>12.4&nbsp;Batch Properties</h2></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrPropertySupport" href="#jsrPropertySupport"></a>12.4.1&nbsp;Property Support</h3></div></div></div><p>JSR-352 allows for properties to be defined at the Job, Step and batch artifact level by way of
+                configuration in the JSL. Batch properties are configured at each level in the following way:</p><pre class="programlisting"><span class="hl-tag">&lt;properties&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"propertyName1"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"propertyValue1"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"propertyName2"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"propertyValue2"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/properties&gt;</span></pre><p>
+                Properties may be configured on any batch artifact.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrBatchPropertyAnnotation" href="#jsrBatchPropertyAnnotation"></a>12.4.2&nbsp;<code class="classname">@BatchProperty</code> annotation</h3></div></div></div><p>Properties are referenced in batch artifacts by annotating class fields with the
+                <code class="classname">@BatchProperty</code> and <code class="classname">@Inject</code> annotations (both annotations
+                are required by the spec). As defined by JSR-352, fields for properties must be String typed. Any type
+                conversion is up to the implementing developer to perform.</p><p>An <code class="classname">javax.batch.api.chunk.ItemReader</code> artifact could be configured with a
+                properties block such as the one described above and accessed as such:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">class</span> MyItemReader <span class="hl-keyword">extends</span> AbstractItemReader {
+    <em><span class="hl-annotation" style="color: gray">@Inject</span></em>
+    <em><span class="hl-annotation" style="color: gray">@BatchProperty</span></em>
+    <span class="hl-keyword">private</span> String propertyName1;
+
+    ...
+}</pre><p>
+                The value of the field "propertyName1" will be "propertyValue1"</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrPropertySubstitution" href="#jsrPropertySubstitution"></a>12.4.3&nbsp;Property Substitution</h3></div></div></div><p>Property substitution is provided by way of operators and simple conditional expressions. The general
+                usage is #{operator['key']}.</p><p>Supported operators:</p><p>
+                </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>jobParameters - access job parameter values that the job was started/restarted with.
+                        </p></li><li class="listitem"><p>jobProperties - access properties configured at the job level of the JSL.</p></li><li class="listitem"><p>systemProperties - access named system properties.</p></li><li class="listitem"><p>partitionPlan - access named property from the partition plan of a partitioned step.
+                        </p></li></ul></div><p>
+            </p><pre class="programlisting">#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']}</pre><p>
+                The left hand side of the assignment is the expected value, the right hand side is the default value. In
+                this example, the result will resolve to a value of the system property file.separator as
+                #{jobParameters['unresolving.prop']} is assumed to not be resolvable. If neither expressions can be
+                resolved, an empty String will be returned. Multiple conditions can be used, which are separated by a
+                ';'.
+            </p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrProcessingModels" href="#jsrProcessingModels"></a>12.5&nbsp;Processing Models</h2></div></div></div><p>JSR-352 provides the same two basic processing models that Spring Batch does:</p><p>
+            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Item based processing - Using an <code class="classname">javax.batch.api.chunk.ItemReader</code>, an
+                        optional <code class="classname">javax.batch.api.chunk.ItemProcessor</code>, and an
+                        <code class="classname">javax.batch.api.chunk.ItemWriter</code>.</p></li><li class="listitem"><p>Task based processing - Using a <code class="classname">javax.batch.api.Batchlet</code>
+                        implementation.  This processing model is the same as the
+                        <code class="classname">org.springframework.batch.core.step.tasklet.Tasklet</code> based processing
+                        currently available.</p></li></ul></div><p>
+        </p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d5e3942" href="#d5e3942"></a>12.5.1&nbsp;Item based processing</h3></div></div></div><p>Item based processing in this context is a chunk size being set by the number of items read by an
+                <code class="classname">ItemReader</code>.  To configure a step this way, specify the
+                <code class="classname">item-count</code> (which defaults to 10) and optionally configure the
+                <code class="classname">checkpoint-policy</code> as item (this is the default).
+            </p><pre class="programlisting">...
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">checkpoint-policy</span>=<span class="hl-value">"item"</span> <span class="hl-attribute">item-count</span>=<span class="hl-value">"3"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;reader</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooReader"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;processor</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooProcessor"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;writer</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooWriter"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/chunk&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+...</pre><p>
+                If item based checkpointing is chosen, an additional attribute <code class="classname">time-limit</code> is
+                supported.  This sets a time limit for how long the number of items specified has to be processed.  If
+                the timeout is reached, the chunk will complete with however many items have been read by then
+                regardless of what the <code class="classname">item-count</code> is configured to be.
+            </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="d5e3952" href="#d5e3952"></a>12.5.2&nbsp;Custom checkpointing</h3></div></div></div><p>JSR-352 calls the process around the commit interval within a step "checkpointing".  Item based
+                checkpointing is one approach as mentioned above.  However, this will not be robust enough in many
+                cases.  Because of this, the spec allows for the implementation of a custom checkpointing algorithm by
+                implementing the <code class="classname">javax.batch.api.chunk.CheckpointAlgorithm</code> interface.  This
+                functionality is functionally the same as Spring Batch's custom completion policy.  To use an
+                implementation of <code class="classname">CheckpointAlgorithm</code>, configure your step with the custom
+                <code class="classname">checkpoint-policy</code> as shown below where fooCheckpointer refers to an
+                implementation of <code class="classname">CheckpointAlgorithm</code>.
+            </p><pre class="programlisting">...
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">checkpoint-policy</span>=<span class="hl-value">"custom"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;checkpoint-algorithm</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooCheckpointer"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;reader</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooReader"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;processor</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooProcessor"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;writer</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fooWriter"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/chunk&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+...</pre></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrRunningAJob" href="#jsrRunningAJob"></a>12.6&nbsp;Running a job</h2></div></div></div><p>The entrance to executing a JSR-352 based job is through the
+            <code class="classname">javax.batch.operations.JobOperator</code>.  Spring Batch provides our own implementation to
+            this interface (<code class="classname">org.springframework.batch.core.jsr.launch.JsrJobOperator</code>).  This
+            implementation is loaded via the <code class="classname">javax.batch.runtime.BatchRuntime</code>.  Launching a
+            JSR-352 based batch job is implemented as follows:</p><pre class="programlisting">
+JobOperator jobOperator = BatchRuntime.getJobOperator();
+<span class="hl-keyword">long</span> jobExecutionId = jobOperator.start(<span class="hl-string">"fooJob"</span>, <span class="hl-keyword">new</span> Properties());
+        </pre><p>The above code does the following:</p><p>
+            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Bootstraps a base ApplicationContext - In order to provide batch functionality, the framework
+                        needs some infrastructure bootstrapped.  This occurs once per JVM.  The components that are
+                        bootstrapped are similar to those provided by <code class="classname">@EnableBatchProcessing</code>.
+                        Specific details can be found in the javadoc for the <code class="classname">JsrJobOperator</code>.
+                    </p></li><li class="listitem"><p>Loads an <code class="classname">ApplicationContext</code> for the job requested - In the example
+                        above, the framework will look in /META-INF/batch-jobs for a file named fooJob.xml and load a
+                        context that is a child of the shared context mentioned previously.</p></li><li class="listitem"><p>Launch the job - The job defined within the context will be executed asynchronously.  The
+                        <code class="classname">JobExecution</code>'s id will be returned.</p></li></ul></div><p>
+        </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>All JSR-352 based batch jobs are executed asynchronously.</p></td></tr></table></div><p>When <code class="classname">JobOperator#start</code> is called using <code class="classname">SimpleJobOperator</code>,
+            Spring Batch determines if the call is an initial run or a retry of a previously executed run.  Using the
+            JSR-352 based <code class="classname">JobOpeator#start(String jobXMLName, Properties jobParameters)</code>, the
+            framework will always create a new <code class="classname">JobInstance</code> (JSR-352 job parameters are
+            non-identifying).  In order to restart a job, a call to
+            <code class="classname">JobOperator#restart(long executionId, Properties restartParameters)</code> is required.
+        </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrContexts" href="#jsrContexts"></a>12.7&nbsp;Contexts</h2></div></div></div><p>JSR-352 defines two context objects that are used to interact with the meta-data of a job or step from
+            within a batch artifact: <code class="classname">javax.batch.runtime.context.JobContext</code> and
+            <code class="classname">javax.batch.runtime.context.StepContext</code>.  Both of these are available in any step
+            level artifact (<code class="classname">Batchlet</code>, <code class="classname">ItemReader</code>, etc) with the
+            <code class="classname">JobContext</code> being available to job level artifacts as well
+            (<code class="classname">JobListener</code> for example).</p><p>To obtain a reference to the <code class="classname">JobContext</code> or <code class="classname">StepContext</code>
+            within the current scope, simply use the <code class="classname">@Inject</code> annotation:</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Inject</span></em>
+JobContext jobContext;
+        </pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note: @Autowire for JSR-352 contexts"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">@Autowire for JSR-352 contexts</th></tr><tr><td align="left" valign="top"><p>Using Spring's @Autowire is not supported for the injection of these contexts.</p></td></tr></table></div><p>In Spring Batch, the <code class="classname">JobContext</code> and <code class="classname">StepContext</code> wrap their
+            corresponding execution objects (<code class="classname">JobExecution</code> and
+            <code class="classname">StepExecution</code> respectively).  Data stored via
+            <code class="classname">StepContext#persistent#setPersistentUserData(Serializable data)</code> is stored in the
+            Spring Batch <code class="classname">StepExecution#executionContext</code>.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrStepFlow" href="#jsrStepFlow"></a>12.8&nbsp;Step Flow</h2></div></div></div><p>Within a JSR-352 based job, the flow of steps works similarly as it does within Spring Batch.
+            However, there are a few subtle differences:</p><p>
+            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Decision's are steps - In a regular Spring Batch job, a decision is a state that does not
+                        have an independent <code class="classname">StepExecution</code> or any of the rights and
+                        responsibilities that go along with being a full step..  However, with JSR-352, a decision
+                        is a step just like any other and will behave just as any other steps (transactionality,
+                        it gets a <code class="classname">StepExecution</code>, etc).  This means that they are treated the
+                        same as any other step on restarts as well.</p></li><li class="listitem"><p><code class="classname">next</code> attribute and step transitions - In a regular job, these are
+                        allowed to appear together in the same step.  JSR-352 allows them to both be used in the
+                        same step with the next attribute taking precedence in evaluation.</p></li><li class="listitem"><p>Transition element ordering - In a standard Spring Batch job, transition elements are
+                        sorted from most specific to least specific and evaluated in that order.  JSR-352 jobs
+                        evaluate transition elements in the order they are specified in the XML.</p></li></ul></div><p>
+        </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrScaling" href="#jsrScaling"></a>12.9&nbsp;Scaling a JSR-352 batch job</h2></div></div></div><p>Traditional Spring Batch jobs have four ways of scaling (the last two capable of being executed across
+            multiple JVMs):
+            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Split - Running multiple steps in parallel.</p></li><li class="listitem"><p>Multiple threads - Executing a single step via multiple threads.</p></li><li class="listitem"><p>Partitioning - Dividing the data up for parallel processing (master/slave).</p></li><li class="listitem"><p>Remote Chunking - Executing the processor piece of logic remotely.</p></li></ul></div><p>
+        </p><p>JSR-352 provides two options for scaling batch jobs.  Both options support only a single JVM:
+            </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Split - Same as Spring Batch</p></li><li class="listitem"><p>Partitioning - Conceptually the same as Spring Batch however implemented slightly different.
+                    </p></li></ul></div><p>
+        </p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="jsrPartitioning" href="#jsrPartitioning"></a>12.9.1&nbsp;Partitioning</h3></div></div></div><p>Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Meta-data is provided
+                to each slave to identify the input to be processed with the slaves reporting back to the master the
+                results upon completion.  However, there are some important differences:
+                </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Partitioned <code class="classname">Batchlet</code> - This will run multiple instances of the
+                            configured <code class="classname">Batchlet</code> on multiple threads.  Each instance will have
+                            it's own set of properties as provided by the JSL or the
+                            <code class="classname">PartitionPlan</code></p></li><li class="listitem"><p><code class="classname">PartitionPlan</code> - With Spring Batch's partitioning, an
+                            <code class="classname">ExecutionContext</code> is provided for each partition.  With JSR-352, a
+                            single <code class="classname">javax.batch.api.partition.PartitionPlan</code> is provided with an
+                            array of <code class="classname">Properties</code> providing the meta-data for each partition.
+                        </p></li><li class="listitem"><p><code class="classname">PartitionMapper</code> - JSR-352 provides two ways to generate partition
+                            meta-data.  One is via the JSL (partition properties).  The second is via an implementation
+                            of the <code class="classname">javax.batch.api.partition.PartitionMapper</code> interface.
+                            Functionally, this interface is similar to the
+                            <code class="classname">org.springframework.batch.core.partition.support.Partitioner</code>
+                            interface provided by Spring Batch in that it provides a way to programmaticaly generate
+                            meta-data for partitioning.</p></li><li class="listitem"><p><code class="classname">StepExecution</code>s - In Spring Batch, partitioned steps are run as
+                            master/slave. Within JSR-352, the same configuration occurs.  However, the slave steps do
+                            not get official <code class="classname">StepExecution</code>s.  Because of that, calls to
+                            <code class="classname">JsrJobOperator#getStepExecutions(long jobExecutionId)</code> will only
+                            return the <code class="classname">StepExecution</code> for the master.  </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The child
+                            <code class="classname">StepExecution</code>s still exist in the job repository and are available
+                            via the <code class="classname">JobExplorer</code> and Spring Batch Admin.</p></td></tr></table></div><p>
+                        </p></li><li class="listitem"><p>Compensating logic - Since Spring Batch implements the master/slave logic of
+                            partitioning using steps, <code class="classname">StepExecutionListener</code>s can be used to
+                            handle compensating logic if something goes wrong.  However, since the slaves JSR-352
+                            provides a collection of other components for the ability to provide compensating logic when
+                            errors occur and to dynamically set the exit status.  These components include the following:
+                            </p><div class="informaltable"><table style="border-collapse: collapse;border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col align="left"><col align="left"></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left">
+                                                <span class="bold"><strong>Artifact Interface</strong></span>
+                                            </td><td style="border-bottom: 0.5pt solid ; " align="left">
+                                                <span class="bold"><strong>Description</strong></span>
+                                            </td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left"><code class="classname">javax.batch.api.partition.PartitionCollector</code></td><td style="border-bottom: 0.5pt solid ; " align="left">Provides a way for slave steps to send information back to the
+                                                master.  There is one instance per slave thread.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; " align="left"><code class="classname">javax.batch.api.partition.PartitionAnalyzer</code></td><td style="border-bottom: 0.5pt solid ; " align="left">End point that receives the information collected by the
+                                                <code class="classname">PartitionCollector</code> as well as the resulting
+                                                statuses from a completed partition.</td></tr><tr><td style="border-right: 0.5pt solid ; " align="left"><code class="classname">javax.batch.api.partition.PartitionReducer</code></td><td style="" align="left">Provides the ability to provide compensating logic for a partitioned
+                                                step.</td></tr></tbody></table></div><p>
+                        </p></li></ul></div><p>
+            </p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jsrTesting" href="#jsrTesting"></a>12.10&nbsp;Testing</h2></div></div></div><p>Since all JSR-352 based jobs are executed asynchronously, it can be difficult to determine when a job has
+            completed.  To help with testing, Spring Batch provides the
+            <code class="classname">org.springframework.batch.core.jsr.JsrTestUtils</code>.  This utility class provides the
+            ability to start a job and restart a job and wait for it to complete.  Once the job completes, the
+            associated <code class="classname">JobExecution</code> is returned.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="patterns.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="springBatchIntegration.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">11.&nbsp;Common Batch Patterns&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;13.&nbsp;Spring Batch Integration</td></tr></table></div></body></html>

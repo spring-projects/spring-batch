@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" tests="11" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testSetSaveState" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testJumpToItem" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testClose" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testOpen" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.001"/>
+  <testcase name="testReadToEnd" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testGetCurrentItemCount" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testOpenWithoutName" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testReadToEndWithMax" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testSetName" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testUpdateWithMax" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <testcase name="testUpdate" classname="org.springframework.batch.item.support.ItemCountingItemStreamItemReaderTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

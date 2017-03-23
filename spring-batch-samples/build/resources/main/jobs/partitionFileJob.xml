@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="partitionJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step">
+			<partition step="step1" partitioner="partitioner">
+				<handler grid-size="2" task-executor="taskExecutor" />
+			</partition>
+		</step>
+	</job>
+
+	<bean id="partitioner" class="org.springframework.batch.core.partition.support.MultiResourcePartitioner">
+		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
+	</bean>
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+
+	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet transaction-manager="transactionManager">
+			<chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
+			<listeners>
+				<listener ref="fileNameListener" />
+			</listeners>
+		</tasklet>
+	</step>
+
+	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" scope="step">
+		<property name="path" value="file:./build/output/file/" />
+	</bean>
+
+
+	<bean id="itemReader" scope="step" autowire-candidate="false" parent="itemReaderParent">
+		<property name="resource" value="#{stepExecutionContext[fileName]}" />
+	</bean>
+
+	<bean id="inputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader">
+		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
+		<property name="delegate" ref="testItemReader" />
+	</bean>
+
+	<bean id="outputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader" scope="prototype">
+		<property name="resources" value="file:build/output/file/delimited*.csv" />
+		<property name="delegate" ref="testItemReader" />
+	</bean>
+
+	<bean id="testItemReader" parent="itemReaderParent" />
+
+	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader" abstract="true">
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value="," />
+						<property name="names" value="name,credit" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="targetType" value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
+
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter" scope="step">
+		<property name="resource" value="#{stepExecutionContext[outputFile]}" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value="," />
+				<property name="fieldExtractor">
+					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="name,credit" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

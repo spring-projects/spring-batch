@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Handling Step Completion When No Input is Found</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch11s06.xhtml" title="Executing System Commands"/><link rel="next" href="ch11s08.xhtml" title="Passing Data to Future Steps"/></head><body><header/><section class="section" title="Handling Step Completion When No Input is Found" epub:type="subchapter" id="handlingStepCompletionWhenNoInputIsFound"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Handling Step Completion When No Input is Found</h2></div></div></div>
+    
+
+    <p>In many batch scenarios, finding no rows in a database or file to
+    process is not exceptional. The <code class="classname">Step</code> is simply
+    considered to have found no work and completes with 0 items read. All of
+    the <code class="classname">ItemReader</code> implementations provided out of the
+    box in Spring Batch default to this approach. This can lead to some
+    confusion if nothing is written out even when input is present. (which
+    usually happens if a file was misnamed, etc) For this reason, the meta
+    data itself should be inspected to determine how much work the framework
+    found to be processed. However, what if finding no input is considered
+    exceptional? In this case, programmatically checking the meta data for no
+    items processed and causing failure is the best solution. Because this is
+    a common use case, a listener is provided with just this
+    functionality:</p>
+
+    <pre class="programlisting">public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        if (stepExecution.getReadCount() == 0) {
+            return ExitStatus.FAILED;
+        }
+        return null;
+    }
+
+}</pre>
+
+    <p>The above <code class="classname">StepExecutionListener</code> inspects the
+    readCount property of the <code class="classname">StepExecution</code> during the
+    'afterStep' phase to determine if no items were read. If that is the case,
+    an exit code of FAILED is returned, indicating that the
+    <code class="classname">Step</code> should fail. Otherwise, null is returned,
+    which will not affect the status of the
+    <code class="classname">Step</code>.</p>
+  </section><footer/></body></html>

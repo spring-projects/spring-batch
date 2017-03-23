@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>BATCH_STEP_EXECUTION</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apbs04.xhtml" title="BATCH_JOB_EXECUTION"/><link rel="next" href="apbs06.xhtml" title="BATCH_JOB_EXECUTION_CONTEXT"/></head><body><header/><section class="section" title="BATCH_STEP_EXECUTION" epub:type="division" id="metaDataBatchStepExecution"><div class="titlepage"><div><div><h2 class="title" style="clear: both">BATCH_STEP_EXECUTION</h2></div></div></div><p>The BATCH_STEP_EXECUTION table holds all information relevant to the
+    <code class="classname">StepExecution</code> object. This table is very similar in
+    many ways to the BATCH_JOB_EXECUTION table and there will always be at
+    least one entry per <code class="classname">Step</code> for each
+    <code class="classname">JobExecution</code> created:</p><pre class="programlisting">CREATE TABLE BATCH_STEP_EXECUTION  (
+  STEP_EXECUTION_ID BIGINT  PRIMARY KEY ,
+  VERSION BIGINT NOT NULL,
+  STEP_NAME VARCHAR(100) NOT NULL,
+  JOB_EXECUTION_ID BIGINT NOT NULL,
+  START_TIME TIMESTAMP NOT NULL ,
+  END_TIME TIMESTAMP DEFAULT NULL,
+  STATUS VARCHAR(10),
+  COMMIT_COUNT BIGINT ,
+  READ_COUNT BIGINT ,
+  FILTER_COUNT BIGINT ,
+  WRITE_COUNT BIGINT ,
+  READ_SKIP_COUNT BIGINT ,
+  WRITE_SKIP_COUNT BIGINT ,
+  PROCESS_SKIP_COUNT BIGINT ,
+  ROLLBACK_COUNT BIGINT ,
+  EXIT_CODE VARCHAR(20) ,
+  EXIT_MESSAGE VARCHAR(2500) ,
+  LAST_UPDATED TIMESTAMP,
+  constraint JOB_EXECUTION_STEP_FK foreign key (JOB_EXECUTION_ID)
+  references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ;</pre><p>Below are descriptions for each column:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>STEP_EXECUTION_ID: Primary key that uniquely identifies this
+        execution. The value of this column should be obtainable by calling
+        the <code class="methodname">getId</code> method of the
+        <code class="classname">StepExecution</code> object.</p></li><li class="listitem" epub:type="list-item"><p>VERSION: See above section.</p></li><li class="listitem" epub:type="list-item"><p>STEP_NAME: The name of the step to which this execution
+        belongs.</p></li><li class="listitem" epub:type="list-item"><p>JOB_EXECUTION_ID: Foreign key from the BATCH_JOB_EXECUTION table
+        indicating the JobExecution to which this StepExecution belongs. There
+        may be only one <code class="classname">StepExecution</code> for a given
+        <code class="classname">JobExecution</code> for a given
+        <code class="classname">Step</code> name.</p></li><li class="listitem" epub:type="list-item"><p>START_TIME: Timestamp representing the time the execution was
+        started.</p></li><li class="listitem" epub:type="list-item"><p>END_TIME: Timestamp representing the time the execution was
+        finished, regardless of success or failure. An empty value in this
+        column even though the job is not currently running indicates that
+        there has been some type of error and the framework was unable to
+        perform a last save before failing.</p></li><li class="listitem" epub:type="list-item"><p>STATUS: Character string representing the status of the
+        execution. This may be COMPLETED, STARTED, etc. The object
+        representation of this column is the
+        <code class="classname">BatchStatus</code> enumeration.</p></li><li class="listitem" epub:type="list-item"><p>COMMIT_COUNT: The number of times in which the step has
+        committed a transaction during this execution.</p></li><li class="listitem" epub:type="list-item"><p>READ_COUNT: The number of items read during this
+        execution.</p></li><li class="listitem" epub:type="list-item"><p>FILTER_COUNT: The number of items filtered out of this
+        execution.</p></li><li class="listitem" epub:type="list-item"><p>WRITE_COUNT: The number of items written and committed during
+        this execution.</p></li><li class="listitem" epub:type="list-item"><p>READ_SKIP_COUNT: The number of items skipped on read during this
+        execution.</p></li><li class="listitem" epub:type="list-item"><p>WRITE_SKIP_COUNT: The number of items skipped on write during
+        this execution.</p></li><li class="listitem" epub:type="list-item"><p>PROCESS_SKIP_COUNT: The number of items skipped during
+        processing during this execution.</p></li><li class="listitem" epub:type="list-item"><p>ROLLBACK_COUNT: The number of rollbacks during this execution.
+        Note that this count includes each time rollback occurs, including
+        rollbacks for retry and those in the skip recovery procedure.</p></li><li class="listitem" epub:type="list-item"><p>EXIT_CODE: Character string representing the exit code of the
+        execution. In the case of a command line job, this may be converted
+        into a number.</p></li><li class="listitem" epub:type="list-item"><p>EXIT_MESSAGE: Character string representing a more detailed
+        description of how the job exited. In the case of failure, this might
+        include as much of the stack trace as is possible.</p></li><li class="listitem" epub:type="list-item"><p>LAST_UPDATED: Timestamp representing the last time this
+        execution was persisted.</p></li></ul></div></section><footer/></body></html>

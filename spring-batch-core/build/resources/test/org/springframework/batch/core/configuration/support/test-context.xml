@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+	<bean
+		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="registry" />
+	</bean>
+
+	<bean id="registry"
+		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
+	<bean id="test-job"
+		class="org.springframework.batch.core.job.JobSupport">
+		<property name="steps">
+			<bean id="step1" class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean">
+				<property name="itemReader" ref="itemReader" />
+				<property name="itemWriter" ref="itemWriter" />
+				<property name="jobRepository" ref="jobRepository" />
+				<property name="transactionManager" ref="transactionManager"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemReader"
+		class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg value="foo,bar,spam" />
+	</bean>
+
+	<bean id="itemWriter"
+		class="org.springframework.batch.core.launch.EmptyItemWriter" />
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.step.JobRepositorySupport" />
+
+	<bean id="transactionManager"
+		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<bean id="test-job-with-name"
+		class="org.springframework.batch.core.job.JobSupport">
+		<property name="name" value="foo" />
+	</bean>
+
+	<bean id="test-job-with-bean-name"
+		class="org.springframework.batch.core.job.JobSupport">
+		<property name="beanName" value="bar" />
+	</bean>
+
+	<bean id="abstract-job"
+		class="org.springframework.batch.core.job.JobSupport"
+		abstract="true" />
+
+	<bean id="test-job-with-parent" parent="abstract-job" />
+
+	<bean id="test-job-with-parent-and-name" parent="abstract-job"
+		p:name="spam" />
+
+	<bean id="test-job-with-parent-and-bean-name" parent="abstract-job"
+		p:name="bucket" />
+
+	<bean id="parent-job"
+		class="org.springframework.batch.core.job.JobSupport" />
+
+	<bean id="test-job-with-concrete-parent" parent="parent-job"
+		p:name="maps" />
+
+	<bean id="test-job-with-concrete-parent-and-name"
+		parent="parent-job" p:name="oof" />
+
+	<bean id="test-job-with-concrete-parent-and-bean-name"
+		parent="parent-job" p:beanName="rab" />
+
+</beans>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<import resource="classpath:/data-source-context.xml"/>
+
+	<!-- Override the default: -->
+	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="initialize" value="${batch.data.source.init}"/>
+		<property name="initScripts">
+			<list>
+				<value>${batch.schema.script}</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBeanTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:45" hostname="Michaels-MacBook-Pro-3.local" time="0.004">
+  <properties/>
+  <testcase name="testType" classname="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBeanTests" time="0.0"/>
+  <testcase name="testStepOperationsWithoutChunkListener" classname="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBeanTests" time="0.003"/>
+  <testcase name="testDefaultValue" classname="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBeanTests" time="0.001"/>
+  <system-out><![CDATA[10:02:45,822  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:02:45,823  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

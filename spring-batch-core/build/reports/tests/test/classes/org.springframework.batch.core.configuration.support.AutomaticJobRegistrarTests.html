@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.configuration.support.AutomaticJobRegistrarTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.configuration.support.AutomaticJobRegistrarTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.configuration.support.html">org.springframework.batch.core.configuration.support</a> &gt; AutomaticJobRegistrarTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">10</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.462s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testChildContextOverridesBeanPostProcessor</td>
+<td>0.073s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testClear</td>
+<td>0.041s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testClearCalledOnContextClosed</td>
+<td>0.048s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testDuplicateJobsInFile</td>
+<td>0.046s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testErrorInContext</td>
+<td>0.043s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testInitCalledOnContextRefreshed</td>
+<td>0.071s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testLocateJob</td>
+<td>0.065s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testNoJobFound</td>
+<td>0.033s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testOrderedImplemented</td>
+<td>0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStartStopRunning</td>
+<td>0.042s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:01:52,253  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,278  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,289  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,292  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,294  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:985 - Closing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,295  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,318  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,329  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,333  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,335  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:985 - Closing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,336  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@6617506f: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,337  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment.xml]
+10:01:52,354  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/test-environment.xml
+10:01:52,369  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@7b47aa09: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,371  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/job.xml]
+10:01:52,388  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/job.xml
+10:01:52,398  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,400  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/job2.xml]
+10:01:52,422  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/job2.xml
+10:01:52,433  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,435  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@1bf1aaed: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,436  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,466  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,477  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,480  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,482  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@5d02e78c: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,483  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,509  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,525  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,527  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,528  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:985 - Closing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,529  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@5d3ad41e: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,530  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml]
+10:01:52,541  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment-with-registry.xml]
+10:01:52,549  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment.xml]
+10:01:52,563  INFO Test worker support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:01:52,569  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@6bec19ff: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,570  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,587  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,595  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,598  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,600  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,614  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,622  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,627  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,629  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/error.xml]
+10:01:52,640  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/error.xml
+10:01:52,642  WARN Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:549 - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'test-job' defined in class path resource [org/springframework/batch/core/launch/support/error.xml]: Cannot create inner bean 'step1' of type [org.springframework.batch.core.step.factory.SimpleStepFactoryBean] while setting bean property 'steps'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'step1': FactoryBean threw exception on object creation; nested exception is java.lang.IllegalStateException: ItemReader must be provided
+10:01:52,643  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@40afa3e9: startup date [Thu Mar 23 10:01:52 CDT 2017]; root of context hierarchy
+10:01:52,644  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml]
+10:01:52,657  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment-with-registry.xml]
+10:01:52,666  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/test-environment.xml]
+10:01:52,677  INFO Test worker support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:01:52,683  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/launch/support/2jobs.xml]
+10:01:52,700  INFO Test worker support.GenericApplicationContextFactory$ResourceXmlApplicationContext:581 - Refreshing ResourceXmlApplicationContext:file:/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-core/build/resources/test/org/springframework/batch/core/launch/support/2jobs.xml
+10:01:52,710  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+10:01:52,715  INFO Test worker builder.SimpleStepBuilder:369 - Setting commit interval to default value (1)
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,986 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>5.&nbsp;Configuring a Step</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="Spring Batch - Reference Documentation"><link rel="up" href="index.html" title="Spring Batch - Reference Documentation"><link rel="prev" href="configureJob.html" title="4.&nbsp;Configuring and Running a Job"><link rel="next" href="readersAndWriters.html" title="6.&nbsp;ItemReaders and ItemWriters"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.&nbsp;Configuring a Step</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="configureJob.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="readersAndWriters.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="configureStep" href="#configureStep"></a>5.&nbsp;Configuring a Step</h1></div></div></div><p>As discussed in <a class="xref" href="domain.html" title="3.&nbsp;The Domain Language of Batch">Batch Domain Language</a>, a
+  <code class="classname">Step</code> is a domain object that encapsulates an
+  independent, sequential phase of a batch job and contains all of the
+  information necessary to define and control the actual batch processing.
+  This is a necessarily vague description because the contents of any given
+  <code class="classname">Step</code> are at the discretion of the developer writing a
+  <code class="classname">Job</code>. A Step can be as simple or complex as the
+  developer desires. A simple <code class="classname">Step</code> might load data from
+  a file into the database, requiring little or no code. (depending upon the
+  implementations used) A more complex <code class="classname">Step</code> may have
+  complicated business rules that are applied as part of the
+  processing.</p><div class="mediaobject" align="center"><img src="images/step.png" align="middle"></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="chunkOrientedProcessing" href="#chunkOrientedProcessing"></a>5.1&nbsp;Chunk-Oriented Processing</h2></div></div></div><p>Spring Batch uses a 'Chunk Oriented' processing style within its
+    most common implementation. Chunk oriented processing refers to reading
+    the data one at a time, and creating 'chunks' that will be written out,
+    within a transaction boundary. One item is read in from an
+    <code class="classname">ItemReader</code>, handed to an
+    <code class="classname">ItemProcessor</code>, and aggregated. Once the number of
+    items read equals the commit interval, the entire chunk is written out via
+    the ItemWriter, and then the transaction is committed.</p><div class="mediaobject" align="center"><img src="images/chunk-oriented-processing.png" align="middle"></div><p>Below is a code representation of the same concepts shown
+    above:</p><pre class="programlisting">List items = <span class="hl-keyword">new</span> Arraylist();
+<span class="hl-keyword">for</span>(<span class="hl-keyword">int</span> i = <span class="hl-number">0</span>; i &lt; commitInterval; i++){
+    Object item = itemReader.read()
+    Object processedItem = itemProcessor.process(item);
+    items.add(processedItem);
+}
+itemWriter.write(items);</pre><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="configuringAStep" href="#configuringAStep"></a>5.1.1&nbsp;Configuring a Step</h3></div></div></div><p>Despite the relatively short list of required dependencies for a
+      <code class="classname">Step</code>, it is an extremely complex class that can
+      potentially contain many collaborators. In order to ease configuration,
+      the Spring Batch namespace can be used:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"sampleJob"</span> <span class="hl-attribute">job-repository</span>=<span class="hl-value">"jobRepository"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">transaction-manager</span>=<span class="hl-value">"transactionManager"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>The configuration above represents the only required dependencies
+      to create a item-oriented step:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>reader - The <code class="classname">ItemReader</code> that provides
+            items for processing.</p></li><li class="listitem"><p>writer - The <code class="classname">ItemWriter</code> that
+            processes the items provided by the
+            <code class="classname">ItemReader</code>.</p></li><li class="listitem"><p>transaction-manager - Spring's
+            <code class="classname">PlatformTransactionManager</code> that will be
+            used to begin and commit transactions during processing.</p></li><li class="listitem"><p>job-repository - The <code class="classname">JobRepository</code>
+            that will be used to periodically store the
+            <code class="classname">StepExecution</code> and
+            <code class="classname">ExecutionContext</code> during processing (just
+            before committing). For an in-line &lt;step/&gt; (one defined
+            within a &lt;job/&gt;) it is an attribute on the &lt;job/&gt;
+            element; for a standalone step, it is defined as an attribute of
+            the &lt;tasklet/&gt;.</p></li><li class="listitem"><p>commit-interval - The number of items that will be processed
+            before the transaction is committed.</p></li></ul></div><p>It should be noted that, job-repository defaults to
+      "jobRepository" and transaction-manager defaults to "transactionManger".
+      Furthermore, the <code class="classname">ItemProcessor</code> is optional, not
+      required, since the item could be directly passed from the reader to the
+      writer.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="InheritingFromParentStep" href="#InheritingFromParentStep"></a>5.1.2&nbsp;Inheriting from a Parent Step</h3></div></div></div><p>If a group of <code class="classname">Step</code>s share similar
+      configurations, then it may be helpful to define a "parent"
+      <code class="classname">Step</code> from which the concrete
+      <code class="classname">Step</code>s may inherit properties. Similar to class
+      inheritance in Java, the "child" <code class="classname">Step</code> will
+      combine its elements and attributes with the parent's. The child will
+      also override any of the parent's <code class="classname">Step</code>s.</p><p>In the following example, the <code class="classname">Step</code>
+      "concreteStep1" will inherit from "parentStep". It will be instantiated
+      with 'itemReader', 'itemProcessor', 'itemWriter', startLimit=5, and
+      allowStartIfComplete=true. Additionally, the commitInterval will be '5'
+      since it is overridden by the "concreteStep1":</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"parentStep"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">allow-start-if-complete</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"concreteStep1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"parentStep"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">start-limit</span>=<span class="hl-value">"5"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">processor</span>=<span class="hl-value">"itemProcessor"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"5"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>The id attribute is still required on the step within the job
+      element. This is for two reasons:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>The id will be used as the step name when persisting the
+            StepExecution. If the same standalone step is referenced in more
+            than one step in the job, an error will occur.</p></li><li class="listitem"><p>When creating job flows, as described later in this chapter,
+            the next attribute should be referring to the step in the flow,
+            not the standalone step.</p></li></ol></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="abstractStep" href="#abstractStep"></a>Abstract Step</h4></div></div></div><p>Sometimes it may be necessary to define a parent
+        <code class="classname">Step</code> that is not a complete
+        <code class="classname">Step</code> configuration. If, for instance, the
+        reader, writer, and tasklet attributes are left off of a
+        <code class="classname">Step </code>configuration, then initialization will
+        fail. If a parent must be defined without these properties, then the
+        "abstract" attribute should be used. An "abstract"
+        <code class="classname">Step</code> will not be instantiated; it is used only
+        for extending.</p><p>In the following example, the <code class="classname">Step</code>
+        "abstractParentStep" would not instantiate if it were not declared to
+        be abstract. The <code class="classname">Step</code> "concreteStep2" will have
+        'itemReader', 'itemWriter', and commitInterval=10.</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"abstractParentStep"</span> <span class="hl-attribute">abstract</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"concreteStep2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"abstractParentStep"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="mergingListsOnStep" href="#mergingListsOnStep"></a>Merging Lists</h4></div></div></div><p>Some of the configurable elements on
+        <code class="classname">Step</code>s are lists; the &lt;listeners/&gt;
+        element, for instance. If both the parent and child
+        <code class="classname">Step</code>s declare a &lt;listeners/&gt; element,
+        then the child's list will override the parent's. In order to allow a
+        child to add additional listeners to the list defined by the parent,
+        every list element has a "merge" attribute. If the element specifies
+        that merge="true", then the child's list will be combined with the
+        parent's instead of overriding it.</p><p>In the following example, the <code class="classname">Step</code>
+        "concreteStep3" will be created will two listeners:
+        <code class="classname">listenerOne</code> and
+        <code class="classname">listenerTwo</code>:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"listenersParentStep"</span> <span class="hl-attribute">abstract</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+        <span class="hl-tag">&lt;listener</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"listenerOne"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"concreteStep3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"listenersParentStep"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"5"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;listeners</span> <span class="hl-attribute">merge</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;listener</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"listenerTwo"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;listeners&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="commitInterval" href="#commitInterval"></a>5.1.3&nbsp;The Commit Interval</h3></div></div></div><p>As mentioned above, a step reads in and writes out items,
+      periodically committing using the supplied
+      <code class="classname">PlatformTransactionManager</code>. With a
+      commit-interval of 1, it will commit after writing each individual item.
+      This is less than ideal in many situations, since beginning and
+      committing a transaction is expensive. Ideally, it is preferable to
+      process as many items as possible in each transaction, which is
+      completely dependent upon the type of data being processed and the
+      resources with which the step is interacting. For this reason, the
+      number of items that are processed within a commit can be
+      configured.</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"sampleJob"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;tasklet&gt;</span>
+            <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="bold"><strong>commit-interval="10"</strong></span>/&gt;
+        <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>In the example above, 10 items will be processed within each
+      transaction. At the beginning of processing a transaction is begun, and
+      each time <span class="markup">read</span> is called on the
+      <code class="classname">ItemReader</code>, a counter is incremented. When it
+      reaches 10, the list of aggregated items is passed to the
+      <code class="classname">ItemWriter</code>, and the transaction will be
+      committed.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="stepRestart" href="#stepRestart"></a>5.1.4&nbsp;Configuring a Step for Restart</h3></div></div></div><p>In <a class="xref" href="configureJob.html" title="4.&nbsp;Configuring and Running a Job">Chapter&nbsp;4, <i>Configuring and Running a Job</i></a>, restarting a
+      <code class="classname">Job</code> was discussed. Restart has numerous impacts
+      on steps, and as such may require some specific configuration.</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="startLimit" href="#startLimit"></a>Setting a StartLimit</h4></div></div></div><p>There are many scenarios where you may want to control the
+        number of times a <code class="classname">Step</code> may be started. For
+        example, a particular <code class="classname">Step</code> might need to be
+        configured so that it only runs once because it invalidates some
+        resource that must be fixed manually before it can be run again. This
+        is configurable on the step level, since different steps may have
+        different requirements. A <code class="classname">Step</code> that may only be
+        executed once can exist as part of the same <code class="classname">Job</code>
+        as a <code class="classname">Step</code> that can be run infinitely. Below is
+        an example start limit configuration:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">start-limit</span>=<span class="hl-value">"1"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>The simple step above can be run only once. Attempting to run it
+        again will cause an exception to be thrown. It should be noted that
+        the default value for the start-limit is
+        <code class="classname">Integer.MAX_VALUE</code>.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="allowStartIfComplete" href="#allowStartIfComplete"></a>Restarting a completed step</h4></div></div></div><p>In the case of a restartable job, there may be one or more steps
+        that should always be run, regardless of whether or not they were
+        successful the first time. An example might be a validation step, or a
+        <code class="classname">Step</code> that cleans up resources before
+        processing. During normal processing of a restarted job, any step with
+        a status of 'COMPLETED', meaning it has already been completed
+        successfully, will be skipped. Setting allow-start-if-complete to
+        "true" overrides this so that the step will always run:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">allow-start-if-complete</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="stepRestartExample" href="#stepRestartExample"></a>Step Restart Configuration Example</h4></div></div></div><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"footballJob"</span> <span class="hl-attribute">restartable</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerload"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"gameLoad"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;tasklet&gt;</span>
+            <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"playerFileItemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"playerWriter"</span>
+                   <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"gameLoad"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"playerSummarization"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">allow-start-if-complete</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"gameFileItemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"gameWriter"</span>
+                   <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"playerSummarization"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">start-limit</span>=<span class="hl-value">"3"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"playerSummarizationSource"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"summaryWriter"</span>
+                   <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;/tasklet&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>The above example configuration is for a job that loads in
+        information about football games and summarizes them. It contains
+        three steps: playerLoad, gameLoad, and playerSummarization. The
+        playerLoad <code class="classname">Step</code> loads player information from a
+        flat file, while the gameLoad <code class="classname">Step</code> does the
+        same for games. The final <code class="classname">Step</code>,
+        playerSummarization, then summarizes the statistics for each player
+        based upon the provided games. It is assumed that the file loaded by
+        'playerLoad' must be loaded only once, but that 'gameLoad' will load
+        any games found within a particular directory, deleting them after
+        they have been successfully loaded into the database. As a result, the
+        playerLoad <code class="classname">Step</code> contains no additional
+        configuration. It can be started almost limitlessly, and if complete
+        will be skipped. The 'gameLoad' <code class="classname">Step</code>, however,
+        needs to be run every time in case extra files have been dropped since
+        it last executed. It has 'allow-start-if-complete' set to 'true' in
+        order to always be started. (It is assumed that the database tables
+        games are loaded into has a process indicator on it, to ensure new
+        games can be properly found by the summarization step). The
+        summarization <code class="classname">Step</code>, which is the most important
+        in the <code class="classname">Job</code>, is configured to have a start limit
+        of 3. This is useful because if the step continually fails, a new exit
+        code will be returned to the operators that control job execution, and
+        it won't be allowed to start again until manual intervention has taken
+        place.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This job is purely for example purposes and is not the same as
+          the footballJob found in the samples project.</p></td></tr></table></div><p>Run 1:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>playerLoad is executed and completes successfully, adding
+            400 players to the 'PLAYERS' table.</p></li><li class="listitem"><p>gameLoad is executed and processes 11 files worth of game
+            data, loading their contents into the 'GAMES' table.</p></li><li class="listitem"><p>playerSummarization begins processing and fails after 5
+            minutes.</p></li></ol></div><p>Run 2:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>playerLoad is not run, since it has already completed
+            successfully, and allow-start-if-complete is 'false' (the
+            default).</p></li><li class="listitem"><p>gameLoad is executed again and processes another 2 files,
+            loading their contents into the 'GAMES' table as well (with a
+            process indicator indicating they have yet to be processed)</p></li><li class="listitem"><p>playerSummarization begins processing of all remaining game
+            data (filtering using the process indicator) and fails again after
+            30 minutes.</p></li></ol></div><p>Run 3:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>playerLoad is not run, since it has already completed
+            successfully, and allow-start-if-complete is 'false' (the
+            default).</p></li><li class="listitem"><p>gameLoad is executed again and processes another 2 files,
+            loading their contents into the 'GAMES' table as well (with a
+            process indicator indicating they have yet to be processed)</p></li><li class="listitem"><p>playerSummarization is not start, and the job is immediately
+            killed, since this is the third execution of playerSummarization,
+            and its limit is only 2. The limit must either be raised, or the
+            <code class="classname">Job</code> must be executed as a new
+            <code class="classname">JobInstance</code>.</p></li></ol></div></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="configuringSkip" href="#configuringSkip"></a>5.1.5&nbsp;Configuring Skip Logic</h3></div></div></div><p>There are many scenarios where errors encountered while processing
+      should not result in <code class="classname">Step</code> failure, but should be
+      skipped instead. This is usually a decision that must be made by someone
+      who understands the data itself and what meaning it has. Financial data,
+      for example, may not be skippable because it results in money being
+      transferred, which needs to be completely accurate. Loading a list of
+      vendors, on the other hand, might allow for skips. If a vendor is not
+      loaded because it was formatted incorrectly or was missing necessary
+      information, then there probably won't be issues. Usually these bad
+      records are logged as well, which will be covered later when discussing
+      listeners.
+      </p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;tasklet&gt;</span>
+      <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span>
+             <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span> <span class="bold"><strong>skip-limit="10"</strong></span>&gt;
+         <span class="bold"><strong>&lt;skippable-exception-classes&gt;
+            &lt;include class="org.springframework.batch.item.file.FlatFileParseException"/&gt;
+         &lt;/skippable-exception-classes&gt;</strong></span>
+      <span class="hl-tag">&lt;/chunk&gt;</span>
+   <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>In this example, a <code class="classname">FlatFileItemReader</code> is
+      used, and if at any point a
+      <code class="classname">FlatFileParseException</code> is thrown, it will be
+      skipped and counted against the total skip limit of 10. Separate counts
+      are made of skips on read, process and write inside the step execution,
+      and the limit applies across all. Once the skip limit is reached, the
+      next exception found will cause the step to fail.</p><p>One problem with the example above is that any other exception
+      besides a <code class="classname">FlatFileParseException</code> will cause the
+      <code class="classname">Job</code> to fail. In certain scenarios this may be the
+      correct behavior. However, in other scenarios it may be easier to
+      identify which exceptions should cause failure and skip everything
+      else:
+      </p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span>
+               <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span> <span class="bold"><strong>skip-limit="10"</strong></span>&gt;
+<span class="bold"><strong>            &lt;skippable-exception-classes&gt;
+                &lt;include class="java.lang.Exception"/&gt;
+                &lt;exclude class="java.io.FileNotFoundException"/&gt;
+            &lt;/skippable-exception-classes&gt;
+</strong></span>        <span class="hl-tag">&lt;/chunk&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>By 'including' <code class="classname">java.lang.Exception</code> as a
+      skippable exception class, the configuration indicates that all
+      <code class="classname">Exception</code>s are skippable. However, by 'excluding'
+      <code class="classname">java.io.FileNotFoundException</code>, the configuration
+      refines the list of skippable exception classes to be all
+      <code class="classname">Exception</code>s <span class="emphasis"><em>except</em></span>
+      <code class="classname">FileNotFoundException</code>. Any excluded exception
+      classes will be fatal if encountered (i.e. not skipped).</p><p>For any exception encountered, the skippability will be determined
+      by the nearest superclass in the class hierarchy. Any unclassifed
+      exception will be treated as 'fatal'. The order of the
+      <code class="code">&lt;include/&gt;</code> and <code class="code">&lt;exclude/&gt;</code> elements
+      does not matter.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="retryLogic" href="#retryLogic"></a>5.1.6&nbsp;Configuring Retry Logic</h3></div></div></div><p>In most cases you want an exception to cause either a skip or
+      <code class="classname">Step</code> failure. However, not all exceptions are
+      deterministic. If a <code class="classname">FlatFileParseException</code> is
+      encountered while reading, it will always be thrown for that record;
+      resetting the <code class="classname">ItemReader</code> will not help. However,
+      for other exceptions, such as a
+      <code class="classname">DeadlockLoserDataAccessException</code>, which indicates
+      that the current process has attempted to update a record that another
+      process holds a lock on, waiting and trying again might result in
+      success. In this case, retry should be configured:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;tasklet&gt;</span>
+      <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span>
+             <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"2"</span> <span class="bold"><strong>retry-limit="3"</strong></span>&gt;
+         <span class="bold"><strong>&lt;retryable-exception-classes&gt;
+            &lt;include class="org.springframework.dao.DeadlockLoserDataAccessException"/&gt;
+         &lt;/retryable-exception-classes&gt;</strong></span>
+      <span class="hl-tag">&lt;/chunk&gt;</span>
+   <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>The <code class="classname">Step</code> allows a limit for the number of
+      times an individual item can be retried, and a list of exceptions that
+      are 'retryable'. More details on how retry works can be found in <a class="xref" href="retry.html" title="9.&nbsp;Retry">Chapter&nbsp;9, <i>Retry</i></a>.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="controllingRollback" href="#controllingRollback"></a>5.1.7&nbsp;Controlling Rollback</h3></div></div></div><p>By default, regardless of retry or skip, any exceptions thrown
+      from the <code class="classname">ItemWriter</code> will cause the transaction
+      controlled by the <code class="classname">Step</code> to rollback. If skip is
+      configured as described above, exceptions thrown from the
+      <code class="classname">ItemReader</code> will not cause a rollback. However,
+      there are many scenarios in which exceptions thrown from the
+      <code class="classname">ItemWriter</code> should not cause a rollback because no
+      action has taken place to invalidate the transaction. For this reason,
+      the <code class="classname">Step</code> can be configured with a list of
+      exceptions that should not cause rollback.</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;tasklet&gt;</span>
+      <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"2"</span><span class="hl-tag">/&gt;</span>
+      <span class="hl-tag">&lt;no-rollback-exception-classes&gt;</span>
+         <span class="hl-tag">&lt;include</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.validator.ValidationException"</span><span class="hl-tag">/&gt;</span>
+      <span class="hl-tag">&lt;/no-rollback-exception-classes&gt;</span>
+   <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="transactionalReaders" href="#transactionalReaders"></a>Transactional Readers</h4></div></div></div><p>The basic contract of the <code class="classname">ItemReader</code> is
+        that it is forward only. The step buffers reader input, so that in the
+        case of a rollback the items don't need to be re-read from the reader.
+        However, there are certain scenarios in which the reader is built on
+        top of a transactional resource, such as a JMS queue. In this case,
+        since the queue is tied to the transaction that is rolled back, the
+        messages that have been pulled from the queue will be put back on. For
+        this reason, the step can be configured to not buffer the
+        items:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"2"</span>
+           <span class="bold"><strong>    is-reader-transactional-queue="true"</strong></span>/&gt;
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="transactionAttributes" href="#transactionAttributes"></a>5.1.8&nbsp;Transaction Attributes</h3></div></div></div><p>Transaction attributes can be used to control the isolation,
+      propagation, and timeout settings. More information on setting
+      transaction attributes can be found in the spring core
+      documentation.</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"itemWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"2"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;transaction-attributes</span> <span class="hl-attribute">isolation</span>=<span class="hl-value">"DEFAULT"</span>
+                                <span class="hl-attribute">propagation</span>=<span class="hl-value">"REQUIRED"</span>
+                                <span class="hl-attribute">timeout</span>=<span class="hl-value">"30"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="registeringItemStreams" href="#registeringItemStreams"></a>5.1.9&nbsp;Registering ItemStreams with the Step</h3></div></div></div><p>The step has to take care of <code class="classname">ItemStream</code>
+      callbacks at the necessary points in its lifecycle. (for more
+      information on the <code class="classname">ItemStream</code> interface, please
+      refer to <a class="xref" href="readersAndWriters.html#itemStream" title="6.4&nbsp;ItemStream">Section&nbsp;6.4, &#8220;ItemStream&#8221;</a>) This is vital if a step fails,
+      and might need to be restarted, because the
+      <code class="classname">ItemStream</code> interface is where the step gets the
+      information it needs about persistent state between executions.</p><p>If the <code class="classname">ItemReader</code>,
+      <code class="classname">ItemProcessor</code>, or
+      <code class="classname">ItemWriter</code> itself implements the
+      <code class="classname">ItemStream</code> interface, then these will be
+      registered automatically. Any other streams need to be registered
+      separately. This is often the case where there are indirect dependencies
+      such as delegates being injected into the reader and writer. A stream
+      can be registered on the <code class="classname">Step</code> through the
+      'streams' element, as illustrated below:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"itemReader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"compositeWriter"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"2"</span><span class="hl-tag">&gt;</span>
+            <span class="bold"><strong>&lt;streams&gt;
+                &lt;stream ref="fileItemWriter1"/&gt;
+                &lt;stream ref="fileItemWriter2"/&gt;
+            &lt;/streams&gt;</strong></span>
+        <span class="hl-tag">&lt;/chunk&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;beans:bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"compositeWriter"</span>
+            <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.support.CompositeItemWriter"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;beans:property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"delegates"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;beans:list&gt;</span>
+            <span class="hl-tag">&lt;beans:ref</span> <span class="hl-attribute">bean</span>=<span class="hl-value">"fileItemWriter1"</span><span class="hl-tag"> /&gt;</span>
+            <span class="hl-tag">&lt;beans:ref</span> <span class="hl-attribute">bean</span>=<span class="hl-value">"fileItemWriter2"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;/beans:list&gt;</span>
+    <span class="hl-tag">&lt;/beans:property&gt;</span>
+<span class="hl-tag">&lt;/beans:bean&gt;</span></pre><p>In the example above, the
+      <code class="classname">CompositeItemWriter</code> is not an
+      <code class="classname">ItemStream</code>, but both of its delegates are.
+      Therefore, both delegate writers must be explicitly registered as
+      streams in order for the framework to handle them correctly. The
+      <code class="classname">ItemReader</code> does not need to be explicitly
+      registered as a stream because it is a direct property of the
+      <code class="classname">Step</code>. The step will now be restartable and the
+      state of the reader and writer will be correctly persisted in the event
+      of a failure.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="interceptingStepExecution" href="#interceptingStepExecution"></a>5.1.10&nbsp;Intercepting Step Execution</h3></div></div></div><p>Just as with the <code class="classname">Job</code>, there are many events
+      during the execution of a <code class="classname">Step</code> where a user may
+      need to perform some functionality. For example, in order to write out
+      to a flat file that requires a footer, the
+      <code class="classname">ItemWriter</code> needs to be notified when the
+      <code class="classname">Step</code> has been completed, so that the footer can
+      written. This can be accomplished with one of many
+      <code class="classname">Step</code> scoped listeners.</p><p>Any class that implements one of the extensions
+	  of <code class="classname">StepListener</code> (but not that interface
+	  itself since it is empty) can be applied to a step via the
+	  listeners element.  The listeners element is valid inside a
+	  step, tasklet or chunk declaration.  It is recommended that you
+	  declare the listeners at the level which its function applies,
+	  or if it is multi-featured
+	  (e.g. <code class="classname">StepExecutionListener</code>
+	  and <code class="classname">ItemReadListener</code>) then declare it at
+	  the most granular level that it applies (chunk in the example
+	  given).</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet&gt;</span>
+        <span class="hl-tag">&lt;chunk</span> <span class="hl-attribute">reader</span>=<span class="hl-value">"reader"</span> <span class="hl-attribute">writer</span>=<span class="hl-value">"writer"</span> <span class="hl-attribute">commit-interval</span>=<span class="hl-value">"10"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;listeners&gt;</span>
+            <span class="hl-tag">&lt;listener</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"chunkListener"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;/listeners&gt;</span>
+    <span class="hl-tag">&lt;/tasklet&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>An <code class="classname">ItemReader</code>,
+      <code class="classname">ItemWriter</code> or
+      <code class="classname">ItemProcessor</code> that itself implements one of the
+      <code class="classname">StepListener</code> interfaces will be registered
+      automatically with the <code class="classname">Step</code> if using the
+      namespace <code class="literal">&lt;step&gt;</code> element, or one of the the
+      <code class="classname">*StepFactoryBean</code> factories. This only applies to
+      components directly injected into the <code class="classname">Step</code>: if
+      the listener is nested inside another component, it needs to be
+      explicitly registered (as described above).</p><p>In addition to the <code class="classname">StepListener</code> interfaces,
+      annotations are provided to address the same concerns. Plain old Java
+      objects can have methods with these annotations that are then converted
+      into the corresponding <code class="classname">StepListener</code> type. It is
+      also common to annotate custom implementations of chunk components like
+      <code class="classname">ItemReader</code> or <code class="classname">ItemWriter</code>
+      or <code class="classname">Tasklet</code>. The annotations are analysed by the
+      XML parser for the <code class="code">&lt;listener/&gt;</code> elements, so all you
+      need to do is use the XML namespace to register the listeners with a
+      step.</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="stepExecutionListener" href="#stepExecutionListener"></a>StepExecutionListener</h4></div></div></div><p><code class="classname">StepExecutionListener</code> represents the most
+        generic listener for <code class="classname">Step</code> execution. It allows
+        for notification before a <code class="classname">Step</code> is started and
+        after it has ends, whether it ended normally or failed:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> StepExecutionListener <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> beforeStep(StepExecution stepExecution);
+
+    ExitStatus afterStep(StepExecution stepExecution);
+
+}</pre><p><code class="classname">ExitStatus</code> is the return type of
+        <code class="methodname">afterStep</code> in order to allow listeners the
+        chance to modify the exit code that is returned upon completion of a
+        <code class="classname">Step</code>.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeStep</code></p></li><li class="listitem"><p><code class="classname">@AfterStep</code></p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="chunkListener" href="#chunkListener"></a>ChunkListener</h4></div></div></div><p>A chunk is defined as the items processed within the scope of a
+        transaction. Committing a transaction, at each commit interval,
+        commits a 'chunk'. A <code class="classname">ChunkListener</code> can be
+        useful to perform logic before a chunk begins processing or after a
+        chunk has completed successfully:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> ChunkListener <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> beforeChunk();
+    <span class="hl-keyword">void</span> afterChunk();
+
+}</pre><p>The <code class="methodname">beforeChunk</code> method is called after
+        the transaction is started, but before <code class="methodname">read</code>
+        is called on the <code class="classname">ItemReader</code>. Conversely,
+        <code class="methodname">afterChunk</code> is called after the chunk has been
+        committed (and not at all if there is a rollback).</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeChunk</code></p></li><li class="listitem"><p><code class="classname">@AfterChunk</code></p></li></ul></div><p>A <code class="classname">ChunkListener</code> can be applied
+		when there is no chunk declaration: it is
+		the <code class="classname">TaskletStep</code> that is responsible for
+		calling the <code class="classname">ChunkListener</code> so it applies
+		to a non-item-oriented tasklet as well (called before and
+		after the tasklet).</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="itemReadListener" href="#itemReadListener"></a>ItemReadListener</h4></div></div></div><p>When discussing skip logic above, it was mentioned that it may
+        be beneficial to log the skipped records, so that they can be deal
+        with later. In the case of read errors, this can be done with an
+        <code class="classname">ItemReaderListener:</code>
+        </p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> ItemReadListener&lt;T&gt; <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> beforeRead();
+    <span class="hl-keyword">void</span> afterRead(T item);
+    <span class="hl-keyword">void</span> onReadError(Exception ex);
+
+}</pre><p>The <code class="methodname">beforeRead</code> method will be called
+        before each call to <code class="methodname">read</code> on the
+        <code class="classname">ItemReader</code>. The
+        <code class="methodname">afterRead</code> method will be called after each
+        successful call to <code class="methodname">read</code>, and will be passed
+        the item that was read. If there was an error while reading, the
+        <code class="classname">onReadError</code> method will be called. The
+        exception encountered will be provided so that it can be
+        logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeRead</code></p></li><li class="listitem"><p><code class="classname">@AfterRead</code></p></li><li class="listitem"><p><code class="classname">@OnReadError</code></p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="itemProcessListener" href="#itemProcessListener"></a>ItemProcessListener</h4></div></div></div><p>Just as with the <code class="classname">ItemReadListener</code>, the
+        processing of an item can be 'listened' to:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> ItemProcessListener&lt;T, S&gt; <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> beforeProcess(T item);
+    <span class="hl-keyword">void</span> afterProcess(T item, S result);
+    <span class="hl-keyword">void</span> onProcessError(T item, Exception e);
+
+}</pre><p>The <code class="methodname">beforeProcess</code> method will be called
+        before <code class="methodname">process</code> on the
+        <code class="classname">ItemProcessor</code>, and is handed the item that will
+        be processed. The <code class="methodname">afterProcess</code> method will be
+        called after the item has been successfully processed. If there was an
+        error while processing, the <code class="methodname">onProcessError</code>
+        method will be called. The exception encountered and the item that was
+        attempted to be processed will be provided, so that they can be
+        logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeProcess</code></p></li><li class="listitem"><p><code class="classname">@AfterProcess</code></p></li><li class="listitem"><p><code class="classname">@OnProcessError</code></p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="itemWriteListener" href="#itemWriteListener"></a>ItemWriteListener</h4></div></div></div><p>The writing of an item can be 'listened' to with the
+        <code class="classname">ItemWriteListener</code>:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> ItemWriteListener&lt;S&gt; <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> beforeWrite(List&lt;? <span class="hl-keyword">extends</span> S&gt; items);
+    <span class="hl-keyword">void</span> afterWrite(List&lt;? <span class="hl-keyword">extends</span> S&gt; items);
+    <span class="hl-keyword">void</span> onWriteError(Exception exception, List&lt;? <span class="hl-keyword">extends</span> S&gt; items);
+
+}</pre><p>The <code class="methodname">beforeWrite</code> method will be called
+        before <code class="methodname">write</code> on the
+        <code class="classname">ItemWriter</code>, and is handed the item that will be
+        written. The <code class="methodname">afterWrite</code> method will be called
+        after the item has been successfully written. If there was an error
+        while writing, the <code class="methodname">onWriteError</code> method will
+        be called. The exception encountered and the item that was attempted
+        to be written will be provided, so that they can be logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@BeforeWrite</code></p></li><li class="listitem"><p><code class="classname">@AfterWrite</code></p></li><li class="listitem"><p><code class="classname">@OnWriteError</code></p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="skipListener" href="#skipListener"></a>SkipListener</h4></div></div></div><p><code class="classname">ItemReadListener</code>,
+        <code class="classname">ItemProcessListener</code>, and
+        <code class="classname">ItemWriteListner</code> all provide mechanisms for
+        being notified of errors, but none will inform you that a record has
+        actually been skipped. <code class="methodname">onWriteError</code>, for
+        example, will be called even if an item is retried and successful. For
+        this reason, there is a separate interface for tracking skipped
+        items:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> SkipListener&lt;T,S&gt; <span class="hl-keyword">extends</span> StepListener {
+
+    <span class="hl-keyword">void</span> onSkipInRead(Throwable t);
+    <span class="hl-keyword">void</span> onSkipInProcess(T item, Throwable t);
+    <span class="hl-keyword">void</span> onSkipInWrite(S item, Throwable t);
+
+}</pre><p><code class="methodname">onSkipInRead</code> will be called whenever an
+        item is skipped while reading. It should be noted that rollbacks may
+        cause the same item to be registered as skipped more than once.
+        <code class="methodname">onSkipInWrite</code> will be called when an item is
+        skipped while writing. Because the item has been read successfully
+        (and not skipped), it is also provided the item itself as an
+        argument.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p><code class="classname">@OnSkipInRead</code></p></li><li class="listitem"><p><code class="classname">@OnSkipInWrite</code></p></li><li class="listitem"><p><code class="classname">@OnSkipInProcess</code></p></li></ul></div><div class="section"><div class="titlepage"><div><div><h5 class="title"><a name="skipListenersAndTransactions" href="#skipListenersAndTransactions"></a>SkipListeners and Transactions</h5></div></div></div><p>One of the most common use cases for a
+          <code class="classname">SkipListener</code> is to log out a skipped item, so
+          that another batch process or even human process can be used to
+          evaluate and fix the issue leading to the skip. Because there are
+          many cases in which the original transaction may be rolled back,
+          Spring Batch makes two guarantees:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>The appropriate skip method (depending on when the error
+              happened) will only be called once per item.</p></li><li class="listitem"><p>The <code class="classname">SkipListener</code> will always be
+              called just before the transaction is committed. This is to
+              ensure that any transactional resources call by the listener are
+              not rolled back by a failure within the
+              <code class="classname">ItemWriter</code>.</p></li></ol></div></div></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="taskletStep" href="#taskletStep"></a>5.2&nbsp;TaskletStep</h2></div></div></div><p>Chunk-oriented processing is not the only way to process in a
+    <code class="classname">Step</code>. What if a <code class="classname">Step</code> must
+    consist as a simple stored procedure call? You could implement the call as
+    an <code class="classname">ItemReader</code> and return null after the procedure
+    finishes, but it is a bit unnatural since there would need to be a no-op
+    <code class="classname">ItemWriter</code>. Spring Batch provides the
+    <code class="classname">TaskletStep</code> for this scenario.</p><p>The <code class="classname">Tasklet</code> is a simple interface that has
+    one method, <code class="methodname">execute</code>, which will be a called
+    repeatedly by the <code class="classname">TaskletStep</code> until it either
+    returns <code class="literal">RepeatStatus.FINISHED</code> or throws an exception to
+    signal a failure. Each call to the <code class="classname">Tasklet</code> is
+    wrapped in a transaction. <code class="classname">Tasklet</code> implementors
+    might call a stored procedure, a script, or a simple SQL update statement.
+    To create a <code class="classname">TaskletStep</code>, the 'ref' attribute of the
+    &lt;tasklet/&gt; element should reference a bean defining a
+    <code class="classname">Tasklet</code> object; no &lt;chunk/&gt; element should be
+    used within the &lt;tasklet/&gt;:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"myTasklet"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p><code class="classname">TaskletStep</code> will automatically register the
+      tasklet as <code class="classname">StepListener</code> if it implements this
+      interface</p></td></tr></table></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="taskletAdapter" href="#taskletAdapter"></a>5.2.1&nbsp;TaskletAdapter</h3></div></div></div><p>As with other adapters for the <code class="classname">ItemReader</code>
+      and <code class="classname">ItemWriter</code> interfaces, the
+      <code class="classname">Tasklet</code> interface contains an implementation that
+      allows for adapting itself to any pre-existing class:
+      <code class="classname">TaskletAdapter</code>. An example where this may be
+      useful is an existing DAO that is used to update a flag on a set of
+      records. The <code class="classname">TaskletAdapter</code> can be used to call
+      this class without having to write an adapter for the
+      <code class="classname">Tasklet</code> interface:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"myTasklet"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"o.s.b.core.step.tasklet.MethodInvokingTaskletAdapter"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"targetObject"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.mycompany.FooDao"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/property&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"targetMethod"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"updateFoo"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="exampleTaskletImplementation" href="#exampleTaskletImplementation"></a>5.2.2&nbsp;Example Tasklet Implementation</h3></div></div></div><p>Many batch jobs contain steps that must be done before the main
+      processing begins in order to set up various resources or after
+      processing has completed to cleanup those resources. In the case of a
+      job that works heavily with files, it is often necessary to delete
+      certain files locally after they have been uploaded successfully to
+      another location. The example below taken from the Spring Batch samples
+      project, is a <code class="classname">Tasklet</code> implementation with just
+      such a responsibility:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">class</span> FileDeletingTasklet <span class="hl-keyword">implements</span> Tasklet, InitializingBean {
+
+    <span class="hl-keyword">private</span> Resource directory;
+
+    <span class="hl-keyword">public</span> RepeatStatus execute(StepContribution contribution,
+                                ChunkContext chunkContext) <span class="hl-keyword">throws</span> Exception {
+        File dir = directory.getFile();
+        Assert.state(dir.isDirectory());
+
+        File[] files = dir.listFiles();
+        <span class="hl-keyword">for</span> (<span class="hl-keyword">int</span> i = <span class="hl-number">0</span>; i &lt; files.length; i++) {
+            <span class="hl-keyword">boolean</span> deleted = files[i].delete();
+            <span class="hl-keyword">if</span> (!deleted) {
+                <span class="hl-keyword">throw</span> <span class="hl-keyword">new</span> UnexpectedJobExecutionException(<span class="hl-string">"Could not delete file "</span> +
+                                                          files[i].getPath());
+            }
+        }
+        <span class="hl-keyword">return</span> RepeatStatus.FINISHED;
+    }
+
+    <span class="hl-keyword">public</span> <span class="hl-keyword">void</span> setDirectoryResource(Resource directory) {
+        <span class="hl-keyword">this</span>.directory = directory;
+    }
+
+    <span class="hl-keyword">public</span> <span class="hl-keyword">void</span> afterPropertiesSet() <span class="hl-keyword">throws</span> Exception {
+        Assert.notNull(directory, <span class="hl-string">"directory must be set"</span>);
+    }
+}</pre><p>The above <code class="classname">Tasklet</code> implementation will
+      delete all files within a given directory. It should be noted that the
+      <code class="methodname">execute</code> method will only be called once. All
+      that is left is to reference the <code class="classname">Tasklet</code> from the
+      <code class="classname">Step</code>:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"taskletJob"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"deleteFilesInDir"</span><span class="hl-tag">&gt;</span>
+       <span class="hl-tag">&lt;tasklet</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"fileDeletingTasklet"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;beans:bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"fileDeletingTasklet"</span>
+            <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.sample.tasklet.FileDeletingTasklet"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;beans:property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"directoryResource"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;beans:bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"directory"</span>
+                    <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.core.io.FileSystemResource"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-tag">&lt;beans:constructor-arg</span> <span class="hl-attribute">value</span>=<span class="hl-value">"target/test-outputs/test-dir"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;/beans:bean&gt;</span>
+    <span class="hl-tag">&lt;/beans:property&gt;</span>
+<span class="hl-tag">&lt;/beans:bean&gt;</span></pre></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="controllingStepFlow" href="#controllingStepFlow"></a>5.3&nbsp;Controlling Step Flow</h2></div></div></div><p>With the ability to group steps together within an owning job comes
+    the need to be able to control how the job 'flows' from one step to
+    another. The failure of a <code class="classname">Step</code> doesn't necessarily
+    mean that the <code class="classname">Job</code> should fail. Furthermore, there
+    may be more than one type of 'success' which determines which
+    <code class="classname">Step</code> should be executed next. Depending upon how a
+    group of Steps is configured, certain steps may not even be processed at
+    all.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="SequentialFlow" href="#SequentialFlow"></a>5.3.1&nbsp;Sequential Flow</h3></div></div></div><p>The simplest flow scenario is a job where all of the steps execute
+      sequentially:</p><div class="mediaobject" align="center"><img src="images/sequential-flow.png" align="middle"></div><p>This can be achieved using the 'next' attribute of the step
+      element:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepA"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"stepB"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepB"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"stepC"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepC"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>In the scenario above, 'step A' will execute
+      first because it is the first <code class="classname">Step</code> listed. If
+      'step A' completes normally, then 'step B' will execute, and so on.
+      However, if 'step A' fails, then the entire <code class="classname">Job</code>
+      will fail and 'step B' will not execute.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>With the Spring Batch namespace, the first step listed in the
+        configuration will <span class="emphasis"><em>always</em></span> be the first step
+        executed by the <code class="classname">Job</code>. The order of the other
+        step elements does not matter, but the first step must always appear
+        first in the xml.</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="conditionalFlow" href="#conditionalFlow"></a>5.3.2&nbsp;Conditional Flow</h3></div></div></div><p>In the example above, there are only two possibilities:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>The <code class="classname">Step</code> is successful and the next
+          <code class="classname">Step</code> should be executed.</p></li><li class="listitem"><p>The <code class="classname">Step</code> failed and thus the
+          <code class="classname">Job</code> should fail.</p></li></ol></div><p>In many cases, this may be sufficient. However, what about a
+      scenario in which the failure of a <code class="classname">Step</code> should
+      trigger a different <code class="classname">Step</code>, rather than causing
+      failure? </p><div class="mediaobject" align="center"><img src="images/conditional-flow.png" align="middle"></div><p><a name="nextElement" href="#nextElement"></a>In order to handle more complex scenarios, the
+      Spring Batch namespace allows transition elements to be defined within
+      the step element. One such transition is the "next" element. Like the
+      "next" attribute, the "next" element will tell the
+      <code class="classname">Job</code> which <code class="classname">Step</code> to execute
+      next. However, unlike the attribute, any number of "next" elements are
+      allowed on a given <code class="classname">Step</code>, and there is no default
+      behavior the case of failure. This means that if transition elements are
+      used, then all of the behavior for the <code class="classname">Step</code>'s
+      transitions must be defined explicitly. Note also that a single step
+      cannot have both a "next" attribute and a transition element.</p><p>The next element specifies a pattern to match and the step to
+      execute next:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepA"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"*"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"stepB"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"stepC"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;/step&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepB"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"stepC"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepC"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span></pre><p>The "on" attribute of a transition element uses a simple
+      pattern-matching scheme to match the <code class="classname">ExitStatus</code>
+      that results from the execution of the <code class="classname">Step</code>. Only
+      two special characters are allowed in the pattern:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>"*" will zero or more characters</p></li><li class="listitem"><p>"?" will match exactly one character</p></li></ul></div><p>For example, "c*t" will match "cat" and "count", while "c?t" will
+      match "cat" but not "count".</p><p>While there is no limit to the number of transition elements on a
+      <code class="classname">Step</code>, if the <code class="classname">Step</code>'s
+      execution results in an <code class="classname">ExitStatus</code> that is not
+      covered by an element, then the framework will throw an exception and
+      the <code class="classname">Job</code> will fail. The framework will
+	  automatically order transitions from most specific to
+      least specific. This means that even if the elements were swapped for
+      "stepA" in the example above, an <code class="classname">ExitStatus</code> of
+      "FAILED" would still go to "stepC".</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="batchStatusVsExitStatus" href="#batchStatusVsExitStatus"></a>Batch Status vs. Exit Status</h4></div></div></div><p>When configuring a <code class="classname">Job</code> for conditional
+        flow, it is important to understand the difference between
+        <code class="classname">BatchStatus</code> and
+        <code class="classname">ExitStatus</code>. <code class="classname">BatchStatus</code>
+        is an enumeration that is a property of both
+        <code class="classname">JobExecution</code> and
+        <code class="classname">StepExecution</code> and is used by the framework to
+        record the status of a <code class="classname">Job</code> or
+        <code class="classname">Step</code>. It can be one of the following values:
+        COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED or
+        UNKNOWN. Most of them are self explanatory: COMPLETED is the status
+        set when a step or job has completed successfully, FAILED is set when
+        it fails, and so on. The example above contains the following 'next'
+        element:</p><pre class="programlisting"><span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"stepB"</span><span class="hl-tag"> /&gt;</span></pre><p>At first glance, it would appear that the 'on' attribute
+        references the <code class="classname">BatchStatus</code> of the
+        <code class="classname">Step</code> to which it belongs. However, it actually
+        references the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Step</code>. As the name implies,
+        <code class="classname">ExitStatus</code> represents the status of a
+        <code class="classname">Step</code> after it finishes execution. More
+        specifically, the 'next' element above references the exit code of the
+        <code class="classname">ExitStatus</code>. To write it in English, it says:
+        "go to stepB if the exit code is FAILED". By default, the exit code is
+        always the same as the <code class="classname">BatchStatus</code> for the
+        Step, which is why the entry above works. However, what if the exit
+        code needs to be different? A good example comes from the skip sample
+        job within the samples project:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;end</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"COMPLETED WITH SKIPS"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"errorPrint1"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"*"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"step2"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span></pre><p>The above step has three possibilities:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>The <code class="classname">Step</code> failed, in which case the
+            job should fail.</p></li><li class="listitem"><p>The <code class="classname">Step</code> completed
+            successfully.</p></li><li class="listitem"><p>The <code class="classname">Step</code> completed successfully, but
+            with an exit code of 'COMPLETED WITH SKIPS'. In this case, a
+            different step should be run to handle the errors.</p></li></ol></div><p>The above configuration will work. However, something needs to
+        change the exit code based on the condition of the execution having
+        skipped records:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">class</span> SkipCheckingListener <span class="hl-keyword">extends</span> StepExecutionListenerSupport {
+    <span class="hl-keyword">public</span> ExitStatus afterStep(StepExecution stepExecution) {
+        String exitCode = stepExecution.getExitStatus().getExitCode();
+        <span class="hl-keyword">if</span> (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp;
+              stepExecution.getSkipCount() &gt; <span class="hl-number">0</span>) {
+            <span class="hl-keyword">return</span> <span class="hl-keyword">new</span> ExitStatus(<span class="hl-string">"COMPLETED WITH SKIPS"</span>);
+        }
+        <span class="hl-keyword">else</span> {
+            <span class="hl-keyword">return</span> null;
+        }
+    }
+}</pre><p>The above code is a <code class="classname">StepExecutionListener</code>
+        that first checks to make sure the <code class="classname">Step</code> was
+        successful, and next if the skip count on the
+        <code class="classname">StepExecution</code> is higher than 0. If both
+        conditions are met, a new <code class="classname">ExitStatus</code> with an
+        exit code of "COMPLETED WITH SKIPS" is returned.</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="configuringForStop" href="#configuringForStop"></a>5.3.3&nbsp;Configuring for Stop</h3></div></div></div><p>After the discussion of <a class="link" href="configureStep.html#batchStatusVsExitStatus" title="Batch Status vs. Exit Status"><code class="classname">BatchStatus</code> and
+      <code class="classname">ExitStatus</code></a>, one might wonder how the
+      <code class="classname">BatchStatus</code> and <code class="classname">ExitStatus</code>
+      are determined for the <code class="classname">Job</code>. While these statuses
+      are determined for the <code class="classname">Step</code> by the code that is
+      executed, the statuses for the <code class="classname">Job</code> will be
+      determined based on the configuration.</p><p>So far, all of the job configurations discussed have had at least
+      one final <code class="classname">Step</code> with no transitions. For example,
+      after the following step executes, the <code class="classname">Job</code> will
+      end:</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"stepC"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span></pre><p>If no transitions are defined for a <code class="classname">Step</code>,
+      then the <code class="classname">Job</code>'s statuses will be defined as
+      follows:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>If the <code class="classname">Step</code> ends with
+          <code class="classname">ExitStatus</code> FAILED, then the
+          <code class="classname">Job</code>'s <code class="classname">BatchStatus</code> and
+          <code class="classname">ExitStatus</code> will both be FAILED.</p></li><li class="listitem"><p>Otherwise, the <code class="classname">Job</code>'s
+          <code class="classname">BatchStatus</code> and
+          <code class="classname">ExitStatus</code> will both be COMPLETED.</p></li></ul></div><p>While this method of terminating a batch job is sufficient for
+      some batch jobs, such as a simple sequential step job, custom defined
+      job-stopping scenarios may be required. For this purpose, Spring Batch
+      provides three transition elements to stop a <code class="classname">Job</code>
+      (in addition to the <a class="link" href="configureStep.html#nextElement">"next" element</a>
+      that we discussed previously). Each of these stopping elements will stop
+      a <code class="classname">Job</code> with a particular
+      <code class="classname">BatchStatus</code>. It is important to note that the
+      stop transition elements will have no effect on either the
+      <code class="classname">BatchStatus</code> or <code class="classname">ExitStatus</code>
+      of any <code class="classname">Step</code>s in the <code class="classname">Job</code>:
+      these elements will only affect the final statuses of the
+      <code class="classname">Job</code>. For example, it is possible for every step
+      in a job to have a status of FAILED but the job to have a status of
+      COMPLETED, or vise versa.</p><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="endElement" href="#endElement"></a>The 'End' Element</h4></div></div></div><p>The 'end' element instructs a <code class="classname">Job</code> to stop
+        with a <code class="classname">BatchStatus</code> of COMPLETED. A
+        <code class="classname">Job</code> that has finished with status COMPLETED
+        cannot be restarted (the framework will throw a
+        <code class="classname">JobInstanceAlreadyCompleteException</code>). The 'end'
+        element also allows for an optional 'exit-code' attribute that can be
+        used to customize the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Job</code>. If no 'exit-code' attribute is given, then
+        the <code class="classname">ExitStatus</code> will be "COMPLETED" by default,
+        to match the <code class="classname">BatchStatus</code>.</p><p>In the following scenario, if step2 fails, then the
+        <code class="classname">Job</code> will stop with a
+        <code class="classname">BatchStatus</code> of COMPLETED and an
+        <code class="classname">ExitStatus</code> of "COMPLETED" and step3 will not
+        execute; otherwise, execution will move to step3. Note that if step2
+        fails, the <code class="classname">Job</code> will not be restartable (because
+        the status is COMPLETED).</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step2"</span><span class="hl-tag">&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;end</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"*"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"step3"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="failElement" href="#failElement"></a>The 'Fail' Element</h4></div></div></div><p>The 'fail' element instructs a <code class="classname">Job</code> to
+        stop with a <code class="classname">BatchStatus</code> of FAILED. Unlike the
+        'end' element, the 'fail' element will not prevent the
+        <code class="classname">Job</code> from being restarted. The 'fail' element
+        also allows for an optional 'exit-code' attribute that can be used to
+        customize the <code class="classname">ExitStatus</code> of the
+        <code class="classname">Job</code>. If no 'exit-code' attribute is given, then
+        the <code class="classname">ExitStatus</code> will be "FAILED" by default, to
+        match the <code class="classname">BatchStatus</code>.</p><p>In the following scenario, if step2 fails, then the
+        <code class="classname">Job</code> will stop with a
+        <code class="classname">BatchStatus</code> of FAILED and an
+        <code class="classname">ExitStatus</code> of "EARLY TERMINATION" and step3
+        will not execute; otherwise, execution will move to step3.
+        Additionally, if step2 fails, and the <code class="classname">Job</code> is
+        restarted, then execution will begin again on step2.</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step2"</span><span class="hl-tag">&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;fail</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span> <span class="hl-attribute">exit-code</span>=<span class="hl-value">"EARLY TERMINATION"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"*"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"step3"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="stopElement" href="#stopElement"></a>The 'Stop' Element</h4></div></div></div><p>The 'stop' element instructs a <code class="classname">Job</code> to
+        stop with a <code class="classname">BatchStatus</code> of STOPPED. Stopping a
+        <code class="classname">Job</code> can provide a temporary break in processing
+        so that the operator can take some action before restarting the
+        <code class="classname">Job</code>. The 'stop' element requires a 'restart'
+        attribute that specifies the step where execution should pick up when
+        the <code class="classname">Job is restarted</code>.</p><p>In the following scenario, if step1 finishes with COMPLETE, then
+        the job will then stop. Once it is restarted, execution will begin on
+        step2.</p><pre class="programlisting"><span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;stop</span> <span class="hl-attribute">on</span>=<span class="hl-value">"COMPLETED"</span> <span class="hl-attribute">restart</span>=<span class="hl-value">"step2"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/step&gt;</span>
+
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span><span class="hl-tag">/&gt;</span></pre></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="programmaticFlowDecisions" href="#programmaticFlowDecisions"></a>5.3.4&nbsp;Programmatic Flow Decisions</h3></div></div></div><p>In some situations, more information than the
+      <code class="classname">ExitStatus</code> may be required to decide which step
+      to execute next. In this case, a
+      <code class="classname">JobExecutionDecider</code> can be used to assist in the
+      decision.</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">class</span> MyDecider <span class="hl-keyword">implements</span> JobExecutionDecider {
+    <span class="hl-keyword">public</span> FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+        <span class="hl-keyword">if</span> (someCondition) {
+            <span class="hl-keyword">return</span> <span class="hl-string">"FAILED"</span>;
+        }
+        <span class="hl-keyword">else</span> {
+            <span class="hl-keyword">return</span> <span class="hl-string">"COMPLETED"</span>;
+        }
+    }
+}</pre><p>In the job configuration, a "decision" tag will specify the
+      decider to use as well as all of the transitions.</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"decision"</span><span class="hl-tag"> /&gt;</span>
+
+    <span class="hl-tag">&lt;decision</span> <span class="hl-attribute">id</span>=<span class="hl-value">"decision"</span> <span class="hl-attribute">decider</span>=<span class="hl-value">"decider"</span><span class="hl-tag">&gt;</span>
+        <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"FAILED"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"step2"</span><span class="hl-tag"> /&gt;</span>
+        <span class="hl-tag">&lt;next</span> <span class="hl-attribute">on</span>=<span class="hl-value">"COMPLETED"</span> <span class="hl-attribute">to</span>=<span class="hl-value">"step3"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;/decision&gt;</span>
+
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step3"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;beans:bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"decider"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"com.MyDecider"</span><span class="hl-tag">/&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="split-flows" href="#split-flows"></a>5.3.5&nbsp;Split Flows</h3></div></div></div><p>Every scenario described so far has involved a
+      <code class="classname">Job</code> that executes its
+      <code class="classname">Step</code>s one at a time in a linear fashion. In
+      addition to this typical style, the Spring Batch namespace also allows
+      for a job to be configured with parallel flows using the 'split'
+      element. As is seen below, the 'split' element contains one or more
+      'flow' elements, where entire separate flows can be defined. A 'split'
+      element may also contain any of the previously discussed transition
+      elements such as the 'next' attribute or the 'next', 'end', 'fail', or
+      'pause' elements.</p><pre class="programlisting"><span class="hl-tag">&lt;split</span> <span class="hl-attribute">id</span>=<span class="hl-value">"split1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step4"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;flow&gt;</span>
+        <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step2"</span><span class="hl-tag">/&gt;</span>
+        <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/flow&gt;</span>
+    <span class="hl-tag">&lt;flow&gt;</span>
+        <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;/flow&gt;</span>
+<span class="hl-tag">&lt;/split&gt;</span>
+<span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step4"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s4"</span><span class="hl-tag">/&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="external-flows" href="#external-flows"></a>5.3.6&nbsp;Externalizing Flow Definitions and Dependencies Between
+      Jobs</h3></div></div></div><p>Part of the flow in a job can be externalized as a separate bean
+      definition, and then re-used. There are two ways to do this, and the
+      first is to simply declare the flow as a reference to one defined
+      elsewhere:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;flow</span> <span class="hl-attribute">id</span>=<span class="hl-value">"job1.flow1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"flow1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step3"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step3"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s3"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;flow</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flow1"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step1"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s1"</span> <span class="hl-attribute">next</span>=<span class="hl-value">"step2"</span><span class="hl-tag">/&gt;</span>
+    <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"step2"</span> <span class="hl-attribute">parent</span>=<span class="hl-value">"s2"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/flow&gt;</span></pre><p>The effect of defining an external flow like this is simply to
+      insert the steps from the external flow into the job as if they had been
+      declared inline. In this way many jobs can refer to the same template
+      flow and compose such templates into different logical flows. This is
+      also a good way to separate the integration testing of the individual
+      flows.</p><p>The other form of an externalized flow is to use a
+      <code class="classname">JobStep</code>. A <code class="classname">JobStep</code> is
+      similar to a <code class="classname">FlowStep</code>, but actually creates and
+      launches a separate job execution for the steps in the flow specified.
+      Here is an example:</p><pre class="programlisting"><span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobStepJob"</span> <span class="hl-attribute">restartable</span>=<span class="hl-value">"true"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;step</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobStepJob.step1"</span><span class="hl-tag">&gt;</span>
+      <span class="hl-tag">&lt;job</span> <span class="hl-attribute">ref</span>=<span class="hl-value">"</span><span class="bold"><strong>job</strong></span>" job-launcher="jobLauncher"
+          job-parameters-extractor="jobParametersExtractor"/&gt;
+   <span class="hl-tag">&lt;/step&gt;</span>
+<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;job</span> <span class="hl-attribute">id</span>=<span class="hl-value">"</span><span class="bold"><strong>job</strong></span>" restartable="true"&gt;...<span class="hl-tag">&lt;/job&gt;</span>
+
+<span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"jobParametersExtractor"</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.spr...DefaultJobParametersExtractor"</span><span class="hl-tag">&gt;</span>
+   <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"keys"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"input.file"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>The job parameters extractor is a strategy that determines how a
+      the <code class="classname">ExecutionContext</code> for the
+      <code class="classname">Step</code> is converted into
+      <code class="classname">JobParameters</code> for the Job that is executed. The
+      <code class="classname">JobStep</code> is useful when you want to have some more
+      granular options for monitoring and reporting on jobs and steps. Using
+      <code class="classname">JobStep</code> is also often a good answer to the
+      question: "How do I create dependencies between jobs?". It is a good way
+      to break up a large system into smaller modules and control the flow of
+      jobs.</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="late-binding" href="#late-binding"></a>5.4&nbsp;Late Binding of Job and Step Attributes</h2></div></div></div><p>Both the XML and Flat File examples above use the Spring
+    <code class="classname">Resource</code> abstraction to obtain a file. This works
+    because <code class="classname">Resource</code> has a <span class="markup">getFile</span>
+    method, which returns a <code class="classname">java.io.File</code>. Both XML and
+    Flat File resources can be configured using standard Spring
+    constructs:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.file.FlatFileItemReader"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span>
+              <span class="hl-attribute">value</span>=<span class="hl-value">"file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>The above <code class="classname">Resource</code> will load the file from
+    the file system location specified. Note that absolute locations have to
+    start with a double slash ("//"). In most spring applications, this
+    solution is good enough because the names of these are known at compile
+    time. However, in batch scenarios, the file name may need to be determined
+    at runtime as a parameter to the job. This could be solved using '-D'
+    parameters, i.e. a system property:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.file.FlatFileItemReader"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"${input.file.name}"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>All that would be required for this solution to work would be a
+    system argument (-Dinput.file.name="file://file.txt"). (Note that although
+    a <code class="classname">PropertyPlaceholderConfigurer</code> can be used here,
+    it is not necessary if the system property is always set because the
+    <code class="classname">ResourceEditor</code> in Spring already filters and does
+    placeholder replacement on system properties.)</p><p>Often in a batch setting it is preferable to parameterize the file
+    name in the <a class="link" href=""><code class="classname">JobParameters</code></a> of the
+    job, instead of through system properties, and access them that way. To
+    accomplish this, Spring Batch allows for the late binding of various Job
+    and Step attributes:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="hl-attribute">scope</span>=<span class="hl-value">"step"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.file.FlatFileItemReader"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"</span><span class="bold"><strong>#{jobParameters['input.file.name']}</strong></span>" /&gt;
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Both the <code class="classname">JobExecution</code> and
+    <code class="classname">StepExecution</code> level
+    <code class="classname">ExecutionContext</code> can be accessed in the same
+    way:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="hl-attribute">scope</span>=<span class="hl-value">"step"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.file.FlatFileItemReader"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"</span><span class="bold"><strong>#{jobExecutionContext['input.file.name']}</strong></span>" /&gt;
+<span class="hl-tag">&lt;/bean&gt;</span></pre><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="hl-attribute">scope</span>=<span class="hl-value">"step"</span>
+      <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.item.file.FlatFileItemReader"</span><span class="hl-tag">&gt;</span>
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"</span><span class="bold"><strong>#{stepExecutionContext['input.file.name']}</strong></span>" /&gt;
+<span class="hl-tag">&lt;/bean&gt;</span></pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>Any bean that uses late-binding must be declared with
+      scope="step". See for <a class="xref" href="configureStep.html#step-scope" title="5.4.1&nbsp;Step Scope">Section&nbsp;5.4.1, &#8220;Step Scope&#8221;</a> more
+      information.</p></td></tr></table></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>If you are using Spring 3.0 (or above) the expressions in
+      step-scoped beans are in the Spring Expression Language, a powerful
+      general purpose language with many interesting features. To provide
+      backward compatibility, if Spring Batch detects the presence of older
+      versions of Spring it uses a native expression language that is less
+      powerful, and has slightly different parsing rules. The main difference
+      is that the map keys in the example above do not need to be quoted with
+      Spring 2.5, but the quotes are mandatory in Spring 3.0.</p></td></tr></table></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="step-scope" href="#step-scope"></a>5.4.1&nbsp;Step Scope</h3></div></div></div><p>All of the late binding examples from above have a scope of "step"
+      declared on the bean definition:</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"flatFileItemReader"</span> <span class="bold"><strong>scope="step"</strong></span>
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"resource"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"#{jobParameters[input.file.name]}"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span></pre><p>Using a scope of <code class="classname">Step</code> is required in order
+      to use late binding since the bean cannot actually be instantiated until
+      the <code class="classname">Step</code> starts, which allows the attributes to
+      be found. Because it is not part of the Spring container by default, the
+      scope must be added explicitly, either by using the
+      <code class="literal">batch</code> namespace:</p><pre class="programlisting"><span class="hl-tag">&lt;beans</span> <span class="hl-attribute">xmlns</span>=<span class="hl-value">"http://www.springframework.org/schema/beans"</span>
+       <span class="hl-attribute">xmlns:batch</span>=<span class="hl-value">"http://www.springframework.org/schema/batch"</span>
+       <span class="hl-attribute">xmlns:xsi</span>=<span class="hl-value">"http://www.w3.org/2001/XMLSchema-instance"</span>
+       <span class="hl-attribute">xsi:schemaLocation</span>=<span class="hl-value">"..."</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;batch:job</span> <span class="hl-attribute">.../&gt;</span>
+<span class="hl-attribute">...</span>
+<span class="hl-attribute">&lt;/beans&gt;</span></pre><p>or by including a bean definition explicitly for the<code class="classname">
+      StepScope</code> (but not both):</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.scope.StepScope"</span><span class="hl-tag"> /&gt;</span></pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="job-scope" href="#job-scope"></a>5.4.2&nbsp;Job Scope</h3></div></div></div><p>Job scope, introduced in Spring Batch 3.0 is similar to Step scope
+		in configuration but is a Scope for the Job context so there is only one
+		instance of such a bean per executing job. Additionally, support is provided
+		for late binding of references accessible from the JobContext using
+		#{..} placeholders. Using this feature, bean properties can be pulled from
+		the job or job execution context and the job parameters. E.g.
+		</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"..."</span> <span class="hl-attribute">class</span>=<span class="hl-value">"..."</span> <span class="bold"><strong>scope="job"</strong></span>&gt;
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"name"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"#{jobParameters[input]}"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span>
+		</pre><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"..."</span> <span class="hl-attribute">class</span>=<span class="hl-value">"..."</span> <span class="bold"><strong>scope="job"</strong></span>&gt;
+    <span class="hl-tag">&lt;property</span> <span class="hl-attribute">name</span>=<span class="hl-value">"name"</span> <span class="hl-attribute">value</span>=<span class="hl-value">"#{jobExecutionContext['input.name']}.txt"</span><span class="hl-tag"> /&gt;</span>
+<span class="hl-tag">&lt;/bean&gt;</span>
+		</pre><p>Because it is not part of the Spring container by default, the scope
+		must be added explicitly, either by using the <code class="literal">batch</code> namespace:</p><pre class="programlisting"><span class="hl-tag">&lt;beans</span> <span class="hl-attribute">xmlns</span>=<span class="hl-value">"http://www.springframework.org/schema/beans"</span>
+		  <span class="hl-attribute">xmlns:batch</span>=<span class="hl-value">"http://www.springframework.org/schema/batch"</span>
+		  <span class="hl-attribute">xmlns:xsi</span>=<span class="hl-value">"http://www.w3.org/2001/XMLSchema-instance"</span>
+		  <span class="hl-attribute">xsi:schemaLocation</span>=<span class="hl-value">"..."</span><span class="hl-tag">&gt;</span>
+
+		  <span class="hl-tag">&lt;batch:job</span> <span class="hl-attribute">.../&gt;</span>
+		  <span class="hl-attribute">...</span>
+		  <span class="hl-attribute">&lt;/beans&gt;</span></pre><p>Or by including a bean definition explicitly for the <code class="classname">JobScope</code> (but not both):</p><pre class="programlisting"><span class="hl-tag">&lt;bean</span> <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.core.scope.JobScope"</span><span class="hl-tag"> /&gt;</span></pre></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="configureJob.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="readersAndWriters.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.&nbsp;Configuring and Running a Job&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;6.&nbsp;ItemReaders and ItemWriters</td></tr></table></div></body></html>

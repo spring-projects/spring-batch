@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<batch:job id="ioSampleJob">
+		<batch:step id="step1">
+			<batch:tasklet>
+				<batch:chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<bean id="itemReader" class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemReader">
+		<property name="delegate">
+			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
+				<property name="resource" value="data/iosample/input/multiLine.txt" />
+				<property name="lineMapper">
+					<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+						<property name="lineTokenizer">
+							<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" />
+						</property>
+						<property name="fieldSetMapper">
+							<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemWriter">
+		<property name="delegate">
+			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+				<property name="resource" value="file:build/test-outputs/multiLineOutput.txt" />
+				<property name="lineAggregator">
+					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

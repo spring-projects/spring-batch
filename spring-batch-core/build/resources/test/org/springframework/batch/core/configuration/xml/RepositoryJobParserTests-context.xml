@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<beans:bean id="thisRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<beans:property name="transactionManager" ref="transactionManager" />
+	</beans:bean>
+
+	<beans:bean id="step1" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<beans:property name="jobRepository" ref="thisRepository"/>
+		<beans:property name="transactionManager" ref="transactionManager"/>
+		<beans:property name="tasklet">
+			<beans:bean class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+				<beans:property name="targetObject"><beans:bean class="java.util.Date"/></beans:property>
+				<beans:property name="targetMethod" value="getTime"/>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+
+	<job id="job" job-repository="thisRepository">
+		<step id="s1" parent="step1" />
+	</job>
+
+</beans:beans>

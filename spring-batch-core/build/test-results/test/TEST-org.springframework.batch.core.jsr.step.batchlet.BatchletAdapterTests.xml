@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:31" hostname="Michaels-MacBook-Pro-3.local" time="0.073">
+  <properties/>
+  <testcase name="testCreateWithNull" classname="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" time="0.069"/>
+  <testcase name="testStop" classname="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" time="0.001"/>
+  <testcase name="testExecuteNoExitStatus" classname="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" time="0.001"/>
+  <testcase name="testStopException" classname="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" time="0.001"/>
+  <testcase name="testExecuteWithExitStatus" classname="org.springframework.batch.core.jsr.step.batchlet.BatchletAdapterTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

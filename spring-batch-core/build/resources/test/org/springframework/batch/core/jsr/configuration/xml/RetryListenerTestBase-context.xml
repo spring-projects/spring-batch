@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+    <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+        <step id="step1">
+            <listeners>
+                <listener ref="readRetryListener" />
+                <listener ref="processRetryListener" />
+                <listener ref="writeRetryListener" />
+            </listeners>
+            <chunk retry-limit="5">
+                <reader ref="reader" />
+                <processor ref="processor" />
+                <writer ref="writer" />
+                <retryable-exception-classes>
+                    <include class="java.lang.IllegalArgumentException" />
+                    <exclude class="java.lang.RuntimeException" />
+                </retryable-exception-classes>
+            </chunk>
+        </step>
+    </job>
+
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+</beans>

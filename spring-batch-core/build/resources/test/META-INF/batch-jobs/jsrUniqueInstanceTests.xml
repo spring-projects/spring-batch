@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="jsrUniqueInstanceTests" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+    <step id="step1" next="step2">
+        <listeners>
+            <listener ref="exitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener0" />
+                </properties>
+            </listener>
+            <listener ref="exitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener1" />
+                </properties>
+            </listener>
+            <listener ref="org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener2" />
+                </properties>
+            </listener>
+            <listener ref="org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener3" />
+                </properties>
+            </listener>
+        </listeners>
+        <batchlet ref="testBatchlet"/>
+    </step>
+    <step id="step2">
+        <listeners>
+            <listener ref="exitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener4" />
+                </properties>
+            </listener>
+            <listener ref="exitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener5" />
+                </properties>
+            </listener>
+            <listener ref="org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener6" />
+                </properties>
+            </listener>
+            <listener ref="org.springframework.batch.core.jsr.step.listener.ExitStatusSettingStepListener">
+                <properties>
+                    <property name="testProperty" value="listener7" />
+                </properties>
+            </listener>
+        </listeners>
+        <batchlet ref="testBatchlet"/>
+    </step>
+</job>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.JpaItemWriterTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:58" hostname="Michaels-MacBook-Pro-3.local" time="0.082">
+  <properties/>
+  <testcase name="testWriteAndFlushWithFailure" classname="org.springframework.batch.item.database.JpaItemWriterTests" time="0.081"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.database.JpaItemWriterTests" time="0.0"/>
+  <testcase name="testWriteAndFlushSunnyDay" classname="org.springframework.batch.item.database.JpaItemWriterTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

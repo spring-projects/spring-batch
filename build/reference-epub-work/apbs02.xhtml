@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>BATCH_JOB_INSTANCE</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="apb.xhtml" title="Appendix B. Meta-Data Schema"/><link rel="next" href="apbs03.xhtml" title="BATCH_JOB_EXECUTION_PARAMS"/></head><body><header/><section class="section" title="BATCH_JOB_INSTANCE" epub:type="division" id="metaDataBatchJobInstance"><div class="titlepage"><div><div><h2 class="title" style="clear: both">BATCH_JOB_INSTANCE</h2></div></div></div><p>The BATCH_JOB_INSTANCE table holds all information relevant to a
+    <code class="classname">JobInstance</code>, and serves as the top of the overall
+    hierarchy. The following generic DDL statement is used to create
+    it:</p><pre class="programlisting">CREATE TABLE BATCH_JOB_INSTANCE  (
+  JOB_INSTANCE_ID BIGINT  PRIMARY KEY ,
+  VERSION BIGINT,
+  JOB_NAME VARCHAR(100) NOT NULL ,
+  JOB_KEY VARCHAR(2500)
+);</pre><p>Below are descriptions of each column in the table:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>JOB_INSTANCE_ID: The unique id that will identify the instance,
+        which is also the primary key. The value of this column should be
+        obtainable by calling the <code class="methodname">getId</code> method on
+        <code class="classname">JobInstance</code>.</p></li><li class="listitem" epub:type="list-item"><p>VERSION: See above section.</p></li><li class="listitem" epub:type="list-item"><p>JOB_NAME: Name of the job obtained from the
+        <code class="classname">Job</code> object. Because it is required to identify
+        the instance, it must not be null.</p></li><li class="listitem" epub:type="list-item"><p>JOB_KEY: A serialization of the
+        <code class="classname">JobParameters</code> that uniquely identifies separate
+        instances of the same job from one another.
+        (<code class="classname">JobInstances</code> with the same job name must have
+        different <code class="classname">JobParameters</code>, and thus, different
+        JOB_KEY values).</p></li></ul></div></section><footer/></body></html>

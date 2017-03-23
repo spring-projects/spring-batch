@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testExtractFieldSet" classname="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" time="0.001"/>
+  <testcase name="testExtractMap" classname="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" time="0.0"/>
+  <testcase name="testExtractCollection" classname="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" time="0.0"/>
+  <testcase name="testExtractString" classname="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" time="0.0"/>
+  <testcase name="testExtractArray" classname="org.springframework.batch.item.file.transform.PassThroughFieldExtractorTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

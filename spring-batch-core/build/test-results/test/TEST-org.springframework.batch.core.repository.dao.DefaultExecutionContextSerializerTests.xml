@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializerTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:34" hostname="Michaels-MacBook-Pro-3.local" time="0.02">
+  <properties/>
+  <testcase name="testSerializeNonSerializable" classname="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializerTests" time="0.0"/>
+  <testcase name="testSerializeAMap" classname="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializerTests" time="0.012"/>
+  <testcase name="testNullSerialization" classname="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializerTests" time="0.0"/>
+  <testcase name="testComplexObject" classname="org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializerTests" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

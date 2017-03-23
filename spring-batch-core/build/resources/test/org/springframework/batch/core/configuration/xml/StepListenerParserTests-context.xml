@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="s1" parent="baseStep" next="s2">
+			<tasklet ref="dummyTasklet">
+				<listeners merge="true">
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener" />
+					</listener>
+					<listener ref="toplevel1" />
+				</listeners>
+			</tasklet>
+		</step>
+
+		<step id="s2" parent="baseStep" next="s3">
+			<tasklet ref="dummyTasklet">
+				<listeners>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+					</listener>
+					<listener ref="toplevel2" />
+				</listeners>
+			</tasklet>
+		</step>
+
+		<step id="s3" parent="baseStep">
+			<tasklet>
+				<chunk reader="reader" writer="writer" skip-limit="1">
+					<skippable-exception-classes>
+						<include class="java.lang.Exception" />
+					</skippable-exception-classes>
+					<listeners>
+						<listener>
+							<beans:bean class="org.springframework.batch.core.listener.ItemListenerSupport" />
+						</listener>
+					</listeners>
+				</chunk>
+				<listeners>
+					<listener ref="toplevel2" />
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<step-listener id="toplevel1">
+		<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+	</step-listener>
+	<step-listener id="toplevel2">
+		<beans:bean class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener" />
+	</step-listener>
+
+	<beans:bean id="baseStep" abstract="true">
+		<beans:property name="listeners">
+			<beans:list>
+				<step-listener>
+					<beans:bean class="org.springframework.batch.core.listener.CompositeStepExecutionListener" />
+				</step-listener>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+
+</beans:beans>

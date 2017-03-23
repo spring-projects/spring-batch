@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/batch-integration"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	xmlns:integration="http://www.springframework.org/schema/integration"
+	targetNamespace="http://www.springframework.org/schema/batch-integration"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+	<xsd:import namespace="http://www.springframework.org/schema/integration"
+		schemaLocation="http://www.springframework.org/schema/integration/spring-integration.xsd" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+			Defines the configuration elements for the Spring Batch Integration
+			Support.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="job-launching-gateway">
+			<xsd:annotation>
+					<xsd:documentation><![CDATA[
+						This Outbound Gateway is used to launch Batch Jobs. The
+						payload of Messages to be processed MUST be an instance
+						of JobLaunchRequest.
+					]]></xsd:documentation>
+			</xsd:annotation>
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element ref="integration:poller" minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+				<xsd:attributeGroup ref="corespringBatchIntegrationComponentAttributes"/>
+				<xsd:attribute name="request-channel" type="xsd:string">
+					<xsd:annotation>
+							<xsd:documentation><![CDATA[
+								The input Message Channel of this endpoint.
+							]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="org.springframework.integration.MessageChannel" />
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="reply-channel" type="xsd:string">
+					<xsd:annotation>
+							<xsd:documentation><![CDATA[
+								Message Channel to which the resulting JobExecution
+								payload will be sent.
+							]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="org.springframework.integration.MessageChannel" />
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="reply-timeout" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+								Allows you to specify how long this gateway will wait for
+								the reply message to be sent successfully to the reply channel
+								before throwing an exception. This attribute only applies when the
+								channel might block, for example when using a bounded queue channel that
+								is currently full.
+
+								Also, keep in mind that when sending to a DirectChannel, the
+								invocation will occur in the sender's thread. Therefore,
+								the failing of the send operation may be caused by other
+								components further downstream.
+
+								The "reply-timeout" attribute maps to the "sendTimeout" property of the
+								underlying 'MessagingTemplate' instance (org.springframework.integration.core.MessagingTemplate).
+
+								The attribute will default, if not specified, to '-1', meaning that
+								by default, the Gateway will wait indefinitely. The value is
+								specified in milliseconds.
+							]]></xsd:documentation>
+						</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="job-launcher" type="xsd:string">
+					<xsd:annotation>
+						<xsd:appinfo>
+							<xsd:documentation><![CDATA[
+								Pass in a custom JobLauncher bean reference.
+								This attribute is optional. If not specified the
+								adapter will re-use the default instance (under
+								the id 'jobLauncher', e.g. when using the
+								@EnableBatchProcessing annotation via JavaConfig).
+								If no default instance exists an exception is
+								thrown.
+							]]></xsd:documentation>
+							<tool:annotation kind="ref">
+								<tool:expected-type type="org.springframework.batch.core.launch.JobLauncher" />
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="order">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+							Specifies the order for invocation when this endpoint
+							is connected as a subscriber to a SubscribableChannel.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:complexType>
+	</xsd:element>
+
+	<xsd:attributeGroup name="corespringBatchIntegrationComponentAttributes">
+		<xsd:attribute name="id" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+					Identifies the underlying Spring bean definition, which is an
+					instance of either 'EventDrivenConsumer' or 'PollingConsumer',
+					depending on whether the component's input channel is a
+					'SubscribableChannel' or 'PollableChannel'.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="auto-startup" default="true" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+					Flag to indicate that the component should start automatically
+					on startup (default true).
+				]]></xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:union memberTypes="xsd:boolean xsd:string" />
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+</xsd:schema>

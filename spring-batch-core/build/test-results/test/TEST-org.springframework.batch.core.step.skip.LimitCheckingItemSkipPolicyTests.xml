@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:46" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testSkippableSubset_unclassified" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testNonSkippableException" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testSkippableSubset_fatal" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testSkip" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.001"/>
+  <testcase name="testFatalSubset_skippable" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testSkippableSubset_skippable" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testLimitExceed" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testFatalSubset_fatal" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <testcase name="testFatalSubset_unclassified" classname="org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicyTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

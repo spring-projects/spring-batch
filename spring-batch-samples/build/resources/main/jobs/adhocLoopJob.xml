@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+      	http://www.springframework.org/schema/batch
+      	http://www.springframework.org/schema/batch/spring-batch.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
+		multiple environments. -->
+
+	<job id="loopJob" incrementer="jobParametersIncrementer" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="3"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.sample.common.InfiniteLoopReader" />
+	<bean id="writer" class="org.springframework.batch.sample.common.InfiniteLoopWriter" />
+
+	<bean id="jobParametersIncrementer"
+	            class="org.springframework.batch.core.launch.support.RunIdIncrementer"/>
+
+	<aop:config>
+		<aop:aspect ref="eventAdvice">
+			<aop:before
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="before" />
+			<aop:after
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="after" />
+			<aop:after-throwing throwing="t"
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
+				method="onError" />
+		</aop:aspect>
+	</aop:config>
+</beans>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="jobStepJob" restartable="true" xmlns="http://www.springframework.org/schema/batch">
+		<step id="jobStepJob.step1">
+			<job ref="tradeJob" job-parameters-extractor="jobParametersExtractor" />
+		</step>
+	</job>
+
+	<job id="tradeJob" restartable="true" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2" />
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="jobParametersExtractor" class="org.springframework.batch.core.step.job.DefaultJobParametersExtractor">
+		<property name="keys" value="input.file" />
+	</bean>
+
+	<!-- INFRASTRUCTURE SETUP -->
+
+	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="fixedValidator" />
+	</bean>
+
+	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+		<property name="dao" ref="tradeDao" />
+	</bean>
+
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<property name="resource" value="#{jobParameters['input.file']}" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileTokenizer" />
+				<property name="fieldSetMapper" ref="fieldSetMapper" />
+			</bean>
+		</property>
+		<property name="saveState" value="true" />
+	</bean>
+
+	<bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+
+	<bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+            <bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+		</property>
+	</bean>
+
+	<bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+
+		</property>
+	</bean>
+
+	<bean id="fieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+
+</beans>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="job1"
+          class="org.springframework.batch.core.job.JobSupport">
+        <property name="steps">
+            <list>
+                <bean id="step11" class="org.springframework.batch.core.step.StepSupport"/>
+                <bean id="step12" class="org.springframework.batch.core.step.StepSupport"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="job2"
+          class="org.springframework.batch.core.job.JobSupport">
+        <property name="steps">
+            <list>
+                <bean id="step21" class="org.springframework.batch.core.step.StepSupport"/>
+                <bean id="step22" class="org.springframework.batch.core.step.StepSupport"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

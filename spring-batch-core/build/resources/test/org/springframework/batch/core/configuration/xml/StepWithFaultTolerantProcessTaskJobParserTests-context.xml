@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="step">
+			<tasklet task-executor="taskExecutor">
+				<chunk reader="reader" processor="processor" writer="writer"
+				       commit-interval="10" skip-limit="20" retry-limit="3" cache-capacity="100"
+				       reader-transactional-queue="true">
+
+					<retry-listeners>
+						<listener ref="retryListener" />
+						<listener>
+							<beans:bean class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+						</listener>
+					</retry-listeners>
+					<streams>
+						<stream ref="reader" />
+					</streams>
+					<skippable-exception-classes>
+						<include class="org.springframework.dao.DataIntegrityViolationException"/>
+					</skippable-exception-classes>
+					<retryable-exception-classes>
+						<include class="org.springframework.dao.DeadlockLoserDataAccessException"/>
+					</retryable-exception-classes>
+				</chunk>
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
+				<no-rollback-exception-classes>
+					<include class="org.springframework.dao.DataIntegrityViolationException"/>
+				</no-rollback-exception-classes>
+				<listeners>
+					<listener>
+						<beans:bean class="org.springframework.batch.core.configuration.xml.TestListener" />
+					</listener>
+					<listener ref="listener" />
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader" />
+
+	<beans:bean id="processor" class="org.springframework.batch.core.configuration.xml.TestProcessor" />
+
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter" />
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener" />
+
+	<beans:bean id="retryListener" class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+
+	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
+
+</beans:beans>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.sample.FootballJobFunctionalTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.sample.FootballJobFunctionalTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.sample.html">org.springframework.batch.sample</a> &gt; FootballJobFunctionalTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.196s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testLaunchJob</td>
+<td>0.196s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:05:57,075  INFO Test worker DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:05:57,075  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@37ae0295, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@d955449, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@6441aa82, org.springframework.test.context.support.DirtiesContextTestExecutionListener@103b8483, org.springframework.test.context.transaction.TransactionalTestExecutionListener@57c686bb, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@70d6b716]
+10:05:57,076  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:05:57,085  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:05:57,098  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:05:57,107  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/footballJob.xml]
+10:05:57,156  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:05:57,164  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@19aa0634: startup date [Thu Mar 23 10:05:57 CDT 2017]; root of context hierarchy
+10:05:57,213  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:05:57,277  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean '(inner bean)#690118d7' of type [class org.springframework.aop.aspectj.AspectJAfterAdvice] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,519  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'org.springframework.aop.aspectj.AspectJPointcutAdvisor#0' of type [class org.springframework.aop.aspectj.AspectJPointcutAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,527  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean '(inner bean)#12ccb93b' of type [class org.springframework.aop.aspectj.AspectJMethodBeforeAdvice] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,529  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'org.springframework.aop.aspectj.AspectJPointcutAdvisor#1' of type [class org.springframework.aop.aspectj.AspectJPointcutAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,531  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean '(inner bean)#7fee67c8' of type [class org.springframework.aop.aspectj.AspectJAfterAdvice] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,534  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'org.springframework.aop.aspectj.AspectJPointcutAdvisor#2' of type [class org.springframework.aop.aspectj.AspectJPointcutAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,543  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean '(inner bean)#453f8a65' of type [class org.springframework.aop.aspectj.AspectJAfterThrowingAdvice] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,546  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'org.springframework.aop.aspectj.AspectJPointcutAdvisor#3' of type [class org.springframework.aop.aspectj.AspectJPointcutAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,553  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:05:57,685  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:05:57,689  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 4 ms.
+10:05:57,689  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:05:57,694  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 5 ms.
+10:05:57,694  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:05:57,703  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 9 ms.
+10:05:57,746  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:05:57,768  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:05:58,306  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=footballJob]] launched with the following parameters: [{random=283853}]
+10:05:58,317  INFO Test worker SimpleStepHandler:146 - Executing step: [playerload]
+10:05:58,341  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AbduKa00,Last Name=Abdul-Jabbar,First Name=Karim,Position=rb,Birth Year=1974,DebutYear=1996, PLAYER:id=AbduRa00,Last Name=Abdullah,First Name=Rabih,Position=rb,Birth Year=1975,DebutYear=1999]
+10:05:58,347  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AberWa00,Last Name=Abercrombie,First Name=Walter,Position=rb,Birth Year=1959,DebutYear=1982, PLAYER:id=AbraDa00,Last Name=Abramowicz,First Name=Danny,Position=wr,Birth Year=1945,DebutYear=1967]
+10:05:58,353  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamBo00,Last Name=Adams,First Name=Bob,Position=te,Birth Year=1946,DebutYear=1969, PLAYER:id=AdamCh00,Last Name=Adams,First Name=Charlie,Position=wr,Birth Year=1979,DebutYear=2003]
+10:05:58,359  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamCu00,Last Name=Adams,First Name=Curtis,Position=rb,Birth Year=1962,DebutYear=1985, PLAYER:id=AdamGe00,Last Name=Adams,First Name=George,Position=rb,Birth Year=1962,DebutYear=1985]
+10:05:58,364  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamGr00,Last Name=Adams,First Name=Grant,Position=wr,Birth Year=2000,DebutYear=2005, PLAYER:id=AdamJo00,Last Name=Adams,First Name=John,Position=rb,Birth Year=1937,DebutYear=1959]
+10:05:58,369  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamMi00,Last Name=Adams,First Name=Michael,Position=wr,Birth Year=1974,DebutYear=1997, PLAYER:id=AdamMi01,Last Name=Adamle,First Name=Mike,Position=rb,Birth Year=1949,DebutYear=1971]
+10:05:58,373  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamTo00,Last Name=Adams,First Name=Tony,Position=qb,Birth Year=1950,DebutYear=1975, PLAYER:id=AdamTo01,Last Name=Adams,First Name=Tom,Position=wr,Birth Year=1940,DebutYear=1962]
+10:05:58,378  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdamTo02,Last Name=Adamle,First Name=Tony,Position=rb,Birth Year=1924,DebutYear=1950, PLAYER:id=AdamWi00,Last Name=Adams,First Name=Willie,Position=wr,Birth Year=1956,DebutYear=1979]
+10:05:58,383  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AddaJo00,Last Name=Addai,First Name=Joseph,Position=rb,Birth Year=1983,DebutYear=2006, PLAYER:id=AdkiJa00,Last Name=Adkisson,First Name=James,Position=te,Birth Year=1980,DebutYear=2005]
+10:05:58,387  INFO Test worker LogAdvice:32 - Processed: [PLAYER:id=AdkiMa00,Last Name=Adkins,First Name=Margene,Position=wr,Birth Year=1947,DebutYear=1970, PLAYER:id=AdkiSa00,Last Name=Adkins,First Name=Sam,Position=qb,Birth Year=1955,DebutYear=1977]
+10:05:58,403  INFO Test worker SimpleStepHandler:146 - Executing step: [gameLoad]
+10:05:58,454  INFO Test worker LogAdvice:32 - Processed: [Game: ID=AbduKa00 mia vs. nwe - 1996, Game: ID=AbduKa00 mia vs. clt - 1996]
+10:05:58,459  INFO Test worker LogAdvice:32 - Processed: [Game: ID=AbduKa00 mia vs. oti - 1996, Game: ID=AbduKa00 mia vs. pit - 1996]
+10:05:58,463  INFO Test worker LogAdvice:32 - Processed: [Game: ID=AbduKa00 mia vs. rai - 1996]
+10:05:58,477  INFO Test worker SimpleStepHandler:146 - Executing step: [playerSummarization]
+10:05:58,485  INFO Test worker LogAdvice:32 - Processed: [Player Summary: ID=AbduKa00 Year=1996[0;0;0;0;0;99;329;0;34;4]
+10:05:58,493  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=footballJob]] completed with the following parameters: [{random=283853}] and the following status: [COMPLETED]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:06:44 AM</p>
+</div>
+</div>
+</body>
+</html>

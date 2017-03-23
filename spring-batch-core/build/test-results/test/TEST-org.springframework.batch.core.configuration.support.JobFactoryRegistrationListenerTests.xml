@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.support.JobFactoryRegistrationListenerTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:53" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testBind" classname="org.springframework.batch.core.configuration.support.JobFactoryRegistrationListenerTests" time="0.001"/>
+  <testcase name="testUnbind" classname="org.springframework.batch.core.configuration.support.JobFactoryRegistrationListenerTests" time="0.001"/>
+  <system-out><![CDATA[10:01:53,579  INFO Test worker support.JobFactoryRegistrationListener:57 - Binding JobFactory: foo
+10:01:53,580  INFO Test worker support.JobFactoryRegistrationListener:57 - Binding JobFactory: foo
+10:01:53,580  INFO Test worker support.JobFactoryRegistrationListener:69 - Unbinding JobFactory: foo
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

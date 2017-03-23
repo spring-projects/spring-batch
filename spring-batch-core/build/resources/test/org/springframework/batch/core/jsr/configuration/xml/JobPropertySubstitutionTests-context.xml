@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+
+    <!-- Not implemented (partition relatated): JSR 8.2.6.2, 8.2.6.3.1, 8.2.6.4.1, 8.2.6.5.1, 8.2.6.6.1 -->
+
+    <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+        <properties>
+            <property name="jobPropertyName1" value="jobPropertyValue1"/>
+        </properties>
+
+        <step id="step1">
+            <chunk>
+                <reader ref="testReader">
+                    <properties>
+                        <property name="readerPropertyName1" value="#{systemProperties['file.separator']}"/>
+                    </properties>
+                </reader>
+                <processor ref="testProcessor">
+                    <properties>
+                        <property name="processorProperty1" value="#{jobParameters['testParam']}"/>
+                        <property name="processorProperty2" value="#{jobParameters['unresolving.prop']}?:myfile1.txt;"/>
+                        <property name="processorProperty3" value="#{jobParameters['unresolving.prop']}?:#{systemProperties['file.separator']};#{jobParameters['infile.name']}?:#{jobParameters['file.name.junit']};.txt" />
+                    </properties>
+                </processor>
+                <writer ref="testWriter">
+                    <properties>
+                        <property name="writerPropertyName1" value="#{jobProperties['jobPropertyName1']}"/>
+                    </properties>
+                </writer>
+            </chunk>
+        </step>
+    </job>
+
+    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository"/>
+	</bean>
+
+    <bean id="testReader" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemReader"
+        scope="step"/>
+
+    <bean id="testWriter" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemWriter"
+        scope="step"/>
+
+    <bean id="testProcessor" class="org.springframework.batch.core.jsr.configuration.xml.JobPropertySubstitutionTests$TestItemProcessor"
+        scope="step"/>
+</beans>

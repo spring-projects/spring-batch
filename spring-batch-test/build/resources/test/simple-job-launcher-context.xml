@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<import resource="classpath:/data-source-context.xml" />
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="jobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="databaseType" value="hsql" />
+	</bean>
+
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob"
+		abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="restartable" value="true" />
+	</bean>
+
+	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep"
+		abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="allowStartIfComplete" value="true" />
+	</bean>
+
+	<bean id="itemOrientedStep"
+		class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean"
+		abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="customEditorConfigurer"
+		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="int[]" value="org.springframework.batch.support.IntArrayPropertyEditor" />
+				<entry key="org.springframework.batch.item.file.transform.Range[]"
+					value="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
+			</map>
+		</property>
+		<property name="propertyEditorRegistrars">
+			<bean
+				class="org.springframework.batch.support.DefaultPropertyEditorRegistrar">
+				<property name="customEditors">
+					<map>
+						<entry key="java.util.Date">
+							<bean
+								class="org.springframework.beans.propertyeditors.CustomDateEditor">
+								<constructor-arg>
+									<bean class="java.text.SimpleDateFormat">
+										<constructor-arg value="yyyyMMdd" />
+									</bean>
+								</constructor-arg>
+								<constructor-arg value="false" />
+							</bean>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

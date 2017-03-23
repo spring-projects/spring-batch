@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.SmokeTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.SmokeTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.html">org.springframework.batch.integration</a> &gt; SmokeTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.002s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testDummyWithSimpleAssert</td>
+<td>0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testVanillaSendAndReceive</td>
+<td>0.002s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:05:25,248  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/SmokeTests-context.xml]&gt;
+2017-03-23 10:05:25,273  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:05:25,273 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:05:25,274 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:05:25,275  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@566445dc: startup date [Thu Mar 23 10:05:25 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:25,283  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:05:25,283  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:05:25,284  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:25,308 DEBUG task-scheduler-4 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:25,313  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:25,395 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:25,399  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:25,438 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:05:25,449 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:25,449 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase -2147483648&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {service-activator} as a subscriber to the 'smokein' channel&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@566445dc.smokein' has 1 subscriber(s).&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started org.springframework.batch.integration.SmokeTests.AnnotatedEndpoint#0.process.serviceActivator&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@566445dc.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:05:25,480  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'smokein', message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@5cbc3458] (org.springframework.batch.integration.SmokeTests.AnnotatedEndpoint#0.process.serviceActivator.handler) received message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;preSend on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postSend (sent=true) on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'smokein', message: GenericMessage [payload=foo, headers={id=607a3d74-025f-628f-3698-8fc236c02703, timestamp=1490281525486}]&gt;
+2017-03-23 10:05:25,486 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postReceive on channel 'smokeout', message: GenericMessage [payload=foo: 1, headers={id=f19628bd-1f9b-7116-08cb-aa67db052f05, timestamp=1490281525486}]&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

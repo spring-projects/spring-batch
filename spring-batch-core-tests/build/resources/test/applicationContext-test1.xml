@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="job1" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="itemReader1" writer="itemWriter" commit-interval="2" skip-limit="1">
+					<skippable-exception-classes>
+						<include class="org.springframework.ldap.ldif.InvalidAttributeFormatException"/>
+					</skippable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<job id="job2" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step2">
+			<tasklet>
+				<chunk reader="itemReader2" writer="itemWriter" commit-interval="2" />
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="itemReader1" class="org.springframework.batch.item.ldif.LdifReader">
+		<property name="resource" value="classpath:/test.ldif" />
+		<property name="recordsToSkip" value="1" />
+	</bean>
+
+	<bean id="itemReader2" class="org.springframework.batch.item.ldif.LdifReader">
+		<property name="resource" value="file:src/test/resources/missing.ldif" />
+		<property name="recordsToSkip" value="1" />
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:target/test-outputs/output.ldif" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
+</beans>

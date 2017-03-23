@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch
+		http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="multilineOrderInputTokenizers.xml" />
+	<import resource="multilineOrderOutputAggregators.xml" />
+	<import resource="multilineOrderValidator.xml" />
+
+	<job id="multilineOrderJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" processor="processor" writer="fileItemWriter" commit-interval="5">
+					<streams>
+						<stream ref="fileItemReader"/>
+						<stream ref="fileItemWriter"/>
+					</streams>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
+		<property name="fieldSetReader" ref="fileItemReader" />
+		<property name="headerMapper"   ref="headerFieldSetMapper" />
+		<property name="customerMapper" ref="customerFieldSetMapper" />
+		<property name="addressMapper"  ref="addressFieldSetMapper" />
+		<property name="billingMapper"  ref="billingFieldSetMapper" />
+		<property name="itemMapper"     ref="orderItemFieldSetMapper" />
+		<property name="shippingMapper" ref="shippingFieldSetMapper" />
+	</bean>
+
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="data/multilineOrderJob/input/multilineOrderInput.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="orderFileTokenizer" />
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="headerFieldSetMapper"    class="org.springframework.batch.sample.domain.order.internal.mapper.HeaderFieldSetMapper" />
+	<bean id="customerFieldSetMapper"  class="org.springframework.batch.sample.domain.order.internal.mapper.CustomerFieldSetMapper" />
+	<bean id="addressFieldSetMapper"   class="org.springframework.batch.sample.domain.order.internal.mapper.AddressFieldSetMapper" />
+	<bean id="billingFieldSetMapper"   class="org.springframework.batch.sample.domain.order.internal.mapper.BillingFieldSetMapper" />
+	<bean id="orderItemFieldSetMapper" class="org.springframework.batch.sample.domain.order.internal.mapper.OrderItemFieldSetMapper" />
+	<bean id="shippingFieldSetMapper"  class="org.springframework.batch.sample.domain.order.internal.mapper.ShippingFieldSetMapper" />
+
+	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="validator" />
+		<property name="filter" value="true"/>
+	</bean>
+
+	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:build/test-outputs/multilineOrderOutput.txt" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.sample.domain.order.internal.OrderLineAggregator">
+				<property name="aggregators" ref="outputAggregators"/>
+			</bean>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:05" hostname="Michaels-MacBook-Pro-3.local" time="3.224">
+  <properties/>
+  <testcase name="testRestartWithDriverSupportsAbsolute" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="1.955"/>
+  <testcase name="testReadBeforeOpen" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.214"/>
+  <testcase name="testReadToExhaustion" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.201"/>
+  <testcase name="testResetAndRestart" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.192"/>
+  <testcase name="testRestart" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.181"/>
+  <testcase name="testReopen" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.145"/>
+  <testcase name="testEmptyInput" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.2"/>
+  <testcase name="testRead" classname="org.springframework.batch.item.database.StoredProcedureItemReaderCommonTests" time="0.135"/>
+  <system-out><![CDATA[2017-03-23 10:04:05,350 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@5ce11653: startup date [Thu Mar 23 10:04:05 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:05,350 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:05,368 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:06,804 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/jdbc/support/sql-error-codes.xml]>
+2017-03-23 10:04:06,829 INFO Test worker [org.springframework.jdbc.support.SQLErrorCodesFactory] - <SQLErrorCodes loaded: [DB2, Derby, H2, HSQL, Informix, MS-SQL, MySQL, Oracle, PostgreSQL, Sybase, Hana]>
+2017-03-23 10:04:07,243 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@5ce11653: startup date [Thu Mar 23 10:04:05 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,243 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,281 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,304 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:07,304 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@1abd0212: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,305 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:07,319 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,474 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@1abd0212: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,474 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,506 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,517 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:07,518 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@8eb83dd: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,518 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:07,534 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,673 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@8eb83dd: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,673 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,704 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,719 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:07,719 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@2a3bbf08: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,719 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:07,733 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,870 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@2a3bbf08: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,870 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,892 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:07,911 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:07,911 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@31ca1355: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:07,912 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:07,926 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,057 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@31ca1355: startup date [Thu Mar 23 10:04:07 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,057 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,081 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,092 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:08,093 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@5d0f4beb: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,093 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:08,107 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,210 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@5d0f4beb: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,210 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,226 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,238 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:08,239 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@512057bc: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,239 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:08,247 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,410 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@512057bc: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,411 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,427 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,438 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+2017-03-23 10:04:08,438 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@5a61962b: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,439 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - <Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]>
+2017-03-23 10:04:08,447 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - <Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,545 INFO Test worker [org.springframework.context.support.ClassPathXmlApplicationContext] - <Closing org.springframework.context.support.ClassPathXmlApplicationContext@5a61962b: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy>
+2017-03-23 10:04:08,545 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - <destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,559 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b>
+2017-03-23 10:04:08,573 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - <Derby database is now shut down.>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.sample.iosample.RepositoryFunctionalTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.sample.iosample.RepositoryFunctionalTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.sample.iosample.html">org.springframework.batch.sample.iosample</a> &gt; RepositoryFunctionalTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.281s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testUpdateCredit</td>
+<td>0.281s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:06:16,658  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DependencyInjectionTestExecutionListener@494061fc, org.springframework.batch.test.StepScopeTestExecutionListener@f7ce7ef]
+10:06:16,659  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:16,670  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:16,685  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:16,693  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:16,705  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/ioSampleJob.xml]
+10:06:16,719  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/iosample/repository.xml]
+10:06:16,951  INFO Test worker RepositoryConfigurationDelegate:170 - Multiple Spring Data modules found, entering strict repository configuration mode!
+10:06:17,045  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'transactionManager' with a different definition: replacing [Generic bean: class [org.springframework.jdbc.datasource.DataSourceTransactionManager]; scope=; abstract=false; lazyInit=true; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [data-source-context.xml]] with [Generic bean: class [org.springframework.orm.jpa.JpaTransactionManager]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/iosample/repository.xml]]
+10:06:17,046  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'jobRepository' with a different definition: replacing [Generic bean: class [org.springframework.batch.core.repository.support.JobRepositoryFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [simple-job-launcher-context.xml]] with [Generic bean: class [org.springframework.batch.core.repository.support.JobRepositoryFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/iosample/repository.xml]]
+10:06:17,047  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@39fe5a84: startup date [Thu Mar 23 10:06:17 CDT 2017]; root of context hierarchy
+10:06:17,112  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'itemReader' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.data.RepositoryItemReader]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/iosample/repository.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [jobs/iosample/repository.xml]]
+10:06:17,130  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:17,155  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:17,173  INFO Test worker LocalContainerEntityManagerFactoryBean:347 - Building JPA container EntityManagerFactory for persistence unit 'customerCredit'
+[info 2017/03/23 10:06:17.174 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: customerCredit
+	...]
+
+[warn 2017/03/23 10:06:17.188 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:06:17.597 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+10:06:17,635  INFO Test worker LocalContainerEntityManagerFactoryBean:379 - Initialized JPA EntityManagerFactory for persistence unit 'customerCredit'
+10:06:17,648  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:17,653  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 4 ms.
+10:06:17,653  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:17,657  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 4 ms.
+10:06:17,657  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:17,662  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 4 ms.
+10:06:17,677  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:17,678  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+[info 2017/03/23 10:06:18.252 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+10:06:18,370  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=ioSampleJob]] launched with the following parameters: [{random=80470, credit=10000}]
+10:06:18,383  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:18,434  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=ioSampleJob]] completed with the following parameters: [{random=80470, credit=10000}] and the following status: [COMPLETED]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:06:44 AM</p>
+</div>
+</div>
+</body>
+</html>

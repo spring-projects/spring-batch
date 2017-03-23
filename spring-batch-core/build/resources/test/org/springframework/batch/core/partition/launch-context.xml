@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<import
+		resource="classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml" />
+
+	<bean id="job1" parent="simpleJob">
+		<property name="steps">
+			<bean name="step1:master"
+				class="org.springframework.batch.core.partition.support.PartitionStep">
+				<property name="partitionHandler">
+					<bean
+						class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler">
+						<property name="taskExecutor">
+							<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+						</property>
+						<property name="step" ref="step1" />
+						<property name="gridSize" value="2" />
+					</bean>
+				</property>
+				<property name="stepExecutionSplitter">
+					<bean
+						class="org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter">
+						<property name="jobRepository" ref="jobRepository" />
+						<property name="stepName" value="step1" />
+						<property name="partitioner">
+							<bean
+								class="org.springframework.batch.core.partition.MinMaxPartitioner" />
+						</property>
+					</bean>
+				</property>
+				<property name="jobRepository" ref="jobRepository" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="step1" parent="simpleStep">
+		<property name="itemReader">
+			<bean class="org.springframework.batch.core.partition.ExampleItemReader"
+				scope="step">
+				<property name="min" value="#{stepExecutionContext['min']}"/>
+				<property name="max" value="#{stepExecutionContext['max']}"/>
+			</bean>
+		</property>
+		<property name="itemWriter">
+			<bean class="org.springframework.batch.core.partition.ExampleItemWriter" />
+		</property>
+	</bean>
+
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob"
+		abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="restartable" value="true" />
+	</bean>
+
+	<bean id="simpleStep"
+		class="org.springframework.batch.core.step.factory.SimpleStepFactoryBean"
+		abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="startLimit" value="100" />
+		<property name="commitInterval" value="1" />
+	</bean>
+
+	<bean id="jobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		p:databaseType="hsql" p:dataSource-ref="dataSource"
+		p:transactionManager-ref="transactionManager" />
+
+	<bean class="org.springframework.batch.core.scope.StepScope" />
+
+</beans>

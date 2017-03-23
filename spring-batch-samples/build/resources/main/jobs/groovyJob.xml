@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd">
+
+	<job id="groovyJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="unzip-step" next="zip-step">
+			<tasklet ref="unzip" />
+		</step>
+		<step id="zip-step">
+			<tasklet ref="zip" />
+		</step>
+	</job>
+
+	<bean id="unzip"
+		class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter"
+		scope="step">
+		<property name="targetObject" ref="unzip-script" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+
+	<bean id="zip"
+		class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter"
+		scope="step">
+		<property name="targetObject" ref="zip-script" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+
+	<lang:groovy id="unzip-script">
+		<lang:inline-script>
+			class UnzipTasklet {
+			void execute() {
+			def ant = new AntBuilder()
+			ant.unzip(src:"src/main/resources/data/groovyJob/input/files.zip",
+			dest:"build/groovyJob/staging")
+			}
+			}
+		</lang:inline-script>
+	</lang:groovy>
+
+	<lang:groovy id="zip-script">
+		<lang:inline-script>
+			class ZipTasklet {
+			void execute() {
+			def ant = new AntBuilder()
+			ant.mkdir(dir:"build/groovyJob/output")
+			ant.zip(destfile:"build/groovyJob/output/files.zip",
+			basedir:"build/groovyJob/staging", includes:"**")
+			}
+			}
+		</lang:inline-script>
+	</lang:groovy>
+</beans>

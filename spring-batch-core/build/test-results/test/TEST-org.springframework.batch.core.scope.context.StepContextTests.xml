@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.scope.context.StepContextTests" tests="17" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:42" hostname="Michaels-MacBook-Pro-3.local" time="0.007">
+  <properties/>
+  <testcase name="testIllegalContextId" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.001"/>
+  <testcase name="testDestructionCallbackWithException" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.001"/>
+  <testcase name="testJobName" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testStepExecutionContext" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testSystemProperties" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testJobExecutionContext" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testEqualsSelf" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testDestructionCallbackSunnyDay" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.001"/>
+  <testcase name="testGetStepExecution" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testContextId" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testNullStepExecution" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testGetPartitionPlan" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testJobParameters" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testDestructionCallbackMissingAttribute" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.001"/>
+  <testcase name="testNotEqualsNull" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testEqualsContextWithSameStepExecution" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <testcase name="testStepName" classname="org.springframework.batch.core.scope.context.StepContextTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

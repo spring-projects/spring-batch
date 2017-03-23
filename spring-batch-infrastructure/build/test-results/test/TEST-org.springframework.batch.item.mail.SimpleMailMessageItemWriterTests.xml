@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.mail.SimpleMailMessageItemWriterTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testSend" classname="org.springframework.batch.item.mail.SimpleMailMessageItemWriterTests" time="0.0"/>
+  <testcase name="testDefaultErrorHandler" classname="org.springframework.batch.item.mail.SimpleMailMessageItemWriterTests" time="0.0"/>
+  <testcase name="testCustomErrorHandler" classname="org.springframework.batch.item.mail.SimpleMailMessageItemWriterTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

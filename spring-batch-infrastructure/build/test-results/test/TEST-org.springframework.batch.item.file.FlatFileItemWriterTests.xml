@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.FlatFileItemWriterTests" tests="33" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:12" hostname="Michaels-MacBook-Pro-3.local" time="0.152">
+  <properties/>
+  <testcase name="testOpenTwice" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.001"/>
+  <testcase name="testWriteWithConverter" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testForcedWriteString" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.004"/>
+  <testcase name="testDeleteOnExitNoRecordsWrittenAfterRestart" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testWriteWithAppendAfterHeaders" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.007"/>
+  <testcase name="testTransactionalRestartWithMultiByteCharacterUTF8" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.016"/>
+  <testcase name="testTransactionalRestartWithMultiByteCharacterUTF16BE" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.006"/>
+  <testcase name="testOpenWithNonWritableFile" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.002"/>
+  <testcase name="testWriteStringWithEncodingAfterClose" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testWriteHeaderAndDeleteOnExitReopen" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.004"/>
+  <testcase name="testWriteRecordWithrecordSeparator" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testDefaultStreamContext" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.001"/>
+  <testcase name="testWriteFooter" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testWriteHeaderAndDeleteOnExit" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.002"/>
+  <testcase name="testWriteHeader" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.004"/>
+  <testcase name="testDeleteOnExitReopen" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.004"/>
+  <testcase name="testWriteWithMultipleOpen" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testRestart" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testWriteRecord" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.002"/>
+  <testcase name="testWriteString" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.004"/>
+  <testcase name="testAppendToNotYetExistingFile" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.002"/>
+  <testcase name="testWriteWithAppend" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testWriteWithAppendRestartOnSecondChunk" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.006"/>
+  <testcase name="testLineAggregatorFailure" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testWriteWithDelete" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testAfterPropertiesSetChecksMandatory" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.0"/>
+  <testcase name="testWriteStringWithBogusEncoding" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.01"/>
+  <testcase name="testWriteStringTransactional" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testWriteWithConverterAndString" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <testcase name="testWriteHeaderAfterRestartOnFirstChunk" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.006"/>
+  <testcase name="testTransactionalRestart" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.013"/>
+  <testcase name="testWriteStringNotTransactional" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.003"/>
+  <testcase name="testWriteHeaderAfterRestartOnSecondChunk" classname="org.springframework.batch.item.file.FlatFileItemWriterTests" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

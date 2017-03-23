@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" tests="13" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:41" hostname="Michaels-MacBook-Pro-3.local" time="0.008">
+  <properties/>
+  <testcase name="testCreateJobExecutionStatusUnknown" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.002"/>
+  <testcase name="testSaveOrUpdateInvalidJobExecution" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testSaveStepExecutionSetsLastUpdated" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.001"/>
+  <testcase name="testCreateJobExecutionAlreadyComplete" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testIsJobInstanceFalse" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.001"/>
+  <testcase name="testSaveStepExecutions" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testIsJobInstanceTrue" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.001"/>
+  <testcase name="testUpdateValidJobExecution" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testSaveNullStepExecutions" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.001"/>
+  <testcase name="testSaveOrUpdateStepExecutionException" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testUpdateStepExecutionSetsLastUpdated" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testCreateJobExecutionAlreadyRunning" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.0"/>
+  <testcase name="testInterrupted" classname="org.springframework.batch.core.repository.support.SimpleJobRepositoryTests" time="0.001"/>
+  <system-out><![CDATA[10:02:41,085  INFO Test worker support.SimpleJobRepository:281 - Parent JobExecution is stopped, so passing message on to StepExecution
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

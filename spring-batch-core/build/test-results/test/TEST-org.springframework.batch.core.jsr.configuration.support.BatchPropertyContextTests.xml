@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.006">
+  <properties/>
+  <testcase name="testPartitionProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.005"/>
+  <testcase name="testArtifactNonOverridingJobProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.0"/>
+  <testcase name="testJobLevelProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.0"/>
+  <testcase name="testAddPropertiesToExistingStep" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.0"/>
+  <testcase name="testStepLevelArtifactProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.001"/>
+  <testcase name="testStepLevelProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.0"/>
+  <testcase name="testNonStepLevelArtifactProperties" classname="org.springframework.batch.core.jsr.configuration.support.BatchPropertyContextTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

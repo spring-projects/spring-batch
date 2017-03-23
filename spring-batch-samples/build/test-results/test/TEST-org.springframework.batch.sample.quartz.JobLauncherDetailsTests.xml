@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" tests="5" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:36" hostname="Michaels-MacBook-Pro-3.local" time="0.198">
+  <properties/>
+  <testcase name="testExecuteWithNoJobParameters" classname="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" time="0.193"/>
+  <testcase name="testExecuteWithJobNameAndComplexParameters" classname="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" time="0.003"/>
+  <testcase name="testExecuteWithSomeJobParameters" classname="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" time="0.0"/>
+  <testcase name="testExecuteWithJobNameAndParameters" classname="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" time="0.0"/>
+  <testcase name="testExecuteWithJobName" classname="org.springframework.batch.sample.quartz.JobLauncherDetailsTests" time="0.001"/>
+  <system-out><![CDATA[10:06:37,027  INFO Test worker JobLauncherDetails:69 - Quartz trigger firing with Spring Batch jobName=null
+10:06:37,039  INFO Test worker JobLauncherDetails:69 - Quartz trigger firing with Spring Batch jobName=FOO
+10:06:37,039 DEBUG Test worker JobLauncherDetails:105 - JobDataMap contains values which are not job parameters (ignoring).
+10:06:37,039 DEBUG Test worker JobLauncherDetails:105 - JobDataMap contains values which are not job parameters (ignoring).
+10:06:37,040  INFO Test worker JobLauncherDetails:69 - Quartz trigger firing with Spring Batch jobName=null
+10:06:37,041  INFO Test worker JobLauncherDetails:69 - Quartz trigger firing with Spring Batch jobName=FOO
+10:06:37,041 DEBUG Test worker JobLauncherDetails:105 - JobDataMap contains values which are not job parameters (ignoring).
+10:06:37,041  INFO Test worker JobLauncherDetails:69 - Quartz trigger firing with Spring Batch jobName=FOO
+10:06:37,042 DEBUG Test worker JobLauncherDetails:105 - JobDataMap contains values which are not job parameters (ignoring).
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

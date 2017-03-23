@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.xml.TransactionalStaxEventItemWriterTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:22" hostname="Michaels-MacBook-Pro-3.local" time="0.02">
+  <properties/>
+  <testcase name="testWriteAndFlush" classname="org.springframework.batch.item.xml.TransactionalStaxEventItemWriterTests" time="0.006"/>
+  <testcase name="testWriteWithHeaderAfterFlushAndRollback" classname="org.springframework.batch.item.xml.TransactionalStaxEventItemWriterTests" time="0.006"/>
+  <testcase name="testWriteWithHeaderAfterRollback" classname="org.springframework.batch.item.xml.TransactionalStaxEventItemWriterTests" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

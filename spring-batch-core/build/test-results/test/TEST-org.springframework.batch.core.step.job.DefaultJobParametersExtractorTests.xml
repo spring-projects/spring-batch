@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:45" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testGetNamedDoubleJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testDontUseParentParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testGetNamedJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.001"/>
+  <testcase name="testGetNamedDateJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testGetNamedIntJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testGetEmptyJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testUseParentParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testGetNamedLongJobParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <testcase name="testGetNamedLongStringParameters" classname="org.springframework.batch.core.step.job.DefaultJobParametersExtractorTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

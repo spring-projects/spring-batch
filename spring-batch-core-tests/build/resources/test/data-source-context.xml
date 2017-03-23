@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<!--  Initialise the database before every test case: -->
+	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="initialize" value="${batch.data.source.init}"/>
+		<property name="initScripts">
+			<list>
+				<value>${batch.drop.script}</value>
+				<value>${batch.schema.script}</value>
+				<value>${batch.business.schema.script}</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- Set up or detect a System property called "ENVIRONMENT" used to construct a properties file on the classpath.  The default is "hsql".  -->
+	<bean id="environment"
+		class="org.springframework.batch.support.SystemPropertyInitializer">
+		<property name="defaultValue" value="hsql"/>
+		<property name="keyName" value="ENVIRONMENT"/>
+	</bean>
+
+	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		depends-on="environment">
+		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="sequenceIncrementerParent" class="${batch.database.incrementer.class}" abstract="true">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="columnIncrementerParent" class="${batch.database.incrementer.class}" abstract="true" parent="sequenceIncrementerParent">
+		<property name="columnName" value="ID" />
+	</bean>
+
+	<bean id="incrementerParent" parent="${batch.database.incrementer.parent}">
+		<property name="incrementerName" value="DUMMY" />
+	</bean>
+
+</beans>

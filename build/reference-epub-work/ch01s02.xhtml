@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Usage Scenarios</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch01.xhtml" title="Chapter 1. Spring Batch Introduction"/><link rel="next" href="ch01s03.xhtml" title="Spring Batch Architecture"/></head><body><header/><section class="section" title="Usage Scenarios" epub:type="subchapter" id="springBatchUsageScenarios"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Usage Scenarios</h2></div></div></div><p>A typical batch program generally reads a large number of records
+    from a database, file, or queue, processes the data in some fashion, and
+    then writes back data in a modified form. Spring Batch automates this
+    basic batch iteration, providing the capability to process similar
+    transactions as a set, typically in an offline environment without any
+    user interaction. Batch jobs are part of most IT projects and Spring Batch
+    is the only open source framework that provides a robust, enterprise-scale
+    solution.</p><p>Business Scenarios </p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>Commit batch process periodically</p></li><li class="listitem" epub:type="list-item"><p>Concurrent batch processing: parallel processing of a
+          job</p></li><li class="listitem" epub:type="list-item"><p>Staged, enterprise message-driven processing</p></li><li class="listitem" epub:type="list-item"><p>Massively parallel batch processing</p></li><li class="listitem" epub:type="list-item"><p>Manual or scheduled restart after failure</p></li><li class="listitem" epub:type="list-item"><p>Sequential processing of dependent steps (with extensions to
+          workflow-driven batches)</p></li><li class="listitem" epub:type="list-item"><p>Partial processing: skip records (e.g. on rollback)</p></li><li class="listitem" epub:type="list-item"><p>Whole-batch transaction: for cases with a small batch size or
+          existing stored procedures/scripts</p></li></ul></div><p>Technical Objectives </p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>Batch developers use the Spring programming model: concentrate
+          on business logic; let the framework take care of
+          infrastructure.</p></li><li class="listitem" epub:type="list-item"><p>Clear separation of concerns between the infrastructure, the
+          batch execution environment, and the batch application.</p></li><li class="listitem" epub:type="list-item"><p>Provide common, core execution services as interfaces that all
+          projects can implement.</p></li><li class="listitem" epub:type="list-item"><p>Provide simple and default implementations of the core
+          execution interfaces that can be used ‘out of the box’.</p></li><li class="listitem" epub:type="list-item"><p>Easy to configure, customize, and extend services, by
+          leveraging the spring framework in all layers.</p></li><li class="listitem" epub:type="list-item"><p>All existing core services should be easy to replace or
+          extend, without any impact to the infrastructure layer.</p></li><li class="listitem" epub:type="list-item"><p>Provide a simple deployment model, with the architecture JARs
+          completely separate from the application, built using Maven.</p></li></ul></div></section><footer/></body></html>

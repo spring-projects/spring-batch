@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.builder.StepBuilderTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:44" hostname="Michaels-MacBook-Pro-3.local" time="0.042">
+  <properties/>
+  <testcase name="testItemListeners" classname="org.springframework.batch.core.step.builder.StepBuilderTests" time="0.025"/>
+  <testcase name="testListeners" classname="org.springframework.batch.core.step.builder.StepBuilderTests" time="0.01"/>
+  <testcase name="test" classname="org.springframework.batch.core.step.builder.StepBuilderTests" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

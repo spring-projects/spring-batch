@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.StepParserTests" tests="20" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:07" hostname="Michaels-MacBook-Pro-3.local" time="0.217">
+  <properties/>
+  <testcase name="testTaskletElementOverridesParentBeanClass" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testTransactionManagerDefaults" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testTaskletStepWithBadStepListener" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.019"/>
+  <testcase name="testStepParserBeanName" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.032"/>
+  <testcase name="testParentStep" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testTaskletStepAttributes" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.044"/>
+  <testcase name="testNonAbstractStep" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testInheritTransactionAttributes" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.001"/>
+  <testcase name="testInlineTaskletElementOverridesParentBeanClass" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testStepWithListsMerge" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testStepParserNoCommitIntervalOrCompletionPolicy" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.016"/>
+  <testcase name="testStepParserCommitInterval" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.035"/>
+  <testcase name="testInheritFromBean" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testJobRepositoryDefaults" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testTaskletElementOverridesChildBeanClass" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testStepParserCompletionPolicy" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.033"/>
+  <testcase name="testStepWithListsNoMerge" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testStepWithListsOverrideWithEmpty" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.0"/>
+  <testcase name="testStepParserCommitIntervalCompletionPolicy" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.017"/>
+  <testcase name="testTaskletStepWithBadRetryListener" classname="org.springframework.batch.core.configuration.xml.StepParserTests" time="0.018"/>
+  <system-out><![CDATA[10:02:07,570  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@3ea68794: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,570  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml]
+10:02:07,581  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,661  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@118d9443: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,662  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml]
+10:02:07,672  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,680  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@445813e1: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,680  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml]
+10:02:07,689  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,712  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@42166a73: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,712  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml]
+10:02:07,746  WARN Test worker builder.FaultTolerantStepBuilder:506 - Asynchronous TaskExecutor detected with ItemStream reader.  This is probably an error, and may lead to incorrect restart data being stored.
+10:02:07,755  WARN Test worker builder.FaultTolerantStepBuilder:506 - Asynchronous TaskExecutor detected with ItemStream reader.  This is probably an error, and may lead to incorrect restart data being stored.
+10:02:07,757  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@3619b81b: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,757  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserNoCommitIntervalOrCompletionPolicyTests-context.xml]
+10:02:07,767  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,773  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@37b009fc: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,774  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserCommitIntervalTests-context.xml]
+10:02:07,782  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,810  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@ad71c58: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,810  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserCompletionPolicyTests-context.xml]
+10:02:07,819  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,842  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4469b620: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,843  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserCommitIntervalCompletionPolicyTests-context.xml]
+10:02:07,851  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:07,859  INFO Test worker support.ClassPathXmlApplicationContext:581 - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@469472c9: startup date [Thu Mar 23 10:02:07 CDT 2017]; root of context hierarchy
+10:02:07,860  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml]
+10:02:07,870  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

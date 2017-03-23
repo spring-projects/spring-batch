@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.domain.order.OrderItemReaderTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:55" hostname="Michaels-MacBook-Pro-3.local" time="0.836">
+  <properties/>
+  <testcase name="testNext" classname="org.springframework.batch.sample.domain.order.OrderItemReaderTests" time="0.836"/>
+  <system-out><![CDATA[10:05:56,065 DEBUG Test worker OrderItemReader:89 - STARTING NEW RECORD
+10:05:56,065 DEBUG Test worker OrderItemReader:114 - MAPPING CUSTOMER
+10:05:56,066 DEBUG Test worker OrderItemReader:122 - MAPPING BILLING ADDRESS
+10:05:56,066 DEBUG Test worker OrderItemReader:126 - MAPPING SHIPPING ADDRESS
+10:05:56,067 DEBUG Test worker OrderItemReader:130 - MAPPING BILLING INFO
+10:05:56,067 DEBUG Test worker OrderItemReader:134 - MAPPING SHIPPING INFO
+10:05:56,068 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:05:56,068 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:05:56,069 DEBUG Test worker OrderItemReader:138 - MAPPING LINE ITEM
+10:05:56,069 DEBUG Test worker OrderItemReader:93 - END OF RECORD
+10:05:56,069  INFO Test worker OrderItemReader:69 - Mapped: Order [customer=Customer [companyName=null, firstName=null, lastName=null], orderId=0, totalItems=3, totalPrice=100]
+10:05:56,070 DEBUG Test worker OrderItemReader:80 - FINISHED
+10:05:56,070  INFO Test worker OrderItemReader:69 - Mapped: null
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.data.Neo4jItemReaderTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:03:05" hostname="Michaels-MacBook-Pro-3.local" time="0.393">
+  <properties/>
+  <testcase name="testNoResults" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.382"/>
+  <testcase name="testResultsWithMatchAndWhere" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.002"/>
+  <testcase name="testResultsWithMatchAndWhereWithSession" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testNullResultsWithSession" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testResultsWithMatchAndWhereWithParametersWithSession" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testResultsWithMatchAndWhereWithParameters" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testNoResultsWithSession" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.001"/>
+  <testcase name="testNullResults" classname="org.springframework.batch.item.data.Neo4jItemReaderTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

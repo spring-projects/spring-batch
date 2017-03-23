@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.JobParametersTests" tests="24" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.004">
+  <properties/>
+  <testcase name="testDoubleReturns0WhenKeyDoesntExit" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testIsEmptyWhenEmpty" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testSerialization" classname="org.springframework.batch.core.JobParametersTests" time="0.001"/>
+  <testcase name="testHashCodeEqualWhenNotEmpty" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetNullString" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetMissingLong" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testDateReturnsNullWhenKeyDoesntExit" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetNullDate" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testToStringOrder" classname="org.springframework.batch.core.JobParametersTests" time="0.001"/>
+  <testcase name="testGetDate" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetLong" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetEmptyLong" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testEqualsNull" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testEqualsSelf" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testEqualsWrongType" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testIsEmptyWhenNotEmpty" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetMissingDouble" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testStringReturnsNullWhenKeyDoesntExit" classname="org.springframework.batch.core.JobParametersTests" time="0.001"/>
+  <testcase name="testGetDouble" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testLongReturns0WhenKeyDoesntExit" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testEquals" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testGetString" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testEqualsDifferent" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <testcase name="testHashCodeEqualWhenEmpty" classname="org.springframework.batch.core.JobParametersTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

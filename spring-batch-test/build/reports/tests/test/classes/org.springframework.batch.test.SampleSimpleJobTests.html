@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.test.SampleSimpleJobTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.test.SampleSimpleJobTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.test.html">org.springframework.batch.test</a> &gt; SampleSimpleJobTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">6</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.400s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testJob</td>
+<td>0.061s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testNonExistentStep</td>
+<td>0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStep1Execution</td>
+<td>0.026s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStep2Execution</td>
+<td>0.026s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStep3Execution</td>
+<td>0.262s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testStepLaunchJobContextEntry</td>
+<td>0.024s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:06:53,350  INFO Test worker support.DefaultTestContextBootstrapper - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:06:53,351  INFO Test worker support.DefaultTestContextBootstrapper - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:06:53,351  INFO Test worker support.DefaultTestContextBootstrapper - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@c67e3ff, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@2b7f89c9, org.springframework.test.context.support.DirtiesContextTestExecutionListener@4a41ecd8, org.springframework.test.context.transaction.TransactionalTestExecutionListener@3ef11c05, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@d3a783f]
+10:06:53,353  INFO Test worker xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:53,370  INFO Test worker xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:53,387  INFO Test worker xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:53,408  INFO Test worker xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [jobs/sampleSimpleJob.xml]
+10:06:53,419  INFO Test worker xml.XmlBeanDefinitionReader - Loading XML bean definitions from class path resource [jobs/sample-steps.xml]
+10:06:53,443  INFO Test worker support.GenericApplicationContext - Refreshing org.springframework.context.support.GenericApplicationContext@5adc9990: startup date [Thu Mar 23 10:06:53 CDT 2017]; root of context hierarchy
+10:06:53,500  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:53,557  INFO Test worker support.SimpleJobLauncher - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:53,631  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=sampleJob]] launched with the following parameters: [{random=176767}]
+10:06:53,641  INFO Test worker job.SimpleStepHandler - Executing step: [step1]
+10:06:53,655  INFO Test worker job.SimpleStepHandler - Executing step: [step2]
+10:06:53,670  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,672  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,680  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=sampleJob]] completed with the following parameters: [{random=176767}] and the following status: [COMPLETED]
+10:06:53,689  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=613013}]
+10:06:53,696  INFO Test worker job.SimpleStepHandler - Executing step: [step2]
+10:06:53,706  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=613013}] and the following status: [COMPLETED]
+10:06:53,708  INFO Test worker statements.SpringRepeat - Repetition 1 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,715  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=845329}]
+10:06:53,722  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,726  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,735  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=845329}] and the following status: [COMPLETED]
+10:06:53,736  INFO Test worker statements.SpringRepeat - Repetition 2 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,744  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=512894}]
+10:06:53,752  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,755  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,761  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=512894}] and the following status: [COMPLETED]
+10:06:53,762  INFO Test worker statements.SpringRepeat - Repetition 3 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,770  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=866318}]
+10:06:53,778  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,781  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,788  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=866318}] and the following status: [COMPLETED]
+10:06:53,789  INFO Test worker statements.SpringRepeat - Repetition 4 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,797  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=283436}]
+10:06:53,804  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,806  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,814  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=283436}] and the following status: [COMPLETED]
+10:06:53,814  INFO Test worker statements.SpringRepeat - Repetition 5 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,821  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=41189}]
+10:06:53,827  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,831  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,839  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=41189}] and the following status: [COMPLETED]
+10:06:53,839  INFO Test worker statements.SpringRepeat - Repetition 6 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,845  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=263787}]
+10:06:53,853  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,855  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,864  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=263787}] and the following status: [COMPLETED]
+10:06:53,865  INFO Test worker statements.SpringRepeat - Repetition 7 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,872  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=208515}]
+10:06:53,880  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,882  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,888  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=208515}] and the following status: [COMPLETED]
+10:06:53,889  INFO Test worker statements.SpringRepeat - Repetition 8 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,895  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=113157}]
+10:06:53,910  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,913  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,920  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=113157}] and the following status: [COMPLETED]
+10:06:53,921  INFO Test worker statements.SpringRepeat - Repetition 9 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,927  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=764864}]
+10:06:53,937  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,939  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,946  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=764864}] and the following status: [COMPLETED]
+10:06:53,947  INFO Test worker statements.SpringRepeat - Repetition 10 of test AbstractSampleJobTests#testStep3Execution()
+10:06:53,953  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=859189}]
+10:06:53,960  INFO Test worker job.SimpleStepHandler - Executing step: [step3]
+10:06:53,962  INFO Test worker sample.LoggingTasklet - tasklet executing: id=3
+10:06:53,970  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=859189}] and the following status: [COMPLETED]
+10:06:53,977  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=988406}]
+10:06:53,984  INFO Test worker job.SimpleStepHandler - Executing step: [step2]
+10:06:53,996  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=988406}] and the following status: [COMPLETED]
+10:06:54,007  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] launched with the following parameters: [{random=754767}]
+10:06:54,015  INFO Test worker job.SimpleStepHandler - Executing step: [step1]
+10:06:54,025  INFO Test worker support.SimpleJobLauncher - Job: [SimpleJob: [name=TestJob]] completed with the following parameters: [{random=754767}] and the following status: [COMPLETED]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:06:55 AM</p>
+</div>
+</div>
+</body>
+</html>

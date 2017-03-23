@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/batch-integration
+		 http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
+
+	<batch-int:remote-chunking-master id="itemWriter" message-template="messagingTemplate" step="process"/>
+</beans>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:09" hostname="Michaels-MacBook-Pro-3.local" time="0.026">
+  <properties/>
+  <testcase name="testCustomNestedTasklet" classname="org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests" time="0.006"/>
+  <testcase name="testTasklet3" classname="org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests" time="0.007"/>
+  <testcase name="testTaskletRef" classname="org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests" time="0.005"/>
+  <testcase name="testTaskletInline" classname="org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests" time="0.006"/>
+  <system-out><![CDATA[10:02:09,347  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/configuration/xml/TaskletParserBeanPropertiesTests-context.xml" for test class [org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests]
+10:02:09,347  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@3ed83610 declaringClass = 'org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/TaskletParserBeanPropertiesTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:02:09,348  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.TaskletParserBeanPropertiesTests]: TaskletParserBeanPropertiesTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:02:09,349  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:09,350  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:09,351  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@5f1f7af6, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@1e0d4d6, org.springframework.test.context.support.DirtiesContextTestExecutionListener@31633dcc, org.springframework.test.context.transaction.TransactionalTestExecutionListener@5bbe3ab5, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@7f5233fe]
+10:02:09,351  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/TaskletParserBeanPropertiesTests-context.xml]
+10:02:09,364  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@78931ea6: startup date [Thu Mar 23 10:02:09 CDT 2017]; root of context hierarchy
+10:02:09,375  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:09,417  INFO Test worker support.GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@1811ec41: startup date [Thu Mar 23 10:01:59 CDT 2017]; root of context hierarchy
+10:02:09,423  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step4]
+10:02:09,430  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step3]
+10:02:09,437  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+10:02:09,443  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step2]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

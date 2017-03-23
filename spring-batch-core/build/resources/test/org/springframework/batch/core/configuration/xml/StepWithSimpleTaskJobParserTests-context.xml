@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="step1">
+			<tasklet ref="tasklet1"/>
+			<next on="*" to="step2" />
+		</step>
+		<step id="step2">
+			<tasklet ref="tasklet2">
+				<listeners>
+					<listener ref="listener"/>
+				</listeners>
+			</tasklet>
+			<next on="*" to="step3" />
+		</step>
+		<step id="step3">
+			<tasklet>
+				<beans:ref bean="tasklet3"/>
+			</tasklet>
+			<next on="*" to="step4" />
+		</step>
+		<step id="step4">
+			<tasklet>
+				<beans:bean class="org.springframework.batch.core.configuration.xml.TestTasklet">
+					<beans:property name="name" value="t4"/>
+				</beans:bean>
+			</tasklet>
+		</step>
+	</job>
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener" >
+		<beans:qualifier value="listener" />
+	</beans:bean>
+
+	<beans:bean id="tasklet1" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t1"/>
+	</beans:bean>
+	<beans:bean id="tasklet2" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t2"/>
+	</beans:bean>
+	<beans:bean id="tasklet3" class="org.springframework.batch.core.configuration.xml.TestTasklet">
+		<beans:property name="name" value="t3"/>
+	</beans:bean>
+
+</beans:beans>

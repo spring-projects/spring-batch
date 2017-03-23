@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Listeners</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch08s03.xhtml" title="Exception Handling"/><link rel="next" href="ch08s05.xhtml" title="Parallel Processing"/></head><body><header/><section class="section" title="Listeners" epub:type="subchapter" id="repeatListeners"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Listeners</h2></div></div></div><p>Often it is useful to be able to receive additional callbacks for
+    cross cutting concerns across a number of different iterations. For this
+    purpose Spring Batch provides the <code class="classname">RepeatListener</code>
+    interface. The <code class="classname">RepeatTemplate</code> allows users to
+    register <code class="classname">RepeatListener</code>s, and they will be given
+    callbacks with the <code class="classname">RepeatContext</code> and
+    <code class="classname">RepeatStatus</code> where available during the
+    iteration.</p><p>The interface looks like this:</p><pre class="programlisting">public interface RepeatListener {
+    void before(RepeatContext context);
+    void after(RepeatContext context, RepeatStatus result);
+    void open(RepeatContext context);
+    void onError(RepeatContext context, Throwable e);
+    void close(RepeatContext context);
+}</pre><p>The <code class="methodname">open</code> and
+    <code class="methodname">close</code> callbacks come before and after the entire
+    iteration. <code class="methodname">before</code>, <code class="methodname">after</code>
+    and <code class="methodname">onError</code> apply to the individual
+    RepeatCallback calls.</p><p>Note that when there is more than one listener, they are in a list,
+    so there is an order. In this case <code class="methodname">open</code> and
+    <code class="methodname">before</code> are called in the same order while
+    <code class="methodname">after</code>, <code class="methodname">onError</code> and
+    <code class="methodname">close</code> are called in reverse order.</p></section><footer/></body></html>

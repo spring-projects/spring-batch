@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.SplitJobParserTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:03" hostname="Michaels-MacBook-Pro-3.local" time="0.03">
+  <properties/>
+  <testcase name="testSplitJob" classname="org.springframework.batch.core.configuration.xml.SplitJobParserTests" time="0.03"/>
+  <system-out><![CDATA[10:02:02,976  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/configuration/xml/SplitJobParserTests-context.xml" for test class [org.springframework.batch.core.configuration.xml.SplitJobParserTests]
+10:02:02,976  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@27dbfae2 declaringClass = 'org.springframework.batch.core.configuration.xml.SplitJobParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/SplitJobParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:02:02,977  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.SplitJobParserTests]: SplitJobParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:02:02,978  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:02,979  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:02,979  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@2ec8ea3, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@410deda5, org.springframework.test.context.support.DirtiesContextTestExecutionListener@1979a2d6, org.springframework.test.context.transaction.TransactionalTestExecutionListener@358d9c63, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@53f295e7]
+10:02:02,980  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/SplitJobParserTests-context.xml]
+10:02:02,993  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:02:03,002  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@7dbc2af9: startup date [Thu Mar 23 10:02:03 CDT 2017]; root of context hierarchy
+10:02:03,018  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:03,105  INFO Test worker support.GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@3c71cfe4: startup date [Thu Mar 23 10:01:54 CDT 2017]; root of context hierarchy
+10:02:03,111  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+10:02:03,118  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:02:03,126  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:02:03,134  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s4]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

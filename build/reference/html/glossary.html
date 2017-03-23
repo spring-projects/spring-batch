@@ -1,0 +1,59 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Glossary</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="Spring Batch - Reference Documentation"><link rel="up" href="index.html" title="Spring Batch - Reference Documentation"><link rel="prev" href="transactions.html" title="Appendix&nbsp;C.&nbsp;Batch Processing and Transactions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Glossary</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="transactions.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;</td></tr></table><hr></div><div class="glossary"><div class="titlepage"><div><div><h1 class="title"><a name="glossary" href="#glossary"></a>Glossary</h1></div></div></div><div class="glossdiv"><h3 class="title">Spring Batch Glossary</h3><dl><dt><span class="glossterm">Batch</span></dt><dd class="glossdef"><p>An accumulation of business transactions over time.</p></dd><dt><span class="glossterm">Batch Application Style</span></dt><dd class="glossdef"><p>Term used to designate batch as an application style in its own
+        right similar to online, Web or SOA. It has standard elements of
+        input, validation, transformation of information to business model,
+        business processing and output. In addition, it requires monitoring at
+        a macro level.</p></dd><dt><span class="glossterm">Batch Processing</span></dt><dd class="glossdef"><p>The handling of a batch of many business transactions that have
+        accumulated over a period of time (e.g. an hour, day, week, month, or
+        year). It is the application of a process, or set of processes, to
+        many data entities or objects in a repetitive and predictable fashion
+        with either no manual element, or a separate manual element for error
+        processing.</p></dd><dt><span class="glossterm">Batch Window</span></dt><dd class="glossdef"><p>The time frame within which a batch job must complete. This can
+        be constrained by other systems coming online, other dependent jobs
+        needing to execute or other factors specific to the batch
+        environment.</p></dd><dt><span class="glossterm">Step</span></dt><dd class="glossdef"><p>It is the main batch task or unit of work controller. It
+        initializes the business logic, and controls the transaction
+        environment based on commit interval setting, etc.</p></dd><dt><span class="glossterm">Tasklet</span></dt><dd class="glossdef"><p>A component created by application developer to process the
+        business logic for a Step.</p></dd><dt><span class="glossterm">Batch Job Type</span></dt><dd class="glossdef"><p>Job Types describe application of jobs for particular type of
+        processing. Common areas are interface processing (typically flat
+        files), forms processing (either for online pdf generation or print
+        formats), report processing.</p></dd><dt><span class="glossterm">Driving Query</span></dt><dd class="glossdef"><p>A driving query identifies the set of work for a job to do; the
+        job then breaks that work into individual units of work. For instance,
+        identify all financial transactions that have a status of "pending
+        transmission" and send them to our partner system. The driving query
+        returns a set of record IDs to process; each record ID then becomes a
+        unit of work. A driving query may involve a join (if the criteria for
+        selection falls across two or more tables) or it may work with a
+        single table.</p></dd><dt><span class="glossterm">Item</span></dt><dd class="glossdef"><p>An item represents the smallest ammount of complete data for
+        processing. In the simplest terms, this might mean a line in a file, a
+        row in a database table, or a particular element in an XML
+        file.</p></dd><dt><span class="glossterm">Logicial Unit of Work (LUW)</span></dt><dd class="glossdef"><p>A batch job iterates through a driving query (or another input
+        source such as a file) to perform the set of work that the job must
+        accomplish. Each iteration of work performed is a unit of work.</p></dd><dt><span class="glossterm">Commit Interval</span></dt><dd class="glossdef"><p>A set of LUWs processed within a single transaction.</p></dd><dt><span class="glossterm">Partitioning</span></dt><dd class="glossdef"><p>Splitting a job into multiple threads where each thread is
+        responsible for a subset of the overall data to be processed. The
+        threads of execution may be within the same JVM or they may span JVMs
+        in a clustered environment that supports workload balancing.</p></dd><dt><span class="glossterm">Staging Table</span></dt><dd class="glossdef"><p>A table that holds temporary data while it is being
+        processed.</p></dd><dt><span class="glossterm">Restartable</span></dt><dd class="glossdef"><p>A job that can be executed again and will assume the same
+        identity as when run initially. In othewords, it is has the same job
+        instance id.</p></dd><dt><span class="glossterm">Rerunnable</span></dt><dd class="glossdef"><p>A job that is restartable and manages its own state in terms of
+        previous run's record processing. An example of a rerunnable step is
+        one based on a driving query. If the driving query can be formed so
+        that it will limit the processed rows when the job is restarted than
+        it is re-runnable. This is managed by the application logic. Often
+        times a condition is added to the where statement to limit the rows
+        returned by the driving query with something like "and processedFlag
+        != true".</p></dd><dt><span class="glossterm">Repeat</span></dt><dd class="glossdef"><p>One of the most basic units of batch processing, that defines
+        repeatability calling a portion of code until it is finished, and
+        while there is no error. Typically a batch process would be repeatable
+        as long as there is input.</p></dd><dt><span class="glossterm">Retry</span></dt><dd class="glossdef"><p>Simplifies the execution of operations with retry semantics most
+        frequently associated with handling transactional output exceptions.
+        Retry is slightly different from repeat, rather than continually
+        calling a block of code, retry is stateful, and continually calls the
+        same block of code with the same input, until it either succeeds, or
+        some type of retry limit has been exceeded. It is only generally
+        useful if a subsequent invocation of the operation might succeed
+        because something in the environment has improved.</p></dd><dt><span class="glossterm">Recover</span></dt><dd class="glossdef"><p>Recover operations handle an exception in such a way that a
+        repeat process is able to continue.</p></dd><dt><span class="glossterm">Skip</span></dt><dd class="glossdef"><p>Skip is a recovery strategy often used on file input sources as
+        the strategy for ignoring bad input records that failed
+        validation.</p></dd></dl></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="transactions.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;</td></tr><tr><td width="40%" align="left" valign="top">Appendix&nbsp;C.&nbsp;Batch Processing and Transactions&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;</td></tr></table></div></body></html>

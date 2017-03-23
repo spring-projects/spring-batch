@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Step</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch03.xhtml" title="Chapter 3. The Domain Language of Batch"/><link rel="next" href="ch03s03.xhtml" title="ExecutionContext"/></head><body><header/><section class="section" title="Step" epub:type="subchapter" id="domainStep"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Step</h2></div></div></div>
+    
+
+    <p>A <code class="classname">Step</code> is a domain object that encapsulates
+    an independent, sequential phase of a batch job. Therefore, every
+    <code class="classname">Job</code> is composed entirely of one or more steps. A
+    <code class="classname">Step</code> contains all of the information necessary to
+    define and control the actual batch processing. This is a necessarily
+    vague description because the contents of any given
+    <code class="classname">Step</code> are at the discretion of the developer writing
+    a <code class="classname">Job</code>. A Step can be as simple or complex as the
+    developer desires. A simple <code class="classname">Step</code> might load data
+    from a file into the database, requiring little or no code. (depending
+    upon the implementations used) A more complex <code class="classname">Step</code>
+    may have complicated business rules that are applied as part of the
+    processing. As with <code class="classname">Job</code>, a
+    <code class="classname">Step</code> has an individual
+    <code class="classname">StepExecution</code> that corresponds with a unique
+    <code class="classname">JobExecution</code>:</p>
+
+    <div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/jobHeirarchyWithSteps.png" width="432"/></div>
+
+    <section class="section" title="StepExecution" epub:type="division" id="domainStepExecution"><div class="titlepage"><div><div><h3 class="title">StepExecution</h3></div></div></div>
+      
+
+      <p>A <code class="classname">StepExecution</code> represents a single attempt
+      to execute a <code class="classname">Step</code>. A new
+      <code class="classname">StepExecution</code> will be created each time a
+      <code class="classname">Step</code> is run, similar to
+      <code class="classname">JobExecution</code>. However, if a step fails to execute
+      because the step before it fails, there will be no execution persisted
+      for it. A <code class="classname">StepExecution</code> will only be created when
+      its <code class="classname">Step</code> is actually started.</p>
+
+      <p>Step executions are represented by objects of the
+      <code class="classname">StepExecution</code> class. Each execution contains a
+      reference to its corresponding step and
+      <code class="classname">JobExecution</code>, and transaction related data such
+      as commit and rollback count and start and end times. Additionally, each
+      step execution will contain an <code class="classname">ExecutionContext</code>,
+      which contains any data a developer needs persisted across batch runs,
+      such as statistics or state information needed to restart. The following
+      is a listing of the properties for
+      <code class="classname">StepExecution</code>:</p>
+
+      <div class="table" id="d5e638"><div class="table-title">Table 3.8. StepExecution Properties</div><div class="table-contents">
+        
+
+        <table style="border-collapse: collapse; border-top: 0.5pt solid ; border-bottom: 0.5pt solid ; border-left: 0.5pt solid ; border-right: 0.5pt solid ; "><colgroup><col class="c1"/><col class="c2"/></colgroup><tbody><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">status</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">BatchStatus</code> object that
+              indicates the status of the execution. While it's running, the
+              status is BatchStatus.STARTED, if it fails, the status is
+              BatchStatus.FAILED, and if it finishes successfully, the status
+              is BatchStatus.COMPLETED</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">startTime</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              current system time when the execution was started.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">endTime</td><td style="border-bottom: 0.5pt solid ; ">A <code class="classname">java.util.Date</code> representing the
+              current system time when the execution finished, regardless of
+              whether or not it was successful.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">exitStatus</td><td style="border-bottom: 0.5pt solid ; ">The <code class="classname">ExitStatus</code> indicating the
+              result of the execution. It is most important because it
+              contains an exit code that will be returned to the caller. See
+              chapter 5 for more details.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">executionContext</td><td style="border-bottom: 0.5pt solid ; ">The 'property bag' containing any user data that needs to
+              be persisted between executions.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">readCount</td><td style="border-bottom: 0.5pt solid ; ">The number of items that have been successfully
+              read</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">writeCount</td><td style="border-bottom: 0.5pt solid ; ">The number of items that have been successfully
+              written</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">commitCount</td><td style="border-bottom: 0.5pt solid ; ">The number transactions that have been committed for this
+              execution</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">rollbackCount</td><td style="border-bottom: 0.5pt solid ; ">The number of times the business transaction controlled
+              by the <code class="classname">Step</code> has been rolled back.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">readSkipCount</td><td style="border-bottom: 0.5pt solid ; ">The number of times <code class="methodname">read</code> has
+              failed, resulting in a skipped item.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">processSkipCount</td><td style="border-bottom: 0.5pt solid ; ">The number of times <code class="methodname">process</code> has
+              failed, resulting in a skipped item.</td></tr><tr><td style="border-right: 0.5pt solid ; border-bottom: 0.5pt solid ; ">filterCount</td><td style="border-bottom: 0.5pt solid ; ">The number of items that have been 'filtered' by the
+              <code class="classname">ItemProcessor</code>.</td></tr><tr><td style="border-right: 0.5pt solid ; ">writeSkipCount</td><td>The number of times <code class="methodname">write</code> has
+              failed, resulting in a skipped item.</td></tr></tbody></table>
+      </div></div>
+    </section>
+  </section><footer/></body></html>

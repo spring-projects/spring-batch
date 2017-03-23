@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" tests="7" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="0.004">
+  <properties/>
+  <testcase name="testInvalidOverlappingRanges" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.003"/>
+  <testcase name="testSetAsTextWithNoSpaces" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.0"/>
+  <testcase name="testSetAsText" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.0"/>
+  <testcase name="testGetAsText" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.0"/>
+  <testcase name="testInvalidInput" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.001"/>
+  <testcase name="testValidDisjointRanges" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.0"/>
+  <testcase name="testValidOverlappingRanges" classname="org.springframework.batch.item.file.transform.RangeArrayPropertyEditorTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

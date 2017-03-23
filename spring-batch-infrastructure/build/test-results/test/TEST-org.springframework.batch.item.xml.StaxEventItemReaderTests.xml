@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.xml.StaxEventItemReaderTests" tests="28" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:22" hostname="Michaels-MacBook-Pro-3.local" time="0.049">
+  <properties/>
+  <testcase name="testAfterPropertesSetException" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testMoveCursorToNextFragment" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.0"/>
+  <testcase name="testMultiFragmentNested" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testRestartAtEndOfFile" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testMoveCursorToNextFragmentOnEmpty" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testItemCountAwareFragmentRestart" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.005"/>
+  <testcase name="testDirectoryResource" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testClose" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.004"/>
+  <testcase name="testMultiFragmentNestedRestart" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testItemCountAwareFragment" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testNonExistentResource" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testFragmentWrapping" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testExecutionContext" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testCloseWithoutOpen" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testFragmentNamespace" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testMultiFragmentNameSpace" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testMultiFragmentRestart" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testRestart" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testFragmentMixedNamespace" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.0"/>
+  <testcase name="testRuntimeFileCreation" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testFragmentInvalid" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.002"/>
+  <testcase name="testRestoreWorksFromClosedStream" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.0"/>
+  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.0"/>
+  <testcase name="testMoveCursorToNextFragmentOnMissing" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testOpenBadIOInput" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="testStrictness" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.0"/>
+  <testcase name="testMultiFragment" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.001"/>
+  <testcase name="exceptionDuringUnmarshalling" classname="org.springframework.batch.item.xml.StaxEventItemReaderTests" time="0.004"/>
+  <system-out><![CDATA[2017-03-23 10:04:22,783 WARN Test worker [org.springframework.batch.item.xml.StaxEventItemReader] - <Input resource is not readable file [/Users/mminella/Documents/IntelliJWorkspace/spring-batch/spring-batch-infrastructure/build/data]>
+2017-03-23 10:04:22,792 WARN Test worker [org.springframework.batch.item.xml.StaxEventItemReader] - <Input resource does not exist NonExistantResource>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

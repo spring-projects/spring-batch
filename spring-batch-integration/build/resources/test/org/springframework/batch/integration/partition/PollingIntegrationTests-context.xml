@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="classpath:/simple-job-launcher-context.xml" />
+
+	<channel id="requests" xmlns="http://www.springframework.org/schema/integration">
+		<queue />
+	</channel>
+
+	<service-activator ref="stepExecutionRequestHandler" input-channel="requests" output-channel="nullChannel"
+		xmlns="http://www.springframework.org/schema/integration">
+		<poller fixed-delay="10"/>
+	</service-activator>
+
+	<!-- This is the "remote" worker (which in this case is local) -->
+	<bean id="stepExecutionRequestHandler" class="org.springframework.batch.integration.partition.StepExecutionRequestHandler"
+		p:jobExplorer-ref="jobExplorer" p:stepLocator-ref="stepLocator" />
+
+	<bean id="stepLocator" class="org.springframework.batch.integration.partition.BeanFactoryStepLocator" />
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean">
+		<property name="repositoryFactory" ref="&amp;jobRepository" />
+	</bean>
+
+	<bean id="partitionHandler" class="org.springframework.batch.integration.partition.MessageChannelPartitionHandler">
+		<property name="messagingOperations">
+			<bean class="org.springframework.integration.core.MessagingTemplate">
+				<property name="defaultChannel" ref="requests" />
+			</bean>
+		</property>
+		<property name="jobExplorer" ref="jobExplorer"/>
+		<property name="stepName" value="step1" />
+		<property name="gridSize" value="2" />
+	</bean>
+
+	<job id="job1" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1-master">
+			<partition handler="partitionHandler" partitioner="partitioner" />
+		</step>
+	</job>
+
+	<bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+
+	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk commit-interval="10">
+				<reader>
+					<bean class="org.springframework.batch.integration.partition.ExampleItemReader" scope="step"
+						xmlns="http://www.springframework.org/schema/beans" />
+				</reader>
+				<writer>
+					<bean class="org.springframework.batch.integration.partition.ExampleItemWriter" xmlns="http://www.springframework.org/schema/beans" />
+				</writer>
+			</chunk>
+		</tasklet>
+	</step>
+
+</beans>

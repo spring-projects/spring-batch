@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
+		multiple environments. -->
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</property>
+	</bean>
+
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="restartable" value="true" />
+	</bean>
+	
+	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="allowStartIfComplete" value="true" />
+	</bean>
+	
+	<bean id="simpleStep" class="org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean" abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="infiniteLoopJob" parent="simpleJob">
+		<property name="jobParametersIncrementer">
+			<bean class="org.springframework.batch.core.launch.support.RunIdIncrementer" />	
+		</property>
+		<property name="steps">
+			<bean id="infiniteStep" parent="simpleStep">
+				<property name="itemReader">
+					<bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+						<property name="limit" value="1000000" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.JsrJobContextTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:18" hostname="Michaels-MacBook-Pro-3.local" time="0.124">
+  <properties/>
+  <testcase name="testGetBatchStatus" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.118"/>
+  <testcase name="testGetInstanceId" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <testcase name="testCreateWithNull" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.0"/>
+  <testcase name="testTransientUserData" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <testcase name="testGetJobName" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <testcase name="testJobProperties" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.0"/>
+  <testcase name="testExitStatus" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <testcase name="testInitialNullExitStatus" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <testcase name="testJobParameters" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.0"/>
+  <testcase name="testGetExecutionId" classname="org.springframework.batch.core.jsr.JsrJobContextTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

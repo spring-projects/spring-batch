@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.JobExecutionTests" tests="22" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
+  <properties/>
+  <testcase name="testGetJobIdForNullJob" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetJobId" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testSerialization" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetEndTime" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testUpgradeStatus" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testJobExecution" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testToStringWithNullJob" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testStop" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetStartTime" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testToString" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testIsRunningWithStoppedExecution" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetExitCode" classname="org.springframework.batch.core.JobExecutionTests" time="0.001"/>
+  <testcase name="testGetJobConfigurationName" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testDowngradeStatus" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testAddAndRemoveStepExecution" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testContextContainsInfo" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetJob" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testGetStatus" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testStepExecutionsWithSameName" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testIsRunning" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testSetStepExecutionsWithIds" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <testcase name="testSetStepExecutions" classname="org.springframework.batch.core.JobExecutionTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1" parent="baseJob">
+		<step id="s1">
+			<tasklet ref="dummyTasklet" />
+		</step>
+
+		<listeners merge="true">
+			<listener>
+				<beans:bean
+					class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+			</listener>
+		</listeners>
+	</job>
+
+	<job id="job2" parent="baseJob">
+		<step id="s2">
+			<tasklet ref="dummyTasklet" />
+		</step>
+
+		<listeners>
+			<listener>
+				<beans:bean
+					class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+			</listener>
+		</listeners>
+	</job>
+
+	<job id="job3" parent="baseJob3">
+		<step id="s3">
+			<tasklet ref="dummyTasklet" />
+		</step>
+
+		<listeners merge="true">
+			<listener ref="listener1" />
+		</listeners>
+	</job>
+
+	<job id="defaultRepoJob">
+		<step id="s4">
+			<tasklet ref="dummyTasklet" />
+		</step>
+	</job>
+
+	<job id="specifiedRepoJob" job-repository="dummyJobRepository">
+		<step id="s5">
+			<tasklet ref="dummyTasklet" />
+		</step>
+	</job>
+
+	<job id="inheritSpecifiedRepoJob" parent="baseSpecifiedRepoJob">
+		<step id="s6">
+			<tasklet ref="dummyTasklet" />
+		</step>
+	</job>
+
+	<job id="overrideInheritedRepoJob" parent="baseSpecifiedRepoJob"
+		job-repository="jobRepository">
+		<step id="s7">
+			<tasklet ref="dummyTasklet" />
+		</step>
+	</job>
+
+	<job id="baseSpecifiedRepoJob" abstract="true" job-repository="dummyJobRepository" />
+
+	<job id="baseJob" abstract="true">
+		<listeners>
+			<listener>
+				<beans:bean
+					class="org.springframework.batch.core.configuration.xml.DummyAnnotationJobExecutionListener" />
+			</listener>
+		</listeners>
+	</job>
+
+	<job-listener id="listener1">
+		<beans:bean
+			class="org.springframework.batch.core.configuration.xml.DummyAnnotationJobExecutionListener" />
+	</job-listener>
+
+	<beans:bean id="baseJob3" abstract="true">
+		<beans:property name="jobExecutionListeners">
+			<beans:list>
+				<job-listener>
+					<beans:bean
+						class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+				</job-listener>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+	<beans:bean id="dummyJobRepository"
+		class="org.springframework.batch.core.configuration.xml.DummyJobRepository" />
+
+	<job id="listenerClearingJob" parent="baseJob">
+		<step id="listenerClearingJobStep">
+			<tasklet ref="dummyTasklet" />
+		</step>
+		<listeners />
+	</job>
+
+</beans:beans>

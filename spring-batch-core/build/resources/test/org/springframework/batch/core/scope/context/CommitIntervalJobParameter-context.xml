@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   					   http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+
+	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+
+	<job id="basicSkipJob"
+		 xmlns="http://www.springframework.org/schema/batch">
+		<step id="basicSkipStep" >
+			<tasklet>
+				<chunk
+						reader="reader"
+						writer="writer"
+						commit-interval="#{jobParameters['commit.interval']}"
+						skip-policy="skipPolicy">
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.item.support.ListItemReader">
+		<constructor-arg>
+			<list>
+				<value>foo</value>
+				<value>bar</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.item.support.ListItemWriter"/>
+
+	<bean id="skipPolicy" class="org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy"/>
+
+</beans>

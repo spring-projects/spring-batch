@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.item.database.html">org.springframework.batch.item.database</a> &gt; StoredProcedureItemReaderIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">9</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.411s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testInvalidRestore</td>
+<td>0.052s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testMultipleRestarts</td>
+<td>0.042s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testNormalProcessing</td>
+<td>0.053s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestart</td>
+<td>0.051s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestartOnSecondPage</td>
+<td>0.043s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRestoreFromEmptyData</td>
+<td>0.040s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRollbackAndRestart</td>
+<td>0.049s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRollbackOnFirstChunkAndRestart</td>
+<td>0.050s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testTransacted</td>
+<td>0.031s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:08,918 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]&gt;
+2017-03-23 10:04:08,919 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]&gt;
+2017-03-23 10:04:08,919 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@457b10af, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@63fff292, org.springframework.test.context.support.DirtiesContextTestExecutionListener@3d3c798, org.springframework.test.context.transaction.TransactionalTestExecutionListener@7964f217, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@64876bfc]&gt;
+2017-03-23 10:04:08,920 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:08,928 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@78706e9c: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:08,930 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:08,950 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,089 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@7f2a33f1, testMethod = testRollbackOnFirstChunkAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@290cdf4b]; rollback [true]&gt;
+2017-03-23 10:04:09,099 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@7f2a33f1, testMethod = testRollbackOnFirstChunkAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:09,099 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@78706e9c: startup date [Thu Mar 23 10:04:08 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,099 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,122 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,136 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:09,138 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:09,145 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@1170baea: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,147 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:09,165 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,303 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@75b3249a, testMethod = testRestartOnSecondPage@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@45ec4179]; rollback [true]&gt;
+2017-03-23 10:04:09,313 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@75b3249a, testMethod = testRestartOnSecondPage@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:09,314 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@1170baea: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,314 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,331 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,344 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:09,344 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:09,351 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@4dcc032e: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,354 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:09,372 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,467 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@41276318, testMethod = testInvalidRestore@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@7fed26b8]; rollback [true]&gt;
+2017-03-23 10:04:09,477 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@41276318, testMethod = testInvalidRestore@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:09,478 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@4dcc032e: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,478 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,506 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,517 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:09,518 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:09,524 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@2f72b4ff: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,527 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:09,542 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,656 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@2e0145a0, testMethod = testMultipleRestarts@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@5034bbe9]; rollback [true]&gt;
+2017-03-23 10:04:09,666 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@2e0145a0, testMethod = testMultipleRestarts@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:09,666 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@2f72b4ff: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,667 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,684 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,696 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:09,697 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:09,703 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@199f847e: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,705 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:09,728 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,868 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@47efd651, testMethod = testNormalProcessing@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@27d7e0ca]; rollback [true]&gt;
+2017-03-23 10:04:09,876 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@47efd651, testMethod = testNormalProcessing@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:09,877 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@199f847e: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,877 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,900 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:09,919 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:09,920 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:09,928 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@3ddbb013: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:09,930 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:09,948 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,075 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@4c6e5620, testMethod = testRestoreFromEmptyData@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@6c7f5ffb]; rollback [true]&gt;
+2017-03-23 10:04:10,083 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@4c6e5620, testMethod = testRestoreFromEmptyData@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:10,083 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@3ddbb013: startup date [Thu Mar 23 10:04:09 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,083 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,099 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,113 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:10,114 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:10,122 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@5d2f30bb: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,124 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:10,140 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,272 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@3e3b5e64, testMethod = testRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@39d1efbc]; rollback [true]&gt;
+2017-03-23 10:04:10,282 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@3e3b5e64, testMethod = testRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:10,283 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@5d2f30bb: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,283 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,305 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,321 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:10,322 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:10,334 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@ba135be: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,337 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:10,356 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,477 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@2561e2cf, testMethod = testRollbackAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@18067bd2]; rollback [true]&gt;
+2017-03-23 10:04:10,486 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@442ffc89 testClass = StoredProcedureItemReaderIntegrationTests, testInstance = org.springframework.batch.item.database.StoredProcedureItemReaderIntegrationTests@2561e2cf, testMethod = testRollbackAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@1132f2de testClass = StoredProcedureItemReaderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/stored-procedure-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:10,487 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@ba135be: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,487 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,510 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,523 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+2017-03-23 10:04:10,524 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/stored-procedure-context.xml]&gt;
+2017-03-23 10:04:10,532 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@3321c4eb: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,533 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:10,551 INFO Test worker [test.jdbc.datasource.DerbyDataSourceFactoryBean] - &lt;Created instance of org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,680 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Closing org.springframework.context.support.GenericApplicationContext@3321c4eb: startup date [Thu Mar 23 10:04:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:10,680 INFO Test worker [test.jdbc.datasource.DataSourceInitializer] - &lt;destroy called for org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,698 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Attempting Derby database shut down on: org.apache.derby.jdbc.EmbeddedDataSource@f758900b&gt;
+2017-03-23 10:04:10,709 INFO Test worker [test.jdbc.datasource.DerbyShutdownBean] - &lt;Derby database is now shut down.&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:04:29 AM</p>
+</div>
+</div>
+</body>
+</html>

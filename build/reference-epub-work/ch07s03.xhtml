@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Remote Chunking</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch07s02.xhtml" title="Parallel Steps"/><link rel="next" href="ch07s04.xhtml" title="Partitioning"/></head><body><header/><section class="section" title="Remote Chunking" epub:type="subchapter" id="remoteChunking"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Remote Chunking</h2></div></div></div><p>In Remote Chunking the Step processing is split across multiple
+    processes, communicating with each other through some middleware. Here is
+    a picture of the pattern in action:</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/remote-chunking.png" width="459"/></div><p>The Master component is a single process, and the Slaves are
+    multiple remote processes. Clearly this pattern works best if the Master
+    is not a bottleneck, so the processing must be more expensive than the
+    reading of items (this is often the case in practice).</p><p>The Master is just an implementation of a Spring Batch
+    <code class="classname">Step</code>, with the ItemWriter replaced with a generic
+    version that knows how to send chunks of items to the middleware as
+    messages. The Slaves are standard listeners for whatever middleware is
+    being used (e.g. with JMS they would be
+    <code class="classname">MesssageListeners</code>), and their role is to process
+    the chunks of items using a standard <code class="classname">ItemWriter</code> or
+    <code class="classname">ItemProcessor</code> plus
+    <code class="classname">ItemWriter</code>, through the
+    <code class="classname">ChunkProcessor</code> interface. One of the advantages of
+    using this pattern is that the reader, processor and writer components are
+    off-the-shelf (the same as would be used for a local execution of the
+    step). The items are divided up dynamically and work is shared through the
+    middleware, so if the listeners are all eager consumers, then load
+    balancing is automatic.</p><p>The middleware has to be durable, with guaranteed delivery and
+    single consumer for each message. JMS is the obvious candidate, but other
+    options exist in the grid computing and shared memory product space (e.g.
+    Java Spaces).</p></section><footer/></body></html>

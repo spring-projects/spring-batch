@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<description>Example for Hibernate integration.</description>
+
+	<job id="hibernateJob" restartable="false" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="hibernateItemReader"
+				       processor="creditIncreaseProcessor"
+				       writer="hibernateCreditWriter"
+				       skip-limit="5"
+				       commit-interval="3">
+					<skippable-exception-classes>
+						<include class="java.lang.RuntimeException"/>
+					</skippable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="creditIncreaseProcessor"
+	            class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
+
+	<bean id="hibernateCreditWriter"
+		        class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="dao" ref="customerCreditDao" />
+	</bean>
+
+	<bean id="customerCreditDao"
+		class="org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="hibernateItemReader"
+		class="org.springframework.batch.item.database.HibernateCursorItemReader">
+		<property name="queryString" value="from CustomerCredit" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+</beans>

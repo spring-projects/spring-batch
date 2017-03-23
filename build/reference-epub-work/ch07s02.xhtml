@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Parallel Steps</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch07.xhtml" title="Chapter 7. Scaling and Parallel Processing"/><link rel="next" href="ch07s03.xhtml" title="Remote Chunking"/></head><body><header/><section class="section" title="Parallel Steps" epub:type="subchapter" id="scalabilityParallelSteps"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Parallel Steps</h2></div></div></div><p>As long as the application logic that needs to be parallelized can
+    be split into distinct responsibilities, and assigned to individual steps
+    then it can be parallelized in a single process. Parallel Step execution
+    is easy to configure and use, for example, to execute steps
+    <code class="literal">(step1,step2)</code> in parallel with
+    <code class="literal">step3</code>, you could configure a flow like this:</p><pre class="programlisting">&lt;job id="job1"&gt;
+    &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
+        &lt;flow&gt;
+            &lt;step id="step1" parent="s1" next="step2"/&gt;
+            &lt;step id="step2" parent="s2"/&gt;
+        &lt;/flow&gt;
+        &lt;flow&gt;
+            &lt;step id="step3" parent="s3"/&gt;
+        &lt;/flow&gt;
+    &lt;/split&gt;
+    &lt;step id="step4" parent="s4"/&gt;
+&lt;/job&gt;
+
+&lt;beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/&gt;</pre><p>The configurable "task-executor" attribute is used to specify which
+    TaskExecutor implementation should be used to execute the individual
+    flows. The default is <code class="classname">SyncTaskExecutor</code>, but an
+    asynchronous TaskExecutor is required to run the steps in parallel. Note
+    that the job will ensure that every flow in the split completes before
+    aggregating the exit statuses and transitioning.</p><p>See the section on <a class="xref" href="ch05s03.xhtml#split-flows" title="Split Flows">the section called “Split Flows”</a> for more
+    detail.</p></section><footer/></body></html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd
+       	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<util:map id="outputAggregators">
+		<entry key="header"   value-ref="outputHeader" />
+		<entry key="footer"   value-ref="outputFooter" />
+		<entry key="customer" value-ref="outputCustomer" />
+		<entry key="address"  value-ref="outputAddress" />
+		<entry key="billing"  value-ref="outputBilling" />
+		<entry key="item"     value-ref="outputLineItem" />
+	</util:map>
+
+	<bean id="baseAggregator" class="org.springframework.batch.item.file.transform.FormatterLineAggregator" abstract="true" />
+
+	<bean id="outputHeader" parent="baseAggregator">
+		<property name="format" value="%-12s%-10s%-30s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.HeaderFieldExtractor"/>
+		</property>
+	</bean>
+	
+	<bean id="outputFooter" parent="baseAggregator">
+		<property name="format" value="%-10s%20s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.FooterFieldExtractor"/>
+		</property>
+	</bean>
+	
+	<bean id="outputCustomer" parent="baseAggregator">
+		<property name="format" value="%-9s%-10s%-10s%-10s%-10s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.CustomerFieldExtractor"/>
+		</property>
+	</bean>
+	
+	<bean id="outputAddress" parent="baseAggregator">
+		<property name="format" value="%-8s%-20s%-10s%-10s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.AddressFieldExtractor"/>
+		</property>
+	</bean>
+	
+	<bean id="outputBilling" parent="baseAggregator">
+		<property name="format" value="%-8s%-10s%-20s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.BillingInfoFieldExtractor"/>
+		</property>
+	</bean>
+	
+	<bean id="outputLineItem" parent="baseAggregator">
+		<property name="format" value="%-5s%-10s%-10s"/>
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.sample.domain.order.internal.extractor.LineItemFieldExtractor"/>
+		</property>
+	</bean>
+</beans>

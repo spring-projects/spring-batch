@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.integration.partition.ExampleItemReaderTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:04" hostname="Michaels-MacBook-Pro-3.local" time="0.002">
+  <properties/>
+  <testcase name="testOpen" classname="org.springframework.batch.integration.partition.ExampleItemReaderTests" time="0.001"/>
+  <testcase name="testRead" classname="org.springframework.batch.integration.partition.ExampleItemReaderTests" time="0.0"/>
+  <testcase name="testFailAndRestart" classname="org.springframework.batch.integration.partition.ExampleItemReaderTests" time="0.001"/>
+  <system-out><![CDATA[2017-03-23 10:05:04,952  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=0, item=Hello, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,952  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=1, item=world!, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,952  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=2, item=Go, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,952  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=3, item=on, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=5, item=make, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=6, item=my, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=7, item=day!, in (org.springframework.batch.integration.partition.ExampleItemReader@45811114)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=0, item=Hello, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=1, item=world!, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=2, item=Go, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=3, item=on, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=5, item=make, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=6, item=my, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,953  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=7, item=day!, in (org.springframework.batch.integration.partition.ExampleItemReader@5379724d)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=0, item=Hello, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=1, item=world!, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=2, item=Go, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=3, item=on, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Throwing exception index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=5, item=make, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=6, item=my, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+2017-03-23 10:05:04,954  INFO Test worker [org.springframework.batch.integration.partition.ExampleItemReader] - <Processing input index=7, item=day!, in (org.springframework.batch.integration.partition.ExampleItemReader@6de0adaa)>
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

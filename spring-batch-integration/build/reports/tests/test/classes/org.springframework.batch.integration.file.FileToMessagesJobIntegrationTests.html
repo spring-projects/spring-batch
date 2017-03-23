@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.file.FileToMessagesJobIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.file.FileToMessagesJobIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.file.html">org.springframework.batch.integration.file</a> &gt; FileToMessagesJobIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.024s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testFileSent</td>
+<td>0.024s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:58,093  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/file/FileToMessagesJobIntegrationTests-context.xml]&gt;
+2017-03-23 10:04:58,127  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]&gt;
+2017-03-23 10:04:58,139  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:04:58,140 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:04:58,140 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:04:58,142  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@76452c1e: startup date [Thu Mar 23 10:04:58 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:58,172  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:04:58,172  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:04:58,173  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,189  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,198  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;No TaskExecutor has been set, defaulting to synchronous executor.&gt;
+2017-03-23 10:04:58,281 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:04:58,361  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:58,401 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:04:58,438  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:04:58,438  INFO Test worker [org.springframework.integration.gateway.GatewayProxyFactoryBean$MethodInvocationGateway] - &lt;started writer&gt;
+2017-03-23 10:04:58,438  INFO Test worker [org.springframework.integration.gateway.GatewayCompletableFutureProxyFactoryBean] - &lt;started writer&gt;
+2017-03-23 10:04:58,439  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:04:58,439  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@76452c1e.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,439  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:04:58,444  INFO Test worker [org.springframework.integration.channel.DirectChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@76452c1e.requests' has 1 subscriber(s).&gt;
+2017-03-23 10:04:58,447  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [FlowJob: [name=job]] launched with the following parameters: [{time.stamp=1490281498444}]&gt;
+2017-03-23 10:04:58,447 DEBUG Test worker [org.springframework.batch.core.job.AbstractJob] - &lt;Job execution starting: JobExecution: id=0, version=0, startTime=null, endTime=null, lastUpdated=Thu Mar 23 10:04:58 CDT 2017, status=STARTING, exitStatus=exitCode=UNKNOWN;exitDescription=, job=[JobInstance: id=0, version=0, Job=[job]], jobParameters=[{time.stamp=1490281498444}]&gt;
+2017-03-23 10:04:58,449 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Resuming state=job.step with status=UNKNOWN&gt;
+2017-03-23 10:04:58,449 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Handling state=job.step&gt;
+2017-03-23 10:04:58,453  INFO Test worker [org.springframework.batch.core.job.SimpleStepHandler] - &lt;Executing step: [step]&gt;
+2017-03-23 10:04:58,453 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Executing: id=1&gt;
+2017-03-23 10:04:58,456 DEBUG Test worker [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Preparing chunk execution for StepContext: org.springframework.batch.core.scope.context.StepContext@2a8f99bd&gt;
+2017-03-23 10:04:58,456 DEBUG Test worker [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Chunk execution starting: queue size=0&gt;
+2017-03-23 10:04:58,457 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=[one, two, three], headers={id=336fcbfc-714b-be97-2fba-90fff6fd52f2, timestamp=1490281498457}]&gt;
+2017-03-23 10:04:58,457 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=[one, two, three], headers={id=336fcbfc-714b-be97-2fba-90fff6fd52f2, timestamp=1490281498457}]&gt;
+2017-03-23 10:04:58,457 DEBUG Test worker [org.springframework.batch.core.step.item.ChunkOrientedTasklet] - &lt;Inputs not busy, ended: false&gt;
+2017-03-23 10:04:58,458 DEBUG Test worker [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Applying contribution: [StepContribution: read=3, written=3, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING]&gt;
+2017-03-23 10:04:58,458 DEBUG Test worker [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Saving step execution before commit: StepExecution: id=1, version=1, name=step, status=STARTED, exitStatus=EXECUTING, readCount=3, filterCount=0, writeCount=3 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=&gt;
+2017-03-23 10:04:58,460 DEBUG Test worker [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Preparing chunk execution for StepContext: org.springframework.batch.core.scope.context.StepContext@2a8f99bd&gt;
+2017-03-23 10:04:58,460 DEBUG Test worker [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Chunk execution starting: queue size=0&gt;
+2017-03-23 10:04:58,460 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=[four, five], headers={id=fb457896-46b9-38ff-7915-25d79c02c04b, timestamp=1490281498460}]&gt;
+2017-03-23 10:04:58,460 DEBUG Test worker [org.springframework.integration.channel.DirectChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=[four, five], headers={id=fb457896-46b9-38ff-7915-25d79c02c04b, timestamp=1490281498460}]&gt;
+2017-03-23 10:04:58,461 DEBUG Test worker [org.springframework.batch.core.step.item.ChunkOrientedTasklet] - &lt;Inputs not busy, ended: true&gt;
+2017-03-23 10:04:58,461 DEBUG Test worker [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Applying contribution: [StepContribution: read=2, written=2, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING]&gt;
+2017-03-23 10:04:58,461 DEBUG Test worker [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Saving step execution before commit: StepExecution: id=1, version=2, name=step, status=STARTED, exitStatus=EXECUTING, readCount=5, filterCount=0, writeCount=5 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=2, rollbackCount=0, exitDescription=&gt;
+2017-03-23 10:04:58,462 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution success: id=1&gt;
+2017-03-23 10:04:58,464 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution complete: StepExecution: id=1, version=4, name=step, status=COMPLETED, exitStatus=COMPLETED, readCount=5, filterCount=0, writeCount=5 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=2, rollbackCount=0&gt;
+2017-03-23 10:04:58,465 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Completed state=job.step with status=COMPLETED&gt;
+2017-03-23 10:04:58,465 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Handling state=job.end17&gt;
+2017-03-23 10:04:58,465 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Completed state=job.end17 with status=COMPLETED&gt;
+2017-03-23 10:04:58,465 DEBUG Test worker [org.springframework.batch.core.job.AbstractJob] - &lt;Job execution complete: JobExecution: id=0, version=1, startTime=Thu Mar 23 10:04:58 CDT 2017, endTime=null, lastUpdated=Thu Mar 23 10:04:58 CDT 2017, status=COMPLETED, exitStatus=exitCode=COMPLETED;exitDescription=, job=[JobInstance: id=0, version=0, Job=[job]], jobParameters=[{time.stamp=1490281498444}]&gt;
+2017-03-23 10:04:58,468  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [FlowJob: [name=job]] completed with the following parameters: [{time.stamp=1490281498444}] and the following status: [COMPLETED]&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>

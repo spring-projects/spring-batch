@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+	<job id="job" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+		<step id="step1">
+			<batchlet ref="testBatchlet"/>
+			<next on="DISTINCT" to="step2"/>
+			<stop on="DISTINCT" restart="step1"/>
+			<end on="DISTINCT"/>
+			<fail on="DISTINCT"/>
+		</step>
+		<step id="step2">
+			<batchlet ref="testBatchlet"/>
+			<stop on="DISTINCT" restart="step3"/>
+			<next on="DISTINCT" to="step3"/>
+			<end on="DISTINCT"/>
+			<fail on="DISTINCT"/>
+		</step>
+		<step id="step3" allow-start-if-complete="true">
+			<batchlet ref="testBatchlet"/>
+			<end on="DISTINCT"/>
+			<next on="RESTART" to="step4"/>
+			<stop on="DISTINCT" restart="step3"/>
+			<fail on="DISTINCT"/>
+		</step>
+		<step id="step4">
+			<batchlet ref="testBatchlet"/>
+			<fail on="DISTINCT"/>
+			<next on="DISTINCT" to="step4"/>
+			<stop on="DISTINCT" restart="step2"/>
+			<end on="DISTINCT"/>
+		</step>
+	</job>
+
+	<bean id="testBatchlet" class="org.springframework.batch.core.jsr.configuration.xml.FlowParserTests$TestBatchlet" scope="step"/>
+</beans>

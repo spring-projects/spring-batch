@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.support.ScriptItemProcessorTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:14" hostname="Michaels-MacBook-Pro-3.local" time="7.925">
+  <properties/>
+  <testcase name="testJavascriptScriptSimple" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="1.096"/>
+  <testcase name="testGroovyScriptSourceMethod" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.685"/>
+  <testcase name="testBeanShellScriptSourceFunction" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.115"/>
+  <testcase name="testGroovyScriptSourceSimple" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.011"/>
+  <testcase name="testJRubyScriptSourceMethod" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="5.679"/>
+  <testcase name="testJRubyScriptSourceSimple" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.006"/>
+  <testcase name="testBeanShellScriptSourceSimple" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.032"/>
+  <testcase name="testJavascriptScriptSourceFunction" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.097"/>
+  <testcase name="testScriptSourceAndScriptResourceSet" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.0"/>
+  <testcase name="testJavascriptScriptSourceSimple" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.101"/>
+  <testcase name="testNoScriptSetWithoutInitBean" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.001"/>
+  <testcase name="testNoScriptSet" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.001"/>
+  <testcase name="testScriptSourceWithNoLanguage" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.0"/>
+  <testcase name="testItemBindingNameChange" classname="org.springframework.batch.item.support.ScriptItemProcessorTests" time="0.098"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

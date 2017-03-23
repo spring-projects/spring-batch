@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="loopFlowSample" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1" next="step2">
+			<tasklet>
+				<chunk reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
+				<listeners>
+					<listener ref="resettingListener"/>
+				</listeners>
+			</tasklet>
+		</step>
+		<step id="step2" next="limitDecision">
+			<tasklet allow-start-if-complete="true">
+				<chunk reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
+				<listeners>
+					<listener ref="resettingListener"/>
+				</listeners>
+			</tasklet>
+		</step>
+		<decision id="limitDecision" decider="limitDecider">
+			<next on="CONTINUE" to="step2" />
+			<end on="COMPLETED" />
+		</decision>
+	</job>
+
+	<bean id="itemGenerator" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+		<property name="limit" value="1" />
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter" />
+
+	<bean id="limitDecider" class="org.springframework.batch.sample.loop.LimitDecider">
+		<property name="limit" value="9" />
+	</bean>
+
+	<bean id="resettingListener" class="org.springframework.batch.sample.loop.GeneratingTradeResettingListener">
+		<property name="reader" ref="itemGenerator" />
+	</bean>
+</beans>

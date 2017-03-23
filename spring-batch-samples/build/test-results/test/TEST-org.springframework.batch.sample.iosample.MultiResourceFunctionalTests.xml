@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.iosample.MultiResourceFunctionalTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:06:16" hostname="Michaels-MacBook-Pro-3.local" time="0.112">
+  <properties/>
+  <testcase name="testUpdateCredit" classname="org.springframework.batch.sample.iosample.MultiResourceFunctionalTests" time="0.112"/>
+  <system-out><![CDATA[10:06:16,234  INFO Test worker DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DependencyInjectionTestExecutionListener@5c7d7ee6, org.springframework.batch.test.StepScopeTestExecutionListener@8b089f3]
+10:06:16,236  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]
+10:06:16,247  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [data-source-context.xml]
+10:06:16,264  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/sample/config/common-context.xml]
+10:06:16,275  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [job-runner-context.xml]
+10:06:16,287  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/ioSampleJob.xml]
+10:06:16,301  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [jobs/iosample/multiResource.xml]
+10:06:16,309  INFO Test worker GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@fa4b445: startup date [Thu Mar 23 10:06:16 CDT 2017]; root of context hierarchy
+10:06:16,354  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'itemReader' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.file.MultiResourceItemReader]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/iosample/multiResource.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [jobs/iosample/multiResource.xml]]
+10:06:16,355  INFO Test worker DefaultListableBeanFactory:818 - Overriding bean definition for bean 'itemWriter' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.file.MultiResourceItemWriter]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [jobs/iosample/multiResource.xml]] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in class path resource [jobs/iosample/multiResource.xml]]
+10:06:16,361  INFO Test worker AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:06:16,388  INFO Test worker PostProcessorRegistrationDelegate$BeanPostProcessorChecker:325 - Bean 'jobRegistry' of type [class org.springframework.batch.core.configuration.support.MapJobRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+10:06:16,410  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql]
+10:06:16,416  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-drop-hsqldb.sql] in 6 ms.
+10:06:16,416  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql]
+10:06:16,421  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [org/springframework/batch/core/schema-hsqldb.sql] in 5 ms.
+10:06:16,421  INFO Test worker ScriptUtils:442 - Executing SQL script from class path resource [business-schema-hsqldb.sql]
+10:06:16,428  INFO Test worker ScriptUtils:508 - Executed SQL script from class path resource [business-schema-hsqldb.sql] in 6 ms.
+10:06:16,443  INFO Test worker JobRepositoryFactoryBean:184 - No database type set, using meta data indicating: HSQL
+10:06:16,445  INFO Test worker SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:06:16,590  INFO Test worker SimpleJobLauncher:139 - Job: [FlowJob: [name=ioSampleJob]] launched with the following parameters: [{random=226164, input.file.path=classpath:data/iosample/input/delimited*.csv, output.file.path=file:build/test-outputs/multiResourceOutput.csv}]
+10:06:16,599  INFO Test worker SimpleStepHandler:146 - Executing step: [step1]
+10:06:16,639  INFO Test worker SimpleJobLauncher:142 - Job: [FlowJob: [name=ioSampleJob]] completed with the following parameters: [{random=226164, input.file.path=classpath:data/iosample/input/delimited*.csv, output.file.path=file:build/test-outputs/multiResourceOutput.csv}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

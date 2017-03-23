@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.core.jsr.configuration.xml.BatchParserTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.core.jsr.configuration.xml.BatchParserTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.core.jsr.configuration.xml.html">org.springframework.batch.core.jsr.configuration.xml</a> &gt; BatchParserTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.038s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testOverrideBeansFirst</td>
+<td>0.020s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testOverrideBeansLast</td>
+<td>0.005s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testRoseyScenario</td>
+<td>0.013s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>10:02:12,389  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/override_batch.xml]
+10:02:12,393  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/batch.xml]
+10:02:12,402  INFO Test worker xml.BatchParser:74 - Ignoring batch.xml bean defintion for itemProcessor because another bean of the same name has been registered
+10:02:12,403  INFO Test worker xml.JsrXmlApplicationContext:581 - Refreshing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@4cdc790c: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+10:02:12,404  INFO Test worker xml.JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@4cdc790c: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+10:02:12,404  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/batch.xml]
+10:02:12,407  INFO Test worker xml.JsrXmlApplicationContext:581 - Refreshing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@12c1b59d: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+10:02:12,409  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'itemProcessor' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.support.PassThroughItemProcessor]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=false; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Root bean: class [org.springframework.aop.scope.ScopedProxyFactoryBean]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in BeanDefinition defined in null]
+10:02:12,409  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:12,417  INFO Test worker xml.JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@12c1b59d: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+10:02:12,417  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/batch.xml]
+10:02:12,420  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/jsr/configuration/xml/override_batch.xml]
+10:02:12,421  INFO Test worker support.DefaultListableBeanFactory:818 - Overriding bean definition for bean 'itemProcessor' with a different definition: replacing [Generic bean: class [org.springframework.batch.item.support.PassThroughItemProcessor]; scope=step; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null] with [Generic bean: class [org.springframework.batch.core.configuration.xml.DummyItemProcessor]; scope=; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in class path resource [org/springframework/batch/core/jsr/configuration/xml/override_batch.xml]]
+10:02:12,421  INFO Test worker xml.JsrXmlApplicationContext:581 - Refreshing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@d2e841: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+10:02:12,422  INFO Test worker xml.JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@d2e841: startup date [Thu Mar 23 10:02:12 CDT 2017]; root of context hierarchy
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:02:49 AM</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Configuring a JobRepository</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch04s02.xhtml" title="Java Config"/><link rel="next" href="ch04s04.xhtml" title="Configuring a JobLauncher"/></head><body><header/><section class="section" title="Configuring a JobRepository" epub:type="subchapter" id="configuringJobRepository"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Configuring a JobRepository</h2></div></div></div><p>As described in earlier, the <a class="link" href="">
+        <code class="classname">JobRepository</code>
+      </a> is used for basic CRUD operations of the various persisted
+    domain objects within Spring Batch, such as
+    <code class="classname">JobExecution</code> and
+    <code class="classname">StepExecution</code>. It is required by many of the major
+    framework features, such as the <code class="classname">JobLauncher</code>,
+    <code class="classname">Job</code>, and <code class="classname">Step</code>. The batch
+    namespace abstracts away many of the implementation details of the
+    <code class="classname">JobRepository</code> implementations and their
+    collaborators. However, there are still a few configuration options
+    available:</p><pre class="programlisting">&lt;job-repository id="jobRepository"
+    data-source="dataSource"
+    transaction-manager="transactionManager"
+    isolation-level-for-create="SERIALIZABLE"
+    table-prefix="BATCH_"
+	max-varchar-length="1000"/&gt;</pre><p>None of the configuration options listed above are required except
+    the id. If they are not set, the defaults shown above will be used. They
+    are shown above for awareness purposes. The
+    <code class="literal">max-varchar-length</code> defaults to 2500, which is the
+    length of the long <code class="literal">VARCHAR</code> columns in the <a class="link" href="apb.xhtml#metaDataSchemaOverview" title="Overview">sample schema scripts</a></p>
+
+     used to store things like exit code descriptions. If you don't modify the schema and you don't use multi-byte characters you shouldn't need to change it.
+
+    <section class="section" title="Transaction Configuration for the JobRepository" epub:type="division" id="txConfigForJobRepository"><div class="titlepage"><div><div><h3 class="title">Transaction Configuration for the JobRepository</h3></div></div></div><p>If the namespace is used, transactional advice will be
+      automatically created around the repository. This is to ensure that the
+      batch meta data, including state that is necessary for restarts after a
+      failure, is persisted correctly. The behavior of the framework is not
+      well defined if the repository methods are not transactional. The
+      isolation level in the <code class="code">create*</code> method attributes is
+      specified separately to ensure that when jobs are launched, if two
+      processes are trying to launch the same job at the same time, only one
+      will succeed. The default isolation level for that method is
+      SERIALIZABLE, which is quite aggressive: READ_COMMITTED would work just
+      as well; READ_UNCOMMITTED would be fine if two processes are not likely
+      to collide in this way. However, since a call to the
+      <code class="classname">create*</code> method is quite short, it is unlikely
+      that the SERIALIZED will cause problems, as long as the database
+      platform supports it. However, this can be overridden:</p><p>
+        </p><pre class="programlisting">&lt;job-repository id="jobRepository"
+                <span class="bold"><strong>isolation-level-for-create="REPEATABLE_READ"</strong></span> /&gt;</pre><p>
+      </p><p>If the namespace or factory beans aren't used then it is also
+      essential to configure the transactional behavior of the repository
+      using AOP:</p><p>
+        </p><pre class="programlisting">&lt;aop:config&gt;
+    &lt;aop:advisor
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"/&gt;
+    &lt;advice-ref="txAdvice" /&gt;
+&lt;/aop:config&gt;
+
+&lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
+    &lt;tx:attributes&gt;
+        &lt;tx:method name="*" /&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;</pre><p>
+      </p><p>This fragment can be used as is, with almost no changes. Remember
+      also to include the appropriate namespace declarations and to make sure
+      spring-tx and spring-aop (or the whole of spring) are on the
+      classpath.</p></section><section class="section" title="Changing the Table Prefix" epub:type="division" id="repositoryTablePrefix"><div class="titlepage"><div><div><h3 class="title">Changing the Table Prefix</h3></div></div></div><p>Another modifiable property of the
+      <code class="classname">JobRepository</code> is the table prefix of the
+      meta-data tables. By default they are all prefaced with BATCH_.
+      BATCH_JOB_EXECUTION and BATCH_STEP_EXECUTION are two examples. However,
+      there are potential reasons to modify this prefix. If the schema names
+      needs to be prepended to the table names, or if more than one set of
+      meta data tables is needed within the same schema, then the table prefix
+      will need to be changed:</p><pre class="programlisting">&lt;job-repository id="jobRepository"
+                <span class="bold"><strong>table-prefix="SYSTEM.TEST_"</strong></span> /&gt;</pre><p>Given the above changes, every query to the meta data tables will
+      be prefixed with "SYSTEM.TEST_". BATCH_JOB_EXECUTION will be referred to
+      as SYSTEM.TEST_JOB_EXECUTION.</p><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>Only the table prefix is configurable. The table and column
+        names are not.</p></td></tr></table></div></section><section class="section" title="In-Memory Repository" epub:type="division" id="inMemoryRepository"><div class="titlepage"><div><div><h3 class="title">In-Memory Repository</h3></div></div></div><p>There are scenarios in which you may not want to persist your
+      domain objects to the database. One reason may be speed; storing domain
+      objects at each commit point takes extra time. Another reason may be
+      that you just don't need to persist status for a particular job. For
+      this reason, Spring batch provides an in-memory Map version of the job
+      repository:</p><pre class="programlisting">&lt;bean id="jobRepository"
+  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"&gt;
+    &lt;property name="transactionManager" ref="transactionManager"/&gt;
+&lt;/bean&gt;</pre><p>Note that the in-memory repository is volatile and so does not
+      allow restart between JVM instances. It also cannot guarantee that two
+      job instances with the same parameters are launched simultaneously, and
+      is not suitable for use in a multi-threaded Job, or a locally
+      partitioned Step. So use the database version of the repository wherever
+      you need those features.</p><p>However it does require a transaction manager to be defined
+      because there are rollback semantics within the repository, and because
+      the business logic might still be transactional (e.g. RDBMS access). For
+      testing purposes many people find the
+      <code class="classname">ResourcelessTransactionManager</code> useful.</p></section><section class="section" title="Non-standard Database Types in a Repository" epub:type="division" id="nonStandardDatabaseTypesInRepository"><div class="titlepage"><div><div><h3 class="title">Non-standard Database Types in a Repository</h3></div></div></div><p>If you are using a database platform that is not in the list of
+      supported platforms, you may be able to use one of the supported types,
+      if the SQL variant is close enough. To do this you can use the raw
+      <code class="classname">JobRepositoryFactoryBean</code> instead of the namespace
+      shortcut and use it to set the database type to the closest
+      match:</p><pre class="programlisting">&lt;bean id="jobRepository" class="org...JobRepositoryFactoryBean"&gt;
+    &lt;property name="databaseType" value="db2"/&gt;
+    &lt;property name="dataSource" ref="dataSource"/&gt;
+&lt;/bean&gt;</pre><p>(The <code class="classname">JobRepositoryFactoryBean</code> tries to
+      auto-detect the database type from the <code class="classname">DataSource</code>
+      if it is not specified.) The major differences between platforms are
+      mainly accounted for by the strategy for incrementing primary keys, so
+      often it might be necessary to override the
+      <code class="literal">incrementerFactory</code> as well (using one of the standard
+      implementations from the Spring Framework).</p><p>If even that doesn't work, or you are not using an RDBMS, then the
+      only option may be to implement the various <code class="classname">Dao</code>
+      interfaces that the <code class="classname">SimpleJobRepository</code> depends
+      on and wire one up manually in the normal Spring way.</p></section></section><footer/></body></html>

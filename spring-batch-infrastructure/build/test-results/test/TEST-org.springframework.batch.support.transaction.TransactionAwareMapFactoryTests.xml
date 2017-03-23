@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" tests="13" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:28" hostname="Michaels-MacBook-Pro-3.local" time="0.015">
+  <properties/>
+  <testcase name="testTransactionalClearWithRollback" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testAdd" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testClear" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.0"/>
+  <testcase name="testEmpty" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.0"/>
+  <testcase name="testTransactionalClear" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.002"/>
+  <testcase name="testTransactionalEmpty" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testTransactionalAdd" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testTransactionalAddWithRollback" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.003"/>
+  <testcase name="testTransactionalRemoveWithRollback" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testRemove" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testValues" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.0"/>
+  <testcase name="testTransactionalRemove" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.001"/>
+  <testcase name="testTransactionalValues" classname="org.springframework.batch.support.transaction.TransactionAwareMapFactoryTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

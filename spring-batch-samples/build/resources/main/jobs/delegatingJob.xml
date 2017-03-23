@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<description>
+		The intent is to to give an example of how existing bean
+		definitions (e.g. from custom application's domain layer) can be
+		integrated into a batch job.
+	</description>
+
+	<job id="delegateJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="1"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+		<property name="targetObject" ref="delegateObject" />
+		<property name="targetMethod" value="getData" />
+	</bean>
+
+	<bean id="writer" class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
+		<property name="targetObject" ref="delegateObject" />
+		<property name="targetMethod" value="processPerson" />
+		<property name="fieldsUsedAsTargetMethodArguments">
+			<list>
+				<value>firstName</value>
+				<value>address.city</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="delegateObject" class="org.springframework.batch.sample.domain.person.PersonService" />
+</beans>

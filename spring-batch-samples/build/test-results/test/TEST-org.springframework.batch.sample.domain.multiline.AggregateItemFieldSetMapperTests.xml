@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" tests="6" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:55" hostname="Michaels-MacBook-Pro-3.local" time="0.008">
+  <properties/>
+  <testcase name="testDefaultEndRecord" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.003"/>
+  <testcase name="testDefaultBeginRecord" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.002"/>
+  <testcase name="testSetEndRecord" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.0"/>
+  <testcase name="testSetBeginRecord" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.0"/>
+  <testcase name="testMandatoryProperties" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.0"/>
+  <testcase name="testDelegate" classname="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapperTests" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.item.database.JpaPagingItemReaderNativeQueryIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.item.database.JpaPagingItemReaderNativeQueryIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.item.database.html">org.springframework.batch.item.database</a> &gt; JpaPagingItemReaderNativeQueryIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.013s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testRead</td>
+<td>0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testReadAfterJumpFirstPage</td>
+<td>0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testReadAfterJumpSecondPage</td>
+<td>0.002s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:04,810 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]&gt;
+2017-03-23 10:04:04,811 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]&gt;
+2017-03-23 10:04:04,812 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@776c8395, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@5449febf, org.springframework.test.context.support.DirtiesContextTestExecutionListener@791bb75b, org.springframework.test.context.transaction.TransactionalTestExecutionListener@c12bbe8, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@1ff1e1d4]&gt;
+2017-03-23 10:04:04,812 INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/item/database/JpaPagingItemReaderParameterTests-context.xml]&gt;
+2017-03-23 10:04:04,826 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@4564893: startup date [Thu Mar 23 10:04:04 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:04:04,829 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:04:04,845 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - &lt;Loaded JDBC driver: org.hsqldb.jdbcDriver&gt;
+2017-03-23 10:04:04,848 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Building JPA container EntityManagerFactory for persistence unit 'bar'&gt;
+[info 2017/03/23 10:04:04.848 CDT &lt;Test worker&gt; tid=0xc] HHH000204: Processing PersistenceUnitInfo [
+	name: bar
+	...]
+
+[warn 2017/03/23 10:04:04.853 CDT &lt;Test worker&gt; tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+
+[info 2017/03/23 10:04:05.040 CDT &lt;Test worker&gt; tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
+
+[info 2017/03/23 10:04:05.051 CDT &lt;Test worker&gt; tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
+
+2017-03-23 10:04:05,052 INFO Test worker [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] - &lt;Initialized JPA EntityManagerFactory for persistence unit 'bar'&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:04:29 AM</p>
+</div>
+</div>
+</body>
+</html>

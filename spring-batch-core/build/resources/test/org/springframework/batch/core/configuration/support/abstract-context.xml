@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+
+	<bean id="abstract-job" abstract="true" class="org.springframework.batch.core.job.JobSupport">
+		<property name="name" value="${foo}" />
+		<property name="steps">
+            <list>
+                <bean id="step31" class="org.springframework.batch.core.step.StepSupport"/>
+                <bean id="step32" class="org.springframework.batch.core.step.StepSupport"/>
+            </list>
+        </property>
+	</bean>
+
+	<bean id="foo" class="org.springframework.batch.core.configuration.support.GenericApplicationContextFactoryTests$Foo">
+		<property name="values" value="1,4" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties" value="foo=bar" />
+		<property name="order" value="1"/>
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="double[]" value="org.springframework.batch.support.IntArrayPropertyEditor"/>
+			</map>
+		</property>
+	</bean>
+</beans>

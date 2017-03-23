@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="parallelJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="staging" next="loading">
+			<tasklet>
+				<chunk reader="fileItemReader"
+				       processor="validatingProcessor"
+				       writer="stagingItemWriter"
+				       commit-interval="2"/>
+			</tasklet>
+		</step>
+		<step id="loading">
+			<tasklet task-executor="taskExecutor">
+				<chunk reader="stagingReader"
+			           processor="stagingProcessor"
+			           writer="tradeWriter"
+			           commit-interval="1"/>
+			</tasklet>
+		</step>
+	</job>
+
+	<!-- INFRASTRUCTURE SETUP -->
+
+	<bean id="validatingProcessor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="fixedValidator" />
+	</bean>
+
+	<bean id="stagingItemWriter" class="org.springframework.batch.sample.common.StagingItemWriter">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="BATCH_STAGING_SEQ" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+
+	<bean id="stagingReader" class="org.springframework.batch.sample.common.StagingItemReader">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="stagingProcessor" class="org.springframework.batch.sample.common.StagingItemProcessor">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+		<property name="dao" ref="tradeDao" />
+	</bean>
+
+	<!--
+		This input source is injected into the test case to verify the output
+		- not used by the job at all
+	-->
+	<bean id="testItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource"
+			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileTokenizer" />
+				<property name="fieldSetMapper" ref="fieldSetMapper" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="fileItemReader" parent="testItemReader"
+		autowire-candidate="false">
+	</bean>
+
+	<bean id="fixedFileTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="ISIN, Quantity, Price, Customer" />
+		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</bean>
+
+	<bean id="fixedValidator"
+		class="org.springframework.batch.item.validator.SpringValidator">
+		<property name="validator">
+            <bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+		</property>
+	</bean>
+
+	<bean id="tradeDao"
+		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+		<property name="dataSource" ref="dataSource" />
+		<property name="incrementer">
+			<bean parent="incrementerParent">
+				<property name="incrementerName" value="TRADE_SEQ" />
+			</bean>
+
+		</property>
+	</bean>
+
+	<bean id="fieldSetMapper"
+		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+
+	<aop:config>
+		<aop:aspect id="moduleLogging" ref="logAdvice">
+			<aop:after
+				pointcut="execution( * org.springframework.batch.item.ItemWriter+.write(Object)) and args(item)"
+				method="doStronglyTypedLogging" />
+		</aop:aspect>
+	</aop:config>
+</beans>

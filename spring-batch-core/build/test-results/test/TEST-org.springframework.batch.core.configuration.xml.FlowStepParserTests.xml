@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.configuration.xml.FlowStepParserTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:58" hostname="Michaels-MacBook-Pro-3.local" time="0.354">
+  <properties/>
+  <testcase name="testFlowStep" classname="org.springframework.batch.core.configuration.xml.FlowStepParserTests" time="0.08"/>
+  <testcase name="testRepeatedFlow" classname="org.springframework.batch.core.configuration.xml.FlowStepParserTests" time="0.112"/>
+  <testcase name="testFlowExternalStep" classname="org.springframework.batch.core.configuration.xml.FlowStepParserTests" time="0.076"/>
+  <testcase name="testRestartedFlow" classname="org.springframework.batch.core.configuration.xml.FlowStepParserTests" time="0.085"/>
+  <system-out><![CDATA[10:01:57,798  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/configuration/xml/FlowStepParserTests-context.xml" for test class [org.springframework.batch.core.configuration.xml.FlowStepParserTests]
+10:01:57,798  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@6185998 declaringClass = 'org.springframework.batch.core.configuration.xml.FlowStepParserTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/configuration/xml/FlowStepParserTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:01:57,799  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.configuration.xml.FlowStepParserTests]: FlowStepParserTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:01:57,801  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:01:57,802  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:01:57,803  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@4b90f24d, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@3dc16a13, org.springframework.test.context.support.DirtiesContextTestExecutionListener@1bddbb73, org.springframework.test.context.transaction.TransactionalTestExecutionListener@4e69e04d, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@2276157]
+10:01:57,804  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/FlowStepParserTests-context.xml]
+10:01:57,822  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/configuration/xml/common-context.xml]
+10:01:57,836  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@340012f2: startup date [Thu Mar 23 10:01:57 CDT 2017]; root of context hierarchy
+10:01:57,855  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:01:58,009  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s1]
+10:01:58,020  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job1.flow]
+10:01:58,031  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:58,050  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:58,074  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s4]
+10:01:58,088  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job3.flow]
+10:01:58,096  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:58,110  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:58,125  INFO Test worker job.SimpleStepHandler:119 - Duplicate step [job3.flow] detected in execution of job=[job3]. If either step fails, both will be executed again on restart.
+10:01:58,131  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job3.flow]
+10:01:58,147  INFO Test worker job.SimpleStepHandler:119 - Duplicate step [s2] detected in execution of job=[job3]. If either step fails, both will be executed again on restart.
+10:01:58,156  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:58,179  INFO Test worker job.SimpleStepHandler:119 - Duplicate step [s3] detected in execution of job=[job3]. If either step fails, both will be executed again on restart.
+10:01:58,187  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:58,200  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job2.s1]
+10:01:58,214  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job2.flow]
+10:01:58,225  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:58,241  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:58,262  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job2.s4]
+10:01:58,276  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job4.flow]
+10:01:58,284  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s2]
+10:01:58,299  INFO Test worker job.SimpleStepHandler:146 - Executing step: [s3]
+10:01:58,327  INFO Test worker job.SimpleStepHandler:146 - Executing step: [job4.flow]
+10:01:58,340  INFO Test worker job.SimpleStepHandler:217 - Step already complete or not restartable, so no action to execute: StepExecution: id=18, version=3, name=s2, status=COMPLETED, exitStatus=COMPLETED, readCount=0, filterCount=0, writeCount=0 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=
+10:01:58,350  INFO Test worker job.SimpleStepHandler:217 - Step already complete or not restartable, so no action to execute: StepExecution: id=19, version=3, name=s3, status=COMPLETED, exitStatus=COMPLETED, readCount=0, filterCount=0, writeCount=0 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

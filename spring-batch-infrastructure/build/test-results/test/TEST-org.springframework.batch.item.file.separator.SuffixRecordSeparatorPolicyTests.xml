@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" tests="9" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:13" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
+  <properties/>
+  <testcase name="testNormalLineWithDefaultSuffixAndWhitespace" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testNormalLine" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testEmptyLine" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testNormalLineWithDefaultSuffixWithIgnoreWhitespace" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testPostProcessNullLine" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testPostProcessSunnyDay" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testNormalLineWithDefaultSuffix" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testNormalLineWithNonDefaultSuffix" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <testcase name="testNullLineIsEndOfRecord" classname="org.springframework.batch.item.file.separator.SuffixRecordSeparatorPolicyTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

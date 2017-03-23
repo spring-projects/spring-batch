@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="mailJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1" xmlns="http://www.springframework.org/schema/batch">
+			<tasklet>
+				<chunk reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="5" skip-limit="100">
+					<skippable-exception-classes>
+						<include class="java.lang.RuntimeException" />
+					</skippable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="sql" value="select ID, NAME, EMAIL from USERS" />
+		<property name="rowMapper">
+			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper">
+				<property name="mappedClass" value="org.springframework.batch.sample.domain.mail.User" />
+			</bean>
+		</property>
+		<property name="dataSource" ref="dataSource" />
+		<property name="verifyCursorPosition" value="${batch.verify.cursor.position}"/>
+	</bean>
+
+	<bean id="itemWriter" class="org.springframework.batch.item.mail.SimpleMailMessageItemWriter">
+		<property name="mailSender" ref="mailSender" />
+		<property name="mailErrorHandler" ref="loggingMailErrorHandler" />
+	</bean>
+
+	<bean id="itemProcessor" class="org.springframework.batch.sample.domain.mail.internal.UserMailItemProcessor" />
+
+	<bean id="loggingMailErrorHandler" class="org.springframework.batch.sample.domain.mail.internal.TestMailErrorHandler" />
+
+	<bean id="mailSender" class="org.springframework.batch.sample.domain.mail.internal.TestMailSender">
+		<property name="subjectsToFail">
+			<list>
+				<value>John Adams's Account Info</value>
+				<value>James Madison's Account Info</value>
+			</list>
+		</property>
+	</bean>
+</beans>

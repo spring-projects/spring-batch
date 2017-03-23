@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step"><tasklet ref="tasklet"/></step>
+	</job>
+
+	<job-repository id="jobRepository" xmlns="http://www.springframework.org/schema/batch"/>
+
+	<bean id="tasklet" class="org.springframework.batch.core.configuration.xml.FailingTasklet"/>
+
+	<bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository"/>
+	</bean>
+
+	<bean class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource" />
+		<property name="initScripts">
+			<list>
+				<value>org/springframework/batch/core/schema-drop-hsqldb.sql</value>
+				<value>org/springframework/batch/core/schema-hsqldb.sql</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true;hsqldb.tx=mvcc" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>

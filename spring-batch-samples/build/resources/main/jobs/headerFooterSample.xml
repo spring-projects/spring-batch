@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+	<description>
+		Showcases reading and writing of headers and footers. Copies header from input to output and adds a footer.
+	</description>
+
+	<job id="headerFooterSample" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="3">
+					<streams>
+						<stream ref="reader"/>
+						<stream ref="writer"/>
+					</streams>
+				</chunk>
+				<listeners>
+					<listener ref="footerCallback"/>
+				</listeners>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" ref="inputResource" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean
+						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value="," />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean
+						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+		<property name="skippedLinesCallback" ref="headerCopier" />
+		<property name="linesToSkip" value="1" />
+	</bean>
+	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" ref="outputResource" />
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+		<property name="headerCallback" ref="headerCopier" />
+		<property name="footerCallback" ref="footerCallback" />
+	</bean>
+	<bean id="footerCallback" class="org.springframework.batch.sample.support.SummaryFooterCallback" />
+	<bean id="headerCopier"
+		class="org.springframework.batch.sample.support.HeaderCopyCallback" />
+	<bean id="inputResource" class="org.springframework.core.io.ClassPathResource">
+		<constructor-arg type="java.lang.String"
+			value="data/headerFooterSample/input.txt" />
+	</bean>
+	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String"
+			value="build/test-outputs/headerFooterOutput.txt" />
+	</bean>
+</beans>

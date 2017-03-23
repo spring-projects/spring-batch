@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Reusing Existing Services</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch06s09.xhtml" title="Database"/><link rel="next" href="ch06s11.xhtml" title="Validating Input"/></head><body><header/><section class="section" title="Reusing Existing Services" epub:type="subchapter" id="reusingExistingServices"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Reusing Existing Services</h2></div></div></div><p>Batch systems are often used in conjunction with other application
+    styles. The most common is an online system, but it may also support
+    integration or even a thick client application by moving necessary bulk
+    data that each application style uses. For this reason, it is common that
+    many users want to reuse existing DAOs or other services within their
+    batch jobs. The Spring container itself makes this fairly easy by allowing
+    any necessary class to be injected. However, there may be cases where the
+    existing service needs to act as an <code class="classname">ItemReader</code> or
+    <code class="classname">ItemWriter</code>, either to satisfy the dependency of
+    another Spring Batch class, or because it truly is the main
+    <code class="classname">ItemReader</code> for a step. It is fairly trivial to
+    write an adaptor class for each service that needs wrapping, but because
+    it is such a common concern, Spring Batch provides implementations:
+    <code class="classname">ItemReaderAdapter</code> and
+    <code class="classname">ItemWriterAdapter</code>. Both classes implement the
+    standard Spring method invoking the delegate pattern and are fairly simple
+    to set up. Below is an example of the reader:</p><pre class="programlisting">&lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
+    &lt;property name="targetObject" ref="fooService" /&gt;
+    &lt;property name="targetMethod" value="generateFoo" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;</pre><p>One important point to note is that the contract of the targetMethod
+    must be the same as the contract for <code class="methodname">read</code>: when
+    exhausted it will return null, otherwise an <code class="classname">Object</code>.
+    Anything else will prevent the framework from knowing when processing
+    should end, either causing an infinite loop or incorrect failure,
+    depending upon the implementation of the
+    <code class="classname">ItemWriter</code>. The <code class="classname">ItemWriter</code>
+    implementation is equally as simple:</p><pre class="programlisting">&lt;bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter"&gt;
+    &lt;property name="targetObject" ref="fooService" /&gt;
+    &lt;property name="targetMethod" value="processFoo" /&gt;
+&lt;/bean&gt;
+
+&lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;
+</pre></section><footer/></body></html>

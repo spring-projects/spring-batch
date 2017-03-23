@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:11" hostname="Michaels-MacBook-Pro-3.local" time="0.013">
+  <properties/>
+  <testcase name="testFactory" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testType" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testSingleton" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testNoSortKey" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testNoDataSource" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testMissingMetaData" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.003"/>
+  <testcase name="testAscending" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.001"/>
+  <testcase name="testAllDatabaseTypes" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.002"/>
+  <testcase name="testWrongDatabaseType" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <testcase name="testWhereClause" classname="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBeanTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

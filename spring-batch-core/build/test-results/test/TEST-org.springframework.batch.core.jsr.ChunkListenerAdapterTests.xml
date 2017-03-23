@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" tests="8" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.096">
+  <properties/>
+  <testcase name="testAfterChunkError" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.089"/>
+  <testcase name="testBeforeChunk" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.001"/>
+  <testcase name="testAfterChunkErrorException" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.002"/>
+  <testcase name="testAfterChunkException" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.001"/>
+  <testcase name="testAfterChunkErrorNullContext" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.001"/>
+  <testcase name="testBeforeChunkException" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.001"/>
+  <testcase name="testAfterChunk" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.0"/>
+  <testcase name="testNullDelegate" classname="org.springframework.batch.core.jsr.ChunkListenerAdapterTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.springframework.batch.core.step.skip.ReprocessExceptionTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:46" hostname="Michaels-MacBook-Pro-3.local" time="0.037">
+  <properties/>
+  <testcase name="testReprocessException" classname="org.springframework.batch.core.step.skip.ReprocessExceptionTests" time="0.037"/>
+  <system-out><![CDATA[10:02:46,369  INFO Test worker support.AbstractContextLoader:252 - Detected default resource location "classpath:org/springframework/batch/core/step/skip/ReprocessExceptionTests-context.xml" for test class [org.springframework.batch.core.step.skip.ReprocessExceptionTests]
+10:02:46,369  INFO Test worker support.AbstractDelegatingSmartContextLoader:176 - GenericXmlContextLoader detected default locations for context configuration [ContextConfigurationAttributes@279fe5bd declaringClass = 'org.springframework.batch.core.step.skip.ReprocessExceptionTests', classes = '{}', locations = '{classpath:org/springframework/batch/core/step/skip/ReprocessExceptionTests-context.xml}', inheritLocations = true, initializers = '{}', inheritInitializers = true, name = [null], contextLoaderClass = 'org.springframework.test.context.ContextLoader'].
+10:02:46,371  INFO Test worker support.AnnotationConfigContextLoaderUtils:81 - Could not detect default configuration classes for test class [org.springframework.batch.core.step.skip.ReprocessExceptionTests]: ReprocessExceptionTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:02:46,373  INFO Test worker support.DefaultTestContextBootstrapper:260 - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+10:02:46,373  INFO Test worker support.DefaultTestContextBootstrapper:209 - Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]
+10:02:46,373  INFO Test worker support.DefaultTestContextBootstrapper:187 - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@6d1558c0, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@14de6e94, org.springframework.test.context.support.DirtiesContextTestExecutionListener@2baba936, org.springframework.test.context.transaction.TransactionalTestExecutionListener@14e46a32, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@5370f336]
+10:02:46,374  INFO Test worker xml.XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [org/springframework/batch/core/step/skip/ReprocessExceptionTests-context.xml]
+10:02:46,385  INFO Test worker support.GenericApplicationContext:581 - Refreshing org.springframework.context.support.GenericApplicationContext@34bd8d02: startup date [Thu Mar 23 10:02:46 CDT 2017]; root of context hierarchy
+10:02:46,396  INFO Test worker annotation.AutowiredAnnotationBeanPostProcessor:151 - JSR-330 'javax.inject.Inject' annotation found and supported for autowiring
+10:02:46,412  INFO Test worker support.SimpleJobLauncher:201 - No TaskExecutor has been set, defaulting to synchronous executor.
+10:02:46,520  INFO Test worker support.GenericApplicationContext:985 - Closing org.springframework.context.support.GenericApplicationContext@125828ab: startup date [Thu Mar 23 10:02:14 CDT 2017]; root of context hierarchy
+10:02:46,524  INFO Test worker support.SimpleJobLauncher:139 - Job: [FlowJob: [name=job]] launched with the following parameters: [{}]
+10:02:46,528  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step1]
+Converting (firstName: Jill, lastName: Doe) into (firstName: JILL, lastName: DOE)
+JILL DOE
+Converting (firstName: Joe, lastName: Doe) into (firstName: JOE, lastName: DOE)
+JOE DOE
+Converting (firstName: Justin, lastName: Doe) into (firstName: JUSTIN, lastName: DOE)
+JUSTIN DOE
+Converting (firstName: Jane, lastName: Doe) into (firstName: JANE, lastName: DOE)
+JANE DOE
+Converting (firstName: John, lastName: Doe) into (firstName: JOHN, lastName: DOE)
+JOHN DOE
+10:02:46,559  INFO Test worker support.SimpleJobLauncher:142 - Job: [FlowJob: [name=job]] completed with the following parameters: [{}] and the following status: [COMPLETED]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Chapter 5. Configuring a Step</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch04s06.xhtml" title="Advanced Meta-Data Usage"/><link rel="next" href="ch05s02.xhtml" title="TaskletStep"/></head><body><header/><section class="chapter" title="Chapter 5. Configuring a Step" epub:type="chapter" id="configureStep"><div class="titlepage"><div><div><h1 class="title">Chapter 5. Configuring a Step</h1></div></div></div><p>As discussed in <a class="xref" href="ch03.xhtml" title="Chapter 3. The Domain Language of Batch">Batch Domain Language</a>, a
+  <code class="classname">Step</code> is a domain object that encapsulates an
+  independent, sequential phase of a batch job and contains all of the
+  information necessary to define and control the actual batch processing.
+  This is a necessarily vague description because the contents of any given
+  <code class="classname">Step</code> are at the discretion of the developer writing a
+  <code class="classname">Job</code>. A Step can be as simple or complex as the
+  developer desires. A simple <code class="classname">Step</code> might load data from
+  a file into the database, requiring little or no code. (depending upon the
+  implementations used) A more complex <code class="classname">Step</code> may have
+  complicated business rules that are applied as part of the
+  processing.</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/step.png" width="324"/></div><section class="section" title="Chunk-Oriented Processing" epub:type="subchapter" id="chunkOrientedProcessing"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Chunk-Oriented Processing</h2></div></div></div><p>Spring Batch uses a 'Chunk Oriented' processing style within its
+    most common implementation. Chunk oriented processing refers to reading
+    the data one at a time, and creating 'chunks' that will be written out,
+    within a transaction boundary. One item is read in from an
+    <code class="classname">ItemReader</code>, handed to an
+    <code class="classname">ItemProcessor</code>, and aggregated. Once the number of
+    items read equals the commit interval, the entire chunk is written out via
+    the ItemWriter, and then the transaction is committed.</p><div style="text-align: center; " class="mediaobject"><img style="text-align: middle; " src="images/chunk-oriented-processing.png"/></div><p>Below is a code representation of the same concepts shown
+    above:</p><pre class="programlisting">List items = new Arraylist();
+for(int i = 0; i &lt; commitInterval; i++){
+    Object item = itemReader.read()
+    Object processedItem = itemProcessor.process(item);
+    items.add(processedItem);
+}
+itemWriter.write(items);</pre><section class="section" title="Configuring a Step" epub:type="division" id="configuringAStep"><div class="titlepage"><div><div><h3 class="title">Configuring a Step</h3></div></div></div><p>Despite the relatively short list of required dependencies for a
+      <code class="classname">Step</code>, it is an extremely complex class that can
+      potentially contain many collaborators. In order to ease configuration,
+      the Spring Batch namespace can be used:</p><pre class="programlisting">&lt;job id="sampleJob" job-repository="jobRepository"&gt;
+    &lt;step id="step1"&gt;
+        &lt;tasklet transaction-manager="transactionManager"&gt;
+            &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;</pre><p>The configuration above represents the only required dependencies
+      to create a item-oriented step:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p>reader - The <code class="classname">ItemReader</code> that provides
+            items for processing.</p></li><li class="listitem" epub:type="list-item"><p>writer - The <code class="classname">ItemWriter</code> that
+            processes the items provided by the
+            <code class="classname">ItemReader</code>.</p></li><li class="listitem" epub:type="list-item"><p>transaction-manager - Spring's
+            <code class="classname">PlatformTransactionManager</code> that will be
+            used to begin and commit transactions during processing.</p></li><li class="listitem" epub:type="list-item"><p>job-repository - The <code class="classname">JobRepository</code>
+            that will be used to periodically store the
+            <code class="classname">StepExecution</code> and
+            <code class="classname">ExecutionContext</code> during processing (just
+            before committing). For an in-line &lt;step/&gt; (one defined
+            within a &lt;job/&gt;) it is an attribute on the &lt;job/&gt;
+            element; for a standalone step, it is defined as an attribute of
+            the &lt;tasklet/&gt;.</p></li><li class="listitem" epub:type="list-item"><p>commit-interval - The number of items that will be processed
+            before the transaction is committed.</p></li></ul></div><p>It should be noted that, job-repository defaults to
+      "jobRepository" and transaction-manager defaults to "transactionManger".
+      Furthermore, the <code class="classname">ItemProcessor</code> is optional, not
+      required, since the item could be directly passed from the reader to the
+      writer.</p></section><section class="section" title="Inheriting from a Parent Step" epub:type="division" id="InheritingFromParentStep"><div class="titlepage"><div><div><h3 class="title">Inheriting from a Parent Step</h3></div></div></div><p>If a group of <code class="classname">Step</code>s share similar
+      configurations, then it may be helpful to define a "parent"
+      <code class="classname">Step</code> from which the concrete
+      <code class="classname">Step</code>s may inherit properties. Similar to class
+      inheritance in Java, the "child" <code class="classname">Step</code> will
+      combine its elements and attributes with the parent's. The child will
+      also override any of the parent's <code class="classname">Step</code>s.</p><p>In the following example, the <code class="classname">Step</code>
+      "concreteStep1" will inherit from "parentStep". It will be instantiated
+      with 'itemReader', 'itemProcessor', 'itemWriter', startLimit=5, and
+      allowStartIfComplete=true. Additionally, the commitInterval will be '5'
+      since it is overridden by the "concreteStep1":</p><pre class="programlisting">&lt;step id="parentStep"&gt;
+    &lt;tasklet allow-start-if-complete="true"&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
+
+&lt;step id="concreteStep1" parent="parentStep"&gt;
+    &lt;tasklet start-limit="5"&gt;
+        &lt;chunk processor="itemProcessor" commit-interval="5"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>The id attribute is still required on the step within the job
+      element. This is for two reasons:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>The id will be used as the step name when persisting the
+            StepExecution. If the same standalone step is referenced in more
+            than one step in the job, an error will occur.</p></li><li class="listitem" epub:type="list-item"><p>When creating job flows, as described later in this chapter,
+            the next attribute should be referring to the step in the flow,
+            not the standalone step.</p></li></ol></div><section class="section" title="Abstract Step" epub:type="division" id="abstractStep"><div class="titlepage"><div><div><h4 class="title">Abstract Step</h4></div></div></div><p>Sometimes it may be necessary to define a parent
+        <code class="classname">Step</code> that is not a complete
+        <code class="classname">Step</code> configuration. If, for instance, the
+        reader, writer, and tasklet attributes are left off of a
+        <code class="classname">Step </code>configuration, then initialization will
+        fail. If a parent must be defined without these properties, then the
+        "abstract" attribute should be used. An "abstract"
+        <code class="classname">Step</code> will not be instantiated; it is used only
+        for extending.</p><p>In the following example, the <code class="classname">Step</code>
+        "abstractParentStep" would not instantiate if it were not declared to
+        be abstract. The <code class="classname">Step</code> "concreteStep2" will have
+        'itemReader', 'itemWriter', and commitInterval=10.</p><pre class="programlisting">&lt;step id="abstractParentStep" abstract="true"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
+
+&lt;step id="concreteStep2" parent="abstractParentStep"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre></section><section class="section" title="Merging Lists" epub:type="division" id="mergingListsOnStep"><div class="titlepage"><div><div><h4 class="title">Merging Lists</h4></div></div></div><p>Some of the configurable elements on
+        <code class="classname">Step</code>s are lists; the &lt;listeners/&gt;
+        element, for instance. If both the parent and child
+        <code class="classname">Step</code>s declare a &lt;listeners/&gt; element,
+        then the child's list will override the parent's. In order to allow a
+        child to add additional listeners to the list defined by the parent,
+        every list element has a "merge" attribute. If the element specifies
+        that merge="true", then the child's list will be combined with the
+        parent's instead of overriding it.</p><p>In the following example, the <code class="classname">Step</code>
+        "concreteStep3" will be created will two listeners:
+        <code class="classname">listenerOne</code> and
+        <code class="classname">listenerTwo</code>:</p><pre class="programlisting">&lt;step id="listenersParentStep" abstract="true"&gt;
+    &lt;listeners&gt;
+        &lt;listener ref="listenerOne"/&gt;
+    &lt;listeners&gt;
+&lt;/step&gt;
+
+&lt;step id="concreteStep3" parent="listenersParentStep"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="5"/&gt;
+    &lt;/tasklet&gt;
+    &lt;listeners merge="true"&gt;
+        &lt;listener ref="listenerTwo"/&gt;
+    &lt;listeners&gt;
+&lt;/step&gt;</pre></section></section><section class="section" title="The Commit Interval" epub:type="division" id="commitInterval"><div class="titlepage"><div><div><h3 class="title">The Commit Interval</h3></div></div></div><p>As mentioned above, a step reads in and writes out items,
+      periodically committing using the supplied
+      <code class="classname">PlatformTransactionManager</code>. With a
+      commit-interval of 1, it will commit after writing each individual item.
+      This is less than ideal in many situations, since beginning and
+      committing a transaction is expensive. Ideally, it is preferable to
+      process as many items as possible in each transaction, which is
+      completely dependent upon the type of data being processed and the
+      resources with which the step is interacting. For this reason, the
+      number of items that are processed within a commit can be
+      configured.</p><pre class="programlisting">&lt;job id="sampleJob"&gt;
+    &lt;step id="step1"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="itemReader" writer="itemWriter" <span class="bold"><strong>commit-interval="10"</strong></span>/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;</pre><p>In the example above, 10 items will be processed within each
+      transaction. At the beginning of processing a transaction is begun, and
+      each time <span class="markup">read</span> is called on the
+      <code class="classname">ItemReader</code>, a counter is incremented. When it
+      reaches 10, the list of aggregated items is passed to the
+      <code class="classname">ItemWriter</code>, and the transaction will be
+      committed.</p></section><section class="section" title="Configuring a Step for Restart" epub:type="division" id="stepRestart"><div class="titlepage"><div><div><h3 class="title">Configuring a Step for Restart</h3></div></div></div><p>In <a class="xref" href="ch04.xhtml" title="Chapter 4. Configuring and Running a Job">Chapter 4, <em>Configuring and Running a Job</em></a>, restarting a
+      <code class="classname">Job</code> was discussed. Restart has numerous impacts
+      on steps, and as such may require some specific configuration.</p><section class="section" title="Setting a StartLimit" epub:type="division" id="startLimit"><div class="titlepage"><div><div><h4 class="title">Setting a StartLimit</h4></div></div></div><p>There are many scenarios where you may want to control the
+        number of times a <code class="classname">Step</code> may be started. For
+        example, a particular <code class="classname">Step</code> might need to be
+        configured so that it only runs once because it invalidates some
+        resource that must be fixed manually before it can be run again. This
+        is configurable on the step level, since different steps may have
+        different requirements. A <code class="classname">Step</code> that may only be
+        executed once can exist as part of the same <code class="classname">Job</code>
+        as a <code class="classname">Step</code> that can be run infinitely. Below is
+        an example start limit configuration:</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet start-limit="1"&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>The simple step above can be run only once. Attempting to run it
+        again will cause an exception to be thrown. It should be noted that
+        the default value for the start-limit is
+        <code class="classname">Integer.MAX_VALUE</code>.</p></section><section class="section" title="Restarting a completed step" epub:type="division" id="allowStartIfComplete"><div class="titlepage"><div><div><h4 class="title">Restarting a completed step</h4></div></div></div><p>In the case of a restartable job, there may be one or more steps
+        that should always be run, regardless of whether or not they were
+        successful the first time. An example might be a validation step, or a
+        <code class="classname">Step</code> that cleans up resources before
+        processing. During normal processing of a restarted job, any step with
+        a status of 'COMPLETED', meaning it has already been completed
+        successfully, will be skipped. Setting allow-start-if-complete to
+        "true" overrides this so that the step will always run:</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet allow-start-if-complete="true"&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre></section><section class="section" title="Step Restart Configuration Example" epub:type="division" id="stepRestartExample"><div class="titlepage"><div><div><h4 class="title">Step Restart Configuration Example</h4></div></div></div><pre class="programlisting">&lt;job id="footballJob" restartable="true"&gt;
+    &lt;step id="playerload" next="gameLoad"&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="playerFileItemReader" writer="playerWriter"
+                   commit-interval="10" /&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+    &lt;step id="gameLoad" next="playerSummarization"&gt;
+        &lt;tasklet allow-start-if-complete="true"&gt;
+            &lt;chunk reader="gameFileItemReader" writer="gameWriter"
+                   commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+    &lt;step id="playerSummarization"&gt;
+        &lt;tasklet start-limit="3"&gt;
+            &lt;chunk reader="playerSummarizationSource" writer="summaryWriter"
+                   commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
+&lt;/job&gt;</pre><p>The above example configuration is for a job that loads in
+        information about football games and summarizes them. It contains
+        three steps: playerLoad, gameLoad, and playerSummarization. The
+        playerLoad <code class="classname">Step</code> loads player information from a
+        flat file, while the gameLoad <code class="classname">Step</code> does the
+        same for games. The final <code class="classname">Step</code>,
+        playerSummarization, then summarizes the statistics for each player
+        based upon the provided games. It is assumed that the file loaded by
+        'playerLoad' must be loaded only once, but that 'gameLoad' will load
+        any games found within a particular directory, deleting them after
+        they have been successfully loaded into the database. As a result, the
+        playerLoad <code class="classname">Step</code> contains no additional
+        configuration. It can be started almost limitlessly, and if complete
+        will be skipped. The 'gameLoad' <code class="classname">Step</code>, however,
+        needs to be run every time in case extra files have been dropped since
+        it last executed. It has 'allow-start-if-complete' set to 'true' in
+        order to always be started. (It is assumed that the database tables
+        games are loaded into has a process indicator on it, to ensure new
+        games can be properly found by the summarization step). The
+        summarization <code class="classname">Step</code>, which is the most important
+        in the <code class="classname">Job</code>, is configured to have a start limit
+        of 3. This is useful because if the step continually fails, a new exit
+        code will be returned to the operators that control job execution, and
+        it won't be allowed to start again until manual intervention has taken
+        place.</p><div class="note" title="Note" epub:type="notice"><table style="border: 0; "><tr><td style="text-align: center; vertical-align: top; width: 25; " rowspan="2"><img alt="[Note]" src="images/note.png"/></td><th style="text-align: left; ">Note</th></tr><tr><td style="text-align: left; vertical-align: top; "><p>This job is purely for example purposes and is not the same as
+          the footballJob found in the samples project.</p></td></tr></table></div><p>Run 1:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>playerLoad is executed and completes successfully, adding
+            400 players to the 'PLAYERS' table.</p></li><li class="listitem" epub:type="list-item"><p>gameLoad is executed and processes 11 files worth of game
+            data, loading their contents into the 'GAMES' table.</p></li><li class="listitem" epub:type="list-item"><p>playerSummarization begins processing and fails after 5
+            minutes.</p></li></ol></div><p>Run 2:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>playerLoad is not run, since it has already completed
+            successfully, and allow-start-if-complete is 'false' (the
+            default).</p></li><li class="listitem" epub:type="list-item"><p>gameLoad is executed again and processes another 2 files,
+            loading their contents into the 'GAMES' table as well (with a
+            process indicator indicating they have yet to be processed)</p></li><li class="listitem" epub:type="list-item"><p>playerSummarization begins processing of all remaining game
+            data (filtering using the process indicator) and fails again after
+            30 minutes.</p></li></ol></div><p>Run 3:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>playerLoad is not run, since it has already completed
+            successfully, and allow-start-if-complete is 'false' (the
+            default).</p></li><li class="listitem" epub:type="list-item"><p>gameLoad is executed again and processes another 2 files,
+            loading their contents into the 'GAMES' table as well (with a
+            process indicator indicating they have yet to be processed)</p></li><li class="listitem" epub:type="list-item"><p>playerSummarization is not start, and the job is immediately
+            killed, since this is the third execution of playerSummarization,
+            and its limit is only 2. The limit must either be raised, or the
+            <code class="classname">Job</code> must be executed as a new
+            <code class="classname">JobInstance</code>.</p></li></ol></div></section></section><section class="section" title="Configuring Skip Logic" epub:type="division" id="configuringSkip"><div class="titlepage"><div><div><h3 class="title">Configuring Skip Logic</h3></div></div></div><p>There are many scenarios where errors encountered while processing
+      should not result in <code class="classname">Step</code> failure, but should be
+      skipped instead. This is usually a decision that must be made by someone
+      who understands the data itself and what meaning it has. Financial data,
+      for example, may not be skippable because it results in money being
+      transferred, which needs to be completely accurate. Loading a list of
+      vendors, on the other hand, might allow for skips. If a vendor is not
+      loaded because it was formatted incorrectly or was missing necessary
+      information, then there probably won't be issues. Usually these bad
+      records are logged as well, which will be covered later when discussing
+      listeners.
+      </p><pre class="programlisting">&lt;step id="step1"&gt;
+   &lt;tasklet&gt;
+      &lt;chunk reader="flatFileItemReader" writer="itemWriter"
+             commit-interval="10" <span class="bold"><strong>skip-limit="10"</strong></span>&gt;
+         <span class="bold"><strong>&lt;skippable-exception-classes&gt;
+            &lt;include class="org.springframework.batch.item.file.FlatFileParseException"/&gt;
+         &lt;/skippable-exception-classes&gt;</strong></span>
+      &lt;/chunk&gt;
+   &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>In this example, a <code class="classname">FlatFileItemReader</code> is
+      used, and if at any point a
+      <code class="classname">FlatFileParseException</code> is thrown, it will be
+      skipped and counted against the total skip limit of 10. Separate counts
+      are made of skips on read, process and write inside the step execution,
+      and the limit applies across all. Once the skip limit is reached, the
+      next exception found will cause the step to fail.</p><p>One problem with the example above is that any other exception
+      besides a <code class="classname">FlatFileParseException</code> will cause the
+      <code class="classname">Job</code> to fail. In certain scenarios this may be the
+      correct behavior. However, in other scenarios it may be easier to
+      identify which exceptions should cause failure and skip everything
+      else:
+      </p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter"
+               commit-interval="10" <span class="bold"><strong>skip-limit="10"</strong></span>&gt;
+<span class="bold"><strong>            &lt;skippable-exception-classes&gt;
+                &lt;include class="java.lang.Exception"/&gt;
+                &lt;exclude class="java.io.FileNotFoundException"/&gt;
+            &lt;/skippable-exception-classes&gt;
+</strong></span>        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>By 'including' <code class="classname">java.lang.Exception</code> as a
+      skippable exception class, the configuration indicates that all
+      <code class="classname">Exception</code>s are skippable. However, by 'excluding'
+      <code class="classname">java.io.FileNotFoundException</code>, the configuration
+      refines the list of skippable exception classes to be all
+      <code class="classname">Exception</code>s <span class="emphasis"><em>except</em></span>
+      <code class="classname">FileNotFoundException</code>. Any excluded exception
+      classes will be fatal if encountered (i.e. not skipped).</p><p>For any exception encountered, the skippability will be determined
+      by the nearest superclass in the class hierarchy. Any unclassifed
+      exception will be treated as 'fatal'. The order of the
+      <code class="code">&lt;include/&gt;</code> and <code class="code">&lt;exclude/&gt;</code> elements
+      does not matter.</p></section><section class="section" title="Configuring Retry Logic" epub:type="division" id="retryLogic"><div class="titlepage"><div><div><h3 class="title">Configuring Retry Logic</h3></div></div></div><p>In most cases you want an exception to cause either a skip or
+      <code class="classname">Step</code> failure. However, not all exceptions are
+      deterministic. If a <code class="classname">FlatFileParseException</code> is
+      encountered while reading, it will always be thrown for that record;
+      resetting the <code class="classname">ItemReader</code> will not help. However,
+      for other exceptions, such as a
+      <code class="classname">DeadlockLoserDataAccessException</code>, which indicates
+      that the current process has attempted to update a record that another
+      process holds a lock on, waiting and trying again might result in
+      success. In this case, retry should be configured:</p><pre class="programlisting">&lt;step id="step1"&gt;
+   &lt;tasklet&gt;
+      &lt;chunk reader="itemReader" writer="itemWriter"
+             commit-interval="2" <span class="bold"><strong>retry-limit="3"</strong></span>&gt;
+         <span class="bold"><strong>&lt;retryable-exception-classes&gt;
+            &lt;include class="org.springframework.dao.DeadlockLoserDataAccessException"/&gt;
+         &lt;/retryable-exception-classes&gt;</strong></span>
+      &lt;/chunk&gt;
+   &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>The <code class="classname">Step</code> allows a limit for the number of
+      times an individual item can be retried, and a list of exceptions that
+      are 'retryable'. More details on how retry works can be found in <a class="xref" href="ch09.xhtml" title="Chapter 9. Retry">Chapter 9, <em>Retry</em></a>.</p></section><section class="section" title="Controlling Rollback" epub:type="division" id="controllingRollback"><div class="titlepage"><div><div><h3 class="title">Controlling Rollback</h3></div></div></div><p>By default, regardless of retry or skip, any exceptions thrown
+      from the <code class="classname">ItemWriter</code> will cause the transaction
+      controlled by the <code class="classname">Step</code> to rollback. If skip is
+      configured as described above, exceptions thrown from the
+      <code class="classname">ItemReader</code> will not cause a rollback. However,
+      there are many scenarios in which exceptions thrown from the
+      <code class="classname">ItemWriter</code> should not cause a rollback because no
+      action has taken place to invalidate the transaction. For this reason,
+      the <code class="classname">Step</code> can be configured with a list of
+      exceptions that should not cause rollback.</p><pre class="programlisting">&lt;step id="step1"&gt;
+   &lt;tasklet&gt;
+      &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
+      &lt;no-rollback-exception-classes&gt;
+         &lt;include class="org.springframework.batch.item.validator.ValidationException"/&gt;
+      &lt;/no-rollback-exception-classes&gt;
+   &lt;/tasklet&gt;
+&lt;/step&gt;</pre><section class="section" title="Transactional Readers" epub:type="division" id="transactionalReaders"><div class="titlepage"><div><div><h4 class="title">Transactional Readers</h4></div></div></div><p>The basic contract of the <code class="classname">ItemReader</code> is
+        that it is forward only. The step buffers reader input, so that in the
+        case of a rollback the items don't need to be re-read from the reader.
+        However, there are certain scenarios in which the reader is built on
+        top of a transactional resource, such as a JMS queue. In this case,
+        since the queue is tied to the transaction that is rolled back, the
+        messages that have been pulled from the queue will be put back on. For
+        this reason, the step can be configured to not buffer the
+        items:</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"
+           <span class="bold"><strong>    is-reader-transactional-queue="true"</strong></span>/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre></section></section><section class="section" title="Transaction Attributes" epub:type="division" id="transactionAttributes"><div class="titlepage"><div><div><h3 class="title">Transaction Attributes</h3></div></div></div><p>Transaction attributes can be used to control the isolation,
+      propagation, and timeout settings. More information on setting
+      transaction attributes can be found in the spring core
+      documentation.</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
+        &lt;transaction-attributes isolation="DEFAULT"
+                                propagation="REQUIRED"
+                                timeout="30"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre></section><section class="section" title="Registering ItemStreams with the Step" epub:type="division" id="registeringItemStreams"><div class="titlepage"><div><div><h3 class="title">Registering ItemStreams with the Step</h3></div></div></div><p>The step has to take care of <code class="classname">ItemStream</code>
+      callbacks at the necessary points in its lifecycle. (for more
+      information on the <code class="classname">ItemStream</code> interface, please
+      refer to <a class="xref" href="ch06s04.xhtml" title="ItemStream">the section called “ItemStream”</a>) This is vital if a step fails,
+      and might need to be restarted, because the
+      <code class="classname">ItemStream</code> interface is where the step gets the
+      information it needs about persistent state between executions.</p><p>If the <code class="classname">ItemReader</code>,
+      <code class="classname">ItemProcessor</code>, or
+      <code class="classname">ItemWriter</code> itself implements the
+      <code class="classname">ItemStream</code> interface, then these will be
+      registered automatically. Any other streams need to be registered
+      separately. This is often the case where there are indirect dependencies
+      such as delegates being injected into the reader and writer. A stream
+      can be registered on the <code class="classname">Step</code> through the
+      'streams' element, as illustrated below:</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="compositeWriter" commit-interval="2"&gt;
+            <span class="bold"><strong>&lt;streams&gt;
+                &lt;stream ref="fileItemWriter1"/&gt;
+                &lt;stream ref="fileItemWriter2"/&gt;
+            &lt;/streams&gt;</strong></span>
+        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
+
+&lt;beans:bean id="compositeWriter"
+            class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
+    &lt;beans:property name="delegates"&gt;
+        &lt;beans:list&gt;
+            &lt;beans:ref bean="fileItemWriter1" /&gt;
+            &lt;beans:ref bean="fileItemWriter2" /&gt;
+        &lt;/beans:list&gt;
+    &lt;/beans:property&gt;
+&lt;/beans:bean&gt;</pre><p>In the example above, the
+      <code class="classname">CompositeItemWriter</code> is not an
+      <code class="classname">ItemStream</code>, but both of its delegates are.
+      Therefore, both delegate writers must be explicitly registered as
+      streams in order for the framework to handle them correctly. The
+      <code class="classname">ItemReader</code> does not need to be explicitly
+      registered as a stream because it is a direct property of the
+      <code class="classname">Step</code>. The step will now be restartable and the
+      state of the reader and writer will be correctly persisted in the event
+      of a failure.</p></section><section class="section" title="Intercepting Step Execution" epub:type="division" id="interceptingStepExecution"><div class="titlepage"><div><div><h3 class="title">Intercepting Step Execution</h3></div></div></div><p>Just as with the <code class="classname">Job</code>, there are many events
+      during the execution of a <code class="classname">Step</code> where a user may
+      need to perform some functionality. For example, in order to write out
+      to a flat file that requires a footer, the
+      <code class="classname">ItemWriter</code> needs to be notified when the
+      <code class="classname">Step</code> has been completed, so that the footer can
+      written. This can be accomplished with one of many
+      <code class="classname">Step</code> scoped listeners.</p><p>Any class that implements one of the extensions
+	  of <code class="classname">StepListener</code> (but not that interface
+	  itself since it is empty) can be applied to a step via the
+	  listeners element.  The listeners element is valid inside a
+	  step, tasklet or chunk declaration.  It is recommended that you
+	  declare the listeners at the level which its function applies,
+	  or if it is multi-featured
+	  (e.g. <code class="classname">StepExecutionListener</code>
+	  and <code class="classname">ItemReadListener</code>) then declare it at
+	  the most granular level that it applies (chunk in the example
+	  given).</p><pre class="programlisting">&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
+        &lt;listeners&gt;
+            &lt;listener ref="chunkListener"/&gt;
+        &lt;/listeners&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</pre><p>An <code class="classname">ItemReader</code>,
+      <code class="classname">ItemWriter</code> or
+      <code class="classname">ItemProcessor</code> that itself implements one of the
+      <code class="classname">StepListener</code> interfaces will be registered
+      automatically with the <code class="classname">Step</code> if using the
+      namespace <code class="literal">&lt;step&gt;</code> element, or one of the the
+      <code class="classname">*StepFactoryBean</code> factories. This only applies to
+      components directly injected into the <code class="classname">Step</code>: if
+      the listener is nested inside another component, it needs to be
+      explicitly registered (as described above).</p><p>In addition to the <code class="classname">StepListener</code> interfaces,
+      annotations are provided to address the same concerns. Plain old Java
+      objects can have methods with these annotations that are then converted
+      into the corresponding <code class="classname">StepListener</code> type. It is
+      also common to annotate custom implementations of chunk components like
+      <code class="classname">ItemReader</code> or <code class="classname">ItemWriter</code>
+      or <code class="classname">Tasklet</code>. The annotations are analysed by the
+      XML parser for the <code class="code">&lt;listener/&gt;</code> elements, so all you
+      need to do is use the XML namespace to register the listeners with a
+      step.</p><section class="section" title="StepExecutionListener" epub:type="division" id="stepExecutionListener"><div class="titlepage"><div><div><h4 class="title">StepExecutionListener</h4></div></div></div><p><code class="classname">StepExecutionListener</code> represents the most
+        generic listener for <code class="classname">Step</code> execution. It allows
+        for notification before a <code class="classname">Step</code> is started and
+        after it has ends, whether it ended normally or failed:</p><pre class="programlisting">public interface StepExecutionListener extends StepListener {
+
+    void beforeStep(StepExecution stepExecution);
+
+    ExitStatus afterStep(StepExecution stepExecution);
+
+}</pre><p><code class="classname">ExitStatus</code> is the return type of
+        <code class="methodname">afterStep</code> in order to allow listeners the
+        chance to modify the exit code that is returned upon completion of a
+        <code class="classname">Step</code>.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@BeforeStep</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@AfterStep</code></p></li></ul></div></section><section class="section" title="ChunkListener" epub:type="division" id="chunkListener"><div class="titlepage"><div><div><h4 class="title">ChunkListener</h4></div></div></div><p>A chunk is defined as the items processed within the scope of a
+        transaction. Committing a transaction, at each commit interval,
+        commits a 'chunk'. A <code class="classname">ChunkListener</code> can be
+        useful to perform logic before a chunk begins processing or after a
+        chunk has completed successfully:</p><pre class="programlisting">public interface ChunkListener extends StepListener {
+
+    void beforeChunk();
+    void afterChunk();
+
+}</pre><p>The <code class="methodname">beforeChunk</code> method is called after
+        the transaction is started, but before <code class="methodname">read</code>
+        is called on the <code class="classname">ItemReader</code>. Conversely,
+        <code class="methodname">afterChunk</code> is called after the chunk has been
+        committed (and not at all if there is a rollback).</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@BeforeChunk</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@AfterChunk</code></p></li></ul></div><p>A <code class="classname">ChunkListener</code> can be applied
+		when there is no chunk declaration: it is
+		the <code class="classname">TaskletStep</code> that is responsible for
+		calling the <code class="classname">ChunkListener</code> so it applies
+		to a non-item-oriented tasklet as well (called before and
+		after the tasklet).</p></section><section class="section" title="ItemReadListener" epub:type="division" id="itemReadListener"><div class="titlepage"><div><div><h4 class="title">ItemReadListener</h4></div></div></div><p>When discussing skip logic above, it was mentioned that it may
+        be beneficial to log the skipped records, so that they can be deal
+        with later. In the case of read errors, this can be done with an
+        <code class="classname">ItemReaderListener:</code>
+        </p><pre class="programlisting">public interface ItemReadListener&lt;T&gt; extends StepListener {
+
+    void beforeRead();
+    void afterRead(T item);
+    void onReadError(Exception ex);
+
+}</pre><p>The <code class="methodname">beforeRead</code> method will be called
+        before each call to <code class="methodname">read</code> on the
+        <code class="classname">ItemReader</code>. The
+        <code class="methodname">afterRead</code> method will be called after each
+        successful call to <code class="methodname">read</code>, and will be passed
+        the item that was read. If there was an error while reading, the
+        <code class="classname">onReadError</code> method will be called. The
+        exception encountered will be provided so that it can be
+        logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@BeforeRead</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@AfterRead</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@OnReadError</code></p></li></ul></div></section><section class="section" title="ItemProcessListener" epub:type="division" id="itemProcessListener"><div class="titlepage"><div><div><h4 class="title">ItemProcessListener</h4></div></div></div><p>Just as with the <code class="classname">ItemReadListener</code>, the
+        processing of an item can be 'listened' to:</p><pre class="programlisting">public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
+
+    void beforeProcess(T item);
+    void afterProcess(T item, S result);
+    void onProcessError(T item, Exception e);
+
+}</pre><p>The <code class="methodname">beforeProcess</code> method will be called
+        before <code class="methodname">process</code> on the
+        <code class="classname">ItemProcessor</code>, and is handed the item that will
+        be processed. The <code class="methodname">afterProcess</code> method will be
+        called after the item has been successfully processed. If there was an
+        error while processing, the <code class="methodname">onProcessError</code>
+        method will be called. The exception encountered and the item that was
+        attempted to be processed will be provided, so that they can be
+        logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@BeforeProcess</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@AfterProcess</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@OnProcessError</code></p></li></ul></div></section><section class="section" title="ItemWriteListener" epub:type="division" id="itemWriteListener"><div class="titlepage"><div><div><h4 class="title">ItemWriteListener</h4></div></div></div><p>The writing of an item can be 'listened' to with the
+        <code class="classname">ItemWriteListener</code>:</p><pre class="programlisting">public interface ItemWriteListener&lt;S&gt; extends StepListener {
+
+    void beforeWrite(List&lt;? extends S&gt; items);
+    void afterWrite(List&lt;? extends S&gt; items);
+    void onWriteError(Exception exception, List&lt;? extends S&gt; items);
+
+}</pre><p>The <code class="methodname">beforeWrite</code> method will be called
+        before <code class="methodname">write</code> on the
+        <code class="classname">ItemWriter</code>, and is handed the item that will be
+        written. The <code class="methodname">afterWrite</code> method will be called
+        after the item has been successfully written. If there was an error
+        while writing, the <code class="methodname">onWriteError</code> method will
+        be called. The exception encountered and the item that was attempted
+        to be written will be provided, so that they can be logged.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@BeforeWrite</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@AfterWrite</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@OnWriteError</code></p></li></ul></div></section><section class="section" title="SkipListener" epub:type="division" id="skipListener"><div class="titlepage"><div><div><h4 class="title">SkipListener</h4></div></div></div><p><code class="classname">ItemReadListener</code>,
+        <code class="classname">ItemProcessListener</code>, and
+        <code class="classname">ItemWriteListner</code> all provide mechanisms for
+        being notified of errors, but none will inform you that a record has
+        actually been skipped. <code class="methodname">onWriteError</code>, for
+        example, will be called even if an item is retried and successful. For
+        this reason, there is a separate interface for tracking skipped
+        items:</p><pre class="programlisting">public interface SkipListener&lt;T,S&gt; extends StepListener {
+
+    void onSkipInRead(Throwable t);
+    void onSkipInProcess(T item, Throwable t);
+    void onSkipInWrite(S item, Throwable t);
+
+}</pre><p><code class="methodname">onSkipInRead</code> will be called whenever an
+        item is skipped while reading. It should be noted that rollbacks may
+        cause the same item to be registered as skipped more than once.
+        <code class="methodname">onSkipInWrite</code> will be called when an item is
+        skipped while writing. Because the item has been read successfully
+        (and not skipped), it is also provided the item itself as an
+        argument.</p><p>The annotations corresponding to this interface are:</p><div class="itemizedlist" epub:type="list"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem" epub:type="list-item"><p><code class="classname">@OnSkipInRead</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@OnSkipInWrite</code></p></li><li class="listitem" epub:type="list-item"><p><code class="classname">@OnSkipInProcess</code></p></li></ul></div><section class="section" title="SkipListeners and Transactions" epub:type="division" id="skipListenersAndTransactions"><div class="titlepage"><div><div><h5 class="title">SkipListeners and Transactions</h5></div></div></div><p>One of the most common use cases for a
+          <code class="classname">SkipListener</code> is to log out a skipped item, so
+          that another batch process or even human process can be used to
+          evaluate and fix the issue leading to the skip. Because there are
+          many cases in which the original transaction may be rolled back,
+          Spring Batch makes two guarantees:</p><div class="orderedlist" epub:type="list"><ol class="orderedlist" type="1"><li class="listitem" epub:type="list-item"><p>The appropriate skip method (depending on when the error
+              happened) will only be called once per item.</p></li><li class="listitem" epub:type="list-item"><p>The <code class="classname">SkipListener</code> will always be
+              called just before the transaction is committed. This is to
+              ensure that any transactional resources call by the listener are
+              not rolled back by a failure within the
+              <code class="classname">ItemWriter</code>.</p></li></ol></div></section></section></section></section></section><footer/></body></html>

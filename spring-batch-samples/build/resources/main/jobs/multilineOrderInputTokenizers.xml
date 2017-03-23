@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="orderFileTokenizer" class="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer">
+		<property name="tokenizers">
+			<map>
+				<entry key="HEA*" value-ref="headerRecordTokenizer" />
+				<entry key="FOT*" value-ref="footerRecordTokenizer" />
+				<entry key="BCU*" value-ref="businessCustomerLineTokenizer" />
+				<entry key="NCU*" value-ref="customerLineTokenizer" />
+				<entry key="BAD*" value-ref="billingAddressLineTokenizer" />
+				<entry key="SAD*" value-ref="shippingAddressLineTokenizer" />
+				<entry key="BIN*" value-ref="billingLineTokenizer" />
+				<entry key="SIN*" value-ref="shippingLineTokenizer" />
+				<entry key="LIT*" value-ref="itemLineTokenizer" />
+				<entry key="*"    value-ref="defaultLineTokenizer" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="defaultLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"/>
+
+	<bean id="parentLineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer" abstract="true">
+		<property name="delimiter" value=";"/>
+	</bean>
+
+	<bean id="headerRecordTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,ORDER_ID,ORDER_DATE" />
+	</bean>
+
+	<bean id="footerRecordTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,TOTAL_LINE_ITEMS,TOTAL_ITEMS,TOTAL_PRICE" />
+	</bean>
+
+	<bean id="businessCustomerLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,COMPANY_NAME,REG_ID,VIP" />
+	</bean>
+
+	<bean id="customerLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,LAST_NAME,FIRST_NAME,MIDDLE_NAME,REGISTERED,REG_ID,VIP" />
+	</bean>
+
+	<bean id="billingAddressLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
+	</bean>
+
+	<bean id="shippingAddressLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,ADDRESSEE,ADDR_LINE1,ADDR_LINE2,CITY,ZIP_CODE,STATE,COUNTRY" />
+	</bean>
+
+	<bean id="billingLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,PAYMENT_TYPE_ID,PAYMENT_DESC" />
+	</bean>
+
+	<bean id="shippingLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,SHIPPER_ID,SHIPPING_TYPE_ID,ADDITIONAL_SHIPPING_INFO" />
+	</bean>
+
+	<bean id="itemLineTokenizer" parent="parentLineTokenizer">
+		<property name="names" value="LINE_ID,ITEM_ID,PRICE,DISCOUNT_PERC,DISCOUNT_AMOUNT,SHIPPING_PRICE,HANDLING_PRICE,QUANTITY,TOTAL_PRICE" />
+	</bean>
+</beans>

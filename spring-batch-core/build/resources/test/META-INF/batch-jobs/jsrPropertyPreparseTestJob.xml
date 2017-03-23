@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="jsrPropertyPreparseTestJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+    <properties>
+        <property name="jobProperty1" value="jobProperty1Value"/>
+        <property name="jobProperty2" value="#{jobProperties['jobProperty1']}"/>
+        <property name="jobProperty3" value="#{jobParameters['file.name']}"/>
+    </properties>
+    <step id="step1" >
+        <batchlet ref="testBatchlet">
+            <properties>
+                <property name="file" value="#{jobParameters['unresolving.prop']}?:myfile1.txt;"/>
+            </properties>
+        </batchlet>
+    </step>
+</job>

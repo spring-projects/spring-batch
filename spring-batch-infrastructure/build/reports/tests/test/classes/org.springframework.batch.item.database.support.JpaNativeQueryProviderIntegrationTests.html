@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.item.database.support.html">org.springframework.batch.item.database.support</a> &gt; JpaNativeQueryProviderIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.011s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">shouldExecuteParameterizedQuery</td>
+<td>0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">shouldRetrieveAndMapAllFoos</td>
+<td>0.008s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:04:11,677 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]&gt;
+2017-03-23 10:04:11,678 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Could not instantiate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener]. Specify custom listener classes or make the default listener classes (and their required dependencies) available. Offending class: [javax/servlet/ServletContext]&gt;
+2017-03-23 10:04:11,678 INFO Test worker [org.springframework.test.context.support.DefaultTestContextBootstrapper] - &lt;Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@3e88fac4, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@a8cf9aa, org.springframework.test.context.support.DirtiesContextTestExecutionListener@6c0c88e6, org.springframework.test.context.transaction.TransactionalTestExecutionListener@7f8af86d, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@6ad7382]&gt;
+2017-03-23 10:04:11,688 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@7addb72b testClass = JpaNativeQueryProviderIntegrationTests, testInstance = org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests@6dbc5da7, testMethod = shouldRetrieveAndMapAllFoos@JpaNativeQueryProviderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@6f06dd56 testClass = JpaNativeQueryProviderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@5667d45f]; rollback [true]&gt;
+2017-03-23 10:04:11,690 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@7addb72b testClass = JpaNativeQueryProviderIntegrationTests, testInstance = org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests@6dbc5da7, testMethod = shouldRetrieveAndMapAllFoos@JpaNativeQueryProviderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@6f06dd56 testClass = JpaNativeQueryProviderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+2017-03-23 10:04:11,691 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Began transaction (1) for test context [DefaultTestContext@7addb72b testClass = JpaNativeQueryProviderIntegrationTests, testInstance = org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests@70757792, testMethod = shouldExecuteParameterizedQuery@JpaNativeQueryProviderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@6f06dd56 testClass = JpaNativeQueryProviderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@5667d45f]; rollback [true]&gt;
+2017-03-23 10:04:11,694 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - &lt;Rolled back transaction for test context [DefaultTestContext@7addb72b testClass = JpaNativeQueryProviderIntegrationTests, testInstance = org.springframework.batch.item.database.support.JpaNativeQueryProviderIntegrationTests@70757792, testMethod = shouldExecuteParameterizedQuery@JpaNativeQueryProviderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@6f06dd56 testClass = JpaNativeQueryProviderIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/JpaPagingItemReaderCommonTests-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]].&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:04:29 AM</p>
+</div>
+</div>
+</body>
+</html>

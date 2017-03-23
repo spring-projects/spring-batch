@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Declarative Retry</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch09s04.xhtml" title="Listeners"/><link rel="next" href="ch10.xhtml" title="Chapter 10. Unit Testing"/></head><body><header/><section class="section" title="Declarative Retry" epub:type="subchapter" id="declarativeRetry"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Declarative Retry</h2></div></div></div><p>Sometimes there is some business processing that you know you want
+    to retry every time it happens. The classic example of this is the remote
+    service call. Spring Batch provides an AOP interceptor that wraps a method
+    call in a <code class="classname">RetryOperations</code> for just this purpose.
+    The <code class="classname">RetryOperationsInterceptor</code> executes the
+    intercepted method and retries on failure according to the
+    <code class="classname">RetryPolicy</code> in the provided
+    <code class="classname">RepeatTemplate</code>.</p><p>Here is an example of declarative iteration using the Spring AOP
+    namespace to repeat a service call to a method called
+    <code class="methodname">remoteCall</code> (for more detail on how to configure
+    AOP interceptors see the Spring User Guide):</p><pre class="programlisting">&lt;aop:config&gt;
+    &lt;aop:pointcut id="transactional"
+        expression="execution(* com..*Service.remoteCall(..))" /&gt;
+    &lt;aop:advisor pointcut-ref="transactional"
+        advice-ref="retryAdvice" order="-1"/&gt;
+&lt;/aop:config&gt;
+
+&lt;bean id="retryAdvice"
+    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/&gt;</pre><p>The example above uses a default
+    <code class="classname">RetryTemplate</code> inside the interceptor. To change the
+    policies or listeners, you only need to inject an instance of
+    <code class="classname">RetryTemplate</code> into the interceptor.</p></section><footer/></body></html>

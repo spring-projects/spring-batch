@@ -1,0 +1,246 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.&nbsp;Retry</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="index.html" title="Spring Batch - Reference Documentation"><link rel="up" href="index.html" title="Spring Batch - Reference Documentation"><link rel="prev" href="repeat.html" title="8.&nbsp;Repeat"><link rel="next" href="testing.html" title="10.&nbsp;Unit Testing"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">9.&nbsp;Retry</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="repeat.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="testing.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="retry" href="#retry"></a>9.&nbsp;Retry</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="retryTemplate" href="#retryTemplate"></a>9.1&nbsp;RetryTemplate</h2></div></div></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The retry functionality was pulled out of Spring Batch as of 2.2.0.
+		It is now part of a new library, Spring Retry.</p></td></tr></table></div><p>To make processing more robust and less prone to failure, sometimes
+    it helps to automatically retry a failed operation in case it might
+    succeed on a subsequent attempt. Errors that are susceptible to this kind
+    of treatment are transient in nature. For example a remote call to a web
+    service or RMI service that fails because of a network glitch or a
+    <code class="classname">DeadLockLoserException</code> in a database update may
+    resolve themselves after a short wait. To automate the retry of such
+    operations Spring Batch has the <code class="classname">RetryOperations</code>
+    strategy. The <code class="classname">RetryOperations</code> interface looks like
+    this:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> RetryOperations {
+
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback) <span class="hl-keyword">throws</span> Exception;
+
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback)
+        <span class="hl-keyword">throws</span> Exception;
+
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RetryState retryState)
+        <span class="hl-keyword">throws</span> Exception, ExhaustedRetryException;
+
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback,
+        RetryState retryState) <span class="hl-keyword">throws</span> Exception;
+
+}</pre><p>The basic callback is a simple interface that allows you to
+    insert some business logic to be retried:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> RetryCallback&lt;T&gt; {
+
+    T doWithRetry(RetryContext context) <span class="hl-keyword">throws</span> Throwable;
+
+}</pre><p>The callback is executed and if it fails (by throwing an
+    <code class="classname">Exception</code>), it will be retried until either it is
+    successful, or the implementation decides to abort. There are a number of
+    overloaded <code class="methodname">execute</code> methods in the
+    <code class="classname">RetryOperations</code> interface dealing with various use
+    cases for recovery when all retry attempts are exhausted, and also with
+    retry state, which allows clients and implementations to store information
+    between calls (more on this later).</p><p>The simplest general purpose implementation of
+    <code class="classname">RetryOperations</code> is
+    <code class="classname">RetryTemplate</code>. It could be used like this</p><pre class="programlisting">RetryTemplate template = <span class="hl-keyword">new</span> RetryTemplate();
+
+TimeoutRetryPolicy policy = <span class="hl-keyword">new</span> TimeoutRetryPolicy();
+policy.setTimeout(<span class="hl-number">30000L</span>);
+
+template.setRetryPolicy(policy);
+
+Foo result = template.execute(<span class="hl-keyword">new</span> RetryCallback&lt;Foo&gt;() {
+
+    <span class="hl-keyword">public</span> Foo doWithRetry(RetryContext context) {
+        <span class="hl-comment">// Do stuff that might fail, e.g. webservice operation</span>
+        <span class="hl-keyword">return</span> result;
+    }
+
+});</pre><p>In the example we execute a web service call and return the result
+    to the user. If that call fails then it is retried until a timeout is
+    reached.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="retryContext" href="#retryContext"></a>9.1.1&nbsp;RetryContext</h3></div></div></div><p>The method parameter for the <code class="classname">RetryCallback</code>
+      is a <code class="classname">RetryContext</code>. Many callbacks will simply
+      ignore the context, but if necessary it can be used as an attribute bag
+      to store data for the duration of the iteration.</p><p>A <code class="classname">RetryContext</code> will have a parent context
+      if there is a nested retry in progress in the same thread. The parent
+      context is occasionally useful for storing data that need to be shared
+      between calls to <code class="methodname">execute</code>.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="recoveryCallback" href="#recoveryCallback"></a>9.1.2&nbsp;RecoveryCallback</h3></div></div></div><p>When a retry is exhausted the
+      <code class="classname">RetryOperations</code> can pass control to a different
+      callback, the <code class="classname">RecoveryCallback</code>. To use this
+      feature clients just pass in the callbacks together to the same method,
+      for example:</p><pre class="programlisting">Foo foo = template.execute(<span class="hl-keyword">new</span> RetryCallback&lt;Foo&gt;() {
+    <span class="hl-keyword">public</span> Foo doWithRetry(RetryContext context) {
+        <span class="hl-comment">// business logic here</span>
+    },
+  <span class="hl-keyword">new</span> RecoveryCallback&lt;Foo&gt;() {
+    Foo recover(RetryContext context) <span class="hl-keyword">throws</span> Exception {
+          <span class="hl-comment">// recover logic here</span>
+    }
+});</pre><p>If the business logic does not succeed before the template
+      decides to abort, then the client is given the chance to do some
+      alternate processing through the recovery callback.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="statelessRetry" href="#statelessRetry"></a>9.1.3&nbsp;Stateless Retry</h3></div></div></div><p>In the simplest case, a retry is just a while loop: the
+      <code class="classname">RetryTemplate</code> can just keep trying until it
+      either succeeds or fails. The <code class="classname">RetryContext</code>
+      contains some state to determine whether to retry or abort, but this
+      state is on the stack and there is no need to store it anywhere
+      globally, so we call this stateless retry. The distinction between
+      stateless and stateful retry is contained in the implementation of the
+      <code class="classname">RetryPolicy</code> (the
+      <code class="classname">RetryTemplate</code> can handle both). In a stateless
+      retry, the callback is always executed in the same thread on retry as
+      when it failed.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="statefulRetry" href="#statefulRetry"></a>9.1.4&nbsp;Stateful Retry</h3></div></div></div><p>Where the failure has caused a transactional resource to become
+      invalid, there are some special considerations. This does not apply to a
+      simple remote call because there is no transactional resource (usually),
+      but it does sometimes apply to a database update, especially when using
+      Hibernate. In this case it only makes sense to rethrow the exception
+      that called the failure immediately so that the transaction can roll
+      back and we can start a new valid one.</p><p>In these cases a stateless retry is not good enough because the
+      re-throw and roll back necessarily involve leaving the
+      <code class="code">RetryOperations.execute()</code> method and potentially losing the
+      context that was on the stack. To avoid losing it we have to introduce a
+      storage strategy to lift it off the stack and put it (at a minimum) in
+      heap storage. For this purpose Spring Batch provides a storage strategy
+      <code class="classname">RetryContextCache</code> which can be injected into the
+      <code class="classname">RetryTemplate</code>. The default implementation of the
+      <code class="classname">RetryContextCache</code> is in memory, using a simple
+      <code class="classname">Map</code>. Advanced usage with multiple processes in a
+      clustered environment might also consider implementing the
+      <code class="classname">RetryContextCache</code> with a cluster cache of some
+      sort (though, even in a clustered environment this might be
+      overkill).</p><p>Part of the responsibility of the
+      <code class="classname">RetryOperations</code> is to recognize the failed
+      operations when they come back in a new execution (and usually wrapped
+      in a new transaction). To facilitate this, Spring Batch provides the
+      <code class="classname">RetryState</code> abstraction. This works in conjunction
+      with a special <code class="classname">execute</code> methods in the
+      <code class="classname">RetryOperations</code>.</p><p>The way the failed operations are recognized is by identifying the
+      state across multiple invocations of the retry. To identify the state,
+      the user can provide an <code class="classname">RetryState</code> object that is
+      responsible for returning a unique key identifying the item. The
+      identifier is used as a key in the
+      <code class="classname">RetryContextCache</code>.</p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Warning"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="images/warning.png"></td><th align="left">Warning</th></tr><tr><td align="left" valign="top"><p>Be very careful with the implementation of
+        <code class="code">Object.equals()</code> and <code class="code">Object.hashCode()</code> in the
+        key returned by <code class="classname">RetryState</code>. The best advice is
+        to use a business key to identify the items. In the case of a JMS
+        message the message ID can be used.</p></td></tr></table></div><p>When the retry is exhausted there is also the option to handle the
+      failed item in a different way, instead of calling the
+      <code class="classname">RetryCallback</code> (which is presumed now to be likely
+      to fail). Just like in the stateless case, this option is provided by
+      the <code class="classname">RecoveryCallback</code>, which can be provided by
+      passing it in to the <code class="classname">execute</code> method of
+      <code class="classname">RetryOperations</code>.</p><p>The decision to retry or not is actually delegated to a regular
+      <code class="classname">RetryPolicy</code>, so the usual concerns about limits
+      and timeouts can be injected there (see below).</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="retryPolicies" href="#retryPolicies"></a>9.2&nbsp;Retry Policies</h2></div></div></div><p>Inside a <code class="classname">RetryTemplate</code> the decision to retry
+    or fail in the <code class="methodname">execute</code> method is determined by a
+    <code class="classname">RetryPolicy</code> which is also a factory for the
+    <code class="classname">RetryContext</code>. The
+    <code class="classname">RetryTemplate</code> has the responsibility to use the
+    current policy to create a <code class="classname">RetryContext</code> and pass
+    that in to the <code class="classname">RetryCallback</code> at every attempt.
+    After a callback fails the <code class="classname">RetryTemplate</code> has to
+    make a call to the <code class="classname">RetryPolicy</code> to ask it to update
+    its state (which will be stored in the
+    <code class="classname">RetryContext</code>), and then it asks the policy if
+    another attempt can be made. If another attempt cannot be made (e.g. a
+    limit is reached or a timeout is detected) then the policy is also
+    responsible for handling the exhausted state. Simple implementations will
+    just throw <code class="classname">RetryExhaustedException</code> which will cause
+    any enclosing transaction to be rolled back. More sophisticated
+    implementations might attempt to take some recovery action, in which case
+    the transaction can remain intact.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Tip"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.png"></td><th align="left">Tip</th></tr><tr><td align="left" valign="top"><p>Failures are inherently either retryable or not - if the same
+      exception is always going to be thrown from the business logic, it
+      doesn't help to retry it. So don't retry on all exception types - try to
+      focus on only those exceptions that you expect to be retryable. It's not
+      usually harmful to the business logic to retry more aggressively, but
+      it's wasteful because if a failure is deterministic there will be time
+      spent retrying something that you know in advance is fatal.</p></td></tr></table></div><p>Spring Batch provides some simple general purpose implementations of
+    stateless <code class="classname">RetryPolicy</code>, for example a
+    <code class="classname">SimpleRetryPolicy</code>, and the
+    <code class="classname">TimeoutRetryPolicy</code> used in the example
+    above.</p><p>The <code class="classname">SimpleRetryPolicy</code> just allows a retry on
+    any of a named list of exception types, up to a fixed number of times. It
+    also has a list of "fatal" exceptions that should never be retried, and
+    this list overrides the retryable list so that it can be used to give
+    finer control over the retry behavior:</p><pre class="programlisting">SimpleRetryPolicy policy = <span class="hl-keyword">new</span> SimpleRetryPolicy();
+<span class="hl-comment">// Set the max retry attempts</span>
+policy.setMaxAttempts(<span class="hl-number">5</span>);
+<span class="hl-comment">// Retry on all exceptions (this is the default)</span>
+policy.setRetryableExceptions(<span class="hl-keyword">new</span> Class[] {Exception.<span class="hl-keyword">class</span>});
+<span class="hl-comment">// ... but never retry IllegalStateException</span>
+policy.setFatalExceptions(<span class="hl-keyword">new</span> Class[] {IllegalStateException.<span class="hl-keyword">class</span>});
+
+<span class="hl-comment">// Use the policy...</span>
+RetryTemplate template = <span class="hl-keyword">new</span> RetryTemplate();
+template.setRetryPolicy(policy);
+template.execute(<span class="hl-keyword">new</span> RetryCallback&lt;Foo&gt;() {
+    <span class="hl-keyword">public</span> Foo doWithRetry(RetryContext context) {
+        <span class="hl-comment">// business logic here</span>
+    }
+});</pre><p>There is also a more flexible implementation called
+    <code class="classname">ExceptionClassifierRetryPolicy</code>, which allows the
+    user to configure different retry behavior for an arbitrary set of
+    exception types though the <code class="classname">ExceptionClassifier</code>
+    abstraction. The policy works by calling on the classifier to convert an
+    exception into a delegate <code class="classname">RetryPolicy</code>, so for
+    example, one exception type can be retried more times before failure than
+    another by mapping it to a different policy.</p><p>Users might need to implement their own retry policies for more
+    customized decisions. For instance, if there is a well-known,
+    solution-specific, classification of exceptions into retryable and not
+    retryable.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="backoffPolicies" href="#backoffPolicies"></a>9.3&nbsp;Backoff Policies</h2></div></div></div><p>When retrying after a transient failure it often helps to wait a bit
+    before trying again, because usually the failure is caused by some problem
+    that will only be resolved by waiting. If a
+    <code class="classname">RetryCallback</code> fails, the
+    <code class="classname">RetryTemplate</code> can pause execution according to the
+    <code class="classname">BackoffPolicy</code> in place.</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> BackoffPolicy {
+
+    BackOffContext start(RetryContext context);
+
+    <span class="hl-keyword">void</span> backOff(BackOffContext backOffContext)
+        <span class="hl-keyword">throws</span> BackOffInterruptedException;
+
+}</pre><p>A <code class="classname">BackoffPolicy</code> is free to implement
+    the backOff in any way it chooses. The policies provided by Spring Batch
+    out of the box all use <code class="code">Object.wait()</code>. A common use case is to
+    backoff with an exponentially increasing wait period, to avoid two retries
+    getting into lock step and both failing - this is a lesson learned from
+    the ethernet. For this purpose Spring Batch provides the
+    <code class="classname">ExponentialBackoffPolicy</code>.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="retryListeners" href="#retryListeners"></a>9.4&nbsp;Listeners</h2></div></div></div><p>Often it is useful to be able to receive additional callbacks for
+    cross cutting concerns across a number of different retries. For this
+    purpose Spring Batch provides the <code class="classname">RetryListener</code>
+    interface. The <code class="classname">RetryTemplate</code> allows users to
+    register <code class="classname">RetryListener</code>s, and they will be given
+    callbacks with the <code class="classname">RetryContext</code> and
+    <code class="classname">Throwable</code> where available during the
+    iteration.</p><p>The interface looks like this:</p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">interface</span> RetryListener {
+
+    <span class="hl-keyword">void</span> open(RetryContext context, RetryCallback&lt;T&gt; callback);
+
+    <span class="hl-keyword">void</span> onError(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
+
+    <span class="hl-keyword">void</span> close(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
+}</pre><p>The <code class="methodname">open</code> and
+    <code class="methodname">close</code> callbacks come before and after the entire
+    retry in the simplest case and <code class="methodname">onError</code> applies to
+    the individual <code class="classname">RetryCallback</code> calls. The
+    <code class="methodname">close</code> method might also receive a
+    <code class="classname">Throwable</code>; if there has been an error it is the
+    last one thrown by the <code class="classname">RetryCallback</code>.</p><p>Note that when there is more than one listener, they are in a list,
+    so there is an order. In this case <code class="methodname">open</code> will be
+    called in the same order while <code class="methodname">onError</code> and
+    <code class="methodname">close</code> will be called in reverse order.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="declarativeRetry" href="#declarativeRetry"></a>9.5&nbsp;Declarative Retry</h2></div></div></div><p>Sometimes there is some business processing that you know you want
+    to retry every time it happens. The classic example of this is the remote
+    service call. Spring Batch provides an AOP interceptor that wraps a method
+    call in a <code class="classname">RetryOperations</code> for just this purpose.
+    The <code class="classname">RetryOperationsInterceptor</code> executes the
+    intercepted method and retries on failure according to the
+    <code class="classname">RetryPolicy</code> in the provided
+    <code class="classname">RepeatTemplate</code>.</p><p>Here is an example of declarative iteration using the Spring AOP
+    namespace to repeat a service call to a method called
+    <code class="methodname">remoteCall</code> (for more detail on how to configure
+    AOP interceptors see the Spring User Guide):</p><pre class="programlisting"><span class="hl-tag">&lt;aop:config&gt;</span>
+    <span class="hl-tag">&lt;aop:pointcut</span> <span class="hl-attribute">id</span>=<span class="hl-value">"transactional"</span>
+        <span class="hl-attribute">expression</span>=<span class="hl-value">"execution(* com..*Service.remoteCall(..))"</span><span class="hl-tag"> /&gt;</span>
+    <span class="hl-tag">&lt;aop:advisor</span> <span class="hl-attribute">pointcut-ref</span>=<span class="hl-value">"transactional"</span>
+        <span class="hl-attribute">advice-ref</span>=<span class="hl-value">"retryAdvice"</span> <span class="hl-attribute">order</span>=<span class="hl-value">"-1"</span><span class="hl-tag">/&gt;</span>
+<span class="hl-tag">&lt;/aop:config&gt;</span>
+
+<span class="hl-tag">&lt;bean</span> <span class="hl-attribute">id</span>=<span class="hl-value">"retryAdvice"</span>
+    <span class="hl-attribute">class</span>=<span class="hl-value">"org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"</span><span class="hl-tag">/&gt;</span></pre><p>The example above uses a default
+    <code class="classname">RetryTemplate</code> inside the interceptor. To change the
+    policies or listeners, you only need to inject an instance of
+    <code class="classname">RetryTemplate</code> into the interceptor.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="repeat.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="testing.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">8.&nbsp;Repeat&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;10.&nbsp;Unit Testing</td></tr></table></div></body></html>

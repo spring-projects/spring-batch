@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class org.springframework.batch.integration.partition.PollingIntegrationTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class org.springframework.batch.integration.partition.PollingIntegrationTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.springframework.batch.integration.partition.html">org.springframework.batch.integration.partition</a> &gt; PollingIntegrationTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">10.035s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testLaunchJob</td>
+<td>10.035s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testSimpleProperties</td>
+<td>0s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2017-03-23 10:05:10,786  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [org/springframework/batch/integration/partition/PollingIntegrationTests-context.xml]&gt;
+2017-03-23 10:05:10,815  INFO Test worker [org.springframework.beans.factory.xml.XmlBeanDefinitionReader] - &lt;Loading XML bean definitions from class path resource [simple-job-launcher-context.xml]&gt;
+2017-03-23 10:05:10,826  INFO Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.&gt;
+2017-03-23 10:05:10,826 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;The '#jsonPath' SpEL function cannot be registered: there is no jayway json-path.jar on the classpath.&gt;
+2017-03-23 10:05:10,827 DEBUG Test worker [org.springframework.integration.config.IntegrationRegistrar] - &lt;SpEL function '#xpath' isn't registered: there is no spring-integration-xml.jar on the classpath.&gt;
+2017-03-23 10:05:10,829  INFO Test worker [org.springframework.context.support.GenericApplicationContext] - &lt;Refreshing org.springframework.context.support.GenericApplicationContext@37df2f22: startup date [Thu Mar 23 10:05:10 CDT 2017]; root of context hierarchy&gt;
+2017-03-23 10:05:10,851  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.&gt;
+2017-03-23 10:05:10,851  INFO Test worker [org.springframework.integration.config.DefaultConfiguringBeanFactoryPostProcessor] - &lt;No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.&gt;
+2017-03-23 10:05:10,852  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:10,868  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:10,873  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;No TaskExecutor has been set, defaulting to synchronous executor.&gt;
+2017-03-23 10:05:10,969 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;MessageChannelPartitionHandler is configured to poll the job repository for slave results&gt;
+2017-03-23 10:05:10,975 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;MessageChannelPartitionHandler is configured to poll the job repository for slave results&gt;
+2017-03-23 10:05:10,996  INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - &lt;JSR-330 'javax.inject.Inject' annotation found and supported for autowiring&gt;
+2017-03-23 10:05:11,017 DEBUG Test worker [org.springframework.integration.config.GlobalChannelInterceptorProcessor] - &lt;No global channel interceptors.&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 0&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.integration.channel.PublishSubscribeChannel] - &lt;Channel 'org.springframework.context.support.GenericApplicationContext@37df2f22.errorChannel' has 1 subscriber(s).&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.integration.endpoint.EventDrivenConsumer] - &lt;started _org.springframework.integration.errorLogger&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.context.support.DefaultLifecycleProcessor] - &lt;Starting beans in phase 1073741823&gt;
+2017-03-23 10:05:11,052  INFO Test worker [org.springframework.integration.endpoint.PollingConsumer] - &lt;started org.springframework.integration.config.ConsumerEndpointFactoryBean#0&gt;
+2017-03-23 10:05:11,058  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [FlowJob: [name=job1]] launched with the following parameters: [{}]&gt;
+2017-03-23 10:05:11,058 DEBUG Test worker [org.springframework.batch.core.job.AbstractJob] - &lt;Job execution starting: JobExecution: id=0, version=0, startTime=null, endTime=null, lastUpdated=Thu Mar 23 10:05:11 CDT 2017, status=STARTING, exitStatus=exitCode=UNKNOWN;exitDescription=, job=[JobInstance: id=0, version=0, Job=[job1]], jobParameters=[{}]&gt;
+2017-03-23 10:05:11,060 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Resuming state=job1.step1-master with status=UNKNOWN&gt;
+2017-03-23 10:05:11,060 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Handling state=job1.step1-master&gt;
+2017-03-23 10:05:11,063  INFO Test worker [org.springframework.batch.core.job.SimpleStepHandler] - &lt;Executing step: [step1-master]&gt;
+2017-03-23 10:05:11,063 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Executing: id=1&gt;
+2017-03-23 10:05:11,071 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG task-scheduler-1 [org.springframework.integration.channel.QueueChannel] - &lt;postReceive on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Sending request: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,072 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Poll resulted in Message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;preSend on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,072 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@a8bba65] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=3, stepName=step1], headers={sequenceNumber=0, correlationId=0:step1, id=5e4b2bf7-6bd9-93ad-39fc-f377b5ad5c4a, sequenceSize=2, timestamp=1490281511071}]&gt;
+2017-03-23 10:05:11,072 DEBUG Test worker [org.springframework.integration.channel.QueueChannel] - &lt;postSend (sent=true) on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,078 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Executing: id=3&gt;
+2017-03-23 10:05:11,080 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.StepScope] - &lt;Creating object in scope=step, name=scopedTarget.org.springframework.batch.integration.partition.ExampleItemReader#1314a890&gt;
+2017-03-23 10:05:11,082 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 2 partitions to finish&gt;
+2017-03-23 10:05:11,084 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Preparing chunk execution for StepContext: org.springframework.batch.core.scope.context.StepContext@76af11e8&gt;
+2017-03-23 10:05:11,084 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Chunk execution starting: queue size=0&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=0, item=Hello, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=1, item=world!, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=2, item=Go, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=3, item=on, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=5, item=make, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=6, item=my, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,084  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=7, item=day!, in (org.springframework.batch.integration.partition.ExampleItemReader@5195f1b0)&gt;
+2017-03-23 10:05:11,085  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemWriter] - &lt;[Hello, world!, Go, on, punk, make, my, day!]&gt;
+2017-03-23 10:05:11,085 DEBUG task-scheduler-1 [org.springframework.batch.core.step.item.ChunkOrientedTasklet] - &lt;Inputs not busy, ended: true&gt;
+2017-03-23 10:05:11,085 DEBUG task-scheduler-1 [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Applying contribution: [StepContribution: read=8, written=8, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING]&gt;
+2017-03-23 10:05:11,085 DEBUG task-scheduler-1 [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Saving step execution before commit: StepExecution: id=3, version=1, name=step1-master:partition1, status=STARTED, exitStatus=EXECUTING, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=&gt;
+2017-03-23 10:05:11,087 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution success: id=3&gt;
+2017-03-23 10:05:11,088 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution complete: StepExecution: id=3, version=3, name=step1-master:partition1, status=COMPLETED, exitStatus=COMPLETED, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0&gt;
+2017-03-23 10:05:11,088 DEBUG task-scheduler-1 [org.springframework.integration.channel.NullChannel] - &lt;message sent to null channel: GenericMessage [payload=StepExecution: id=3, version=3, name=step1-master:partition1, status=COMPLETED, exitStatus=COMPLETED, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=, headers={sequenceNumber=0, correlationId=0:step1, id=f21b6d15-31ff-4045-9e85-db60929dc9e3, sequenceSize=2, timestamp=1490281511088}]&gt;
+2017-03-23 10:05:11,088 DEBUG task-scheduler-1 [org.springframework.integration.channel.QueueChannel] - &lt;postReceive on channel 'requests', message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,088 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Poll resulted in Message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,088 DEBUG task-scheduler-1 [org.springframework.integration.handler.ServiceActivatingHandler] - &lt;ServiceActivator for [org.springframework.integration.handler.MethodInvokingMessageProcessor@a8bba65] (org.springframework.integration.config.ServiceActivatorFactoryBean#0) received message: GenericMessage [payload=StepExecutionRequest: [jobExecutionId=0, stepExecutionId=2, stepName=step1], headers={sequenceNumber=1, correlationId=0:step1, id=434ce803-cc24-3a60-4b3d-0bade77c3166, sequenceSize=2, timestamp=1490281511072}]&gt;
+2017-03-23 10:05:11,091 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Executing: id=2&gt;
+2017-03-23 10:05:11,092 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.StepScope] - &lt;Creating object in scope=step, name=scopedTarget.org.springframework.batch.integration.partition.ExampleItemReader#1314a890&gt;
+2017-03-23 10:05:11,093 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Preparing chunk execution for StepContext: org.springframework.batch.core.scope.context.StepContext@2a252017&gt;
+2017-03-23 10:05:11,093 DEBUG task-scheduler-1 [org.springframework.batch.core.scope.context.StepContextRepeatCallback] - &lt;Chunk execution starting: queue size=0&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=0, item=Hello, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=1, item=world!, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=2, item=Go, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=3, item=on, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=4, item=punk, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,093  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=5, item=make, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,094  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=6, item=my, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,094  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemReader] - &lt;Processing input index=7, item=day!, in (org.springframework.batch.integration.partition.ExampleItemReader@4aca7b53)&gt;
+2017-03-23 10:05:11,094  INFO task-scheduler-1 [org.springframework.batch.integration.partition.ExampleItemWriter] - &lt;[Hello, world!, Go, on, punk, make, my, day!]&gt;
+2017-03-23 10:05:11,094 DEBUG task-scheduler-1 [org.springframework.batch.core.step.item.ChunkOrientedTasklet] - &lt;Inputs not busy, ended: true&gt;
+2017-03-23 10:05:11,094 DEBUG task-scheduler-1 [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Applying contribution: [StepContribution: read=8, written=8, filtered=0, readSkips=0, writeSkips=0, processSkips=0, exitStatus=EXECUTING]&gt;
+2017-03-23 10:05:11,094 DEBUG task-scheduler-1 [org.springframework.batch.core.step.tasklet.TaskletStep] - &lt;Saving step execution before commit: StepExecution: id=2, version=1, name=step1-master:partition0, status=STARTED, exitStatus=EXECUTING, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=&gt;
+2017-03-23 10:05:11,095 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution success: id=2&gt;
+2017-03-23 10:05:11,097 DEBUG task-scheduler-1 [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution complete: StepExecution: id=2, version=3, name=step1-master:partition0, status=COMPLETED, exitStatus=COMPLETED, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0&gt;
+2017-03-23 10:05:11,097 DEBUG task-scheduler-1 [org.springframework.integration.channel.NullChannel] - &lt;message sent to null channel: GenericMessage [payload=StepExecution: id=2, version=3, name=step1-master:partition0, status=COMPLETED, exitStatus=COMPLETED, readCount=8, filterCount=0, writeCount=8 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=1, rollbackCount=0, exitDescription=, headers={sequenceNumber=1, correlationId=0:step1, id=e37c4bdb-883c-561b-47d4-83e2eeb667e6, sequenceSize=2, timestamp=1490281511097}]&gt;
+2017-03-23 10:05:11,339 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:11,682 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:12,102 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:12,341 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:12,697 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:13,117 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:13,345 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:13,709 DEBUG task-scheduler-10 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:14,133 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:14,349 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:14,725 DEBUG task-scheduler-8 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:15,150 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:15,353 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:15,741 DEBUG task-scheduler-8 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:16,166 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:16,357 DEBUG task-scheduler-4 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:16,757 DEBUG task-scheduler-8 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:17,181 DEBUG task-scheduler-2 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:17,361 DEBUG task-scheduler-4 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:17,773 DEBUG task-scheduler-8 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:18,197 DEBUG task-scheduler-4 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:18,365 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:18,789 DEBUG task-scheduler-8 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:19,213 DEBUG task-scheduler-1 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:19,369 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:19,805 DEBUG task-scheduler-7 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:20,229 DEBUG task-scheduler-5 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:20,373 DEBUG task-scheduler-3 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:20,820 DEBUG task-scheduler-6 [org.springframework.integration.endpoint.PollingConsumer] - &lt;Received no Message during the poll, returning 'false'&gt;
+2017-03-23 10:05:21,082 DEBUG Test worker [org.springframework.batch.integration.partition.MessageChannelPartitionHandler] - &lt;Currently waiting on 2 partitions to finish&gt;
+2017-03-23 10:05:21,082 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution success: id=1&gt;
+2017-03-23 10:05:21,084 DEBUG Test worker [org.springframework.batch.core.step.AbstractStep] - &lt;Step execution complete: StepExecution: id=1, version=2, name=step1-master, status=COMPLETED, exitStatus=COMPLETED, readCount=16, filterCount=0, writeCount=16 readSkipCount=0, writeSkipCount=0, processSkipCount=0, commitCount=2, rollbackCount=0&gt;
+2017-03-23 10:05:21,084 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Completed state=job1.step1-master with status=COMPLETED&gt;
+2017-03-23 10:05:21,084 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Handling state=job1.end21&gt;
+2017-03-23 10:05:21,084 DEBUG Test worker [org.springframework.batch.core.job.flow.support.SimpleFlow] - &lt;Completed state=job1.end21 with status=COMPLETED&gt;
+2017-03-23 10:05:21,084 DEBUG Test worker [org.springframework.batch.core.job.AbstractJob] - &lt;Job execution complete: JobExecution: id=0, version=1, startTime=Thu Mar 23 10:05:11 CDT 2017, endTime=null, lastUpdated=Thu Mar 23 10:05:11 CDT 2017, status=COMPLETED, exitStatus=exitCode=COMPLETED;exitDescription=, job=[JobInstance: id=0, version=0, Job=[job1]], jobParameters=[{}]&gt;
+2017-03-23 10:05:21,086  INFO Test worker [org.springframework.batch.core.launch.support.SimpleJobLauncher] - &lt;Job: [FlowJob: [name=job1]] completed with the following parameters: [{}] and the following status: [COMPLETED]&gt;
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 3.4</a> at Mar 23, 2017 10:05:30 AM</p>
+</div>
+</div>
+</body>
+</html>
