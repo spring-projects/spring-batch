@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	protected static final Log logger = LogFactory
 			.getLog(HibernateItemWriter.class);
 
-	private HibernateOperations hibernateTemplate;
 	private SessionFactory sessionFactory;
 
 	private boolean clearSession = true;
@@ -67,18 +66,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the {@link HibernateOperations} property.
-	 *
-	 * @param hibernateTemplate
-	 *            the hibernateTemplate to set
-	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
-	 */
-	@Deprecated
-	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
-		this.hibernateTemplate = hibernateTemplate;
-	}
-
-	/**
 	 * Set the Hibernate SessionFactory to be used internally.
 	 *
 	 * @param sessionFactory session factory to be used by the writer
@@ -88,12 +75,12 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a hibernateTemplate.
+	 * Check mandatory properties - there must be a sessionFactory.
 	 */
 	@Override
 	public void afterPropertiesSet() {
-		Assert.state(!(hibernateTemplate == null && sessionFactory == null),
-				"Either HibernateOperations or SessionFactory must be provided");
+		Assert.state(sessionFactory != null,
+				"SessionFactory must be provided");
 	}
 
 	/**
@@ -104,19 +91,10 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(List<? extends T> items) {
-		if(sessionFactory == null) {
-			doWrite(hibernateTemplate, items);
-			hibernateTemplate.flush();
-			if (clearSession) {
-				hibernateTemplate.clear();
-			}
-		}
-		else {
-			doWrite(sessionFactory, items);
-			sessionFactory.getCurrentSession().flush();
-			if(clearSession) {
-				sessionFactory.getCurrentSession().clear();
-			}
+		doWrite(sessionFactory, items);
+		sessionFactory.getCurrentSession().flush();
+		if(clearSession) {
+			sessionFactory.getCurrentSession().clear();
 		}
 	}
 

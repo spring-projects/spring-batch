@@ -85,12 +85,6 @@ public class JdbcBatchItemWriterBuilderTests {
 		verifyWrite();
 	}
 
-	private void verifyWrite() {
-		verifyRow(1, "two", "three");
-		verifyRow(4, "five", "six");
-		verifyRow(7, "eight", "nine");
-	}
-
 	@Test
 	public void testCustomJdbcTemplate() throws Exception {
 		NamedParameterJdbcOperations template = new NamedParameterJdbcTemplate(this.dataSource);
@@ -233,6 +227,12 @@ public class JdbcBatchItemWriterBuilderTests {
 			fail("Incorrect exception was thrown both mapping types are used" +
 					e.getMessage());
 		}
+	}
+
+	private void verifyWrite() {
+		verifyRow(1, "two", "three");
+		verifyRow(4, "five", "six");
+		verifyRow(7, "eight", "nine");
 	}
 
 	private List<Map<String, Object>> buildMapItems() {
