@@ -25,8 +25,6 @@ import org.mockito.MockitoAnnotations;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 
-import org.springframework.data.neo4j.template.Neo4jOperations;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
@@ -36,8 +34,7 @@ import static org.mockito.Mockito.when;
 public class Neo4jItemWriterTests {
 
 	private Neo4jItemWriter<String> writer;
-	@Mock
-	private Neo4jOperations template;
+
 	@Mock
 	private SessionFactory sessionFactory;
 	@Mock
@@ -50,18 +47,19 @@ public class Neo4jItemWriterTests {
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception{
+
 		writer = new Neo4jItemWriter<>();
 
 		try {
 			writer.afterPropertiesSet();
-			fail("Template was not set but exception was not thrown.");
+			fail("SessionFactory was not set but exception was not thrown.");
 		} catch (IllegalStateException iae) {
-			assertEquals("A Neo4JOperations implementation or a SessionFactory is required", iae.getMessage());
+			assertEquals("A SessionFactory is required", iae.getMessage());
 		} catch (Throwable t) {
 			fail("Wrong exception was thrown.");
 		}
 
-		writer.setTemplate(template);
+		writer.setSessionFactory(this.sessionFactory);
 
 		writer.afterPropertiesSet();
 
@@ -73,28 +71,15 @@ public class Neo4jItemWriterTests {
 	}
 
 	@Test
-	public void testWriteNull() throws Exception {
+	public void testWriteNullSession() throws Exception {
+
 		writer = new Neo4jItemWriter<>();
 
-		writer.setTemplate(template);
+		writer.setSessionFactory(this.sessionFactory);
 		writer.afterPropertiesSet();
 
 		writer.write(null);
 
-		verifyZeroInteractions(template);
-		verifyZeroInteractions(this.session);
-	}
-
-	@Test
-	public void testWriteNoItems() throws Exception {
-		writer = new Neo4jItemWriter<>();
-
-		writer.setTemplate(template);
-		writer.afterPropertiesSet();
-
-		writer.write(new ArrayList<>());
-
-		verifyZeroInteractions(template);
 		verifyZeroInteractions(this.session);
 	}
 
@@ -108,7 +93,6 @@ public class Neo4jItemWriterTests {
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(null);
 
-		verifyZeroInteractions(template);
 		verifyZeroInteractions(this.session);
 	}
 
@@ -122,27 +106,7 @@ public class Neo4jItemWriterTests {
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(new ArrayList<>());
 
-		verifyZeroInteractions(template);
 		verifyZeroInteractions(this.session);
-	}
-
-	@Test
-	public void testWriteItems() throws Exception {
-		writer = new Neo4jItemWriter<>();
-
-		writer.setTemplate(template);
-		writer.afterPropertiesSet();
-
-		List<String> items = new ArrayList<>();
-		items.add("foo");
-		items.add("bar");
-
-		writer.write(items);
-
-		verify(template).save("foo");
-		verify(template).save("bar");
-		verifyZeroInteractions(this.session);
-		verifyZeroInteractions(this.sessionFactory);
 	}
 
 	@Test
@@ -161,28 +125,6 @@ public class Neo4jItemWriterTests {
 
 		verify(this.session).save("foo");
 		verify(this.session).save("bar");
-		verifyZeroInteractions(template);
-	}
-
-	@Test
-	public void testDeleteItems() throws Exception {
-		writer = new Neo4jItemWriter<>();
-
-		writer.setTemplate(template);
-		writer.afterPropertiesSet();
-
-		List<String> items = new ArrayList<>();
-		items.add("foo");
-		items.add("bar");
-
-		writer.setDelete(true);
-
-		writer.write(items);
-
-		verify(template).delete("foo");
-		verify(template).delete("bar");
-		verifyZeroInteractions(this.session);
-		verifyZeroInteractions(this.sessionFactory);
 	}
 
 	@Test
@@ -203,6 +145,5 @@ public class Neo4jItemWriterTests {
 
 		verify(this.session).delete("foo");
 		verify(this.session).delete("bar");
-		verifyZeroInteractions(template);
 	}
 }

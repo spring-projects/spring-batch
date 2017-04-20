@@ -25,7 +25,6 @@ import org.neo4j.ogm.session.SessionFactory;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -49,25 +48,10 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private boolean delete = false;
 
-	private Neo4jOperations template;
-
 	private SessionFactory sessionFactory;
-
-	private boolean useSession = false;
 
 	public void setDelete(boolean delete) {
 		this.delete = delete;
-	}
-
-	/**
-	 * Set the {@link Neo4jOperations} to be used to save items
-	 *
-	 * @param template the template implementation to be used
-	 * @deprecated Use {@link #setSessionFactory(SessionFactory)}
-	 */
-	@Deprecated
-	public void setTemplate(Neo4jOperations template) {
-		this.template = template;
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -81,10 +65,8 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null || this.sessionFactory != null,
-				"A Neo4JOperations implementation or a SessionFactory is required");
-
-		this.useSession = this.sessionFactory != null;
+		Assert.state(this.sessionFactory != null,
+				"A SessionFactory is required");
 	}
 
 	/**
@@ -115,28 +97,18 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	private void delete(List<? extends T> items) {
-		if(this.useSession) {
-			Session session = this.sessionFactory.openSession();
+		Session session = this.sessionFactory.openSession();
 
-			items.forEach(session::delete);
-		}
-		else {
-			for (T item : items) {
-				this.template.delete(item);
-			}
+		for(T item : items) {
+			session.delete(item);
 		}
 	}
 
 	private void save(List<? extends T> items) {
-		if(this.useSession) {
-			Session session = this.sessionFactory.openSession();
+		Session session = this.sessionFactory.openSession();
 
-			items.forEach(session::save);
-		}
-		else {
-			for (T item : items) {
-				this.template.save(item);
-			}
+		for (T item : items) {
+			session.save(item);
 		}
 	}
 }

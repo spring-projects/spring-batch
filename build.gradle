@@ -52,11 +52,11 @@ allprojects {
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.0.RELEASE'
 		springAmqpVersion = '1.5.6.RELEASE'
-		springDataCommonsVersion = '2.0.0.M1'
-		springDataGemfireVersion = '2.0.0.M1'
-		springDataJpaVersion = '2.0.0.M1'
-		springDataMongodbVersion = '2.0.0.M1'
-		springDataNeo4jVersion = '5.0.0.M1'
+		springDataCommonsVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataGemfireVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataJpaVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataMongodbVersion = '2.0.0.BUILD-SNAPSHOT'
+		springDataNeo4jVersion = '5.0.0.BUILD-SNAPSHOT'
 		springIntegrationVersion = '5.0.0.M1'
 		springLdapVersion = '2.0.4.RELEASE'
 
@@ -264,7 +264,6 @@ project('spring-batch-core') {
 	dependencies {
 		compile project(":spring-batch-infrastructure")
 
-		compile "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
 		compile "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 		compile ("org.codehaus.jettison:jettison:$jettisonVersion") {
 			exclude group: 'stax', module: 'stax-api'
@@ -284,6 +283,7 @@ project('spring-batch-core') {
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		optional "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
 		optional "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
@@ -297,11 +297,8 @@ project('spring-batch-core') {
 
 project('spring-batch-infrastructure') {
     description = 'Spring Batch Infrastructure'
+
 	test {
-		// permsize settings not passed down from GRADLE_OPTS nor JAVA_OPTS
-		// when running certain tests causing permgen OOM when using JDK7
-		// compilation is not performed with JDK6 and permgen is removed
-		// starting with JDK8..
 		if (JavaVersion.current().isJava7Compatible()) {
 			jvmArgs '-XX:MaxPermSize=256m'
 		}
@@ -493,7 +490,7 @@ project('spring-batch-test') {
 	dependencies {
 		compile project(":spring-batch-core")
 
-		compile "junit:junit:${junitVersion}" 
+		compile "junit:junit:${junitVersion}"
 		compile "org.hamcrest:hamcrest-library:$hamcrestVersion" 
 		compile "org.springframework:spring-test:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
