@@ -246,7 +246,7 @@ implements InitializingBean {
 	/**
 	 * Moves the cursor in the ResultSet to the position specified by the row
 	 * parameter by traversing the ResultSet.
-	 * @param row
+	 * @param row The index of the row to move to
 	 */
 	private void moveCursorToRow(int row) {
 		try {

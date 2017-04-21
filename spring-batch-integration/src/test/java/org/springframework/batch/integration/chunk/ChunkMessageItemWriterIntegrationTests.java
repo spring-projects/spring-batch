@@ -1,14 +1,12 @@
 package org.springframework.batch.integration.chunk;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -41,6 +39,9 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -186,11 +187,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	}
 
-	/**
-	 * @param jobId
-	 * @param string
-	 * @return
-	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
@@ -262,8 +258,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 	/**
 	 * This one is flakey - we try to force it to wait until after the step to
 	 * finish processing just by waiting for long enough.
-	 *
-	 * @throws Exception
 	 */
 	@Test
 	public void testFailureInStepListener() throws Exception {
@@ -294,11 +288,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	// TODO : test non-dispatch of empty chunk
 
-	/**
-	 * @param expected
-	 * @param maxWait
-	 * @throws InterruptedException
-	 */
 	private void waitForResults(int expected, int maxWait) throws InterruptedException {
 		int count = 0;
 		while (TestItemWriter.count < expected && count < maxWait) {

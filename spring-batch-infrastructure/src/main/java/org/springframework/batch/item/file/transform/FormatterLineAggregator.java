@@ -78,7 +78,7 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 	@Override
 	protected String doAggregate(Object[] fields) {
 
-		Assert.notNull(format);
+		Assert.notNull(format, "A format is required");
 
 		String value = String.format(locale, format, fields);
 

@@ -16,6 +16,15 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import java.beans.PropertyEditor;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -31,15 +40,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
-
-import java.beans.PropertyEditor;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
@@ -198,7 +198,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * {@link #initBinder(DataBinder)} and
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
 	 * 
-	 * @param target
+	 * @param target Object to bind to
 	 * @return a {@link DataBinder} that can be used to bind properties to the
 	 * target.
 	 */
@@ -243,9 +243,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * @param bean
-	 * @param properties
-	 * @return
+	 * @param bean Object to get properties for
+	 * @param properties Properties to retrieve
 	 */
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
@@ -254,9 +253,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		// Map from field names to property names
 		DistanceHolder distanceKey = new DistanceHolder(cls, distanceLimit);
 		if (!propertiesMatched.containsKey(distanceKey)) {
-			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<String, String>());
+			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<>());
 		}
-		Map<String, String> matches = new HashMap<String, String>(propertiesMatched.get(distanceKey));
+		Map<String, String> matches = new HashMap<>(propertiesMatched.get(distanceKey));
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Set<String> keys = new HashSet(properties.keySet());
@@ -285,7 +284,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			}
 		}
 
-		propertiesMatched.replace(distanceKey, new ConcurrentHashMap<String, String>(matches));
+		propertiesMatched.replace(distanceKey, new ConcurrentHashMap<>(matches));
 		return properties;
 	}
 
@@ -378,7 +377,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields
 	 * that cannot be mapped to the bean.
 	 * 
-	 * @param strict
+	 * @param strict indicator
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;

@@ -102,8 +102,8 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(String)
 	 */
 	public DefaultFieldSet(String[] tokens, String[] names) {
-		Assert.notNull(tokens);
-		Assert.notNull(names);
+		Assert.notNull(tokens, "Tokens must not be null");
+		Assert.notNull(names, "Names must not be null");
 		if (tokens.length != names.length) {
 			throw new IllegalArgumentException("Field names must be same length as values: names="
 					+ Arrays.asList(names) + ", values=" + Arrays.asList(tokens));

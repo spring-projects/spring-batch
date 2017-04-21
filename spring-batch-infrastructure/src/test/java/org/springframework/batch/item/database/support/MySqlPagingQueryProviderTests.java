@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
 import org.springframework.batch.item.database.Order;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thomas Risberg
@@ -100,12 +101,13 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test
 	public void testFirstPageSqlWithAliases() {
+		Map<String, Order> sorts = new HashMap<>();
+		sorts.put("owner.id", Order.ASCENDING);
+
 		this.pagingQueryProvider = new MySqlPagingQueryProvider();
 		this.pagingQueryProvider.setSelectClause("SELECT owner.id as ownerid, first_name, last_name, dog_name ");
 		this.pagingQueryProvider.setFromClause("FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ");
-		this.pagingQueryProvider.setSortKeys(new HashMap<String, Order>() {{
-			put("owner.id", Order.ASCENDING);
-		}});
+		this.pagingQueryProvider.setSortKeys(sorts);
 
 		String firstPage = this.pagingQueryProvider.generateFirstPageQuery(5);
 		String jumpToItemQuery = this.pagingQueryProvider.generateJumpToItemQuery(7, 5);

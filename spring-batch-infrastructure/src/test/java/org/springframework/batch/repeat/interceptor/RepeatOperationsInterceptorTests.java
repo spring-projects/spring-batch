@@ -48,7 +48,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
 		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
-		factory.setInterfaces(new Class[] { Service.class });
+		factory.setInterfaces(Service.class);
 		factory.setTarget(target);
 		service = (Service) factory.getProxy();
 	}
@@ -101,7 +101,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong exception message: "+message, message.toLowerCase().indexOf("no result available")>=0);
+			assertTrue("Wrong exception message: "+message, message.toLowerCase().contains("no result available"));
 		}
 		assertEquals(1, calls.size());
 	}
@@ -182,7 +182,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
                 @Override
 				public Method getMethod() {
 					try {
-						return Object.class.getMethod("toString", new Class[0]);
+						return Object.class.getMethod("toString");
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e);

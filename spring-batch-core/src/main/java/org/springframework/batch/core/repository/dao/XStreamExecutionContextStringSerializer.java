@@ -45,6 +45,7 @@ import org.springframework.util.Assert;
  * 		versions, this serializer is depricated in favor of
  * 		{@link Jackson2ExecutionContextStringSerializer}
  */
+@Deprecated
 public class XStreamExecutionContextStringSerializer implements ExecutionContextSerializer, InitializingBean {
 
 	private ReflectionProvider reflectionProvider = null;
@@ -87,8 +88,8 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	 */
 	@Override
 	public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
-		Assert.notNull(context);
-		Assert.notNull(out);
+		Assert.notNull(context, "context is required");
+		Assert.notNull(out, "An OutputStream is required");
 
 		out.write(xstream.toXML(context).getBytes());
 	}

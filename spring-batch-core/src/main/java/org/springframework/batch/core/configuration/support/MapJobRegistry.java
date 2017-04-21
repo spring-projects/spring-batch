@@ -43,7 +43,7 @@ public class MapJobRegistry implements JobRegistry {
 
 	@Override
 	public void register(JobFactory jobFactory) throws DuplicateJobException {
-		Assert.notNull(jobFactory);
+		Assert.notNull(jobFactory, "jobFactory is null");
 		String name = jobFactory.getJobName();
 		Assert.notNull(name, "Job configuration must have a name.");
 		JobFactory previousValue = map.putIfAbsent(name, jobFactory);

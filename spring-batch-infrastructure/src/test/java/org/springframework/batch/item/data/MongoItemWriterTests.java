@@ -240,7 +240,7 @@ public class MongoItemWriterTests {
 	public void testResourceKeyCollision() throws Exception {
 		final int limit = 5000;
 		@SuppressWarnings("unchecked")
-		final MongoItemWriter<String>[] writers = new MongoItemWriter[limit];
+		List<MongoItemWriter<String>> writers = new ArrayList<>(limit);
 		final String[] results = new String[limit];
 		for(int i = 0; i< limit; i++) {
 			final int index = i;
@@ -255,14 +255,14 @@ public class MongoItemWriterTests {
 				}
 				return null;
 			}).when(mongoOperations).save(any(String.class));
-			writers[i] = new MongoItemWriter<>();
-			writers[i].setTemplate(mongoOperations);
+			writers.add(i, new MongoItemWriter<>());
+			writers.get(i).setTemplate(mongoOperations);
 		}
 		
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
 				for(int i=0; i< limit; i++) {
-					writers[i].write(Collections.singletonList(String.valueOf(i)));
+					writers.get(i).write(Collections.singletonList(String.valueOf(i)));
 				}
 			}
 			catch (Exception e) {

@@ -66,6 +66,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public void testNotRethrownErrorLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
             @Override
@@ -78,6 +79,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
+	@SuppressWarnings("serial")
 	public void testNotRethrownWarnLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
             @Override
@@ -90,6 +92,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
+	@SuppressWarnings("serial")
 	public void testNotRethrownDebugLevel() throws Throwable {
 		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
             @Override

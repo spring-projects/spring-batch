@@ -172,7 +172,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	private void validateJobExecution(JobExecution jobExecution) {
 
-		Assert.notNull(jobExecution);
+		Assert.notNull(jobExecution, "jobExecution cannot be null");
 		Assert.notNull(jobExecution.getJobId(), "JobExecution Job-Id cannot be null.");
 		Assert.notNull(jobExecution.getStatus(), "JobExecution status cannot be null.");
 		Assert.notNull(jobExecution.getCreateTime(), "JobExecution create time cannot be null");

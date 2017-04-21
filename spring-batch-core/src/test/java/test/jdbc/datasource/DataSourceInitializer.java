@@ -16,9 +16,14 @@
 
 package test.jdbc.datasource;
 
+import java.io.IOException;
+import java.util.List;
+import javax.sql.DataSource;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,10 +37,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Wrapper for a {@link DataSource} that can run scripts on start up and shut
@@ -75,7 +76,7 @@ public class DataSourceInitializer implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "A DataSource is required");
 		initialize();
 	}
 

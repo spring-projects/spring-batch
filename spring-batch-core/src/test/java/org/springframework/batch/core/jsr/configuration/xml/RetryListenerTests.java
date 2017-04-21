@@ -124,7 +124,7 @@ public class RetryListenerTests {
 
 			String currentItem = (String) item;
 
-			Assert.isTrue("three".equals(currentItem));
+			Assert.isTrue("three".equals(currentItem), "currentItem was expected to be three but was not " + currentItem);
 			Assert.isInstanceOf(IllegalArgumentException.class, ex);
 		}
 	}

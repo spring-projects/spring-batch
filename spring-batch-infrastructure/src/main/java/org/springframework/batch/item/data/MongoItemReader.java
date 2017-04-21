@@ -16,7 +16,15 @@
 
 package org.springframework.batch.item.data;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.mongodb.util.JSON;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,13 +37,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -117,7 +118,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * {@link List} of values to be substituted in for each of the
 	 * parameters in the query.
 	 *
-	 * @param parameterValues
+	 * @param parameterValues values
 	 */
 	public void setParameterValues(List<Object> parameterValues) {
 		this.parameterValues = parameterValues;
@@ -163,11 +164,11 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	@SuppressWarnings("unchecked")
 	protected Iterator<T> doPageRead() {
 
-		Pageable pageRequest = new PageRequest(page, pageSize, sort);
+		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
 		String populatedQuery = replacePlaceholders(query, parameterValues);
 
-		Query mongoQuery = null;
+		Query mongoQuery;
 
 		if(StringUtils.hasText(fields)) {
 			mongoQuery = new BasicQuery(populatedQuery, fields);
@@ -222,12 +223,12 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<Sort.Order>();
+		List<Sort.Order> sortValues = new ArrayList<>();
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
 			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
 		}
 
-		return new Sort(sortValues);
+		return Sort.by(sortValues);
 	}
 }

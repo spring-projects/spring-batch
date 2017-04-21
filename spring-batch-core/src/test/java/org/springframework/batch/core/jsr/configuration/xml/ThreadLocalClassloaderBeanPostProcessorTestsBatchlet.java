@@ -37,8 +37,9 @@ public class ThreadLocalClassloaderBeanPostProcessorTestsBatchlet implements Bat
 	@Override
 	public String process() throws Exception {
 		Assert.isTrue("someParameter".equals(jobParam1), jobParam1 + " does not equal someParamter");
-		Assert.isTrue("threadLocalClassloaderBeanPostProcessorTestsJob".equals(jobContext.getJobName()));
-		Assert.isTrue("step1".equals(stepContext.getStepName()));
+		Assert.isTrue("threadLocalClassloaderBeanPostProcessorTestsJob".equals(jobContext.getJobName()),
+				"jobName does not equal threadLocalClassloaderBeanPostProcessorTestsJob");
+		Assert.isTrue("step1".equals(stepContext.getStepName()), "stepName does not equal step1");
 
 		return null;
 	}

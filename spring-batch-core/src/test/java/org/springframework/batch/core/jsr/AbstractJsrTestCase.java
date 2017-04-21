@@ -43,9 +43,9 @@ public abstract class AbstractJsrTestCase {
 	 * reach one of those statuses within the given timeout, a {@link java.util.concurrent.TimeoutException} is
 	 * thrown.
 	 *
-	 * @param jobName
-	 * @param properties
-	 * @param timeout
+	 * @param jobName Name of the job to run
+	 * @param properties Properties to pass the job
+	 * @param timeout length of time to wait for a job to finish
 	 * @return the {@link javax.batch.runtime.JobExecution} for the final state of the job
 	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */
@@ -78,9 +78,9 @@ public abstract class AbstractJsrTestCase {
 	 * reach one of those statuses within the given timeout, a {@link java.util.concurrent.TimeoutException} is
 	 * thrown.
 	 *
-	 * @param executionId
-	 * @param properties
-	 * @param timeout
+	 * @param executionId The execution id to restart
+	 * @param properties The Properties to pass to the new run
+	 * @param timeout The length of time to wait for the job to run
 	 * @return the {@link JobExecution} for the final state of the job
 	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */

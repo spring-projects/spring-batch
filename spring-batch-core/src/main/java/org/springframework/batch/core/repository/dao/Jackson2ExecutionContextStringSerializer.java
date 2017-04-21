@@ -15,18 +15,19 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.batch.core.repository.ExecutionContextSerializer;
-import org.springframework.util.Assert;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
+import org.springframework.util.Assert;
 
 /**
  * Implementation that uses Jackson2 to provide (de)serialization.
@@ -60,8 +61,8 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
 
     public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
 
-        Assert.notNull(context);
-        Assert.notNull(out);
+        Assert.notNull(context, "A context is required");
+        Assert.notNull(out, "An OutputStream is required");
 
         objectMapper.writeValue(out, context);
     }

@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-
 import javax.sql.DataSource;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -25,9 +27,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractDatabaseItemStreamItemReaderTests extends AbstractItemStreamItemReaderTests {
 
@@ -49,7 +50,6 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 
 	/**
 	 * Sub-classes can override this and create their own context.
-	 * @throws Exception
 	 */
 	protected void initializeContext() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");

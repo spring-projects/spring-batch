@@ -224,7 +224,7 @@ public class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testWorkingDirectory() throws Exception {
 		File notExistingFile = new File("not-existing-path");
-		Assert.state(!notExistingFile.exists());
+		Assert.state(!notExistingFile.exists(), "not-existing-path does actually exist");
 
 		try {
 			tasklet.setWorkingDirectory(notExistingFile.getCanonicalPath());
@@ -235,8 +235,8 @@ public class SystemCommandTaskletIntegrationTests {
 		}
 
 		File notDirectory = File.createTempFile(this.getClass().getName(), null);
-		Assert.state(notDirectory.exists());
-		Assert.state(!notDirectory.isDirectory());
+		Assert.state(notDirectory.exists(), "The file does not exist");
+		Assert.state(!notDirectory.isDirectory(), "The file is actually a directory");
 
 		try {
 			tasklet.setWorkingDirectory(notDirectory.getCanonicalPath());
@@ -247,8 +247,8 @@ public class SystemCommandTaskletIntegrationTests {
 		}
 
 		File directory = notDirectory.getParentFile();
-		Assert.state(directory.exists());
-		Assert.state(directory.isDirectory());
+		Assert.state(directory.exists(), "The directory does not exist");
+		Assert.state(directory.isDirectory(), "The directory is not a directory");
 
 		// no error expected now
 		tasklet.setWorkingDirectory(directory.getCanonicalPath());

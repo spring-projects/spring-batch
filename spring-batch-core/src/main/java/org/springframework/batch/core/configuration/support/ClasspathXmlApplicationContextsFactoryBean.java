@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -57,7 +56,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<A
 	 * resources can be given as a pattern (e.g.
 	 * <code>classpath*:/config/*-context.xml</code>).
 	 *
-	 * @param resources
+	 * @param resources array of resources to use
 	 */
 	public void setResources(Resource[] resources) {
 		this.resources = Arrays.asList(resources);
@@ -105,7 +104,6 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<A
 	 * in {@link #setResources(Resource[])}.
 	 *
 	 * @return an array of {@link ApplicationContextFactory}
-	 * @throws Exception
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
@@ -115,7 +113,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<A
 			return new ApplicationContextFactory[0];
 		}
 
-		List<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
+		List<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
 		for (Resource resource : resources) {
 			GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource);
 			factory.setCopyConfiguration(copyConfiguration);
@@ -158,7 +156,6 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<A
 	 * factories.
 	 *
 	 * @param applicationContext the {@link ApplicationContext} to set
-	 * @throws BeansException
 	 * @see ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
 	@Override

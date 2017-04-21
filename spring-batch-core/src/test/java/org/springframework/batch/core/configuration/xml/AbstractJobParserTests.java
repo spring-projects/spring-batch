@@ -15,11 +15,10 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 
 import org.junit.Before;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -30,6 +29,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Dan Garrette
@@ -63,11 +64,6 @@ public abstract class AbstractJobParserTests {
 		return jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong("key1", 1L).toJobParameters());
 	}
 
-	/**
-	 * @param jobExecution
-	 * @param stepName
-	 * @return the StepExecution corresponding to the specified step
-	 */
 	protected StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			if (stepExecution.getStepName().equals(stepName)) {

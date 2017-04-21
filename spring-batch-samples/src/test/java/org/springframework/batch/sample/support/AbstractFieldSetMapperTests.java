@@ -15,11 +15,12 @@
  */
 package org.springframework.batch.sample.support;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Encapsulates basic logic for testing custom {@link FieldSetMapper} implementations.
@@ -49,7 +50,6 @@ public abstract class AbstractFieldSetMapperTests {
 	/**
 	 * Regular usage scenario.
 	 * Assumes the domain object implements sensible <code>equals(Object other)</code>
-	 * @throws Exception 
 	 */
 	@Test
 	public void testRegularUse() throws Exception {

@@ -163,14 +163,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "DataSource may not be null");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Assert.notNull(queryProvider);
+		Assert.notNull(queryProvider, "QueryProvider may not be null");
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());
@@ -180,7 +180,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
+			results = new CopyOnWriteArrayList<>();
 		}
 		else {
 			results.clear();
@@ -253,7 +253,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			startAfterValues = (Map<String, Object>) executionContext.get(getExecutionContextKey(START_AFTER_VALUE));
 
 			if(startAfterValues == null) {
-				startAfterValues = new LinkedHashMap<String, Object>();
+				startAfterValues = new LinkedHashMap<>();
 			}
 		}
 
@@ -285,7 +285,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private Map<String, Object> getParameterMap(Map<String, Object> values, Map<String, Object> sortKeyValues) {
-		Map<String, Object> parameterMap = new LinkedHashMap<String, Object>();
+		Map<String, Object> parameterMap = new LinkedHashMap<>();
 		if (values != null) {
 			parameterMap.putAll(values);
 		}
@@ -301,14 +301,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private List<Object> getParameterList(Map<String, Object> values, Map<String, Object> sortKeyValue) {
-		SortedMap<String, Object> sm = new TreeMap<String, Object>();
+		SortedMap<String, Object> sm = new TreeMap<>();
 		if (values != null) {
 			sm.putAll(values);
 		}
-		List<Object> parameterList = new ArrayList<Object>();
+		List<Object> parameterList = new ArrayList<>();
 		parameterList.addAll(sm.values());
 		if (sortKeyValue != null && sortKeyValue.size() > 0) {
-			List<Map.Entry<String, Object>> keys = new ArrayList<Map.Entry<String,Object>>(sortKeyValue.entrySet());
+			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
 			for(int i = 0; i < keys.size(); i++) {
 				for(int j = 0; j < i; j++) {
@@ -328,7 +328,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private class PagingRowMapper implements RowMapper<T> {
 		@Override
 		public T mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValues = new LinkedHashMap<String, Object>();
+			startAfterValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
 			}

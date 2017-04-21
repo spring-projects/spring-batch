@@ -89,7 +89,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private EntityManager entityManager;
 
-	private final Map<String, Object> jpaPropertyMap = new HashMap<String, Object>();
+	private final Map<String, Object> jpaPropertyMap = new HashMap<>();
 
 	private String queryString;
 
@@ -136,7 +136,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	 * particular transaction.  (e.g. Hibernate with a JTA transaction).  NOTE: may cause 
 	 * problems in guaranteeing the object consistency in the EntityManagerFactory.
 	 * 
-	 * @param transacted
+	 * @param transacted indicator
 	 */
 	public void setTransacted(boolean transacted) {
 		this.transacted = transacted;
@@ -147,12 +147,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		super.afterPropertiesSet();
 
 		if (queryProvider == null) {
-			Assert.notNull(entityManagerFactory);
-			Assert.hasLength(queryString);
-		}
-		// making sure that the appropriate (JPA) query provider is set
-		else {
-			Assert.isTrue(queryProvider != null, "JPA query provider must be set");
+			Assert.notNull(entityManagerFactory, "EntityManager is required when queryProvider is null");
+			Assert.hasLength(queryString, "Query string is required when queryProvider is null");
 		}
 	}
 
@@ -209,7 +205,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 
 		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
+			results = new CopyOnWriteArrayList<>();
 		}
 		else {
 			results.clear();

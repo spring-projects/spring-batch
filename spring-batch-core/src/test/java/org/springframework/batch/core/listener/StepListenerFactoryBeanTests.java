@@ -15,23 +15,17 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
-import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
@@ -62,6 +56,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
+import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
 /**
  * @author Lucas Ward
@@ -380,7 +380,7 @@ public class StepListenerFactoryBeanTests {
 		@Override
 		@AfterStep
 		public ExitStatus afterStep(StepExecution stepExecution) {
-			Assert.notNull(stepExecution);
+			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;
 		}
@@ -399,7 +399,7 @@ public class StepListenerFactoryBeanTests {
 
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
-			Assert.notNull(stepExecution);
+			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;
 		}
@@ -489,7 +489,7 @@ public class StepListenerFactoryBeanTests {
 
 		@AfterRead
 		public void afterReadMethod(Object item) {
-			Assert.notNull(item);
+			Assert.notNull(item, "An item is required");
 			afterReadCalled = true;
 		}
 

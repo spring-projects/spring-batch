@@ -51,7 +51,7 @@ public final class FileUtils {
 	 */
 	public static void setUpOutputFile(File file, boolean restarted, boolean append, boolean overwriteOutputFile) {
 
-		Assert.notNull(file);
+		Assert.notNull(file, "An output file is required");
 
 		try {
 			if (!restarted) {

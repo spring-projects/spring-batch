@@ -80,7 +80,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	 * @param delimiter the desired delimiter.  This is required
 	 */
 	public DelimitedLineTokenizer(String delimiter) {
-		Assert.notNull(delimiter);
+		Assert.notNull(delimiter, "A delimiter is required");
 		Assert.state(!delimiter.equals(String.valueOf(DEFAULT_QUOTE_CHARACTER)), "[" + DEFAULT_QUOTE_CHARACTER
 				+ "] is not allowed as delimiter for tokenizers.");
 
@@ -91,7 +91,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	/**
 	 * Setter for the delimiter character.
 	 *
-	 * @param delimiter
+	 * @param delimiter the String used as a delimiter
 	 */
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
@@ -106,7 +106,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	 * @param includedFields the included fields to set
 	 */
 	public void setIncludedFields(int[] includedFields) {
-		this.includedFields = new HashSet<Integer>();
+		this.includedFields = new HashSet<>();
 		for (int i : includedFields) {
 			this.includedFields.add(i);
 		}
@@ -139,7 +139,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	@Override
 	protected List<String> doTokenize(String line) {
 
-		List<String> tokens = new ArrayList<String>();
+		List<String> tokens = new ArrayList<>();
 
 		// line is never null in current implementation
 		// line is checked in parent: AbstractLineTokenizer.tokenize()
@@ -281,6 +281,6 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(null != delimiter && 0 != delimiter.length());
+		Assert.hasLength(this.delimiter, "A delimiter is required");
 	}
 }

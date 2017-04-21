@@ -380,7 +380,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * Builds the {@link FlatFileItemReader}.
 	 *
 	 * @return a {@link FlatFileItemReader}
-	 * @throws Exception
+	 * @throws Exception if an error occurs during construction
 	 */
 	public FlatFileItemReader<T> build() throws Exception {
 		if(this.saveState) {
@@ -574,7 +574,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * Returns a {@link DelimitedLineTokenizer}
 		 *
 		 * @return {@link DelimitedLineTokenizer}
-		 * @throws Exception
+		 * @throws Exception if an error occurs during construction
 		 */
 		public DelimitedLineTokenizer build() throws Exception {
 			Assert.notNull(this.fieldSetFactory, "A FieldSetFactory is required.");

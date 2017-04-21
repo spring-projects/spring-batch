@@ -98,7 +98,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "A DataSource is required");
 		initialize();
 	}
 

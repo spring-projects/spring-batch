@@ -142,7 +142,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	public void afterPropertiesSet() {
 		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
-		List<String> namedParameters = new ArrayList<String>();
+		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
 		if (namedParameters.size() > 0) {
 			if (parameterCount != namedParameters.size()) {
@@ -158,7 +158,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public void write(final List<? extends T> items) throws Exception {
 

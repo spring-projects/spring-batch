@@ -25,6 +25,8 @@ package org.springframework.batch.core.configuration;
  */
 public class BatchConfigurationException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @param t an exception to be wrapped
 	 */

@@ -352,7 +352,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(marshaller);
+		Assert.notNull(marshaller, "A Marshaller is required");
 		if (rootTagName.contains("{")) {
 			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
 			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");

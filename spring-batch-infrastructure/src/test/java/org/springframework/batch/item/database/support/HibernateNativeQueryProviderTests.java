@@ -22,8 +22,8 @@ import org.hibernate.query.NativeQuery;
 import org.junit.Test;
 
 import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
-import org.springframework.util.Assert;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +53,7 @@ public class HibernateNativeQueryProviderTests {
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setStatelessSession(session);
-		Assert.notNull(hibernateQueryProvider.createQuery());
+		assertNotNull(hibernateQueryProvider.createQuery());
 
 	}
 
@@ -69,7 +69,7 @@ public class HibernateNativeQueryProviderTests {
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setSession(session);
-		Assert.notNull(hibernateQueryProvider.createQuery());
+		assertNotNull(hibernateQueryProvider.createQuery());
 
 	}
 

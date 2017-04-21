@@ -115,7 +115,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 *
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<T> queryProvider) {
 		helper.setQueryProvider(queryProvider);
 	}
 

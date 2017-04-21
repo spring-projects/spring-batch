@@ -49,7 +49,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(callable);
+		Assert.notNull(callable, "A Callable is required");
 	}
 
 	/**

@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.sample.jsr352;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.batch.api.chunk.AbstractItemReader;
 import java.util.ArrayList;
 import java.util.List;
+import javax.batch.api.chunk.AbstractItemReader;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -30,6 +30,7 @@ import java.util.List;
  * @since 3.0
  * @author Chris Schaefer
  */
+@SuppressWarnings("serial")
 public class JsrSampleItemReader extends AbstractItemReader {
 	private static final Log LOG = LogFactory.getLog(JsrSampleItemReader.class);
 

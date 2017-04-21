@@ -33,7 +33,7 @@ public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCa
 	
 	@Override
 	public void handleLine(String line) {
-		Assert.notNull(line);
+		Assert.notNull(line, "line must not be null");
 		this.header = line;
 	}
 

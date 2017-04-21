@@ -17,10 +17,10 @@ package org.springframework.batch.item.database;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 /**
@@ -37,7 +37,7 @@ AbstractGenericDataSourceItemReaderIntegrationTests {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
-		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
+		factoryBean.setMappingLocations(new ClassPathResource("Foo.hbm.xml", getClass()));
 		customizeSessionFactory(factoryBean);
 		factoryBean.afterPropertiesSet();
 

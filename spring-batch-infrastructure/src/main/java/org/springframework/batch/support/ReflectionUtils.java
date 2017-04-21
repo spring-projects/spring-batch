@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.support;
 
-import org.springframework.core.annotation.AnnotationUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * Provides reflection based utilities for Spring Batch that are not available
@@ -41,10 +41,11 @@ public class ReflectionUtils {
 	 * @param annotationType The type of annotation to look for
 	 * @return a set of {@link java.lang.reflect.Method} instances if any are found, an empty set if not.
 	 */
+	@SuppressWarnings("rawtypes")
 	public static final Set<Method> findMethod(Class clazz, Class<? extends Annotation> annotationType) {
 
 		Method [] declaredMethods = org.springframework.util.ReflectionUtils.getAllDeclaredMethods(clazz);
-		Set<Method> results = new HashSet<Method>();
+		Set<Method> results = new HashSet<>();
 
 		for (Method curMethod : declaredMethods) {
 			Annotation annotation = AnnotationUtils.findAnnotation(curMethod, annotationType);

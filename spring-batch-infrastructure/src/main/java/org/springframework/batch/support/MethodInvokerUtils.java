@@ -57,7 +57,7 @@ public class MethodInvokerUtils {
 			Assert.isTrue(!paramsRequired, errorMsg);
 			// if no method was found for the given parameters, and the
 			// parameters aren't required, then try with no params
-			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[] {});
+			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName);
 			Assert.notNull(method, errorMsg);
 		}
 		return new SimpleMethodInvoker(object, method);
@@ -66,8 +66,8 @@ public class MethodInvokerUtils {
 	/**
 	 * Create a String representation of the array of parameter types.
 	 * 
-	 * @param paramTypes
-	 * @return String
+	 * @param paramTypes types of the parameters to be used
+	 * @return String a String representation of those types
 	 */
 	public static String getParamTypesString(Class<?>... paramTypes) {
 		StringBuilder paramTypesList = new StringBuilder("(");
@@ -116,22 +116,19 @@ public class MethodInvokerUtils {
 		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
 				.getTargetClass() : target.getClass();
 		if (mi != null) {
-			ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
-                @Override
-				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
-					if (annotation != null) {
-						Class<?>[] paramTypes = method.getParameterTypes();
-						if (paramTypes.length > 0) {
-							String errorMsg = "The method [" + method.getName() + "] on target class ["
-									+ targetClass.getSimpleName() + "] is incompatible with the signature ["
-									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
-									+ annotationType.getSimpleName() + "].";
+			ReflectionUtils.doWithMethods(targetClass, method -> {
+				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
+				if (annotation != null) {
+					Class<?>[] paramTypes = method.getParameterTypes();
+					if (paramTypes.length > 0) {
+						String errorMsg = "The method [" + method.getName() + "] on target class ["
+								+ targetClass.getSimpleName() + "] is incompatible with the signature ["
+								+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
+								+ annotationType.getSimpleName() + "].";
 
-							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
-							for (int i = 0; i < paramTypes.length; i++) {
-								Assert.isTrue(expectedParamTypes[i].isAssignableFrom(paramTypes[i]), errorMsg);
-							}
+						Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
+						for (int i = 0; i < paramTypes.length; i++) {
+							Assert.isTrue(expectedParamTypes[i].isAssignableFrom(paramTypes[i]), errorMsg);
 						}
 					}
 				}
@@ -162,17 +159,14 @@ public class MethodInvokerUtils {
 			// Proxy with no target cannot have annotations
 			return null;
 		}
-		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
-		ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
-            @Override
-			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
-				if (annotation != null) {
-					Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
-							+ targetClass.getSimpleName() + "] with the annotation type ["
-							+ annotationType.getSimpleName() + "].");
-					annotatedMethod.set(method);
-				}
+		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();
+		ReflectionUtils.doWithMethods(targetClass, method -> {
+			Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
+			if (annotation != null) {
+				Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
+						+ targetClass.getSimpleName() + "] with the annotation type ["
+						+ annotationType.getSimpleName() + "].");
+				annotatedMethod.set(method);
 			}
 		});
 		Method method = annotatedMethod.get();
@@ -192,20 +186,17 @@ public class MethodInvokerUtils {
 	 * @return a MethodInvoker that calls a method on the delegate
 	 */
 	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object target) {
-		final AtomicReference<Method> methodHolder = new AtomicReference<Method>();
-		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
-            @Override
-			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-				if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {
-					return;
-				}
-				if (method.getReturnType().equals(Void.TYPE) || ReflectionUtils.isEqualsMethod(method)) {
-					return;
-				}
-				Assert.state(methodHolder.get() == null,
-						"More than one non-void public method detected with single argument.");
-				methodHolder.set(method);
+		final AtomicReference<Method> methodHolder = new AtomicReference<>();
+		ReflectionUtils.doWithMethods(target.getClass(), method -> {
+			if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {
+				return;
 			}
+			if (method.getReturnType().equals(Void.TYPE) || ReflectionUtils.isEqualsMethod(method)) {
+				return;
+			}
+			Assert.state(methodHolder.get() == null,
+					"More than one non-void public method detected with single argument.");
+			methodHolder.set(method);
 		});
 		Method method = methodHolder.get();
 		return new SimpleMethodInvoker(target, method);

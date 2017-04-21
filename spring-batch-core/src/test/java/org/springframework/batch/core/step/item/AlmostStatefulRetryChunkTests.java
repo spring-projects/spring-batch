@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +25,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -81,8 +81,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param chunk
-	 * @throws Exception
+	 * @param chunk  Chunk to retry
 	 */
 	private void statefulRetry(Chunk<String> chunk) throws Exception {
 		if (retryAttempts <= retryLimit) {
@@ -113,8 +112,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param chunk
-	 * @throws Exception
+	 * @param chunk Chunk to recover
 	 */
 	private void recover(Chunk<String> chunk) throws Exception {
 		for (Chunk<String>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
@@ -129,8 +127,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param items
-	 * @throws Exception
+	 * @param items items to write
 	 */
 	private void doWrite(List<String> items) throws Exception {
 		if (items.contains("fail")) {

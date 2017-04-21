@@ -79,7 +79,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "DataSource is required");
 		logger.info("Initializing with scripts: " + Arrays.asList(initScripts));
 		if (!initialized && initialize) {
 			try {

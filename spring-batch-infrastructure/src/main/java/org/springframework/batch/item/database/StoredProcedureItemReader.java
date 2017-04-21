@@ -81,7 +81,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 *
-	 * @param rowMapper
+	 * @param rowMapper the RowMapper to use to map the results
 	 */
 	public void setRowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
@@ -92,7 +92,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * should be a complete and valid SQL statement, as it will be run directly
 	 * without any modification.
 	 *
-	 * @param sprocedureName
+	 * @param sprocedureName the SQL used to call the statement
 	 */
 	public void setProcedureName(String sprocedureName) {
 		this.procedureName = sprocedureName;
@@ -102,7 +102,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the PreparedStatementSetter to use if any parameter values that need
 	 * to be set in the supplied query.
 	 *
-	 * @param preparedStatementSetter
+	 * @param preparedStatementSetter used to populate the SQL
 	 */
 	public void setPreparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
@@ -120,6 +120,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Set whether this stored procedure is a function.
+	 *
+	 * @param function indicator
 	 */
 	public void setFunction(boolean function) {
 		this.function = function;

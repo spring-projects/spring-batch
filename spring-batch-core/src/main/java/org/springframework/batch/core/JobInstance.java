@@ -45,7 +45,7 @@ public class JobInstance extends Entity implements javax.batch.runtime.JobInstan
 
 	public JobInstance(Long id, String jobName) {
 		super(id);
-		Assert.hasLength(jobName);
+		Assert.hasLength(jobName, "A jobName is required");
 		this.jobName = jobName;
 	}
 

@@ -56,7 +56,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 			dao.writeTrade(trade);
 
-			Assert.notNull(trade.getPrice()); // There must be a price to total
+			Assert.notNull(trade.getPrice(), "price must not be null"); // There must be a price to total
 
 			if (this.failingCustomers.contains(trade.getCustomer())) {
 				throw new WriteFailedException("Something unexpected happened!");

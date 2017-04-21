@@ -126,7 +126,6 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * Launch the entire job, including all steps.
 	 * 
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
 	 */
 	protected JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
@@ -135,9 +134,8 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	/**
 	 * Launch the entire job, including all steps
 	 * 
-	 * @param jobParameters
+	 * @param jobParameters parameters for the job
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
 	 */
 	protected JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);

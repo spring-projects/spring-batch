@@ -143,10 +143,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * @return true or false
 	 */
 	public boolean isCloseSuppressionActive(Connection connection) {
-		if (connection == null) {
-			return false;
-		}
-		return connection.equals(closeSuppressedConnection);
+		return connection != null && connection.equals(closeSuppressedConnection);
 	}
 
 	/**
@@ -240,6 +237,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 * @param target the original Connection to wrap
 	 * @return the wrapped Connection
 	 */
+	@SuppressWarnings("rawtypes")
 	protected Connection getCloseSuppressingConnectionProxy(Connection target) {
 		return (Connection) Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(),
 				new Class[] { ConnectionProxy.class }, new CloseSuppressingInvocationHandler(target, this));
@@ -265,29 +263,27 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			// Invocation on ConnectionProxy interface coming in...
 
-			if (method.getName().equals("equals")) {
-				// Only consider equal when proxies are identical.
-				return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
-			}
-			else if (method.getName().equals("hashCode")) {
-				// Use hashCode of Connection proxy.
-				return new Integer(System.identityHashCode(proxy));
-			}
-			else if (method.getName().equals("close")) {
-				// Handle close method: don't pass the call on if we are
-				// suppressing close calls.
-				if (dataSource.completeCloseCall((Connection) proxy)) {
-					return null;
-				}
-				else {
-					target.close();
-					return null;
-				}
-			}
-			else if (method.getName().equals("getTargetConnection")) {
-				// Handle getTargetConnection method: return underlying
-				// Connection.
-				return this.target;
+			switch (method.getName()) {
+				case "equals":
+					// Only consider equal when proxies are identical.
+					return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
+				case "hashCode":
+					// Use hashCode of Connection proxy.
+					return System.identityHashCode(proxy);
+				case "close":
+					// Handle close method: don't pass the call on if we are
+					// suppressing close calls.
+					if (dataSource.completeCloseCall((Connection) proxy)) {
+						return null;
+					}
+					else {
+						target.close();
+						return null;
+					}
+				case "getTargetConnection":
+					// Handle getTargetConnection method: return underlying
+					// Connection.
+					return this.target;
 			}
 
 			// Invoke method on target Connection.
@@ -306,10 +302,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 	 */
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		if (iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass())) {
-			return true;
-		}
-		return false;
+		return iface.isAssignableFrom(SmartDataSource.class) || iface.isAssignableFrom(dataSource.getClass());
 	}
 
 	/**
@@ -334,7 +327,7 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "DataSource is required");
 	}
 
 	/**
@@ -348,14 +341,8 @@ public class ExtendedConnectionDataSourceProxy implements SmartDataSource, Initi
 		try {
 			invoker.prepare();
 			return (Logger) invoker.invoke();
-		} catch (ClassNotFoundException cnfe) {
-			throw new SQLFeatureNotSupportedException(cnfe);
-		} catch (NoSuchMethodException nsme) {
+		} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException nsme) {
 			throw new SQLFeatureNotSupportedException(nsme);
-		} catch (IllegalAccessException iae) {
-			throw new SQLFeatureNotSupportedException(iae);
-		} catch (InvocationTargetException ite) {
-			throw new SQLFeatureNotSupportedException(ite);
 		}
 	}
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.neo4j.ogm.session.Session;
-import org.neo4j.ogm.session.SessionFactory;
 
 /**
  * <p>
@@ -29,19 +28,16 @@ import org.neo4j.ogm.session.SessionFactory;
  *
  * @author Michael Minella
  */
-public class Neo4jItemReader<T> extends AbstractNeo4jItemReader {
+public class Neo4jItemReader<T> extends AbstractNeo4jItemReader<T> {
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Iterator<T> doPageRead() {
-		SessionFactory factory = getSessionFactory();
+		Session session = getSessionFactory().openSession();
 
-		Iterable<T> queryResults;
-
-			Session session = factory.openSession();
-
-			queryResults = session.query(getTargetType(),
-					generateLimitCypherQuery(),
-					getParameterValues());
+		Iterable<T> queryResults = session.query(getTargetType(),
+				generateLimitCypherQuery(),
+				getParameterValues());
 
 		if(queryResults != null) {
 			return queryResults.iterator();

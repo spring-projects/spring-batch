@@ -65,7 +65,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		this.method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
 		if (this.method == null) {
 			// try with no params
-			this.method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[] {});
+			this.method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName);
 		}
 		if (this.method == null) {
 			throw new IllegalArgumentException("No methods found for name: [" + methodName + "] in class: ["

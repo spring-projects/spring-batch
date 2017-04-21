@@ -56,7 +56,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * unwrapped and the cause will be thrown.
 	 *
 	 * @param items {@link java.util.concurrent.Future}s to be upwrapped and passed to the delegate
-	 * @throws Exception
+	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
 	public void write(List<? extends Future<T>> items) throws Exception {
 		List<T> list = new ArrayList<T>();

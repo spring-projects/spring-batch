@@ -249,10 +249,10 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public SimpleStepBuilder listener(Object listener) {
+	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
-		Set<Method> itemListenerMethods = new HashSet<Method>();
+		Set<Method> itemListenerMethods = new HashSet<>();
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeRead.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterRead.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeProcess.class));
@@ -270,7 +270,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		}
 
 		@SuppressWarnings("unchecked")
-		SimpleStepBuilder result = this;
+		SimpleStepBuilder<I, O> result = this;
 		return result;
 	}
 

@@ -45,6 +45,8 @@ public class JdbcParameterUtils {
 	 * suite the batch processing requirements.
 	 *
 	 * @param sql String to search in. Returns 0 if the given String is <code>null</code>.
+	 * @param namedParameterHolder holder for the named parameters
+	 * @return the number of named parameter placeholders
 	 */
 	public static int countParameterPlaceholders(String sql, List<String> namedParameterHolder ) {
 		if (sql == null) {

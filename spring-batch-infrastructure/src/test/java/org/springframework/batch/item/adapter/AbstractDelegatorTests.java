@@ -15,18 +15,19 @@
  */
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
-import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link AbstractMethodInvokingDelegator}
@@ -75,7 +76,7 @@ public class AbstractDelegatorTests {
 
 		// using the arguments setter should work equally well
 		foo.setName("foo");
-		Assert.state(!foo.getName().equals(NEW_FOO_NAME));
+		assertTrue(!foo.getName().equals(NEW_FOO_NAME));
 		delegator.setArguments(new Object[] { NEW_FOO_NAME });
 		delegator.afterPropertiesSet();
 		delegator.invokeDelegateMethod();

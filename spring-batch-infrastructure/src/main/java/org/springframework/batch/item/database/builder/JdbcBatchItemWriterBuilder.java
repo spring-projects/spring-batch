@@ -167,6 +167,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 	 *
 	 * @return a {@link JdbcBatchItemWriter}
 	 */
+	@SuppressWarnings("unchecked")
 	public JdbcBatchItemWriter<T> build() {
 		Assert.state(this.dataSource != null || this.namedParameterJdbcTemplate != null,
 				"Either a DataSource or a NamedParameterJdbcTemplate is required");

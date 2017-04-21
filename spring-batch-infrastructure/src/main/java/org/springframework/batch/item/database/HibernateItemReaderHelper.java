@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  *
  */
+@SuppressWarnings("rawtype")
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -48,7 +49,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private String queryName = "";
 
-	private HibernateQueryProvider queryProvider;
+	private HibernateQueryProvider<T> queryProvider;
 
 	private boolean useStatelessSession = true;
 
@@ -73,7 +74,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<T> queryProvider) {
 		this.queryProvider = queryProvider;
 	}
 

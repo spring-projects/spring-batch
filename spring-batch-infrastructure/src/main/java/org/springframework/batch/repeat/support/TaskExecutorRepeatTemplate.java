@@ -83,7 +83,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * @throws IllegalArgumentException if the argument is null
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		Assert.notNull(taskExecutor);
+		Assert.notNull(taskExecutor, "A TaskExecutor is required");
 		this.taskExecutor = taskExecutor;
 	}
 
@@ -99,7 +99,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 
-		ExecutingRunnable runnable = null;
+		ExecutingRunnable runnable;
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
 

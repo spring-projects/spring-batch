@@ -136,7 +136,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Convenient constructor for setting only the name property.
 	 *
-	 * @param name
+	 * @param name Name of the step
 	 */
 	public AbstractStep(String name) {
 		this.name = name;
@@ -147,7 +147,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * {@link StepExecution} before returning.
 	 *
 	 * @param stepExecution the current step context
-	 * @throws Exception
+	 * @throws Exception checked exception thrown by implementation
 	 */
 	protected abstract void doExecute(StepExecution stepExecution) throws Exception;
 
@@ -156,7 +156,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * acquire resources. Does nothing by default.
 	 *
 	 * @param ctx the {@link ExecutionContext} to use
-	 * @throws Exception
+	 * @throws Exception checked exception thrown by implementation
 	 */
 	protected void open(ExecutionContext ctx) throws Exception {
 	}
@@ -166,7 +166,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * of the finally block), to close or release resources. Does nothing by default.
 	 *
 	 * @param ctx the {@link ExecutionContext} to use
-	 * @throws Exception
+	 * @throws Exception checked exception thrown by implementation
 	 */
 	protected void close(ExecutionContext ctx) throws Exception {
 	}
@@ -293,7 +293,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Registers the {@link StepExecution} for property resolution via {@link StepScope}
 	 *
-	 * @param stepExecution
+	 * @param stepExecution StepExecution to use when hydrating the StepScoped beans
 	 */
 	protected void doExecutionRegistration(StepExecution stepExecution) {
 		StepSynchronizationManager.register(stepExecution);

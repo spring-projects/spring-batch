@@ -140,8 +140,8 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 
 		@Override
 		public String decide(StepExecution[] executions) throws Exception {
-			Assert.isTrue(executions.length == 1);
-			Assert.isTrue(executions[0].getStepName().equals("step1"));
+			Assert.isTrue(executions.length == 1, "Invalid array length");
+			Assert.isTrue(executions[0].getStepName().equals("step1"), "Incorrect step name");
 
 			if(runs == 0) {
 				runs++;

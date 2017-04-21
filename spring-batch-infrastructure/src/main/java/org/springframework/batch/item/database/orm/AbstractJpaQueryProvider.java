@@ -43,7 +43,7 @@ public abstract class AbstractJpaQueryProvider implements JpaQueryProvider, Init
 	 * {@link HibernateQueryProvider} to participate in a user's managed transaction.
 	 * </p>
 	 *
-	 * @param entityManager
+	 * @param entityManager EntityManager to use
 	 */
 	@Override
 	public void setEntityManager(EntityManager entityManager) {

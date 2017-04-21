@@ -127,7 +127,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Specifies what method on the repository to call.  This method must take
 	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
 	 *
-	 * @param methodName
+	 * @param methodName name of the method to invoke
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
@@ -187,15 +187,16 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Available for overriding as needed.
 	 *
 	 * @return the list of items that make up the page
-	 * @throws Exception
+	 * @throws Exception Based on what the underlying method throws or related to the
+	 * 			calling of the method
 	 */
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
-		Pageable pageRequest = new PageRequest(page, pageSize, sort);
+		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
-		List<Object> parameters = new ArrayList<Object>();
+		List<Object> parameters = new ArrayList<>();
 
 		if(arguments != null && arguments.size() > 0) {
 			parameters.addAll(arguments);
@@ -224,23 +225,20 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<Sort.Order>();
+		List<Sort.Order> sortValues = new ArrayList<>();
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
 			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
 		}
 
-		return new Sort(sortValues);
+		return Sort.by(sortValues);
 	}
 
 	private Object doInvoke(MethodInvoker invoker) throws Exception{
 		try {
 			invoker.prepare();
 		}
-		catch (ClassNotFoundException e) {
-			throw new DynamicMethodInvocationException(e);
-		}
-		catch (NoSuchMethodException e) {
+		catch (ClassNotFoundException | NoSuchMethodException e) {
 			throw new DynamicMethodInvocationException(e);
 		}
 

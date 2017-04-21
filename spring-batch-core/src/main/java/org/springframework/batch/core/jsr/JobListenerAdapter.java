@@ -37,7 +37,7 @@ public class JobListenerAdapter implements JobExecutionListener {
 	 * @param delegate to be delegated to
 	 */
 	public JobListenerAdapter(JobListener delegate) {
-		Assert.notNull(delegate);
+		Assert.notNull(delegate, "Delegate is required");
 		this.delegate = delegate;
 	}
 

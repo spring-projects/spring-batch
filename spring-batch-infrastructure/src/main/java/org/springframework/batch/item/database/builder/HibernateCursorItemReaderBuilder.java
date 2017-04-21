@@ -45,7 +45,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 
 	private int fetchSize;
 
-	private HibernateQueryProvider queryProvider;
+	private HibernateQueryProvider<T> queryProvider;
 
 	private String queryString;
 
@@ -124,7 +124,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see HibernateCursorItemReader#setQueryProvider(HibernateQueryProvider)
 	 */
-	public HibernateCursorItemReaderBuilder<T> queryProvider(HibernateQueryProvider queryProvider) {
+	public HibernateCursorItemReaderBuilder<T> queryProvider(HibernateQueryProvider<T> queryProvider) {
 		this.queryProvider = queryProvider;
 
 		return this;

@@ -97,7 +97,7 @@ public class StepExecution extends Entity {
 	 */
 	public StepExecution(String stepName, JobExecution jobExecution) {
 		super();
-		Assert.hasLength(stepName);
+		Assert.hasLength(stepName, "A stepName is required");
 		this.stepName = stepName;
 		this.jobExecution = jobExecution;
 	}
@@ -112,7 +112,7 @@ public class StepExecution extends Entity {
 	@SuppressWarnings("unused")
 	private StepExecution(String stepName) {
 		super();
-		Assert.hasLength(stepName);
+		Assert.hasLength(stepName, "A stepName is required");
 		this.stepName = stepName;
 		this.jobExecution = null;
 	}

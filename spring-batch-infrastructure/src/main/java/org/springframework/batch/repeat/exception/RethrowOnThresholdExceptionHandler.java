@@ -43,12 +43,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
-	private Classifier<? super Throwable, IntegerHolder> exceptionClassifier = new Classifier<Throwable, IntegerHolder>() {
-        @Override
-		public RethrowOnThresholdExceptionHandler.IntegerHolder classify(Throwable classifiable) {
-			return ZERO;
-		}
-	};
+	private Classifier<? super Throwable, IntegerHolder> exceptionClassifier = (Classifier<Throwable, IntegerHolder>) classifiable -> ZERO;
 
 	private boolean useParent = false;
 
@@ -82,7 +77,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		for (Entry<Class<? extends Throwable>, Integer> entry : thresholds.entrySet()) {
 			typeMap.put(entry.getKey(), new IntegerHolder(entry.getValue()));
 		}
-		exceptionClassifier = new SubclassClassifier<Throwable, IntegerHolder>(typeMap, ZERO);
+		exceptionClassifier = new SubclassClassifier<>(typeMap, ZERO);
 	}
 
 	/**
@@ -123,7 +118,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		private final int value;
 
 		/**
-		 * @param value
+		 * @param value value within holder
 		 */
 		public IntegerHolder(int value) {
 			this.value = value;

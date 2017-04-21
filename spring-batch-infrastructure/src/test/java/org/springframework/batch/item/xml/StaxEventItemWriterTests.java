@@ -132,7 +132,7 @@ public class StaxEventItemWriterTests {
 
 	@Test(expected = WriterNotOpenException.class)
 	public void testAssertWriterIsInitialized() throws Exception {
-		StaxEventItemWriter writer = new StaxEventItemWriter();
+		StaxEventItemWriter<String> writer = new StaxEventItemWriter<>();
 
 		writer.write(Collections.singletonList("foo"));
 	}

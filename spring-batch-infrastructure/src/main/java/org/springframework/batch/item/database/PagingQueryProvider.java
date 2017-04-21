@@ -16,8 +16,8 @@
 
 package org.springframework.batch.item.database;
 
-import javax.sql.DataSource;
 import java.util.Map;
+import javax.sql.DataSource;
 
 
 /**
@@ -34,6 +34,7 @@ public interface PagingQueryProvider {
 	 * Initialize the query provider using the provided {@link DataSource} if necessary.
 	 * 
 	 * @param dataSource DataSource to use for any initialization
+	 * @throws Exception for errors when initializing
 	 */
 	void init(DataSource dataSource) throws Exception;
 

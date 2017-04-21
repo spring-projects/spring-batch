@@ -16,18 +16,18 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.database.JdbcParameterUtils;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided
@@ -182,7 +182,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 */
     @Override
 	public void init(DataSource dataSource) throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "A DataSource is required");
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
 		Assert.notEmpty(sortKeys, "sortKey must be specified");

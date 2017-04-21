@@ -54,7 +54,7 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	 * readers. Main (or only) use case for setting this flag to false is a
 	 * transactional JMS item reader.
 	 *
-	 * @param buffering
+	 * @param buffering indicator
 	 */
 	public void setBuffering(boolean buffering) {
 		this.buffering = buffering;

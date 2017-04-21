@@ -198,7 +198,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public SimpleStepBuilder listener(Object listener) {
+	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
 		Set<Method> skipListenerMethods = new HashSet<Method>();
@@ -224,7 +224,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 
 		@SuppressWarnings("unchecked")
-		SimpleStepBuilder result = this;
+		SimpleStepBuilder<I, O> result = this;
 		return result;
 	}
 
@@ -548,12 +548,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			types.add(ExhaustedRetryException.class);
 			final Classifier<Throwable, Boolean> panic = new BinaryExceptionClassifier(types, true);
 
-			classifier = new Classifier<Throwable, Boolean>() {
-				@Override
-				public Boolean classify(Throwable classifiable) {
-					// Rollback if either the user's list or our own applies
-					return panic.classify(classifiable) || binary.classify(classifiable);
-				}
+			classifier = (Classifier<Throwable, Boolean>) classifiable -> {
+				// Rollback if either the user's list or our own applies
+				return panic.classify(classifiable) || binary.classify(classifiable);
 			};
 
 		}
@@ -700,8 +697,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return skipPolicyWrapper;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void addNonSkippableExceptionIfMissing(Class<? extends Throwable>... cls) {
-		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>();
+		List<Class<? extends Throwable>> exceptions = new ArrayList<>();
 		for (Class<? extends Throwable> exceptionClass : nonSkippableExceptionClasses) {
 			exceptions.add(exceptionClass);
 		}
@@ -713,8 +711,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		nonSkippableExceptionClasses = exceptions;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void addNonRetryableExceptionIfMissing(Class<? extends Throwable>... cls) {
-		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>();
+		List<Class<? extends Throwable>> exceptions = new ArrayList<>();
 		for (Class<? extends Throwable> exceptionClass : nonRetryableExceptionClasses) {
 			exceptions.add(exceptionClass);
 		}

@@ -15,16 +15,17 @@
  */
 package org.springframework.batch.item.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.util.Assert;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +58,7 @@ public class FileUtilsTests {
 		}
 
 		file.delete();
-		Assert.state(!file.exists());
+		Assert.state(!file.exists(), "Delete failed");
 
 		FileUtils.setUpOutputFile(file, false, false, true);
 		assertTrue(file.exists());
@@ -66,7 +67,7 @@ public class FileUtilsTests {
 		writer.write("testString");
 		writer.close();
 		long size = file.length();
-		Assert.state(size > 0);
+		Assert.state(size > 0, "Nothing was written");
 
 		FileUtils.setUpOutputFile(file, false, false, true);
 		long newSize = file.length();
@@ -196,7 +197,7 @@ public class FileUtilsTests {
 	@Before
 	public void setUp() throws Exception {
 		file.delete();
-		Assert.state(!file.exists());
+		Assert.state(!file.exists(), "File delete failed");
 	}
 
 	@After

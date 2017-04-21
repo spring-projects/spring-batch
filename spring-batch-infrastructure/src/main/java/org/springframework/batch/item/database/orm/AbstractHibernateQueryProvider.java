@@ -35,7 +35,7 @@ import org.hibernate.StatelessSession;
  * @since 2.1
  *
  */
-public abstract class AbstractHibernateQueryProvider implements HibernateQueryProvider {
+public abstract class AbstractHibernateQueryProvider<T> implements HibernateQueryProvider<T> {
 
 	private StatelessSession statelessSession;
 	private Session statefulSession;

@@ -17,6 +17,8 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.BeanMetadataElement;
@@ -35,7 +37,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;chunk/&gt; element inside a step.
@@ -67,8 +68,8 @@ public class ChunkElementParser {
 			StepListenerMetaData.itemListenerMetaData());
 
 	/**
-	 * @param element
-	 * @param parserContext
+	 * @param element the element to parse
+	 * @param parserContext the context to use
 	 */
 	protected void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, boolean underspecified) {
 

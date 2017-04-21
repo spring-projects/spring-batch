@@ -38,7 +38,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	/**
 	 * Lines ending in this terminator String signal the end of a record.
 	 * 
-	 * @param suffix
+	 * @param suffix suffix to indicate the end of a record
 	 */
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
@@ -48,7 +48,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * Flag to indicate that the decision to terminate a record should ignore
 	 * whitespace at the end of the line.
 	 * 
-	 * @param ignoreWhitespace
+	 * @param ignoreWhitespace indicator
 	 */
 	public void setIgnoreWhitespace(boolean ignoreWhitespace) {
 		this.ignoreWhitespace = ignoreWhitespace;

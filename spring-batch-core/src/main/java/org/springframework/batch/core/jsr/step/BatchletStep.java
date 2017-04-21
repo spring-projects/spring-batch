@@ -39,7 +39,7 @@ public class BatchletStep extends TaskletStep {
 	 */
 	public BatchletStep(String name, BatchPropertyContext propertyContext) {
 		super(name);
-		Assert.notNull(propertyContext);
+		Assert.notNull(propertyContext, "A propertyContext is required");
 		this.propertyContext = propertyContext;
 	}
 

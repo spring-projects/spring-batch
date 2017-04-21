@@ -16,16 +16,8 @@
 
 package org.springframework.batch.container.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -35,10 +27,18 @@ import javax.jms.Session;
 
 import org.aopalliance.aop.Advice;
 import org.junit.Test;
+
 import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.ReflectionUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BatchMessageListenerContainerTests {
 
@@ -186,13 +186,12 @@ public class BatchMessageListenerContainerTests {
 	}
 
 	private boolean doExecute(Session session, MessageConsumer consumer) throws IllegalAccessException {
-		Method method = ReflectionUtils.findMethod(container.getClass(), "receiveAndExecute", new Class[] {
-				Object.class, Session.class, MessageConsumer.class });
+		Method method = ReflectionUtils.findMethod(container.getClass(), "receiveAndExecute", Object.class, Session.class, MessageConsumer.class);
 		method.setAccessible(true);
 		boolean received;
 		try {
 			// A null invoker is not normal, but we don't care about the invoker for a unit test
-			received = ((Boolean) method.invoke(container, new Object[] { null, session, consumer })).booleanValue();
+			received = (Boolean) method.invoke(container, null, session, consumer);
 		}
 		catch (InvocationTargetException e) {
 			if (e.getCause() instanceof RuntimeException) {

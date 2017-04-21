@@ -16,17 +16,18 @@
 
 package org.springframework.batch.item.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * This class provides a little bit of indirection to avoid ugly conditional object creation. It is unfortunately
@@ -69,10 +70,10 @@ public abstract class StaxUtils {
 				Class<?> clzz = ClassUtils.forName(staxSourceClassNameOnSpringOxm30, defaultClassLoader);
 
 				// javax.xml.transform.Source
-				staxUtilsSourceMethodOnSpring30 = ClassUtils.getStaticMethod(clzz, "createStaxSource", new Class[]{ XMLEventReader.class});
+				staxUtilsSourceMethodOnSpring30 = ClassUtils.getStaticMethod(clzz, "createStaxSource", XMLEventReader.class);
 
 				// javax.xml.transform.Result
-				staxUtilsResultMethodOnSpring30 = ClassUtils.getStaticMethod(clzz, "createStaxResult", new Class[]{XMLEventWriter.class});
+				staxUtilsResultMethodOnSpring30 = ClassUtils.getStaticMethod(clzz, "createStaxResult", XMLEventWriter.class);
 			} else if (hasSpringWs15StaxSupport) {
 
 				// javax.xml.transform.Source
@@ -126,7 +127,7 @@ public abstract class StaxUtils {
 	}
 
     public static XMLEventWriter getXmlEventWriter(Result r) throws Exception {
-        Method m = r.getClass().getDeclaredMethod("getXMLEventWriter", new Class[]{});
+        Method m = r.getClass().getDeclaredMethod("getXMLEventWriter");
         boolean accessible = m.isAccessible();
         m.setAccessible(true);
         Object result = m.invoke(r);
@@ -135,7 +136,7 @@ public abstract class StaxUtils {
     }
 
     public static XMLEventReader getXmlEventReader(Source s) throws Exception {
-        Method m = s.getClass().getDeclaredMethod("getXMLEventReader", new Class[]{});
+        Method m = s.getClass().getDeclaredMethod("getXMLEventReader");
         boolean accessible = m.isAccessible();
         m.setAccessible(true);
         Object result = m.invoke(s);

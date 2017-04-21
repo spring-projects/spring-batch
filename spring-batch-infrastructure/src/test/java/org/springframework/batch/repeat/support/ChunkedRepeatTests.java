@@ -16,11 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -28,6 +25,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test various approaches to chunking of a batch. Not really a unit test, but
@@ -43,8 +44,6 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	/**
 	 * Chunking using a dedicated TerminationPolicy. Transactions would be laid
 	 * on at the level of chunkTemplate.execute() or the surrounding callback.
-	 * 
-	 * @throws Exception
 	 */
 	@Test
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
@@ -79,8 +78,6 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	/**
 	 * Chunking with an asynchronous taskExecutor in the chunks. Transactions
 	 * have to be at the level of the business callback.
-	 * 
-	 * @throws Exception
 	 */
 	@Test
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
@@ -113,8 +110,6 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	/**
 	 * Explicit chunking of input data. Transactions would be laid on at the
 	 * level of template.execute().
-	 * 
-	 * @throws Exception
 	 */
 	@Test
 	public void testChunksWithTruncatedItemProvider() throws Exception {

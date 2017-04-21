@@ -85,7 +85,7 @@ InitializingBean {
 	 * Convenience constructor to immediately add name (which is mandatory but
 	 * not final).
 	 *
-	 * @param name
+	 * @param name name of the job
 	 */
 	public AbstractJob(String name) {
 		super();
@@ -154,7 +154,7 @@ InitializingBean {
 	 * Retrieve the step with the given name. If there is no Step with the given
 	 * name, then return null.
 	 *
-	 * @param stepName
+	 * @param stepName name of the step
 	 * @return the Step
 	 */
 	@Override
@@ -242,7 +242,7 @@ InitializingBean {
 	 * state of the batch meta domain (jobs, steps, executions) during the life
 	 * of a job.
 	 *
-	 * @param jobRepository
+	 * @param jobRepository repository to use during the job execution
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;

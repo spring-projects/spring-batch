@@ -81,7 +81,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jdbcTemplate);
+		Assert.notNull(jdbcTemplate, "JdbcOperations is required");
 	}
 
 }

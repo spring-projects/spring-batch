@@ -50,7 +50,7 @@ public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 	 */
     @Override
 	public String aggregate(T item) {
-		Assert.notNull(item);
+		Assert.notNull(item, "Item is required");
 		Object[] fields = this.fieldExtractor.extract(item);
 
 		//

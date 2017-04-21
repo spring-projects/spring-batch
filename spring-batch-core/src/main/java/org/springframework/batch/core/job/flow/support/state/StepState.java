@@ -67,11 +67,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return new FlowExecutionStatus(executor.executeStep(step));
 	}
 
-	/**
-	 * @deprecated in favor of using {@link StepLocator#getStep(String)}.
-	 */
 	@Override
-	@Deprecated
 	public Step getStep() {
 		return step;
 	}

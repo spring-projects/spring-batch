@@ -29,10 +29,6 @@ public enum Alignment {
 	private String code;
 	private String label;
 	
-	/**
-	 * @param code
-	 * @param label
-	 */
 	private Alignment(String code, String label) {
         Assert.notNull(code, "'code' must not be null");
 

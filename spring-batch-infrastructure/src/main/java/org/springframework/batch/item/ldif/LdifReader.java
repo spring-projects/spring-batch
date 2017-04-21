@@ -162,7 +162,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "A resource is required to parse.");
-		Assert.notNull(ldifParser);
+		Assert.notNull(ldifParser, "A parser is required");
 	}
 
 }

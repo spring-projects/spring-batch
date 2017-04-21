@@ -66,7 +66,7 @@ public class Chunk<W> implements Iterable<W> {
 
 	/**
 	 * Add the item to the chunk.
-	 * @param item
+	 * @param item the item to add
 	 */
 	public void add(W item) {
 		items.add(item);

@@ -50,7 +50,7 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 	 * {@link org.springframework.batch.core.ExitStatus} values.
 	 */
 	public void setMappings(Map<Object, ExitStatus> mappings) {
-		Assert.notNull(mappings.get(ELSE_KEY));
+		Assert.notNull(mappings.get(ELSE_KEY), "Missing value for " + ELSE_KEY);
 		this.mappings = mappings;
 	}
 

@@ -53,7 +53,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public void saveJobExecution(JobExecution jobExecution) {
-		Assert.isTrue(jobExecution.getId() == null);
+		Assert.isTrue(jobExecution.getId() == null, "jobExecution id is not null");
 		Long newId = currentId.getAndIncrement();
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();

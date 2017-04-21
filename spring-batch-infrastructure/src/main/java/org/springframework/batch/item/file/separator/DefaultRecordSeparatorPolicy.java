@@ -45,6 +45,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	/**
 	 * Convenient constructor with quote character as parameter.
+	 *
+	 * @param quoteCharacter value used to indicate a quoted string
 	 */
 	public DefaultRecordSeparatorPolicy(String quoteCharacter) {
 		this(quoteCharacter, CONTINUATION);
@@ -53,6 +55,9 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	/**
 	 * Convenient constructor with quote character and continuation marker as
 	 * parameters.
+	 *
+	 * @param quoteCharacter value used to indicate a quoted string
+	 * @param continuation value used to indicate a line continuation
 	 */
 	public DefaultRecordSeparatorPolicy(String quoteCharacter, String continuation) {
 		super();

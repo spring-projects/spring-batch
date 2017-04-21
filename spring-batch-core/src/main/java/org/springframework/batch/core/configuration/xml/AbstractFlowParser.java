@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -33,9 +37,6 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Dave Syer
@@ -89,7 +90,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * is available (null is fine, but the quality of error reports is better if
 	 * it is available).
 	 *
-	 * @param jobFactoryRef
+	 * @param jobFactoryRef name of the ref
 	 */
 	protected void setJobFactoryRef(String jobFactoryRef) {
 		this.jobFactoryRef = jobFactoryRef;
@@ -179,7 +180,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Find all of the elements that are pointed to by this element.
 	 *
-	 * @param element
+	 * @param element The parent element
 	 * @return a collection of reachable element names
 	 */
 	private Set<String> findReachableElements(Element element) {
@@ -208,8 +209,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Find all of the elements reachable from the startElement.
 	 *
-	 * @param startElement
-	 * @param reachableElementMap
+	 * @param startElement name of the element to start from
+	 * @param reachableElementMap Map of elements that can be reached from the startElement
 	 * @param accumulator a collection of reachable element names
 	 */
 	protected void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,

@@ -49,7 +49,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * @param checkpointKey key to store the checkpoint object with in the {@link ExecutionContext}
 	 */
 	public CheckpointSupport(String checkpointKey) {
-		Assert.hasText(checkpointKey);
+		Assert.hasText(checkpointKey, "checkpointKey is required");
 		this.checkpointKey = checkpointKey;
 	}
 
@@ -72,7 +72,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * Used to open a batch artifact with previously saved checkpoint information.
 	 *
 	 * @param checkpoint previously saved checkpoint object
-	 * @throws Exception
+	 * @throws Exception thrown by the implementation
 	 */
 	protected abstract void doOpen(Serializable checkpoint) throws Exception;
 
@@ -94,7 +94,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * batch artifact.
 	 *
 	 * @return the current state of the batch artifact
-	 * @throws Exception
+	 * @throws Exception thrown by the implementation
 	 */
 	protected abstract Serializable doCheckpoint() throws Exception;
 
@@ -113,7 +113,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	/**
 	 * Used to close the underlying batch artifact
 	 *
-	 * @throws Exception
+	 * @throws Exception thrown by the underlying implementation
 	 */
 	protected abstract void doClose() throws Exception;
 

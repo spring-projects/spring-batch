@@ -153,7 +153,7 @@ JobInstanceDao, InitializingBean {
 		if (instances.isEmpty()) {
 			return null;
 		} else {
-			Assert.state(instances.size() == 1);
+			Assert.state(instances.size() == 1, "instance counte must be 1 but was " + instances.size());
 			return instances.get(0);
 		}
 	}
@@ -282,7 +282,7 @@ JobInstanceDao, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobIncrementer);
+		Assert.notNull(jobIncrementer, "JobIncrementer is required");
 	}
 
 	/**

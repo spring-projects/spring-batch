@@ -52,11 +52,11 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	@Override
 	@SuppressWarnings("unchecked")
 	public void serialize(Map<String, Object> context, OutputStream out) throws IOException {
-		Assert.notNull(context);
-		Assert.notNull(out);
+		Assert.notNull(context, "context is required");
+		Assert.notNull(out, "OutputStream is required");
 
 		for(Object value : context.values()) {
-			Assert.notNull(value);
+			Assert.notNull(value, "A null value was found");
 			if (!(value instanceof Serializable)) {
 				throw new IllegalArgumentException(
 						"Value: [ " + value + "must be serializable."

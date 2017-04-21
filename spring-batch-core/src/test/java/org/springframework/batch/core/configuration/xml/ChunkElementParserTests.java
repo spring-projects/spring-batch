@@ -15,18 +15,13 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.skip.SkipPolicy;
@@ -49,6 +44,12 @@ import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Dan Garrette
@@ -338,7 +339,7 @@ public class ChunkElementParserTests {
 	/**
 	 * @param object the target object
 	 * @param path the path to the required field
-	 * @return
+	 * @return The field
 	 */
 	private Object getNestedPath(Object object, String path) {
 		while (StringUtils.hasText(path)) {

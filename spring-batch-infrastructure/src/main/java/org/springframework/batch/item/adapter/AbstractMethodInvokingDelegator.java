@@ -107,10 +107,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		try {
 			invoker.prepare();
 		}
-		catch (ClassNotFoundException e) {
-			throw new DynamicMethodInvocationException(e);
-		}
-		catch (NoSuchMethodException e) {
+		catch (ClassNotFoundException | NoSuchMethodException e) {
 			throw new DynamicMethodInvocationException(e);
 		}
 
@@ -132,8 +129,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(targetObject);
-		Assert.hasLength(targetMethod);
+		Assert.notNull(targetObject, "targetObject must not be null");
+		Assert.hasLength(targetMethod, "targetMethod must not be empty");
 		Assert.state(targetClassDeclaresTargetMethod(),
 				"target class must declare a method with matching name and parameter types");
 	}
@@ -148,7 +145,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		Method[] memberMethods = invoker.getTargetClass().getMethods();
 		Method[] declaredMethods = invoker.getTargetClass().getDeclaredMethods();
 
-		List<Method> allMethods = new ArrayList<Method>();
+		List<Method> allMethods = new ArrayList<>();
 		allMethods.addAll(Arrays.asList(memberMethods));
 		allMethods.addAll(Arrays.asList(declaredMethods));
 

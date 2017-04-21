@@ -152,7 +152,7 @@ InitializingBean {
 	/**
 	 * Setter for resource. Represents a file that can be written.
 	 * 
-	 * @param resource
+	 * @param resource the resource to be written to
 	 */
 	@Override
 	public void setResource(Resource resource) {
@@ -208,7 +208,7 @@ InitializingBean {
 	 * update. Setting this to false means that it will always start at the
 	 * beginning on a restart.
 	 * 
-	 * @param saveState
+	 * @param saveState if true, state will be persisted
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
@@ -448,14 +448,14 @@ InitializingBean {
 		}
 
 		/**
-		 * @param append
+		 * @param append if true, append to previously created file
 		 */
 		public void setAppendAllowed(boolean append) {
 			this.append = append;
 		}
 
 		/**
-		 * @param executionContext
+		 * @param executionContext state from which to restore writing from
 		 */
 		public void restoreFrom(ExecutionContext executionContext) {
 			lastMarkedByteOffsetPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
@@ -470,14 +470,14 @@ InitializingBean {
 		}
 
 		/**
-		 * @param shouldDeleteIfExists
+		 * @param shouldDeleteIfExists indicator
 		 */
 		public void setDeleteIfExists(boolean shouldDeleteIfExists) {
 			this.shouldDeleteIfExists = shouldDeleteIfExists;
 		}
 
 		/**
-		 * @param encoding
+		 * @param encoding file encoding
 		 */
 		public void setEncoding(String encoding) {
 			this.encoding = encoding;
@@ -527,7 +527,7 @@ InitializingBean {
 		}
 
 		/**
-		 * @param line
+		 * @param line String to be written to the file
 		 * @throws IOException
 		 */
 		public void write(String line) throws IOException {
@@ -542,7 +542,7 @@ InitializingBean {
 		/**
 		 * Truncate the output at the last known good point.
 		 * 
-		 * @throws IOException
+		 * @throws IOException if unable to work with file
 		 */
 		public void truncate() throws IOException {
 			fileChannel.truncate(lastMarkedByteOffsetPosition);
@@ -552,7 +552,7 @@ InitializingBean {
 		/**
 		 * Creates the buffered writer for the output file channel based on
 		 * configuration information.
-		 * @throws IOException
+		 * @throws IOException if unable to initialize buffer
 		 */
 		private void initializeBufferedWriter() throws IOException {
 
@@ -574,7 +574,8 @@ InitializingBean {
 				}
 			}
 
-			Assert.state(outputBufferedWriter != null);
+			Assert.state(outputBufferedWriter != null,
+					"Unable to initialize buffered writer");
 			// in case of restarting reset position to last committed point
 			if (restarted) {
 				checkFileSize();
@@ -596,12 +597,7 @@ InitializingBean {
 			try {
 				final FileChannel channel = fileChannel;
 				if (transactional) {
-					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, new Runnable() {
-						@Override
-						public void run() {
-							closeStream();
-						}
-					});
+					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, () -> closeStream());
 
 					writer.setEncoding(encoding);
 					writer.setForceSync(forceSync);

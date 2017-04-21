@@ -16,13 +16,8 @@
 
 package org.springframework.batch.repeat.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -44,6 +39,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -190,9 +189,9 @@ public class AsynchronousTests {
 	}
 
 	/**
-	 * @param list
-	 * @param timeout
-	 * @throws InterruptedException 
+	 * @param list resource to monitor
+	 * @param timeout how long to monitor for
+	 * @throws InterruptedException If interrupted while waiting
 	 */
 	private void waitFor(List<String> list, int size, int timeout) throws InterruptedException {
 		int count = 0;

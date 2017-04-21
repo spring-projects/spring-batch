@@ -16,16 +16,17 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.junit.Test;
+
 import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.util.Assert;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Anatoly Polinsky
@@ -37,7 +38,7 @@ public class JpaNativeQueryProviderTests {
 	private JpaNativeQueryProvider<Foo> jpaQueryProvider;
 
 	public JpaNativeQueryProviderTests() {
-		jpaQueryProvider = new JpaNativeQueryProvider<Foo>();
+		jpaQueryProvider = new JpaNativeQueryProvider<>();
 		jpaQueryProvider.setEntityClass(Foo.class);
 	}
 
@@ -53,6 +54,6 @@ public class JpaNativeQueryProviderTests {
 		when(entityManager.createNativeQuery(sqlQuery, Foo.class)).thenReturn(query);
 
 		jpaQueryProvider.setEntityManager(entityManager);
-		Assert.notNull(jpaQueryProvider.createQuery());
+		Assert.notNull(jpaQueryProvider.createQuery(), "Query was null");
 	}
 }

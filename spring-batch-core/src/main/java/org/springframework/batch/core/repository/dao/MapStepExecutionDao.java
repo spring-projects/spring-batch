@@ -68,8 +68,8 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	@Override
 	public void saveStepExecution(StepExecution stepExecution) {
 
-		Assert.isTrue(stepExecution.getId() == null);
-		Assert.isTrue(stepExecution.getVersion() == null);
+		Assert.isTrue(stepExecution.getId() == null, "stepExecution id was not null");
+		Assert.isTrue(stepExecution.getVersion() == null, "stepExecution version was not null");
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
@@ -89,7 +89,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	@Override
 	public void updateStepExecution(StepExecution stepExecution) {
 
-		Assert.notNull(stepExecution.getJobExecutionId());
+		Assert.notNull(stepExecution.getJobExecutionId(), "jobExecution id is null");
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");

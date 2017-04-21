@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -28,9 +32,6 @@ import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
@@ -89,7 +90,7 @@ public abstract class AbstractStepParser {
 
 	/**
 	 * @param stepElement   The &lt;step/&gt; element
-	 * @param parserContext
+	 * @param parserContext context
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
 	 *                      from the enclosing tag. Use 'null' if unknown.
 	 */

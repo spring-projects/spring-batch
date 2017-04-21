@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
@@ -36,6 +34,9 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
+
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
 
 /**
  * {@link FactoryBean} implementation that builds a listener based on the
@@ -157,7 +158,10 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		else {
 			proxyFactory.setTarget(delegate);
 		}
-		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
+		@SuppressWarnings("rawtypes")
+		Class[] a = new Class[0];
+
+		proxyFactory.setInterfaces(listenerInterfaces.toArray(a));
 		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
 		return proxyFactory.getProxy();
 

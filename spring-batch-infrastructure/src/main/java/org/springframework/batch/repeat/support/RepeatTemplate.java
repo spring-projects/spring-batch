@@ -16,8 +16,14 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -29,11 +35,6 @@ import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Simple implementation and base class for batch templates implementing
@@ -76,7 +77,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * Set the listeners for this template, registering them for callbacks at
 	 * appropriate times in the iteration.
 	 * 
-	 * @param listeners
+	 * @param listeners listeners to be used
 	 */
 	public void setListeners(RepeatListener[] listeners) {
 		this.listeners = Arrays.asList(listeners).toArray(new RepeatListener[listeners.length]);
@@ -85,10 +86,10 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Register an additional listener.
 	 * 
-	 * @param listener
+	 * @param listener a single listener to be added to the list
 	 */
 	public void registerListener(RepeatListener listener) {
-		List<RepeatListener> list = new ArrayList<RepeatListener>(Arrays.asList(listeners));
+		List<RepeatListener> list = new ArrayList<>(Arrays.asList(listeners));
 		list.add(listener);
 		listeners = list.toArray(new RepeatListener[list.size()]);
 	}
@@ -121,7 +122,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @throws IllegalArgumentException if the argument is null
 	 */
 	public void setCompletionPolicy(CompletionPolicy terminationPolicy) {
-		Assert.notNull(terminationPolicy);
+		Assert.notNull(terminationPolicy, "CompletionPolicy is required");
 		this.completionPolicy = terminationPolicy;
 	}
 
@@ -172,8 +173,7 @@ public class RepeatTemplate implements RepeatOperations {
 		// processing takes place.
 		boolean running = !isMarkedComplete(context);
 
-		for (int i = 0; i < listeners.length; i++) {
-			RepeatListener interceptor = listeners[i];
+		for (RepeatListener interceptor : listeners) {
 			interceptor.open(context);
 			running = running && !isMarkedComplete(context);
 			if (!running)
@@ -188,7 +188,7 @@ public class RepeatTemplate implements RepeatOperations {
 		Collection<Throwable> throwables = state.getThrowables();
 		// Keep a separate list of exceptions we handled that need to be
 		// rethrown
-		Collection<Throwable> deferred = new ArrayList<Throwable>();
+		Collection<Throwable> deferred = new ArrayList<>();
 
 		try {
 
@@ -361,6 +361,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param callback the callback to execute.
 	 * @param state maintained by the implementation.
 	 * @return a finished result.
+	 * @throws Throwable any Throwable emitted during the iteration
 	 * 
 	 * @see #isComplete(RepeatContext)
 	 * @see #createInternalState(RepeatContext)

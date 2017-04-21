@@ -15,14 +15,15 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import org.junit.Test;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Tests for {@link ExecutionContextPromotionListener}.
@@ -57,8 +58,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
@@ -87,8 +88,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(new ExitStatus(status));
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
@@ -117,8 +118,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(new ExitStatus(status2));
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
@@ -147,8 +148,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(new ExitStatus(status));
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
@@ -176,8 +177,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 
@@ -203,8 +204,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		jobExecution.getExecutionContext().putString(key, value);
 
@@ -231,8 +232,8 @@ public class ExecutionContextPromotionListenerTests {
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
 		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
-		Assert.state(jobExecution.getExecutionContext().isEmpty());
-		Assert.state(stepExecution.getExecutionContext().isEmpty());
+		Assert.state(jobExecution.getExecutionContext().isEmpty(), "Job ExecutionContext is not empty");
+		Assert.state(stepExecution.getExecutionContext().isEmpty(), "Step ExecutionContext is not empty");
 
 		stepExecution.getExecutionContext().putString(key, value);
 

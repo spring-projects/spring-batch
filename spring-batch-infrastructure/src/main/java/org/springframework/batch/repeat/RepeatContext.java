@@ -54,6 +54,8 @@ public interface RepeatContext extends AttributeAccessor {
 
 	/**
 	 * Public accessor for the complete flag.
+	 *
+	 * @return indicator if the repeat is complete
 	 */
 	boolean isCompleteOnly();
 
@@ -66,6 +68,8 @@ public interface RepeatContext extends AttributeAccessor {
 	/**
 	 * Public accessor for the termination flag. If this flag is set then the
 	 * complete flag will also be.
+	 *
+	 * @return indicates if the repeat should terminate
 	 */
 	boolean isTerminateOnly();
 

@@ -62,7 +62,7 @@ ItemWriter<T> {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notEmpty(fieldsUsedAsTargetMethodArguments);
+		Assert.notEmpty(fieldsUsedAsTargetMethodArguments, "fieldsUsedAsTargetMethodArguments must not be empty");
 	}
 
 	/**

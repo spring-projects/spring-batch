@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemReader;
  * @since 2.1
  * 
  */
-public interface HibernateQueryProvider {
+public interface HibernateQueryProvider<T> {
 
 	/**
 	 * <p>
@@ -43,7 +43,7 @@ public interface HibernateQueryProvider {
 	 * 
 	 * @return created query
 	 */
-	Query createQuery();
+	Query<T> createQuery();
 
 	/**
 	 * <p>

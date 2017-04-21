@@ -29,10 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -233,10 +233,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
-		Assert.state(!foo2.equals(foo1));
+		assertTrue(!foo2.equals(foo1));
 
 		Foo foo3 = reader.read();
-		Assert.state(!foo2.equals(foo3));
+		assertTrue(!foo2.equals(foo3));
 	
 		getAsItemStream(reader).close();
 
@@ -263,10 +263,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		Foo foo1 = reader.read();
 
 		Foo foo2 = reader.read();
-		Assert.state(!foo2.equals(foo1));
+		assertTrue(!foo2.equals(foo1));
 
 		Foo foo3 = reader.read();
-		Assert.state(!foo2.equals(foo3));
+		assertTrue(!foo2.equals(foo3));
 	
 		getAsItemStream(reader).close();
 
@@ -292,10 +292,10 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
-		Assert.state(!foo2.equals(foo1));
+		assertTrue(!foo2.equals(foo1));
 
 		Foo foo3 = reader.read();
-		Assert.state(!foo2.equals(foo3));
+		assertTrue(!foo2.equals(foo3));
 	
 		getAsItemStream(reader).close();
 

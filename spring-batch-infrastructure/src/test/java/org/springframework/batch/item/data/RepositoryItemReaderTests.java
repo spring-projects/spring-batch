@@ -15,14 +15,6 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +35,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@SuppressWarnings("serial")
 public class RepositoryItemReaderTests {
 
 	private RepositoryItemReader<Object> reader;
@@ -214,7 +215,7 @@ public class RepositoryItemReaderTests {
 	public void testDifferentTypes() throws Exception {
 		TestRepository differentRepository = mock(TestRepository.class);
 		RepositoryItemReader<String> reader = new RepositoryItemReader<String>();
-		sorts = new HashMap<String, Sort.Direction>();
+		sorts = new HashMap<>();
 		sorts.put("id", Direction.ASC);
 		reader.setRepository(differentRepository);
 		reader.setPageSize(1);
@@ -240,14 +241,14 @@ public class RepositoryItemReaderTests {
 		reader.setCurrentItemCount(3);
 		reader.setPageSize(2);
 
-		PageRequest request = new PageRequest(1, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		PageRequest request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("3");
 			add("4");
 		}}));
 
-		request = new PageRequest(2, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		request = PageRequest.of(2, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("5");
 			add("6");
 		}}));
@@ -267,14 +268,14 @@ public class RepositoryItemReaderTests {
 		reader.setCurrentItemCount(3);
 		reader.setPageSize(2);
 
-		PageRequest request = new PageRequest(1, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		PageRequest request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("3");
 			add("4");
 		}}));
 
-		request = new PageRequest(2, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		request = PageRequest.of(2, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("5");
 			add("6");
 		}}));
@@ -298,14 +299,14 @@ public class RepositoryItemReaderTests {
 	public void testResetOfPage() throws Exception {
 		reader.setPageSize(2);
 
-		PageRequest request = new PageRequest(0, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		PageRequest request = PageRequest.of(0, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("1");
 			add("2");
 		}}));
 
-		request = new PageRequest(1, 2, new Sort(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("3");
 			add("4");
 		}}));
@@ -324,7 +325,7 @@ public class RepositoryItemReaderTests {
 		assertEquals("3", reader.read());
 	}
 
-	public static interface TestRepository extends PagingAndSortingRepository<Map, Long> {
+	public interface TestRepository extends PagingAndSortingRepository<Map<String, String>, Long> {
 		Page<String> findFirstNames(Pageable pageable);
 	}
 }

@@ -48,7 +48,7 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '5.0.0.M5'
+		springVersionDefault = '5.0.0.BUILD-SNAPSHOT'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.0.RELEASE'
 		springAmqpVersion = '1.5.6.RELEASE'
@@ -58,7 +58,7 @@ allprojects {
 		springDataMongodbVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataNeo4jVersion = '5.0.0.BUILD-SNAPSHOT'
 		springIntegrationVersion = '5.0.0.M1'
-		springLdapVersion = '2.0.4.RELEASE'
+		springLdapVersion = '2.3.1.RELEASE'
 
 		activemqVersion = '5.13.2'
 		aspectjVersion = '1.8.9'
