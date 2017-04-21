@@ -273,6 +273,7 @@ project('spring-batch-core') {
 		compile "org.springframework:spring-context:$springVersion"
 		compile "org.springframework:spring-core:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
+		compile "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
@@ -290,8 +291,6 @@ project('spring-batch-core') {
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "log4j:log4j:$log4jVersion"
-
-		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 	}
 }
 
