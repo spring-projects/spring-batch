@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[3.3.0.201307091516-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.7.3.201602250914-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -92,7 +92,6 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForJobElementTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/AutoRegisteringJobScopeForStepElementTests-context.xml</config>
 		<config>src/main/resources/baseContext.xml</config>
-		<config>src/main/resources/beanRefContext.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementLateBindingParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/ChunkElementRetryPolicyParserTests-context.xml</config>
@@ -109,14 +108,12 @@
 		<config>src/test/resources/META-INF/batch-jobs/DecisionStepTests-restart-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/jsr/configuration/xml/default-split-task-executor-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DefaultUnknownJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/jsr/configuration/xml/ExceptionHandlingParsingTests-context.xml</config>
 		<config>src/test/resources/META-INF/batch-jobs/FlowParserTests-context.xml</config>
 		<config>src/test/resources/META-INF/batch-jobs/FlowParserTestsStepGetsFailedTransitionWhenNextAttributePresent.xml</config>
 		<config>src/test/resources/META-INF/batch-jobs/FlowParserTestsStepNoOverrideWhenNextAndFailedTransitionElementExists.xml</config>
 		<config>src/test/resources/META-INF/batch-jobs/FlowParserTestsWildcardAndNextAttrJob.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/InlineItemHandlerWithStepScopeParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/jsr/configuration/xml/ItemListenerParsingTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/jsr/configuration/xml/ItemSkipParsingTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/job-context-with-separate-steps.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/job-context-with-steps.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobExecutionListenerMethodAttributeParserTests-context.xml</config>
@@ -191,8 +188,10 @@
 		<config>java:org.springframework.batch.core.configuration.annotation.JobBuilderConfigurationTests$TestConfiguration</config>
 		<config>java:org.springframework.batch.core.configuration.annotation.JobBuilderConfigurationTests$TestConfigurer</config>
 		<config>java:org.springframework.batch.core.configuration.annotation.JobLoaderConfigurationTests$VanillaConfiguration</config>
-		<config>java:org.springframework.batch.core.configuration.annotation.StepScopeConfiguration</config>
+		<config>src/main/resources/JSR-352-beanRefContext.xml</config>
 	</configs>
+	<autoconfigs>
+	</autoconfigs>
 	<configSets>
 		<configSet>
 			<name><![CDATA[launcher]]></name>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 		StepExecutionCountingDecider.previousStepCount = 0;
 
 		if(jobExplorer == null) {
-			BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
+			BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance("JSR-352-beanRefContext.xml");
 			BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
 			baseContext = (ApplicationContext) ref.getFactory();
 
