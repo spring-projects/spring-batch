@@ -88,6 +88,26 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 		setQuoteCharacter(DEFAULT_QUOTE_CHARACTER);
 	}
 
+	public DelimitedLineTokenizer (String delimiter, String [] names){
+		this(delimiter);
+		setNames(names);
+	}
+
+	public DelimitedLineTokenizer (String delimiter, String [] names, int [] includedFields) {
+		this (delimiter, names);
+		setIncludedFields(includedFields);
+	}
+
+	public DelimitedLineTokenizer (String [] names){
+		this() ;
+		setNames(names);
+	}
+
+	public DelimitedLineTokenizer (String [] names, int [] includedFields){
+		this(names) ;
+		setIncludedFields(includedFields);
+	}
+
 	/**
 	 * Setter for the delimiter character.
 	 *

@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentMap;
  * name in the enclosing BeanFactory, or by providing a class to instantiate
  * reflectively.<br>
  * <br>
- * 
+ * <p/>
  * Nested property paths, including indexed properties in maps and collections,
  * can be referenced by the {@link FieldSet} names. They will be converted to
  * nested bean properties inside the prototype. The {@link FieldSet} and the
@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentMap;
  * that can be initialized. If some of the nested properties are optional (e.g.
  * collection members) they need to be removed by a post processor.<br>
  * <br>
- * 
+ * <p/>
  * To customize the way that {@link FieldSet} values are converted to the
  * desired type for injecting into the prototype there are several choices. You
  * can inject {@link PropertyEditor} instances directly through the
@@ -65,10 +65,10 @@ import java.util.concurrent.ConcurrentMap;
  * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
  * methods, or you can provide a custom {@link FieldSet} implementation.<br>
  * <br>
- * 
+ * <p/>
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
- * 
+ * <p/>
  * <ul>
  * <li>Quantity = quantity (field names can be capitalised)</li>
  * <li>ISIN = isin (acronyms can be lower case bean property names, as per Java
@@ -79,13 +79,13 @@ import java.util.concurrent.ConcurrentMap;
  * <li>ORDER.CUSTOMER_ID = order.customerId (nested paths are recursively
  * checked)</li>
  * </ul>
- * 
+ * <p/>
  * The algorithm used to match a property name is to start with an exact match
  * and then search successively through more distant matches until precisely one
  * match is found. If more than one match is found there will be an error.
- * 
+ *
  * @author Dave Syer
- * 
+ * @author Josh Long
  */
 public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
 		BeanFactoryAware, InitializingBean {
@@ -102,14 +102,25 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private boolean strict = true;
 
+	public BeanWrapperFieldSetMapper(Class<? extends T> type) {
+		setTargetType(type);
+	}
+
+	public BeanWrapperFieldSetMapper() {
+	}
+
+	public BeanWrapperFieldSetMapper(String name) {
+		setPrototypeBeanName(name);
+	}
+
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
-	 * .springframework.beans.factory.BeanFactory)
-	 */
-    @Override
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
+		 * .springframework.beans.factory.BeanFactory)
+		 */
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
@@ -118,7 +129,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * The maximum difference that can be tolerated in spelling between input
 	 * key names and bean property names. Defaults to 5, but could be set lower
 	 * if the field names match the bean names.
-	 * 
+	 *
 	 * @param distanceLimit the distance limit to set
 	 */
 	public void setDistanceLimit(int distanceLimit) {
@@ -130,10 +141,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * that will be passed into {@link #mapFieldSet(FieldSet)}. Typically a
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
-	 * 
+	 * <p/>
 	 * Either this property or the type property must be specified, but not
 	 * both.
-	 * 
+	 *
 	 * @param name the name of a prototype bean in the enclosing BeanFactory
 	 */
 	public void setPrototypeBeanName(String name) {
@@ -144,10 +155,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
 	 * for every call to {@link #mapFieldSet(FieldSet)}.<br>
-	 * 
+	 * <p/>
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
-	 * 
+	 *
 	 * @param type the type to set
 	 */
 	public void setTargetType(Class<? extends T> type) {
@@ -156,13 +167,12 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * Check that precisely one of type or prototype bean name is specified.
-	 * 
+	 *
 	 * @throws IllegalStateException if neither is set or both properties are
-	 * set.
-	 * 
+	 *                               set.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null || type != null, "Either name or type must be provided.");
 		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
@@ -172,15 +182,15 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
 	 * context, or to a new instance of the required type if no prototype is
 	 * available.
-	 * @throws BindException if there is a type conversion or other error (if
-	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
-	 * after binding).
-	 * 
+	 *
+	 * @throws BindException                if there is a type conversion or other error (if
+	 *                                      the {@link DataBinder} from {@link #createBinder(Object)} has errors
+	 *                                      after binding).
 	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
-	 * field that cannot be mapped to a bean property.
+	 *                                      field that cannot be mapped to a bean property.
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
 	 */
-    @Override
+	@Override
 	public T mapFieldSet(FieldSet fs) throws BindException {
 		T copy = getBean();
 		DataBinder binder = createBinder(copy);
@@ -197,7 +207,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * implementation creates a new {@link DataBinder} and calls out to
 	 * {@link #initBinder(DataBinder)} and
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
-	 * 
+	 *
 	 * @param target
 	 * @return a {@link DataBinder} that can be used to bind properties to the
 	 * target.
@@ -218,6 +228,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Note that registration of custom property editors can be done in
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
 	 * </p>
+	 *
 	 * @param binder new binder instance
 	 * @see #createBinder(Object)
 	 */
@@ -231,11 +242,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		}
 		try {
 			return type.newInstance();
-		}
-		catch (InstantiationException e) {
+		} catch (InstantiationException e) {
 			ReflectionUtils.handleReflectionException(e);
-		}
-		catch (IllegalAccessException e) {
+		} catch (IllegalAccessException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -258,7 +267,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		}
 		Map<String, String> matches = new HashMap<String, String>(propertiesMatched.get(distanceKey));
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings({"unchecked", "rawtypes"})
 		Set<String> keys = new HashSet(properties.keySet());
 		for (String key : keys) {
 
@@ -323,8 +332,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		if (index > 0) {
 			prefix = key.substring(0, index);
 			suffix = key.substring(index);
-		}
-		else {
+		} else {
 			prefix = key;
 			suffix = "";
 		}
@@ -337,8 +345,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				if (candidate.equals(prefix)) { // if it's the same don't
 					// replace it...
 					name = key;
-				}
-				else {
+				} else {
 					name = candidate + suffix;
 				}
 			}
@@ -356,11 +363,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			try {
 				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
-			}
-			catch (InstantiationException e) {
+			} catch (InstantiationException e) {
 				ReflectionUtils.handleReflectionException(e);
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}
@@ -377,7 +382,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Public setter for the 'strict' property. If true, then
 	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields
 	 * that cannot be mapped to the bean.
-	 * 
+	 *
 	 * @param strict
 	 */
 	public void setStrict(boolean strict) {
@@ -416,8 +421,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			if (cls == null) {
 				if (other.cls != null)
 					return false;
-			}
-			else if (!cls.equals(other.cls))
+			} else if (!cls.equals(other.cls))
 				return false;
 			if (distance != other.distance)
 				return false;
