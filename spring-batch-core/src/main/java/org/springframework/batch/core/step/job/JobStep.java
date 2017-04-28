@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.job;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -116,14 +117,27 @@ public class JobStep extends AbstractStep {
 		}
 
 		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+		
+		stepExecution.setExitStatus(determineStepExitStatus(stepExecution, jobExecution));
+
 		if (jobExecution.getStatus().isUnsuccessful()) {
 			// AbstractStep will take care of the step execution status
 			throw new UnexpectedJobExecutionException("Step failure: the delegate Job failed in JobStep.");
 		}
-		else if(jobExecution.getStatus().equals(BatchStatus.STOPPED)) {
-			stepExecution.setStatus(BatchStatus.STOPPED);
-		}
-
+	}
+	
+	/**
+	 * Determines the {@link ExitStatus} taking into consideration the {@link ExitStatus} from
+	 * the {@link StepExecution}, which invoked the {@link JobStep}, and the {@link JobExecution}.
+	 * 
+	 * @param stepExecution the {@link StepExecution} which invoked the {@link JobExecution}
+	 * @param jobExecution the {@link JobExecution}
+	 * @return the final {@link ExitStatus}
+	 */
+	private ExitStatus determineStepExitStatus(StepExecution stepExecution, JobExecution jobExecution) {
+		ExitStatus exitStatus = stepExecution.getExitStatus() != null ? stepExecution.getExitStatus() : ExitStatus.COMPLETED;
+		
+		return exitStatus.and(jobExecution.getExitStatus());
 	}
 
 }
