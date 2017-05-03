@@ -60,7 +60,7 @@ import org.springframework.util.ClassUtils;
 public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> 
                 implements InitializingBean {
 
-	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
+	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<>();
 
 	private Map<String, Object> parameterValues;
 
@@ -108,7 +108,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	 *
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider<T> queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<? extends T> queryProvider) {
 		helper.setQueryProvider(queryProvider);
 	}
 

@@ -148,7 +148,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 	/**
 	 * The Hibernate {@link SessionFactory} to execute the query against.
 	 *
-	 * @param sessionFactory the session factorry
+	 * @param sessionFactory the session factory
 	 * @return this instance for method chaining
 	 * @see HibernateCursorItemReader#setSessionFactory(SessionFactory)
 	 */

@@ -49,7 +49,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private String queryName = "";
 
-	private HibernateQueryProvider<T> queryProvider;
+	private HibernateQueryProvider<? extends T> queryProvider;
 
 	private boolean useStatelessSession = true;
 
@@ -74,7 +74,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider<T> queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<? extends T> queryProvider) {
 		this.queryProvider = queryProvider;
 	}
 
@@ -108,11 +108,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
 					"queryString or queryName must be set");
 		}
-		// making sure that the appropriate (Hibernate) query provider is set
-		else {
-			Assert.state(queryProvider != null, "Hibernate query provider must be set");
-		}
-
 	}
 
 	/**
