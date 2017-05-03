@@ -84,7 +84,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setCurrentItemCount(int)
 	 */
-
 	public HibernatePagingItemReaderBuilder<T> currentItem(int currentItem) {
 		this.currentItem = currentItem;
 

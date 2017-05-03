@@ -36,7 +36,7 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
- * It depends on {@link org.springframework.data.repository.CrudRepository#save(Iterable)}
+ * It depends on {@link org.springframework.data.repository.CrudRepository#saveAll(Iterable)}
  * method to store the items for the chunk.  Performance will be determined by that
  * implementation more than this writer.
  * </p>
