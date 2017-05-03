@@ -75,7 +75,6 @@ allprojects {
 		hibernateVersion = '5.2.2.Final'
 		hibernateValidatorVersion = '5.3.0.CR1'
 		hsqldbVersion = '2.3.3'
-		ibatisVersion = '2.3.4.726'
 		jackson2Version = "2.8.6" //?
 		javaMailVersion = '1.5.6'
 		javaxBatchApiVersion = '1.0'
@@ -341,7 +340,6 @@ project('spring-batch-infrastructure') {
 		}
 		optional "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
 		optional "javax.transaction:javax.transaction-api:$javaxTransactionVersion"
-		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		optional "javax.mail:javax.mail-api:$javaMailVersion"
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 		compile("org.springframework:spring-oxm:$springVersion") { dep ->
@@ -461,7 +459,6 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
@@ -573,7 +570,6 @@ project('spring-batch-samples') {
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
 		compile "javax.transaction:javax.transaction-api:$javaxTransactionVersion"
-		compile "org.apache.ibatis:ibatis-sqlmap:$ibatisVersion"
 		compile "org.springframework:spring-aop:$springVersion"
 		compile("org.springframework:spring-oxm:$springVersion") {
 			exclude group: 'commons-lang', module: 'commons-lang'

@@ -269,15 +269,6 @@
 			</profiles>
 		</configSet>
 		<configSet>
-			<name><![CDATA[ibatis]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-			</configs>
-			<profiles>
-			</profiles>
-		</configSet>
-		<configSet>
 			<name><![CDATA[partition]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>

@@ -2270,53 +2270,6 @@ itemReader.close(executionContext);</programlisting>
         entities read from the database for each query execution.</para>
       </section>
 
-      <section id="IbatisPagingItemReader">
-        <title>IbatisPagingItemReader</title>
-
-        <note>This reader is deprecated as of Spring Batch 3.0.</note>
-
-        <para>If you use IBATIS for your data access then you can use the
-        <classname>IbatisPagingItemReader</classname> which, as the name
-        indicates, is an implementation of a paging
-        <classname>ItemReader</classname>. IBATIS doesn't have direct support
-        for reading rows in pages but by providing a couple of standard
-        variables you can add paging support to your IBATIS queries.</para>
-
-        <para>Here is an example of a configuration for a
-        <classname>IbatisPagingItemReader</classname> reading CustomerCredits
-        as in the examples above:</para>
-
-        <programlisting language="xml">&lt;bean id="itemReader" class="org.spr...IbatisPagingItemReader"&gt;
-    &lt;property name="sqlMapClient" ref="sqlMapClient"/&gt;
-    &lt;property name="queryId" value="getPagedCustomerCredits"/&gt;
-    &lt;property name="pageSize" value="1000"/&gt;
-&lt;/bean&gt;</programlisting>
-
-        <para>The <classname>IbatisPagingItemReader</classname> configuration
-        above references an IBATIS query called "getPagedCustomerCredits".
-        Here is an example of what that query should look like for
-        MySQL.</para>
-
-        <programlisting language="xml">&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
-    select id, name, credit from customer order by id asc LIMIT #_skiprows#, #_pagesize#
-&lt;/select&gt;</programlisting>
-
-        <para>The <classname>_skiprows</classname> and
-        <classname>_pagesize</classname> variables are provided by the
-        <classname>IbatisPagingItemReader</classname> and there is also a
-        <classname>_page</classname> variable that can be used if necessary.
-        The syntax for the paging queries varies with the database used. Here
-        is an example for Oracle (unfortunately we need to use CDATA for some
-        operators since this belongs in an XML document):</para>
-
-        <programlisting language="xml">&lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
-    select * from (
-      select * from (
-        select t.id, t.name, t.credit, ROWNUM ROWNUM_ from customer t order by id
-       )) where ROWNUM_ &lt;![CDATA[ &gt; ]]&gt; ( #_page# * #_pagesize# )
-    ) where ROWNUM &lt;![CDATA[ &lt;= ]]&gt; #_pagesize#
-&lt;/select&gt;</programlisting>
-      </section>
     </section>
 
     <section id="databaseItemWriters">

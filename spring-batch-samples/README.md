@@ -51,7 +51,6 @@ Job/Feature                 | delimited input | fixed-length input | xml input |
 :-------------------------- | :-------------: | :----------------: | :-------: | :-------------: | :-------------: | :--------------: | :-----------------: | :--------: | :-------: | :------------: | :--------: | :----------:
 delimited                   |       x         |                    |           |                 |                 |                  |                     |     x      |           |                |            |
 [fixedLength](#fixedLength) |                 |          x         |           |                 |                 |                  |                     |            |      x    |                |            |
-[ibatis](#ibatis)           |                 |                    |           |                 |        x        |                  |                     |            |           |                |      x     |
 [hibernate](#hibernate)     |                 |                    |           |                 |        x        |                  |                     |            |           |                |      x     |
 [jdbcCursor](#jdbcCursor)   |                 |                    |           |                 |        x        |                  |                     |            |           |                |      x     |
 jpa                         |                 |                    |           |       x         |                 |                  |                     |            |           |                |      x     |
@@ -520,12 +519,6 @@ The output reliability and robustness are improved by the use of
 "write-behind" behaviour is provided by Hibernate implicitly, but we
 need to take control of it so that the skip and retry features
 provided by Spring Batch can work effectively.
-
-### [Ibatis Sample](id:ibatis)
-
-The goal of this sample is to show the use of Ibatis as a query
-mapping tool.  Its features are similar to the Hibernate sample, but
-it uses Ibatis to drive its input and output.
 
 ### [Infinite Loop Sample](id:infiniteLoop)
 
