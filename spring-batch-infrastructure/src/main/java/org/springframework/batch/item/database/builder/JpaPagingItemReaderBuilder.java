@@ -23,8 +23,13 @@ import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.util.Assert;
 
 /**
+ * Creates a fully qualified JpaPagingItemReader.
+ *
  * @author Michael Minella
+ *
+ * @since 4.0
  */
+
 public class JpaPagingItemReaderBuilder<T> {
 
 	private String name;
