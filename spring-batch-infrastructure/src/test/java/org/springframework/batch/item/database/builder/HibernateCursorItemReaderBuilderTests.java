@@ -137,11 +137,36 @@ public class HibernateCursorItemReaderBuilderTests {
 		provider.setSqlQuery("select * from T_FOOS");
 		provider.afterPropertiesSet();
 
-
 		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
 				.name("fooReader")
 				.sessionFactory(this.sessionFactory)
 				.queryProvider(provider)
+				.build();
+
+		reader.afterPropertiesSet();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		reader.open(executionContext);
+
+		int i = 0;
+		while(reader.read() != null) {
+			i++;
+		}
+
+		reader.update(executionContext);
+		reader.close();
+
+		assertEquals(5, i);
+	}
+
+	@Test
+	public void testConfigurationNativeQuery() throws Exception {
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.sessionFactory(this.sessionFactory)
+				.nativeQuery("select * from T_FOOS")
+				.entityClass(Foo.class)
 				.build();
 
 		reader.afterPropertiesSet();
@@ -195,10 +220,12 @@ public class HibernateCursorItemReaderBuilderTests {
 					.sessionFactory(this.sessionFactory)
 					.saveState(false)
 					.build();
-			fail("queryString or queryName must be set");
+			fail("A HibernateQueryProvider, queryName, queryString, " +
+					"or both the nativeQuery and entityClass must be configured");
 		}
 		catch (IllegalStateException ise) {
-			assertEquals("queryString or queryName must be set", ise.getMessage());
+			assertEquals("A HibernateQueryProvider, queryName, queryString, " +
+					"or both the nativeQuery and entityClass must be configured", ise.getMessage());
 		}
 
 	}

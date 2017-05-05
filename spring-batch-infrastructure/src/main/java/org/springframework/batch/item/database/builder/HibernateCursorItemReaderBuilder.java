@@ -20,17 +20,19 @@ import java.util.Map;
 import org.hibernate.SessionFactory;
 
 import org.springframework.batch.item.database.HibernateCursorItemReader;
+import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
  * This is a builder for the {@link HibernateCursorItemReader}.  When configuring, one of
- * the following should be provided:
+ * the following should be provided (listed in order of precedence):
  * <ul>
- *     <li>{@link #queryString(String)}</li>
- *     <li>{@link #queryName(String)}</li>
  *     <li>{@link #queryProvider(HibernateQueryProvider)}</li>
+ *     <li>{@link #queryName(String)}</li>
+ *     <li>{@link #queryString(String)}</li>
+ *     <li>{@link #nativeQuery(String)} and {@link #entityClass(Class)}</li>
  * </ul>
  *
  * @author Michael Minella
@@ -60,6 +62,10 @@ public class HibernateCursorItemReaderBuilder<T> {
 	private boolean saveState = true;
 
 	private String name;
+
+	private String nativeQuery;
+
+	private Class nativeClass;
 
 	/**
 	 * A name used to prevent key collisions while saving the state in the
@@ -213,6 +219,23 @@ public class HibernateCursorItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Used to configure a {@link HibernateNativeQueryProvider}.  This is ignored if
+	 * @param nativeQuery
+	 * @return
+	 */
+	public HibernateCursorItemReaderBuilder<T> nativeQuery(String nativeQuery) {
+		this.nativeQuery = nativeQuery;
+
+		return this;
+	}
+
+	public HibernateCursorItemReaderBuilder<T> entityClass(Class nativeClass) {
+		this.nativeClass = nativeClass;
+
+		return this;
+	}
+
+	/**
 	 * Returns a fully constructed {@link HibernateCursorItemReader}.
 	 *
 	 * @return a new {@link HibernateCursorItemReader}
@@ -226,18 +249,39 @@ public class HibernateCursorItemReaderBuilder<T> {
 					"A name is required when saveState is set to true.");
 		}
 
-		if (queryProvider == null) {
-			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
-					"queryString or queryName must be set");
-		}
-
 		HibernateCursorItemReader<T> reader = new HibernateCursorItemReader<>();
 
 		reader.setFetchSize(this.fetchSize);
 		reader.setParameterValues(this.parameterValues);
-		reader.setQueryName(this.queryName);
-		reader.setQueryProvider(this.queryProvider);
-		reader.setQueryString(this.queryString);
+
+		if(this.queryProvider != null) {
+			reader.setQueryProvider(this.queryProvider);
+		}
+		else if(StringUtils.hasText(this.queryName)) {
+			reader.setQueryName(this.queryName);
+		}
+		else if(StringUtils.hasText(this.queryString)) {
+			reader.setQueryString(this.queryString);
+		}
+		else if(StringUtils.hasText(this.nativeQuery) && this.nativeClass != null) {
+			HibernateNativeQueryProvider provider = new HibernateNativeQueryProvider();
+			provider.setSqlQuery(this.nativeQuery);
+			provider.setEntityClass(this.nativeClass);
+
+			try {
+				provider.afterPropertiesSet();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Unable to initialize the HibernateNativeQueryProvider", e);
+			}
+
+			reader.setQueryProvider(provider);
+		}
+		else {
+			throw new IllegalStateException("A HibernateQueryProvider, queryName, queryString, " +
+					"or both the nativeQuery and entityClass must be configured");
+		}
+
 		reader.setSessionFactory(this.sessionFactory);
 		reader.setUseStatelessSession(this.useStatelessSession);
 		reader.setCurrentItemCount(this.currentItem);
