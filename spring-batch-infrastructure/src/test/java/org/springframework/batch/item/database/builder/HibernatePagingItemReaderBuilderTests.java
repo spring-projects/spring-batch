@@ -170,7 +170,7 @@ public class HibernatePagingItemReaderBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>()
+			new HibernatePagingItemReaderBuilder<Foo>()
 					.sessionFactory(this.sessionFactory)
 					.fetchSize(-2)
 					.build();
@@ -181,26 +181,26 @@ public class HibernatePagingItemReaderBuilderTests {
 		}
 
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>().build();
-			fail("sessionFactory is required");
+			new HibernatePagingItemReaderBuilder<Foo>().build();
+			fail("A SessionFactory must be provided");
 		}
-		catch (IllegalStateException ise) {
+		catch (IllegalArgumentException ise) {
 			assertEquals("A SessionFactory must be provided", ise.getMessage());
 		}
 
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>()
+			new HibernatePagingItemReaderBuilder<Foo>()
 					.sessionFactory(this.sessionFactory)
 					.saveState(true)
 					.build();
 			fail("name is required when saveState is set to true");
 		}
-		catch (IllegalStateException ise) {
-			assertEquals("A name is required when saveState is set to true.", ise.getMessage());
+		catch (IllegalArgumentException ise) {
+			assertEquals("A name is required when saveState is set to true", ise.getMessage());
 		}
 
 		try {
-			new HibernateCursorItemReaderBuilder<Foo>()
+			new HibernatePagingItemReaderBuilder<Foo>()
 					.sessionFactory(this.sessionFactory)
 					.saveState(false)
 					.build();
