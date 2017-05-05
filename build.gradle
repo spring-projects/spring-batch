@@ -57,7 +57,7 @@ allprojects {
 		springDataJpaVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataMongodbVersion = '2.0.0.BUILD-SNAPSHOT'
 		springDataNeo4jVersion = '5.0.0.BUILD-SNAPSHOT'
-		springIntegrationVersion = '5.0.0.M1'
+		springIntegrationVersion = '5.0.0.BUILD-SNAPSHOT'
 		springLdapVersion = '2.3.1.RELEASE'
 
 		activemqVersion = '5.13.2'
