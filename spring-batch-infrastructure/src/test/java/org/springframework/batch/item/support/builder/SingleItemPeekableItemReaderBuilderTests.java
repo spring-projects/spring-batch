@@ -21,8 +21,8 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.SingleItemPeekableItemReader;
-import org.springframework.batch.item.support.SingleItemPeekableItemReaderTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -40,11 +40,9 @@ public class SingleItemPeekableItemReaderBuilderTests {
 	@Test
 	public void testPeek() throws Exception {
 		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReaderBuilder<String>()
-				.setDelegate(
-						new SingleItemPeekableItemReaderTests.CountingListItemReader<String>(Arrays.asList("a", "b")))
+				.delegate(
+						new ListItemReader<String>(Arrays.asList("a", "b")))
 				.build();
-		reader.setDelegate(
-				new SingleItemPeekableItemReaderTests.CountingListItemReader<String>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());

@@ -24,6 +24,8 @@ import org.springframework.util.Assert;
  * Creates a fully qualified SingleItemPeekeableItemReader.
  *
  * @author Glenn Renfro
+ *
+ * @since 4.0
  */
 public class SingleItemPeekableItemReaderBuilder<T> {
 
@@ -36,8 +38,9 @@ public class SingleItemPeekableItemReaderBuilder<T> {
 	 *
 	 * @param delegate the delegate to set
 	 * @return this instance for method chaining
+	 * @see SingleItemPeekableItemReader#setDelegate(ItemReader)
 	 */
-	public SingleItemPeekableItemReaderBuilder<T> setDelegate(ItemReader<T> delegate) {
+	public SingleItemPeekableItemReaderBuilder<T> delegate(ItemReader<T> delegate) {
 		this.delegate = delegate;
 
 		return this;
