@@ -41,6 +41,14 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
 	private boolean ignoreItemStream = false;
 
+	/**
+	 * Establishes the policy whether to call the open, close, or update methods for the
+	 * item writer delegates associated with the CompositeItemWriter.
+	 * 
+	 * @param ignoreItemStream if false the delegates' open, close, or update methods will
+	 * be called when the corresponding methods on the CompositeItemWriter are called. If
+	 * true the delegates' open, close, nor update methods will not be called (default is false).
+	 */
 	public void setIgnoreItemStream(boolean ignoreItemStream) {
 		this.ignoreItemStream = ignoreItemStream;
 	}
@@ -58,6 +66,12 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
 	}
 
+	/**
+	 * The list of item writers to use as delegates. Items are written to each of the
+	 * delegates.
+	 *
+	 * @param delegates the list of delegates to use.  The delegates list must not be null nor be empty.
+	 */
 	public void setDelegates(List<ItemWriter<? super T>> delegates) {
 		this.delegates = delegates;
 	}
