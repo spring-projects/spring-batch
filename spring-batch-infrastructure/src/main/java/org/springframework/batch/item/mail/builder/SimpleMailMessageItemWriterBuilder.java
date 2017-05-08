@@ -18,12 +18,11 @@ package org.springframework.batch.item.mail.builder;
 
 import java.util.List;
 
-import org.apache.shiro.util.Assert;
-
 import org.springframework.batch.item.mail.DefaultMailErrorHandler;
 import org.springframework.batch.item.mail.MailErrorHandler;
 import org.springframework.batch.item.mail.SimpleMailMessageItemWriter;
 import org.springframework.mail.MailSender;
+import org.springframework.util.Assert;
 
 /**
  * Creates a fully qualified SimpleMailMessageItemWriter.
