@@ -74,7 +74,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
 	 * input resource does not exist.
-	 * @param strict false by default
+	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
@@ -155,6 +155,11 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
+	/**
+	 * Establishes the resource that will be used as the input for the LdifReader.
+	 *
+	 * @param resource the resource that will be read.
+	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 		this.ldifParser = new LdifParser(resource);
