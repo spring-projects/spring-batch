@@ -24,6 +24,7 @@ import java.util.Map;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.ClassifierSupport;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.util.Assert;
 
 /**
  * Calls one of a collection of ItemWriters for each item, based on a router
@@ -32,6 +33,7 @@ import org.springframework.batch.item.ItemWriter;
  * The implementation is thread-safe if all delegates are thread-safe.
  * 
  * @author Dave Syer
+ * @author Glenn Renfro
  * @since 2.0
  */
 public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
@@ -42,6 +44,7 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 	 * @param classifier the classifier to set
 	 */
 	public void setClassifier(Classifier<T, ItemWriter<? super T>> classifier) {
+		Assert.notNull(classifier, "A classifier is required.");
 		this.classifier = classifier;
 	}
 
