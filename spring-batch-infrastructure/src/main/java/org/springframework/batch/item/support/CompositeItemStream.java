@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.shiro.util.Assert;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -27,6 +29,7 @@ import org.springframework.batch.item.ItemStreamException;
  * Simple {@link ItemStream} that delegates to a list of other streams.
  * 
  * @author Dave Syer
+ * @author Glenn Renfro
  * 
  */
 public class CompositeItemStream implements ItemStream {
@@ -39,6 +42,7 @@ public class CompositeItemStream implements ItemStream {
 	 * @param listeners
 	 */
 	public void setStreams(ItemStream[] listeners) {
+		Assert.notNull(listeners, "Listeners must not be null.");
 		this.streams = Arrays.asList(listeners);
 	}
 
