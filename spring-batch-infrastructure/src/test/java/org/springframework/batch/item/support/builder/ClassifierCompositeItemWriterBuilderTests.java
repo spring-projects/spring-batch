@@ -69,7 +69,7 @@ public class ClassifierCompositeItemWriterBuilderTests {
 	@Test
 	public void testSetNullClassifier() throws Exception {
 		try {
-			ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriterBuilder<>().classifier(null).build();
+			ClassifierCompositeItemWriter writer = new ClassifierCompositeItemWriterBuilder().classifier(null).build();
 			fail("A classifier is required.");
 		}
 		catch (IllegalArgumentException iae) {

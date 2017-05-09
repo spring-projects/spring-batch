@@ -41,7 +41,7 @@ public class ClassifierCompositeItemWriterBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.ClassifierCompositeItemWriter#setClassifier(Classifier)
 	 */
-	public ClassifierCompositeItemWriterBuilder classifier(Classifier<T, ItemWriter<? super T>> classifier) {
+	public ClassifierCompositeItemWriterBuilder<T> classifier(Classifier<T, ItemWriter<? super T>> classifier) {
 		Assert.notNull(classifier, "A classifier is required.");
 		this.classifier = classifier;
 
