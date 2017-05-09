@@ -62,9 +62,6 @@ public class CompositeItemWriterBuilder<T> {
 	 * @see CompositeItemWriter#setDelegates(List)
 	 */
 	public CompositeItemWriterBuilder delegates(List<ItemWriter<? super T>> delegates) {
-		Assert.notNull(delegates, "A list of delegates is required.");
-		Assert.notEmpty(delegates, "The delegates list must have one or more delegates.");
-
 		this.delegates = delegates;
 
 		return this;
@@ -76,7 +73,8 @@ public class CompositeItemWriterBuilder<T> {
 	 * @return a new {@link CompositeItemWriter}
 	 */
 	public CompositeItemWriter<T> build() {
-		Assert.notNull(this.delegates, "A list of delegates is required");
+		Assert.notNull(delegates, "A list of delegates is required.");
+		Assert.notEmpty(delegates, "The delegates list must have one or more delegates.");
 
 		CompositeItemWriter<T> writer = new CompositeItemWriter<>();
 		writer.setDelegates(this.delegates);
