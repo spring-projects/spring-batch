@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.item.support;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,11 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.springframework.classify.PatternMatchingClassifier;
+
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.classify.PatternMatchingClassifier;
+
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
+ * @author Glenn Renfro
  *
  */
 public class ClassifierCompositeItemWriterTests {
@@ -60,4 +63,16 @@ public class ClassifierCompositeItemWriterTests {
 		assertEquals("[one, two, three]", defaults.toString());
 	}
 
+	@Test
+	public void testSetNullClassifier() throws Exception {
+		try {
+			ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
+			writer.setClassifier(null);
+			fail("A classifier is required.");
+		}
+		catch (IllegalArgumentException iae) {
+			assertEquals("Message returned from exception did not match expected result.", "A classifier is required.",
+					iae.getMessage());
+		}
+	}
 }
