@@ -385,7 +385,7 @@ public class FlatFileItemReaderBuilder<T> {
 	public FlatFileItemReader<T> build() throws Exception {
 		if(this.saveState) {
 			Assert.state(StringUtils.hasText(this.name),
-					"A name is required when saveSate is set to true.");
+					"A name is required when saveState is set to true.");
 		}
 
 		if(this.resource == null) {

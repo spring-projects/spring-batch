@@ -221,7 +221,8 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	 * Set the boolean indicating whether or not state should be saved in the provided {@link ExecutionContext} during
 	 * the {@link ItemStream} call to update.
 	 * 
-	 * @param saveState
+	 * @param saveState true to update ExecutionContext. False do not update
+	 * ExecutionContext.
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
