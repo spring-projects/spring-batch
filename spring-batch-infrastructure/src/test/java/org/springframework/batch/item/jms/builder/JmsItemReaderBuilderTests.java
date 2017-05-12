@@ -47,17 +47,9 @@ public class JmsItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNoItemType() {
+	public void testBasicRead() {
 		JmsItemReader<String> itemReader = new JmsItemReaderBuilder<String>().jmsTemplate(this.defaultJmsTemplate)
 				.build();
-		assertEquals("foo", itemReader.read());
-	}
-
-	@Test
-	public void testSetItemType() {
-		JmsItemReader<String> itemReader = new JmsItemReaderBuilder<String>().jmsTemplate(this.defaultJmsTemplate)
-				.itemType(String.class).build();
-
 		assertEquals("foo", itemReader.read());
 	}
 
@@ -88,7 +80,7 @@ public class JmsItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNextMessage() {
+	public void testMessageType() {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		Message message = mock(Message.class);
 		when(jmsTemplate.receive()).thenReturn(message);
@@ -96,21 +88,6 @@ public class JmsItemReaderBuilderTests {
 		JmsItemReader<Message> itemReader = new JmsItemReaderBuilder<Message>().jmsTemplate(jmsTemplate)
 				.itemType(Message.class).build();
 		assertEquals(message, itemReader.read());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoDefaultDestination() {
-		JmsTemplate jmsTemplate = new JmsTemplate();
-		jmsTemplate.setReceiveTimeout(100L);
-		new JmsItemReaderBuilder<String>().jmsTemplate(jmsTemplate).itemType(String.class).build();
-
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoTimeout() {
-		JmsTemplate jmsTemplate = new JmsTemplate();
-		jmsTemplate.setDefaultDestinationName("foo");
-		new JmsItemReaderBuilder<String>().jmsTemplate(jmsTemplate).itemType(String.class).build();
 	}
 
 	@Test
