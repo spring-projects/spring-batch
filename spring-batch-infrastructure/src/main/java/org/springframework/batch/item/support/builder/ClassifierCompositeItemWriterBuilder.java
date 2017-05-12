@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  */
 public class ClassifierCompositeItemWriterBuilder<T> {
 
-	private Classifier<T, ItemWriter<? super T>> classifier = new ClassifierSupport<T, ItemWriter<? super T>>(null);
+	private Classifier<T, ItemWriter<? super T>> classifier;
 
 	/**
 	 * Establish the classifier to be used for the selection of which {@link ItemWriter}
@@ -42,7 +42,6 @@ public class ClassifierCompositeItemWriterBuilder<T> {
 	 * @see org.springframework.batch.item.support.ClassifierCompositeItemWriter#setClassifier(Classifier)
 	 */
 	public ClassifierCompositeItemWriterBuilder<T> classifier(Classifier<T, ItemWriter<? super T>> classifier) {
-		Assert.notNull(classifier, "A classifier is required.");
 		this.classifier = classifier;
 
 		return this;
@@ -54,6 +53,8 @@ public class ClassifierCompositeItemWriterBuilder<T> {
 	 * @return a new {@link ClassifierCompositeItemWriter}
 	 */
 	public ClassifierCompositeItemWriter<T> build() {
+		Assert.notNull(classifier, "A classifier is required.");
+
 		ClassifierCompositeItemWriter<T> writer = new ClassifierCompositeItemWriter<>();
 		writer.setClassifier(this.classifier);
 		return writer;

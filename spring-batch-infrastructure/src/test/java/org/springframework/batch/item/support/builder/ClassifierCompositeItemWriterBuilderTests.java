@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ClassifierCompositeItemWriter;
-import org.springframework.batch.support.annotation.Classifier;
 import org.springframework.classify.PatternMatchingClassifier;
 
 import static junit.framework.TestCase.fail;
@@ -69,7 +68,7 @@ public class ClassifierCompositeItemWriterBuilderTests {
 	@Test
 	public void testSetNullClassifier() throws Exception {
 		try {
-			ClassifierCompositeItemWriter writer = new ClassifierCompositeItemWriterBuilder().classifier(null).build();
+			new ClassifierCompositeItemWriterBuilder().build();
 			fail("A classifier is required.");
 		}
 		catch (IllegalArgumentException iae) {
