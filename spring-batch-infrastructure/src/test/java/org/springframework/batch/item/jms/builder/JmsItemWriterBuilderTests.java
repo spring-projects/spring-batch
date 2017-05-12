@@ -46,12 +46,6 @@ public class JmsItemWriterBuilderTests {
 		assertEquals("Expected foo", "foo", argCaptor.getAllValues().get(0));
 		assertEquals("Expected bar", "bar", argCaptor.getAllValues().get(1));
 	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testTemplateWithNoDefaultDestination() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate();
-		new JmsItemWriterBuilder<String>().jmsTemplate(jmsTemplate).build();
-	}
 	
 	@Test
 	public void testNullJmsTemplate() {
