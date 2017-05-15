@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.batch.item.file.LineMapper;
@@ -52,14 +53,14 @@ import org.springframework.util.StringUtils;
  * A builder implementation for the {@link FlatFileItemReader}.
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 4.0
  * @see FlatFileItemReader
  */
-public class FlatFileItemReaderBuilder<T> {
+public class FlatFileItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<FlatFileItemReaderBuilder<T>> {
 
 	protected Log logger = LogFactory.getLog(getClass());
-
-	private String name;
 
 	private boolean strict = true;
 
@@ -67,8 +68,6 @@ public class FlatFileItemReaderBuilder<T> {
 			new SimpleRecordSeparatorPolicy();
 
 	private Resource resource;
-
-	private int maxItemCount = Integer.MAX_VALUE;
 
 	private List<String> comments = new ArrayList<>();
 
@@ -98,8 +97,6 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private boolean beanMapperStrict = true;
 
-	private boolean saveState = true;
-
 	private BigInteger tokenizerValidator = new BigInteger("0");
 
 	/**
@@ -124,18 +121,6 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public FlatFileItemReaderBuilder<T> comments(String[] comments) {
 		this.comments.addAll(Arrays.asList(comments));
-		return this;
-	}
-
-	/**
-	 * Configure the max number of items to be read.
-	 *
-	 * @param maxItemCount the max items to be read
-	 * @return The current instance of the builder.
-	 * @see FlatFileItemReader#setMaxItemCount(int)
-	 */
-	public FlatFileItemReaderBuilder<T> maxItemCount(int maxItemCount) {
-		this.maxItemCount = maxItemCount;
 		return this;
 	}
 
@@ -350,33 +335,6 @@ public class FlatFileItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Configure if the state of the {@link FlatFileItemReader} should be persisted within
-	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
-	 *
-	 * @param saveState defaults to true
-	 * @return The current instance of the builder.
-	 * @see FlatFileItemReader#setSaveState(boolean)
-	 */
-	public FlatFileItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-		return this;
-	}
-
-	/**
-	 * The name used to calculate the key within the
-	 * {@link org.springframework.batch.item.ExecutionContext}.  Required if
-	 * {@link FlatFileItemReaderBuilder#saveState(boolean)} is set to true.
-	 *
-	 * @param name name of the reader instance
-	 * @return The current instance of the builder.
-	 * @see FlatFileItemReader#setName(String)
-	 */
-	public FlatFileItemReaderBuilder<T> name(String name) {
-		this.name = name;
-		return this;
-	}
-
-	/**
 	 * Builds the {@link FlatFileItemReader}.
 	 *
 	 * @return a {@link FlatFileItemReader}
@@ -456,6 +414,7 @@ public class FlatFileItemReaderBuilder<T> {
 		reader.setSkippedLinesCallback(this.skippedLinesCallback);
 		reader.setRecordSeparatorPolicy(this.recordSeparatorPolicy);
 		reader.setMaxItemCount(this.maxItemCount);
+		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setStrict(this.strict);
 

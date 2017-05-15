@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
@@ -33,17 +34,14 @@ import org.springframework.util.StringUtils;
  * @since 4.0
  * @see MultiResourceItemReader
  */
-public class MultiResourceItemReaderBuilder<T> {
+public class MultiResourceItemReaderBuilder<T>
+		extends AbstractItemStreamSupportBuilder<MultiResourceItemReaderBuilder<T>> {
 
 	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
 	private Resource[] resources;
 
-	private boolean saveState = true;
-
 	private boolean strict = false;
-
-	private String name;
 
 	private Comparator<Resource> comparator;
 
@@ -77,22 +75,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Set the boolean indicating whether or not state should be saved in the provided
-	 * {@link ExecutionContext} during the {@link ItemStream} call to update.
-	 *
-	 * @param saveState true to update ExecutionContext. False do not update
-	 * ExecutionContext.
-	 * @return this instance for method chaining.
-	 * @see MultiResourceItemReader#setSaveState(boolean)
-	 * 
-	 */
-	public MultiResourceItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
 	 * In strict mode the reader will throw an exception on
 	 * {@link MultiResourceItemReader#open(org.springframework.batch.item.ExecutionContext)}
 	 * if there are no resources to read.
@@ -103,21 +85,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	 */
 	public MultiResourceItemReaderBuilder<T> setStrict(boolean strict) {
 		this.strict = strict;
-
-		return this;
-	}
-
-	/**
-	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g. the short
-	 * form of the class name.
-	 *
-	 * @param name the name for the component.
-	 * @return this instance for method chaining.
-	 * @see MultiResourceItemReader#setName(String)
-	 */
-	public MultiResourceItemReaderBuilder<T> name(String name) {
-		this.name = name;
 
 		return this;
 	}

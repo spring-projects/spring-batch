@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -29,9 +30,11 @@ import org.springframework.util.StringUtils;
  * A fluent builder for the {@link StaxEventItemReader}
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 4.0
  */
-public class StaxEventItemReaderBuilder<T> {
+public class StaxEventItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<StaxEventItemReaderBuilder<T>> {
 
 	private boolean strict = true;
 
@@ -40,29 +43,6 @@ public class StaxEventItemReaderBuilder<T> {
 	private Unmarshaller unmarshaller;
 
 	private List<String> fragmentRootElements = new ArrayList<>();
-
-	private int currentItemCount = 0;
-
-	private int maxItemCount = Integer.MAX_VALUE;
-
-	private boolean saveState = true;
-
-	private String name;
-
-	/**
-	 * The name used to calculate the key within the
-	 * {@link org.springframework.batch.item.ExecutionContext}.  Required if
-	 * {@link StaxEventItemReaderBuilder#saveState(boolean)} is set to true.
-	 *
-	 * @param name name of the reader instance
-	 * @return The current instance of the builder.
-	 * @see StaxEventItemReader#setName(String)
-	 */
-	public StaxEventItemReaderBuilder<T> name(String name) {
-		this.name = name;
-
-		return this;
-	}
 
 	/**
 	 * The {@link Resource} to be used as input.
@@ -91,9 +71,11 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Adds the list of fragments to be used as the root of each chunk to the configuration.
+	 * Adds the list of fragments to be used as the root of each chunk to the
+	 * configuration.
 	 *
-	 * @param fragmentRootElements the XML root elements to be used to identify XML chunks.
+	 * @param fragmentRootElements the XML root elements to be used to identify XML
+	 * chunks.
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemReader#setFragmentRootElementNames(String[])
 	 */
@@ -104,9 +86,11 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Adds the list of fragments to be used as the root of each chunk to the configuration.
+	 * Adds the list of fragments to be used as the root of each chunk to the
+	 * configuration.
 	 *
-	 * @param fragmentRootElements the XML root elements to be used to identify XML chunks.
+	 * @param fragmentRootElements the XML root elements to be used to identify XML
+	 * chunks.
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemReader#setFragmentRootElementNames(String[])
 	 */
@@ -117,50 +101,8 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The starting point for reading (offset number of items).  This value is overriden
-	 * on restart if saveState is set to true.
-	 *
-	 * @param currentItemCount item number to begin at
-	 * @return The current instance of the builder.
-	 * @see StaxEventItemReader#setCurrentItemCount(int)
-	 */
-	public StaxEventItemReaderBuilder<T> currentItemCount(int currentItemCount) {
-		this.currentItemCount = currentItemCount;
-
-		return this;
-	}
-
-	/**
-	 * The maximum number of items to read.
-	 *
-	 * @param maxItemCount max number of items to be read
-	 * @return The current instance of the builder.
-	 * @see StaxEventItemReader#setMaxItemCount(int)
-	 */
-	public StaxEventItemReaderBuilder<T> maxItemCount(int maxItemCount) {
-		this.maxItemCount = maxItemCount;
-
-		return this;
-	}
-
-	/**
-	 * Indicates that the state of the reader should be saved in the
-	 * {@link org.springframework.batch.item.ExecutionContext} for restart.  True by
-	 * default.
-	 *
-	 * @param saveState indicates the state of the reader should be saved
-	 * @return The current instance of the builder.
-	 * @see StaxEventItemReader#setSaveState(boolean)
-	 */
-	public StaxEventItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
 	 * Setting this value to true indicates that it is an error if the input does not
-	 * exist and an exception will be thrown.  Defaults to true.
+	 * exist and an exception will be thrown. Defaults to true.
 	 *
 	 * @param strict indicates the input file must exist
 	 * @return The current instance of the builder
@@ -182,16 +124,14 @@ public class StaxEventItemReaderBuilder<T> {
 
 		StaxEventItemReader<T> reader = new StaxEventItemReader<>();
 
-		if(this.saveState) {
-			Assert.state(StringUtils.hasText(this.name),
-					"A name is required when saveState is set to true.");
+		if (this.saveState) {
+			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 		else {
 			reader.setName(this.name);
 		}
 
-		Assert.notEmpty(this.fragmentRootElements,
-				"At least one fragment root element is required");
+		Assert.notEmpty(this.fragmentRootElements, "At least one fragment root element is required");
 
 		reader.setSaveState(this.saveState);
 		reader.setResource(this.resource);

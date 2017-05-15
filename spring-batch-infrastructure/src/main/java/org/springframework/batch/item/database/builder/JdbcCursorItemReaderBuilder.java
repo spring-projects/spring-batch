@@ -19,6 +19,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.database.AbstractCursorItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.support.ListPreparedStatementSetter;
@@ -34,9 +35,11 @@ import org.springframework.util.StringUtils;
  * Builder for the {@link JdbcCursorItemReader}
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 4.0
  */
-public class JdbcCursorItemReaderBuilder<T> {
+public class JdbcCursorItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<JdbcCursorItemReaderBuilder<T>> {
 
 	private DataSource dataSource;
 
@@ -46,10 +49,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 
 	private int queryTimeout = AbstractCursorItemReader.VALUE_NOT_SET;
 
-	private int currentItemCount = 0;
-
-	private int maxItemCount = Integer.MAX_VALUE;
-
 	private boolean ignoreWarnings;
 
 	private boolean verifyCursorPosition;
@@ -58,13 +57,9 @@ public class JdbcCursorItemReaderBuilder<T> {
 
 	private boolean useSharedExtendedConnection;
 
-	private boolean saveState = true;
-
 	private PreparedStatementSetter preparedStatementSetter;
 
 	private String sql;
-
-	private String name;
 
 	private RowMapper<T> rowMapper;
 
@@ -116,49 +111,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 */
 	public JdbcCursorItemReaderBuilder<T> queryTimeout(int queryTimeout) {
 		this.queryTimeout = queryTimeout;
-
-		return this;
-	}
-
-	/**
-	 * The index of the first record to begin reading from.  Overridden if a previous value
-	 * is provided via the {@link org.springframework.batch.item.ExecutionContext} on
-	 * {@link org.springframework.batch.item.ItemStream#open(ExecutionContext)}
-	 *
-	 * @param currentItemCount current index
-	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setCurrentItemCount(int)
-	 */
-	public JdbcCursorItemReaderBuilder<T> currentItemCount(int currentItemCount) {
-		this.currentItemCount = currentItemCount;
-
-		return this;
-	}
-
-	/**
-	 * The max number of items to be read.  Overriden if a previous value is povided via
-	 * the {@link ExecutionContext} on {@link org.springframework.batch.item.ItemStream#open}
-	 *
-	 * @param maxItemCount count
-	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setMaxItemCount(int)
-	 */
-	public JdbcCursorItemReaderBuilder<T> maxItemCount(int maxItemCount) {
-		this.maxItemCount = maxItemCount;
-
-		return this;
-	}
-
-	/**
-	 * Indicates if the state of the reader should be persisted in the
-	 * {@link ExecutionContext}.  Defaults to true.
-	 *
-	 * @param saveState indicator.  Defaults to true
-	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setSaveState(boolean)
-	 */
-	public JdbcCursorItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
 
 		return this;
 	}
@@ -294,20 +246,6 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 */
 	public JdbcCursorItemReaderBuilder<T> rowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
-
-		return this;
-	}
-
-	/**
-	 * A name used to prevent key collisions while saving state in the
-	 * {@link ExecutionContext}.
-	 *
-	 * @param name unique name for this reader instance
-	 * @return this instance for method chaining
-	 * @see JdbcCursorItemReader#setName(String)
-	 */
-	public JdbcCursorItemReaderBuilder<T> name(String name) {
-		this.name = name;
 
 		return this;
 	}

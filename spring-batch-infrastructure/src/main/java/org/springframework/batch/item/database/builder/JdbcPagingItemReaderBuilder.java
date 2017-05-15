@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.builder;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
@@ -45,10 +46,12 @@ import org.springframework.util.Assert;
  * will be used.
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 4.0
  * @see JdbcPagingItemReader
  */
-public class JdbcPagingItemReaderBuilder<T> {
+public class JdbcPagingItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<JdbcPagingItemReaderBuilder<T>> {
 
 	private DataSource dataSource;
 
@@ -61,14 +64,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	private Map<String, Object> parameterValues;
 
 	private int pageSize = 10;
-
-	private boolean saveState = true;
-
-	private String name;
-
-	private int maxItemCount = Integer.MAX_VALUE;
-
-	private int currentItemCount = 0;
 
 	private String groupClause;
 
@@ -142,60 +137,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 */
 	public JdbcPagingItemReaderBuilder<T> pageSize(int pageSize) {
 		this.pageSize = pageSize;
-
-		return this;
-	}
-
-	/**
-	 * Set to false in a multithreaded environment (restart is disabled).  If set to true,
-	 * a name is required.  Defaults to true.
-	 *
-	 * @param saveState determine if the reader's state should be persisted
-	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setSaveState(boolean)
-	 */
-	public JdbcPagingItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
-	 * A name used to prevent key collissions while saving the state in the
-	 * {@link org.springframework.batch.item.ExecutionContext}
-	 *
-	 * @param name unique name for this reader instance
-	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setName(String)
-	 */
-	public JdbcPagingItemReaderBuilder<T> name(String name) {
-		this.name = name;
-
-		return this;
-	}
-
-	/**
-	 * Maximum number of items to read.
-	 *
-	 * @param count number of items
-	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setMaxItemCount(int)
-	 */
-	public JdbcPagingItemReaderBuilder<T> maxItemCount(int count) {
-		this.maxItemCount = count;
-
-		return this;
-	}
-
-	/**
-	 * The current index of the item to read.
-	 *
-	 * @param count current index
-	 * @return this instance for method chaining
-	 * @see JdbcPagingItemReader#setCurrentItemCount(int)
-	 */
-	public JdbcPagingItemReaderBuilder<T> currentItemCount(int count) {
-		this.currentItemCount = count;
 
 		return this;
 	}

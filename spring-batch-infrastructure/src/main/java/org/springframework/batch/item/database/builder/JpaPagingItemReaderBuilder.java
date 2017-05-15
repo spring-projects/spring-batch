@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.builder;
 import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.util.Assert;
@@ -26,19 +27,13 @@ import org.springframework.util.Assert;
  * Creates a fully qualified JpaPagingItemReader.
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  *
  * @since 4.0
  */
 
-public class JpaPagingItemReaderBuilder<T> {
-
-	private String name;
-
-	private int currentItem = 0;
-
-	private int maxItemCount = Integer.MAX_VALUE;
-
-	private boolean saveState = true;
+public class JpaPagingItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<JpaPagingItemReaderBuilder<T>> {
 
 	private int pageSize = 10;
 
@@ -51,60 +46,6 @@ public class JpaPagingItemReaderBuilder<T> {
 	private String queryString;
 
 	private JpaQueryProvider queryProvider;
-
-	/**
-	 * A name used to prevent key collisions while saving the state in the
-	 * {@link org.springframework.batch.item.ExecutionContext}
-	 *
-	 * @param name unique name for this reader instance
-	 * @return this instance for method chaining
-	 * @see JpaPagingItemReader#setName(String)
-	 */
-	public JpaPagingItemReaderBuilder<T> name(String name) {
-		this.name = name;
-
-		return this;
-	}
-
-	/**
-	 * Index for the current item.  Used on restarts to indicate where to start from.
-	 *
-	 * @param currentItem current index
-	 * @return this instance for method chaining
-	 * @see JpaPagingItemReader#setCurrentItemCount(int)
-	 */
-	public JpaPagingItemReaderBuilder<T> currentItem(int currentItem) {
-		this.currentItem = currentItem;
-
-		return this;
-	}
-
-	/**
-	 * The index of the max item to be read.
-	 *
-	 * @param maxItemCount max index
-	 * @return this instance for method chaining
-	 * @see JpaPagingItemReader#setMaxItemCount(int)
-	 */
-	public JpaPagingItemReaderBuilder<T> maxItemCount(int maxItemCount) {
-		this.maxItemCount = maxItemCount;
-
-		return this;
-	}
-
-	/**
-	 * Indicates if the state should be saved.  If set to false, restarts will begin at
-	 * the beginning of the dataset.  Defaults to true
-	 *
-	 * @param saveState indicator
-	 * @return this instance for method chaining
-	 * @see JpaPagingItemReader#setSaveState(boolean)
-	 */
-	public JpaPagingItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
 
 	/**
 	 * The number of records to request per page/query.  Defaults to 10.  Must be greater
@@ -216,7 +157,7 @@ public class JpaPagingItemReaderBuilder<T> {
 		reader.setEntityManagerFactory(this.entityManagerFactory);
 		reader.setQueryProvider(this.queryProvider);
 		reader.setTransacted(this.transacted);
-		reader.setCurrentItemCount(this.currentItem);
+		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);

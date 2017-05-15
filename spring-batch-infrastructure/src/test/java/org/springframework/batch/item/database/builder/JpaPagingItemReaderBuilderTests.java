@@ -73,7 +73,7 @@ public class JpaPagingItemReaderBuilderTests {
 		JpaPagingItemReader<Foo> reader = new JpaPagingItemReaderBuilder<Foo>()
 				.name("fooReader")
 				.entityManagerFactory(this.entityManagerFactory)
-				.currentItem(2)
+				.currentItemCount(2)
 				.maxItemCount(4)
 				.pageSize(5)
 				.transacted(false)
