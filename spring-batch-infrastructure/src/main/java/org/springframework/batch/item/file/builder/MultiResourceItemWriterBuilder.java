@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.builder;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.MultiResourceItemWriter;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.file.ResourceSuffixCreator;
@@ -27,10 +28,12 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link MultiResourceItemWriter}.
  *
  * @author Glenn Renfro
+ * @author Glenn Renfro
  * @since 4.0
  * @see MultiResourceItemWriter
  */
-public class MultiResourceItemWriterBuilder<T> {
+public class MultiResourceItemWriterBuilder<T>
+		extends AbstractItemStreamSupportBuilder<MultiResourceItemWriterBuilder<T>> {
 
 	private Resource resource;
 
@@ -39,10 +42,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	private int itemCountLimitPerResource = Integer.MAX_VALUE;
 
 	private ResourceSuffixCreator suffixCreator;
-
-	private boolean saveState = true;
-
-	private String name;
 
 	/**
 	 * Allows customization of the suffix of the created resources based on the index.
@@ -94,36 +93,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	 */
 	public MultiResourceItemWriterBuilder<T> resource(Resource resource) {
 		this.resource = resource;
-
-		return this;
-	}
-
-	/**
-	 * Set the boolean indicating whether or not state should be saved in the provided
-	 * {@link ExecutionContext} during the delegate call to update.
-	 *
-	 * @param saveState true to update ExecutionContext. False do not update
-	 * ExecutionContext.
-	 * @return The current instance of the builder.
-	 * @see MultiResourceItemWriter#setSaveState(boolean)
-	 */
-	public MultiResourceItemWriterBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
-	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g.
-	 * the short form of the class name.
-	 *
-	 * @param name the name for the component.
-	 * @return The current instance of the builder.
-	 * @see MultiResourceItemWriter#setName(String)
-	 */
-	public MultiResourceItemWriterBuilder<T> name(String name) {
-		this.name = name;
 
 		return this;
 	}

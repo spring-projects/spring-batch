@@ -71,10 +71,10 @@ public class HibernateCursorItemReaderBuilderTests {
 				.name("fooReader")
 				.sessionFactory(this.sessionFactory)
 				.fetchSize(2)
-				.currentItem(2)
+				.currentItemCount(2)
 				.maxItemCount(4)
 				.queryName("allFoos")
-				.useSatelessSession(true)
+				.useStatelessSession(true)
 				.build();
 
 		reader.afterPropertiesSet();

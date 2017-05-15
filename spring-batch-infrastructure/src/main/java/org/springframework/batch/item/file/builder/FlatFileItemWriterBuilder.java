@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.file.builder;
 
+import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -26,10 +27,11 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link FlatFileItemWriter}
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 4.0
  * @see FlatFileItemWriter
  */
-public class FlatFileItemWriterBuilder<T> {
+public class FlatFileItemWriterBuilder<T> extends AbstractItemStreamSupportBuilder<FlatFileItemWriterBuilder<T>> {
 
 	private Resource resource;
 
@@ -47,30 +49,11 @@ public class FlatFileItemWriterBuilder<T> {
 
 	private boolean shouldDeleteIfEmpty = false;
 
-	private boolean saveState = true;
-
 	private FlatFileHeaderCallback headerCallback;
 
 	private FlatFileFooterCallback footerCallback;
 
 	private boolean transactional = FlatFileItemWriter.DEFAULT_TRANSACTIONAL;
-
-	private String name;
-
-	/**
-	 * The name used to calculate the key within the
-	 * {@link org.springframework.batch.item.ExecutionContext}.  Required if
-	 * {@link FlatFileItemWriterBuilder#saveState(boolean)} is set to true.
-	 *
-	 * @param name name of the writer instance
-	 * @return The current instance of the builder.
-	 * @see FlatFileItemWriter#setName(String)
-	 */
-	public FlatFileItemWriterBuilder<T> name(String name) {
-		this.name = name;
-
-		return this;
-	}
 
 	/**
 	 * The {@link Resource} to be used as output.
@@ -177,20 +160,6 @@ public class FlatFileItemWriterBuilder<T> {
 	 */
 	public FlatFileItemWriterBuilder<T> append(boolean append) {
 		this.append = append;
-
-		return this;
-	}
-
-	/**
-	 * If set to false, the state of the output is not maintained and restart is not
-	 * supported.
-	 *
-	 * @param saveState defaults to true
-	 * @return The current instance of the builder
-	 * @see FlatFileItemWriter#setSaveState(boolean)
-	 */
-	public FlatFileItemWriterBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
 
 		return this;
 	}

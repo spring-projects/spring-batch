@@ -73,7 +73,7 @@ public class HibernatePagingItemReaderBuilderTests {
 				.name("fooReader")
 				.sessionFactory(this.sessionFactory)
 				.fetchSize(2)
-				.currentItem(2)
+				.currentItemCount(2)
 				.maxItemCount(4)
 				.pageSize(5)
 				.queryName("allFoos")
