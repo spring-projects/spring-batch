@@ -38,6 +38,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -192,80 +193,11 @@ public class RepositoryItemReaderBuilderTests {
 				this.pageRequestContainer.getValue().getPageSize());
 	}
 
-	public static class TestRepository implements PagingAndSortingRepository<Object, Integer> {
+	public static interface TestRepository extends PagingAndSortingRepository<Object, Integer> {
 
-		@Override
-		public Iterable<Object> findAll(Sort sort) {
-			return null;
-		}
+		public Object foo(PageRequest request);
 
-		@Override
-		public <S extends Sort> Page<Object> findAll(Pageable pageable) {
-			return null;
-		}
-
-		@Override
-		public <S> S save(S entity) {
-			return null;
-		}
-
-		@Override
-		public <S> Iterable<S> saveAll(Iterable<S> entities) {
-			return null;
-		}
-
-		@Override
-		public Optional<Object> findById(Integer integer) {
-			return null;
-		}
-
-		@Override
-		public boolean existsById(Integer integer) {
-			return false;
-		}
-
-		@Override
-		public Iterable<Object> findAll() {
-			return null;
-		}
-
-		@Override
-		public Iterable<Object> findAllById(Iterable<Integer> integers) {
-			return null;
-		}
-
-		@Override
-		public long count() {
-			return 0;
-		}
-
-		@Override
-		public void deleteById(Integer integer) {
-
-		}
-
-		@Override
-		public void delete(Object entity) {
-
-		}
-
-		@Override
-		public void deleteAll(Iterable<?> entities) {
-
-		}
-
-		@Override
-		public void deleteAll() {
-
-		}
-
-		public Object foo(PageRequest request) {
-			return null;
-		}
-
-		public Object foo(String arg1, String arg2, String arg3, PageRequest request) {
-			return null;
-		}
+		public Object foo(String arg1, String arg2, String arg3, PageRequest request) ;
 	}
 
 }
