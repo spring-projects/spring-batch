@@ -350,8 +350,11 @@ InitializingBean {
 
 				try {
 					listener.afterJob(execution);
-				} catch (Exception e) {
-					logger.error("Exception encountered in afterStep callback", e);
+				} catch (Throwable t) {
+					logger.error("Exception encountered in afterStep callback", t);
+					execution.setExitStatus(getDefaultExitStatusForFailure(t, execution));
+					execution.setStatus(BatchStatus.FAILED);
+					execution.addFailureException(t);
 				}
 
 				jobRepository.update(execution);
