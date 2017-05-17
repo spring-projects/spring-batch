@@ -39,6 +39,7 @@ import org.springframework.util.CollectionUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Glenn Renfro
  *
  */
 public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -50,10 +51,21 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private SessionFactory sessionFactory;
 
+	/**
+	 * Boolean flag indicating whether the writer should save or delete the item at write
+	 * time.
+	 * @param delete true if write should delete item, false if item should be saved.
+	 * Default is false.
+	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
 
+	/**
+	 * Establish the session factory that will be used to create {@link Session} instances
+	 * for interacting with Neo4j.
+	 * @param sessionFactory sessionFactory to be used.
+	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
