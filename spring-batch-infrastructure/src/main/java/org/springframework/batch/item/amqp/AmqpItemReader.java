@@ -33,6 +33,11 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 	private final AmqpTemplate amqpTemplate;
 	private Class<? extends T> itemType;
 
+	/**
+	 * Initialize the AmqpItemReader.
+	 *
+	 * @param amqpTemplate the template to be used.  Must not be null.
+	 */
 	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
 		Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
 
@@ -56,6 +61,11 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 		return (T) result;
 	}
 
+	/**
+	 * Establish the itemType for the reader.
+	 * 
+	 * @param itemType class type that will be returned by the reader.
+	 */
 	public void setItemType(Class<? extends T> itemType) {
 		Assert.notNull(itemType, "Item type cannot be null");
 		this.itemType = itemType;
