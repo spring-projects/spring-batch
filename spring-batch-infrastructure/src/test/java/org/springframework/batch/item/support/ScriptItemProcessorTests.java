@@ -150,6 +150,17 @@ public class ScriptItemProcessorTests {
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
 	}
 
+	@Test
+	public void testItemBinding() throws Exception {
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		scriptItemProcessor.setScriptSource("foo.contains('World');", "javascript");
+		scriptItemProcessor.setItemBindingVariableName("foo");
+
+		scriptItemProcessor.afterPropertiesSet();
+
+		assertEquals("Incorrect transformed value", true, scriptItemProcessor.process("Hello World"));
+	}
+
 	@Test(expected = IllegalStateException.class)
 	public void testNoScriptSet() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
