@@ -67,8 +67,14 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
 	}
 
+	/**
+	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be
+	 * processed.
+	 * @param delegates list of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
 	public void setDelegates(List<? extends ItemProcessor<?, ?>> delegates) {
 		this.delegates = delegates;
-	}	
+	}
 
 }
