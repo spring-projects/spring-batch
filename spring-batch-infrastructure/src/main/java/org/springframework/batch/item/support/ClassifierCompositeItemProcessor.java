@@ -36,7 +36,8 @@ public class ClassifierCompositeItemProcessor<I,O> implements ItemProcessor<I, O
 			new ClassifierSupport<I, ItemProcessor<?, ? extends O>> (null);
 
 	/**
-	 * @param classifier the classifier to set
+	 * Establishes the classifier that will determine which {@link ItemProcessor} to use.
+	 * @param classifier the {@link Classifier} to set
 	 */
 	public void setClassifier(Classifier<? super I, ItemProcessor<?, ? extends O>> classifier) {
 		this.classifier = classifier;
