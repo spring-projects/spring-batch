@@ -1,0 +1,49 @@
+= Spring Batch - Reference Documentation
+Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund, Michael Minella, Chris Schaefer, Gunnar Hillert
+
+:batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
+
+Copyright © 2009, 2010, 2011, 2012, 2013, 2014, 201, 2016, 2017 Pivotal, Inc. All Rights Reserved.
+
+Copies of this document may be made for your own use and for
+distribution to others, provided that you do not charge any fee for such
+copies and further provided that each copy contains this Copyright
+Notice, whether distributed in print or electronically.
+
+// ======================================================================================
+
+* <<spring-batch-intro.adoc#spring-batch-intro,Spring Batch Introduction>>
+
+* <<whatsnew.adoc#whatsNew,What's New in Spring Batch 4.0>>
+
+* <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>
+
+* <<job.adoc#configureJob,Configuring and Running a Job>>
+
+* <<step.adoc#configureStep,Configuring a Step>>
+
+* <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>>
+
+* <<scalability.adoc#scalability,Scaling and Parallel Processings>>
+
+* <<repeat.adoc#repeat,Repeat>>
+
+* <<retry.adoc#retry,Retry>>
+
+* <<testing.adoc#testing,Unit Testing>>
+
+* <<common-patterns#commonPatterns, Common Patterns>>
+
+* <<jsr-352.adoc#jsr-352,JSR-352 Support>>
+
+* <<spring-batch-integration.adoc#springBatchIntegration,Spring Batch Integration>>
+
+[big maroon]#Appendix#
+
+* <<appendix.adoc#listOfReadersAndWriters,List of ItemReaders and ItemWriters>>
+
+* <<schema-appendix.adoc#metaDataSchema,Meta-Data Schema>>
+
+* <<transaction-appendix.adoc#transactions,Batch Processing and Transactions>>
+
+* <<glossary.adoc#glossary,Glossary>>

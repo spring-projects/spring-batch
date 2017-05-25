@@ -8,11 +8,12 @@ buildscript {
 		maven { url 'https://plugins.gradle.org/m2/' }
 	}
 	dependencies {
-		classpath 'io.spring.gradle:docbook-reference-plugin:0.3.1'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1"
+		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
+		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14"
 	}
 }
 
@@ -613,10 +614,28 @@ project('spring-batch-samples') {
 	}
 }
 
-apply plugin: 'docbook-reference'
+apply plugin: "org.asciidoctor.convert"
+asciidoctor {
+	sourceDir = file('src/site/asciidoc')
+	sources {
+		include '*.adoc'
+	}
+	logDocuments = true
+	backends = ["html", "pdf"]
+	options doctype: 'book', eruby: 'erubis'
+	attributes  'icons': 'font',
+			'idprefix': '',
+			'idseparator': '-',
+			docinfo: '',
+			revnumber: project.version,
+			sectanchors: '',
+			sectnums: '',
+			'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend
+			stylesdir: 'stylesheets/',
+			stylesheet: 'spring.css',
+			'spring-version': project.version,
+			'allow-uri-read': ''
 
-reference {
-	sourceDir = file('src/site/docbook/reference')
 }
 
 apply plugin: 'org.sonarqube'
@@ -698,7 +717,7 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (reference) {
+		from (asciidoctor) {
 			into 'reference'
 		}
 }

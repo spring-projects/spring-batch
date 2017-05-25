@@ -1,0 +1,51 @@
+:batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
+:toc: left
+:toclevels: 4
+
+[[whatsNew]]
+
+== What's New in Spring Batch 4.0
+
+The Spring Batch 4.0 release has three major themes:
+
+
+* Java 8 Requirement
+
+
+* Dependencies re-baseline
+
+
+* Builders for ItemReaders and ItemWriters
+
+[[whatsNewJava]]
+
+
+=== Java 8 Requirement
+
+Spring Batch has historically followed Spring Framework's baselines for both
+		java version as well as third party dependencies.  With Spring Batch 4, the Spring
+		Framework version is being upgraded to Spring Framework 5.  As such, the java
+		version requirement for Spring Batch is also increasing to Java 8.
+	
+
+[[whatsNewDependencies]]
+
+
+=== Dependencies re-baseline
+
+In order to continue to integrate with supported versions of the third party
+		libraries Spring Batch utilizes, Spring Batch 4 is updating the dependencies across
+		the board.  The new dependency versions are in alignment with Spring Framework 5.
+	
+
+[[whatsNewBuilders]]
+
+
+=== Provide builders for the ItemReaders and ItemWriters
+
+Spring Batch 4 is providing a collection of builders for all of the ItemReaders
+		and ItemWriters that come with the framework.  As of this release, builders for the
+		`FlatFileItemReader`, `FlatFileItemWriter`, `JdbcCursorItemReader`, and
+		`JdbcBatchItemWriter` are available.  More information can be found in the javadoc
+		for Spring Batch.
+
