@@ -220,13 +220,14 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	@Override
 	protected void doClose() throws Exception {
 
-		initialized = false;
+		if(initialized) {
+			if (cursor != null) {
+				cursor.close();
+			}
 
-		if (cursor != null) {
-			cursor.close();
+			helper.close();
 		}
 
-		helper.close();
-
+		initialized = false;
 	}
 }
