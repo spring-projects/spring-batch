@@ -36,11 +36,6 @@ import org.springframework.util.ClassUtils;
  * object which can be consumed and manipulated as necessary by {@link org.springframework.batch.item.ItemProcessor ItemProcessor} or any
  * output service.
  * <p>
- * {@link LdifReader LdifReader} usage is mimics that of the FlatFileItemReader for all intensive purposes. Adjustments have been made to
- * process records instead of lines, however.  As such, the {@link #recordsToSkip recordsToSkip} attribute indicates the number of records
- * from the top of the file that should not be processed.  Implementations of the {@link RecordCallbackHandler RecordCallbackHandler}
- * interface can be used to execute operations on those skipped records.
- * <p>
  * As with the {@link org.springframework.batch.item.file.FlatFileItemReader FlatFileItemReader}, the {@link #strict strict} option
  * differentiates between whether or not to require the resource to exist before processing.  In the case of a value set to false, a warning
  * is logged instead of an exception being thrown.

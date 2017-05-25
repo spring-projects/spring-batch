@@ -1,0 +1,39 @@
+include::header/index-header.adoc[]
+
+// ======================================================================================
+
+* <<spring-batch-intro.adoc#spring-batch-intro,Spring Batch Introduction>>
+
+* <<whatsnew.adoc#whatsNew,What's New in Spring Batch 4.0>>
+
+* <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>>
+
+* <<job.adoc#configureJob,Configuring and Running a Job>>
+
+* <<step.adoc#configureStep,Configuring a Step>>
+
+* <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>>
+
+* <<scalability.adoc#scalability,Scaling and Parallel Processings>>
+
+* <<repeat.adoc#repeat,Repeat>>
+
+* <<retry.adoc#retry,Retry>>
+
+* <<testing.adoc#testing,Unit Testing>>
+
+* <<common-patterns.adoc#commonPatterns, Common Patterns>>
+
+* <<jsr-352.adoc#jsr-352,JSR-352 Support>>
+
+* <<spring-batch-integration.adoc#springBatchIntegration,Spring Batch Integration>>
+
+[big maroon]#Appendix#
+
+* <<appendix.adoc#listOfReadersAndWriters,List of ItemReaders and ItemWriters>>
+
+* <<schema-appendix.adoc#metaDataSchema,Meta-Data Schema>>
+
+* <<transaction-appendix.adoc#transactions,Batch Processing and Transactions>>
+
+* <<glossary.adoc#glossary,Glossary>>
