@@ -43,6 +43,10 @@ import static org.mockito.Mockito.when;
  */
 public class RepositoryItemReaderBuilderTests {
 
+	private static final String ARG1 = "foo";
+	private static final  String ARG2 = "bar";
+	private static final  String ARG3 = "baz";
+
 	public static final String TEST_CONTENT = "FOOBAR";
 
 	@Mock
@@ -82,7 +86,8 @@ public class RepositoryItemReaderBuilderTests {
 
 	@Test
 	public void testRepositoryMethodReference() throws Exception {
-		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference(this.repository);
+		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference(
+				this.repository);
 		repositoryMethodReference.methodIs().foo(null);
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<Object>()
 				.repository(repositoryMethodReference)
@@ -92,6 +97,27 @@ public class RepositoryItemReaderBuilderTests {
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
+	}
+
+	@Test
+	public void testRepositoryMethodReferenceWithArgs() throws Exception {
+		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference(
+				this.repository);
+		repositoryMethodReference.methodIs().foo(ARG1, ARG2, ARG3, null);
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<Object>()
+				.repository(repositoryMethodReference)
+				.sorts(this.sorts)
+				.maxItemCount(5)
+				.name("bar").build();
+		ArgumentCaptor<String> arg1Captor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
+		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
+				this.pageRequestContainer.capture())).thenReturn(this.page);
+
+		String result = (String) reader.read();
+		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
+		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
 	}
 
 	@Test
@@ -180,9 +206,6 @@ public class RepositoryItemReaderBuilderTests {
 
 	@Test
 	public void testArguments() throws Exception {
-		final String ARG1 = "foo";
-		final String ARG2 = "bar";
-		final String ARG3 = "baz";
 		List<String> args = new ArrayList<>(3);
 		args.add(ARG1);
 		args.add(ARG2);
@@ -196,19 +219,23 @@ public class RepositoryItemReaderBuilderTests {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<Object>().repository(this.repository)
 				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").arguments(args).build();
 
-		reader.read();
-		assertEquals("ARG1 for calling method did not match expected result", ARG1, arg1Captor.getValue());
-		assertEquals("ARG2 for calling method did not match expected result", ARG2, arg2Captor.getValue());
-		assertEquals("ARG3 for calling method did not match expected result", ARG3, arg3Captor.getValue());
-		assertEquals("Result Total Pages did not match expected result", 10,
-				this.pageRequestContainer.getValue().getPageSize());
+		String result = (String) reader.read();
+		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
 	}
 
 	public static interface TestRepository extends PagingAndSortingRepository<Object, Integer> {
 
 		public Object foo(PageRequest request);
 
-		public Object foo(String arg1, String arg2, String arg3, PageRequest request) ;
+		public Object foo(String arg1, String arg2, String arg3, PageRequest request);
 	}
 
+	private void verifyMultiArgRead(ArgumentCaptor<String> arg1Captor, ArgumentCaptor<String> arg2Captor, ArgumentCaptor<String> arg3Captor, String result) {
+		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
+		assertEquals("ARG1 for calling method did not match expected result", ARG1, arg1Captor.getValue());
+		assertEquals("ARG2 for calling method did not match expected result", ARG2, arg2Captor.getValue());
+		assertEquals("ARG3 for calling method did not match expected result", ARG3, arg3Captor.getValue());
+		assertEquals("Result Total Pages did not match expected result", 10,
+				this.pageRequestContainer.getValue().getPageSize());
+	}
 }

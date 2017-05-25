@@ -17,6 +17,8 @@
 package org.springframework.batch.item.data.builder;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,8 @@ import org.springframework.util.StringUtils;
  * @see RepositoryItemReader
  */
 
-public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStreamItemReaderBuilder<RepositoryItemReaderBuilder<T>> {
+public class RepositoryItemReaderBuilder<T>
+		extends AbstractItemCountingItemStreamItemReaderBuilder<RepositoryItemReaderBuilder<T>> {
 
 	private PagingAndSortingRepository<?, ?> repository;
 
@@ -49,6 +52,8 @@ public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStre
 	private int pageSize = 10;
 
 	private String methodName;
+
+	private RepositoryMethodReference repositoryMethodReference;
 
 	/**
 	 * Arguments to be passed to the data providing method.
@@ -120,20 +125,19 @@ public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStre
 	/**
 	 * Specifies a repository and the type-safe method to call for the reader. This method
 	 * must take {@link org.springframework.data.domain.Pageable} as the <em>last</em>
-	 * argument. This method can be used in place of {@link #methodName(String)} and
-	 * {@link #repository(PagingAndSortingRepository)}.
+	 * argument. This method can be used in place of {@link #methodName(String)},
+	 * {@link #arguments(List)} and {@link #repository(PagingAndSortingRepository)}. The
+	 * repository that is used by the repositoryMethodReference must be non-final.
 	 *
-	 * @param repositoryReference of the used to get a repository and type-safe method for
-	 * use by the reader.
+	 * @param repositoryMethodReference of the used to get a repository and type-safe
+	 * method for use by the reader.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemReader#setMethodName(String)
 	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
 	 *
 	 */
-	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference repositoryReference) {
-		Assert.notNull(repositoryReference, "repositoryReference must not be null.");
-		this.methodName = repositoryReference.getMethodName();
-		this.repository = repositoryReference.getRepository();
+	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference repositoryMethodReference) {
+		this.repositoryMethodReference = repositoryMethodReference;
 
 		return this;
 	}
@@ -144,6 +148,12 @@ public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStre
 	 * @return a {@link RepositoryItemReader}
 	 */
 	public RepositoryItemReader<T> build() {
+		if (this.repositoryMethodReference != null) {
+			this.methodName = this.repositoryMethodReference.getMethodName();
+			this.repository = this.repositoryMethodReference.getRepository();
+			this.arguments = this.repositoryMethodReference.getArguments();
+		}
+
 		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.hasText(this.methodName, "methodName is required.");
@@ -179,9 +189,12 @@ public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStre
 			this.repositoryInvocationHandler = new RepositoryMethodIterceptor();
 		}
 
-		// T is a proxy of the object passed in in the constructor
+		/**
+		 * The proxy returned prevents actual method execution and is only used to gather,
+		 * information about the method.
+		 * @return T is a proxy of the object passed in in the constructor
+		 */
 		public T methodIs() {
-
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(this.repository.getClass());
 			enhancer.setCallback(this.repositoryInvocationHandler);
@@ -196,19 +209,34 @@ public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStre
 			return this.repositoryInvocationHandler.getMethodName();
 		}
 
+		public List<Object> getArguments() {
+			return this.repositoryInvocationHandler.getArguments();
+		}
 	}
 
 	private static class RepositoryMethodIterceptor implements MethodInterceptor {
 		private String methodName;
 
+		private List<Object> arguments;
+
 		@Override
 		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
 			this.methodName = method.getName();
+			if (objects != null && objects.length > 1) {
+				arguments = new ArrayList<>(Arrays.asList(objects));
+				// remove last entry because that will be provided by the
+				// RepositoryItemReader
+				arguments.remove(objects.length - 1);
+			}
 			return null;
 		}
 
 		public String getMethodName() {
 			return this.methodName;
+		}
+
+		public List<Object> getArguments() {
+			return arguments;
 		}
 	}
 }
