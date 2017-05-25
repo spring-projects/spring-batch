@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,14 +30,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -78,6 +75,20 @@ public class RepositoryItemReaderBuilderTests {
 	public void testBasicRead() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<Object>().repository(this.repository)
 				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").build();
+		String result = (String) reader.read();
+		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
+		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
+	}
+
+	@Test
+	public void testRepositoryMethodReference() throws Exception {
+		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference(this.repository);
+		repositoryMethodReference.methodIs().foo(null);
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<Object>()
+				.repository(repositoryMethodReference)
+				.sorts(this.sorts)
+				.maxItemCount(5)
+				.name("bar").build();
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());

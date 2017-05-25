@@ -16,11 +16,15 @@
 
 package org.springframework.batch.item.data.builder;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
@@ -34,7 +38,7 @@ import org.springframework.util.StringUtils;
  * @see RepositoryItemReader
  */
 
-public class RepositoryItemReaderBuilder<T> {
+public class RepositoryItemReaderBuilder<T> extends AbstractItemCountingItemStreamItemReaderBuilder<RepositoryItemReaderBuilder<T>> {
 
 	private PagingAndSortingRepository<?, ?> repository;
 
@@ -45,14 +49,6 @@ public class RepositoryItemReaderBuilder<T> {
 	private int pageSize = 10;
 
 	private String methodName;
-
-	private int currentItemCount;
-
-	private int maxItemCount;
-
-	private boolean saveState = true;
-
-	private String name;
 
 	/**
 	 * Arguments to be passed to the data providing method.
@@ -122,69 +118,22 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The index of the item to start reading from. If the {@link ExecutionContext}
-	 * contains a key <code>[name].read.count</code> (where <code>[name]</code> is the
-	 * name of this component) the value from the {@link ExecutionContext} will be used in
-	 * preference.
+	 * Specifies a repository and the type-safe method to call for the reader. This method
+	 * must take {@link org.springframework.data.domain.Pageable} as the <em>last</em>
+	 * argument. This method can be used in place of {@link #methodName(String)} and
+	 * {@link #repository(PagingAndSortingRepository)}.
 	 *
-	 * @see RepositoryItemReader#setName(String)
-	 *
-	 * @param count the value of the current item count
+	 * @param repositoryReference of the used to get a repository and type-safe method for
+	 * use by the reader.
 	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setCurrentItemCount(int)
-	 * 
-	 */
-	public RepositoryItemReaderBuilder<T> currentItemCount(int count) {
-		this.currentItemCount = count;
-
-		return this;
-	}
-
-	/**
-	 * The maximum index of the items to be read. If the {@link ExecutionContext} contains
-	 * a key <code>[name].read.count.max</code> (where <code>[name]</code> is the name of
-	 * this component) the value from the {@link ExecutionContext} will be used in
-	 * preference.
+	 * @see RepositoryItemReader#setMethodName(String)
+	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
 	 *
-	 * @see RepositoryItemReader#setName(String)
-	 *
-	 * @param count the value of the maximum item count
-	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setMaxItemCount(int)
 	 */
-	public RepositoryItemReaderBuilder<T> maxItemCount(int count) {
-		this.maxItemCount = count;
-
-		return this;
-	}
-
-	/**
-	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to save any
-	 * state from this stream, and you don't need it to be restartable. Always set it to
-	 * false if the reader is being used in a concurrent environment.
-	 *
-	 * @param saveState flag value (default true).
-	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setSaveState(boolean)
-	 */
-	public RepositoryItemReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
-	 * The name of the component which will be used as a stem for keys in the
-	 * {@link ExecutionContext}. Subclasses should provide a default value, e.g. the short
-	 * form of the class name.
-	 *
-	 * @param name the name for the component
-	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setName(String)
-	 */
-	public RepositoryItemReaderBuilder<T> name(String name) {
-		this.name = name;
+	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference repositoryReference) {
+		Assert.notNull(repositoryReference, "repositoryReference must not be null.");
+		this.methodName = repositoryReference.getMethodName();
+		this.repository = repositoryReference.getRepository();
 
 		return this;
 	}
@@ -213,5 +162,53 @@ public class RepositoryItemReaderBuilder<T> {
 		reader.setSort(this.sorts);
 		reader.setName(this.name);
 		return reader;
+	}
+
+	/**
+	 * Establishes a proxy that will capture a the Repository and the associated
+	 * methodName that will be used by the reader.
+	 * @param <T> The type of repository that will be used by the reader.
+	 */
+	public static class RepositoryMethodReference<T> {
+		private RepositoryMethodIterceptor repositoryInvocationHandler;
+
+		private PagingAndSortingRepository<?, ?> repository;
+
+		public RepositoryMethodReference(PagingAndSortingRepository<?, ?> repository) {
+			this.repository = repository;
+			this.repositoryInvocationHandler = new RepositoryMethodIterceptor();
+		}
+
+		// T is a proxy of the object passed in in the constructor
+		public T methodIs() {
+
+			Enhancer enhancer = new Enhancer();
+			enhancer.setSuperclass(this.repository.getClass());
+			enhancer.setCallback(this.repositoryInvocationHandler);
+			return (T) enhancer.create();
+		}
+
+		public PagingAndSortingRepository<?, ?> getRepository() {
+			return this.repository;
+		}
+
+		public String getMethodName() {
+			return this.repositoryInvocationHandler.getMethodName();
+		}
+
+	}
+
+	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+		private String methodName;
+
+		@Override
+		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+			this.methodName = method.getName();
+			return null;
+		}
+
+		public String getMethodName() {
+			return this.methodName;
+		}
 	}
 }
