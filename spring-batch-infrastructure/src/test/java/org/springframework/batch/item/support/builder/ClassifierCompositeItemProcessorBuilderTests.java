@@ -36,24 +36,14 @@ public class ClassifierCompositeItemProcessorBuilderTests {
 	@Test
 	public void testBasicClassifierCompositeItemProcessor() throws Exception {
 
-		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
-			@Override
-			public String process(String item) throws Exception {
-				return "foo: " + item;
-			}
-		};
-		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<String, String>() {
-			@Override
-			public String process(String item) throws Exception {
-				return item;
-			}
-		};
+		ItemProcessor<String, String> fooProcessor = item -> "foo: " + item;
+		ItemProcessor<String, String> defaultProcessor = item -> item;
 
-		Map<String, ItemProcessor<?, ? extends String>> routingConfiguration = new HashMap<String, ItemProcessor<?, ? extends String>>();
+		Map<String, ItemProcessor<?, ? extends String>> routingConfiguration = new HashMap<>();
 		routingConfiguration.put("foo", fooProcessor);
 		routingConfiguration.put("*", defaultProcessor);
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessorBuilder<String, String>()
-				.classifier(new PatternMatchingClassifier<ItemProcessor<?, ? extends String>>(routingConfiguration))
+				.classifier(new PatternMatchingClassifier<>(routingConfiguration))
 				.build();
 
 		assertEquals("bar", processor.process("bar"));
