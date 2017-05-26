@@ -59,7 +59,7 @@ public class CompositeItemProcessorBuilderTests {
 		Object item = new Object();
 		Object itemAfterFirstTransfromation = new Object();
 		Object itemAfterSecondTransformation = new Object();
-		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<Object, Object>()
+		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
 				.delegates(this.processors).build();
 
 		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
@@ -70,13 +70,13 @@ public class CompositeItemProcessorBuilderTests {
 
 	@Test
 	public void testNullOrEmptyDelegates() throws Exception {
-		validateExceptionMessage(new CompositeItemProcessorBuilder<Object, Object>().delegates(new ArrayList()),
+		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(new ArrayList<>()),
 				"The delegates list must have one or more delegates.");
-		validateExceptionMessage(new CompositeItemProcessorBuilder<Object, Object>(),
+		validateExceptionMessage(new CompositeItemProcessorBuilder<>(),
 				"A list of delegates is required.");
 	}
 
-	private void validateExceptionMessage(CompositeItemProcessorBuilder<Object, Object> builder, String message) {
+	private void validateExceptionMessage(CompositeItemProcessorBuilder<?, ?> builder, String message) {
 		try {
 			builder.build();
 			fail("IllegalArgumentException should have been thrown");
