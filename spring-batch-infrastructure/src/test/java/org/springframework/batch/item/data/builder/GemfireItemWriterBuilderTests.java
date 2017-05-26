@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -47,12 +47,8 @@ public class GemfireItemWriterBuilderTests {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		this.items = new ArrayList<GemfireItemWriterBuilderTests.Foo>() {
-			{
-				add(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")));
-				add(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
-			}
-		};
+		this.items = Arrays.asList(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
+				new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
 		this.itemKeyMapper = new SpELItemKeyMapper<>("bar.val");
 	}
 
