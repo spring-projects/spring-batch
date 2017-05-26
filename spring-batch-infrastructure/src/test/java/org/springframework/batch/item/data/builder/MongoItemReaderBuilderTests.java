@@ -17,6 +17,7 @@
 package org.springframework.batch.item.data.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,7 +74,9 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testFields() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().fields("{name : 1, age : 1, _id: 0}").build();
+		MongoItemReader<String> reader = getBasicBuilder()
+				.fields("{name : 1, age : 1, _id: 0}")
+				.build();
 
 		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -87,7 +90,9 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testHint() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().hint("{ $natural : 1}").build();
+		MongoItemReader<String> reader = getBasicBuilder()
+				.hint("{ $natural : 1}")
+				.build();
 
 		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -99,11 +104,11 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testCollection() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder().parameterValues(new ArrayList<Object>() {
-			{
-				add("foo");
-			}
-		}).query("{ name : ?0 }").collection("collection").build();
+		MongoItemReader<String> reader = getBasicBuilder()
+				.parameterValues(Collections.singletonList("foo"))
+				.query("{ name : ?0 }")
+				.collection("collection")
+				.build();
 
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
@@ -120,32 +125,47 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testNullTemplate() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class).query("{ }")
-				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "template is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class)
+				.query("{ }")
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50), "template is required.");
 	}
 
 	@Test
 	public void testNullTargetType() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).query("{ }")
-				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "targetType is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+				.query("{ }")
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50), "targetType is required.");
 	}
 
 	@Test
 	public void testNullQuery() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
-				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "query is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50), "query is required.");
 	}
 
 	@Test
 	public void testNullSorts() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
-				.query("{ }").name("mongoReaderTest").pageSize(50), "sorts map is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query("{ }")
+				.name("mongoReaderTest")
+				.pageSize(50), "sorts map is required.");
 	}
 
 	@Test
 	public void testNullName() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
-				.query("{ }").sorts(this.sortOptions).pageSize(50), "A name is required when saveState is set to true");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query("{ }")
+				.sorts(this.sortOptions)
+				.pageSize(50), "A name is required when saveState is set to true");
 	}
 
 	private void validateExceptionMessage(MongoItemReaderBuilder<String> builder, String message) {
@@ -160,7 +180,11 @@ public class MongoItemReaderBuilderTests {
 	}
 
 	private MongoItemReaderBuilder<String> getBasicBuilder() {
-		return new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class).query("{ }")
-				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50);
+		return new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query("{ }")
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50);
 	}
 }
