@@ -37,8 +37,6 @@ public class GemfireItemWriterTests {
 	@Mock
 	private GemfireTemplate template;
 
-	//private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
