@@ -153,7 +153,7 @@ public class Neo4jItemReaderBuilderTests {
 				"orderByStatement is required.");
 	}
 
-	private void validateExceptionMessage(Neo4jItemReaderBuilder<String> builder, String message) {
+	private void validateExceptionMessage(Neo4jItemReaderBuilder<?> builder, String message) {
 		try {
 			builder.build();
 			fail("IllegalArgumentException should have been thrown");
