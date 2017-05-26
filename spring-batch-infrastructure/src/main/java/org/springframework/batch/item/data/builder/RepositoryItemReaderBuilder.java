@@ -30,6 +30,7 @@ import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -123,11 +124,14 @@ public class RepositoryItemReaderBuilder<T>
 	}
 
 	/**
-	 * Specifies a repository and the type-safe method to call for the reader. This method
-	 * must take {@link org.springframework.data.domain.Pageable} as the <em>last</em>
-	 * argument. This method can be used in place of {@link #methodName(String)},
-	 * {@link #arguments(List)} and {@link #repository(PagingAndSortingRepository)}. The
-	 * repository that is used by the repositoryMethodReference must be non-final.
+	 * Specifies a repository and the type-safe method to call for the reader. The method
+	 * configured via this mechanism must take
+	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em>
+	 * argument. This method can be used in place of {@link #repository(PagingAndSortingRepository)},
+	 * {@link #methodName(String)}, and {@link #arguments(List)}.
+	 *
+	 * Note: The repository that is used by the repositoryMethodReference must be
+	 * non-final.
 	 *
 	 * @param repositoryMethodReference of the used to get a repository and type-safe
 	 * method for use by the reader.
@@ -151,7 +155,10 @@ public class RepositoryItemReaderBuilder<T>
 		if (this.repositoryMethodReference != null) {
 			this.methodName = this.repositoryMethodReference.getMethodName();
 			this.repository = this.repositoryMethodReference.getRepository();
-			this.arguments = this.repositoryMethodReference.getArguments();
+
+			if(CollectionUtils.isEmpty(this.arguments)) {
+				this.arguments = this.repositoryMethodReference.getArguments();
+			}
 		}
 
 		Assert.notNull(this.sorts, "sorts map is required.");
@@ -177,7 +184,8 @@ public class RepositoryItemReaderBuilder<T>
 	/**
 	 * Establishes a proxy that will capture a the Repository and the associated
 	 * methodName that will be used by the reader.
-	 * @param <T> The type of repository that will be used by the reader.
+	 * @param <T> The type of repository that will be used by the reader.  The class must
+	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
 		private RepositoryMethodIterceptor repositoryInvocationHandler;
@@ -201,15 +209,15 @@ public class RepositoryItemReaderBuilder<T>
 			return (T) enhancer.create();
 		}
 
-		public PagingAndSortingRepository<?, ?> getRepository() {
+		PagingAndSortingRepository<?, ?> getRepository() {
 			return this.repository;
 		}
 
-		public String getMethodName() {
+		String getMethodName() {
 			return this.repositoryInvocationHandler.getMethodName();
 		}
 
-		public List<Object> getArguments() {
+		List<Object> getArguments() {
 			return this.repositoryInvocationHandler.getArguments();
 		}
 	}
@@ -231,11 +239,11 @@ public class RepositoryItemReaderBuilder<T>
 			return null;
 		}
 
-		public String getMethodName() {
+		String getMethodName() {
 			return this.methodName;
 		}
 
-		public List<Object> getArguments() {
+		List<Object> getArguments() {
 			return arguments;
 		}
 	}
