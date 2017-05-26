@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.ldif.builder;
 
-import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.ldif.MappingLdifReader;
 import org.springframework.batch.item.ldif.RecordCallbackHandler;
 import org.springframework.batch.item.ldif.RecordMapper;
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  *
  * @since 4.0
  */
-public class MappingLdifReaderBuilder<T> {
+public class MappingLdifReaderBuilder<T> extends AbstractItemCountingItemStreamItemReaderBuilder<MappingLdifReaderBuilder<T>> {
 	private Resource resource;
 
 	private int recordsToSkip = 0;
@@ -38,12 +38,6 @@ public class MappingLdifReaderBuilder<T> {
 	private boolean strict = true;
 
 	private RecordCallbackHandler skippedRecordsCallback;
-
-	private boolean saveState = true;
-
-	private int currentItemCount = 0;
-
-	private int maxItemCount = Integer.MAX_VALUE;
 
 	private RecordMapper<T> recordMapper;
 
@@ -106,55 +100,6 @@ public class MappingLdifReaderBuilder<T> {
 	}
 
 	/**
-	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to save any
-	 * state from this stream, and you don't need it to be restartable. Always set it to
-	 * false if the reader is being used in a concurrent environment.
-	 *
-	 * @param saveState flag value (default true).
-	 * @return this instance for method chaining.
-	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setSaveState(boolean)
-	 */
-	public MappingLdifReaderBuilder<T> saveState(boolean saveState) {
-		this.saveState = saveState;
-
-		return this;
-	}
-
-	/**
-	 * The index of the item to start reading from. If the {@link ExecutionContext}
-	 * contains a key <code>[name].read.count</code> (where <code>[name]</code> is the
-	 * name of this component) the value from the {@link ExecutionContext} will be used in
-	 * preference.
-	 *
-	 * @param count the value of the current item count.
-	 * @return this instance for method chaining.
-	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
-	 */
-	public MappingLdifReaderBuilder<T> currentItemCount(int count) {
-		this.currentItemCount = count;
-
-		return this;
-	}
-
-	/**
-	 * The maximum index of the items to be read. If the {@link ExecutionContext} contains
-	 * a key <code>[name].read.count.max</code> (where <code>[name]</code> is the name of
-	 * this component) the value from the {@link ExecutionContext} will be used in
-	 * preference.
-	 *
-	 * @param count the value of the maximum item count.
-	 * @return this instance for method chaining.
-	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
-	 *
-	 */
-	public MappingLdifReaderBuilder<T> maxItemCount(int count) {
-		this.maxItemCount = count;
-
-		return this;
-	}
-
-	/**
 	 * Setter for object mapper. This property is required to be set.
 	 * @param recordMapper maps record to an object
 	 */
@@ -172,14 +117,17 @@ public class MappingLdifReaderBuilder<T> {
 	public MappingLdifReader<T> build() {
 		Assert.notNull(this.resource, "Resource is required.");
 		Assert.notNull(this.recordMapper, "RecordMapper is required.");
-
-		MappingLdifReader reader = new MappingLdifReader();
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
+		}
+		MappingLdifReader<T> reader = new MappingLdifReader();
 		reader.setResource(this.resource);
 		reader.setRecordsToSkip(this.recordsToSkip);
 		reader.setSaveState(saveState);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setRecordMapper(this.recordMapper);
+		reader.setName(this.name);
 		if (this.skippedRecordsCallback != null) {
 			reader.setSkippedRecordsCallback(this.skippedRecordsCallback);
 		}

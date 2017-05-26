@@ -62,6 +62,7 @@ public class MappingLdifReaderBuilderTests {
 				.recordsToSkip(1)
 				.recordMapper(new TestMapper())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("The attribute name for the second record did not match expected result",
@@ -73,6 +74,7 @@ public class MappingLdifReaderBuilderTests {
 		this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>()
 				.recordMapper(new TestMapper())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("The attribute name for the first record did not match expected result",
@@ -85,6 +87,7 @@ public class MappingLdifReaderBuilderTests {
 				.currentItemCount(3)
 				.recordMapper(new TestMapper())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("The attribute name for the third record did not match expected result",
@@ -97,6 +100,7 @@ public class MappingLdifReaderBuilderTests {
 				.maxItemCount(1)
 				.recordMapper(new TestMapper())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("The attribute name for the first record did not match expected result",
@@ -112,6 +116,7 @@ public class MappingLdifReaderBuilderTests {
 				.recordMapper(new TestMapper())
 				.skippedRecordsCallback(new TestCallBackHandler())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		firstRead();
 		assertEquals("The attribute name from the callback handler did not match the  expected result",
@@ -123,12 +128,13 @@ public class MappingLdifReaderBuilderTests {
 		this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>()
 				.recordMapper(new TestMapper())
 				.resource(context.getResource("classpath:/test.ldif"))
+				.name("foo")
 				.build();
 		ExecutionContext executionContext = new ExecutionContext();
 		firstRead(executionContext);
 		this.mappingLdifReader.update(executionContext);
-		assertEquals("LdifReader.read.count did not have the expected result", 1,
-				executionContext.getInt("MappingLdifReader.read.count"));
+		assertEquals("foo.read.count did not have the expected result", 1,
+				executionContext.getInt("foo.read.count"));
 	}
 
 	@Test
@@ -145,12 +151,13 @@ public class MappingLdifReaderBuilderTests {
 	}
 
 	@Test
-	public void testStrict() throws Exception {
+	public void testStrict() {
 		// Test that strict when enabled will throw an exception.
 		try {
 			this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>()
 					.recordMapper(new TestMapper())
 					.resource(context.getResource("classpath:/teadsfst.ldif"))
+					.name("foo")
 					.build();
 			this.mappingLdifReader.open(new ExecutionContext());
 			fail("IllegalStateException should have been thrown, because strict was set to true");
@@ -160,13 +167,13 @@ public class MappingLdifReaderBuilderTests {
 					"Failed to initialize the reader", ise.getMessage());
 		}
 		// Test that strict when disabled will still allow the ldap resource to be opened.
-		this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>().strict(false)
+		this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>().strict(false).name("foo")
 				.recordMapper(new TestMapper()).resource(context.getResource("classpath:/teadsfst.ldif")).build();
 		this.mappingLdifReader.open(new ExecutionContext());
 	}
 
 	@Test
-	public  void testNullRecordMapper() {
+	public void testNullRecordMapper() {
 		try {
 			this.mappingLdifReader = new MappingLdifReaderBuilder<LdapAttributes>()
 					.resource(context.getResource("classpath:/teadsfst.ldif"))
