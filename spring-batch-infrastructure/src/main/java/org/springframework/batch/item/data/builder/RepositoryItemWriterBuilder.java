@@ -16,9 +16,14 @@
 
 package org.springframework.batch.item.data.builder;
 
+import java.lang.reflect.Method;
+
 import org.apache.shiro.util.Assert;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -33,6 +38,8 @@ public class RepositoryItemWriterBuilder<T> {
 	private CrudRepository<T, ?> repository;
 
 	private String methodName;
+
+	private RepositoryMethodReference repositoryMethodReference;
 
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
@@ -62,12 +69,37 @@ public class RepositoryItemWriterBuilder<T> {
 		return this;
 	}
 
+
+	/**
+	 * Specifies a repository and the type-safe method to call for the writer.
+	 * This method can be used in place of {@link #methodName(String)}
+	 * and {@link #repository(CrudRepository)}. The
+	 * repository that is used by the repositoryMethodReference must be non-final.
+	 *
+	 * @param repositoryMethodReference of the used to get a repository and type-safe
+	 * method for use by the writer.
+	 * @return The current instance of the builder.
+	 * @see RepositoryItemWriter#setMethodName(String)
+	 * @see RepositoryItemWriter#setRepository(CrudRepository)
+	 *
+	 */
+	public RepositoryItemWriterBuilder<T> repository(RepositoryMethodReference repositoryMethodReference) {
+		this.repositoryMethodReference = repositoryMethodReference;
+
+		return this;
+	}
+
 	/**
 	 * Builds the {@link RepositoryItemWriter}.
 	 *
 	 * @return a {@link RepositoryItemWriter}
 	 */
 	public RepositoryItemWriter<T> build() {
+		if (this.repositoryMethodReference != null) {
+			this.methodName = this.repositoryMethodReference.getMethodName();
+			this.repository = this.repositoryMethodReference.getRepository();
+		}
+
 		Assert.hasText(this.methodName, "methodName is required.");
 		Assert.notNull(this.repository, "repository is required.");
 
@@ -75,5 +107,56 @@ public class RepositoryItemWriterBuilder<T> {
 		writer.setMethodName(this.methodName);
 		writer.setRepository(this.repository);
 		return writer;
+	}
+
+	/**
+	 * Establishes a proxy that will capture a the Repository and the associated
+	 * methodName that will be used by the writer.
+	 * @param <T> The type of repository that will be used by the writer.
+	 */
+	public static class RepositoryMethodReference<T> {
+		private RepositoryMethodIterceptor repositoryInvocationHandler;
+
+		private CrudRepository<?, ?> repository;
+
+		public RepositoryMethodReference(CrudRepository<?, ?> repository) {
+			this.repository = repository;
+			this.repositoryInvocationHandler = new RepositoryMethodIterceptor();
+		}
+
+		/**
+		 * The proxy returned prevents actual method execution and is only used to gather,
+		 * information about the method.
+		 * @return T is a proxy of the object passed in in the constructor
+		 */
+		public T methodIs() {
+			Enhancer enhancer = new Enhancer();
+			enhancer.setSuperclass(this.repository.getClass());
+			enhancer.setCallback(this.repositoryInvocationHandler);
+			return (T) enhancer.create();
+		}
+
+		public CrudRepository<?, ?> getRepository() {
+			return this.repository;
+		}
+
+		public String getMethodName() {
+			return this.repositoryInvocationHandler.getMethodName();
+		}
+
+	}
+
+	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+		private String methodName;
+
+		@Override
+		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+			this.methodName = method.getName();
+			return null;
+		}
+
+		public String getMethodName() {
+			return this.methodName;
+		}
 	}
 }
