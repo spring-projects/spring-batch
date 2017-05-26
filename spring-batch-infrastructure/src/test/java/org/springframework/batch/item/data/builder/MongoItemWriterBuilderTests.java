@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -44,12 +44,7 @@ public class MongoItemWriterBuilderTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		this.items = new ArrayList<String>() {
-			{
-				add("foo");
-				add("bar");
-			}
-		};
+		this.items = Arrays.asList("foo", "bar");
 	}
 
 	@Test
@@ -65,7 +60,8 @@ public class MongoItemWriterBuilderTests {
 
 	@Test
 	public void testDelete() throws Exception {
-		MongoItemWriter<String> writer = new MongoItemWriterBuilder<String>().template(this.template).delete(true)
+		MongoItemWriter<String> writer = new MongoItemWriterBuilder<String>().template(this.template)
+				.delete(true)
 				.build();
 
 		writer.write(this.items);
@@ -79,7 +75,8 @@ public class MongoItemWriterBuilderTests {
 	@Test
 	public void testWriteToCollection() throws Exception {
 		MongoItemWriter<String> writer = new MongoItemWriterBuilder<String>().collection("collection")
-				.template(this.template).build();
+				.template(this.template)
+				.build();
 
 		writer.write(this.items);
 
