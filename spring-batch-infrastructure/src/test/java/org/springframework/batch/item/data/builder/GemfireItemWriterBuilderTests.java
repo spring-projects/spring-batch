@@ -42,7 +42,7 @@ public class GemfireItemWriterBuilderTests {
 
 	private SpELItemKeyMapper<String, GemfireItemWriterBuilderTests.Foo> itemKeyMapper;
 
-	List<GemfireItemWriterBuilderTests.Foo> items;
+	private List<GemfireItemWriterBuilderTests.Foo> items;
 
 	@Before
 	public void setUp() {
@@ -53,7 +53,7 @@ public class GemfireItemWriterBuilderTests {
 				add(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
 			}
 		};
-		this.itemKeyMapper = new SpELItemKeyMapper<String, GemfireItemWriterBuilderTests.Foo>("bar.val");
+		this.itemKeyMapper = new SpELItemKeyMapper<>("bar.val");
 	}
 
 	@Test
