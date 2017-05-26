@@ -38,7 +38,7 @@ import static org.junit.Assume.assumeTrue;
  * @author Glenn Renfro
  */
 public class ScriptItemProcessorBuilderTests {
-	private static List<String> availableLanguages = new ArrayList<String>();
+	private static List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeClass
 	public static void populateAvailableEngines() {
