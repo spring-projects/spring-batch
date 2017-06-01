@@ -59,7 +59,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	private String methodName;
 
 	/**
-	 * Specifies what method on the repository to call.  This method must the type of
+	 * Specifies what method on the repository to call.  This method must have the type of
 	 * object passed to this writer as the <em>sole</em> argument.
 	 *
 	 * @param methodName
