@@ -106,6 +106,7 @@ public class ScriptItemProcessorBuilder<I, O> {
 		if (this.scriptResource == null && !StringUtils.hasText(this.scriptSource)) {
 			throw new IllegalArgumentException("scriptResource or scriptSource is required.");
 		}
+
 		if (StringUtils.hasText(this.scriptSource)) {
 			Assert.hasText(this.language, "language is required when using scriptSource.");
 		}
@@ -114,12 +115,15 @@ public class ScriptItemProcessorBuilder<I, O> {
 		if (StringUtils.hasText(this.itemBindingVariableName)) {
 			processor.setItemBindingVariableName(this.itemBindingVariableName);
 		}
+
 		if (this.scriptResource != null) {
 			processor.setScript(this.scriptResource);
 		}
+
 		if (this.scriptSource != null) {
 			processor.setScriptSource(this.scriptSource, this.language);
 		}
+
 		return processor;
 	}
 }
