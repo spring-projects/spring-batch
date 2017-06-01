@@ -188,6 +188,9 @@ public class Neo4jItemReaderBuilder<T>
 		Assert.hasText(this.startStatement, "startStatement is required.");
 		Assert.hasText(this.returnStatement, "returnStatement is required.");
 		Assert.hasText(this.orderByStatement, "orderByStatement is required.");
+		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
+		Assert.isTrue(this.maxItemCount > 0, "maxItemCount must be greater than zero");
+		Assert.isTrue(this.maxItemCount > this.currentItemCount , "maxItemCount must be greater than currentItemCount");
 
 		Neo4jItemReader<T> reader = new Neo4jItemReader<>();
 		reader.setMatchStatement(this.matchStatement);

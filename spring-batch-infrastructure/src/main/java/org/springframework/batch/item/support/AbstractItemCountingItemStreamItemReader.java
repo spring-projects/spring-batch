@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
  * Subclasses are inherently <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
+ * @author Glenn Renfro
  */
 public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -119,9 +120,10 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * 
 	 * @see #setName(String)
 	 * 
-	 * @param count the value of the maximum item count
+	 * @param count the value of the maximum item count.  count must be greater than zero.
 	 */
 	public void setMaxItemCount(int count) {
+		Assert.isTrue(count > 0, "count must be greater than zero");
 		this.maxItemCount = count;
 	}
 

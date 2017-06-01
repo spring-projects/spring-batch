@@ -53,7 +53,6 @@ public class Neo4jItemReaderBuilderTests {
 		MockitoAnnotations.initMocks(this);
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testFullyQualifiedItemReader() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>()
@@ -77,29 +76,9 @@ public class Neo4jItemReaderBuilderTests {
 		assertEquals("The expected value was not returned by reader.", "baz", itemReader.read());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testCurrentSize() throws Exception {
 		Neo4jItemReader<String> itemReader = new Neo4jItemReaderBuilder<String>()
-				.sessionFactory(this.sessionFactory)
-				.targetType(String.class)
-				.startStatement("n=node(*)")
-				.orderByStatement("n.age")
-				.pageSize(50)
-				.name("bar")
-				.returnStatement("m")
-				.currentItemCount(5)
-				.maxItemCount(5)
-				.build();
-
-		when(this.sessionFactory.openSession()).thenReturn(this.session);
-		when(this.session.query(String.class, "START n=node(*) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null))
-				.thenReturn(result);
-		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
-
-		assertNull("The expected value was not returned by reader.", itemReader.read());
-
-		itemReader = new Neo4jItemReaderBuilder<String>()
 				.sessionFactory(this.sessionFactory)
 				.targetType(String.class)
 				.startStatement("n=node(*)")
@@ -110,11 +89,15 @@ public class Neo4jItemReaderBuilderTests {
 				.maxItemCount(1)
 				.build();
 
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
+		when(this.session.query(String.class, "START n=node(*) RETURN m ORDER BY n.age SKIP 0 LIMIT 50", null))
+				.thenReturn(result);
+		when(result.iterator()).thenReturn(Arrays.asList("foo", "bar", "baz").iterator());
+
 		assertEquals("The expected value was not returned by reader.", "foo", itemReader.read());
 		assertNull("The expected value was not should be null.", itemReader.read());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testResultsWithMatchAndWhereWithParametersWithSession() throws Exception {
 		Map<String, Object> params = new HashMap<>();
@@ -159,6 +142,57 @@ public class Neo4jItemReaderBuilderTests {
 			assertEquals("IllegalArgumentException message did not match the expected result.",
 					"sessionFactory is required.", iae.getMessage());
 		}
+	}
+
+	@Test
+	public void testZeroPageSize() {
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>()
+				.sessionFactory(this.sessionFactory)
+				.targetType(String.class)
+				.startStatement("n=node(*)")
+				.returnStatement("*")
+				.orderByStatement("n.age")
+				.pageSize(0)
+				.name("foo")
+				.matchStatement("n -- m")
+				.whereStatement("has(n.name)")
+				.returnStatement("m"),
+				"pageSize must be greater than zero");
+	}
+
+	@Test
+	public void testZeroMaxItemCount() {
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>()
+						.sessionFactory(this.sessionFactory)
+						.targetType(String.class)
+						.startStatement("n=node(*)")
+						.returnStatement("*")
+						.orderByStatement("n.age")
+						.pageSize(5)
+						.maxItemCount(0)
+						.name("foo")
+						.matchStatement("n -- m")
+						.whereStatement("has(n.name)")
+						.returnStatement("m"),
+				"maxItemCount must be greater than zero");
+	}
+
+	@Test
+	public void testCurrentItemCountGreaterThanMaxItemCount() {
+		validateExceptionMessage(new Neo4jItemReaderBuilder<String>()
+						.sessionFactory(this.sessionFactory)
+						.targetType(String.class)
+						.startStatement("n=node(*)")
+						.returnStatement("*")
+						.orderByStatement("n.age")
+						.pageSize(5)
+						.maxItemCount(5)
+						.currentItemCount(6)
+						.name("foo")
+						.matchStatement("n -- m")
+						.whereStatement("has(n.name)")
+						.returnStatement("m"),
+				"maxItemCount must be greater than currentItemCount");
 	}
 
 	@Test

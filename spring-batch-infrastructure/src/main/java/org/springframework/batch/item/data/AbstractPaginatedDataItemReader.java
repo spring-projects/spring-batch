@@ -18,6 +18,7 @@ package org.springframework.batch.item.data;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.util.Assert;
 
 import java.util.Iterator;
 
@@ -27,6 +28,7 @@ import java.util.Iterator;
  * semantics required for restartability based on those facilities.
  * 
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 2.2
  * @param <T> Type of item to be read
  */
@@ -44,9 +46,10 @@ AbstractItemCountingItemStreamItemReader<T> {
 	/**
 	 * The number of items to be read with each page.
 	 * 
-	 * @param pageSize the number of items
+	 * @param pageSize the number of items.  pageSize must be greater than zero.
 	 */
 	public void setPageSize(int pageSize) {
+		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		this.pageSize = pageSize;
 	}
 
