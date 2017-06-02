@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
  */
 public class RepositoryItemWriterBuilderTests {
 	@Mock
-	private CrudRepository<String, Serializable> repository;
+	private TestRepository repository;
 
 	@Before
 	public void setUp() throws Exception {
@@ -72,13 +72,54 @@ public class RepositoryItemWriterBuilderTests {
 
 	@Test
 	public void testWriteItems() throws Exception {
-		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("save")
-				.repository(this.repository).build();
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
+				.methodName("save")
+				.repository(this.repository)
+				.build();
 
 		List<String> items = Collections.singletonList("foo");
 
 		writer.write(items);
 
 		verify(this.repository).save("foo");
+	}
+
+	@Test
+	public void testWriteItemsTestRepsository() throws Exception {
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
+				.methodName("foo")
+				.repository(this.repository)
+				.build();
+
+		List<String> items = Collections.singletonList("foo");
+
+		writer.write(items);
+
+		verify(this.repository).foo("foo");
+	}
+
+	@Test
+	public void testWriteItemsTestRepsositoryMethodIs() throws Exception {
+		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository>
+				repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
+				this.repository);
+		repositoryMethodReference.methodIs().foo(null);
+
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
+				.methodName("foo")
+				.repository(repositoryMethodReference)
+				.build();
+
+		List<String> items = Collections.singletonList("foo");
+
+		writer.write(items);
+
+		verify(this.repository).foo("foo");
+	}
+
+	public interface TestRepository extends CrudRepository<String, Serializable> {
+
+		Object foo(String arg1);
+
 	}
 }
