@@ -382,6 +382,10 @@ project('spring-batch-infrastructure') {
 	}
 }
 
+project('spring-batch-docs') {
+
+}
+
 project('spring-batch-core-tests') {
 	description = 'Spring Batch Core Tests'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
@@ -616,7 +620,7 @@ project('spring-batch-samples') {
 
 apply plugin: "org.asciidoctor.convert"
 asciidoctor {
-	sourceDir = file('src/site/asciidoc')
+	sourceDir = file('spring-batch-docs/asciidoc')
 	sources {
 		include '*.adoc'
 	}
