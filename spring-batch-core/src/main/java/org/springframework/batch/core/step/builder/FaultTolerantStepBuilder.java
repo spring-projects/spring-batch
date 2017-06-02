@@ -178,7 +178,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	@Override
 	protected Tasklet createTasklet() {
 		Assert.state(getReader() != null, "ItemReader must be provided");
-		Assert.state(getProcessor() != null || getWriter() != null, "ItemWriter or ItemProcessor must be provided");
+		Assert.state(getWriter() != null, "ItemWriter must be provided");
 		addSpecialExceptions();
 		registerSkipListeners();
 		ChunkProvider<I> chunkProvider = createChunkProvider();
@@ -772,6 +772,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			}
 			return chunkListener.equals(obj);
 		}
-		
+
 	}
 }
