@@ -59,6 +59,10 @@ import org.springframework.util.MethodInvoker;
  * <code>saveState=false</code> if used in a multi-threaded client (no restart available).
  * </p>
  *
+ * <p>
+ * The RepositoryItemReader only reads Java Objects i.e. non primitives.
+ * </p>
+ *
  * @author Michael Minella
  * @since 2.2
  */
