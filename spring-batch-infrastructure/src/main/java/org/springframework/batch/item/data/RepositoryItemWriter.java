@@ -48,7 +48,7 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
- * The RepositoryItemWriter only stores Java Objects i.e. non primitives.
+ * NOTE: The {@code RepositoryItemWriter} only stores Java Objects i.e. non primitives.
  * </p>
  *
  * @author Michael Minella

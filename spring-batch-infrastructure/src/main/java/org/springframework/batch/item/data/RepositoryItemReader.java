@@ -60,7 +60,7 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
- * The RepositoryItemReader only reads Java Objects i.e. non primitives.
+ * NOTE: The {@code RepositoryItemReader} only reads Java Objects i.e. non primitives.
  * </p>
  *
  * @author Michael Minella
