@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,7 +156,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	@Override
 	protected Tasklet createTasklet() {
 		Assert.state(reader != null, "ItemReader must be provided");
-		Assert.state(processor != null || writer != null, "ItemWriter or ItemProcessor must be provided");
+		Assert.state(writer != null, "ItemWriter must be provided");
 		RepeatOperations repeatOperations = createChunkOperations();
 		SimpleChunkProvider<I> chunkProvider = new SimpleChunkProvider<>(getReader(), repeatOperations);
 		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(getProcessor(), getWriter());
