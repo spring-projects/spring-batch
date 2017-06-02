@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -472,32 +473,6 @@ public class SimpleStepFactoryBeanTests {
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals("[write, write, write]", listenerCalls.toString());
-
-	}
-
-	@Test
-	public void testNullWriter() throws Exception {
-
-		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
-		factory.setItemWriter(null);
-		factory.setItemProcessor(new ItemProcessor<String, String>() {
-			@Override
-			public String process(String item) throws Exception {
-				written.add(item);
-				return null;
-			}
-		});
-
-		Step step = factory.getObject();
-
-		job.setSteps(Collections.singletonList(step));
-
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-
-		job.execute(jobExecution);
-
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals("[foo, bar, spam]", written.toString());
 
 	}
 
