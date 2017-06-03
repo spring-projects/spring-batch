@@ -263,7 +263,7 @@
       always be restarted and only the failed Steps will be
       re-executed.</para>
 
-      <para><classname>The PartitionHandler</classname> interface can have
+      <para>The <classname>PartitionHandler</classname> interface can have
       specialized implementations for a variety of fabric types: e.g. simple
       RMI remoting, EJB remoting, custom web service, JMS, Java Spaces, shared
       memory grids (like Terracotta or Coherence), grid execution fabrics
@@ -337,13 +337,13 @@
       this convention.</para>
 
       <para>An optional interface
-      <classname>PartitioneNameProvider</classname> can be used to
+      <classname>PartitionNameProvider</classname> can be used to
       provide the partition names separately from the partitions
       themselves.  If a <classname>Partitioner</classname> implements
       this interface then on a restart only the names will be queried.
       If partitioning is expensive this can be a useful optimisation.
       Obviously the names provided by the
-      <classname>PartitioneNameProvider</classname> must match those
+      <classname>PartitionNameProvider</classname> must match those
       provided by the <classname>Partitioner</classname>.</para>
 
     </section>

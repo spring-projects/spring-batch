@@ -17,7 +17,7 @@
     succeed on a subsequent attempt. Errors that are susceptible to this kind
     of treatment are transient in nature. For example a remote call to a web
     service or RMI service that fails because of a network glitch or a
-    <classname>DeadLockLoserException</classname> in a database update may
+    <classname>DeadlockLoserDataAccessException</classname> in a database update may
     resolve themselves after a short wait. To automate the retry of such
     operations Spring Batch has the <classname>RetryOperations</classname>
     strategy. The <classname>RetryOperations</classname> interface looks like
