@@ -23,10 +23,10 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamSupport;
-import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
  * @author Dave Syer
+ * @author Glenn Renfro
  * 
  */
 public class CompositeItemStreamTests extends TestCase {
@@ -100,4 +100,14 @@ public class CompositeItemStreamTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
+	public void testSetNullStreams() {
+		try {
+			manager.setStreams(null);
+			fail("Expected an IllegalArgumentException.");
+		}
+		catch (IllegalArgumentException iae) {
+			assertEquals("Message returned from exception did not match expected result.", "Listeners must not be null.",
+					iae.getMessage());
+		}
+	}
 }
