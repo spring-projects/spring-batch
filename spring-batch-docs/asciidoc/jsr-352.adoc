@@ -321,7 +321,7 @@ JSR-352 provides the same two basic processing models that Spring Batch does:
 
 
             
-* Item based processing - Using an`javax.batch.api.chunk.ItemReader`, an
+* Item based processing - Using an `javax.batch.api.chunk.ItemReader`, an
                         optional `javax.batch.api.chunk.ItemProcessor`, and an
                         `javax.batch.api.chunk.ItemWriter`.
 

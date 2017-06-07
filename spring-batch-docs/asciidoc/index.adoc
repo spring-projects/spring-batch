@@ -22,7 +22,7 @@ include::header/index-header.adoc[]
 
 * <<testing.adoc#testing,Unit Testing>>
 
-* <<common-patterns#commonPatterns, Common Patterns>>
+* <<common-patterns.adoc#commonPatterns, Common Patterns>>
 
 * <<jsr-352.adoc#jsr-352,JSR-352 Support>>
 

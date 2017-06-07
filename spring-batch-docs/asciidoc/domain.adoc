@@ -9,7 +9,7 @@
 To any experienced batch architect, the overall concepts of batch
 processing used in Spring Batch should be familiar and comfortable. There
 are "Jobs" and "Steps" and developer supplied processing units called
-`ItemReader`s and `ItemWriter`s. However, because of the Spring patterns,
+`ItemReaders` and `ItemWriters`. However, because of the Spring patterns,
 operations, templates, callbacks, and idioms, there are opportunities for
 the following:
       
@@ -73,9 +73,9 @@ namespace abstracts away the need to instantiate it directly. Instead, the
 [source, xml]
 ----
 <job id="footballJob">
-<step id="playerload" next="gameLoad"/>
-<step id="gameLoad" next="playerSummarization"/>
-<step id="playerSummarization"/>
+    <step id="playerload" next="gameLoad"/>
+    <step id="gameLoad" next="playerSummarization"/>
+    <step id="playerSummarization"/>
 </job>
 ----
 
@@ -83,7 +83,7 @@ namespace abstracts away the need to instantiate it directly. Instead, the
 
 A `JobInstance` refers to the concept of a
 logical job run. Let's consider a batch job that should be run once at
-the end of the day, such as the 'EndOfDay' `job` from the diagram above.
+the end of the day, such as the 'EndOfDay' `Job` from the diagram above.
 There is one 'EndOfDay' job, but each individual
 run of the `Job` must be tracked separately. In the
 case of this job, there will be one logical
@@ -95,7 +95,7 @@ meaning the January 1st run processes data for January 1st, etc).
 Therefore, each `JobInstance` can have multiple
 executions (`JobExecution` is discussed in more
 detail below) and only one `JobInstance`
-corresponding to a particular `Job`and
+corresponding to a particular `Job` and
 identifying `JobParameters` can be running at a given
 time.
 
@@ -131,10 +131,10 @@ image::{batch-asciidoc}images/job-stereotypes-parameters.png[Job Parameters, sca
 
 In the example above, where there are two instances, one for
 January 1st, and another for January 2nd, there is really only one Job,
-one that was started with a job parameter of 01-01-2008 and another that
-was started with a parameter of 01-02-2008. Thus, the contract can be
+one that was started with a job parameter of 01-01-2017 and another that
+was started with a parameter of 01-02-2017. Thus, the contract can be
 defined as: `JobInstance` =
-Job + identifying `JobParameters`. This
+`Job` + identifying `JobParameters`. This
 allows a developer to effectively control how a
 `JobInstance` is defined, since they control what
 parameters are passed in.
@@ -153,8 +153,8 @@ execution may end in failure or success, but the
 will not be considered complete unless the execution completes
 successfully. Using the EndOfDay `Job` described
 above as an example, consider a `JobInstance` for
-01-01-2008 that failed the first time it was run. If it is run again
-with the same identifying job parameters as the first run (01-01-2008), a new
+01-01-2017 that failed the first time it was run. If it is run again
+with the same identifying job parameters as the first run (01-01-2017), a new
 `JobExecution` will be created. However, there will
 still be only one `JobInstance`.
 
@@ -198,7 +198,7 @@ current system time when the `JobExecution`
 was first persisted. The job may not have been started yet (and
 thus has no start time), but it will always have a createTime,
 which is required by the framework for managing job level
-`ExecutionContext`s.
+`ExecutionContexts`.
 
 |lastUpdated
 |A `java.util.Date` representing the
@@ -236,7 +236,7 @@ tables:
 |1
 |DATE
 |schedule.Date
-|2008-01-01
+|2017-01-01
 |TRUE
 |===
 
@@ -245,8 +245,8 @@ tables:
 |JOB_EXEC_ID|JOB_INST_ID|START_TIME|END_TIME|STATUS
 |1
 |1
-|2008-01-01 21:00
-|2008-01-01 21:30
+|2017-01-01 21:00
+|2017-01-01 21:30
 |FAILED
 |===
 
@@ -295,19 +295,19 @@ the `JobExecution` table:
 |1
 |DATE
 |schedule.Date
-|2008-01-01 00:00:00
+|2017-01-01 00:00:00
 |TRUE
 
 |2
 |DATE
 |schedule.Date
-|2008-01-01 00:00:00
+|2017-01-01 00:00:00
 |TRUE
 
 |3
 |DATE
 |schedule.Date
-|2008-01-02 00:00:00
+|2017-01-02 00:00:00
 |TRUE
 |===
 
@@ -316,20 +316,20 @@ the `JobExecution` table:
 |JOB_EXEC_ID|JOB_INST_ID|START_TIME|END_TIME|STATUS
 |1
 |1
-|2008-01-01 21:00
-|2008-01-01 21:30
+|2017-01-01 21:00
+|2017-01-01 21:30
 |FAILED
 
 |2
 |1
-|2008-01-02 21:00
-|2008-01-02 21:30
+|2017-01-02 21:00
+|2017-01-02 21:30
 |COMPLETED
 
 |3
 |2
-|2008-01-02 21:31
-|2008-01-02 22:29
+|2017-01-02 21:31
+|2017-01-02 22:29
 |COMPLETED
 |===
 
@@ -345,12 +345,12 @@ Job is composed entirely of one or more steps. A
 define and control the actual batch processing. This is a necessarily
 vague description because the contents of any given
 `Step` are at the discretion of the developer writing
-a Job. A `Step` can be as simple or complex as the
+a `Job`. A `Step` can be as simple or complex as the
 developer desires. A simple `Step` might load data
 from a file into the database, requiring little or no code. (depending
 upon the implementations used) A more complex `Step`
 may have complicated business rules that are applied as part of the
-processing. As with Job, a
+processing. As with `Job`, a
 `Step` has an individual
 `StepExecution` that corresponds with a unique
 `JobExecution`:
@@ -484,7 +484,7 @@ the following:
 |1
 |DATE
 |schedule.Date
-|2008-01-01
+|2017-01-01
 |===
 
 .BATCH_JOB_EXECUTION
@@ -492,8 +492,8 @@ the following:
 |JOB_EXEC_ID|JOB_INST_ID|START_TIME|END_TIME|STATUS
 |1
 |1
-|2008-01-01 21:00
-|2008-01-01 21:30
+|2017-01-01 21:00
+|2017-01-01 21:30
 |FAILED
 |===
 
@@ -503,8 +503,8 @@ the following:
 |1
 |1
 |loadData
-|2008-01-01 21:00
-|2008-01-01 21:30
+|2017-01-01 21:00
+|2017-01-01 21:30
 |FAILED
 |===
 
@@ -532,7 +532,7 @@ any stored state in the context, and initialize itself from there:
 
 [source, java]
 ----
-    if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
+if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
 
     long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
@@ -591,7 +591,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
 ----
 
 As noted in the comment, ecStep will not equal ecJob; they are two
-different `ExecutionContext`s. The one scoped to the
+different `ExecutionContexts`. The one scoped to the
 `Step` will be saved at every commit point in the
 `Step`, whereas the one scoped to the
 Job will be saved in between every

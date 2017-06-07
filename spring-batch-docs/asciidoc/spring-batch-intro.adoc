@@ -94,7 +94,8 @@ A typical batch program generally reads a large number of records
     is the only open source framework that provides a robust, enterprise-scale
     solution.
 
-Business Scenarios 
+Business Scenarios
+
 * Commit batch process periodically
 
 
@@ -123,7 +124,8 @@ Business Scenarios
 
 
 
-Technical Objectives 
+Technical Objectives
+
 * Batch developers use the Spring programming model: concentrate
           on business logic; let the framework take care of
           infrastructure.

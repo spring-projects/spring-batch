@@ -1,5 +1,8 @@
-include::header/index-header.adoc[]
+:doctype: book
+:toc:
+:toclevels: 4
 
+include::header/index-header.adoc[]
 
 include::spring-batch-intro.adoc[]
 
@@ -21,7 +24,7 @@ include::retry.adoc[]
 
 include::testing.adoc[]
 
-include::common-patterns[]
+include::common-patterns.adoc[]
 
 include::jsr-352.adoc[]
 

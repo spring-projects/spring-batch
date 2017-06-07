@@ -335,7 +335,7 @@ The exact implementation depends on whether the component's input channel is a:
 
 * `auto-startup` Boolean flag to indicate that the endpoint should start automatically on
 startup. The default is __true__.
-* `request-channel The input `MessageChannel` of this endpoint.
+* `request-channel` The input `MessageChannel` of this endpoint.
 * `reply-channel` `Message Channel` to which the resulting `JobExecution` payload will be sent.
 * `reply-timeout` Allows you to specify how long this gateway will wait for the reply message
 to be sent successfully to the reply channel before throwing
@@ -408,7 +408,7 @@ Therefore, Spring Batch provides listeners such as:
 
 * StepListener
 * ChunkListener
-* `JobExecutionListener`
+* JobExecutionListener
 
 In the following example, a Spring Batch job was configured with a
 `StepExecutionListener`. Thus, Spring
@@ -468,7 +468,7 @@ Then modify your job to add a step level listener:
 Asynchronous Processors help you to to scale the processing of
 items. In the asynchronous processor use-case, an
 `AsyncItemProcessor` serves as a dispatcher,
-executing the `ItemProcessor`'s logic for an
+executing the `ItemProcessor's` logic for an
 item on a new thread. The `Future` is passed to
 the AsynchItemWriter to be written once the
 processor completes.

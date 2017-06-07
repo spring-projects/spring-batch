@@ -295,7 +295,7 @@ The way that the `TradeItemWriter` has been
       in the event of a restart. In order to make this class restartable, the
       `ItemStream` interface should be implemented along
       with the methods `open` and
-      `update:
+      `update`:
 
 [source, java]
 ----
