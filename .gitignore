@@ -25,3 +25,4 @@ build
 pom.xml
 out
 
+/.gradletasknamecache

@@ -6,6 +6,8 @@
 
 == Spring Batch Introduction
 
+include::toggle.adoc[]
+
 Many applications within the enterprise domain require bulk processing
   to perform business operations in mission critical environments. These
   business operations include automated, complex processing of large volumes
