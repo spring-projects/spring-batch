@@ -6,6 +6,51 @@
 
 == The Domain Language of Batch
 
+ifdef::backend-html5[]
++++
+<script src="./jsfiles/jquery.js"></script>
+<script src="./jsfiles/underscore.js"></script>
+<script src="./jsfiles/backbone.js"></script>
+<script src="./jsfiles/projectDocumentationWidget.js"></script>
+<script src="./jsfiles/application.js"></script>
+<script>
+    var apiBaseUrl = "https://spring.io",
+        projectId = "spring-batch",
+        siteBaseUrl = "/spring-batch";
+</script>
+<div code-widget-controls="" style="display: inline-block">
+<div class="item-slider-widget js-item-slider--wrapper">
+        <div class="item-slider--container">
+            <div class="item--slider js-item--slider"
+                 style="width: 57px; margin-left: 0.01555px;"></div>
+            <div class="item js-item js-active" data-snippet-type="java">
+                Java
+            </div>
+            <div class="item js-item" data-snippet-type="xml">
+                XML
+            </div>
+        </div>
+    </div>
+</div>
+<div class="code-widget--body">
+    <div class="js-code-maven-widget"></div>
+</div>
+<script type="text/html" id="code-widget-controls-template">
+    <div class="item-slider-widget js-item-slider--wrapper">
+        <div class="item-slider--container">
+            <div class="item--slider js-item--slider"></div>
+            <div class="item js-active js-item" data-snippet-type='java'>
+                Java
+            </div>
+            <div class="item js-item" data-snippet-type='xml'>
+                XML
+            </div>
+        </div>
+    </div>
+</script>
++++
+endif::backend-html5[]
+
 To any experienced batch architect, the overall concepts of batch
 processing used in Spring Batch should be familiar and comfortable. There
 are "Jobs" and "Steps" and developer supplied processing units called
@@ -70,6 +115,11 @@ functionality on top of `Job`, however the batch
 namespace abstracts away the need to instantiate it directly. Instead, the
 `<job>` tag can be used:
 
+ifdef::backend-html5[]
++++
+   <div id="xml_seg_1">
+   <div id="xml_section_1">
++++
 [source, xml]
 ----
 <job id="footballJob">
@@ -78,6 +128,43 @@ namespace abstracts away the need to instantiate it directly. Instead, the
     <step id="playerSummarization"/>
 </job>
 ----
+
++++
+</div>
+</div>
+<div id="java_seg_1" style="display: none;">
+<div id="java_section_1">
++++
+[source, java]
+----
+System.out.println("Hello World");
+----
++++
+</div>
+</div>
++++
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+
+XML FUN
+[source, xml]
+----
+<job id="footballJob">
+    <step id="playerload" next="gameLoad"/>
+    <step id="gameLoad" next="playerSummarization"/>
+    <step id="playerSummarization"/>
+</job>
+----
+
+JAVA CONFIGURATION
+
+[source, java]
+----
+System.out.println("Hello World");
+----
+
+endif::backend-pdf[]
 
 ==== JobInstance
 
@@ -673,6 +760,50 @@ implementations of the interfaces above that can be used in a standard
 bean definition, a namespace has been provided for ease of
 configuration:
 
+ifdef::backend-html5[]
++++
+<div id="xml_seg_2">
+<div id="xml_section_2">
++++
+[source, xml]
+----
+<beans:beans xmlns="http://www.springframework.org/schema/batch"
+xmlns:beans="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="
+   http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://www.springframework.org/schema/batch
+   http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+
+<job id="ioSampleJob">
+<step id="step1">
+    <tasklet>
+        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
+    </tasklet>
+</step>
+</job>
+
+</beans:beans>
+----
++++
+</div>
+</div>
+<div id="java_seg_2" style="display: none;">
+<div id="java_section_2">
++++
+[source, java]
+----
+System.out.println("Hello World");
+----
++++
+</div>
+</div>
++++
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+XML
 [source, xml]
 ----
 <beans:beans xmlns="http://www.springframework.org/schema/batch"
@@ -695,6 +826,12 @@ xsi:schemaLocation="
 </beans:beans>
 ----
 
+JAVA CONFIGURATION
+[source, java]
+----
+System.out.println("Hello World");
+----
+endif::backend-pdf[]
 As long as the batch namespace has been declared, any of its
 elements can be used. More information on configuring a
 Job can be found in <<job.adoc#configureJob,Configuring and Running a Job>>. More information on configuring a `Step` can be
