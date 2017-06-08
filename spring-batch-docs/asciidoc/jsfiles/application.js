@@ -1,0 +1,10 @@
+
+$(function(){
+    new Spring.ProjectDocumentationWidget();
+});
+
+
+
+
+
+
