@@ -273,7 +273,7 @@ public class FlatFileItemReaderBuilderTests {
 				.name("fooReader")
 				.resource(getResource("1,2,3"))
 				.delimited()
-				.includedFields(new Integer[] {new Integer(0), new Integer(2)})
+				.includedFields(new Integer[] {0, 2})
 				.addIncludedField(1)
 				.names(new String[] {"first", "second", "third"})
 				.targetType(Foo.class)
