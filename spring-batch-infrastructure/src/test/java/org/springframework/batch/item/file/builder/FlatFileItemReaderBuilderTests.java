@@ -37,7 +37,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
@@ -350,6 +352,55 @@ public class FlatFileItemReaderBuilderTests {
 		assertEquals(3, item.getSecond());
 		assertEquals("foo", item.getThird());
 		assertNull(reader.read());
+	}
+
+
+	@Test
+	public void testName() throws Exception {
+		try {
+			new FlatFileItemReaderBuilder<Foo>()
+					.resource(getResource("1  2  3"))
+					.fixedLength()
+					.columns(new Range[]{new Range(1, 3), new Range(4, 6), new Range(7)})
+					.names(new String[]{"first", "second", "third"})
+					.targetType(Foo.class)
+					.build();
+			fail("null name should throw exception");
+		}
+		catch (IllegalStateException iae) {
+			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
+		}
+		try {
+			new FlatFileItemReaderBuilder<Foo>()
+					.resource(getResource("1  2  3"))
+					.fixedLength()
+					.columns(new Range[]{new Range(1, 3), new Range(4, 6), new Range(7)})
+					.names(new String[]{"first", "second", "third"})
+					.targetType(Foo.class)
+					.name(null)
+					.build();
+		}
+		catch (IllegalStateException iae) {
+			assertEquals("A name is required when saveState is set to true.", iae.getMessage());
+		}
+		assertNotNull("builder should return new instance of FlatFileItemReader", new FlatFileItemReaderBuilder<Foo>()
+				.resource(getResource("1  2  3"))
+				.fixedLength()
+				.columns(new Range[]{new Range(1, 3), new Range(4, 6), new Range(7)})
+				.names(new String[]{"first", "second", "third"})
+				.targetType(Foo.class)
+				.saveState(false)
+				.build());
+
+		assertNotNull("builder should return new instance of FlatFileItemReader", new FlatFileItemReaderBuilder<Foo>()
+				.resource(getResource("1  2  3"))
+				.fixedLength()
+				.columns(new Range[]{new Range(1, 3), new Range(4, 6), new Range(7)})
+				.names(new String[]{"first", "second", "third"})
+				.targetType(Foo.class)
+				.name("foobar")
+				.build());
+
 	}
 
 	private Resource getResource(String contents) {
