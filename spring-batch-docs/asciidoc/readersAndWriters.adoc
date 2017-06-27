@@ -2205,7 +2205,6 @@ sets the parameter values for the call. This works the same as for the
 `JdbcCursorItemReader` above. All the additional
 properties listed in <<JdbcCursorItemReaderProperties>>
 apply to the `StoredProcedureItemReader` as well.
-        
 
 [[pagingItemReaders]]
 
@@ -2325,6 +2324,7 @@ assuming the Customer object has the correct JPA annotations or ORM
 mapping file. The 'pageSize' property determines the number of
 entities read from the database for each query execution.
 
+
 [[databaseItemWriters]]
 
 ==== Database ItemWriters
@@ -2379,6 +2379,7 @@ the simple guideline for implementations of `ItemWriter`, is to flush on each ca
 `write()`. Doing so allows for items to be
 skipped reliably, with Spring Batch taking care internally of the
 granularity of the calls to `ItemWriter` after an error.
+
 
 [[reusingExistingServices]]
 
@@ -2787,3 +2788,221 @@ writer you should probably also be sure to implement
 the writer needs to be aware of the `ItemStream`,
 so you may need to register it as a stream in the configuration
 xml.
+
+[[itemReaderAndWriterImplementations]]
+=== Item Reader and Writer Implementations
+In this section we will introduce you to Reader and Writers that have not
+already been discussed in the previous sections.
+
+[[decorators]]
+==== Decorators
+
+In some cases a user needs a specialized behavior to be appended to a
+pre-existing ItemReader.   Spring Batch offers some out of the box decorators
+that can add additional behavior to to your `ItemReaders` and `ItemWriters`.
+
+[[synchronizedItemStreamReader]]
+===== SynchronizedItemStreamReader
+When using a `ItemReader` that is not thread safe, Spring Batch offers the
+`SynchronizedItemStreamReader` decorator that can be used to make the `ItemReader`
+ thread safe. Spring Batch provides a
+`SynchronizedItemStreamReaderBuilder` to construct an instance of the
+`SynchronizedItemStreamReader`.
+
+[[singleItemPeekableItemReader]]
+===== SingleItemPeekableItemReader
+A decorator that adds a peek method to an `ItemReader`.
+This peek method allow the user to peek one item ahead.  Repeated calls to the
+peek will return the same item, and this will be the next item returned from read method.
+Spring Batch provides a `SingleItemPeekableItemReaderBuilder` to construct an
+instance of the `SingleItemPeekableItemReader`.
+
+NOTE: SingleItemPeekableItemReader's peek method is not thread-safe:
+it wouldn't be possible to honour the peek in multiple threads because only one
+of the threads that peeked would get that item in the next call to read.
+
+[[multiResourceItemWriter]]
+===== MultiResourceItemWriter
+The MultiResourceItemWriter wraps a `ResourceAwareItemWriterItemStream` and
+creates a new output resource when the count of items written in current
+resource exceeds the `itemCountLimitPerResource`.
+Spring Batch provides a `MultiResourceItemWriterBuilder` to construct an
+instance of the `MultiResourceItemWriter`.
+
+
+[[messagingReadersAndWriters]]
+==== Messaging Readers And Writers
+Spring Batch offers readers and writers to some commonly used messaging systems.
+
+[[amqpItemReader]]
+===== AmqpItemReader
+The `AmqpItemReader` is an `ItemReader` that uses an `AmqpTemplate` to receive and/or
+convert messages from an exchange. Spring Batch provides a `AmqpItemReaderBuilder`
+to construct an instance of the `AmqpItemReader`.
+
+[[amqpItemWriter]]
+===== AmqpItemWriter
+The `AmqpItemWriter` is an `ItemWriter` that uses an `AmqpTemplate` to
+send messages to an AMQP exchange. Messages will be sent to the nameless exchange if
+not specified on the provided `AmqpTemplate`.  Spring Batch provides a `AmqpItemWriterBuilder`
+to construct an instance of the `AmqpItemWriter`.
+
+
+[[jmsItemReader]]
+===== JmsItemReader
+The `JmsItemReader` is an `ItemReader` for JMS that uses an `JmsTemplate`. The template
+should have a default destination, which will be used to provide items
+for the `read()` method.
+Spring Batch provides a `JmsItemReaderBuilder` to construct an instance of the `JmsItemReader`.
+
+[[jmsItemWriter]]
+===== JmsItemWriter
+The `JmsItemWriter` is an `ItemWriter` for JMS that uses an `JmsTemplate`. The template
+should have a default destination, which will be used to send items in `write(List)`.
+Spring Batch provides a `JmsItemWriterBuilder` to construct an instance of the `JmsItemWriter`.
+
+
+[[databaseReaders]]
+==== Database Readers
+Here are the database readers offered by Spring Batch out of the box.
+
+[[Neo4jItemReader]]
+===== Neo4jItemReader
+The `Neo4jItemReader` is an `ItemReader` that reads objects from the graph database Neo4j via a paging technique.
+Spring Batch provides a `Neo4jItemReaderBuilder` to construct an instance of the `Neo4jItemReader`.
+
+[[mongoItemReader]]
+===== MongoItemReader
+The `MongoItemReader` is an `ItemReader` that reads documents from MongoDB via a paging technique.
+Spring Batch provides a `MongoItemReaderBuilder` to construct an instance of the `MongoItemReader`.
+
+[[hibernateCursorItemReader]]
+===== HibernateCursorItemReader
+The `HibernateCursorItemReader` is an `ItemStreamReader` for reading database
+records built on top of Hibernate. It executes the HQL query, then when initialized,
+iterates over the result set as the `read()` method is called, returning an object
+corresponding to the current row.
+Spring Batch provides a `HibernateCursorItemReaderBuilder` to construct an instance of the `HibernateCursorItemReader`.
+
+
+[[hibernatePagingItemReader]]
+===== HibernatePagingItemReader
+The `HibernatePagingItemReader` is an `ItemReader` for reading database records
+built on top of Hibernate and reading only up to a fixed number of items at a time.
+Spring Batch provides a `HibernatePagingItemReaderBuilder` to construct an instance of the `HibernatePagingItemReader`.
+
+
+[[repositoryItemReader]]
+===== RepositoryItemReader
+The `RepositoryItemReader` is an `ItemReader` that reads records utilizing
+a `PagingAndSortingRepository`.
+Spring Batch provides a `RepositoryItemReaderBuilder` to construct an instance
+of the `RepositoryItemReader`.
+
+[[databaseWriters]]
+==== Database Writers
+Here are the database writers offered by Spring Batch out of the box.
+
+[[neo4jItemWriter]]
+===== Neo4jItemWriter
+The `Neo4jItemWriter` is an `ItemWriter` implementation that writes to a Neo4j database.
+Spring Batch provides a `Neo4jItemWriterBuilder` to construct an instance
+of the `Neo4jItemWriter`.
+
+[[mongoItemWriter]]
+===== MongoItemWriter
+The `MongoItemWriter` is an `ItemWriter` implementation that writes to a
+MongoDB store using an implementation of Spring Data's `MongoOperations`.
+Spring Batch provides a `MongoItemWriterBuilder` to construct an instance
+of the `MongoItemWriter`.
+
+[[repositoryItemWriter]]
+===== RepositoryItemWriter
+The `RepositoryItemWriter` is an `ItemWriter` wrapper for a `CrudRepository` from Spring Data.
+Spring Batch provides a `RepositoryItemWriterBuilder` to construct an instance
+of the `RepositoryItemWriter`.
+
+[[hibernateItemWriter]]
+===== HibernateItemWriter
+The `HibernateItemWriter` is an `ItemWriter` that uses a Hibernate session to save or update entities
+that are not part of the current Hibernate session.
+Spring Batch provides a `HibernateItemWriterBuilder` to construct an instance
+of the `HibernateItemWriter`.
+
+[[jdbcBatchItemWriter]]
+===== JdbcBatchItemWriter
+The `JdbcBatchItemWriter` is an `ItemWriter` that uses the batching features from
+`NamedParameterJdbcTemplate` to execute a batch of statements for all items
+provided.
+Spring Batch provides a `JdbcBatchItemWriterBuilder` to construct an instance
+of the `JdbcBatchItemWriter`.
+
+[[jpaItemWriter]]
+===== JpaItemWriter
+The `JpaItemWriter` is an `ItemWriter` that is using a JPA EntityManagerFactory
+to merge any Entities that aren't part of the persistence context.
+Spring Batch provides a `JpaItemWriterBuilder` to construct an instance
+of the `JpaItemWriter`.
+
+[[specializedReaders]]
+==== Specialized Readers
+Here are some specialized readers offered by Spring Batch out of the box.
+
+[[ldifReader]]
+===== LdifReader
+The `LdifReader` reads LDIF (LDAP Data Interchange Format) records from a `Resource`, parses them
+and returns a `LdapAttribute` object for each `read` executed.
+Spring Batch provides a `LdifReaderBuilder` to construct an instance of the `LdifReader`.
+
+
+[[mappingLdifReader]]
+===== MappingLdifReader
+The `MappingLdifReader` reads LDIF (LDAP Data Interchange Format) records from a `Resource`, parses them
+then maps each LDIF record to a POJO (Plain Old Java Object). Each read returns a POJO.
+Spring Batch provides a `MappingLdifReaderBuilder` to construct an instance of the `MappingLdifReader`.
+
+[[specializedWriters]]
+==== Specialized Writers
+Here are some specialized writers offered by Spring Batch out of the box.
+
+[[classifierCompositeItemWriter]]
+===== ClassifierCompositeItemWriter
+The `ClassifierCompositeItemWriter` calls one of a collection of ItemWriters for
+each item, based on a router pattern implemented through the provided
+`Classifier`.  The implementation is thread-safe if all delegates are thread-safe.
+Spring Batch provides a `ClassifierCompositeItemWriterBuilder` to construct an
+instance of the `ClassifierCompositeItemWriter`.
+
+[[simpleMailMessageItemWriter]]
+===== SimpleMailMessageItemWriter
+The SimpleMailMessageItemWriter is an `ItemWriter` that can send mail messages.
+It delegates the actual sending of messages to an instance of `MailSender`.
+Spring Batch provides a `SimpleMailMessageItemWriterBuilder` to construct an
+instance of the `SimpleMailMessageItemWriter`.
+
+
+[[gemfireItemWriter]]
+===== GemfireItemWriter
+The GemfireItemWriter is an `ItemWriter` that uses an `GemfireTemplate` that
+stores items in GemFire as key/value pairs.
+Spring Batch provides a `GemfireItemWriterBuilder` to construct an
+instance of the `GemfireItemWriter`.
+
+[[specializedProcessors]]
+==== Specialized Processors
+Here are some specialized processors offered by Spring Batch out of the box.
+
+[[scriptItemProcessor]]
+===== ScriptItemProcessor
+The `ScriptItemProcessor` is an `ItemProcessor` that passes the current item to
+process to the provided script and the result of the script is returned by the processor.
+Spring Batch provides a `ScriptItemProcessorBuilder` to construct an
+instance of the `ScriptItemProcessor`.
+
+[[classifierCompositeItemProcessor]]
+===== ClassifierCompositeItemProcessor
+The `ClassifierCompositeItemProcessor` is an `ItemProcessor` that calls one of a collection
+of ItemProcessors, based on a router pattern implemented through the provided
+`Classifier`.
+Spring Batch provides a `ClassifierCompositeItemProcessorBuilder` to construct an
+instance of the `ClassifierCompositeItemProcessor`.
