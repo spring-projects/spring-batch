@@ -1,0 +1,128 @@
+:batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
+:toc: left
+:toclevels: 4
+
+[[listOfReadersAndWriters]]
+
+[appendix]
+== List of ItemReaders and ItemWriters
+
+[[itemReadersAppendix]]
+
+=== Item Readers
+
+.Available Item Readers
+[options="header"]
+|===============
+|Item Reader|Description
+|AbstractItemCountingItemStreamItemReader|Abstract base class that provides basic
+            restart capabilities by counting the number of items returned from
+            an `ItemReader`.
+|AggregateItemReader|An `ItemReader` that delivers a list as its
+            item, storing up objects from the injected `ItemReader` until they
+            are ready to be packed out as a collection. This `ItemReader` should
+            mark the beginning and end of records with the constant values in
+            `FieldSetMapper AggregateItemReader#__$$BEGIN_RECORD$$__` and
+            `AggregateItemReader#__$$END_RECORD$$__`
+|AmqpItemReader|Given a Spring AmqpTemplate it provides
+            synchronous receive methods. The receiveAndConvert() method 
+            lets you receive POJO objects. 
+|FlatFileItemReader|Reads from a flat file. Includes `ItemStream`
+            and Skippable functionality. See section on Read from a
+            File
+|HibernateCursorItemReader|Reads from a cursor based on an HQL query. See
+            section on Reading from a Database
+|HibernatePagingItemReader|Reads from a paginated HQL query
+|ItemReaderAdapter|Adapts any class to the
+            `ItemReader` interface.
+|JdbcCursorItemReader|Reads from a database cursor via JDBC. See
+            HOWTO - Read from a Database
+|JdbcPagingItemReader|Given a SQL statement, pages through the rows,
+            such that large datasets can be read without running out of
+            memory
+|JmsItemReader|Given a Spring JmsOperations object and a JMS
+            Destination or destination name to send errors, provides items
+            received through the injected JmsOperations receive()
+            method
+|JpaPagingItemReader|Given a JPQL statement, pages through the
+            rows, such that large datasets can be read without running out of
+            memory
+|ListItemReader|Provides the items from a list, one at a
+            time
+|MongoItemReader|Given a MongoOperations object and JSON based MongoDB
+            query, provides items received from the MongoOperations find method
+|Neo4jItemReader|Given a Neo4jOperations object and the components of a 
+            Cyhper query, items are returned as the result of the Neo4jOperations.query
+            method
+|RepositoryItemReader|Given a Spring Data PagingAndSortingRepository object, 
+            a Sort and the name of method to execute, returns items provided by the 
+            Spring Data repository implementation
+|StoredProcedureItemReader|Reads from a database cursor resulting from the
+            execution of a database stored procedure. See HOWTO - Read from a 
+            Database
+|StaxEventItemReader|Reads via StAX. See HOWTO - Read from a
+            File
+
+|===============
+
+
+[[itemWritersAppendix]]
+
+
+=== Item Writers
+
+.Available Item Writers
+[options="header"]
+|===============
+|Item Writer|Description
+|AbstractItemStreamItemWriter|Abstract base class that combines the
+            `ItemStream` and
+            `ItemWriter` interfaces.
+|AmqpItemWriter|Given a Spring AmqpTemplate it provides
+            for synchronous send method. The convertAndSend(Object)
+             method lets you send POJO objects. 
+|CompositeItemWriter|Passes an item to the process method of each
+            in an injected __List__ of __ItemWriter__ objects
+|FlatFileItemWriter|Writes to a flat file. Includes `ItemStream` and
+            Skippable functionality. See section on Writing to a File
+|GemfireItemWriter|Using a GemfireOperations object, items wre either written 
+            or removed from the Gemfire instance based on the configuration of the delete
+            flag
+|HibernateItemWriter|This item writer is hibernate session aware
+            and handles some transaction-related work that a non-"hibernate
+            aware" item writer would not need to know about and then delegates
+            to another item writer to do the actual writing.
+|ItemWriterAdapter|Adapts any class to the
+            `ItemWriter` interface.
+|JdbcBatchItemWriter|Uses batching features from a
+            `PreparedStatement`, if available, and can
+            take rudimentary steps to locate a failure during a
+            `flush`.
+|JmsItemWriter|Using a JmsOperations object, items are written 
+            to the default queue via the JmsOperations.convertAndSend() method
+|JpaItemWriter|This item writer is JPA EntityManager aware
+            and handles some transaction-related work that a non-"jpa aware"
+            `ItemWriter` would not need to know about and
+            then delegates to another writer to do the actual writing.
+|MimeMessageItemWriter|Using Spring's JavaMailSender, items of type `MimeMessage`
+            are sent as mail messages
+|MongoItemWriter|Given a MongoOperations object, items are written
+            via the MongoOperations.save(Object) method.  The actual write is delayed
+            until the last possible moment before the transaction commits.
+|Neo4jItemWriter|Given a Neo4jOperations object, items are persisted via the
+            save(Object) method or deleted via the delete(Object) per the 
+            `ItemWriter's` configuration
+|PropertyExtractingDelegatingItemWriter|Extends AbstractMethodInvokingDelegator
+            creating arguments on the fly. Arguments are created by retrieving
+            the values from the fields in the item to be processed (via a
+            SpringBeanWrapper) based on an injected array of field
+            name
+|RepositoryItemWriter|Given a Spring Data CrudRepository implementation, 
+            items are saved via the method specified in the configuration.
+|StaxEventItemWriter|Uses an __ObjectToXmlSerializer__ implementation to
+            convert each item to XML and then writes it to an XML file using
+            StAX.
+
+|===============
+
+

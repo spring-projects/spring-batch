@@ -8,11 +8,12 @@ buildscript {
 		maven { url 'https://plugins.gradle.org/m2/' }
 	}
 	dependencies {
-		classpath 'io.spring.gradle:docbook-reference-plugin:0.3.1'
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1"
+		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
+		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14"
 	}
 }
 
@@ -381,6 +382,10 @@ project('spring-batch-infrastructure') {
 	}
 }
 
+project('spring-batch-docs') {
+
+}
+
 project('spring-batch-core-tests') {
 	description = 'Spring Batch Core Tests'
     project.tasks.findByPath("artifactoryPublish")?.enabled = false
@@ -613,10 +618,28 @@ project('spring-batch-samples') {
 	}
 }
 
-apply plugin: 'docbook-reference'
+apply plugin: "org.asciidoctor.convert"
+asciidoctor {
+	sourceDir = file('spring-batch-docs/asciidoc')
+	sources {
+		include '*.adoc'
+	}
+	logDocuments = true
+	backends = ["html", "pdf"]
+	options doctype: 'book', eruby: 'erubis'
+	attributes  'icons': 'font',
+			'idprefix': '',
+			'idseparator': '-',
+			docinfo: '',
+			revnumber: project.version,
+			sectanchors: '',
+			sectnums: '',
+			'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend
+			stylesdir: 'stylesheets/',
+			stylesheet: 'spring.css',
+			'spring-version': project.version,
+			'allow-uri-read': ''
 
-reference {
-	sourceDir = file('src/site/docbook/reference')
 }
 
 apply plugin: 'org.sonarqube'
@@ -698,7 +721,32 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (reference) {
+		from (asciidoctor) {
+			exclude '*.pdf'
+			exclude '*.html'
+			exclude 'images'
+			exclude  'html/index-pdf.html'
+			exclude 'pdf/images'
+			exclude 'pdf/appendix.pdf'
+			exclude 'pdf/common-patterns.pdf'
+			exclude 'pdf/domain.pdf'
+			exclude 'pdf/index.pdf'
+			exclude 'pdf/index-single.pdf'
+			exclude 'pdf/job.pdf'
+			exclude 'pdf/jsr-352.pdf'
+			exclude 'pdf/readersAndWriters.pdf'
+			exclude 'pdf/repeat.pdf'
+			exclude 'pdf/retry.pdf'
+			exclude 'pdf/scalability.pdf'
+			exclude 'pdf/schema-appendix.pdf'
+			exclude 'pdf/spring-batch-integration.pdf'
+			exclude 'pdf/spring-batch-intro.pdf'
+			exclude 'pdf/step.pdf'
+			exclude 'pdf/testing.pdf'
+			exclude 'pdf/transaction-appendix.pdf'
+			exclude 'pdf/whatsnew.pdf'
+			exclude 'pdf/glossary.pdf'
+
 			into 'reference'
 		}
 }
