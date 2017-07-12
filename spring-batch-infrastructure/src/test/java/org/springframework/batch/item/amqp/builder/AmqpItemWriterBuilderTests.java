@@ -27,6 +27,7 @@ import org.springframework.batch.item.amqp.AmqpItemWriter;
 import static org.aspectj.bridge.MessageUtil.fail;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
@@ -49,11 +50,10 @@ public class AmqpItemWriterBuilderTests {
 	public void voidTestWrite() throws Exception {
 		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-		amqpTemplate.convertAndSend("foo");
-		amqpTemplate.convertAndSend("bar");
-
 		AmqpItemWriter<String> amqpItemWriter =
 				new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();
 		amqpItemWriter.write(Arrays.asList("foo", "bar"));
+		verify(amqpTemplate).convertAndSend("foo");
+		verify(amqpTemplate).convertAndSend("bar");
 	}
 }
