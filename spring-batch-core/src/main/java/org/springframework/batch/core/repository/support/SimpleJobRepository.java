@@ -236,6 +236,11 @@ public class SimpleJobRepository implements JobRepository {
 			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
 				latest = stepExecution;
 			}
+			// Use step execution ID as the tie breaker if start time is identical
+			if (latest.getStartTime().getTime() == stepExecution.getStartTime().getTime() && 
+			        latest.getId() < stepExecution.getId()) {
+				latest = stepExecution;
+			}
 		}
 
 		if (latest != null) {
