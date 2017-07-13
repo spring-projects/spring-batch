@@ -25,7 +25,9 @@ The Spring Batch 4.0 release has three major themes:
 Spring Batch has historically followed Spring Framework's baselines for both
 		java version as well as third party dependencies.  With Spring Batch 4, the Spring
 		Framework version is being upgraded to Spring Framework 5.  As such, the java
-		version requirement for Spring Batch is also increasing to Java 8.
+		version requirement for Spring Batch is also increasing to Java 8.  This should be
+		mainly an internal change in that most of the framework has supported things like
+		functional interfaces and lambdas since they were released.
 	
 
 [[whatsNewDependencies]]
@@ -41,11 +43,39 @@ In order to continue to integrate with supported versions of the third party
 [[whatsNewBuilders]]
 
 
-=== Provide builders for the ItemReaders and ItemWriters
+=== Provide builders for the ItemReaders, ItemProcessors, and ItemWriters
 
 Spring Batch 4 is providing a collection of builders for all of the ItemReaders
 		and ItemWriters that come with the framework.  As of this release, builders for the
-		`FlatFileItemReader`, `FlatFileItemWriter`, `JdbcCursorItemReader`, and
-		`JdbcBatchItemWriter` are available.  More information can be found in the javadoc
-		for Spring Batch.
+		following components (as well as some related utility builders) are available:
+
+		* `AmqpItemReader` - `AmqpItemReaderBuilder`
+		* `ClassifierCompositeItemProcessor` - `ClassifierCompositeItemProcessorBuilder`
+		* `ClassifierCompositeItemWriter` - `ClassifierCompositeItemWriterBuilder`
+		* `CompositeItemWriter` - `CompositeItemWriterBuilder`
+		* `FlatFileItemReader` - `FlatFileItemReaderBuilder`
+		* `FlatFileItemWriter` - `FlatFileItemWriterBuilder`
+		* `GemfireItemWriter` - `GemfireItemWriterBuilder`
+		* `HibernateCursorItemReader` - `HibernateCursorItemReaderBuilder`
+		* `HibernateItemWriter` - `HibernateItemWriterBuilder`
+		* `HibernatePagingItemReader` - `HibernatePagingItemReaderBuilder`
+		* `JdbcBatchItemWriter` - `JdbcBatchItemWriterBuilder`
+		* `JdbcCursorItemReader` - `JdbcCursorItemReaderBuilder`
+		* `JdbcPagingItemReader` - `JdbcCursorItemReaderBuilder`
+		* `JmsItemReader` - `JmsItemReaderBuilder`
+		* `JmsItemWriter` - `JmsItemWriterBuilder`
+		* `JpaPagingItemReader` - `JpaPagingItemReaderBuilder`
+		* `MongoItemReader` - `MongoItemReaderBuilder`
+		* `MultiResourceItemReader` - `MultiResourceItemReaderBuilder`
+		* `MultiResourceItemWriter` - `MultiResourceItemWriterBuilder`
+		* `Neo4jItemWriter` - `Neo4jItemWriterBuilder`
+		* `RepositoryItemReader` - `RepositoryItemReaderBuilder`
+		* `RepositoryItemWriter` - `RepositoryItemWriterBuilder`
+		* `ScriptItemProcessor` - `ScriptItemProcessorBuilder`
+		* `SimpleMailMessageItemWriter` - `SimpleMailMessageItemWriterBuilder`
+		* `SingleItemPeekableItemReader` - `SingleItemPeekableItemReaderBuilder`
+		* `StaxEventItemReader` - `StaxEventItemReaderBuilder`
+		* `StaxEventItemWriter` - `StaxEventItemWriterBuilder`
+		* `SynchronizedItemStreamReader` - `SynchronizedItemStreamReaderBuilder`
+
 
