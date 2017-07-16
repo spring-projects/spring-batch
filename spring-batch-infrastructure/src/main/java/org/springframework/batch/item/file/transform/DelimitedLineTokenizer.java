@@ -105,7 +105,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	 *
 	 * @param includedFields the included fields to set
 	 */
-	public void setIncludedFields(int[] includedFields) {
+	public void setIncludedFields(int... includedFields) {
 		this.includedFields = new HashSet<>();
 		for (int i : includedFields) {
 			this.includedFields.add(i);
