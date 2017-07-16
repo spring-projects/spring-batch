@@ -50,7 +50,7 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * 
 	 * @param ranges the column ranges expected in the input
 	 */
-	public void setColumns(Range[] ranges) {
+	public void setColumns(Range... ranges) {
 		this.ranges = Arrays.asList(ranges).toArray(new Range[ranges.length]);
 		calculateMaxRange(ranges);
 	}
