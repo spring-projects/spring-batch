@@ -46,17 +46,16 @@ def customizePom(pom, gradleProject) {
 				developer {
 					id = 'dsyer'
 					name = 'Dave Syer'
-					email = 'dsyer@gopivotal.com'
+					email = 'dsyer@pivotal.io'
 				}
 				developer {
 					id = 'nebhale'
 					name = 'Ben Hale'
-					email = 'bhale@gopivotal.com'
+					email = 'bhale@gpivotal.io'
 				}
 				developer {
 					id = 'lward'
 					name = 'Lucas Ward'
-					email = 'lucas.l.ward@accenture.com'
 				}
 				developer {
 					id = 'robokaso'
@@ -66,7 +65,7 @@ def customizePom(pom, gradleProject) {
 				developer {
 					id = 'trisberg'
 					name = 'Thomas Risberg'
-					email = 'trisberg@gopivotal.com'
+					email = 'trisberg@pivotal.io'
 				}
 				developer {
 					id = 'dhgarrette'
@@ -76,13 +75,13 @@ def customizePom(pom, gradleProject) {
 				developer {
 					id = 'mminella'
 					name = 'Michael Minella'
-					email = 'mminella@gopivotal.com'
+					email = 'mminella@pivotal.io'
 					roles = ["project lead"]
 				}
 				developer {
 					id = 'chrisjs'
 					name = 'Chris Schaefer'
-					email = 'cschaefer@gopivotal.com'
+					email = 'cschaefer@pivotal.io'
 				}
 			}
 		}

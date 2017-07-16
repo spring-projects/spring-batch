@@ -31,7 +31,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -140,7 +140,7 @@ public class MongoItemReaderTests {
 		assertEquals(100, query.getSkip());
 		assertEquals("{ }", query.getQueryObject().toJson());
 		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
-		assertNull(query.getFieldsObject());
+		assertTrue(query.getFieldsObject().isEmpty());
 	}
 
 	@Test
