@@ -147,6 +147,10 @@ public abstract class AbstractNeo4jItemReader<T> extends
 		return sessionFactory;
 	}
 
+	/**
+	 * Establish the session factory for the reader.
+	 * @param sessionFactory the factory to use for the reader.
+	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
