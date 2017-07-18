@@ -18,9 +18,6 @@ package org.springframework.batch.item.file.builder;
 
 import java.util.Comparator;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.core.io.Resource;
@@ -34,8 +31,7 @@ import org.springframework.util.StringUtils;
  * @since 4.0
  * @see MultiResourceItemReader
  */
-public class MultiResourceItemReaderBuilder<T>
-		extends AbstractItemStreamSupportBuilder<MultiResourceItemReaderBuilder<T>> {
+public class MultiResourceItemReaderBuilder<T> {
 
 	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
@@ -44,6 +40,39 @@ public class MultiResourceItemReaderBuilder<T>
 	private boolean strict = false;
 
 	private Comparator<Resource> comparator;
+
+	private boolean saveState = true;
+
+	private String name;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public MultiResourceItemReaderBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public MultiResourceItemReaderBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
 
 	/**
 	 * The array of resources that the {@link MultiResourceItemReader} will use to

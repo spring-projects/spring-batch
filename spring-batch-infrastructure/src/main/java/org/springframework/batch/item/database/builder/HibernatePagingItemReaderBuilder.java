@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 
-import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.database.HibernatePagingItemReader;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.util.Assert;
@@ -39,8 +38,7 @@ import org.springframework.util.StringUtils;
  * @since 4.0
  * @see HibernatePagingItemReader
  */
-public class HibernatePagingItemReaderBuilder<T>
-		extends AbstractItemCountingItemStreamItemReaderBuilder<HibernatePagingItemReaderBuilder<T>> {
+public class HibernatePagingItemReaderBuilder<T> {
 
 	private int pageSize = 10;
 
@@ -57,6 +55,69 @@ public class HibernatePagingItemReaderBuilder<T>
 	private SessionFactory sessionFactory;
 
 	private boolean statelessSession = true;
+
+	private boolean saveState = true;
+
+	private String name;
+
+	private int maxItemCount = Integer.MAX_VALUE;
+
+	private int currentItemCount;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public HibernatePagingItemReaderBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public HibernatePagingItemReaderBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
+
+	/**
+	 * Configure the max number of items to be read.
+	 *
+	 * @param maxItemCount the max items to be read
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
+	 */
+	public HibernatePagingItemReaderBuilder<T> maxItemCount(int maxItemCount) {
+		this.maxItemCount = maxItemCount;
+
+		return this;
+	}
+
+	/**
+	 * Index for the current item. Used on restarts to indicate where to start from.
+	 *
+	 * @param currentItemCount current index
+	 * @return this instance for method chaining
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
+	 */
+	public HibernatePagingItemReaderBuilder<T> currentItemCount(int currentItemCount) {
+		this.currentItemCount = currentItemCount;
+
+		return this;
+	}
 
 	/**
 	 * The number of records to request per page/query.  Defaults to 10.  Must be greater

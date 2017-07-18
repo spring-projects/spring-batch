@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -33,8 +32,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @since 4.0
  */
-public class StaxEventItemReaderBuilder<T>
-		extends AbstractItemCountingItemStreamItemReaderBuilder<StaxEventItemReaderBuilder<T>> {
+public class StaxEventItemReaderBuilder<T> {
 
 	private boolean strict = true;
 
@@ -43,6 +41,69 @@ public class StaxEventItemReaderBuilder<T>
 	private Unmarshaller unmarshaller;
 
 	private List<String> fragmentRootElements = new ArrayList<>();
+
+	private boolean saveState = true;
+
+	private String name;
+
+	private int maxItemCount = Integer.MAX_VALUE;
+
+	private int currentItemCount;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public StaxEventItemReaderBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public StaxEventItemReaderBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
+
+	/**
+	 * Configure the max number of items to be read.
+	 *
+	 * @param maxItemCount the max items to be read
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
+	 */
+	public StaxEventItemReaderBuilder<T> maxItemCount(int maxItemCount) {
+		this.maxItemCount = maxItemCount;
+
+		return this;
+	}
+
+	/**
+	 * Index for the current item. Used on restarts to indicate where to start from.
+	 *
+	 * @param currentItemCount current index
+	 * @return this instance for method chaining
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
+	 */
+	public StaxEventItemReaderBuilder<T> currentItemCount(int currentItemCount) {
+		this.currentItemCount = currentItemCount;
+
+		return this;
+	}
 
 	/**
 	 * The {@link Resource} to be used as input.

@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.file.builder;
 
-import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -31,7 +30,7 @@ import org.springframework.util.Assert;
  * @since 4.0
  * @see FlatFileItemWriter
  */
-public class FlatFileItemWriterBuilder<T> extends AbstractItemStreamSupportBuilder<FlatFileItemWriterBuilder<T>> {
+public class FlatFileItemWriterBuilder<T> {
 
 	private Resource resource;
 
@@ -54,6 +53,39 @@ public class FlatFileItemWriterBuilder<T> extends AbstractItemStreamSupportBuild
 	private FlatFileFooterCallback footerCallback;
 
 	private boolean transactional = FlatFileItemWriter.DEFAULT_TRANSACTIONAL;
+
+	private boolean saveState = true;
+
+	private String name;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public FlatFileItemWriterBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public FlatFileItemWriterBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
 
 	/**
 	 * The {@link Resource} to be used as output.

@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.file.builder;
 
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.builder.AbstractItemStreamSupportBuilder;
 import org.springframework.batch.item.file.MultiResourceItemWriter;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.file.ResourceSuffixCreator;
@@ -32,8 +30,7 @@ import org.springframework.util.Assert;
  * @since 4.0
  * @see MultiResourceItemWriter
  */
-public class MultiResourceItemWriterBuilder<T>
-		extends AbstractItemStreamSupportBuilder<MultiResourceItemWriterBuilder<T>> {
+public class MultiResourceItemWriterBuilder<T> {
 
 	private Resource resource;
 
@@ -42,6 +39,39 @@ public class MultiResourceItemWriterBuilder<T>
 	private int itemCountLimitPerResource = Integer.MAX_VALUE;
 
 	private ResourceSuffixCreator suffixCreator;
+
+	private boolean saveState = true;
+
+	private String name;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public MultiResourceItemWriterBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public MultiResourceItemWriterBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
 
 	/**
 	 * Allows customization of the suffix of the created resources based on the index.

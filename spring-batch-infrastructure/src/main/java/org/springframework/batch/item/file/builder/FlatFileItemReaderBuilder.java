@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.batch.item.builder.AbstractItemCountingItemStreamItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.batch.item.file.LineMapper;
@@ -57,8 +56,7 @@ import org.springframework.util.StringUtils;
  * @since 4.0
  * @see FlatFileItemReader
  */
-public class FlatFileItemReaderBuilder<T>
-		extends AbstractItemCountingItemStreamItemReaderBuilder<FlatFileItemReaderBuilder<T>> {
+public class FlatFileItemReaderBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -98,6 +96,69 @@ public class FlatFileItemReaderBuilder<T>
 	private boolean beanMapperStrict = true;
 
 	private BigInteger tokenizerValidator = new BigInteger("0");
+
+	private boolean saveState = true;
+
+	private String name;
+
+	private int maxItemCount = Integer.MAX_VALUE;
+
+	private int currentItemCount;
+
+	/**
+	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
+	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
+	 * for restart purposes.
+	 *
+	 * @param saveState defaults to true
+	 * @return The current instance of the builder.
+	 */
+	public FlatFileItemReaderBuilder<T> saveState(boolean saveState) {
+		this.saveState = saveState;
+
+		return this;
+	}
+
+	/**
+	 * The name used to calculate the key within the
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public FlatFileItemReaderBuilder<T> name(String name) {
+		this.name = name;
+
+		return this;
+	}
+
+	/**
+	 * Configure the max number of items to be read.
+	 *
+	 * @param maxItemCount the max items to be read
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
+	 */
+	public FlatFileItemReaderBuilder<T> maxItemCount(int maxItemCount) {
+		this.maxItemCount = maxItemCount;
+
+		return this;
+	}
+
+	/**
+	 * Index for the current item. Used on restarts to indicate where to start from.
+	 *
+	 * @param currentItemCount current index
+	 * @return this instance for method chaining
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
+	 */
+	public FlatFileItemReaderBuilder<T> currentItemCount(int currentItemCount) {
+		this.currentItemCount = currentItemCount;
+
+		return this;
+	}
 
 	/**
 	 * Add a string to the list of Strings that indicate commented lines.
@@ -353,8 +414,6 @@ public class FlatFileItemReaderBuilder<T>
 
 		Assert.notNull(this.recordSeparatorPolicy, "A RecordSeparatorPolicy is required.");
 		int validatorValue = this.tokenizerValidator.intValue();
-		Assert.state(validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
-				"Only one LineTokenizer option may be configured");
 
 		FlatFileItemReader<T> reader = new FlatFileItemReader<>();
 
@@ -368,6 +427,9 @@ public class FlatFileItemReaderBuilder<T>
 			reader.setLineMapper(this.lineMapper);
 		}
 		else {
+			Assert.state(validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
+					"Only one LineTokenizer option may be configured");
+
 			DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
 
 			if(this.lineTokenizer != null && this.fieldSetMapper != null) {
