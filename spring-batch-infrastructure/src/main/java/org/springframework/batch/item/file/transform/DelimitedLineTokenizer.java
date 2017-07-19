@@ -211,7 +211,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
         int start = offset;
         int len = count;
 
-        while ((start < (start + len)) && (chars[start] <= ' ')) {
+        while ((start < (start + len - 1)) && (chars[start] <= ' ')) {
             start++;
             len--;
         }
