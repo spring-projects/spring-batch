@@ -81,7 +81,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 */
 	@Override
 	public void onReadError(Exception ex) {
-		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ItemReadListener<? super T>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener<? super T> listener = iterator.next();
 			listener.onReadError(ex);
 		}
