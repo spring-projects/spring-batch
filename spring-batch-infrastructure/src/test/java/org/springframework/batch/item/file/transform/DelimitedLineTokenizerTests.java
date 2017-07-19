@@ -47,7 +47,7 @@ public class DelimitedLineTokenizerTests {
 	}
 
     @Test
-    public void testEmptyString() {
+    public void testBlankString() {
         FieldSet tokens = tokenizer.tokenize("   ");
         assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
     }
