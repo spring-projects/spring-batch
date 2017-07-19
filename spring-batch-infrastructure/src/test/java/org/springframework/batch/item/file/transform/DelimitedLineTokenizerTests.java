@@ -46,10 +46,11 @@ public class DelimitedLineTokenizerTests {
 		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals(""));
 	}
 
-	@Test
-	public void testEmptyString() {
-		tokenizer.tokenize("   ");
-	}
+    @Test
+    public void testEmptyString() {
+        FieldSet tokens = tokenizer.tokenize("   ");
+        assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+    }
 
 	@Test
 	public void testInvalidConstructorArgument() {
