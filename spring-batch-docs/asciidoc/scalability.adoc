@@ -352,13 +352,13 @@ The names of the step executions (the keys in the
       this convention.
 
 An optional interface
-      `PartitioneNameProvider` can be used to
+      `PartitionNameProvider` can be used to
       provide the partition names separately from the partitions
       themselves.  If a Partitioner implements
       this interface then on a restart only the names will be queried.
       If partitioning is expensive this can be a useful optimisation.
       Obviously the names provided by the
-      `PartitioneNameProvider` must match those
+      `PartitionNameProvider` must match those
       provided by the `Partitioner`.
 
 [[bindingInputDataToSteps]]
