@@ -63,13 +63,13 @@ The simplest general purpose implementation of
 ----
 RepeatTemplate template = new RepeatTemplate();
 
-template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
+template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
 template.iterate(new RepeatCallback() {
 
-    public ExitStatus doInIteration(RepeatContext context) {
+    public RepeatStatus doInIteration(RepeatContext context) {
         // Do stuff in batch...
-        return ExitStatus.CONTINUABLE;
+        return RepeatStatus.CONTINUABLE;
     }
 
 });
@@ -77,7 +77,7 @@ template.iterate(new RepeatCallback() {
 
 In the example we return `RepeatStatus.CONTINUABLE` to
     show that there is more work to do. The callback can also return
-    `ExitStatus.FINISHED` if it wants to signal to the caller that
+    `RepeatStatus.FINISHED` if it wants to signal to the caller that
     there is no more work to do. Some iterations can be terminated by
     considerations intrinsic to the work being done in the callback, others
     are effectively infinite loops as far as the callback is concerned and the
@@ -112,7 +112,7 @@ A `RepeatContext` will have a parent context
       Spring Batch to indicate whether processing has finished. These are
       possible `RepeatStatus` values:
 
-.ExitStatus Properties
+.RepeatStatus Properties
 
 |===============
 |__Value__|__Description__
@@ -295,12 +295,12 @@ The example above uses a default
     `RepeatTemplate` into the interceptor.
 
 If the intercepted method returns `void` then the
-    interceptor always returns `ExitStatus.CONTINUABLE` (so there is a danger of
+    interceptor always returns `RepeatStatus.CONTINUABLE` (so there is a danger of
     an infinite loop if the `CompletionPolicy` does not
     have a finite end point). Otherwise it returns
-    `ExitStatus.CONTINUABLE` until the return value from the
+    `RepeatStatus.CONTINUABLE` until the return value from the
     intercepted method is null, at which point it returns
-    `ExitStatus.FINISHED`. So the business logic inside the target
+    `RepeatStatus.FINISHED`. So the business logic inside the target
     method can signal that there is no more work to do by returning
     `null`, or by throwing an exception that is re-thrown by the
     `ExceptionHandler` in the provided
