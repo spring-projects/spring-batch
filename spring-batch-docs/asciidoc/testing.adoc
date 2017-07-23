@@ -90,10 +90,10 @@ public class SkipSampleFunctionalTests {
                                       i, "customer" + i);
         }
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob().getStatus();
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
 
-        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
+        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
     }
 }
 ----
