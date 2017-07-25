@@ -83,7 +83,7 @@ allprojects {
 		jmsVersion = '2.0.1'
 		jtdsVersion = '1.3.1' //?
 		junitVersion = '4.12'
-		log4jVersion = '1.2.17'
+		log4jVersion = '2.8.2'
 		mysqlVersion = '5.1.42'
 		mockitoVersion = '2.7.22'
 		postgresqlVersion = '42.1.1'
@@ -287,7 +287,8 @@ project('spring-batch-core') {
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "log4j:log4j:$log4jVersion"
+		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
 	}
 }
 
@@ -305,7 +306,8 @@ project('spring-batch-infrastructure') {
 		compile "org.springframework:spring-core:$springVersion"
 		compile "org.springframework.retry:spring-retry:$springRetryVersion"
 
-		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
@@ -404,7 +406,8 @@ project('spring-batch-core-tests') {
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
-		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 
@@ -446,7 +449,8 @@ project('spring-batch-infrastructure-tests') {
 			exclude group: 'stax', module: 'stax'
 			exclude group: 'commons-lang', module: 'commons-lang'
 		}
-		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "xerces:xercesImpl:$xercesVersion"
 		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		testCompile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
@@ -539,7 +543,8 @@ project('spring-batch-integration') {
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
-		optional "log4j:log4j:$log4jVersion"
+		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
 		optional "org.springframework:spring-jms:$springVersion"
 
@@ -589,7 +594,8 @@ project('spring-batch-samples') {
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
-		testCompile "log4j:log4j:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
+		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "org.codehaus.groovy:groovy:$groovyVersion"
 		testCompile "org.codehaus.groovy:groovy-ant:$groovyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
