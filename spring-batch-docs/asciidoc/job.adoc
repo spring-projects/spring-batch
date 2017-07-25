@@ -250,7 +250,7 @@ The validator can be specified as a reference (as above) or as a
 Spring 3 brought the ability to configure applications via java instead
   	of XML.  As of Spring Batch 2.2.0, batch jobs can be configured using the same
   	java config.  There are two components for the java based configuration:
-  	the `@EnableBatchConfiguration` annotation and two builders.
+  	the `@EnableBatchProcessing` annotation and two builders.
 
 The `@EnableBatchProcessing` works similarly to the other
   	@Enable* annotations in the Spring family.  In this case,
