@@ -166,9 +166,9 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 			destinationFile = file("$buildDir/jacoco.exec")
 		}
 
-		testLogging {
-			showStandardStreams = true
-		}
+//		testLogging {
+//			showStandardStreams = true
+//		}
 	}
 
 	task sourcesJar(type: Jar) {
