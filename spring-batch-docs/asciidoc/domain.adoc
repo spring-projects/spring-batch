@@ -11,6 +11,7 @@ ifdef::backend-html5[]
 <script src="./jsfiles/jquery.js"></script>
 <script src="./jsfiles/underscore.js"></script>
 <script src="./jsfiles/backbone.js"></script>
+<script src="./jsfiles/js.cookie.js"></script>
 <script src="./jsfiles/projectDocumentationWidget.js"></script>
 <script src="./jsfiles/application.js"></script>
 <script>
@@ -23,7 +24,7 @@ ifdef::backend-html5[]
         <div class="item-slider--container">
             <div class="item--slider js-item--slider"
                  style="width: 57px; margin-left: 0.01555px;"></div>
-            <div class="item js-item js-active" data-snippet-type="java">
+            <div class="item js-item" data-snippet-type="java">
                 Java
             </div>
             <div class="item js-item" data-snippet-type="xml">
@@ -39,10 +40,10 @@ ifdef::backend-html5[]
     <div class="item-slider-widget js-item-slider--wrapper">
         <div class="item-slider--container">
             <div class="item--slider js-item--slider"></div>
-            <div class="item js-active js-item" data-snippet-type='java'>
+            <div id="java_snip_item" class="item js-item" data-snippet-type='java'>
                 Java
             </div>
-            <div class="item js-item" data-snippet-type='xml'>
+            <div id="xml_snip_item" class="item js-item" data-snippet-type='xml'>
                 XML
             </div>
         </div>

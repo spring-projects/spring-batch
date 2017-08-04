@@ -12,47 +12,25 @@ Spring.ProjectDocumentationWidget = function () {
     var codeEl = $('[code-widget-controls]');
     var codeWidgetEl = $('.js-code-maven-widget');
 
-    var projectUrl = apiBaseUrl + "/project_metadata/" + projectId;
-    var promise = Spring.loadProject(projectUrl);
+    Spring.buildCodeWidget(codeEl, codeWidgetEl);
 
-    promise.then(function (project) {
-        Spring.buildCodeWidget(codeEl, codeWidgetEl, project);
-    });
+    var displayValue = Cookies.get("widget.display");
+
+    if(displayValue === 'xml') {
+        $('#xml_snip_item').trigger("click");
+    }
+    else if(displayValue === 'java') {
+        $('#java_snip_item').trigger("click");
+    }
 };
 
-Spring.buildCodeWidget = function (codeEl, codeWidgetEl, project) {
+Spring.buildCodeWidget = function (codeEl, codeWidgetEl) {
     new Spring.CodeSelectorView({
         el: codeEl,
-        model: project,
         template: $("#code-widget-controls-template").text(),
         snippetWidgetEl: codeWidgetEl
     }).render();
 }
-
-Spring.loadProject = function (url) {
-    return $.ajax(url, {
-        dataType: 'jsonp',
-        processData: false
-    }).then(function (value) {
-        return new Spring.Project(value);
-    });
-}
-
-Spring.Release = function (data) {
-    _.extend(this, data);
-}
-
-
-
-Spring.Project = function (data) {
-    _.extend(this, data);
-    var self = this;
-    this.releases = _.map(this.projectReleases, function (r) {
-        return new Spring.Release(r);
-    });
-
-    return this;
-};
 
 function isJavaVisible(displayVal, currentVal) {
     var result= false;
@@ -62,6 +40,7 @@ function isJavaVisible(displayVal, currentVal) {
     else if (entry > 1) {
         result = (currentVal  === 'java');
     }
+
     return result;
 }
 
@@ -130,7 +109,6 @@ Spring.CodeSelectorView = Backbone.View.extend({
         if(this.activeWidget != null) this.activeWidget.remove();
         this.activeWidget = new Spring.SnippetView({
             el: this.snippetWidgetEl,
-            model: this.model.releases[this.$('.selector :selected').val()],
             snippetType: this.$('.js-active').data('snippet-type')
         });
         this.activeWidget.render();
