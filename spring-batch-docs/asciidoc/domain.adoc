@@ -108,18 +108,17 @@ The job configuration contains:
 * Definition and ordering of Steps
 * Whether or not the job is restartable
 
-A default simple implementation of the Job
-interface is provided by Spring Batch in the form of the
-`SimpleJob` class which creates some standard
-functionality on top of `Job`, however the batch
-namespace abstracts away the need to instantiate it directly. Instead, the
-`<job>` tag can be used:
-
 ifdef::backend-html5[]
 +++
    <div id="xml_seg_1">
    <div id="xml_section_1">
 +++
+A default simple implementation of the Job
+interface is provided by Spring Batch in the form of the
+`SimpleJob` class which creates some standard
+functionality on top of `Job`, however the batch namespace abstracts away
+the need to instantiate it directly. Instead, the
+`<job>` tag can be used:
 [source, xml]
 ----
 <job id="footballJob">
@@ -132,17 +131,25 @@ ifdef::backend-html5[]
 +++
 </div>
 </div>
-<div id="java_seg_1" style="display: none;">
+<div id="java_seg_1">
 <div id="java_section_1">
 +++
+
+To simplify this, Spring Batch offers a JobBuilderFactory to create a JobBuilder
+that will allow the user to create a job and its job flow.
+For example:
+
 [source, java]
 ----
-jobBuilderFactory.get("footballJob")
-    .flow(playerload())
-    .next(gameLoad())
-    .next(playerSummarization())
-    .end()
-    .build();
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .start(playerLoad())
+                     .next(gameLoad())
+                     .next(playerSummarization())
+                     .end()
+                     .build();
+}
 ----
 +++
 </div>
@@ -153,6 +160,12 @@ endif::backend-html5[]
 ifdef::backend-pdf[]
 
 .XML Configuration
+A default simple implementation of the Job
+interface is provided by Spring Batch in the form of the
+`SimpleJob` class which creates some standard
+functionality on top of `Job`, however the batch namespace abstracts away
+the need to instantiate it directly. Instead, the
+`<job>` tag can be used:
 [source, xml]
 ----
 <job id="footballJob">
@@ -163,15 +176,20 @@ ifdef::backend-pdf[]
 ----
 
 .Java Configuration
-
+To simplify this, Spring Batch offers a JobBuilderFactory to create a JobBuilder
+that will allow the user to create a job and its job flow.
+For example:
 [source, java]
 ----
-jobBuilderFactory.get("footballJob")
-    .flow(playerload())
-    .next(gameLoad())
-    .next(playerSummarization())
-    .end()
-    .build();
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .start(playerLoad())
+                     .next(gameLoad())
+                     .next(playerSummarization())
+                     .end()
+                     .build();
+}
 ----
 
 endif::backend-pdf[]
@@ -704,13 +722,13 @@ Job is first launched, a
 `JobExecution` is obtained from the repository, and
 during the course of execution `StepExecution` and
 `JobExecution` implementations are persisted by
-passing them to the repository:
-
+passing them to the repository.
 ifdef::backend-html5[]
 +++
    <div id="xml_seg_2">
    <div id="xml_section_2">
 +++
+
 [source, xml]
 ----
 <job-repository id="jobRepository"/>
@@ -718,14 +736,14 @@ ifdef::backend-html5[]
 +++
 </div>
 </div>
-<div id="java_seg_2" style="display: none;">
+<div id="java_seg_2">
 <div id="java_section_2">
 +++
-[source, java]
-----
-@Autowired
-private JobRepository jobRepository;
-----
+
+The JobRepository is automatically provided when  the `@EnableBatchProcessing`
+is used with a Java Configuration class.  The behavior can be customized via the
+<<job.adoc#javaConfig,BatchConfigurer>>.
+
 +++
 </div>
 </div>
@@ -742,11 +760,9 @@ ifdef::backend-pdf[]
 
 .Java Configuration
 
-[source, java]
-----
-@Autowired
-private JobRepository jobRepository;
-----
+The JobRepository is automatically provided when  the `@EnableBatchProcessing`
+is used with a Java Configuration class.  The behavior can be customized via the
+link:job.html#javaConfig[BatchConfigurer].
 
 endif::backend-pdf[]
 
@@ -835,4 +851,3 @@ As long as the batch namespace has been declared, any of its
 elements can be used. More information on configuring a
 Job can be found in <<job.adoc#configureJob,Configuring and Running a Job>>. More information on configuring a `Step` can be
 found in <<step.adoc#configureStep,Configuring a Step>>.
-
