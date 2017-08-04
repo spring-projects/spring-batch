@@ -70,8 +70,8 @@ Spring.SnippetView = Backbone.View.extend({
         var displayVal = document.cookie;
         entry++;
         var javaDisplayStatus  = this.options.snippetType;
-
-        for (i=1; i<3 ; i++) {
+        var codeSegmentCount = document.querySelectorAll('[id^=xml_seg_]').length +1
+        for (i=1; i< codeSegmentCount ; i++) {
             var xmlSegment = document.getElementById('xml_seg_'+i);
             var javaSegment = document.getElementById('java_seg_'+i);
             if (!isJavaVisible(displayVal, this.options.snippetType)) {

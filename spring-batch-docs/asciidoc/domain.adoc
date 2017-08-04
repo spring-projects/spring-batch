@@ -137,7 +137,12 @@ ifdef::backend-html5[]
 +++
 [source, java]
 ----
-System.out.println("Hello World");
+jobBuilderFactory.get("footballJob")
+    .flow(playerload())
+    .next(gameLoad())
+    .next(playerSummarization())
+    .end()
+    .build();
 ----
 +++
 </div>
@@ -147,7 +152,7 @@ endif::backend-html5[]
 
 ifdef::backend-pdf[]
 
-XML FUN
+.XML Configuration
 [source, xml]
 ----
 <job id="footballJob">
@@ -157,11 +162,16 @@ XML FUN
 </job>
 ----
 
-JAVA CONFIGURATION
+.Java Configuration
 
 [source, java]
 ----
-System.out.println("Hello World");
+jobBuilderFactory.get("footballJob")
+    .flow(playerload())
+    .next(gameLoad())
+    .next(playerSummarization())
+    .end()
+    .build();
 ----
 
 endif::backend-pdf[]
@@ -696,10 +706,49 @@ during the course of execution `StepExecution` and
 `JobExecution` implementations are persisted by
 passing them to the repository:
 
+ifdef::backend-html5[]
++++
+   <div id="xml_seg_2">
+   <div id="xml_section_2">
++++
 [source, xml]
 ----
 <job-repository id="jobRepository"/>
 ----
++++
+</div>
+</div>
+<div id="java_seg_2" style="display: none;">
+<div id="java_section_2">
++++
+[source, java]
+----
+@Autowired
+private JobRepository jobRepository;
+----
++++
+</div>
+</div>
++++
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+
+.XML Configuration
+[source, xml]
+----
+<job-repository id="jobRepository"/>
+----
+
+.Java Configuration
+
+[source, java]
+----
+@Autowired
+private JobRepository jobRepository;
+----
+
+endif::backend-pdf[]
 
 === JobLauncher
 
@@ -752,7 +801,7 @@ not be written out. More details about the `ItemProcessor` interface can be
 found in <<readersAndWriters.adoc#readersAndWriters,Readers And Writers>>.
 
 
-=== Batch Namespace
+=== Batch Namespace When Using XML Configuration
 
 Many of the domain concepts listed above need to be configured in a
 Spring ApplicationContext. While there are
@@ -760,50 +809,6 @@ implementations of the interfaces above that can be used in a standard
 bean definition, a namespace has been provided for ease of
 configuration:
 
-ifdef::backend-html5[]
-+++
-<div id="xml_seg_2">
-<div id="xml_section_2">
-+++
-[source, xml]
-----
-<beans:beans xmlns="http://www.springframework.org/schema/batch"
-xmlns:beans="http://www.springframework.org/schema/beans"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="
-   http://www.springframework.org/schema/beans
-   http://www.springframework.org/schema/beans/spring-beans.xsd
-   http://www.springframework.org/schema/batch
-   http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
-
-<job id="ioSampleJob">
-<step id="step1">
-    <tasklet>
-        <chunk reader="itemReader" writer="itemWriter" commit-interval="2"/>
-    </tasklet>
-</step>
-</job>
-
-</beans:beans>
-----
-+++
-</div>
-</div>
-<div id="java_seg_2" style="display: none;">
-<div id="java_section_2">
-+++
-[source, java]
-----
-System.out.println("Hello World");
-----
-+++
-</div>
-</div>
-+++
-endif::backend-html5[]
-
-ifdef::backend-pdf[]
-XML
 [source, xml]
 ----
 <beans:beans xmlns="http://www.springframework.org/schema/batch"
@@ -826,12 +831,6 @@ xsi:schemaLocation="
 </beans:beans>
 ----
 
-JAVA CONFIGURATION
-[source, java]
-----
-System.out.println("Hello World");
-----
-endif::backend-pdf[]
 As long as the batch namespace has been declared, any of its
 elements can be used. More information on configuring a
 Job can be found in <<job.adoc#configureJob,Configuring and Running a Job>>. More information on configuring a `Step` can be
