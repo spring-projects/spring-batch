@@ -50,19 +50,28 @@ Spring.SnippetView = Backbone.View.extend({
         entry++;
         var javaDisplayStatus  = this.options.snippetType;
 
-        for (i=1; i<3 ; i++) {
-            var xmlSegment = document.getElementById('xml_seg_'+i);
-            var javaSegment = document.getElementById('java_seg_'+i);
-            if (!isJavaVisible(displayVal, this.options.snippetType)) {
-                xmlSegment.style.display = 'block';
-                javaSegment.style.display = 'none';
-                javaDisplayStatus = 'widget.display=xml';
-            } else {
-                xmlSegment.style.display = 'none';
-                javaSegment.style.display = 'block';
-                javaDisplayStatus = 'widget.display=java';
-            }
+        if(isJavaVisible(displayVal, javaDisplayStatus)) {
+            $('.javaContent').each(function() {
+               $(this).show();
+            });
+
+            $('.xmlContent').each(function() {
+                $(this).hide();
+            });
+
+            javaDisplayStatus = 'widget.display=java';
+        } else {
+            $('.xmlContent').each(function() {
+                $(this).show();
+            });
+
+            $('.javaContent').each(function() {
+                $(this).hide();
+            });
+
+            javaDisplayStatus = 'widget.display=xml';
         }
+
         document.cookie = javaDisplayStatus;
         _.bindAll(this, "render");
     },
