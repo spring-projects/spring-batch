@@ -1,45 +1,42 @@
 ifdef::backend-html5[]
 +++
-<script src="./jsfiles/jquery.js"></script>
-<script src="./jsfiles/underscore.js"></script>
-<script src="./jsfiles/backbone.js"></script>
-<script src="./jsfiles/js.cookie.js"></script>
-<script src="./jsfiles/projectDocumentationWidget.js"></script>
-<script src="./jsfiles/application.js"></script>
-<script>
-    var apiBaseUrl = "https://spring.io",
-        projectId = "spring-batch",
-        siteBaseUrl = "/spring-batch";
-</script>
-<div code-widget-controls="" style="display: inline-block">
-<div class="item-slider-widget js-item-slider--wrapper">
-        <div class="item-slider--container">
-            <div class="item--slider js-item--slider"
-                 style="width: 57px; margin-left: 0.01555px;"></div>
-            <div class="item js-item" data-snippet-type="java">
-                Java
-            </div>
-            <div class="item js-item" data-snippet-type="xml">
-                XML
-            </div>
-        </div>
-    </div>
+<div class="toggleWidget">
+	<script src="./jsfiles/jquery.js"></script>
+	<script src="./jsfiles/underscore.js"></script>
+	<script src="./jsfiles/backbone.js"></script>
+	<script src="./jsfiles/js.cookie.js"></script>
+	<script src="./jsfiles/projectDocumentationWidget.js"></script>
+	<script src="./jsfiles/application.js"></script>
+	<div code-widget-controls="" style="display: inline-block">
+	<div class="item-slider-widget js-item-slider--wrapper">
+			<div class="item-slider--container">
+				<div class="item--slider js-item--slider"
+					 style="width: 57px; margin-left: 0.01555px;"></div>
+				<div class="item js-item" data-snippet-type="java">
+					Java
+				</div>
+				<div class="item js-item" data-snippet-type="xml">
+					XML
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="code-widget--body">
+		<div class="js-code-maven-widget"></div>
+	</div>
+	<script type="text/html" id="code-widget-controls-template">
+		<div class="item-slider-widget js-item-slider--wrapper">
+			<div class="item-slider--container">
+				<div class="item--slider js-item--slider"></div>
+				<div class="item js-item java_snip_item" data-snippet-type='java'>
+					Java
+				</div>
+				<div class="item js-item xml_snip_item" data-snippet-type='xml'>
+					XML
+				</div>
+			</div>
+		</div>
+	</script>
 </div>
-<div class="code-widget--body">
-    <div class="js-code-maven-widget"></div>
-</div>
-<script type="text/html" id="code-widget-controls-template">
-    <div class="item-slider-widget js-item-slider--wrapper">
-        <div class="item-slider--container">
-            <div class="item--slider js-item--slider"></div>
-            <div id="java_snip_item" class="item js-item" data-snippet-type='java'>
-                Java
-            </div>
-            <div id="xml_snip_item" class="item js-item" data-snippet-type='xml'>
-                XML
-            </div>
-        </div>
-    </div>
-</script>
 +++
 endif::backend-html5[]

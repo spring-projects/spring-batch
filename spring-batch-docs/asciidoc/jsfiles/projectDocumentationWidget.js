@@ -17,10 +17,22 @@ Spring.ProjectDocumentationWidget = function () {
     var displayValue = Cookies.get("widget.display");
 
     if(displayValue === 'xml') {
-        $('#xml_snip_item').trigger("click");
+        $('.xml_snip_item').each(function() {
+            var widget = $(this).closest('.toggleWidget');
+
+            if(!widget.is(":hidden")) {
+                $(this).trigger("click");
+            }
+        });
     }
     else if(displayValue === 'java') {
-        $('#java_snip_item').trigger("click");
+        $('.java_snip_item').each(function() {
+            var widget = $(this).closest('.toggleWidget');
+
+            if(!widget.is(":hidden")) {
+                $(this).trigger("click");
+            }
+        });
     }
 };
 
