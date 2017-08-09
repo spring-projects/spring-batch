@@ -631,6 +631,12 @@ asciidoctor {
 	sources {
 		include '*.adoc'
 	}
+	resources {
+		from(sourceDir) {
+			include 'images/**'
+			include 'jsfiles/**'
+		}
+	}
 	logDocuments = true
 	backends = ["html", "pdf"]
 	options doctype: 'book', eruby: 'erubis'

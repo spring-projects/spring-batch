@@ -2,6 +2,11 @@
 :toc: left
 :toclevels: 4
 
+ifdef::backend-html5[]
++++
++++
+endif::backend-html5[]
+
 include::header/index-header.adoc[]
 
 include::spring-batch-intro.adoc[]
