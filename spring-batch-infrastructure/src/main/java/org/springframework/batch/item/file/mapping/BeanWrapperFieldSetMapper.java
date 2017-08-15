@@ -36,6 +36,8 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
@@ -45,7 +47,7 @@ import org.springframework.validation.DataBinder;
  * {@link FieldSetMapper} implementation based on bean property paths. The
  * {@link FieldSet} to be mapped should have field name meta data corresponding
  * to bean property paths in an instance of the desired type. The instance is
- * created and initialized either by referring to to a prototype object by bean
+ * created and initialized either by referring to a prototype object by bean
  * name in the enclosing BeanFactory, or by providing a class to instantiate
  * reflectively.<br>
  * <br>
@@ -63,7 +65,11 @@ import org.springframework.validation.DataBinder;
  * can inject {@link PropertyEditor} instances directly through the
  * {@link #setCustomEditors(Map) customEditors} property, or you can override
  * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
- * methods, or you can provide a custom {@link FieldSet} implementation.<br>
+ * methods, or you can provide a custom {@link FieldSet} implementation.
+ * You can also use a {@link ConversionService} to convert to the desired type
+ * through the {@link #setConversionService(ConversionService) conversionService}
+ * property.
+ * <br>
  * <br>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
@@ -101,6 +107,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	private int distanceLimit = 5;
 
 	private boolean strict = true;
+
+	private ConversionService conversionService;
+
+	private boolean isCustomEditorsSet;
 
 	/*
 	 * (non-Javadoc)
@@ -166,6 +176,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null || type != null, "Either name or type must be provided.");
 		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
+		Assert.state(!this.isCustomEditorsSet || this.conversionService == null, "Both customEditor and conversionService cannot be specified together.");
 	}
 
 	/**
@@ -207,6 +218,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		binder.setIgnoreUnknownFields(!this.strict);
 		initBinder(binder);
 		registerCustomEditors(binder);
+		if(this.conversionService != null) {
+			binder.setConversionService(this.conversionService);
+		}
 		return binder;
 	}
 
@@ -381,6 +395,31 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
+	}
+
+
+	/**
+	 * Public setter for the 'conversionService' property.
+	 * {@link #createBinder(Object)} will use it if not null.
+	 *
+	 * @param conversionService
+	 */
+	public void setConversionService(ConversionService conversionService) {
+		this.conversionService = conversionService;
+	}
+
+	/**
+	 * Specify the {@link PropertyEditor custom editors} to register.
+	 *
+	 *
+	 * @param customEditors a map of Class to PropertyEditor (or class name to
+	 * PropertyEditor).
+	 * @see CustomEditorConfigurer#setCustomEditors(Map)
+	 */
+	@Override
+	public void setCustomEditors(Map<? extends Object, ? extends PropertyEditor> customEditors) {
+		this.isCustomEditorsSet = true;
+		super.setCustomEditors(customEditors);
 	}
 
 	private static class DistanceHolder {
