@@ -43,6 +43,10 @@ import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
@@ -51,27 +55,38 @@ public class BeanWrapperFieldSetMapperTests {
 	
 	@Test
 	public void testNameAndTypeSpecified() throws Exception {
+		boolean errorCaught = false;
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		mapper.setTargetType(TestObject.class);
 		mapper.setPrototypeBeanName("foo");
 		try {
 			mapper.afterPropertiesSet();
 		}
-		catch (IllegalStateException e) {
-			// expected
+		catch (IllegalStateException ise) {
+			errorCaught = true;
+			assertEquals("Both name and type cannot be specified together.", ise.getMessage());
+		}
+		if (!errorCaught) {
+			fail();
 		}
 	}
 
 	@Test
 	public void testNameNorTypeSpecified() throws Exception {
+		boolean errorCaught = false;
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		try {
 			mapper.afterPropertiesSet();
 		}
-		catch (IllegalStateException e) {
-			// expected
+		catch (IllegalStateException ise) {
+			errorCaught = true;
+			assertEquals("Either name or type must be provided.", ise.getMessage());
 		}
-	}
+		if (!errorCaught) {
+			fail();
+		}
+
+}
 
 	@Test
 	public void testVanillaBeanCreatedFromType() throws Exception {
@@ -422,6 +437,78 @@ public class BeanWrapperFieldSetMapperTests {
 		assertEquals(7890.1, bean.getVarFloat(), 0.01);
 	}
 
+
+	@Test
+	public void testConversionWithTestConverter() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "SHOULD BE CONVERTED" }, new String[] { "varString" });
+
+		mapper.setConversionService(new TestConversion());
+		mapper.afterPropertiesSet();
+		TestObject bean = mapper.mapFieldSet(fieldSet);
+
+		assertEquals("Expecting the conversion to have returned \"CONVERTED\"", bean.getVarString(), "CONVERTED");
+	}
+
+	@Test
+	public void testDefaultConversion() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setTargetType(TestObject.class);
+
+		final String sampleString = "myString";
+		Date date = new Date();
+		BigDecimal bigDecimal = new BigDecimal(12345L);
+		String dateString = date.toString();
+
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "12", "12345", "true", "Z", "123", "12345", "12345", "12", dateString, "12345", sampleString},
+				new String[] { "varInt", "varLong", "varBoolean", "varChar","varByte","varFloat", "varDouble", "varShort", "varDate", "varBigDecimal", "varString"  });
+
+		mapper.setConversionService(new DefaultConversionService());
+		mapper.afterPropertiesSet();
+
+		TestObject bean = mapper.mapFieldSet(fieldSet);
+
+		assertEquals("Expected 12 for varInt", bean.getVarInt(), 12);
+		assertEquals("Expected 12345 for varLong", bean.getVarLong(), 12345L);
+		assertEquals("Expected true for varBoolean", bean.isVarBoolean(), true);
+		assertEquals("Expected Z for varChar", bean.getVarChar(), 'Z');
+		assertEquals("Expected A for varByte", bean.getVarByte(), 123);
+		assertEquals("Expected 12345 for varFloat", bean.getVarFloat(), 12345F, 1F);
+		assertEquals("Expected 12345 for varDouble", bean.getVarDouble(), 12345D, 1D);
+		assertEquals("Expected 12 for varShort", bean.getVarShort(), 12);
+		assertEquals("Expected currentDate for varDate", bean.getVarDate().toString(), dateString);
+		assertEquals("Expected 12345 for varBigDecimal", bean.getVarBigDecimal(), bigDecimal);
+		assertEquals("Expected " + sampleString + " for varString", bean.getVarString(), sampleString);
+
+	}
+
+	@Test
+	public void testConversionAndCustomEditor() throws Exception {
+
+		boolean errorCaught = false;
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setTargetType(TestObject.class);
+
+		mapper.setConversionService(new TestConversion());
+		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
+				.getNumberInstance(), true)));
+		try {
+			mapper.afterPropertiesSet();
+		}
+		catch (IllegalStateException ise) {
+			errorCaught = true;
+			assertEquals("Both customEditor and conversionService cannot be specified together.", ise.getMessage());
+		}
+		if (!errorCaught) {
+			fail();
+		}
+	}
+
 	@Test
 	public void testBinderWithErrors() throws Exception {
 
@@ -730,6 +817,31 @@ public class BeanWrapperFieldSetMapperTests {
 
 		public void setVarInt(int varInt) {
 			this.varInt = varInt;
+		}
+	}
+
+	public static class TestConversion implements ConversionService{
+
+		@Override
+		public boolean canConvert(@Nullable Class<?> sourceType, Class<?> targetType) {
+			return true;
+		}
+
+		@Override
+		public boolean canConvert(@Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
+			return true;
+		}
+
+		@Nullable
+		@Override
+		public <T> T convert(@Nullable Object source, Class<T> targetType) {
+			return (T)"CONVERTED";
+		}
+
+		@Nullable
+		@Override
+		public Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
+			return "CONVERTED";
 		}
 	}
 }
