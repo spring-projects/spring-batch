@@ -48,6 +48,9 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
+		if(this.dataSource != null) {
+			return;
+		}
 		this.dataSource = dataSource;
 		this.transactionManager = new DataSourceTransactionManager(dataSource);
 	}
