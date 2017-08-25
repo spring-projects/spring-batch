@@ -31,7 +31,7 @@ import org.springframework.util.MethodInvoker;
 
 /**
  * <p>
- * A {@link org.springframework.batch.item.ItemReader} wrapper for a
+ * A {@link org.springframework.batch.item.ItemWriter} wrapper for a
  * {@link org.springframework.data.repository.CrudRepository} from Spring Data.
  * </p>
  *
