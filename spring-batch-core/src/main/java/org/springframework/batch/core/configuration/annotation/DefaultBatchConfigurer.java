@@ -31,6 +31,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
@@ -46,9 +49,17 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobLauncher jobLauncher;
 	private JobExplorer jobExplorer;
 
-	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
-		if(this.dataSource != null) {
+		setDataSource(dataSource, false);
+	}
+
+	@Autowired(required = false)
+	private void setDataSourceByAutowire(DataSource dataSource) {
+		setDataSource(dataSource, true);
+	}
+
+	private void setDataSource(DataSource dataSource, boolean isAutowireDataSource) {
+		if(isAutowireDataSource && this.dataSource != null) {
 			return;
 		}
 		this.dataSource = dataSource;
