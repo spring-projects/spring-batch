@@ -46,20 +46,16 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobExplorer jobExplorer;
 
 	public void setDataSource(DataSource dataSource) {
-		setDataSource(dataSource, false);
+		this.dataSource = dataSource;
+		this.transactionManager = new DataSourceTransactionManager(dataSource);
 	}
 
 	@Autowired(required = false)
 	private void setDataSourceByAutowire(DataSource dataSource) {
-		setDataSource(dataSource, true);
-	}
-
-	private void setDataSource(DataSource dataSource, boolean isAutowireDataSource) {
-		if(isAutowireDataSource && this.dataSource != null) {
+		if(this.dataSource != null) {
 			return;
 		}
-		this.dataSource = dataSource;
-		this.transactionManager = new DataSourceTransactionManager(dataSource);
+		setDataSource(dataSource);
 	}
 
 	protected DefaultBatchConfigurer() {}
