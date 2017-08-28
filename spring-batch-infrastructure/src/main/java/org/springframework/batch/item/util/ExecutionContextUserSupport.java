@@ -54,10 +54,13 @@ public class ExecutionContextUserSupport {
 	/**
 	 * Prefix the argument with {@link #getName()} to create a unique key that can be safely used to identify data
 	 * stored in {@link ExecutionContext}.
+	 *
+	 * @param suffix {@link String} to be used to generate the key.
+	 * @return the key that was generated based on the name and the suffix.
 	 */
-	public String getKey(String s) {
+	public String getKey(String suffix) {
 		Assert.hasText(name, "Name must be assigned for the sake of defining the execution context keys prefix.");
-		return name + "." + s;
+		return name + "." + suffix;
 	}
 
 }

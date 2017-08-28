@@ -222,8 +222,9 @@ public class HibernateCursorItemReaderBuilder<T> {
 
 	/**
 	 * Used to configure a {@link HibernateNativeQueryProvider}.  This is ignored if
-	 * @param nativeQuery
-	 * @return
+	 *
+	 * @param nativeQuery {@link String} containing the native query.
+	 * @return this instance for method chaining
 	 */
 	public HibernateCursorItemReaderBuilder<T> nativeQuery(String nativeQuery) {
 		this.nativeQuery = nativeQuery;

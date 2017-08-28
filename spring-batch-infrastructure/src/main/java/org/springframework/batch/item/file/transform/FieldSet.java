@@ -57,6 +57,8 @@ public interface FieldSet {
 	 * Read the {@link String} value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return {@link String} containing the value at the index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	String readString(int index);
@@ -65,6 +67,7 @@ public interface FieldSet {
 	 * Read the {@link String} value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return {@link String} containing the value from the specified name.
 	 */
 	String readString(String name);
 
@@ -73,6 +76,8 @@ public interface FieldSet {
 	 * trailing whitespace (don't trim).
 	 * 
 	 * @param index the field index.
+	 * @return {@link String} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	String readRawString(int index);
@@ -82,6 +87,7 @@ public interface FieldSet {
 	 * including trailing whitespace (don't trim).
 	 * 
 	 * @param name the field name.
+	 * @return {@link String} containing the value from the specified name.
 	 */
 	String readRawString(String name);
 
@@ -89,6 +95,8 @@ public interface FieldSet {
 	 * Read the '<code>boolean</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return boolean containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	boolean readBoolean(int index);
@@ -97,6 +105,8 @@ public interface FieldSet {
 	 * Read the '<code>boolean</code>' value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return boolean containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -108,6 +118,8 @@ public interface FieldSet {
 	 * @param index the field index.
 	 * @param trueValue the value that signifies {@link Boolean#TRUE true};
 	 * case-sensitive.
+	 * @return boolean containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds, or if
 	 * the supplied <code>trueValue</code> is <code>null</code>.
 	 */
@@ -119,6 +131,8 @@ public interface FieldSet {
 	 * @param name the field name.
 	 * @param trueValue the value that signifies {@link Boolean#TRUE true};
 	 * case-sensitive.
+	 * @return boolean containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined, or if the supplied <code>trueValue</code> is <code>null</code>.
 	 */
@@ -128,6 +142,8 @@ public interface FieldSet {
 	 * Read the '<code>char</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return char containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	char readChar(int index);
@@ -136,6 +152,8 @@ public interface FieldSet {
 	 * Read the '<code>char</code>' value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return char containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -145,6 +163,8 @@ public interface FieldSet {
 	 * Read the '<code>byte</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return byte containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	byte readByte(int index);
@@ -152,7 +172,8 @@ public interface FieldSet {
 	/**
 	 * Read the '<code>byte</code>' value from column with given '<code>name</code>'.
 	 * 
-	 * @param name the field name.
+	 * @param name the field name.*
+	 * @return byte containing the value from the specified name.
 	 */
 	byte readByte(String name);
 
@@ -160,6 +181,8 @@ public interface FieldSet {
 	 * Read the '<code>short</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return short containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	short readShort(int index);
@@ -168,6 +191,8 @@ public interface FieldSet {
 	 * Read the '<code>short</code>' value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return short containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -177,6 +202,8 @@ public interface FieldSet {
 	 * Read the '<code>int</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return int containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	int readInt(int index);
@@ -185,6 +212,8 @@ public interface FieldSet {
 	 * Read the '<code>int</code>' value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return int containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -196,6 +225,9 @@ public interface FieldSet {
 	 * blank.
 	 * 
 	 * @param index the field index.
+	 * @param defaultValue the value to use if the field value is blank.
+	 * @return int containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	int readInt(int index, int defaultValue);
@@ -206,6 +238,9 @@ public interface FieldSet {
 	 * blank.
 	 * 
 	 * @param name the field name.
+	 * @param defaultValue the value to use if the field value is blank.
+	 * @return int containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -215,6 +250,8 @@ public interface FieldSet {
 	 * Read the '<code>long</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return long containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	long readLong(int index);
@@ -223,6 +260,8 @@ public interface FieldSet {
 	 * Read the '<code>long</code>' value from column with given '<code>name</code>'.
 	 * 
 	 * @param name the field name.
+	 * @return long containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -234,6 +273,9 @@ public interface FieldSet {
 	 * blank.
 	 * 
 	 * @param index the field index.
+	 * @param defaultValue the value to use if the field value is blank.
+	 * @return long containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	long readLong(int index, long defaultValue);
@@ -244,6 +286,9 @@ public interface FieldSet {
 	 * blank.
 	 * 
 	 * @param name the field name.
+	 * @param defaultValue the value to use if the field value is blank.
+	 * @return long containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -253,6 +298,8 @@ public interface FieldSet {
 	 * Read the '<code>float</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return float containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	float readFloat(int index);
@@ -261,6 +308,8 @@ public interface FieldSet {
 	 * Read the '<code>float</code>' value from column with given '<code>name</code>.
 	 * 
 	 * @param name the field name.
+	 * @return float containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -270,6 +319,8 @@ public interface FieldSet {
 	 * Read the '<code>double</code>' value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return double containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	double readDouble(int index);
@@ -278,6 +329,8 @@ public interface FieldSet {
 	 * Read the '<code>double</code>' value from column with given '<code>name</code>.
 	 * 
 	 * @param name the field name.
+	 * @return double containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -287,6 +340,8 @@ public interface FieldSet {
 	 * Read the {@link java.math.BigDecimal} value at index '<code>index</code>'.
 	 * 
 	 * @param index the field index.
+	 * @return {@link BigDecimal} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	BigDecimal readBigDecimal(int index);
@@ -295,6 +350,8 @@ public interface FieldSet {
 	 * Read the {@link java.math.BigDecimal} value from column with given '<code>name</code>.
 	 * 
 	 * @param name the field name.
+	 * @return {@link BigDecimal} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -306,6 +363,9 @@ public interface FieldSet {
 	 * value at index '<code>index</code>' is blank.
 	 * 
 	 * @param index the field index.
+	 * @param defaultValue the value to use if the field value is blank.
+	 * @return {@link BigDecimal} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
 	BigDecimal readBigDecimal(int index, BigDecimal defaultValue);
@@ -317,6 +377,8 @@ public interface FieldSet {
 	 * 
 	 * @param name the field name.
 	 * @param defaultValue the default value to use if the field is blank
+	 * @return {@link BigDecimal} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -327,6 +389,8 @@ public interface FieldSet {
 	 * designated column <code>index</code>.
 	 * 
 	 * @param index the field index.
+	 * @return {@link Date} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @throws IllegalArgumentException if the value is not parseable
 	 * @throws NullPointerException if the value is empty
@@ -338,6 +402,8 @@ public interface FieldSet {
 	 * with given <code>name</code>.
 	 * 
 	 * @param name the field name.
+	 * @return {@link Date} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined or if the value is not parseable
 	 * @throws NullPointerException if the value is empty
@@ -350,6 +416,8 @@ public interface FieldSet {
 	 * 
 	 * @param index the field index.
 	 * @param defaultValue the default value to use if the field is blank
+	 * @return {@link Date} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @throws IllegalArgumentException if the value is not parseable
 	 * @throws NullPointerException if the value is empty
@@ -362,6 +430,8 @@ public interface FieldSet {
 	 * 
 	 * @param name the field name.
 	 * @param defaultValue the default value to use if the field is blank
+	 * @return {@link Date} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -373,6 +443,8 @@ public interface FieldSet {
 	 * 
 	 * @param index the field index.
 	 * @param pattern the pattern describing the date and time format
+	 * @return {@link Date} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @throws IllegalArgumentException if the date cannot be parsed.
 	 * 
@@ -385,6 +457,8 @@ public interface FieldSet {
 	 * 
 	 * @param name the field name.
 	 * @param pattern the pattern describing the date and time format
+	 * @return {@link Date} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined or if the specified field cannot be parsed
 	 * 
@@ -398,6 +472,8 @@ public interface FieldSet {
 	 * @param index the field index.
 	 * @param pattern the pattern describing the date and time format
 	 * @param defaultValue the default value to use if the field is blank
+	 * @return {@link Date} containing the value from the specified index.
+	 *
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @throws IllegalArgumentException if the date cannot be parsed.
 	 * 
@@ -411,6 +487,8 @@ public interface FieldSet {
 	 * @param name the field name.
 	 * @param pattern the pattern describing the date and time format
 	 * @param defaultValue the default value to use if the field is blank
+	 * @return {@link Date} containing the value from the specified name.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined or if the specified field cannot be parsed
 	 * 
@@ -419,6 +497,8 @@ public interface FieldSet {
 
 	/**
 	 * Return the number of fields in this '<code>FieldSet</code>'.
+	 *
+	 * @return int containing the number of fields in this field set.
 	 */
 	int getFieldCount();
 

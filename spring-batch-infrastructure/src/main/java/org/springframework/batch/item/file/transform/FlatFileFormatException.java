@@ -34,6 +34,8 @@ public class FlatFileFormatException extends RuntimeException {
 	 * Create a new {@link FlatFileFormatException} based on a message.
 	 *
 	 * @param message the message for this exception
+	 * @param input {@link String} containing the input for that caused this
+	 * exception to be thrown.
 	 */
 	public FlatFileFormatException(String message, String input) {
 		super(message);
@@ -58,5 +60,10 @@ public class FlatFileFormatException extends RuntimeException {
 		super(message, cause);
 	}
 
+	/**
+	 * Retrieve the input that caused this exception.
+	 *
+	 * @return String containing the input.
+	 */
 	public String getInput() { return input; }
 }

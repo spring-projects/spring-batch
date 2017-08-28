@@ -29,6 +29,10 @@ public interface FlatFileFooterCallback {
 	/**
 	 * Write contents to a file using the supplied {@link Writer}. It is not
 	 * required to flush the writer inside this method.
+	 *
+	 * @param writer the {@link Writer} to be used to write the footer.
+	 *
+	 * @throws IOException if error occurs during writing.
 	 */
 	void writeFooter(Writer writer) throws IOException;
 }

@@ -59,7 +59,8 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	/**
 	 * Set the {@link Converter} to use to derive the key from the item
-	 * @param itemKeyMapper
+	 *
+	 * @param itemKeyMapper the {@link Converter} used to derive a key from an item.
 	 */
 	public void setItemKeyMapper(Converter<V, K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;
@@ -67,7 +68,9 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	/**
 	 * Sets the delete flag to have the item writer perform deletes
-	 * @param delete
+	 *
+	 * @param delete if true {@link ItemWriter} will perform deletes,
+	 * if False not to perform deletes.
 	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;

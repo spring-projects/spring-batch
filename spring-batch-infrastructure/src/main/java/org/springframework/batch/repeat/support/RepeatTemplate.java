@@ -434,7 +434,10 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
-	 * 
+	 * @param context the current batch context.
+	 * @param result the result of the latest batch item processing.
+	 * @return true if complete according to policy and result value, else false.
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext,
 	 * RepeatStatus)
 	 */
@@ -448,6 +451,8 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Delegate to {@link CompletionPolicy}.
+	 * @param context the current batch context.
+	 * @return true if complete according to policy alone not including result value, else false.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(RepeatContext)
 	 */
@@ -461,6 +466,9 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
+	 *
+	 * @return a RepeatContext object that can be used by the implementation to store
+	 * internal state for a batch step.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
@@ -474,6 +482,7 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
+	 * @param context the value returned by start.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(RepeatContext)
 	 */

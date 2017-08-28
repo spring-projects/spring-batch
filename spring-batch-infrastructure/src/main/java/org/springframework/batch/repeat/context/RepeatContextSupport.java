@@ -41,7 +41,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but
 	 * should be set to the enclosing repeat context if there is one, e.g. if
 	 * this context is an inner loop.
-	 * @param parent
+	 * @param parent {@link RepeatContext} to be used as the parent context.
 	 */
 	public RepeatContextSupport(RepeatContext parent) {
 		super();

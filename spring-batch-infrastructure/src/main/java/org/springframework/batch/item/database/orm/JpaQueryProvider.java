@@ -42,7 +42,7 @@ public interface JpaQueryProvider {
     /**
      * Provide an {@link EntityManager} for the query to be built.
      * 
-     * @param entityManager
+     * @param entityManager to be used by the JpQueryProvider.
      */
     void setEntityManager(EntityManager entityManager);
 

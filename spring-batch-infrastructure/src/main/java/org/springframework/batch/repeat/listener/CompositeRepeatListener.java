@@ -24,6 +24,8 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 
 /**
+ * Allows a user to register one or more RepeatListeners to be notified on batch events.
+ *
  * @author Dave Syer
  * 
  */
@@ -34,7 +36,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/**
 	 * Public setter for the listeners.
 	 * 
-	 * @param listeners
+	 * @param listeners array of RepeatListeners to be used by the CompositeRepeatListener.
 	 */
 	public void setListeners(RepeatListener[] listeners) {
 		this.listeners = Arrays.asList(listeners);
@@ -43,7 +45,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param listener
+	 * @param listener the RepeatListener to be added to the list of listeners to be notified.
 	 */
 	public void register(RepeatListener listener) {
 		if (!listeners.contains(listener)) {

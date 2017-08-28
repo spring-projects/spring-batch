@@ -43,6 +43,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Creates a ValidatingItemProcessor based on the given Validator.
+	 *
+	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public ValidatingItemProcessor(Validator<? super T> validator) {
 		this.validator = validator;
@@ -51,7 +53,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	/**
 	 * Set the validator used to validate each item.
 	 * 
-	 * @param validator
+	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public void setValidator(Validator<? super T> validator) {
 		this.validator = validator;
@@ -60,7 +62,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	/**
 	 * Should the processor filter invalid records instead of skipping them?
 	 * 
-	 * @param filter
+	 * @param filter true if filter is to return null or false if filter is to
+	 * throw a {@link ValidationException}.
 	 */
 	public void setFilter(boolean filter) {
 		this.filter = filter;

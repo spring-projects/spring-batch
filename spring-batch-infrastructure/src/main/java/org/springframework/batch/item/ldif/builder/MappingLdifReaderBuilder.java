@@ -163,7 +163,9 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Setter for object mapper. This property is required to be set.
+	 *
 	 * @param recordMapper maps record to an object
+	 * @return this instance for method chaining.
 	 */
 	public MappingLdifReaderBuilder<T> recordMapper(RecordMapper<T> recordMapper) {
 		this.recordMapper = recordMapper;
