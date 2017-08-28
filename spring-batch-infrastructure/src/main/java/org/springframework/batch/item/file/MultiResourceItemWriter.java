@@ -91,6 +91,8 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	/**
 	 * Allows customization of the suffix of the created resources based on the
 	 * index.
+	 *
+	 * @param suffixCreator {@link ResourceSuffixCreator} to be used by the writer.
 	 */
 	public void setResourceSuffixCreator(ResourceSuffixCreator suffixCreator) {
 		this.suffixCreator = suffixCreator;
@@ -99,6 +101,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	/**
 	 * After this limit is exceeded the next chunk will be written into newly
 	 * created resource.
+	 *
+	 * @param itemCountLimitPerResource int containing the limit to determine
+	 * when the next chunk will be written to a newly created resource.
 	 */
 	public void setItemCountLimitPerResource(int itemCountLimitPerResource) {
 		this.itemCountLimitPerResource = itemCountLimitPerResource;
@@ -106,6 +111,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	/**
 	 * Delegate used for actual writing of the output.
+	 *
+	 * @param delegate {@link ResourceAwareItemWriterItemStream} that will be used
+	 * to write the output.
 	 */
 	public void setDelegate(ResourceAwareItemWriterItemStream<? super T> delegate) {
 		this.delegate = delegate;
@@ -116,11 +124,20 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	 * the same directory and use the same name as this prototype with appended
 	 * suffix (according to
 	 * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
+	 *
+	 * @param resource The prototype resource.
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
 
+
+	/**
+	 * Establishes that state of each resource is saved to the context when
+	 * update is called.
+	 *
+	 * @param saveState true the state is saved.
+	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

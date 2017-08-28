@@ -82,7 +82,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	 * </p>
 	 *
 	 * @param scriptSource the {@link String} form of the script source code to use.
-	 * @param language the language of the script as returned by the {@link javax.script.ScriptEngineFactory}
+	 * @param language the language of the script.
 	 */
 	public void setScriptSource(String scriptSource, String language) {
 		Assert.hasText(language, "Language must contain the script language");

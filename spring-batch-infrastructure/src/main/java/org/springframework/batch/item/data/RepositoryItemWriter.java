@@ -66,7 +66,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 * Specifies what method on the repository to call.  This method must have the type of
 	 * object passed to this writer as the <em>sole</em> argument.
 	 *
-	 * @param methodName
+	 * @param methodName {@link String} containing the method name.
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
@@ -99,6 +99,8 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	 * a subclass if necessary.
 	 *
 	 * @param items the list of items to be persisted.
+	 *
+	 * @throws Exception thrown if error occurs during writing.
 	 */
 	protected void doWrite(List<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {

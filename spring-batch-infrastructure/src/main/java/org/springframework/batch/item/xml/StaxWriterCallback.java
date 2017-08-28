@@ -31,6 +31,10 @@ public interface StaxWriterCallback {
 	/**
 	 * Write contents using the supplied {@link XMLEventWriter}. It is not
 	 * required to flush the writer inside this method.
+	 *
+	 * @param writer the {@link XMLEventWriter} to be used to write the contents.
+	 *
+	 * @throws IOException thrown if an error occurs during writing.
 	 */
 	void write(XMLEventWriter writer) throws IOException;
 }

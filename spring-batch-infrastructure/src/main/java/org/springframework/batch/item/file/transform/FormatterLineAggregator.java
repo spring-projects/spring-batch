@@ -60,7 +60,9 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	/**
 	 * Set the format string used to aggregate items.
-	 * 
+	 *
+	 * @param format {@link String} containing the format to use.
+	 *
 	 * @see Formatter
 	 */
 	public void setFormat(String format) {

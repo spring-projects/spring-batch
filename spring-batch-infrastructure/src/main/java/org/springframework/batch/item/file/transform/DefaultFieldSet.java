@@ -649,6 +649,8 @@ public class DefaultFieldSet implements FieldSet {
 
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
+	 *
+	 * @param index the offset in the token array to obtain the value to be trimmed.
 	 * 
 	 * @return null if the field value is <code>null</code>.
 	 */
@@ -664,9 +666,12 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	/**
-	 * Read and trim the {@link String} value from column with given '
-	 * <code>name</code>.
-	 * 
+	 * Retrieve the index of where a specified column is located based on the
+	 * name parameter.
+	 *
+	 * @param name the value to search in the {@link List} of names.
+	 * @return the index in the {@link List} of names where the name was found.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */

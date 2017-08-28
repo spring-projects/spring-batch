@@ -72,8 +72,9 @@ public enum DatabaseType {
 	/**
 	 * Static method to obtain a DatabaseType from the provided product name.
 	 *
-	 * @param productName
-	 * @return DatabaseType for given product name.
+	 * @param productName {@link String} containing the product name.
+	 * @return the {@link DatabaseType} for given product name.
+	 *
 	 * @throws IllegalArgumentException if none is found.
 	 */
 	public static DatabaseType fromProductName(String productName){
@@ -89,9 +90,10 @@ public enum DatabaseType {
 	/**
 	 * Convenience method that pulls a database product name from the DataSource's metadata.
 	 *
-	 * @param dataSource
-	 * @return DatabaseType
-	 * @throws MetaDataAccessException
+	 * @param dataSource {@link DataSource} to the database to be used.
+	 * @return {@link DatabaseType} for the {@link DataSource} specified.
+	 *
+	 * @throws MetaDataAccessException thrown if error occured during Metadata lookup.
 	 */
 	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
 		String databaseProductName =
