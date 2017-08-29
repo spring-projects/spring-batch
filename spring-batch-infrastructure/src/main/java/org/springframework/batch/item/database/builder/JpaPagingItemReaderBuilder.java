@@ -183,8 +183,9 @@ public class JpaPagingItemReaderBuilder<T> {
 	 * The {@link EntityManagerFactory} to be used for executing the configured
 	 * {@link #queryString}.
 	 *
-	 * @param entityManagerFactory
-	 * @return
+	 * @param entityManagerFactory {@link EntityManagerFactory} used to create
+	 * {@link javax.persistence.EntityManager}
+	 * @return this instance for method chaining
 	 */
 	public JpaPagingItemReaderBuilder<T> entityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;

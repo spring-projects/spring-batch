@@ -139,6 +139,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * 
 	 * This implementation simply looks for the next corresponding element, it does not care about element nesting. You
 	 * will need to override this method to correctly handle composite fragments.
+	 *
+	 * @param reader the {@link XMLEventReader} to be used to find next fragment.
 	 * 
 	 * @return <code>true</code> if next fragment was found, <code>false</code> otherwise.
 	 * 

@@ -96,7 +96,7 @@ public final class PropertiesConverter {
 	 * an empty properties object is passed in, a blank string is returned,
 	 * otherwise it's string representation is returned.
 	 * 
-	 * @param propertiesToParse
+	 * @param propertiesToParse contains the properties be converted.
 	 * @return String representation of properties object
 	 */
 	public static String propertiesToString(Properties propertiesToParse) {

@@ -95,6 +95,20 @@ public final class FileUtils {
 	}
 
 	/**
+	 * Set up output file for batch processing. This method implements common logic for handling output files when
+	 * starting or restarting file I/O. When starting output file processing, creates/overwrites new file. When
+	 * restarting output file processing, checks whether file is writable.
+	 *
+	 * @param file file to be set up
+	 * @param restarted true signals that we are restarting output file processing
+	 * @param overwriteOutputFile If set to true, output file will be overwritten (this flag is ignored when processing
+	 * is restart)
+	 *
+	 * @throws IllegalArgumentException when file is null
+	 * @throws ItemStreamException when starting output file processing, file exists and flag "overwriteOutputFile" is
+	 * set to false
+	 * @throws ItemStreamException when unable to create file or file is not writable
+	 *
 	 * @deprecated use the version with explicit append parameter instead. Here append=false is assumed.
 	 */
 	@Deprecated
@@ -106,6 +120,10 @@ public final class FileUtils {
 	 * Create a new file if it doesn't already exist.
 	 * 
 	 * @param file the file to create on the filesystem
+	 * @return true if file was created else false.
+	 *
+	 * @throws IOException is thrown if error occurs during creation and file
+	 * does not exist.
 	 */
 	public static boolean createNewFile(File file) throws IOException {
 

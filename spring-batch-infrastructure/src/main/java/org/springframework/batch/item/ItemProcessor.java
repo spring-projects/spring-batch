@@ -36,7 +36,8 @@ public interface ItemProcessor<I, O> {
 	 * @param item to be processed
 	 * @return potentially modified or new item for continued processing, null if processing of the 
 	 *  provided item should not continue.
-	 * @throws Exception
+	 *
+	 * @throws Exception thrown if exception occurs during processing.
 	 */
 	O process(I item) throws Exception;
 }

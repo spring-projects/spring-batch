@@ -34,18 +34,19 @@ public class CompositeItemStream implements ItemStream {
 	private List<ItemStream> streams = new ArrayList<ItemStream>();
 
 	/**
-	 * Public setter for the listeners.
+	 * Public setter for the streams.
 	 * 
-	 * @param listeners
+	 * @param streams array of {@link ItemStream}.
 	 */
-	public void setStreams(ItemStream[] listeners) {
-		this.streams = Arrays.asList(listeners);
+	public void setStreams(ItemStream[] streams) {
+		this.streams = Arrays.asList(streams);
 	}
 
 	/**
 	 * Register a {@link ItemStream} as one of the interesting providers under
 	 * the provided key.
-	 * 
+	 *
+	 * @param stream an instance of {@link ItemStream} to be added to the list of streams.
 	 */
 	public void register(ItemStream stream) {
 		synchronized (streams) {
@@ -77,7 +78,10 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to close.
-	 * @throws ItemStreamException
+
+	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in
+	 * the list fails to close.  This is a sequential operation so all itemStreams
+	 * in the list after the one that failed to close will remain open.
 	 */
     @Override
 	public void close() throws ItemStreamException {
@@ -88,7 +92,10 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Broadcast the call to open.
-	 * @throws ItemStreamException
+	 *
+	 * @throws ItemStreamException thrown if one of the {@link ItemStream}s in
+	 * the list fails to open.  This is a sequential operation so all itemStreams
+	 * in the list after the one that failed to open will not be opened.
 	 */
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {

@@ -58,7 +58,9 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * @param executionContext
+	 * Initializes a new execution context with the contents of another executionContext.
+	 *
+	 * @param executionContext containing the entries to be copied to this current context.
 	 */
 	public ExecutionContext(ExecutionContext executionContext) {
 		this();
@@ -324,6 +326,9 @@ public class ExecutionContext implements Serializable {
 
 	/**
 	 * Removes the mapping for a key from this context if it is present.
+	 *
+	 * @param key {@link String} that identifies the entry to be removed from the context.
+	 * @return the value that was removed from the context.
 	 *
 	 * @see java.util.Map#remove(Object)
 	 */

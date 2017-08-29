@@ -85,7 +85,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * result. The context is used to accumulate the number of exceptions of the
 	 * same type according to the classifier.
 	 * 
-	 * @throws Throwable
+	 * @throws Throwable is thrown if number of exceptions exceeds threshold.
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
     @Override

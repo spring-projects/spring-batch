@@ -40,7 +40,9 @@ public class AnnotationMethodResolver implements MethodResolver {
 
 
 	/**
-	 * Create a MethodResolver for the specified Method-level annotation type
+	 * Create a MethodResolver for the specified Method-level annotation type.
+	 *
+	 * @param annotationType establish the annotation to be used.
 	 */
 	public AnnotationMethodResolver(Class<? extends Annotation> annotationType) {
 		Assert.notNull(annotationType, "annotationType must not be null");

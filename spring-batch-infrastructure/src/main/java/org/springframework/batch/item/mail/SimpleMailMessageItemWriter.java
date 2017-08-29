@@ -63,7 +63,7 @@ public class SimpleMailMessageItemWriter implements ItemWriter<SimpleMailMessage
 	/**
 	 * A {@link MailSender} to be used to send messages in {@link #write(List)}.
 	 * 
-	 * @param mailSender
+	 * @param mailSender The {@link MailSender} to be used.
 	 */
 	public void setMailSender(MailSender mailSender) {
 		this.mailSender = mailSender;

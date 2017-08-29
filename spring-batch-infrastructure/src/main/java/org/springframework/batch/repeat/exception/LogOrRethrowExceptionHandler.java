@@ -86,7 +86,8 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * Classify the throwables and decide whether to rethrow based on the
 	 * result. The context is not used.
 	 * 
-	 * @throws Throwable
+	 * @throws Throwable thrown if {@link LogOrRethrowExceptionHandler#exceptionClassifier}
+	 * is classified as {@link Level#RETHROW}.
 	 * 
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */

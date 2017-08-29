@@ -55,7 +55,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 	 * Set force disjoint ranges. If set to TRUE, ranges are validated to be disjoint.
 	 * For example: defining ranges '1-10, 5-15' will cause IllegalArgumentException in
 	 * case of forceDisjointRanges=TRUE.  
-	 * @param forceDisjointRanges 
+	 * @param forceDisjointRanges  true to force disjoint ranges.
 	 */
 	public void setForceDisjointRanges(boolean forceDisjointRanges) {
 		this.forceDisjointRanges = forceDisjointRanges;

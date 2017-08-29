@@ -61,6 +61,7 @@ PreparedStatementSetter, InitializingBean {
 	 * It is assumed that their order in the List is the order of the parameters
 	 * in the PreparedStatement.
 	 *
+	 * @param parameters list containing the parameter values to be used.
 	 * @deprecated In favor of the constructor
 	 */
 	@Deprecated

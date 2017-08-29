@@ -184,6 +184,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * headerCallback is called before writing any items.
+	 *
+	 * @param headerCallback the {@link StaxWriterCallback} to be called prior to writing items.
 	 */
 	public void setHeaderCallback(StaxWriterCallback headerCallback) {
 		this.headerCallback = headerCallback;
@@ -191,7 +193,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * footerCallback is called after writing all items but before closing the
-	 * file
+	 * file.
+	 *
+	 *@param footerCallback the {@link StaxWriterCallback} to be called after writing items.
 	 */
 	public void setFooterCallback(StaxWriterCallback footerCallback) {
 		this.footerCallback = footerCallback;
@@ -250,7 +254,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get XML version.
-	 * 
+	 *
 	 * @return the XML version used
 	 */
 	public String getVersion() {
@@ -336,7 +340,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * Set "overwrite" flag for the output file. Flag is ignored when output
 	 * file processing is restarted.
 	 * 
-	 * @param overwriteOutput
+	 * @param overwriteOutput If set to true, output file will be overwritten
+	 * (this flag is ignored when processing is restart).
 	 */
 	public void setOverwriteOutput(boolean overwriteOutput) {
 		this.overwriteOutput = overwriteOutput;
@@ -347,7 +352,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override
@@ -365,6 +370,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Open the output source
+	 *
+	 * @param executionContext the batch context.
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
@@ -499,10 +506,13 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the writer.
-	 * @param outputFactory
-	 * @param writer
+	 *
+	 * @param outputFactory the factory to be used to create an {@link XMLEventWriter}.
+	 * @param writer the {@link Writer} to be used by the {@link XMLEventWriter} for
+	 * writing to character streams.
 	 * @return an xml writer
-	 * @throws XMLStreamException
+	 *
+	 * @throws XMLStreamException thrown if error occured creating {@link XMLEventWriter}.
 	 */
 	protected XMLEventWriter createXmlEventWriter(XMLOutputFactory outputFactory, Writer writer)
 			throws XMLStreamException {
@@ -511,8 +521,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the factory.
+	 *
 	 * @return a factory for the xml output
-	 * @throws FactoryConfigurationError
+	 *
+	 * @throws FactoryConfigurationError throw if an instance of this factory cannot be loaded.
 	 */
 	protected XMLOutputFactory createXmlOutputFactory() throws FactoryConfigurationError {
 		return XMLOutputFactory.newInstance();
@@ -520,8 +532,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the event factory.
+	 *
 	 * @return a factory for the xml events
-	 * @throws FactoryConfigurationError
+	 *
+	 * @throws FactoryConfigurationError thrown if an instance of this factory cannot be loaded.
 	 */
 	protected XMLEventFactory createXmlEventFactory() throws FactoryConfigurationError {
 		XMLEventFactory factory = XMLEventFactory.newInstance();
@@ -530,8 +544,10 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Subclasses can override to customize the STAX result.
+	 *
 	 * @return a result for writing to
-	 * @throws Exception
+	 *
+	 * @throws Exception thrown if an error occurs curing the creation of the result.
 	 */
 	protected Result createStaxResult() throws Exception {
 		return StaxUtils.getResult(eventWriter);
@@ -545,7 +561,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * </ul>
 	 * 
 	 * @param writer XML event writer
-	 * @throws XMLStreamException
+	 *
+	 * @throws XMLStreamException thrown if error occurs while setting the
+	 * prefix or default name space.
 	 */
 	protected void initNamespaceContext(XMLEventWriter writer) throws XMLStreamException {
 		if (StringUtils.hasText(getRootTagNamespace())) {
@@ -582,7 +600,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * version and root tag name can be retrieved with corresponding getters.
 	 * 
 	 * @param writer XML event writer
-	 * @throws XMLStreamException
+	 *
+	 * @throws XMLStreamException thrown if error occurs.
 	 */
 	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
@@ -634,7 +653,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * Writes the EndDocument tag manually.
 	 * 
 	 * @param writer XML event writer
-	 * @throws XMLStreamException
+	 *
+	 * @throws XMLStreamException thrown if error occurs.
 	 */
 	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
 
@@ -732,8 +752,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * Write the value objects and flush them to the file.
 	 * 
 	 * @param items the value object
-	 * @throws IOException
-	 * @throws XmlMappingException
+	 *
+	 * @throws Exception thrown if general error occurs.
+	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
 	@Override
 	public void write(List<? extends T> items) throws XmlMappingException, Exception {
@@ -767,6 +788,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	/**
 	 * Get the restart data.
+	 *
+	 * @param executionContext the batch context.
 	 * 
 	 * @see org.springframework.batch.item.ItemStream#update(ExecutionContext)
 	 */
