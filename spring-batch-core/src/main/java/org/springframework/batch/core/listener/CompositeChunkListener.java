@@ -33,7 +33,7 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link ChunkListener}.
 	 */
 	public void setListeners(List<? extends ChunkListener> listeners) {
 		this.listeners.setItems(listeners);
@@ -42,7 +42,7 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param chunkListener
+	 * @param chunkListener instance of {@link ChunkListener}.
 	 */
 	public void register(ChunkListener chunkListener) {
 		listeners.add(chunkListener);

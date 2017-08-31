@@ -29,14 +29,14 @@ public class SkipWrapper<T> {
 	final private T item;
 
 	/**
-	 * @param item
+	 * @param item the item that is associated with the SkipWrapper.
 	 */
 	public SkipWrapper(T item) {
 		this(item, null);
 	}
 
 	/**
-	 * @param e
+	 * @param e instance of {@link Throwable} that is associated with the SkipWrapper.
 	 */
 	public SkipWrapper(Throwable e) {
 		this(null, e);

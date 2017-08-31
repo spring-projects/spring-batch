@@ -80,8 +80,6 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	}
 
 	/**
-	 * @param context
-	 * @param result
 	 * @return true if the commit interval has been reached or the result
 	 * indicates completion
 	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
@@ -94,7 +92,6 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	}
 
 	/**
-	 * @param context
 	 * @return if the commit interval has been reached
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -106,7 +103,6 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	}
 
 	/**
-	 * @param parent
 	 * @return a new {@link RepeatContext}
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(org.springframework.batch.repeat.RepeatContext)
 	 */
@@ -118,7 +114,6 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	}
 
 	/**
-	 * @param context
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
 	@Override

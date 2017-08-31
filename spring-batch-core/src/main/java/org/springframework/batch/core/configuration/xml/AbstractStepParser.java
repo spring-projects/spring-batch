@@ -90,9 +90,10 @@ public abstract class AbstractStepParser {
 
 	/**
 	 * @param stepElement   The &lt;step/&gt; element
-	 * @param parserContext context
+	 * @param parserContext instance of {@link ParserContext}.
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
 	 *                      from the enclosing tag. Use 'null' if unknown.
+	 * @return {@link AbstractBeanDefinition} for the stepElement.
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
 

@@ -54,6 +54,8 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Create a {@link FlowJob} with provided name and no flow (invalid state).
+	 *
+	 * @param name the name to be associated with the FlowJob.
 	 */
 	public FlowJob(String name) {
 		super(name);

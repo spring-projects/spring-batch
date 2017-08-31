@@ -52,7 +52,7 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	/**
-	 * @param name
+	 * @param name the job name.
 	 */
 	public SimpleJob(String name) {
 		super(name);

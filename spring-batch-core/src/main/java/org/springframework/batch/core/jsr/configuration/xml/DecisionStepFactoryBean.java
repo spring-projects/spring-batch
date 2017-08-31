@@ -54,7 +54,7 @@ public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingB
 	/**
 	 * The name of the state
 	 *
-	 * @param name
+	 * @param name the name to be used by the DecisionStep.
 	 */
 	public void setName(String name) {
 		this.name = name;

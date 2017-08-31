@@ -99,7 +99,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	 * If set to TRUE, the listener will throw an exception if any 'key' is not
 	 * found in the Step {@link ExecutionContext}. FALSE by default.
 	 *
-	 * @param strict
+	 * @param strict boolean value to establish the state of the strict flag.
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;

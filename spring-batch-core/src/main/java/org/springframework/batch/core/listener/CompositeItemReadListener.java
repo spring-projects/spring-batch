@@ -33,7 +33,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param itemReadListeners
+	 * @param itemReadListeners list of {@link ItemReadListener}s to be called when read events occur.
 	 */
 	public void setListeners(List<? extends ItemReadListener<? super T>> itemReadListeners) {
 		this.listeners.setItems(itemReadListeners);
@@ -42,7 +42,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param itemReaderListener
+	 * @param itemReaderListener instance of {@link ItemReadListener} to be called when read events occur.
 	 */
 	public void register(ItemReadListener<? super T> itemReaderListener) {
 		listeners.add(itemReaderListener);

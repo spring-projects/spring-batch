@@ -205,6 +205,8 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 	 * into a listener.
 	 *
 	 * @param target the object to check
+	 * @param listenerType the class of the listener.
+	 * @param metaDataValues array of {@link ListenerMetaData}.
 	 * @return true if the delegate is an instance of any of the listener
 	 * interface, or contains the marker annotations
 	 */

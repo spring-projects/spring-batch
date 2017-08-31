@@ -63,7 +63,8 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean im
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	@Override

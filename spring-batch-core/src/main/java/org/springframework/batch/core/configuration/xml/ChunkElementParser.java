@@ -68,8 +68,11 @@ public class ChunkElementParser {
 			StepListenerMetaData.itemListenerMetaData());
 
 	/**
+	 * @param bd {@link AbstractBeanDefinition} instance of the containing bean.
 	 * @param element the element to parse
 	 * @param parserContext the context to use
+	 * @param underspecified if true, a fatal error will not be raised if attribute
+	 * or element is missing.
 	 */
 	protected void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, boolean underspecified) {
 

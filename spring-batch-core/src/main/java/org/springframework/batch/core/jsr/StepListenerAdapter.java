@@ -35,7 +35,7 @@ public class StepListenerAdapter implements StepExecutionListener {
 	private final StepListener delegate;
 
 	/**
-	 * @param delegate
+	 * @param delegate instance of {@link StepListener}.
 	 */
 	public StepListenerAdapter(StepListener delegate) {
 		Assert.notNull(delegate, "A listener is required");

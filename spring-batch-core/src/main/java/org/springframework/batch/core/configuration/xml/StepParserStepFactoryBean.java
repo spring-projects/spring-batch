@@ -757,7 +757,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * Public setter for {@link JobRepository}.
 	 *
-	 * @param jobRepository
+	 * @param jobRepository {@link JobRepository} instance to be used by the factory bean.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -766,7 +766,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * The number of times that the step should be allowed to start
 	 *
-	 * @param startLimit
+	 * @param startLimit int containing the number of times a step should be allowed to start.
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
@@ -775,7 +775,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * A preconfigured {@link Tasklet} to use.
 	 *
-	 * @param tasklet
+	 * @param tasklet {@link Tasklet} instance to be used by the factory bean.
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
@@ -786,7 +786,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * @return transactionManager
+	 * @return transactionManager instance of {@link PlatformTransactionManager}
+	 * used by the factory bean.
 	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
@@ -1105,7 +1106,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * Public setter for exception classes that when raised won't crash the job but will result in transaction rollback
 	 * and the item which handling caused the exception will be skipped.
 	 *
-	 * @param exceptionClasses
+	 * @param exceptionClasses {@link Map} containing the {@link Throwable}s as
+	 * the keys and the values are {@link Boolean}s, that if true the item is skipped.
 	 */
 	public void setSkippableExceptionClasses(Map<Class<? extends Throwable>, Boolean> exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
@@ -1135,7 +1137,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * @param hasChunkElement
+	 * @param hasChunkElement true if step has &lt;chunk&gt; element.
 	 */
 	public void setHasChunkElement(boolean hasChunkElement) {
 		this.hasChunkElement = hasChunkElement;

@@ -356,7 +356,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * @param executionId
+	 * @param executionId {@link Long} containing the id for the execution.
 	 * @return job parameters for the requested execution id
 	 */
 	protected JobParameters getJobParameters(Long executionId) {

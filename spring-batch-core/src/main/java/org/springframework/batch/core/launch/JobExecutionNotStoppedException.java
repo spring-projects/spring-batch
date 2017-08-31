@@ -29,6 +29,8 @@ public class JobExecutionNotStoppedException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
+	 *
+	 * @param msg the message.
 	 */
 	public JobExecutionNotStoppedException(String msg) {
 		super(msg);

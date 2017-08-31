@@ -65,6 +65,8 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Create a factory instance with the resource specified. The resources are Spring configuration files or java
 	 * packages containing configuration files.
+	 *
+	 * @param resource resource to be used in the creation of the ApplicationContext.
 	 */
 	public AbstractApplicationContextFactory(Object... resource) {
 

@@ -84,7 +84,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	/**
 	 * Setter for {@link Serializer} implementation
 	 *
-	 * @param serializer
+	 * @param serializer {@link ExecutionContextSerializer} instance to use.
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
 		this.serializer = serializer;
@@ -98,7 +98,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * Default value is 2500. Clients using multi-bytes charsets on the database
 	 * server may need to reduce this value to as little as half the value of
 	 * the column size.
-	 * @param shortContextLength
+	 * @param shortContextLength int containing the shortContextLength.
 	 */
 	public void setShortContextLength(int shortContextLength) {
 		this.shortContextLength = shortContextLength;

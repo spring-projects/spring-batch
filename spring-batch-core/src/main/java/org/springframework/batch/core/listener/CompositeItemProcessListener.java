@@ -32,19 +32,19 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param itemReadListeners
+	 * @param itemProcessorListeners list of {@link ItemProcessListener}s to be called when process events occur.
 	 */
-	public void setListeners(List<? extends ItemProcessListener<? super T, ? super S>> itemReadListeners) {
-		this.listeners.setItems(itemReadListeners);
+	public void setListeners(List<? extends ItemProcessListener<? super T, ? super S>> itemProcessorListeners) {
+		this.listeners.setItems(itemProcessorListeners);
 	}
 
 	/**
 	 * Register additional listener.
 	 *
-	 * @param itemReaderListener
+	 * @param itemProcessorListener instance  of {@link ItemProcessListener} to be called when process events occur.
 	 */
-	public void register(ItemProcessListener<? super T, ? super S> itemReaderListener) {
-		listeners.add(itemReaderListener);
+	public void register(ItemProcessListener<? super T, ? super S> itemProcessorListener) {
+		listeners.add(itemProcessorListener);
 	}
 
 	/**

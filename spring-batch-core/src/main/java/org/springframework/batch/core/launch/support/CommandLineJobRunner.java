@@ -222,7 +222,7 @@ public class CommandLineJobRunner {
 	 * dependency injection. Typically overridden by
 	 * {@link #setSystemExiter(SystemExiter)}.
 	 *
-	 * @param systemExiter
+	 * @param systemExiter {@link SystemExiter} instance to be used by CommandLineJobRunner instance.
 	 */
 	public static void presetSystemExiter(SystemExiter systemExiter) {
 		CommandLineJobRunner.systemExiter = systemExiter;
@@ -242,7 +242,7 @@ public class CommandLineJobRunner {
 	/**
 	 * Injection setter for the {@link SystemExiter}.
 	 *
-	 * @param systemExiter
+	 * @param systemExiter {@link SystemExiter} instance to be used by CommandLineJobRunner instance.
 	 */
 	public void setSystemExiter(SystemExiter systemExiter) {
 		CommandLineJobRunner.systemExiter = systemExiter;
@@ -251,7 +251,8 @@ public class CommandLineJobRunner {
 	/**
 	 * Injection setter for {@link JobParametersConverter}.
 	 *
-	 * @param jobParametersConverter
+	 * @param jobParametersConverter instance of {@link JobParametersConverter}
+	 * to be used by the CommandLineJobRunner instance.
 	 */
 	public void setJobParametersConverter(JobParametersConverter jobParametersConverter) {
 		this.jobParametersConverter = jobParametersConverter;
@@ -260,7 +261,7 @@ public class CommandLineJobRunner {
 	/**
 	 * Delegate to the exiter to (possibly) exit the VM gracefully.
 	 *
-	 * @param status
+	 * @param status int exit code that should be reported.
 	 */
 	public void exit(int status) {
 		systemExiter.exit(status);
@@ -524,6 +525,8 @@ public class CommandLineJobRunner {
 	 * The options (<code>-restart, -next</code>) can occur anywhere in the
 	 * command line.
 	 * </p>
+	 *
+	 * @throws Exception is thrown if error occurs.
 	 */
 	public static void main(String[] args) throws Exception {
 

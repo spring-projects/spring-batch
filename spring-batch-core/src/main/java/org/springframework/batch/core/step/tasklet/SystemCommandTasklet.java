@@ -223,6 +223,8 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	/**
 	 * Sets the task executor that will be used to execute the system command
 	 * NB! Avoid using a synchronous task executor
+	 *
+	 * @param taskExecutor instance of {@link TaskExecutor}.
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
@@ -232,6 +234,8 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * If <code>true</code> tasklet will attempt to interrupt the thread
 	 * executing the system command if {@link #setTimeout(long)} has been
 	 * exceeded or user interrupts the job. <code>false</code> by default
+	 *
+	 * @param interruptOnCancel boolean to establish state of interruptOnCancel
 	 */
 	public void setInterruptOnCancel(boolean interruptOnCancel) {
 		this.interruptOnCancel = interruptOnCancel;

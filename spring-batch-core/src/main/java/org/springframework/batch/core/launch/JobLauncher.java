@@ -46,7 +46,9 @@ public interface JobLauncher {
 	 * one created. A exception will only be thrown if there is a failure to
 	 * start the job. If the job encounters some error while processing, the
 	 * JobExecution will be returned, and the status will need to be inspected.
-	 * 
+	 *
+	 * @param job the job to be executed.
+	 * @param jobParameters the parameters to be associated with the job.
 	 * @return the {@link JobExecution} if it returns synchronously. If the
 	 * implementation is asynchronous, the status might well be unknown.
 	 * 

@@ -107,6 +107,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * context is available in the enclosing block.
 	 *
 	 * @param execution the execution to register
+	 * @param propertyContext instance of {@link BatchPropertyContext} to be registered with this thread.
 	 * @return a new context or the current one if it has the same
 	 *         execution
 	 */

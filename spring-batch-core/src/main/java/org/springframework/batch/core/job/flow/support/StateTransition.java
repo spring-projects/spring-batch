@@ -53,6 +53,7 @@ public final class StateTransition {
 	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state) {
 		return createStateTransition(state, null, null);
@@ -67,6 +68,7 @@ public final class StateTransition {
 	 * transition
 	 * @param pattern the pattern to match in the exit status of the
 	 * {@link State}
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state, String pattern) {
 		return createStateTransition(state, pattern, null);
@@ -80,7 +82,7 @@ public final class StateTransition {
 	 * @param state the new state for the origin
 	 * @param next the new name for the destination
 	 *
-	 * @return a {@link StateTransition}
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state, String next) {
 		return createStateTransition(state, stateTransition.pattern, next);
@@ -93,6 +95,7 @@ public final class StateTransition {
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param next the name of the next {@link State} to execute
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createStateTransition(State state, String next) {
 		return createStateTransition(state, null, next);
@@ -107,6 +110,7 @@ public final class StateTransition {
 	 * @param pattern the pattern to match in the exit status of the
 	 * {@link State}
 	 * @param next the name of the next {@link State} to execute
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createStateTransition(State state, String pattern, String next) {
 		return new StateTransition(state, pattern, next);

@@ -42,6 +42,8 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a String.
+	 * @param parameter {@link String} instance.
+	 * @param identifying true if JobParameter should be identifying.
 	 */
 	public JobParameter(String parameter, boolean identifying) {
 		this.parameter = parameter;
@@ -52,7 +54,8 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Long.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Long} instance.
+	 * @param identifying true if JobParameter should be identifying.
 	 */
 	public JobParameter(Long parameter, boolean identifying) {
 		this.parameter = parameter;
@@ -63,7 +66,8 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Date.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Date} instance.
+	 * @param identifying true if JobParameter should be identifying.
 	 */
 	public JobParameter(Date parameter, boolean identifying) {
 		this.parameter = parameter;
@@ -74,7 +78,8 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Double.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Double} instance.
+	 * @param identifying true if JobParameter should be identifying.
 	 */
 	public JobParameter(Double parameter, boolean identifying) {
 		this.parameter = parameter;
@@ -85,6 +90,8 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a String.
+	 *
+	 * @param parameter {@link String} instance.
 	 */
 	public JobParameter(String parameter) {
 		this.parameter = parameter;
@@ -95,7 +102,7 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Long.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Long} instance.
 	 */
 	public JobParameter(Long parameter) {
 		this.parameter = parameter;
@@ -106,7 +113,7 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Date.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Date} instance.
 	 */
 	public JobParameter(Date parameter) {
 		this.parameter = parameter;
@@ -117,7 +124,7 @@ public class JobParameter implements Serializable {
 	/**
 	 * Construct a new JobParameter as a Double.
 	 *
-	 * @param parameter
+	 * @param parameter {@link Double} instance.
 	 */
 	public JobParameter(Double parameter) {
 		this.parameter = parameter;

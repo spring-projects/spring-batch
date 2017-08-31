@@ -54,6 +54,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Copy constructor. Initializes the builder with the supplied parameters.
+	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
 	 */
 	public JobParametersBuilder(JobParameters jobParameters) {
 		this.parameterMap = new LinkedHashMap<String, JobParameter>(jobParameters.getParameters());

@@ -133,7 +133,9 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
 	/**
 	 * setter to support switching off all parent parameters
-	 * @param useAllParentParameters
+	 *
+	 * @param useAllParentParameters if false do not include parent parameters.
+	 * True if all parent parameters need to be included.
 	 */
 	public void setUseAllParentParameters(boolean useAllParentParameters) {
 		this.useAllParentParameters = useAllParentParameters;

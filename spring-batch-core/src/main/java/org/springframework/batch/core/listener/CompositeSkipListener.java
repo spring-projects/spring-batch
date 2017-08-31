@@ -32,7 +32,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link SkipListener}s to be called when skip events occur.
 	 */
 	public void setListeners(List<? extends SkipListener<? super T,? super S>> listeners) {
 		this.listeners.setItems(listeners);
@@ -41,7 +41,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param listener
+	 * @param listener instance of {@link SkipListener} to be called when skip events occur.
 	 */
 	public void register(SkipListener<? super T,? super S> listener) {
 		listeners.add(listener);
