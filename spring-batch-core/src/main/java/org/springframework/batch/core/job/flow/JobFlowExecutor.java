@@ -48,7 +48,9 @@ public class JobFlowExecutor implements FlowExecutor {
 	private final JobRepository jobRepository;
 
 	/**
-	 * @param execution
+	 * @param jobRepository instance of {@link JobRepository}.
+	 * @param stepHandler instance of {@link StepHandler}.
+	 * @param execution instance of {@link JobExecution}.
 	 */
 	public JobFlowExecutor(JobRepository jobRepository, StepHandler stepHandler, JobExecution execution) {
 		this.jobRepository = jobRepository;
@@ -134,7 +136,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	/**
-	 * @param status
+	 * @param status instance of {@link FlowExecutionStatus}.
 	 * @return A {@link BatchStatus} appropriate for the {@link FlowExecutionStatus} provided
 	 */
 	protected BatchStatus findBatchStatus(FlowExecutionStatus status) {

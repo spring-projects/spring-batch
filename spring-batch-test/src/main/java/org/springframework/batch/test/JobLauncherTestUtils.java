@@ -135,7 +135,7 @@ public class JobLauncherTestUtils {
 	 * Launch the entire job, including all steps.
 	 * 
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs launching the job.
 	 */
 	public JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
@@ -144,9 +144,9 @@ public class JobLauncherTestUtils {
 	/**
 	 * Launch the entire job, including all steps
 	 * 
-	 * @param jobParameters
+	 * @param jobParameters instance of {@link JobParameters}.
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs launching the job.
 	 */
 	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);

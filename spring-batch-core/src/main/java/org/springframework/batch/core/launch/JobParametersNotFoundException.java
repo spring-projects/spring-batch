@@ -31,14 +31,16 @@ public class JobParametersNotFoundException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
+	 *
+	 * @param msg The message to send to caller.
 	 */
 	public JobParametersNotFoundException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg The message to send to caller
-	 * @param e the cause of the exception
+	 * @param msg The message to send to caller.
+	 * @param e the cause of the exception.
 	 */
 	public JobParametersNotFoundException(String msg, Throwable e) {
 		super(msg, e);

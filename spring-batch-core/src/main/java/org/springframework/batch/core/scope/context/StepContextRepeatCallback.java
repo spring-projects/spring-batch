@@ -43,7 +43,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	private final Log logger = LogFactory.getLog(StepContextRepeatCallback.class);
 
 	/**
-	 * @param stepExecution
+	 * @param stepExecution instance of {@link StepExecution} to be used by StepContextRepeatCallback.
 	 */
 	public StepContextRepeatCallback(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;

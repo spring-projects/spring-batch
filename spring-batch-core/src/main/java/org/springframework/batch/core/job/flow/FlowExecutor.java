@@ -34,9 +34,9 @@ public interface FlowExecutor {
 	/**
 	 * @param step a {@link Step} to execute
 	 * @return the exit status that drives the surrounding {@link Flow}
-	 * @throws StartLimitExceededException
-	 * @throws JobRestartException
-	 * @throws JobInterruptedException
+	 * @throws StartLimitExceededException thrown if start limit is exceeded.
+	 * @throws JobRestartException thrown if job restart is not allowed.
+	 * @throws JobInterruptedException thrown if job was interrupted.
 	 */
 	String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException;
 
@@ -66,6 +66,8 @@ public interface FlowExecutor {
 	/**
 	 * Handle any status changes that might be needed in the
 	 * {@link JobExecution}.
+	 *
+	 * @param status instance of {@link FlowExecutionStatus} to be associated with FlowExecutor.
 	 */
 	void updateJobExecutionStatus(FlowExecutionStatus status);
 

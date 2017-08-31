@@ -185,8 +185,9 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
-	 * @param jobExecution
-	 * @param step
+	 * @param jobExecution the {@link JobExecution} instance to be evaluated.
+	 * @param step the {@link Step} instance to be evaluated.
+	 * @return true if step should start, false if it should not.
 	 *
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step

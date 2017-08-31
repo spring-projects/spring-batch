@@ -548,6 +548,7 @@ public class FlowBuilder<Q> {
 		/**
 		 * Signal the end of the flow with the status provided.
 		 *
+		 * @param status {@link String} containing the status.
 		 * @return a FlowBuilder
 		 */
 		public FlowBuilder<Q> end(String status) {

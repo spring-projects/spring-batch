@@ -50,7 +50,7 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 
 	/**
 	 * Public setter for the validators
-	 * @param validators
+	 * @param validators list of validators to be used by the CompositeJobParametersValidator.
 	 */
 	public void setValidators(List<JobParametersValidator> validators) {
 		this.validators = validators;

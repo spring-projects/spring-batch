@@ -143,7 +143,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
 	 * @return an item
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during the reading portion of the chunking loop.
 	 */
 	protected I provide(final StepContribution contribution, final Chunk<I> chunk) throws Exception {
 		return doProvide(contribution, chunk);
@@ -155,7 +155,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
 	 * @return an item
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during reading or listener calls.
 	 */
 	protected final I doProvide(final StepContribution contribution, final Chunk<I> chunk) throws Exception {
 		try {
@@ -185,7 +185,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 * @param contribution a {@link StepContribution}
 	 * @param item an item
 	 * @return a processed item if a processor is present (the unmodified item if it is not)
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during the processing portion of the chunking loop.
 	 */
 	protected O transform(final StepContribution contribution, final I item) throws Exception {
 		if (itemProcessor == null) {
@@ -202,7 +202,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 *
 	 * @param item the item to be processed
 	 * @return the processed item
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during processing.
 	 */
 	protected final O doTransform(I item) throws Exception {
 		try {
@@ -223,7 +223,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 *
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during the writing portion of the chunking loop.
 	 */
 	protected void persist(final StepContribution contribution, final Chunk<O> chunk) throws Exception {
 		doPersist(contribution, chunk);
@@ -236,7 +236,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 	 *
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs during the writing portion of the chunking loop.
 	 */
 	protected final void doPersist(final StepContribution contribution, final Chunk<O> chunk) throws Exception {
 		try {

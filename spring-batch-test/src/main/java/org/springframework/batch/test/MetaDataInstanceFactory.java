@@ -166,9 +166,10 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} with the parameters provided.
 	 *
-	 * @param stepName the stepName for the {@link StepExecution}
-	 * @param executionId the id for the {@link StepExecution}
-	 * @return a {@link StepExecution} with the given {@link JobExecution}
+	 * @param jobExecution instance of {@link JobExecution}.
+	 * @param stepName the name for the {@link StepExecution}.
+	 * @param executionId the id for the {@link StepExecution}.
+	 * @return a {@link StepExecution} with the given {@link JobExecution}.
 	 */
 	public static StepExecution createStepExecution(JobExecution jobExecution, String stepName, Long executionId) {
 		StepExecution stepExecution = jobExecution.createStepExecution(stepName);

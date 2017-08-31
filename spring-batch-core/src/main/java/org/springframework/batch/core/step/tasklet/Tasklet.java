@@ -39,6 +39,8 @@ public interface Tasklet {
 	 * restarts
 	 * @return an {@link RepeatStatus} indicating whether processing is
 	 * continuable.
+	 *
+	 * @throws Exception thrown if error occurs during execution.
 	 */
 	RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
 

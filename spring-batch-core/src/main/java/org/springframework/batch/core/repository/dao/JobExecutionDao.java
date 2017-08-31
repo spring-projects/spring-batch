@@ -36,7 +36,7 @@ public interface JobExecutionDao {
 	 * Preconditions: jobInstance the jobExecution belongs to must have a
 	 * jobInstanceId.
 	 * 
-	 * @param jobExecution
+	 * @param jobExecution {@link JobExecution} instance to be saved.
 	 */
 	void saveJobExecution(JobExecution jobExecution);
 
@@ -46,13 +46,16 @@ public interface JobExecutionDao {
 	 * Preconditions: jobExecution must have an Id (which can be obtained by the
 	 * save method) and a jobInstanceId.
 	 * 
-	 * @param jobExecution
+	 * @param jobExecution {@link JobExecution} instance to be updated.
 	 */
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return all {@link JobExecution} for given {@link JobInstance}, sorted
+	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted
 	 * backwards by creation order (so the first element is the most recent).
+	 *
+	 * @param jobInstance {@link JobInstance} instance to find.
+	 * @return {@link List} containing JobExecutions for the jobInstance.
 	 */
 	List<JobExecution> findJobExecutions(JobInstance jobInstance);
 
@@ -65,12 +68,14 @@ public interface JobExecutionDao {
 	JobExecution getLastJobExecution(JobInstance jobInstance);
 
 	/**
+	 * @param jobName {@link String} containing the name of the job.
 	 * @return all {@link JobExecution} that are still running (or indeterminate
 	 * state), i.e. having null end date, for the specified job name.
 	 */
 	Set<JobExecution> findRunningJobExecutions(String jobName);
 
 	/**
+	 * @param executionId {@link Long} containing the id of the execution.
 	 * @return the {@link JobExecution} for given identifier.
 	 */
 	JobExecution getJobExecution(Long executionId);

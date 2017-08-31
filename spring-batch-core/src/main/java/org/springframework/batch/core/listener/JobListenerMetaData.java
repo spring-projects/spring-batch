@@ -84,7 +84,7 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 *
-	 * @param propertyName
+	 * @param propertyName name of the property to retrieve.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static JobListenerMetaData fromPropertyName(String propertyName){

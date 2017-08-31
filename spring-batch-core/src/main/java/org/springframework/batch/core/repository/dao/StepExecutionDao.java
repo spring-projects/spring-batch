@@ -30,7 +30,7 @@ public interface StepExecutionDao {
 	 * 
 	 * Postconditions: Id will be set to a unique Long.
 	 * 
-	 * @param stepExecution
+	 * @param stepExecution {@link StepExecution} instance to be saved.
 	 */
 	void saveStepExecution(StepExecution stepExecution);
 
@@ -41,7 +41,7 @@ public interface StepExecutionDao {
 	 * 
 	 * Postconditions: StepExecution Id will be set to a unique Long.
 	 * 
-	 * @param stepExecutions
+	 * @param stepExecutions a collection of {@link JobExecution} instances to be saved.
 	 */
 	void saveStepExecutions(Collection<StepExecution> stepExecutions);
 
@@ -50,7 +50,7 @@ public interface StepExecutionDao {
 	 * 
 	 * Preconditions: Id must not be null.
 	 * 
-	 * @param stepExecution
+	 * @param stepExecution {@link StepExecution} instance to be updated.
 	 */
 	void updateStepExecution(StepExecution stepExecution);
 

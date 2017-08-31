@@ -84,7 +84,7 @@ public class JobRegistryBackgroundJobRunner {
 	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<Exception>());
 
 	/**
-	 * @param parentContextPath
+	 * @param parentContextPath the parentContextPath to be used by the JobRegistryBackgroundJobRunner.
 	 */
 	public JobRegistryBackgroundJobRunner(String parentContextPath) {
 		super();

@@ -56,7 +56,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 * Register some {@link StepListener}s with the handler. Each will get the
 	 * callbacks in the order specified at the correct stage.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link StepListener}s.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
 		for (StepListener listener : listeners) {
@@ -83,7 +83,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	/**
 	 * Surrounds the read call with listener callbacks.
 	 * @return item
-	 * @throws Exception
+	 * @throws Exception is thrown if error occurs during read.
 	 */
 	protected final I doRead() throws Exception {
 		try {

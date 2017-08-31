@@ -27,7 +27,7 @@ public class NoSuchStepException extends RuntimeException {
 
 	/**
 	 * Create a new exception instance with the message provided.
-	 * @param message
+	 * @param message the message to be used for this exception.
 	 */
 	public NoSuchStepException(String message) {
 		super(message);

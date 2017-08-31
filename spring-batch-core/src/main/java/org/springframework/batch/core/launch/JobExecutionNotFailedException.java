@@ -29,6 +29,8 @@ public class JobExecutionNotFailedException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
+	 *
+	 * @param msg The message to send to the caller.
 	 */
 	public JobExecutionNotFailedException(String msg) {
 		super(msg);

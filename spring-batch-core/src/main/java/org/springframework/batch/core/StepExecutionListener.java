@@ -29,7 +29,7 @@ public interface StepExecutionListener extends StepListener {
 	 * Initialize the state of the listener with the {@link StepExecution} from
 	 * the current scope.
 	 *
-	 * @param stepExecution
+	 * @param stepExecution instance of {@link StepExecution}.
 	 */
 	void beforeStep(StepExecution stepExecution);
 
@@ -42,6 +42,7 @@ public interface StepExecutionListener extends StepListener {
 	 * failed). Throwing exception in this method has no effect, it will only be
 	 * logged.
 	 *
+	 * @param stepExecution {@link StepExecution} instance.
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.
 	 */

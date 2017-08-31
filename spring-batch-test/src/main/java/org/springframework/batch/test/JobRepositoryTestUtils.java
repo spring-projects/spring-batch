@@ -123,6 +123,10 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * @param count the required number of instances of {@link JobExecution} to
 	 * create
 	 * @return a collection of {@link JobExecution}
+	 *
+	 * @throws JobExecutionAlreadyRunningException thrown if Job is already running.
+	 * @throws JobRestartException thrown if Job is not restartable.
+	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already complete.
 	 */
 	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
@@ -146,6 +150,9 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 * @param count the required number of instances of {@link JobExecution} to
 	 * create
 	 * @return a collection of {@link JobExecution}
+	 * @throws JobExecutionAlreadyRunningException thrown if Job is already running.
+	 * @throws JobRestartException thrown if Job is not restartable.
+	 * @throws JobInstanceAlreadyCompleteException thrown if Job Instance is already complete.
 	 */
 	public List<JobExecution> createJobExecutions(int count) throws JobExecutionAlreadyRunningException,
 	JobRestartException, JobInstanceAlreadyCompleteException {

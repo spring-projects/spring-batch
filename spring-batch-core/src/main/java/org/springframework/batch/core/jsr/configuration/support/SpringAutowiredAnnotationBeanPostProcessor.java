@@ -124,6 +124,8 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
      * <p>This setter property exists so that developers can provide their own
      * (non-Spring-specific) annotation type to indicate that a member is
      * supposed to be autowired.
+     *
+     * @param autowiredAnnotationType type to be used by constructors, fields and methods.
      */
     public void setAutowiredAnnotationType(Class<? extends Annotation> autowiredAnnotationType) {
         Assert.notNull(autowiredAnnotationType, "'autowiredAnnotationType' must not be null");
@@ -139,6 +141,8 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
      * <p>This setter property exists so that developers can provide their own
      * (non-Spring-specific) annotation types to indicate that a member is
      * supposed to be autowired.
+
+     * @param autowiredAnnotationTypes set of types to be used by constructors, fields and methods.
      */
     public void setAutowiredAnnotationTypes(Set<Class<? extends Annotation>> autowiredAnnotationTypes) {
         Assert.notEmpty(autowiredAnnotationTypes, "'autowiredAnnotationTypes' must not be empty");
@@ -149,6 +153,9 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     /**
      * Set the name of a parameter of the annotation that specifies
      * whether it is required.
+     *
+     * @param requiredParameterName the name of the parameter.
+     *
      * @see #setRequiredParameterValue(boolean)
      */
     public void setRequiredParameterName(String requiredParameterName) {
@@ -160,6 +167,9 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
      * <p>For example if using 'required=true' (the default),
      * this value should be <code>true</code>; but if using
      * 'optional=false', this value should be <code>false</code>.
+     *
+     * @param requiredParameterValue true if dependency is required.
+     *
      * @see #setRequiredParameterName(String)
      */
     public void setRequiredParameterValue(boolean requiredParameterValue) {
@@ -357,8 +367,11 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 
     /**
      * Obtain all beans of the given type as autowire candidates.
-     * @param type the type of the bean
+     *
+     * @param type the type of the bean.
+     * @param <T> the type of the bean.
      * @return the target beans, or an empty Collection if no bean of this type is found
+     *
      * @throws BeansException if bean retrieval failed
      */
     protected <T> Map<String, T> findAutowireCandidates(Class<T> type) throws BeansException {

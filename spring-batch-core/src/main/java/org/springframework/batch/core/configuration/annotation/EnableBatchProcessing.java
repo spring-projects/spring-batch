@@ -169,6 +169,9 @@ public @interface EnableBatchProcessing {
 	 * Indicate whether the configuration is going to be modularized into multiple application contexts. If true then
 	 * you should not create any &#64;Bean Job definitions in this context, but rather supply them in separate (child)
 	 * contexts through an {@link ApplicationContextFactory}.
+	 *
+	 * @return boolean indicating whether the configuration is going to be
+	 * modularized into multiple application contexts.  Defaults to false.
 	 */
 	boolean modular() default false;
 

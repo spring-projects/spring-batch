@@ -95,6 +95,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Getter for the exit description (defaults to blank)
+	 *
+	 * @return {@link String} containing the exit description.
 	 */
 	public String getExitDescription() {
 		return exitDescription;
@@ -260,7 +262,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * Extract the stack trace from the throwable provided and append it to
 	 * the exist description.
 	 *
-	 * @param throwable
+	 * @param throwable {@link Throwable} instance containing the stack trace.
 	 * @return a new ExitStatus with the stack trace appended
 	 */
 	public ExitStatus addExitDescription(Throwable throwable) {

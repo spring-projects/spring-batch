@@ -23,15 +23,15 @@ package org.springframework.batch.core.job.flow;
 public class FlowExecutionException extends Exception {
 
 	/**
-	 * @param message
+	 * @param message the message to be associated with this exception.
 	 */
 	public FlowExecutionException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @param message the message to be associated with this exception.
+	 * @param cause instance of {@link Throwable} that caused this exception.
 	 */
 	public FlowExecutionException(String message, Throwable cause) {
 		super(message, cause);
