@@ -134,6 +134,8 @@ InitializingBean {
 	 * Set the name property. Always overrides the default value if this object
 	 * is a Spring bean.
 	 *
+	 * @param name the name to be associated with the job.
+	 *
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setName(String name) {
@@ -396,8 +398,8 @@ InitializingBean {
 	/**
 	 * Default mapping from throwable to {@link ExitStatus}.
 	 *
-	 * @param ex
-	 *            the cause of the failure
+	 * @param ex the cause of the failure
+	 * @param execution the {@link JobExecution} instance.
 	 * @return an {@link ExitStatus}
 	 */
 	protected ExitStatus getDefaultExitStatusForFailure(Throwable ex, JobExecution execution) {

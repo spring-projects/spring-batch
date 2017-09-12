@@ -201,8 +201,11 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	/**
+	 * @param stateName the name of the next state.
+	 * @param status {@link FlowExecutionStatus} instance.
+	 * @param stepExecution {@link StepExecution} instance.
 	 * @return the next {@link Step} (or null if this is the end)
-	 * @throws org.springframework.batch.core.job.flow.FlowExecutionException
+	 * @throws FlowExecutionException thrown if error occurs during nextState processing.
 	 */
 	protected State nextState(String stateName, FlowExecutionStatus status, StepExecution stepExecution) throws FlowExecutionException {
 		Set<StateTransition> set = transitionMap.get(stateName);

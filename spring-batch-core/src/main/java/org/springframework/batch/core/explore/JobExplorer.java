@@ -74,7 +74,7 @@ public interface JobExplorer {
 	StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
 
 	/**
-	 * @param instanceId
+	 * @param instanceId {@link Long} id for the jobInstance to obtain.
 	 * @return the {@link JobInstance} with this id, or null
 	 */
 	JobInstance getJobInstance(Long instanceId);
@@ -113,10 +113,10 @@ public interface JobExplorer {
 	 * Fetch {@link JobInstance} values in descending order of creation (and
 	 * there for usually of first execution) with a 'like'/wildcard criteria.
 	 * 
-	 * @param jobName
-	 * @param start
-	 * @param count
-	 * @return a list of {@link JobInstance} for the job name requested
+	 * @param jobName the name of the job to query for.
+	 * @param start the start index of the instances to return.
+	 * @param count the maximum number of instances to return.
+	 * @return a list of {@link JobInstance} for the job name requested.
 	 */
 	List<JobInstance> findJobInstancesByJobName(String jobName, int start, int count);
 
@@ -127,7 +127,9 @@ public interface JobExplorer {
 	 * @param jobName the name of the job to query for
 	 * @return the number of {@link JobInstance}s that exist within the
 	 * associated job repository
-	 * @throws NoSuchJobException
+	 *
+	 * @throws NoSuchJobException thrown when there is no {@link JobInstance}
+	 * for the jobName specified.
 	 */
 	int getJobInstanceCount(String jobName) throws NoSuchJobException;
 

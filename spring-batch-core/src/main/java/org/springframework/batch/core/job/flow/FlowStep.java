@@ -49,6 +49,8 @@ public class FlowStep extends AbstractStep {
 	/**
 	 * Constructor for a {@link FlowStep} that sets the flow and of the step
 	 * explicitly.
+	 *
+	 * @param flow the {@link Flow} instance to be associated with this step.
 	 */
 	public FlowStep(Flow flow) {
 		super(flow.getName());

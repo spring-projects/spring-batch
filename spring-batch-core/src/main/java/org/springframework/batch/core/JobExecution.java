@@ -86,6 +86,10 @@ public class JobExecution extends Entity {
 	 * constructor is the only valid one from a modeling point of view.
 	 *
 	 * @param job the job of which this execution is a part
+	 * @param id {@link Long} that represents the id for the JobExecution.
+	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
+	 * @param jobConfigurationName {@link String} instance that represents the
+	 * job configuration name.
 	 */
 	public JobExecution(JobInstance job, Long id, JobParameters jobParameters, String jobConfigurationName) {
 		super(id);
@@ -106,6 +110,7 @@ public class JobExecution extends Entity {
 	 * Constructor for transient (unsaved) instances.
 	 *
 	 * @param job the enclosing {@link JobInstance}
+	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
 		this(job, null, jobParameters, null);
@@ -181,7 +186,7 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * @param exitStatus
+	 * @param exitStatus {@link ExitStatus} instance to be used for job execution.
 	 */
 	public void setExitStatus(ExitStatus exitStatus) {
 		this.exitStatus = exitStatus;
@@ -213,6 +218,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Register a step execution with the current job execution.
 	 * @param stepName the name of the step the new execution is associated with
+	 * @return {@link StepExecution} instance created by this method.
 	 */
 	public StepExecution createStepExecution(String stepName) {
 		StepExecution stepExecution = new StepExecution(stepName, this);
@@ -224,6 +230,7 @@ public class JobExecution extends Entity {
 	 * Test if this {@link JobExecution} indicates that it is running. It should
 	 * be noted that this does not necessarily mean that it has been persisted
 	 * as such yet.
+	 *
 	 * @return true if the end time is null
 	 */
 	public boolean isRunning() {
@@ -310,7 +317,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Set the last time this JobExecution was updated.
 	 *
-	 * @param lastUpdated
+	 * @param lastUpdated {@link Date} instance to mark job execution's lastUpdated attribute.
 	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -323,7 +330,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Add the provided throwable to the failure exception list.
 	 *
-	 * @param t
+	 * @param t {@link Throwable} instance to be added failure exception list.
 	 */
 	public synchronized void addFailureException(Throwable t) {
 		this.failureExceptions.add(t);
@@ -348,7 +355,12 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Deserialize and ensure transient fields are re-instantiated when read
-	 * back
+	 * back.
+	 *
+	 * @param stream instance of {@link ObjectInputStream}.
+	 *
+	 * @throws IOException thrown if error occurs during read.
+	 * @throws ClassNotFoundException thrown if class is not found.
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();

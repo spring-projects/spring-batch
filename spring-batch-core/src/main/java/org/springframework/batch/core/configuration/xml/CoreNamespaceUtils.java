@@ -181,7 +181,7 @@ public class CoreNamespaceUtils {
 	 * Should this element be treated as incomplete? If it has a parent or is
 	 * abstract, then it may not have all properties.
 	 *
-	 * @param element
+	 * @param element to be evaluated.
 	 * @return TRUE if the element is abstract or has a parent
 	 */
 	public static boolean isUnderspecified(Element element) {
@@ -189,7 +189,7 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * @param element
+	 * @param element to be evaluated.
 	 * @return TRUE if the element is abstract
 	 */
 	public static boolean isAbstract(Element element) {

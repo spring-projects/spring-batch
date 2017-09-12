@@ -73,6 +73,8 @@ public class JsrXmlApplicationContext extends GenericApplicationContext {
 
 	/**
 	 * Set whether to use XML validation. Default is <code>true</code>.
+	 *
+	 * @param validating true if XML should be validated.
 	 */
 	public void setValidating(boolean validating) {
 		this.reader.setValidating(validating);

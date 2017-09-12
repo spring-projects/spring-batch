@@ -63,6 +63,7 @@ public class PartitionParser {
 
 	/**
 	 * @param stepName the name of the step that is being partitioned
+	 * @param allowStartIfComplete  boolean to establish the allowStartIfComplete property for parition properties.
 	 */
 	public PartitionParser(String stepName, boolean allowStartIfComplete) {
 		this.name = stepName;

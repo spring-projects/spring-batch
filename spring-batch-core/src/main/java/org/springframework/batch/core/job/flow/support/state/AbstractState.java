@@ -29,7 +29,7 @@ public abstract class AbstractState implements State {
 	private final String name;
 
 	/**
-	 *
+	 * @param name to be used by the state.
 	 */
 	public AbstractState(String name) {
 		this.name = name;

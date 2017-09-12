@@ -83,6 +83,8 @@ public class StepSynchronizationManager {
 	 * context is available in the enclosing block.
 	 *
 	 * @param stepExecution the step context to register
+	 * @param propertyContext an instance of {@link BatchPropertyContext} to be
+	 * used by the StepSynchronizationManager.
 	 * @return a new {@link StepContext} or the current one if it has the same
 	 * {@link StepExecution}
 	 */

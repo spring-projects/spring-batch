@@ -44,7 +44,7 @@ public class StepContribution implements Serializable {
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 	/**
-	 * @param execution
+	 * @param execution {@link StepExecution} instance to be used by the step contribution.
 	 */
 	public StepContribution(StepExecution execution) {
 		this.parentSkipCount = execution.getSkipCount();
@@ -53,7 +53,7 @@ public class StepContribution implements Serializable {
 	/**
 	 * Set the {@link ExitStatus} for this contribution.
 	 *
-	 * @param status
+	 * @param status {@link ExitStatus} instance to be used to set the exit status.
 	 */
 	public void setExitStatus(ExitStatus status) {
 		this.exitStatus = status;
@@ -70,6 +70,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items processed.
+	 *
+	 * @param count int used to set the increment filter count.
 	 */
 	public void incrementFilterCount(int count) {
 		filterCount += count;
@@ -84,6 +86,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items written.
+	 *
+	 * @param count int used to increment the write count.
 	 */
 	public void incrementWriteCount(int count) {
 		writeCount += count;
@@ -109,6 +113,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the filter counter.
+	 *
 	 * @return the filter counter
 	 */
 	public int getFilterCount() {
@@ -141,6 +146,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the read skip count for this contribution
+	 *
+	 * @param count int used to increment the read skip count.
 	 */
 	public void incrementReadSkipCount(int count) {
 		readSkipCount += count;
@@ -176,6 +183,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the process skip count.
+	 *
 	 * @return the process skip count
 	 */
 	public int getProcessSkipCount() {

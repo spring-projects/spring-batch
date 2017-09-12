@@ -84,7 +84,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * Register some {@link StepListener}s with the handler. Each will get the
 	 * callbacks in the order specified at the correct stage.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link StepListener} instances.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
 		for (StepListener listener : listeners) {
@@ -111,7 +111,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * @param item the input item
 	 * @return the result of the processing
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	protected final O doProcess(I item) throws Exception {
 
@@ -137,8 +137,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Surrounds the actual write call with listener callbacks.
 	 *
-	 * @param items
-	 * @throws Exception
+	 * @param items list of items to be written.
+	 * @throws Exception thrown if error occurs.
 	 */
 	protected final void doWrite(List<O> items) throws Exception {
 
@@ -161,15 +161,25 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Call the listener's after write method.
 	 *
-	 * @param items
+	 * @param items list of items that will be passed to {@link MulticasterBatchListener#afterWrite(List)}.
 	 */
 	protected final void doAfterWrite(List<O> items) {
 		listener.afterWrite(items);
 	}
+
+	/**
+	 * Call listener's writerError method.
+	 * @param e exception that occured.
+	 * @param items list of items that will be passed to {@link MulticasterBatchListener#onWriteError(Exception, List)}.
+	 */
 	protected final void doOnWriteError(Exception e, List<O> items) {
 		listener.onWriteError(e, items);
 	}
 
+	/**
+	 * @param items list of items to be written.
+	 * @throws Exception thrown if error occurs.
+	 */
 	protected void writeItems(List<O> items) throws Exception {
 		if (itemWriter != null) {
 			itemWriter.write(items);

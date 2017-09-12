@@ -236,6 +236,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Setter for number of rollbacks for this execution
+	 * @param rollbackCount int used to set the rollbackCount.
 	 */
 	public void setRollbackCount(int rollbackCount) {
 		this.rollbackCount = rollbackCount;
@@ -308,7 +309,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @param exitStatus
+	 * @param exitStatus {@link ExitStatus} instance used to establish the exit status.
 	 */
 	public void setExitStatus(ExitStatus exitStatus) {
 		this.exitStatus = exitStatus;
@@ -345,7 +346,7 @@ public class StepExecution extends Entity {
 	 * called. Synchronizes access to the {@link StepExecution} so that changes
 	 * are atomic.
 	 *
-	 * @param contribution
+	 * @param contribution {@link StepContribution} instance used to update the StepExecution state.
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		readSkipCount += contribution.getReadSkipCount();
@@ -423,7 +424,7 @@ public class StepExecution extends Entity {
 	/**
 	 * Set the number of records skipped on read
 	 *
-	 * @param readSkipCount
+	 * @param readSkipCount int containing read skip count to be used for the step execution.
 	 */
 	public void setReadSkipCount(int readSkipCount) {
 		this.readSkipCount = readSkipCount;
@@ -432,7 +433,7 @@ public class StepExecution extends Entity {
 	/**
 	 * Set the number of records skipped on write
 	 *
-	 * @param writeSkipCount
+	 * @param writeSkipCount int containing write skip count to be used for the step execution.
 	 */
 	public void setWriteSkipCount(int writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
@@ -448,7 +449,7 @@ public class StepExecution extends Entity {
 	/**
 	 * Set the number of records skipped during processing.
 	 *
-	 * @param processSkipCount
+	 * @param processSkipCount int containing process skip count to be used for the step execution.
 	 */
 	public void setProcessSkipCount(int processSkipCount) {
 		this.processSkipCount = processSkipCount;
@@ -464,7 +465,8 @@ public class StepExecution extends Entity {
 	/**
 	 * Set the time when the StepExecution was last updated before persisting
 	 *
-	 * @param lastUpdated
+	 * @param lastUpdated {@link Date} instance used to establish the last
+	 * updated date for the Step Execution.
 	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -500,7 +502,12 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Deserialize and ensure transient fields are re-instantiated when read
-	 * back
+	 * back.
+	 *
+	 * @param stream instance of {@link ObjectInputStream}.
+	 *
+	 * @throws IOException thrown if error occurs during read.
+	 * @throws ClassNotFoundException thrown if class is not found.
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();

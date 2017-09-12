@@ -42,9 +42,10 @@ public interface JobInstanceDao {
 	 * PostConditions: A valid job instance will be returned which has been
 	 * persisted and contains an unique Id.
 	 *
-	 * @param jobName
-	 * @param jobParameters
-	 * @return JobInstance
+	 * @param jobName {@link String} containing the name of the job.
+	 * @param jobParameters {@link JobParameters} containing the parameters for
+	 * the JobInstance.
+	 * @return JobInstance {@link JobInstance} instance that was created.
 	 */
 	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
 
@@ -93,6 +94,7 @@ public interface JobInstanceDao {
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs
 	 * that have ever been executed.
+	 *
 	 * @return the names of all job instances
 	 */
 	List<String> getJobNames();
@@ -101,9 +103,10 @@ public interface JobInstanceDao {
 	 * Fetch the last job instances with the provided name, sorted backwards by
 	 * primary key, using a 'like' criteria
 	 * 
-	 * @param jobName
-	 * @param start
-	 * @param count
+	 * @param jobName {@link String} containing the name of the job.
+	 * @param start int containing the offset of where list of job instances
+	 * results should begin.
+	 * @param count int containing the number of job instances to return.
 	 * @return a list of {@link JobInstance} for the job name requested.
 	 */
 	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
@@ -116,7 +119,8 @@ public interface JobInstanceDao {
 	 * @param jobName the name of the job to query for
 	 * @return the number of {@link JobInstance}s that exist within the
 	 * associated job repository
-	 * @throws NoSuchJobException
+	 *
+	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
 	int getJobInstanceCount(String jobName) throws NoSuchJobException;
 

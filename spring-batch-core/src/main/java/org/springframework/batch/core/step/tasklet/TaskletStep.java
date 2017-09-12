@@ -110,7 +110,7 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * @param name
+	 * @param name the name for the {@link TaskletStep}
 	 */
 	public TaskletStep(String name) {
 		super(name);
@@ -200,7 +200,7 @@ public class TaskletStep extends AbstractStep {
 	 * Register a single {@link ItemStream} for callbacks to the stream
 	 * interface.
 	 *
-	 * @param stream
+	 * @param stream instance of {@link ItemStream}
 	 */
 	public void registerStream(ItemStream stream) {
 		this.stream.register(stream);

@@ -83,7 +83,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Set the name property. Always overrides the default value if this object is a Spring bean.
-	 *
+	 * @param name the name to use for the {@link Step}.
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setName(String name) {

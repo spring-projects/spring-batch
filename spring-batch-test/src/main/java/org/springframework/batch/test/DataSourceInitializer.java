@@ -69,7 +69,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	/**
 	 * Main method as convenient entry point.
 	 * 
-	 * @param args
+	 * @param args arguments to be passed to main.
 	 */
 	@SuppressWarnings("resource")
 	public static void main(String... args) {

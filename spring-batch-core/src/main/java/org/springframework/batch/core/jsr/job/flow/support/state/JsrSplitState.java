@@ -38,7 +38,7 @@ public class JsrSplitState extends org.springframework.batch.core.job.flow.suppo
 
 	/**
 	 * @param flows {@link Flow}s to be executed in parallel
-	 * @param name
+	 * @param name the name to be associated with the split state.
 	 */
 	public JsrSplitState(Collection<Flow> flows, String name) {
 		super(flows, name);

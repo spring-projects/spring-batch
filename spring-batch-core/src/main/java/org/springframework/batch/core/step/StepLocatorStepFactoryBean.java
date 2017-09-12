@@ -34,14 +34,14 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 	public String stepName;
 
 	/**
-	 * @param stepLocator
+	 * @param stepLocator instance of {@link StepLocator} to be used by the factory bean.
 	 */
 	public void setStepLocator(StepLocator stepLocator) {
 		this.stepLocator = stepLocator;
 	}
 
 	/**
-	 * @param stepName
+	 * @param stepName the name to be associated with the step.
 	 */
 	public void setStepName(String stepName) {
 		this.stepName = stepName;

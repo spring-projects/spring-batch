@@ -213,10 +213,12 @@ public class FlowParser extends AbstractFlowParser {
 	 * "no restriction" (same as "*").
 	 * @param next The state to which this transition should go. Use null if not
 	 * applicable.
+	 * @param restart The restart attribute this transition will set.
 	 * @param exitCode The exit code that this transition will set. Use null to
 	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
+	 * @param abandon the abandon state this transition will set.
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references

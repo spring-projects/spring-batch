@@ -157,7 +157,7 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 	}
 
 	/**
-	 * @param executor
+	 * @param executor instance of {@link TaskExecutor} to be used.
 	 * @return builder for fluent chaining
 	 */
 	public JobFlowBuilder.SplitBuilder<FlowJobBuilder> split(TaskExecutor executor) {

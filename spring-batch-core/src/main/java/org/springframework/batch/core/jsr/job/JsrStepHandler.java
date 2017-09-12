@@ -47,7 +47,8 @@ public class JsrStepHandler extends SimpleStepHandler {
 	private JobExplorer jobExplorer;
 
 	/**
-	 * @param jobRepository
+	 * @param jobRepository instance of {@link JobRepository}.
+	 * @param jobExplorer instance of {@link JobExplorer}.
 	 */
 	public JsrStepHandler(JobRepository jobRepository, JobExplorer jobExplorer) {
 		super(jobRepository, new ExecutionContext());
@@ -65,8 +66,8 @@ public class JsrStepHandler extends SimpleStepHandler {
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
-	 * @param jobExecution
-	 * @param step
+	 * @param jobExecution instance of {@link JobExecution}
+	 * @param step instance of {@link Step}
 	 *
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step

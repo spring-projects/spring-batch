@@ -294,7 +294,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * @param transitionElement The element to parse
 	 * @param patterns a list of patterns on state transitions for this element
-	 * @param element
+	 * @param element {@link Element} representing the source.
 	 * @param parserContext the parser context for the bean factory
 	 */
 	protected static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
@@ -342,6 +342,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
+	 * @param abandon the abandon flag to be used by the transition.
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references

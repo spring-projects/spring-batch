@@ -36,7 +36,8 @@ public class JsrJobExecution implements javax.batch.runtime.JobExecution {
 	private JobParametersConverter parametersConverter;
 
 	/**
-	 * @param execution for all information to be delegated from
+	 * @param execution for all information to be delegated from.
+	 * @param parametersConverter instance of {@link JobParametersConverter}.
 	 */
 	public JsrJobExecution(org.springframework.batch.core.JobExecution execution, JobParametersConverter parametersConverter) {
 		Assert.notNull(execution, "A JobExecution is required");

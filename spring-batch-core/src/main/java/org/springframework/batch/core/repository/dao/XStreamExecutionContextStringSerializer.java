@@ -82,8 +82,10 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	/**
 	 * Serializes the passed execution context to the supplied OutputStream.
 	 *
-	 * @param context
-	 * @param out
+	 * @param context {@link Map} containing the context information.
+	 * @param out {@link OutputStream} where the serialized context information
+	 * will be written.
+	 *
 	 * @see Serializer#serialize(Object, OutputStream)
 	 */
 	@Override
@@ -97,7 +99,8 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 	/**
 	 * Deserializes the supplied input stream into a new execution context.
 	 *
-	 * @param in
+	 * @param in {@link InputStream} containing the information to be deserialized.
+
 	 * @return a reconstructed execution context
 	 * @see Deserializer#deserialize(InputStream)
 	 */

@@ -26,8 +26,8 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	private final FlowExecutionStatus status;
 
 	/**
-	 * @param name
-	 * @param status
+	 * @param name the flow execution name to be associated with the FlowExecution.
+	 * @param status the {@link FlowExecutionStatus} to be associated with the FlowExecution.
 	 */
 	public FlowExecution(String name, FlowExecutionStatus status) {
 		this.name = name;
@@ -54,7 +54,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	 *
 	 * @see Comparable#compareTo(Object)
 	 *
-	 * @param other
+	 * @param other the {@link FlowExecution} instance to compare with this instance.
 	 * @return negative, zero or positive as per the contract
 	 */
 	@Override

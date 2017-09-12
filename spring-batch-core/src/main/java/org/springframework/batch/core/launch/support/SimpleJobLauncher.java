@@ -84,7 +84,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * re-start is either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if this instance has already
 	 * completed successfully
-	 * @throws JobParametersInvalidException
+	 * @throws JobParametersInvalidException thrown if jobParameters is invalid.
 	 */
 	@Override
 	public JobExecution run(final Job job, final JobParameters jobParameters)
@@ -175,7 +175,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	/**
 	 * Set the JobRepsitory.
 	 *
-	 * @param jobRepository
+	 * @param jobRepository instance of {@link JobRepository}.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -184,7 +184,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	/**
 	 * Set the TaskExecutor. (Optional)
 	 *
-	 * @param taskExecutor
+	 * @param taskExecutor instance of {@link TaskExecutor}.
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;

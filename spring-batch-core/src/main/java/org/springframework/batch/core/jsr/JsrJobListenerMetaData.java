@@ -78,7 +78,7 @@ public enum JsrJobListenerMetaData implements ListenerMetaData {
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 *
-	 * @param propertyName
+	 * @param propertyName the name of the property to return.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static JsrJobListenerMetaData fromPropertyName(String propertyName){

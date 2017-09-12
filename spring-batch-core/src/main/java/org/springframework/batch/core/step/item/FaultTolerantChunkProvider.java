@@ -63,10 +63,10 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	/**
 	 * The policy that determines whether exceptions can be skipped on read.
-	 * @param SkipPolicy
+	 * @param skipPolicy instance of {@link SkipPolicy} to be used by FaultTolerantChunkProvider.
 	 */
-	public void setSkipPolicy(SkipPolicy SkipPolicy) {
-		this.skipPolicy = SkipPolicy;
+	public void setSkipPolicy(SkipPolicy skipPolicy) {
+		this.skipPolicy = skipPolicy;
 	}
 
 	/**

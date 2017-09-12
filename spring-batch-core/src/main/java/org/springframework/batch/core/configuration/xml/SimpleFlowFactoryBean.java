@@ -94,7 +94,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	/**
 	 * Check mandatory properties (name).
 	 *
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {

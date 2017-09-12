@@ -35,7 +35,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link StepExecutionListener}s to be called when step execution events occur.
 	 */
 	public void setListeners(StepExecutionListener[] listeners) {
 		list.setItems(Arrays.asList(listeners));
@@ -44,7 +44,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param stepExecutionListener
+	 * @param stepExecutionListener instance of {@link StepExecutionListener} to be called when step execution events occur.
 	 */
 	public void register(StepExecutionListener stepExecutionListener) {
 		list.add(stepExecutionListener);

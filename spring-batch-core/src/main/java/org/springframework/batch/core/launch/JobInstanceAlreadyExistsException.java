@@ -31,14 +31,16 @@ public class JobInstanceAlreadyExistsException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
+	 *
+	 * @param msg The message to send to caller.
 	 */
 	public JobInstanceAlreadyExistsException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg The message to send to caller
-	 * @param e the cause of the exception
+	 * @param msg The message to send to caller.
+	 * @param e the cause of the exception.
 	 */
 	public JobInstanceAlreadyExistsException(String msg, Throwable e) {
 		super(msg, e);

@@ -125,7 +125,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 *
-	 * @param propertyName
+	 * @param propertyName name of the {@link StepListenerMetaData} to retrieve.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static StepListenerMetaData fromPropertyName(String propertyName){

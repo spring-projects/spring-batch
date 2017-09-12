@@ -48,6 +48,7 @@ public class EndState extends AbstractState {
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
+	 * @param code The exit status to save
 	 */
 	public EndState(FlowExecutionStatus status, String code, String name) {
 		this(status, code, name, false);
@@ -56,6 +57,7 @@ public class EndState extends AbstractState {
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
+	 * @param code The exit status to save
 	 * @param abandon flag to indicate that previous step execution can be
 	 * marked as abandoned (if there is one)
 	 *

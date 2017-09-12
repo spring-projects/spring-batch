@@ -63,21 +63,29 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
+	 *
+	 * @throws Exception thrown if error occurs creating JobInstanceDao.
 	 */
 	protected abstract JobInstanceDao createJobInstanceDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link JobExecutionDao} implementation.
+	 *
+	 * @throws Exception thrown if error occurs creating JobExecutionDao.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link StepExecutionDao} implementation.
+	 *
+	 * @throws Exception thrown if error occurs creating StepExecutionDao.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link ExecutionContextDao} implementation.
+	 *
+	 * @throws Exception thrown if error occurs creating ExecutionContextDao.
 	 */
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
