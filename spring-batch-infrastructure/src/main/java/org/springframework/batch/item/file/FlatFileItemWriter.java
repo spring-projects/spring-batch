@@ -221,8 +221,7 @@ InitializingBean {
 	 * headerCallback will be called before writing the first item to file.
 	 * Newline will be automatically appended after the header is written.
 	 *
-	 * @param headerCallback {@link FlatFileHeaderCallback} to be used after
-	 * header is written.
+	 * @param headerCallback {@link FlatFileHeaderCallback} to generate the header
 	 *
 	 */
 	public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
@@ -233,8 +232,7 @@ InitializingBean {
 	 * footerCallback will be called after writing the last item to file, but
 	 * before the file is closed.
 	 *
-	 * @param footerCallback {@link FlatFileFooterCallback} to be used after
-	 * footer is written.
+	 * @param footerCallback {@link FlatFileFooterCallback} to generate the footer
 	 *
 	 */
 	public void setFooterCallback(FlatFileFooterCallback footerCallback) {

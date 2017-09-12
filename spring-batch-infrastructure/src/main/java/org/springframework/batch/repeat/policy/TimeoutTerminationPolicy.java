@@ -52,7 +52,7 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 	 * Construct a {@link TimeoutTerminationPolicy} with the specified timeout
 	 * value (in milliseconds).
 	 * 
-	 * @param timeout the milliseconds to be used for the timeout.
+	 * @param timeout durration of the timeout.
 	 */
 	public TimeoutTerminationPolicy(long timeout) {
 		super();

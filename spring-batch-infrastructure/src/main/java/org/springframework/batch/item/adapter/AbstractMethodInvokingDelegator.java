@@ -53,7 +53,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 *
 	 * @return object returned by invoked method
 	 *
-	 * @throws Exception if the {@link MethodInvoker} used, throws an Exception.
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethod() throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -67,7 +67,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @param object argument for the target method
 	 * @return object returned by target method
 	 *
-	 * @throws Exception if the {@link MethodInvoker} used throws exception
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -81,7 +81,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @param args arguments for the invoked method
 	 * @return object returned by invoked method
 	 *
-	 * @throws Exception if the {@link MethodInvoker} used, throws an exception
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArguments(Object[] args) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);

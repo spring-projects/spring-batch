@@ -62,8 +62,9 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	/**
 	 * Should the processor filter invalid records instead of skipping them?
 	 * 
-	 * @param filter true if filter is to return null or false if filter is to
-	 * throw a {@link ValidationException}.
+	 * @param filter if set to {@code true}, items that fail validation are filtered
+	 * ({@code null} is returned).  Otherwise, a {@link ValidationException} will be
+	 * thrown.
 	 */
 	public void setFilter(boolean filter) {
 		this.filter = filter;

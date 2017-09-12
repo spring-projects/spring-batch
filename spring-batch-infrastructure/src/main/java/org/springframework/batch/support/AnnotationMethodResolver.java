@@ -29,7 +29,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * MethodResolver implementation that finds a <em>single</em> Method on the
+ * {@link MethodResolver} implementation that finds a <em>single</em> Method on the
  * given Class that contains the specified annotation type.
  * 
  * @author Mark Fisher
@@ -40,7 +40,7 @@ public class AnnotationMethodResolver implements MethodResolver {
 
 
 	/**
-	 * Create a MethodResolver for the specified Method-level annotation type.
+	 * Create a {@link MethodResolver} for the specified Method-level annotation type.
 	 *
 	 * @param annotationType establish the annotation to be used.
 	 */

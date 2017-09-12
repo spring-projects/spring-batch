@@ -102,8 +102,8 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	 * After this limit is exceeded the next chunk will be written into newly
 	 * created resource.
 	 *
-	 * @param itemCountLimitPerResource int containing the limit to determine
-	 * when the next chunk will be written to a newly created resource.
+	 * @param itemCountLimitPerResource int item threshold used to determine when a new
+	 * resource should be created.
 	 */
 	public void setItemCountLimitPerResource(int itemCountLimitPerResource) {
 		this.itemCountLimitPerResource = itemCountLimitPerResource;
@@ -133,8 +133,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 
 	/**
-	 * Establishes that state of each resource is saved to the context when
-	 * update is called.
+	 * Indicates that the state of the reader will be saved after each commit.
 	 *
 	 * @param saveState true the state is saved.
 	 */

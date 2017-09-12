@@ -58,7 +58,8 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Initializes a new execution context with the contents of another executionContext.
+	 * Initializes a new {@link ExecutionContext} with the contents of another
+	 * {@code ExecutionContext}.
 	 *
 	 * @param executionContext containing the entries to be copied to this current context.
 	 */

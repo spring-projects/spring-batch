@@ -70,7 +70,7 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 	 * Sets the delete flag to have the item writer perform deletes
 	 *
 	 * @param delete if true {@link ItemWriter} will perform deletes,
-	 * if False not to perform deletes.
+	 * 		if false not to perform deletes.
 	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;

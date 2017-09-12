@@ -667,7 +667,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	/**
 	 * Retrieve the index of where a specified column is located based on the
-	 * name parameter.
+	 * {@code name} parameter.
 	 *
 	 * @param name the value to search in the {@link List} of names.
 	 * @return the index in the {@link List} of names where the name was found.

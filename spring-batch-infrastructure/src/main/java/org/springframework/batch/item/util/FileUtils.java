@@ -43,11 +43,6 @@ public final class FileUtils {
 	 * @param append true signals input file may already exist (but doesn't have to)
 	 * @param overwriteOutputFile If set to true, output file will be overwritten (this flag is ignored when processing
 	 * is restart)
-	 * 
-	 * @throws IllegalArgumentException when file is null
-	 * @throws ItemStreamException when starting output file processing, file exists and flag "overwriteOutputFile" is
-	 * set to false
-	 * @throws ItemStreamException when unable to create file or file is not writable
 	 */
 	public static void setUpOutputFile(File file, boolean restarted, boolean append, boolean overwriteOutputFile) {
 

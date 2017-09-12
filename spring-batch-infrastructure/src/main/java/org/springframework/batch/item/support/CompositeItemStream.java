@@ -34,7 +34,7 @@ public class CompositeItemStream implements ItemStream {
 	private List<ItemStream> streams = new ArrayList<ItemStream>();
 
 	/**
-	 * Public setter for the streams.
+	 * Public setter for the {@link ItemStream}s.
 	 * 
 	 * @param streams array of {@link ItemStream}.
 	 */

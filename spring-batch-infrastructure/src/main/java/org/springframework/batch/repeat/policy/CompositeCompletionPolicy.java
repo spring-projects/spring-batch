@@ -40,7 +40,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * Setter for the policies.
 	 * 
 	 * @param policies an array of completion policies to be used to determine
-	 *  isComplete by consensus.
+	 *  {@link #isComplete(RepeatContext)}  by consensus.
 	 */
 	public void setPolicies(CompletionPolicy[] policies) {
 		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[policies.length]);

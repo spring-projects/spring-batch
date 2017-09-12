@@ -185,7 +185,7 @@ public class MethodInvokerUtils {
 	 * @param target an object to search for an appropriate method.
 	 * @param <C> the class.
 	 * @param <T> the type.
-	 * @return a MethodInvoker that calls a method on the delegate.
+	 * @return a {@link MethodInvoker} that calls a method on the delegate.
 	 */
 	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object target) {
 		final AtomicReference<Method> methodHolder = new AtomicReference<>();

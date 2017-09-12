@@ -44,7 +44,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 	private String lineEnding = DEFAULT_LINE_ENDING;
 
 	/**
-	 * @param lineEnding {@link String} contains the line ending to use.
+	 * @param lineEnding {@link String} indicating what defines the end of a "line".
 	 */
 	public void setLineEnding(String lineEnding) {
 		this.lineEnding = lineEnding;

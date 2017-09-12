@@ -467,7 +467,7 @@ public class RepeatTemplate implements RepeatOperations {
 	/**
 	 * Delegate to the {@link CompletionPolicy}.
 	 *
-	 * @return a RepeatContext object that can be used by the implementation to store
+	 * @return a {@link RepeatContext} object that can be used by the implementation to store
 	 * internal state for a batch step.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
