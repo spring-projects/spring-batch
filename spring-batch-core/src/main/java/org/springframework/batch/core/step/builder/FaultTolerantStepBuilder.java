@@ -185,7 +185,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		registerSkipListeners();
 		ChunkProvider<I> chunkProvider = createChunkProvider();
 		ChunkProcessor<I> chunkProcessor = createChunkProcessor();
-		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
+		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
 		return tasklet;
 	}
@@ -452,7 +452,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		chunkProvider.setMaxSkipsOnRead(Math.max(getChunkSize(), FaultTolerantChunkProvider.DEFAULT_MAX_SKIPS_ON_READ));
 		chunkProvider.setSkipPolicy(readSkipPolicy);
 		chunkProvider.setRollbackClassifier(getRollbackClassifier());
-		ArrayList<StepListener> listeners = new ArrayList<StepListener>(getItemListeners());
+		ArrayList<StepListener> listeners = new ArrayList<>(getItemListeners());
 		listeners.addAll(skipListeners);
 		chunkProvider.setListeners(listeners);
 
@@ -464,7 +464,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 		BatchRetryTemplate batchRetryTemplate = createRetryOperations();
 
-		FaultTolerantChunkProcessor<I, O> chunkProcessor = new FaultTolerantChunkProcessor<I, O>(getProcessor(),
+		FaultTolerantChunkProcessor<I, O> chunkProcessor = new FaultTolerantChunkProcessor<>(getProcessor(),
 				getWriter(), batchRetryTemplate);
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 		chunkProcessor.setProcessorTransactional(processorTransactional);
