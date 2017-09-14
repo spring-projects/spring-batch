@@ -17,13 +17,13 @@ package org.springframework.batch.core.step.builder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.junit.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
@@ -39,12 +39,10 @@ import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -66,13 +64,7 @@ public class StepBuilderTests {
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
-				.transactionManager(transactionManager).tasklet(new Tasklet() {
-					@Override
-					public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-							throws Exception {
-						return null;
-					}
-				});
+				.transactionManager(transactionManager).tasklet((contribution, chunkContext) -> null);
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
@@ -88,13 +80,7 @@ public class StepBuilderTests {
 											 .transactionManager(transactionManager)
 											 .listener(new InterfaceBasedStepExecutionListener())
 											 .listener(new AnnotationBasedStepExecutionListener())
-											 .tasklet(new Tasklet() {
-												 @Override
-												 public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-														 throws Exception {
-													 return null;
-												 }
-											 });
+											 .tasklet((contribution, chunkContext) -> null);
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, InterfaceBasedStepExecutionListener.beforeStepCount);
@@ -140,6 +126,41 @@ public class StepBuilderTests {
 		assertEquals(1, AnnotationBasedStepExecutionListener.afterWriteCount);
 		assertEquals(2, AnnotationBasedStepExecutionListener.beforeChunkCount);
 		assertEquals(2, AnnotationBasedStepExecutionListener.afterChunkCount);
+	}
+
+	@Test
+	public void testFunctions() throws Exception {
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		jobRepository.add(execution);
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		List<Long> items = new ArrayList<Long>() {{
+			add(1L);
+			add(2L);
+			add(3L);
+		}};
+
+		ItemReader<Long> reader = new ListItemReader<>(items);
+
+		ListItemWriter<String> itemWriter = new ListItemWriter<>();
+		@SuppressWarnings("unchecked")
+		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
+											 .repository(jobRepository)
+											 .transactionManager(transactionManager)
+											 .<Object, String>chunk(3)
+											 .reader(reader)
+											 .processor((Function<Object, String>) s -> s.toString())
+											 .writer(itemWriter)
+											 .listener(new AnnotationBasedStepExecutionListener());
+		builder.build().execute(execution);
+
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+
+		List<? extends String> writtenItems = itemWriter.getWrittenItems();
+		assertEquals("1", writtenItems.get(0));
+		assertEquals("2", writtenItems.get(1));
+		assertEquals("3", writtenItems.get(2));
 	}
 
 	public static class InterfaceBasedStepExecutionListener implements StepExecutionListener {
