@@ -91,7 +91,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	}
 
 	static{
-		propertyMap = new HashMap<String, StepListenerMetaData>();
+		propertyMap = new HashMap<>();
 		for(StepListenerMetaData metaData : values()){
 			propertyMap.put(metaData.getPropertyName(), metaData);
 		}
@@ -125,7 +125,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 *
-	 * @param propertyName name of the {@link StepListenerMetaData} to retrieve.
+	 * @param propertyName property name to retrieve data for.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static StepListenerMetaData fromPropertyName(String propertyName){

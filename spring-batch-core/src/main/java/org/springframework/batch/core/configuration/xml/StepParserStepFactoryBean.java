@@ -16,6 +16,23 @@
 
 package org.springframework.batch.core.configuration.xml;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.batch.api.chunk.listener.RetryProcessListener;
+import javax.batch.api.chunk.listener.RetryReadListener;
+import javax.batch.api.chunk.listener.RetryWriteListener;
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.api.partition.PartitionCollector;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
@@ -78,23 +95,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
-
-import javax.batch.api.chunk.listener.RetryProcessListener;
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.api.chunk.listener.RetryWriteListener;
-import javax.batch.api.chunk.listener.SkipProcessListener;
-import javax.batch.api.chunk.listener.SkipReadListener;
-import javax.batch.api.chunk.listener.SkipWriteListener;
-import javax.batch.api.partition.PartitionCollector;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
@@ -757,7 +757,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * Public setter for {@link JobRepository}.
 	 *
-	 * @param jobRepository {@link JobRepository} instance to be used by the factory bean.
+	 * @param jobRepository {@link JobRepository} instance to be used by the step.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -775,7 +775,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * A preconfigured {@link Tasklet} to use.
 	 *
-	 * @param tasklet {@link Tasklet} instance to be used by the factory bean.
+	 * @param tasklet {@link Tasklet} instance to be used by step.
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
@@ -787,7 +787,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * @return transactionManager instance of {@link PlatformTransactionManager}
-	 * used by the factory bean.
+	 * used by the step.
 	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
@@ -1137,28 +1137,28 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * @param hasChunkElement true if step has &lt;chunk&gt; element.
+	 * @param hasChunkElement true if step has &lt;chunk/&gt; element.
 	 */
 	public void setHasChunkElement(boolean hasChunkElement) {
 		this.hasChunkElement = hasChunkElement;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;chunk&gt; element
+	 * @return true if the defined step has a &lt;chunk/&gt; element
 	 */
 	protected boolean hasChunkElement() {
 		return this.hasChunkElement;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;tasklet&gt; element
+	 * @return true if the defined step has a &lt;tasklet/&gt; element
 	 */
 	protected boolean hasTasklet() {
 		return this.tasklet != null;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;partition&gt; element
+	 * @return true if the defined step has a &lt;partition/&gt; element
 	 */
 	protected boolean hasPartitionElement() {
 		return this.partitionHandler != null;

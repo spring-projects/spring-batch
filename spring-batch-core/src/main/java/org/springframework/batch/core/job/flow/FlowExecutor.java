@@ -67,7 +67,7 @@ public interface FlowExecutor {
 	 * Handle any status changes that might be needed in the
 	 * {@link JobExecution}.
 	 *
-	 * @param status instance of {@link FlowExecutionStatus} to be associated with FlowExecutor.
+	 * @param status status to update the {@link JobExecution} to.
 	 */
 	void updateJobExecutionStatus(FlowExecutionStatus status);
 

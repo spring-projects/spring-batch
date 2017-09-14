@@ -161,7 +161,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	/**
 	 * Call the listener's after write method.
 	 *
-	 * @param items list of items that will be passed to {@link MulticasterBatchListener#afterWrite(List)}.
+	 * @param items list of items that were just written.
 	 */
 	protected final void doAfterWrite(List<O> items) {
 		listener.afterWrite(items);
@@ -169,8 +169,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Call listener's writerError method.
-	 * @param e exception that occured.
-	 * @param items list of items that will be passed to {@link MulticasterBatchListener#onWriteError(Exception, List)}.
+	 * @param e exception that occurred.
+	 * @param items list of items that failed to be written.
 	 */
 	protected final void doOnWriteError(Exception e, List<O> items) {
 		listener.onWriteError(e, items);

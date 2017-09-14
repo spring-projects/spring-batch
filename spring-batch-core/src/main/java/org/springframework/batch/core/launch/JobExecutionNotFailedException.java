@@ -30,14 +30,14 @@ public class JobExecutionNotFailedException extends JobExecutionException {
 	/**
 	 * Create an exception with the given message.
 	 *
-	 * @param msg The message to send to the caller.
+	 * @param msg the error message.
 	 */
 	public JobExecutionNotFailedException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg The message to send to caller
+	 * @param msg the error message
 	 * @param e the cause of the exception
 	 */
 	public JobExecutionNotFailedException(String msg, Throwable e) {

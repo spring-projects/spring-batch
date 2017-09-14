@@ -46,7 +46,7 @@ public class DefaultExecutionContextSerializer implements ExecutionContextSerial
 	 * Serializes an execution context to the provided {@link OutputStream}.  The
 	 * stream is not closed prior to it's return.
 	 *
-	 * @param context {@link Map} containing the context information.
+	 * @param context {@link Map} contents of the {@code ExecutionContext}.
 	 * @param out {@link OutputStream} where the serialized context information
 	 * will be written.
 	 */

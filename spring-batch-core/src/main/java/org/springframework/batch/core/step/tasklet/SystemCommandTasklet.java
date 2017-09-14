@@ -235,7 +235,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * executing the system command if {@link #setTimeout(long)} has been
 	 * exceeded or user interrupts the job. <code>false</code> by default
 	 *
-	 * @param interruptOnCancel boolean to establish state of interruptOnCancel
+	 * @param interruptOnCancel boolean determines if process should be interrupted
 	 */
 	public void setInterruptOnCancel(boolean interruptOnCancel) {
 		this.interruptOnCancel = interruptOnCancel;

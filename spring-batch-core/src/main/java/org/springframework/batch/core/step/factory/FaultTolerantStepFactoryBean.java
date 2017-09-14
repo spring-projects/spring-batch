@@ -209,7 +209,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * @param processorTransactional boolean to set the state of the processorTransactional for the factory bean.
+	 * @param processorTransactional boolean indicates if the {@code ItemProcessor} participates in the transaction.
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
 		this.processorTransactional = processorTransactional;

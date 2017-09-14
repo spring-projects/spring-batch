@@ -44,7 +44,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param stepExecutionListener instance of {@link StepExecutionListener} to be called when step execution events occur.
+	 * @param stepExecutionListener instance of {@link StepExecutionListener} to be registered.
 	 */
 	public void register(StepExecutionListener stepExecutionListener) {
 		list.add(stepExecutionListener);

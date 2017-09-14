@@ -359,7 +359,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	/**
 	 * Explicitly request certain exceptions (and subclasses) to be skipped.
 	 *
-	 * @param type the class type.
+	 * @param type the exception type.
 	 * @return this for fluent chaining
 	 */
 	public FaultTolerantStepBuilder<I, O> skip(Class<? extends Throwable> type) {

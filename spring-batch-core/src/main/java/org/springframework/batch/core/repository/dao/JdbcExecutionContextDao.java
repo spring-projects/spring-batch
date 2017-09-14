@@ -98,7 +98,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * Default value is 2500. Clients using multi-bytes charsets on the database
 	 * server may need to reduce this value to as little as half the value of
 	 * the column size.
-	 * @param shortContextLength int containing the shortContextLength.
+	 * @param shortContextLength int max length of the short context.
 	 */
 	public void setShortContextLength(int shortContextLength) {
 		this.shortContextLength = shortContextLength;

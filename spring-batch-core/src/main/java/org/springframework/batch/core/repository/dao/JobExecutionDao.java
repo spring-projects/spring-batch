@@ -54,7 +54,7 @@ public interface JobExecutionDao {
 	 * Return all {@link JobExecution}s for given {@link JobInstance}, sorted
 	 * backwards by creation order (so the first element is the most recent).
 	 *
-	 * @param jobInstance {@link JobInstance} instance to find.
+	 * @param jobInstance parent {@link JobInstance} of the {@link JobExecution}s to find.
 	 * @return {@link List} containing JobExecutions for the jobInstance.
 	 */
 	List<JobExecution> findJobExecutions(JobInstance jobInstance);

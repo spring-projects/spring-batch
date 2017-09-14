@@ -26,7 +26,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	private final FlowExecutionStatus status;
 
 	/**
-	 * @param name the flow execution name to be associated with the FlowExecution.
+	 * @param name the flow name to be associated with the FlowExecution.
 	 * @param status the {@link FlowExecutionStatus} to be associated with the FlowExecution.
 	 */
 	public FlowExecution(String name, FlowExecutionStatus status) {

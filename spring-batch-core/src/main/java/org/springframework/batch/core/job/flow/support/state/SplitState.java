@@ -50,7 +50,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 	/**
 	 * @param flows collection of {@link Flow} instances.
-	 * @param name the name to be associated with the state.
+	 * @param name the name of the state.
 	 */
 	public SplitState(Collection<Flow> flows, String name) {
 		super(name);

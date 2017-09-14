@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core;
 
-import org.springframework.batch.item.ExecutionContext;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -29,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Batch domain object representing the execution of a job.
@@ -89,7 +89,7 @@ public class JobExecution extends Entity {
 	 * @param id {@link Long} that represents the id for the JobExecution.
 	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
 	 * @param jobConfigurationName {@link String} instance that represents the
-	 * job configuration name.
+	 * job configuration name (used with JSR-352).
 	 */
 	public JobExecution(JobInstance job, Long id, JobParameters jobParameters, String jobConfigurationName) {
 		super(id);
@@ -218,7 +218,8 @@ public class JobExecution extends Entity {
 	/**
 	 * Register a step execution with the current job execution.
 	 * @param stepName the name of the step the new execution is associated with
-	 * @return {@link StepExecution} instance created by this method.
+	 * @return {@link StepExecution} an empty {@code StepExecution} associated with this
+	 * 	{@code JobExecution}.
 	 */
 	public StepExecution createStepExecution(String stepName) {
 		StepExecution stepExecution = new StepExecution(stepName, this);

@@ -136,7 +136,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	/**
-	 * @param status instance of {@link FlowExecutionStatus}.
+	 * @param status {@link FlowExecutionStatus} to convert.
 	 * @return A {@link BatchStatus} appropriate for the {@link FlowExecutionStatus} provided
 	 */
 	protected BatchStatus findBatchStatus(FlowExecutionStatus status) {

@@ -64,7 +64,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	}
 
 	/**
-	 * @param status String containing the status to be associated with this instance.
+	 * @param status String status value.
 	 */
 	public FlowExecutionStatus(String status) {
 		this.name = status;

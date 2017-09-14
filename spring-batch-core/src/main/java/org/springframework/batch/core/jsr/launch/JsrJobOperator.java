@@ -177,7 +177,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 * @param jobExplorer an instance of Spring Batch's {@link JobExplorer}.
 	 * @param jobRepository an instance of Spring Batch's {@link JobOperator}.
 	 * @param jobParametersConverter an instance of Spring Batch's {@link JobParametersConverter}.
-	 * @param transactionManager and instance of Spring Batch's {@link javax.transaction.TransactionManager}.
+	 * @param transactionManager a {@link javax.transaction.TransactionManager}.
 	 */
 	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, JobParametersConverter jobParametersConverter, PlatformTransactionManager transactionManager) {
 		Assert.notNull(jobExplorer, "A JobExplorer is required");
@@ -719,7 +719,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 *
 	 * @param executionId the database id for the {@link JobExecution} to be stopped.
 	 * @throws NoSuchJobExecutionException thrown if {@link JobExecution} instance does not exist.
-	 * @throws JobExecutionNotRunningException thrownif {@link JobExecution} is not running.
+	 * @throws JobExecutionNotRunningException thrown if {@link JobExecution} is not running.
 	 */
 	@Override
 	public void stop(long executionId) throws NoSuchJobExecutionException,

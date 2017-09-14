@@ -236,7 +236,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Setter for number of rollbacks for this execution
-	 * @param rollbackCount int used to set the rollbackCount.
+	 * @param rollbackCount int the number of rollbacks.
 	 */
 	public void setRollbackCount(int rollbackCount) {
 		this.rollbackCount = rollbackCount;

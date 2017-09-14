@@ -18,7 +18,6 @@ package org.springframework.batch.core.listener;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.core.Ordered;
 
@@ -43,7 +42,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param itemWriteListener list of {@link ItemWriteListener}s to be called when write events occur.
+	 * @param itemWriteListener list of {@link ItemWriteListener}s to be registered.
 	 */
 	public void register(ItemWriteListener<? super S> itemWriteListener) {
 		listeners.add(itemWriteListener);

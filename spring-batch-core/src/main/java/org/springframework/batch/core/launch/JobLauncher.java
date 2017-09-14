@@ -48,7 +48,7 @@ public interface JobLauncher {
 	 * JobExecution will be returned, and the status will need to be inspected.
 	 *
 	 * @param job the job to be executed.
-	 * @param jobParameters the parameters to be associated with the job.
+	 * @param jobParameters the parameters passed to this execution of the job.
 	 * @return the {@link JobExecution} if it returns synchronously. If the
 	 * implementation is asynchronous, the status might well be unknown.
 	 * 

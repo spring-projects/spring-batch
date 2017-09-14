@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.core.launch;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -26,10 +30,6 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Low level interface for inspecting and controlling jobs with access only to
@@ -50,7 +50,8 @@ public interface JobOperator {
 	 * @param instanceId the id of a {@link JobInstance}
 	 * @return the id values of all the {@link JobExecution JobExecutions}
 	 * associated with this instance
-	 * @throws NoSuchJobInstanceException is thrown if job for instance id does not exist.
+	 * @throws NoSuchJobInstanceException if the {@link JobInstance} associated with the
+	 * 	{@code instanceId} cannot be found.
 	 */
 	List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException;
 
@@ -62,7 +63,7 @@ public interface JobOperator {
 	 * @param start the start index of the instances
 	 * @param count the maximum number of values to return
 	 * @return the id values of the {@link JobInstance JobInstances}
-	 * @throws NoSuchJobException is thrown if job for the jobName does not exist.
+	 * @throws NoSuchJobException is thrown if no {@link JobInstance}s for the jobName exist.
 	 */
 	List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException;
 
@@ -99,7 +100,7 @@ public interface JobOperator {
 	 * name
 	 * @throws JobInstanceAlreadyExistsException if a job instance with this
 	 * name and parameters already exists
-	 * @throws JobParametersInvalidException thrown if some of the job parameters are invalid.
+	 * @throws JobParametersInvalidException thrown if any of the job parameters are invalid.
 	 */
 	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException;
 

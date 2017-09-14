@@ -35,8 +35,8 @@ public class FlowState extends AbstractState implements FlowHolder {
 	private final Flow flow;
 
 	/**
-	 * @param flow the {@link Flow} instance to be used by the state.
-	 * @param name the name to be associated with the state.
+	 * @param flow the {@link Flow} to delegate to.
+	 * @param name the name of the state.
 	 */
 	public FlowState(Flow flow, String name) {
 		super(name);

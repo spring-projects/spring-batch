@@ -32,7 +32,7 @@ public class DecisionState extends AbstractState {
 
 	/**
 	 * @param decider the {@link JobExecutionDecider} instance to make the status decision.
-	 * @param name the name to be associated with the decision state.
+	 * @param name the name of the decision state.
 	 */
 	public DecisionState(JobExecutionDecider decider, String name) {
 		super(name);
