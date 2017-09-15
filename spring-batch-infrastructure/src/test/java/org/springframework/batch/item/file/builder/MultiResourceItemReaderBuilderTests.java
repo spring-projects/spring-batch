@@ -24,7 +24,6 @@ import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
@@ -42,17 +41,12 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<Foo>();
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
 
-		fileReader.setLineMapper(new LineMapper<Foo>() {
-
-			@Override
-			public Foo mapLine(String line, int lineNumber) throws Exception {
-				Foo foo = new Foo();
-				foo.setValue(Integer.valueOf(line));
-				return foo;
-			}
-
+		fileReader.setLineMapper((line, lineNumber) -> {
+			Foo foo = new Foo();
+			foo.setValue(Integer.valueOf(line));
+			return foo;
 		});
 		fileReader.setSaveState(true);
 
@@ -61,12 +55,8 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 		Resource r3 = new ByteArrayResource("3\n".getBytes());
 		Resource r4 = new ByteArrayResource("4\n5\n".getBytes());
 
-		Comparator<Resource> comparator = new Comparator<Resource>() {
-			@Override
-			public int compare(Resource arg0, Resource arg1) {
-				return 0; // preserve original ordering
-			}
-
+		Comparator<Resource> comparator = (arg0, arg1) -> {
+			return 0; // preserve original ordering
 		};
 		return new MultiResourceItemReaderBuilder<Foo>().delegate(fileReader)
 				.resources(new Resource[] { r1, r2, r3, r4 }).saveState(true).comparator(comparator).name("FOO")
@@ -86,6 +76,7 @@ public class MultiResourceItemReaderBuilderTests extends AbstractItemStreamItemR
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testNullResources() {
 		try {
 			new MultiResourceItemReaderBuilder<String>().delegate(mock(FlatFileItemReader.class)).build();

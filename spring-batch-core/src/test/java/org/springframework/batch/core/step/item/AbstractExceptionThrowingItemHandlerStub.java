@@ -40,8 +40,9 @@ public abstract class AbstractExceptionThrowingItemHandlerStub<T> {
 		exception = SkippableRuntimeException.class.getConstructor(String.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setFailures(T... failures) {
-		this.failures = new ArrayList<T>(Arrays.asList(failures));
+		this.failures = new ArrayList<>(Arrays.asList(failures));
 	}
 
 	public void setExceptionType(Class<? extends Throwable> exceptionType) throws Exception {

@@ -15,11 +15,20 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
@@ -42,14 +51,6 @@ import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -272,7 +273,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setItemProcessor(processor);
 
 		@SuppressWarnings("unchecked")
-		List<Class<? extends Throwable>> exceptions = Arrays.<Class<? extends Throwable>>asList(Exception.class);
+		List<Class<? extends Throwable>> exceptions = Arrays.asList(Exception.class);
 		factory.setNoRollbackExceptionClasses(exceptions);
 		@SuppressWarnings("unchecked")
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
@@ -596,8 +597,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		return Arrays.<Class<? extends Throwable>> asList(arg);
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		for (Class<? extends Throwable> arg : args) {
 			map.put(arg, true);
 		}

@@ -53,7 +53,7 @@ public class RepositoryItemReaderBuilderTests {
 	private TestRepository repository;
 
 	@Mock
-	private Page page;
+	private Page<String> page;
 
 	private Map<String, Sort.Direction> sorts;
 

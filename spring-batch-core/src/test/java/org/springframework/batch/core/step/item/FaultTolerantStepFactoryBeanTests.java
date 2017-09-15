@@ -15,12 +15,20 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -60,13 +68,6 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -97,15 +98,15 @@ public class FaultTolerantStepFactoryBeanTests {
 	private boolean closed = false;
 
 	public FaultTolerantStepFactoryBeanTests() throws Exception {
-		reader = new SkipReaderStub<String>();
-		processor = new SkipProcessorStub<String>();
-		writer = new SkipWriterStub<String>();
+		reader = new SkipReaderStub<>();
+		processor = new SkipProcessorStub<>();
+		writer = new SkipWriterStub<>();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -1116,8 +1117,9 @@ public class FaultTolerantStepFactoryBeanTests {
 		return (SkipPolicy) ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		for (Class<? extends Throwable> arg : args) {
 			map.put(arg, true);
 		}

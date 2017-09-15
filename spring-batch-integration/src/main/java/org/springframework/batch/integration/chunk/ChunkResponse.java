@@ -28,6 +28,8 @@ import org.springframework.batch.core.StepContribution;
  */
 public class ChunkResponse implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	private final StepContribution stepContribution;
 
 	private final Long jobId;

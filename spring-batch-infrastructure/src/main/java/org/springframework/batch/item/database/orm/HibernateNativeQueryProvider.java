@@ -33,7 +33,7 @@ import org.springframework.util.StringUtils;
  * 
  * @param <E> entity returned by executing the query
  */
-public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider {
+public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider<E> {
 
 	private String sqlQuery;
 
@@ -46,7 +46,8 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 	 * </p>
 	 */
     @Override
-	public NativeQuery createQuery() {
+	@SuppressWarnings("unchecked")
+	public NativeQuery<E> createQuery() {
 
 		if (isStatelessSession()) {
 			return getStatelessSession().createNativeQuery(sqlQuery).addEntity(entityClass);

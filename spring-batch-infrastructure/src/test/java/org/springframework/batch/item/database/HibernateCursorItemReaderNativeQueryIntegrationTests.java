@@ -25,13 +25,13 @@ import org.springframework.batch.item.sample.Foo;
 public class HibernateCursorItemReaderNativeQueryIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
   
     @Override
-    protected void setQuery(HibernateCursorItemReader<?> hibernateReader) throws Exception {
+    protected void setQuery(HibernateCursorItemReader<Foo> hibernateReader) throws Exception {
 
     	String nativeQuery = "select * from T_FOOS";
         
         //creating a native query provider as it would be created in configuration
         HibernateNativeQueryProvider<Foo> queryProvider = 
-            new HibernateNativeQueryProvider<Foo>();
+            new HibernateNativeQueryProvider<>();
 
         queryProvider.setSqlQuery(nativeQuery);
         queryProvider.setEntityClass(Foo.class);

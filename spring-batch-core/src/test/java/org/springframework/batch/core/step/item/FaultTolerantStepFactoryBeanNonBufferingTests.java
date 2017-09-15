@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -44,13 +41,17 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.StringUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+
 public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();
 
-	private List<String> items = Arrays.asList(new String[] { "1", "2", "3", "4", "5" });
+	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
 	private ListItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory
 			.createTransactionalList(items));
@@ -86,6 +87,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock(SkipListener.class);

@@ -40,7 +40,7 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see SynchronizedItemStreamReader#setDelegate(ItemStreamReader)
 	 */
-	public SynchronizedItemStreamReaderBuilder delegate(ItemStreamReader<T> delegate) {
+	public SynchronizedItemStreamReaderBuilder<T> delegate(ItemStreamReader<T> delegate) {
 		this.delegate = delegate;
 
 		return this;

@@ -16,10 +16,6 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.beans.PropertyEditor;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -33,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
+
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.BeanWrapperImpl;
@@ -50,6 +47,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BeanWrapperFieldSetMapperTests {
 	
@@ -834,6 +835,7 @@ public class BeanWrapperFieldSetMapperTests {
 
 		@Nullable
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T> T convert(@Nullable Object source, Class<T> targetType) {
 			return (T)"CONVERTED";
 		}

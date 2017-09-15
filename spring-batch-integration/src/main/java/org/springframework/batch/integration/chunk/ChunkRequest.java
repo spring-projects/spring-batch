@@ -31,6 +31,8 @@ import org.springframework.batch.core.StepContribution;
  */
 public class ChunkRequest<T> implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	private final long jobId;
 
 	private final Collection<? extends T> items;

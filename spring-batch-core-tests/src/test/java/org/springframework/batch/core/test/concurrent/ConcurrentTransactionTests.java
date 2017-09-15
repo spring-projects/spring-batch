@@ -15,13 +15,10 @@
  */
 package org.springframework.batch.core.test.concurrent;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.sql.DataSource;
 
 import org.junit.Test;
@@ -60,6 +57,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michael Minella
@@ -117,6 +116,7 @@ public class ConcurrentTransactionTests {
 			embeddedDatabaseFactory.setDatabaseConfigurer(new EmbeddedDatabaseConfigurer() {
 
 				@Override
+				@SuppressWarnings("unchecked")
 				public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
 					try {
 						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver", this.getClass().getClassLoader()));

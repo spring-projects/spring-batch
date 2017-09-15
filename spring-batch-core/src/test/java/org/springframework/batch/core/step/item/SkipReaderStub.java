@@ -39,11 +39,13 @@ public class SkipReaderStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 		super();
 	}
 
+	@SuppressWarnings("unchecked")
 	public SkipReaderStub(T... items) throws Exception {
 		super();
 		this.items = items;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setItems(T... items) {
 		Assert.isTrue(counter < 0, "Items cannot be set once reading has started");
 		this.items = items;

@@ -122,7 +122,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 			logger.debug("Converting TaskletStep with name=" + step.getName());
 		}
 
-		Tasklet tasklet = getTasklet((TaskletStep) step);
+		Tasklet tasklet = getTasklet(step);
 		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>, "Tasklet must be ChunkOrientedTasklet in step="
 				+ step.getName());
 

@@ -107,7 +107,7 @@ public class DataSourceInitializer implements InitializingBean {
 				String[] scripts;
 				try {
 					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-							.getInputStream())), ";");
+							.getInputStream(), "UTF-8")), ";");
 				}
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);

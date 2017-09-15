@@ -34,6 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class BatchParserTests {
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testRoseyScenario() throws Exception {
 		JsrXmlApplicationContext context = new JsrXmlApplicationContext();
 		Resource batchXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/batch.xml");
@@ -49,7 +50,7 @@ public class BatchParserTests {
 		context.registerBeanDefinition("postProcessor", bd);
 		context.refresh();
 
-		ItemProcessor itemProcessor = context.getBean(ItemProcessor.class);
+		ItemProcessor<String, String> itemProcessor = context.getBean(ItemProcessor.class);
 
 		assertNotNull(itemProcessor);
 		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l)));
@@ -60,7 +61,7 @@ public class BatchParserTests {
 	}
 
 	@Test
-	@SuppressWarnings({"resource", "rawtypes"})
+	@SuppressWarnings("unchecked")
 	public void testOverrideBeansFirst() throws Exception {
 		JsrXmlApplicationContext context = new JsrXmlApplicationContext();
 		Resource overrideXml = new ClassPathResource("/org/springframework/batch/core/jsr/configuration/xml/override_batch.xml");
@@ -70,7 +71,7 @@ public class BatchParserTests {
 		context.load(overrideXml, batchXml);
 		context.refresh();
 
-		ItemProcessor itemProcessor = (ItemProcessor) context.getBean("itemProcessor");
+		ItemProcessor<String, String> itemProcessor = context.getBean("itemProcessor", ItemProcessor.class);
 
 		assertNotNull(itemProcessor);
 		StepSynchronizationManager.register(new StepExecution("step1", new JobExecution(5l)));

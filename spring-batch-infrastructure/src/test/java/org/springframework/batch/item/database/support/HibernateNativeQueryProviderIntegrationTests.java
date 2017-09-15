@@ -58,7 +58,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 	}
 
 	public HibernateNativeQueryProviderIntegrationTests() {
-		hibernateQueryProvider = new HibernateNativeQueryProvider<Foo>();
+		hibernateQueryProvider = new HibernateNativeQueryProvider<>();
 		hibernateQueryProvider.setEntityClass(Foo.class);
 	}
 
@@ -84,7 +84,7 @@ public class HibernateNativeQueryProviderIntegrationTests {
 		hibernateQueryProvider.afterPropertiesSet();
 		hibernateQueryProvider.setSession(sessionFactory.openSession());
 
-		Query query = hibernateQueryProvider.createQuery();
+		Query<Foo> query = hibernateQueryProvider.createQuery();
 
 		List<Foo> expectedFoos = new ArrayList<>();
 

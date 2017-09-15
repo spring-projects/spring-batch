@@ -106,7 +106,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		String[] scripts;
 		try {
 			String[] list = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-					.getInputStream())), ";");
+					.getInputStream(), "UTF-8")), ";");
 			scripts = list;
 		}
 		catch (IOException e) {

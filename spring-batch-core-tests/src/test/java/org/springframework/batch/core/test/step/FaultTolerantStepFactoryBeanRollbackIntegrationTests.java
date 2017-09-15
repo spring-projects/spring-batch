@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.test.step;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -57,6 +54,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -183,6 +182,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
 		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
 		for (Class<? extends Throwable> arg : args) {

@@ -27,6 +27,8 @@ import org.springframework.batch.item.ItemWriterException;
  */
 public class AsynchronousFailureException extends ItemWriterException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Create a new {@link AsynchronousFailureException} based on a message and
 	 * another exception.

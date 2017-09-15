@@ -37,19 +37,19 @@ import static org.mockito.Mockito.verify;
 public class CompositeItemWriterBuilderTests {
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testProcess() throws Exception {
 
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			ItemWriter<? super Object> writer = mock(ItemWriter.class);
 			writers.add(writer);
 		}
-		CompositeItemWriter itemWriter = new CompositeItemWriterBuilder().delegates(writers).build();
-		itemWriter.setDelegates(writers);
+		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writers).build();
 		itemWriter.write(data);
 
 		for (ItemWriter<? super Object> writer : writers) {
@@ -64,14 +64,15 @@ public class CompositeItemWriterBuilderTests {
 		ignoreItemStream(true);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void ignoreItemStream(boolean ignoreItemStream) throws Exception {
 		ItemStreamWriter<? super Object> writer = mock(ItemStreamWriter.class);
 		List<Object> data = Collections.singletonList(new Object());
 		ExecutionContext executionContext = new ExecutionContext();
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 		writers.add(writer);
-		CompositeItemWriter itemWriter = new CompositeItemWriterBuilder().delegates(writers)
+		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writers)
 				.ignoreItemStream(ignoreItemStream).build();
 		itemWriter.open(executionContext);
 

@@ -19,6 +19,8 @@ import java.util.Collections;
 
 import org.hibernate.StatelessSession;
 
+import org.springframework.batch.item.sample.Foo;
+
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
  * 
@@ -29,9 +31,9 @@ public class HibernateCursorItemReaderParametersIntegrationTests extends
 		AbstractHibernateCursorItemReaderIntegrationTests {
 
     @Override
-	protected void setQuery(HibernateCursorItemReader<?> reader) {
+	protected void setQuery(HibernateCursorItemReader<Foo> reader) {
 		reader.setQueryString("from Foo where name like :name");
-		reader.setParameterValues(Collections.singletonMap("name", (Object) "bar%"));
+		reader.setParameterValues(Collections.singletonMap("name", "bar%"));
 	}
 
 }

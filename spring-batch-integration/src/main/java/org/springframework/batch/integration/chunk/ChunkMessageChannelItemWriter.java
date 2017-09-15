@@ -216,6 +216,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
 	 * and we shouldn't be)
 	 */
+	@SuppressWarnings("unchecked")
 	private void getNextResult() throws AsynchronousFailureException {
 		Message<ChunkResponse> message = (Message<ChunkResponse>) messagingGateway.receive(replyChannel);
 		if (message != null) {

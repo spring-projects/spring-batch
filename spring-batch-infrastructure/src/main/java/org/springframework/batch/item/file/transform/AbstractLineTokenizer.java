@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Abstract class handling common concerns of various {@link LineTokenizer}
  * implementations such as dealing with names and actual construction of
@@ -80,7 +82,22 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @param names names of each column
 	 */
 	public void setNames(String... names) {
-		this.names = names==null ? null : Arrays.asList(names).toArray(new String[names.length]);
+		if(names == null) {
+			this.names = null;
+		}
+		else {
+			boolean valid = false;
+			for (String name : names) {
+				if(StringUtils.hasText(name)) {
+					valid = true;
+					break;
+				}
+			}
+
+			if(valid) {
+				this.names = Arrays.asList(names).toArray(new String[names.length]);
+			}
+		}
 	}
 
 	/**

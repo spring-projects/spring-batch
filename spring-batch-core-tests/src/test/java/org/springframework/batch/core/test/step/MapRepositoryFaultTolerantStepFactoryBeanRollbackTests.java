@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.test.step;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -41,12 +40,12 @@ import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -81,7 +80,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 		writer = new SkipWriterStub();
 		processor = new SkipProcessorStub();
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setTransactionManager(transactionManager);
 		factory.setBeanName("stepName");
@@ -144,7 +143,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 				assertEquals(5, stepExecution.getSkipCount());
-				List<String> processed = new ArrayList<String>(processor.getProcessed());
+				List<String> processed = new ArrayList<>(processor.getProcessed());
 				Collections.sort(processed);
 				assertEquals("[1, 1, 2, 2, 3, 3, 4, 4, 5, 5]", processed.toString());
 
@@ -178,13 +177,12 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 		}
 
 		@Override
-		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
+		public synchronized String read() throws Exception {
 			counter++;
 			if (counter >= items.length) {
 				return null;
 			}
-			String item = items[counter];
-			return item;
+			return items[counter];
 		}
 	}
 
@@ -246,8 +244,9 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		for (Class<? extends Throwable> arg : args) {
 			map.put(arg, true);
 		}

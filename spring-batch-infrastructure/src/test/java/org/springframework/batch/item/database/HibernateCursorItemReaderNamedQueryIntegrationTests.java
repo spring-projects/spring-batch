@@ -15,13 +15,15 @@
  */
 package org.springframework.batch.item.database;
 
+import org.springframework.batch.item.sample.Foo;
+
 /**
  * Tests {@link HibernateCursorItemReader} configured with named query.
  */
 public class HibernateCursorItemReaderNamedQueryIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
 	@Override
-	protected void setQuery(HibernateCursorItemReader<?> reader) {
+	protected void setQuery(HibernateCursorItemReader<Foo> reader) {
 		reader.setQueryName("allFoos");
 	}
 

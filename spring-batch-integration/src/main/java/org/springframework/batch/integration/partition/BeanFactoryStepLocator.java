@@ -31,7 +31,7 @@ public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
 	 * @see StepLocator#getStep(String)
 	 */
 	public Step getStep(String stepName) {
-		return (Step) beanFactory.getBean(stepName, Step.class);
+		return beanFactory.getBean(stepName, Step.class);
 	}
 
 	/**

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.config.xml;
 
+import org.w3c.dom.Element;
+
 import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
@@ -29,7 +31,6 @@ import org.springframework.integration.config.ServiceActivatorFactoryBean;
 import org.springframework.integration.config.xml.AbstractConsumerEndpointParser;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.w3c.dom.Element;
 
 /**
  * <p>
@@ -78,7 +79,7 @@ public class RemoteChunkingSlaveParser extends AbstractBeanDefinitionParser {
 		if(StringUtils.hasText(itemProcessor)) {
 			chunkProcessorBuilder.addPropertyReference(ITEM_PROCESSOR_PROPERTY_NAME, itemProcessor);
 		} else {
-			chunkProcessorBuilder.addPropertyValue(ITEM_PROCESSOR_PROPERTY_NAME, new PassThroughItemProcessor());
+			chunkProcessorBuilder.addPropertyValue(ITEM_PROCESSOR_PROPERTY_NAME, new PassThroughItemProcessor<>());
 		}
 
 		BeanDefinition chunkProcessorChunkHandler =

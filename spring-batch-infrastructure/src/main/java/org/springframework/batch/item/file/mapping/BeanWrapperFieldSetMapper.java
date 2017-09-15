@@ -402,7 +402,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * Public setter for the 'conversionService' property.
 	 * {@link #createBinder(Object)} will use it if not null.
 	 *
-	 * @param conversionService
+	 * @param conversionService {@link ConversionService} to be used for type conversions
 	 */
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

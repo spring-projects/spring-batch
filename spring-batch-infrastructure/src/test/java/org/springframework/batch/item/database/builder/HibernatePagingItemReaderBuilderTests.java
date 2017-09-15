@@ -68,6 +68,7 @@ public class HibernatePagingItemReaderBuilderTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testConfiguration() throws Exception {
 		HibernatePagingItemReader<Foo> reader = new HibernatePagingItemReaderBuilder<Foo>()
 				.name("fooReader")
@@ -101,7 +102,7 @@ public class HibernatePagingItemReaderBuilderTests {
 		assertEquals(2, executionContext.size());
 		assertEquals(5, ReflectionTestUtils.getField(reader, "pageSize"));
 
-		HibernateItemReaderHelper helper = (HibernateItemReaderHelper) ReflectionTestUtils.getField(reader, "helper");
+		HibernateItemReaderHelper<Foo> helper = (HibernateItemReaderHelper<Foo>) ReflectionTestUtils.getField(reader, "helper");
 		assertEquals(false, ReflectionTestUtils.getField(helper, "useStatelessSession"));
 	}
 

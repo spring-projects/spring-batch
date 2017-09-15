@@ -324,7 +324,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 	}
 
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
-		return new SimpleStepBuilder<T, S>(new StepBuilder(name));
+		return new SimpleStepBuilder<>(new StepBuilder(name));
 	}
 
 	@Override

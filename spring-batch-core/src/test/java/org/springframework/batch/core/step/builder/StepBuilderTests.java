@@ -55,6 +55,7 @@ import static org.junit.Assert.assertEquals;
  * @author Michael Minella
  *
  */
+@SuppressWarnings("serial")
 public class StepBuilderTests {
 
 	@Test
@@ -115,7 +116,7 @@ public class StepBuilderTests {
 			add("3");
 		}};
 
-		ItemReader<String> reader = new ListItemReader<String>(items);
+		ItemReader<String> reader = new ListItemReader<>(items);
 
 		@SuppressWarnings("unchecked")
 		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
@@ -123,7 +124,7 @@ public class StepBuilderTests {
 											 .transactionManager(transactionManager)
 											 .<String, String>chunk(3)
 										     .reader(reader)
-											 .processor(new PassThroughItemProcessor<String>())
+											 .processor(new PassThroughItemProcessor<>())
 											 .writer(new DummyItemWriter())
 											 .listener(new AnnotationBasedStepExecutionListener());
 		builder.build().execute(execution);
