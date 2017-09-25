@@ -105,7 +105,7 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 				this.configurer = configurer;
 				return configurer;
 			} else {
-				throw new IllegalStateException("To use the default BatchConfigurer the context must contain no more than" +
+				throw new IllegalStateException("To use the default BatchConfigurer the context must contain no more than " +
 														"one DataSource, found " + dataSources.size());
 			}
 		}
