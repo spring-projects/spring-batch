@@ -6,6 +6,8 @@
 
 == JSR-352 Support
 
+include::toggle.adoc[]
+
 As of Spring Batch 3.0 support for JSR-352 has been fully implemented. This section is not a replacement for
         the spec itself and instead, intends to explain how the JSR-352 specific concepts apply to Spring Batch.
         Additional information on JSR-352 can be found via the
@@ -182,7 +184,8 @@ To use Spring dependency injection within a JSR-352 based batch job consists of 
             them as it would any bean defined within the batch.xml.
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -204,7 +207,29 @@ To use Spring dependency injection within a JSR-352 based batch job consists of 
         </step>
     </job>
 </beans>
-        
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Configuration
+public class BatchConfiguration {
+
+    @Bean
+    public Batchlet fooBatchlet() {
+        FooBatchlet batchlet = new FooBatchlet();
+        batchlet.setProp("bar");
+        return batchlet;
+       }
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="fooJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+    <step id="step1" >
+        <batchlet ref="fooBatchlet" />
+    </step>
+</job>
 ----
 
 The assembly of Spring contexts (imports, etc) works with JSR-352 jobs just as it would with any other
