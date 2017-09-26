@@ -184,6 +184,7 @@ To use Spring dependency injection within a JSR-352 based batch job consists of 
             them as it would any bean defined within the batch.xml.
 
 
+.XML Configuration
 [source, xml, role="xmlContent"]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
@@ -208,6 +209,7 @@ To use Spring dependency injection within a JSR-352 based batch job consists of 
 </beans>
 ----
 
+.Java Configuration
 [source, java, role="javaContent"]
 ----
 @Configuration
