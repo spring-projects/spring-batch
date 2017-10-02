@@ -61,31 +61,27 @@ While open source software projects and associated communities have
     architecture has resulted in the proliferation of many one-off, in-house
     solutions developed within client enterprise IT functions.
 
-SpringSource and Accenture collaborated to change this.
+SpringSource (now Pivotal) and Accenture collaborated to change this.
     Accenture's hands-on industry and technical experience in implementing
     batch architectures, SpringSource's depth of technical experience, and
-    Spring's proven programming model together mark a natural and powerful
+    Spring's proven programming model together made a natural and powerful
     partnership to create high-quality, market-relevant software aimed at
-    filling an important gap in enterprise Java. Both companies are also
-    currently working with a number of clients solving similar problems
-    developing Spring-based batch architecture solutions. This has provided
-    some useful additional detail and real-life constraints that help to ensure
+    filling an important gap in enterprise Java. Both companies
+    worked with a number of clients who were solving similar problems by
+    developing Spring-based batch architecture solutions. This provided
+    some useful additional detail and real-life constraints that helped to ensure
     the solution can be applied to the real-world problems posed by clients.
-    For these reasons and many more, SpringSource and Accenture have teamed to
-    collaborate on the development of Spring Batch.
-    // TODO This paragraph is marketing material. If this is a technical introduction to
-    // a tool, this content is misplace.
     // TODO Turn this into historical context. Accenture is no longer involved, and SpringSource became Pivotal (through VMWare).
 
-Accenture has contributed previously proprietary batch processing
-    architecture frameworks, to the
-    Spring Batch project along with committer resources to drive support,
-    enhancements, and the future roadmap. Accenture's contribution is based upon decades
+Accenture contributed previously proprietary batch processing
+    architecture frameworks to the
+    Spring Batch project, along with committer resources to drive support,
+    enhancements, and the existing feature set. Accenture's contribution was based upon decades
     of experience in
     building batch architectures with the last several generations of
     platforms: COBOL/Mainframe, C++/Unix, and now Java/anywhere.
 
-The collaborative effort between Accenture and SpringSource aims to
+The collaborative effort between Accenture and SpringSource aimed to
     promote the standardization of software processing approaches, frameworks,
     and tools that can be consistently leveraged by enterprise users when
     creating batch applications. Companies and government agencies desiring to
@@ -382,13 +378,13 @@ In order to use this approach, preprocessing is required to split the recordset 
 
 Preprocessing could be a large overhead, as it has to calculate and determine the bounds of each portion of the record set.
 
-_2. Breakup by a Key Column_
+_2. Break up by a Key Column_
 
-This involves breaking up the input record set by a key column, such as a location code, and assigning data from each key to a batch instance. In order to achieve this, column values can either be
+This involves breaking up the input record set by a key column, such as a location code, and assigning data from each key to a batch instance. In order to achieve this, column values can be either:
 
-_2a. Assigned to a batch instance by a partitioning table (described later in this section)._
+_* Assigned to a batch instance by a partitioning table (described later in this section)._
 
-_2b. Assigned to a batch instance by a portion of the value (such as 0000-0999, 1000 - 1999, and so on)._
+_* Assigned to a batch instance by a portion of the value (such as 0000-0999, 1000 - 1999, and so on)._
 
 Under option 1, adding new values means a manual reconfiguration of the batch/extract to ensure that the new value is added to a particular instance.
 
