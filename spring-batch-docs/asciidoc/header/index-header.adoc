@@ -1,6 +1,6 @@
 = Spring Batch - Reference Documentation
 
-Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund, Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro
+Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund, Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro, Jay Bryant
 
 :batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
 
