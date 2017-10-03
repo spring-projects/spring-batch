@@ -308,8 +308,8 @@ tables:
 |FAILED
 |===
 
-NOTE: column names may have been abbreviated or removed for the sake of clarity
-and formatting
+NOTE: Column names may have been abbreviated or removed for the sake of clarity
+and formatting.
 
 
 Now that the job has failed, assume that it took the entire
@@ -391,7 +391,7 @@ the `JobExecution` table, as shown in the following tables:
 |COMPLETED
 |===
 
-NOTE: column names may have been abbreviated or removed for the sake of clarity
+NOTE: Column names may have been abbreviated or removed for the sake of clarity
 and formatting.
 
 === Step
