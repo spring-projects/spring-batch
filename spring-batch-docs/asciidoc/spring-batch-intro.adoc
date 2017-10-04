@@ -43,17 +43,18 @@ Spring Batch provides reusable functions that are essential in
   management. It also provides more advanced technical services and features
   that enable extremely high-volume and high performance batch jobs
   though optimization and partitioning techniques.
+  Spring Batch can be used in both simple use cases (such as reading a file into a
+  database or running a stored procedure) as well as complex, high volume use cases (such
+  as moving high volumes of data between databases, transforming it, and so on).
   High-volume batch jobs can leverage the framework in a highly scalable
   manner to process significant volumes of information.
-// TODO I removed "Simple as well as complex". What do you mean by that?
-// What are you actually trying to convey to the reader?
 
 [[springBatchBackground]]
 
 === Background
 
 While open source software projects and associated communities have
-    focused greater attention on web-based and SOA-messaging-based
+    focused greater attention on web-based and microservices-based
     architecture frameworks, there has been a notable lack of focus on
     reusable architecture frameworks to accommodate Java-based batch
     processing needs, despite continued needs to handle such processing within
@@ -196,8 +197,8 @@ This layered architecture highlights three major high-level
     common readers and writers and services (such as the
     `RetryTemplate`), which are used both by application
     developers(readers and
-    writers, such as `ItemReader` and `ItemWriter`) and the core framework itself.
-    (retry).
+    writers, such as `ItemReader` and `ItemWriter`) and the core framework itself
+    (retry, which is its own library).
 
 [[batchArchitectureConsiderations]]
 
@@ -440,7 +441,7 @@ On program start-up, the program `id` and partition number should be passed to t
 
 When applications run in parallel or are partitioned, contention in database resources and deadlocks may occur. It is critical that the database design team eliminates potential contention situations as much as possible as part of the database design.
 
-Also, the database design team must ensure that the database index tables are designed with deadlock prevention and performance in mind.
+Also, the developers must ensure that the database index tables are designed with deadlock prevention and performance in mind.
 
 Deadlocks or hot spots often occur in administration or architecture tables, such as log tables, control tables, and lock tables. The implications of these should be taken into account as well. A realistic stress test is crucial for identifying the possible bottlenecks in the architecture.
 
