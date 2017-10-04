@@ -12,7 +12,7 @@ The Spring Batch 4.0 release has three major themes:
 * Java 8 Requirement
 
 
-* Dependencies Redefinition
+* Dependencies Re-baseline
 
 
 * Builders for ItemReaders and ItemWriters
@@ -33,7 +33,7 @@ Spring Batch has historically followed Spring Framework's baselines for both
 [[whatsNewDependencies]]
 
 
-=== Dependencies Redefinition
+=== Dependencies Re-baseline
 
 In order to continue to integrate with supported versions of the third party
 		libraries Spring Batch uses, Spring Batch 4 is updating the dependencies across
