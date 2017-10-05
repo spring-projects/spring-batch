@@ -307,10 +307,9 @@ There are many scenarios where you may want to control the
 ----
 
 The step above can be run only once. Attempting to run it
-        again causes an exception to be thrown. Note that
+        again causes a `StartLimitExceededException` to be thrown. Note that
         the default value for the start-limit is
         `Integer.MAX_VALUE`.
-// TODO What exception does it throw?
 
 [[allowStartIfComplete]]
 
@@ -323,7 +322,7 @@ In the case of a restartable job, there may be one or more steps
         `Step` that cleans up resources before
         processing. During normal processing of a restarted job, any step with
         a status of 'COMPLETED', meaning it has already been completed
-        successfully, is skipped. `Setting allow-start-if-complete` to
+        successfully, is skipped. Setting `allow-start-if-complete` to
         "true" overrides this so that the step always runs, as shown in the following example:
 
 
@@ -488,7 +487,7 @@ The following example shows an example of using a skip limit:
 
 In the preceding example, a `FlatFileItemReader` is
       used. If, at any point, a
-      `FlatFileParseException` is thrown, it the item is
+      `FlatFileParseException` is thrown, the item is
       skipped and counted against the total skip limit of 10. Separate counts
       are made of skips on read, process, and write inside the step execution,
       but the limit applies across all skips. Once the skip limit is reached, the
@@ -648,7 +647,7 @@ Transaction attributes can be used to control the `isolation`,
 [[registeringItemStreams]]
 
 
-==== Registering `ItemStreams` with a `Step`
+==== Registering `ItemStream` with a `Step`
 
 The step has to take care of `ItemStream`
       callbacks at the necessary points in its lifecycle. (For more
@@ -745,7 +744,7 @@ Any class that implements one of the extensions
 
 An `ItemReader`,
       `ItemWriter` or
-      ``ItemProcessor`` that itself implements one of the
+      `ItemProcessor` that itself implements one of the
       `StepListener` interfaces is registered
       automatically with the `Step` if using the
       namespace `<step>` element or one of the the
@@ -759,7 +758,7 @@ In addition to the `StepListener` interfaces,
       objects can have methods with these annotations that are then converted
       into the corresponding `StepListener` type. It is
       also common to annotate custom implementations of chunk components such as
-      `ItemReader` or ItemWriter
+      `ItemReader` or `ItemWriter`
       or `Tasklet`. The annotations are analyzed by the
       XML parser for the `<listener/>` elements, so all you
       need to do is use the XML namespace to register the listeners with a
@@ -950,7 +949,7 @@ public interface ItemWriteListener<S> extends StepListener {
 
 The `beforeWrite` method is called
         before `write` on the
-        `ItemWriter` and is handed the item that is
+        `ItemWriter` and is handed the list of items that is
         written. The `afterWrite` method is called
         after the item has been successfully written. If there was an error
         while writing, the `onWriteError` method is
@@ -1073,10 +1072,8 @@ One of the most common use cases for a
 [NOTE]
 ====
 `TaskletStep` automatically registers the
-      tasklet as a `StepListener` if it implements the
+      tasklet as a `StepListener` if it implements the `StepListener`
       interface.
-      // TODO if it implements which interface? There are a number of interfaces in this
-      // discussion, so we should be specific here.
 
 ====
 
@@ -1322,7 +1319,7 @@ When configuring a `Job` for conditional
         `ExitStatus`. `BatchStatus`
         is an enumeration that is a property of both
         `JobExecution` and
-        ``StepExecution`` and is used by the framework to
+        `StepExecution` and is used by the framework to
         record the status of a `Job` or
         `Step`. It can be one of the following values:
         `COMPLETED`, `STARTING`, `STARTED`, `STOPPING`, `STOPPED`, `FAILED`, `ABANDONED`, or
@@ -1401,12 +1398,10 @@ public class SkipCheckingListener extends StepExecutionListenerSupport {
 
 The above code is a `StepExecutionListener`
         that first checks to make sure the `Step` was
-        successful and next if the skip count on the
+        successful and then checks to see if the skip count on the
         `StepExecution` is higher than 0. If both
         conditions are met, a new `ExitStatus` with an
         exit code of `COMPLETED WITH SKIPS` is returned.
-// TODO "and next if the skip count on the `StepExecution` is higher than 0" confuses me.
-// Please explain that, and I'll make a stronger sentence here.
 
 [[configuringForStop]]
 
