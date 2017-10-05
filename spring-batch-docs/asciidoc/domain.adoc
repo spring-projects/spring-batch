@@ -230,7 +230,7 @@ controlled and persisted, as shown in the following table:
 |Status
 |A `BatchStatus` object that
 indicates the status of the execution. While running, it is
-BatchStatus.STARTED. If it fails, it is BatchStatus.FAILED.
+BatchStatus#STARTED. If it fails, it is BatchStatus.FAILED.
 If it finishes successfully, it is BatchStatus.COMPLETED
 
 |startTime
@@ -240,15 +240,13 @@ current system time when the execution was started. This field is empty if the j
 |endTime
 |A `java.util.Date` representing the
 current system time when the execution finished, regardless of
-whether or not it was successful.
-// TODO Is it empty if the job has yet to finish?
+whether or not it was successful. The field is empty if the job has yet to finish.
 
 |exitStatus
 |The `ExitStatus`, indicating the
 result of the run. It is most important, because it contains an
 exit code that is returned to the caller. See chapter 5 for
-more details.
-// TODO Is this field empty if the job has yet to finish?
+more details. The field is empty if the job has yet to finish.
 
 |createTime
 |A `java.util.Date` representing the
