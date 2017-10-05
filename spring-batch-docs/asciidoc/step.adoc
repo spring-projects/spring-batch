@@ -3,9 +3,9 @@
 :toclevels: 4
 
 [[configureStep]]
-== Configuring a Step
+== Configuring a `Step`
 
-As discussed in <<domain.adoc#domainLanguageOfBatch,domain>>, a
+As discussed in <<domain.adoc#domainLanguageOfBatch,the domain chapter>>, a
   `Step` is a domain object that encapsulates an
   independent, sequential phase of a batch job and contains all of the
   information necessary to define and control the actual batch processing.
@@ -13,32 +13,31 @@ As discussed in <<domain.adoc#domainLanguageOfBatch,domain>>, a
   `Step` are at the discretion of the developer writing a
   `Job`. A `Step` can be as simple or complex as the
   developer desires. A simple `Step` might load data from
-  a file into the database, requiring little or no code. (depending upon the
-  implementations used) A more complex `Step` may have
+  a file into the database, requiring little or no code (depending upon the
+  implementations used). A more complex `Step` might have
   complicated business rules that are applied as part of the
-  processing.
+  processing, as shown in the following image:
 
 .Step
 image::{batch-asciidoc}images/step.png[Step, scaledwidth="60%"]
 
 [[chunkOrientedProcessing]]
 
-=== Chunk-Oriented Processing
+=== Chunk-oriented Processing
 
-Spring Batch uses a 'Chunk Oriented' processing style within its
+Spring Batch uses a 'Chunk-oriented' processing style within its
     most common implementation. Chunk oriented processing refers to reading
-    the data one at a time, and creating 'chunks' that will be written out,
+    the data one at a time and creating 'chunks' that are written out
     within a transaction boundary. One item is read in from an
     `ItemReader`, handed to an
     `ItemProcessor`, and aggregated. Once the number of
-    items read equals the commit interval, the entire chunk is written out via
-    the ItemWriter, and then the transaction is committed.
+    items read equals the commit interval, the entire chunk is written out by
+    the `ItemWriter`, and then the transaction is committed. The following image shows the process:
 
-.Chunk Oriented Processing
+.Chunk-oriented Processing
 image::{batch-asciidoc}images/chunk-oriented-processing.png[Chunk Oriented Processing, scaledwidth="60%"]
 
-Below is a code representation of the same concepts shown
-    above:
+The followig code shows the same concepts shown:
 
 
 [source, java]
@@ -55,12 +54,12 @@ itemWriter.write(items);
 [[configuringAStep]]
 
 
-==== Configuring a Step
+==== Configuring a `Step`
 
 Despite the relatively short list of required dependencies for a
       `Step`, it is an extremely complex class that can
       potentially contain many collaborators. In order to ease configuration,
-      the Spring Batch namespace can be used:
+      the Spring Batch namespace can be used, as shown in the following example:
 
 
 [source, xml]
@@ -74,62 +73,62 @@ Despite the relatively short list of required dependencies for a
 </job>
 ----
 
-The configuration above represents the only required dependencies
+The configuration above includes the only required dependencies
       to create a item-oriented step:
 
-* reader - The `ItemReader` that provides
+* `reader`: The `ItemReader` that provides
             items for processing.
 
 
-* writer - The ItemWriter that
+* `writer`: The ItemWriter that
             processes the items provided by the
             `ItemReader`.
 
 
-* transaction-manager - Spring's
-            `PlatformTransactionManager` that will be
-            used to begin and commit transactions during processing.
+* `transaction-manager`: Spring's
+            `PlatformTransactionManager` that
+            begins and commits transactions during processing.
 
 
-* job-repository - The `JobRepository`
-            that will be used to periodically store the
+* job-repository: The `JobRepository`
+            that periodically stores the
             `StepExecution` and
             `ExecutionContext` during processing (just
             before committing). For an in-line <step/> (one defined
-            within a <job/>) it is an attribute on the <job/>
-            element; for a standalone step, it is defined as an attribute of
+            within a <job/>), it is an attribute on the <job/>
+            element. For a standalone step, it is defined as an attribute of
             the <tasklet/>.
 
 
-* commit-interval - The number of items that will be processed
+* commit-interval: The number of items to be processed
             before the transaction is committed.
 
 
 
-It should be noted that, job-repository defaults to
-      "jobRepository" and transaction-manager defaults to "transactionManger".
-      Furthermore, the `ItemProcessor` is optional, not
-      required, since the item could be directly passed from the reader to the
+It should be noted that `job-repository` defaults to
+      `jobRepository` and `transaction-manager` defaults to `transactionManger`.
+      Also, the `ItemProcessor` is optional,
+      since the item could be directly passed from the reader to the
       writer.
 
 [[InheritingFromParentStep]]
 
 
-==== Inheriting from a Parent Step
+==== Inheriting from a Parent `Step`
 
 If a group of `Steps` share similar
       configurations, then it may be helpful to define a "parent"
       `Step` from which the concrete
       `Steps` may inherit properties. Similar to class
-      inheritance in Java, the "child" `Step` will
-      combine its elements and attributes with the parent's. The child will
-      also override any of the parent's `Steps`.
+      inheritance in Java, the "child" `Step`
+      combines its elements and attributes with the parent's. The child
+      also overrides any of the parent's `Steps`.
 
-In the following example, the `Step`
-      "concreteStep1" will inherit from "parentStep". It will be instantiated
-      with 'itemReader', 'itemProcessor', 'itemWriter', startLimit=5, and
-      allowStartIfComplete=true. Additionally, the commitInterval will be '5'
-      since it is overridden by the "concreteStep1":
+In the following example, the `Step`,
+      "concreteStep1", inherits from "parentStep". It will be instantiated
+      with 'itemReader', 'itemProcessor', 'itemWriter', `startLimit=5`, and
+      `allowStartIfComplete=true`. Additionally, the `commitInterval` is '5',
+      since it is overridden by the "concreteStep1" `Step`, as shown in the following example:
 
 
 [source, xml]
@@ -147,15 +146,15 @@ In the following example, the `Step`
 </step>
 ----
 
-The id attribute is still required on the step within the job
+The `id` attribute is still required on the step within the job
       element. This is for two reasons:
-. The id will be used as the step name when persisting the
+. The `id` is used as the step name when persisting the
             `StepExecution`. If the same standalone step is referenced in more
             than one step in the job, an error will occur.
 
 
 . When creating job flows, as described later in this chapter,
-            the next attribute should be referring to the step in the flow,
+            the `next` attribute should be referring to the step in the flow,
             not the standalone step.
 
 
@@ -163,21 +162,20 @@ The id attribute is still required on the step within the job
 [[abstractStep]]
 
 
-===== Abstract Step
+===== Abstract `Step`
 
-Sometimes it may be necessary to define a parent
+Sometimes, it may be necessary to define a parent
         `Step` that is not a complete
         `Step` configuration. If, for instance, the
-        reader, writer, and tasklet attributes are left off of a
+        `reader`, `writer`, and `tasklet` attributes are left off of a
         `Step` configuration, then initialization will
         fail. If a parent must be defined without these properties, then the
-        "abstract" attribute should be used. An "abstract"
-        `Step` will not be instantiated; it is used only
-        for extending.
+        `abstract` attribute should be used. An `abstract`
+        `Step` is only extended, never instantiated.
 
 In the following example, the `Step`
-        "abstractParentStep" would not instantiate if it were not declared to
-        be abstract. The `Step` "concreteStep2" will have
+        `abstractParentStep` would not be instantiated if it were not declared to
+        be abstract. The `Step`, "concreteStep2", has
         'itemReader', 'itemWriter', and commitInterval=10.
 
 
@@ -202,17 +200,17 @@ In the following example, the `Step`
 ===== Merging Lists
 
 Some of the configurable elements on
-        `Steps` are lists; the <listeners/>
+        `Steps` are lists. The `<listeners/>`
         element, for instance. If both the parent and child
-        `Steps` declare a <listeners/> element,
-        then the child's list will override the parent's. In order to allow a
+        `Steps` declare a `<listeners/>` element,
+        then the child's list overrides the parent's. In order to allow a
         child to add additional listeners to the list defined by the parent,
-        every list element has a "merge" attribute. If the element specifies
-        that merge="true", then the child's list will be combined with the
+        every list element has a `merge` attribute. If the element specifies
+        that `merge="true"`, then the child's list is combined with the
         parent's instead of overriding it.
 
-In the following example, the `Step`
-        "concreteStep3" will be created will two listeners:
+In the following example, the `Step`,
+        "concreteStep3", is created with two listeners:
         `listenerOne` and
         `listenerTwo`:
 
@@ -240,17 +238,18 @@ In the following example, the `Step`
 
 ==== The Commit Interval
 
-As mentioned above, a step reads in and writes out items,
+As mentioned previously, a step reads in and writes out items,
       periodically committing using the supplied
       `PlatformTransactionManager`. With a
-      commit-interval of 1, it will commit after writing each individual item.
+      `commit-interval` of 1, it commits after writing each individual item.
       This is less than ideal in many situations, since beginning and
       committing a transaction is expensive. Ideally, it is preferable to
       process as many items as possible in each transaction, which is
       completely dependent upon the type of data being processed and the
       resources with which the step is interacting. For this reason, the
       number of items that are processed within a commit can be
-      configured.
+      configured. The following example shows a `step` whose `tasklet` has a
+      `commit-interval` value of 10.
 
 
 [source, xml]
@@ -264,27 +263,27 @@ As mentioned above, a step reads in and writes out items,
 </job></pre>
 ----
 
-In the example above, 10 items will be processed within each
-      transaction. At the beginning of processing a transaction is begun, and
-      each time read is called on the
+In the preceding example, 10 items are processed within each
+      transaction. At the beginning of processing, a transaction is begun. Also,
+      each time `read` is called on the
       `ItemReader`, a counter is incremented. When it
       reaches 10, the list of aggregated items is passed to the
-      ItemWriter, and the transaction will be
+      `ItemWriter`, and the transaction is
       committed.
 
 [[stepRestart]]
 
 
-==== Configuring a Step for Restart
+==== Configuring a `Step` for Restart
 
-In the <<job.adoc#configureJob, configure job>> section , restarting a
+In the "<<job.adoc#configureJob,Configuring and Running a Job>>" section , restarting a
       `Job` was discussed. Restart has numerous impacts
-      on steps, and as such may require some specific configuration.
+      on steps, and, consequently, may require some specific configuration.
 
 [[startLimit]]
 
 
-===== Setting a StartLimit
+===== Setting a Start Limit
 
 There are many scenarios where you may want to control the
         number of times a `Step` may be started. For
@@ -294,8 +293,8 @@ There are many scenarios where you may want to control the
         is configurable on the step level, since different steps may have
         different requirements. A `Step` that may only be
         executed once can exist as part of the same `Job`
-        as a `Step` that can be run infinitely. Below is
-        an example start limit configuration:
+        as a `Step` that can be run infinitely. The following XML fragment shows
+        an example of a start limit configuration:
 
 
 [source, xml]
@@ -307,24 +306,25 @@ There are many scenarios where you may want to control the
 </step>
 ----
 
-The simple step above can be run only once. Attempting to run it
-        again will cause an exception to be thrown. It should be noted that
+The step above can be run only once. Attempting to run it
+        again causes an exception to be thrown. Note that
         the default value for the start-limit is
         `Integer.MAX_VALUE`.
+// TODO What exception does it throw?
 
 [[allowStartIfComplete]]
 
 
-===== Restarting a completed step
+===== Restarting a Completed `Step`
 
 In the case of a restartable job, there may be one or more steps
         that should always be run, regardless of whether or not they were
-        successful the first time. An example might be a validation step, or a
+        successful the first time. An example might be a validation step or a
         `Step` that cleans up resources before
         processing. During normal processing of a restarted job, any step with
         a status of 'COMPLETED', meaning it has already been completed
-        successfully, will be skipped. Setting allow-start-if-complete to
-        "true" overrides this so that the step will always run:
+        successfully, is skipped. `Setting allow-start-if-complete` to
+        "true" overrides this so that the step always runs, as shown in the following example:
 
 
 [source, xml]
@@ -339,8 +339,9 @@ In the case of a restartable job, there may be one or more steps
 [[stepRestartExample]]
 
 
-===== Step Restart Configuration Example
+===== `Step` Restart Configuration Example
 
+The following example shows how to configure a job to have steps that can be restarted:
 
 [source, xml]
 ----
@@ -366,87 +367,89 @@ In the case of a restartable job, there may be one or more steps
 </job>
 ----
 
-The above example configuration is for a job that loads in
+The preceding example configuration is for a job that loads in
         information about football games and summarizes them. It contains
-        three steps: playerLoad, gameLoad, and playerSummarization. The
+        three steps: `playerLoad`, `gameLoad`, and `playerSummarization`. The
         playerLoad `Step` loads player information from a
         flat file, while the gameLoad `Step` does the
         same for games. The final `Step`,
-        playerSummarization, then summarizes the statistics for each player
+        `playerSummarization`, then summarizes the statistics for each player,
         based upon the provided games. It is assumed that the file loaded by
-        'playerLoad' must be loaded only once, but that 'gameLoad' will load
+        'playerLoad' must be loaded only once, but that 'gameLoad' can load
         any games found within a particular directory, deleting them after
         they have been successfully loaded into the database. As a result, the
         playerLoad `Step` contains no additional
-        configuration. It can be started almost limitlessly, and if complete
-        will be skipped. The 'gameLoad' `Step`, however,
-        needs to be run every time in case extra files have been dropped since
-        it last executed. It has 'allow-start-if-complete' set to 'true' in
+        configuration. It can be started any number of times, and, if complete,
+        is skipped. The 'gameLoad' `Step`, however,
+        needs to be run every time in case extra files have been added since
+        it last ran. It has 'allow-start-if-complete' set to 'true' in
         order to always be started. (It is assumed that the database tables
         games are loaded into has a process indicator on it, to ensure new
         games can be properly found by the summarization step). The
         summarization `Step`, which is the most important
         in the `Job`, is configured to have a start limit
         of 3. This is useful because if the step continually fails, a new exit
-        code will be returned to the operators that control job execution, and
-        it won't be allowed to start again until manual intervention has taken
+        code is returned to the operators that control job execution, and
+        it can not start again until manual intervention has taken
         place.
 
 
 [NOTE]
 ====
-This job is purely for example purposes and is not the same as
-          the footballJob found in the samples project.
+This job provides an example for this document and is not the same as
+          the `footballJob` found in the samples project.
 ====
 
+The remainder of this section describes what happens for each of three runs of the
+`footballJob` example.
 
 Run 1:
 
 
-. playerLoad is executed and completes successfully, adding
+. `playerLoad` runs and completes successfully, adding
             400 players to the 'PLAYERS' table.
 
 
-. gameLoad is executed and processes 11 files worth of game
+. `gameLoad` runs and processes 11 files worth of game
             data, loading their contents into the 'GAMES' table.
 
 
-. playerSummarization begins processing and fails after 5
+. `playerSummarization` begins processing and fails after 5
             minutes.
 
 Run 2:
 
 
-. playerLoad is not run, since it has already completed
-            successfully, and allow-start-if-complete is 'false' (the
+. `playerLoad` does not run, since it has already completed
+            successfully, and `allow-start-if-complete` is 'false' (the
             default).
 
 
-. gameLoad is executed again and processes another 2 files,
+. `gameLoad` runs again and processes another 2 files,
             loading their contents into the 'GAMES' table as well (with a
             process indicator indicating they have yet to be processed)
 
 
-. playerSummarization begins processing of all remaining game
+. `playerSummarization` begins processing of all remaining game
             data (filtering using the process indicator) and fails again after
             30 minutes.
 
 Run 3:
 
 
-. playerLoad is not run, since it has already completed
-            successfully, and allow-start-if-complete is 'false' (the
+. `playerLoad` does not run, since it has already completed
+            successfully, and `allow-start-if-complete` is 'false' (the
             default).
 
 
-. gameLoad is executed again and processes another 2 files,
+. `gameLoad` runs again and processes another 2 files,
             loading their contents into the 'GAMES' table as well (with a
             process indicator indicating they have yet to be processed)
 
 
-. playerSummarization is not start, and the job is immediately
+. `playerSummarization` is not started and the job is immediately
             killed, since this is the third execution of playerSummarization,
-            and its limit is only 2. The limit must either be raised, or the
+            and its limit is only 2. Either the limit must be raised or the
             `Job` must be executed as a new
             `JobInstance`.
 
@@ -463,11 +466,11 @@ There are many scenarios where errors encountered while processing
       transferred, which needs to be completely accurate. Loading a list of
       vendors, on the other hand, might allow for skips. If a vendor is not
       loaded because it was formatted incorrectly or was missing necessary
-      information, then there probably won't be issues. Usually these bad
-      records are logged as well, which will be covered later when discussing
+      information, then there probably are not issues. Usually, these bad
+      records are logged as well, which is covered later when discussing
       listeners.
-      
 
+The following example shows an example of using a skip limit:
 
 [source, xml]
 ----
@@ -483,21 +486,22 @@ There are many scenarios where errors encountered while processing
 </step>
 ----
 
-In this example, a `FlatFileItemReader` is
-      used, and if at any point a
-      `FlatFileParseException` is thrown, it will be
+In the preceding example, a `FlatFileItemReader` is
+      used. If, at any point, a
+      `FlatFileParseException` is thrown, it the item is
       skipped and counted against the total skip limit of 10. Separate counts
-      are made of skips on read, process and write inside the step execution,
-      and the limit applies across all. Once the skip limit is reached, the
-      next exception found will cause the step to fail.
+      are made of skips on read, process, and write inside the step execution,
+      but the limit applies across all skips. Once the skip limit is reached, the
+      next exception found causes the step to fail. In other words, the eleventh skip
+      triggers the exception, not the tenth.
 
-One problem with the example above is that any other exception
-      besides a `FlatFileParseException` will cause the
-      `Job` to fail. In certain scenarios this may be the
-      correct behavior. However, in other scenarios it may be easier to
+One problem with the preceding example is that any other exception
+      besides a `FlatFileParseException` causes the
+      `Job` to fail. In certain scenarios, this may be the
+      correct behavior. However, in other scenarios, it may be easier to
       identify which exceptions should cause failure and skip everything
-      else:
-      
+      else, as shown in the following example:
+
 
 
 [source, xml]
@@ -522,11 +526,11 @@ By 'including' `java.lang.Exception` as a
       refines the list of skippable exception classes to be all
       `Exceptions` __except__
       `FileNotFoundException`. Any excluded exception
-      classes will be fatal if encountered (i.e. not skipped).
+      classes will be fatal if encountered (that is, they are not skipped).
 
-For any exception encountered, the skippability will be determined
+For any exception encountered, the skippability is determined
       by the nearest superclass in the class hierarchy. Any unclassifed
-      exception will be treated as 'fatal'. The order of the
+      exception is treated as 'fatal'. The order of the
       `<include/>` and `<exclude/>` elements
       does not matter.
 
@@ -535,16 +539,16 @@ For any exception encountered, the skippability will be determined
 
 ==== Configuring Retry Logic
 
-In most cases you want an exception to cause either a skip or
+In most cases, you want an exception to cause either a skip or a
       `Step` failure. However, not all exceptions are
       deterministic. If a `FlatFileParseException` is
-      encountered while reading, it will always be thrown for that record;
-      resetting the `ItemReader` will not help. However,
+      encountered while reading, it is always thrown for that record.
+      Resetting the `ItemReader` does not help. However,
       for other exceptions, such as a
       `DeadlockLoserDataAccessException`, which indicates
       that the current process has attempted to update a record that another
-      process holds a lock on, waiting and trying again might result in
-      success. In this case, retry should be configured:
+      process holds a lock on. Waiting and trying again might result in
+      success. In this case, retry should be configured as follows:
 
 
 [source, xml]
@@ -561,7 +565,7 @@ In most cases you want an exception to cause either a skip or
 </step>
 ----
 The `Step` allows a limit for the number of
-      times an individual item can be retried, and a list of exceptions that
+      times an individual item can be retried and a list of exceptions that
       are 'retryable'. More details on how retry works can be found in <<step.adoc#retryLogic, retry>>.
 
 [[controllingRollback]]
@@ -570,15 +574,15 @@ The `Step` allows a limit for the number of
 ==== Controlling Rollback
 
 By default, regardless of retry or skip, any exceptions thrown
-      from the ItemWriter will cause the transaction
+      from the `ItemWriter` cause the transaction
       controlled by the `Step` to rollback. If skip is
       configured as described above, exceptions thrown from the
-      `ItemReader` will not cause a rollback. However,
+      `ItemReader` do not cause a rollback. However,
       there are many scenarios in which exceptions thrown from the
-      ItemWriter should not cause a rollback because no
+      `ItemWriter` should not cause a rollback, because no
       action has taken place to invalidate the transaction. For this reason,
       the `Step` can be configured with a list of
-      exceptions that should not cause rollback.
+      exceptions that should not cause rollback, as shown in the following example:
 
 
 [source, xml]
@@ -599,14 +603,14 @@ By default, regardless of retry or skip, any exceptions thrown
 ===== Transactional Readers
 
 The basic contract of the `ItemReader` is
-        that it is forward only. The step buffers reader input, so that in the
-        case of a rollback the items don't need to be re-read from the reader.
+        that it is forward only. The step buffers reader input, so that, in the
+        case of a rollback, the items do not need to be re-read from the reader.
         However, there are certain scenarios in which the reader is built on
         top of a transactional resource, such as a JMS queue. In this case,
         since the queue is tied to the transaction that is rolled back, the
-        messages that have been pulled from the queue will be put back on. For
+        messages that have been pulled from the queue are put back on. For
         this reason, the step can be configured to not buffer the
-        items:
+        items, as shown in the following example:
 
 
 [source, xml]
@@ -623,10 +627,10 @@ The basic contract of the `ItemReader` is
 
 ==== Transaction Attributes
 
-Transaction attributes can be used to control the isolation,
-      propagation, and timeout settings. More information on setting
-      transaction attributes can be found in the spring core
-      documentation.
+Transaction attributes can be used to control the `isolation`,
+      `propagation`, and `timeout` settings. More information on setting
+      transaction attributes can be found in the https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction[Spring core
+      documentation]. The following example sets the `isolation`, `propagation`, and `timeout` transaction attributes:
 
 
 [source, xml]
@@ -644,25 +648,25 @@ Transaction attributes can be used to control the isolation,
 [[registeringItemStreams]]
 
 
-==== Registering ItemStreams with the Step
+==== Registering `ItemStreams` with a `Step`
 
 The step has to take care of `ItemStream`
-      callbacks at the necessary points in its lifecycle. (for more
-      information on the `ItemStream` interface, please
-      refer to <<readersAndWriters.adoc#itemStream,itemStream>>) This is vital if a step fails,
+      callbacks at the necessary points in its lifecycle. (For more
+      information on the `ItemStream` interface,
+      see <<readersAndWriters.adoc#itemStream,ItemStream>>) This is vital if a step fails
       and might need to be restarted, because the
       `ItemStream` interface is where the step gets the
       information it needs about persistent state between executions.
 
 If the `ItemReader`,
       `ItemProcessor`, or
-      ItemWriter itself implements the
-      `ItemStream` interface, then these will be
+      `ItemWriter` itself implements the
+      `ItemStream` interface, then these are
       registered automatically. Any other streams need to be registered
-      separately. This is often the case where there are indirect dependencies
-      such as delegates being injected into the reader and writer. A stream
+      separately. This is often the case where indirect dependencies
+      such as delegates are injected into the reader and writer. A stream
       can be registered on the `Step` through the
-      'streams' element, as illustrated below:
+      'streams' element, as illustrated in the following example:
 
 
 [source, xml]
@@ -696,35 +700,35 @@ In the example above, the
       streams in order for the framework to handle them correctly. The
       `ItemReader` does not need to be explicitly
       registered as a stream because it is a direct property of the
-      `Step`. The step will now be restartable and the
-      state of the reader and writer will be correctly persisted in the event
+      `Step`. The step is now restartable, and the
+      state of the reader and writer is correctly persisted in the event
       of a failure.
 
 [[interceptingStepExecution]]
 
 
-==== Intercepting Step Execution
+==== Intercepting `Step` Execution
 
 Just as with the `Job`, there are many events
       during the execution of a `Step` where a user may
       need to perform some functionality. For example, in order to write out
       to a flat file that requires a footer, the
-      ItemWriter needs to be notified when the
+      `ItemWriter` needs to be notified when the
       `Step` has been completed, so that the footer can
       written. This can be accomplished with one of many
       `Step` scoped listeners.
 
 Any class that implements one of the extensions
 	  of `StepListener` (but not that interface
-	  itself since it is empty) can be applied to a step via the
-	  listeners element.  The listeners element is valid inside a
-	  step, tasklet or chunk declaration.  It is recommended that you
-	  declare the listeners at the level which its function applies,
-	  or if it is multi-featured
-	  (e.g. `StepExecutionListener`
-	  and `ItemReadListener`) then declare it at
-	  the most granular level that it applies (chunk in the example
-	  given).
+	  itself since it is empty) can be applied to a step through the
+	  `listeners` element.  The `listeners` element is valid inside a
+	  step, tasklet, or chunk declaration.  It is recommended that you
+	  declare the listeners at the level at which its function applies,
+	  or, if it is multi-featured
+	  (such as `StepExecutionListener`
+	  and `ItemReadListener`), then declare it at
+	  the most granular level where it applies.
+	  The following example shows a listener applied at the chunk level:
 
 
 [source, xml]
@@ -740,23 +744,23 @@ Any class that implements one of the extensions
 ----
 
 An `ItemReader`,
-      ItemWriter or
-      `ItemProcessor` that itself implements one of the
-      `StepListener` interfaces will be registered
+      `ItemWriter` or
+      ``ItemProcessor`` that itself implements one of the
+      `StepListener` interfaces is registered
       automatically with the `Step` if using the
-      namespace `<step>` element, or one of the the
+      namespace `<step>` element or one of the the
       `*StepFactoryBean` factories. This only applies to
-      components directly injected into the `Step`: if
+      components directly injected into the `Step`. If
       the listener is nested inside another component, it needs to be
-      explicitly registered (as described above).
+      explicitly registered (as described previously under <<registeringItemStreams>>).
 
 In addition to the `StepListener` interfaces,
       annotations are provided to address the same concerns. Plain old Java
       objects can have methods with these annotations that are then converted
       into the corresponding `StepListener` type. It is
-      also common to annotate custom implementations of chunk components like
+      also common to annotate custom implementations of chunk components such as
       `ItemReader` or ItemWriter
-      or `Tasklet`. The annotations are analysed by the
+      or `Tasklet`. The annotations are analyzed by the
       XML parser for the `<listener/>` elements, so all you
       need to do is use the XML namespace to register the listeners with a
       step.
@@ -764,12 +768,12 @@ In addition to the `StepListener` interfaces,
 [[stepExecutionListener]]
 
 
-===== StepExecutionListener
+===== `StepExecutionListener`
 
 `StepExecutionListener` represents the most
         generic listener for `Step` execution. It allows
         for notification before a `Step` is started and
-        after it has ends, whether it ended normally or failed:
+        after it ends, whether it ended normally or failed, as shown in the following example:
 
 
 [source, java]
@@ -783,7 +787,7 @@ public interface StepExecutionListener extends StepListener {
 }
 ----
 
-ExitStatus is the return type of
+`ExitStatus` is the return type of
         `afterStep` in order to allow listeners the
         chance to modify the exit code that is returned upon completion of a
         `Step`.
@@ -799,13 +803,13 @@ The annotations corresponding to this interface are:
 [[chunkListener]]
 
 
-===== ChunkListener
+===== `ChunkListener`
 
 A chunk is defined as the items processed within the scope of a
         transaction. Committing a transaction, at each commit interval,
         commits a 'chunk'. A `ChunkListener` can be
-        useful to perform logic before a chunk begins processing or after a
-        chunk has completed successfully:
+        used to perform logic before a chunk begins processing or after a
+        chunk has completed successfully, as shown in the following interface definition:
 
 
 [source, java]
@@ -819,7 +823,7 @@ public interface ChunkListener extends StepListener {
 ----
 
 The beforeChunk method is called after
-        the transaction is started, but before read
+        the transaction is started but before read
         is called on the `ItemReader`. Conversely,
         `afterChunk` is called after the chunk has been
         committed (and not at all if there is a rollback).
@@ -833,22 +837,22 @@ The annotations corresponding to this interface are:
 * `@AfterChunk`
 
 A `ChunkListener` can be applied
-		when there is no chunk declaration: it is
-		the `TaskletStep` that is responsible for
-		calling the `ChunkListener` so it applies
-		to a non-item-oriented tasklet as well (called before and
+		when there is no chunk declaration.
+		The `TaskletStep` is responsible for
+		calling the `ChunkListener`, so it applies
+		to a non-item-oriented tasklet as well (it is called before and
 		after the tasklet).
 
 [[itemReadListener]]
 
 
-===== ItemReadListener
+===== `ItemReadListener`
 
-When discussing skip logic above, it was mentioned that it may
-        be beneficial to log the skipped records, so that they can be deal
+When discussing skip logic previously, it was mentioned that it may
+        be beneficial to log the skipped records, so that they can be dealt
         with later. In the case of read errors, this can be done with an
-        `ItemReaderListener`:
-        
+        `ItemReaderListener`, as shown in the following interface definition:
+
 
 
 [source, java]
@@ -862,14 +866,14 @@ public interface ItemReadListener<T> extends StepListener {
 }
 ----
 
-The `beforeRead` method will be called
+The `beforeRead` method is called
         before each call to read on the
         `ItemReader`. The
-        afterRead method will be called after each
-        successful call to read, and will be passed
+        `afterRead` method is called after each
+        successful call to read and is passed
         the item that was read. If there was an error while reading, the
-        `onReadError` method will be called. The
-        exception encountered will be provided so that it can be
+        `onReadError` method is called. The
+        exception encountered is provided so that it can be
         logged.
 
 The annotations corresponding to this interface are:
@@ -886,10 +890,10 @@ The annotations corresponding to this interface are:
 [[itemProcessListener]]
 
 
-===== ItemProcessListener
+===== `ItemProcessListener`
 
 Just as with the `ItemReadListener`, the
-        processing of an item can be 'listened' to:
+        processing of an item can be 'listened' to, as shown in the following interface definition:
 
 
 [source, java]
@@ -903,14 +907,14 @@ public interface ItemProcessListener<T, S> extends StepListener {
 }
 ----
 
-The `beforeProcess` method will be called
+The `beforeProcess` method is called
         before `process` on the
-        `ItemProcessor`, and is handed the item that will
-        be processed. The `afterProcess` method will be
+        `ItemProcessor` and is handed the item that is to
+        be processed. The `afterProcess` method is
         called after the item has been successfully processed. If there was an
         error while processing, the `onProcessError`
-        method will be called. The exception encountered and the item that was
-        attempted to be processed will be provided, so that they can be
+        method is called. The exception encountered and the item that was
+        attempted to be processed is provided, so that they can be
         logged.
 
 The annotations corresponding to this interface are:
@@ -927,10 +931,10 @@ The annotations corresponding to this interface are:
 [[itemWriteListener]]
 
 
-===== ItemWriteListener
+===== `ItemWriteListener`
 
 The writing of an item can be 'listened' to with the
-        `ItemWriteListener`:
+        `ItemWriteListener`, as shown in the following interface definition:
 
 
 [source, java]
@@ -944,14 +948,14 @@ public interface ItemWriteListener<S> extends StepListener {
 }
 ----
 
-The `beforeWrite` method will be called
+The `beforeWrite` method is called
         before `write` on the
-        `ItemWriter`, and is handed the item that will be
-        written. The `afterWrite` method will be called
+        `ItemWriter` and is handed the item that is
+        written. The `afterWrite` method is called
         after the item has been successfully written. If there was an error
-        while writing, the `onWriteError` method will
-        be called. The exception encountered and the item that was attempted
-        to be written will be provided, so that they can be logged.
+        while writing, the `onWriteError` method is
+        called. The exception encountered and the item that was attempted
+        to be written is provided, so that they can be logged.
 
 The annotations corresponding to this interface are:
 
@@ -967,16 +971,16 @@ The annotations corresponding to this interface are:
 [[skipListener]]
 
 
-===== SkipListener
+===== `SkipListener`
 
 `ItemReadListener`,
         `ItemProcessListener`, and
         `ItemWriteListener` all provide mechanisms for
-        being notified of errors, but none will inform you that a record has
+        being notified of errors, but none informs you that a record has
         actually been skipped. `onWriteError`, for
-        example, will be called even if an item is retried and successful. For
+        example, is called even if an item is retried and successful. For
         this reason, there is a separate interface for tracking skipped
-        items:
+        items, as shown in the following interface definition:
 
 
 [source, java]
@@ -990,10 +994,10 @@ public interface SkipListener<T,S> extends StepListener {
 }
 ----
 
-`onSkipInRead` will be called whenever an
+`onSkipInRead` is called whenever an
         item is skipped while reading. It should be noted that rollbacks may
         cause the same item to be registered as skipped more than once.
-        `onSkipInWrite` will be called when an item is
+        `onSkipInWrite` is called when an item is
         skipped while writing. Because the item has been read successfully
         (and not skipped), it is also provided the item itself as an
         argument.
@@ -1023,10 +1027,10 @@ One of the most common use cases for a
 
 
 . The appropriate skip method (depending on when the error
-              happened) will only be called once per item.
+              happened) is called only once per item.
 
 
-. The `SkipListener` will always be
+. The `SkipListener` is always
               called just before the transaction is committed. This is to
               ensure that any transactional resources call by the listener are
               not rolled back by a failure within the
@@ -1035,27 +1039,27 @@ One of the most common use cases for a
 [[taskletStep]]
 
 
-=== TaskletStep
+=== `TaskletStep`
 
-Chunk-oriented processing is not the only way to process in a
+<<chunkOrientedProcessing,Chunk-oriented processing>> is not the only way to process in a
     `Step`. What if a `Step` must
-    consist as a simple stored procedure call? You could implement the call as
+    consist of a simple stored procedure call? You could implement the call as
     an `ItemReader` and return null after the procedure
-    finishes, but it is a bit unnatural since there would need to be a no-op
+    finishes. However, doing so is a bit unnatural, since there would need to be a no-op
     `ItemWriter`. Spring Batch provides the
     `TaskletStep` for this scenario.
 
-The `Tasklet` is a simple interface that has
-    one method, `execute`, which will be a called
+`Tasklet` is a simple interface that has
+    one method, `execute`, which is called
     repeatedly by the `TaskletStep` until it either
     returns `RepeatStatus.FINISHED` or throws an exception to
-    signal a failure. Each call to the `Tasklet` is
+    signal a failure. Each call to a `Tasklet` is
     wrapped in a transaction. `Tasklet` implementors
     might call a stored procedure, a script, or a simple SQL update statement.
     To create a `TaskletStep`, the 'ref' attribute of the
-    <tasklet/> element should reference a bean defining a
-    `Tasklet` object; no <chunk/> element should be
-    used within the <tasklet/>:
+    <tasklet/> element should reference a bean that defines a
+    `Tasklet` object. No <chunk/> element should be
+    used within the <tasklet/>. The following example shows a simple tasklet:
 
 
 [source, xml]
@@ -1068,9 +1072,11 @@ The `Tasklet` is a simple interface that has
 
 [NOTE]
 ====
-`TaskletStep` will automatically register the
-      tasklet as `StepListener` if it implements this
-      interface
+`TaskletStep` automatically registers the
+      tasklet as a `StepListener` if it implements the
+      interface.
+      // TODO if it implements which interface? There are a number of interfaces in this
+      // discussion, so we should be specific here.
 
 ====
 
@@ -1078,7 +1084,7 @@ The `Tasklet` is a simple interface that has
 [[taskletAdapter]]
 
 
-==== TaskletAdapter
+==== `TaskletAdapter`
 
 As with other adapters for the `ItemReader`
       and `ItemWriter` interfaces, the
@@ -1088,7 +1094,7 @@ As with other adapters for the `ItemReader`
       useful is an existing DAO that is used to update a flag on a set of
       records. The `TaskletAdapter` can be used to call
       this class without having to write an adapter for the
-      `Tasklet` interface:
+      `Tasklet` interface, as shown in the following example:
 
 
 [source, xml]
@@ -1104,15 +1110,15 @@ As with other adapters for the `ItemReader`
 [[exampleTaskletImplementation]]
 
 
-==== Example Tasklet Implementation
+==== Example `Tasklet` Implementation
 
 Many batch jobs contain steps that must be done before the main
       processing begins in order to set up various resources or after
       processing has completed to cleanup those resources. In the case of a
       job that works heavily with files, it is often necessary to delete
       certain files locally after they have been uploaded successfully to
-      another location. The example below taken from the Spring Batch samples
-      project, is a `Tasklet` implementation with just
+      another location. The following example (taken from the https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring Batch samples
+      project]) is a `Tasklet` implementation with just
       such a responsibility:
 
 
@@ -1148,9 +1154,9 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
 }
 ----
 
-The above `Tasklet` implementation will
-      delete all files within a given directory. It should be noted that the
-      `execute` method will only be called once. All
+The preceding `Tasklet` implementation
+      deletes all files within a given directory. It should be noted that the
+      `execute` method is called only once. All
       that is left is to reference the `Tasklet` from the
       `Step`:
 
@@ -1180,10 +1186,10 @@ The above `Tasklet` implementation will
 === Controlling Step Flow
 
 With the ability to group steps together within an owning job comes
-    the need to be able to control how the job 'flows' from one step to
-    another. The failure of a `Step` doesn't necessarily
+    the need to be able to control how the job "flows" from one step to
+    another. The failure of a `Step` does not necessarily
     mean that the `Job` should fail. Furthermore, there
-    may be more than one type of 'success' which determines which
+    may be more than one type of 'success' that determines which
     `Step` should be executed next. Depending upon how a
     group of `Steps` is configured, certain steps may not even be processed at
     all.
@@ -1194,13 +1200,13 @@ With the ability to group steps together within an owning job comes
 ==== Sequential Flow
 
 The simplest flow scenario is a job where all of the steps execute
-      sequentially:
+      sequentially, as shown in the following image:
 
 .Sequential Flow
 image::{batch-asciidoc}images/sequential-flow.png[Sequential Flow, scaledwidth="60%"]
 
-This can be achieved using the 'next' attribute of the step
-      element:
+This can be achieved by using the 'next' attribute of the step
+      element, as shown in the following example:
 
 
 [source, xml]
@@ -1212,18 +1218,18 @@ This can be achieved using the 'next' attribute of the step
 </job>
 ----
 
-In the scenario above, 'step A' will execute
+In the scenario above, 'step A' runs
       first because it is the first `Step` listed. If
-      'step A' completes normally, then 'step B' will execute, and so on.
+      'step A' completes normally, then 'step B' runs, and so on.
       However, if 'step A' fails, then the entire `Job`
-      will fail and 'step B' will not execute.
+      fails and 'step B' does not execute.
 
 
 [NOTE]
 ====
 With the Spring Batch namespace, the first step listed in the
-        configuration will __always__ be the first step
-        executed by the `Job`. The order of the other
+        configuration is __always__ the first step
+        run by the `Job`. The order of the other
         step elements does not matter, but the first step must always appear
         first in the xml.
 ====
@@ -1241,13 +1247,13 @@ In the example above, there are only two possibilities:
           `Step` should be executed.
 
 
-. The `Step` failed and thus the
+. The `Step` failed and, thus, the
           `Job` should fail.
 
 In many cases, this may be sufficient. However, what about a
       scenario in which the failure of a `Step` should
       trigger a different `Step`, rather than causing
-      failure?
+      failure? The following image shows such a flow:
 
 .Conditional Flow
 image::{batch-asciidoc}images/conditional-flow.png[Conditional Flow, scaledwidth="60%"]
@@ -1255,18 +1261,18 @@ image::{batch-asciidoc}images/conditional-flow.png[Conditional Flow, scaledwidth
 [[nextElement]]
 In order to handle more complex scenarios, the
       Spring Batch namespace allows transition elements to be defined within
-      the step element. One such transition is the "next" element. Like the
-      "next" attribute, the "next" element will tell the
+      the step element. One such transition is the `next` element. Like the
+      `next` attribute, the `next` element tells the
       `Job` which `Step` to execute
-      next. However, unlike the attribute, any number of "next" elements are
+      next. However, unlike the attribute, any number of `next` elements are
       allowed on a given `Step`, and there is no default
-      behavior the case of failure. This means that if transition elements are
-      used, then all of the behavior for the `Step`'s
+      behavior the case of failure. This means that, if transition elements are
+      used, then all of the behavior for the `Step`
       transitions must be defined explicitly. Note also that a single step
-      cannot have both a "next" attribute and a transition element.
+      cannot have both a `next` attribute and a `transition` element.
 
-The next element specifies a pattern to match and the step to
-      execute next:
+The `next` element specifies a pattern to match and the step to
+      execute next, as shown in the following example:
 
 
 [source, xml]
@@ -1281,7 +1287,7 @@ The next element specifies a pattern to match and the step to
 </job>
 ----
 
-The "on" attribute of a transition element uses a simple
+The `on` attribute of a transition element uses a simple
       pattern-matching scheme to match the `ExitStatus`
       that results from the execution of the `Step`. Only
       two special characters are allowed in the pattern:
@@ -1292,39 +1298,40 @@ The "on" attribute of a transition element uses a simple
 
 * "?" will match exactly one character
 
-For example, "c*t" will match "cat" and "count", while "c?t" will
-      match "cat" but not "count".
+For example, "c*t" matches "cat" and "count", while "c?t"
+      matches "cat" but not "count".
 
 While there is no limit to the number of transition elements on a
-      `Step`, if the `Step`'s
+      `Step`, if the `Step`
       execution results in an `ExitStatus` that is not
-      covered by an element, then the framework will throw an exception and
-      the `Job` will fail. The framework will
-	  automatically order transitions from most specific to
-      least specific. This means that even if the elements were swapped for
+      covered by an element, then the framework throws an exception and
+      the `Job` fails. The framework
+	  automatically orders transitions from most specific to
+      least specific. This means that, even if the elements were swapped for
       "stepA" in the example above, an `ExitStatus` of
       "FAILED" would still go to "stepC".
 
 [[batchStatusVsExitStatus]]
 
 
-===== Batch Status vs. Exit Status
+===== Batch Status Versus Exit Status
 
 When configuring a `Job` for conditional
         flow, it is important to understand the difference between
-        BatchStatus and
-        `ExitStatus`. BatchStatus
+        `BatchStatus` and
+        `ExitStatus`. `BatchStatus`
         is an enumeration that is a property of both
-        JobExecution and
-        `StepExecution` and is used by the framework to
+        `JobExecution` and
+        ``StepExecution`` and is used by the framework to
         record the status of a `Job` or
         `Step`. It can be one of the following values:
-        COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED or
-        UNKNOWN. Most of them are self explanatory: COMPLETED is the status
-        set when a step or job has completed successfully, FAILED is set when
-        it fails, and so on. The example above contains the following 'next'
+        `COMPLETED`, `STARTING`, `STARTED`, `STOPPING`, `STOPPED`, `FAILED`, `ABANDONED`, or
+        `UNKNOWN`. Most of them are self explanatory: `COMPLETED` is the status
+        set when a step or job has completed successfully, `FAILED` is set when
+        it fails, and so on. The following example above contains the following 'next'
         element:
-
+// TODO It might help readers to know the difference between STARTING and STARTED (same
+// for STOPPING and STOPPED). Specifically, when does the status go from STARTING to STARTED?
 
 [source, xml]
 ----
@@ -1332,16 +1339,16 @@ When configuring a `Job` for conditional
 ----
 
 At first glance, it would appear that the 'on' attribute
-        references the BatchStatus of the
+        references the `BatchStatus` of the
         `Step` to which it belongs. However, it actually
         references the `ExitStatus` of the
         `Step`. As the name implies,
         `ExitStatus` represents the status of a
         `Step` after it finishes execution. More
-        specifically, the 'next' element above references the exit code of the
-        `ExitStatus`. To write it in English, it says:
-        "go to stepB if the exit code is FAILED". By default, the exit code is
-        always the same as the BatchStatus for the
+        specifically, the 'next' element shown in the preceding example references the exit code of
+        `ExitStatus`. In English, it says:
+        "go to stepB if the exit code is `FAILED`". By default, the exit code is
+        always the same as the `BatchStatus` for the
         `Step`, which is why the entry above works. However, what if the exit
         code needs to be different? A good example comes from the skip sample
         job within the samples project:
@@ -1367,13 +1374,13 @@ The above step has three possibilities:
             successfully.
 
 
-. The `Step` completed successfully, but
+. The `Step` completed successfully but
             with an exit code of 'COMPLETED WITH SKIPS'. In this case, a
             different step should be run to handle the errors.
 
-The above configuration will work. However, something needs to
+The above configuration works. However, something needs to
         change the exit code based on the condition of the execution having
-        skipped records:
+        skipped records, as shown in the following example:
 
 
 [source, java]
@@ -1394,10 +1401,12 @@ public class SkipCheckingListener extends StepExecutionListenerSupport {
 
 The above code is a `StepExecutionListener`
         that first checks to make sure the `Step` was
-        successful, and next if the skip count on the
+        successful and next if the skip count on the
         `StepExecution` is higher than 0. If both
         conditions are met, a new `ExitStatus` with an
-        exit code of "COMPLETED WITH SKIPS" is returned.
+        exit code of `COMPLETED WITH SKIPS` is returned.
+// TODO "and next if the skip count on the `StepExecution` is higher than 0" confuses me.
+// Please explain that, and I'll make a stronger sentence here.
 
 [[configuringForStop]]
 
@@ -1409,13 +1418,13 @@ After the discussion of <<step.adoc#batchStatusVsExitStatus,BatchStatus and
       `BatchStatus` and `ExitStatus`
       are determined for the `Job`. While these statuses
       are determined for the `Step` by the code that is
-      executed, the statuses for the `Job` will be
+      executed, the statuses for the `Job` are
       determined based on the configuration.
 
 So far, all of the job configurations discussed have had at least
       one final `Step` with no transitions. For example,
-      after the following step executes, the `Job` will
-      end:
+      after the following step executes, the `Job`
+      ends, as shown in the following example:
 
 
 [source, xml]
@@ -1424,59 +1433,58 @@ So far, all of the job configurations discussed have had at least
 ----
 
 If no transitions are defined for a `Step`,
-      then the `Job`'s statuses will be defined as
+      then the `Job`'s statuses is defined as
       follows:
 
 
 * If the `Step` ends with
           `ExitStatus` FAILED, then the
-          `Job`'s `BatchStatus` and
-          `ExitStatus` will both be FAILED.
-
-
-* Otherwise, the `Job`'s
           `BatchStatus` and
-          `ExitStatus` will both be COMPLETED.
+          `ExitStatus` of the `Job` are both `FAILED`.
+
+* Otherwise, the
+          `BatchStatus` and
+          `ExitStatus` of the `Job` are both `COMPLETED`.
 
 While this method of terminating a batch job is sufficient for
       some batch jobs, such as a simple sequential step job, custom defined
       job-stopping scenarios may be required. For this purpose, Spring Batch
       provides three transition elements to stop a `Job`
-      (in addition to the <<step.adoc#nextElement,"next" element>>
-      that we discussed previously). Each of these stopping elements will stop
+      (in addition to the <<step.adoc#nextElement,`next` element>>
+      that we discussed previously). Each of these stopping elements stops
       a `Job` with a particular
       `BatchStatus`. It is important to note that the
-      stop transition elements will have no effect on either the
+      stop transition elements have no effect on either the
       `BatchStatus` or `ExitStatus`
-      of any `Steps` in the `Job`:
-      these elements will only affect the final statuses of the
+      of any `Steps` in the `Job`.
+      These elements affect only the final statuses of the
       `Job`. For example, it is possible for every step
-      in a job to have a status of FAILED but the job to have a status of
-      COMPLETED, or vise versa.
+      in a job to have a status of `FAILED` but for the job to have a status of
+      `COMPLETED`. (It is also possible for the steps to have a status of `FAILED` and the job to have a status of `COMPLETED`.)
 
 [[endElement]]
 
 
-===== The 'End' Element
+===== The 'end' Element
 
 The 'end' element instructs a `Job` to stop
-        with a `BatchStatus` of COMPLETED. A
-        `Job` that has finished with status COMPLETED
-        cannot be restarted (the framework will throw a
+        with a `BatchStatus` of `COMPLETED`. A
+        `Job` that has finished with status `COMPLETED`
+        cannot be restarted (the framework throws a
         `JobInstanceAlreadyCompleteException`). The 'end'
         element also allows for an optional 'exit-code' attribute that can be
         used to customize the `ExitStatus` of the
         `Job`. If no 'exit-code' attribute is given, then
-        the `ExitStatus` will be "COMPLETED" by default,
+        the `ExitStatus` is `COMPLETED` by default,
         to match the `BatchStatus`.
 
-In the following scenario, if step2 fails, then the
-        `Job` will stop with a
-        `BatchStatus` of COMPLETED and an
-        `ExitStatus` of "COMPLETED" and step3 will not
-        execute; otherwise, execution will move to step3. Note that if step2
-        fails, the `Job` will not be restartable (because
-        the status is COMPLETED).
+In the following scenario, if `step2` fails, then the
+        `Job` stops with a
+        `BatchStatus` of `COMPLETED` and an
+        `ExitStatus` of `COMPLETED` and `step3` does not
+        run. Otherwise, execution moves to `step3`. Note that if `step2`
+        fails, the `Job` is not restartable (because
+        the status is `COMPLETED`).
 
 
 [source, xml]
@@ -1497,22 +1505,22 @@ In the following scenario, if step2 fails, then the
 ===== The 'Fail' Element
 
 The 'fail' element instructs a `Job` to
-        stop with a `BatchStatus` of FAILED. Unlike the
-        'end' element, the 'fail' element will not prevent the
+        stop with a `BatchStatus` of `FAILED`. Unlike the
+        'end' element, the 'fail' element does not prevent the
         `Job` from being restarted. The 'fail' element
         also allows for an optional 'exit-code' attribute that can be used to
         customize the `ExitStatus` of the
         `Job`. If no 'exit-code' attribute is given, then
-        the `ExitStatus` will be "FAILED" by default, to
+        the `ExitStatus` is `FAILED` by default, to
         match the `BatchStatus`.
 
-In the following scenario, if step2 fails, then the
+In the following scenario, if `step2` fails, then the
         `Job` will stop with a
-        `BatchStatus` of FAILED and an
-        `ExitStatus` of "EARLY TERMINATION" and step3
-        will not execute; otherwise, execution will move to step3.
-        Additionally, if step2 fails, and the `Job` is
-        restarted, then execution will begin again on step2.
+        `BatchStatus` of `FAILED` and an
+        `ExitStatus` of `EARLY TERMINATION` and `step3`
+        does not execute. Otherwise, execution moves to `step3`.
+        Additionally, if `step2` fails and the `Job` is
+        restarted, then execution begins again on `step2`.
 
 
 [source, xml]
@@ -1530,19 +1538,19 @@ In the following scenario, if step2 fails, then the
 [[stopElement]]
 
 
-===== The 'Stop' Element
+===== The 'stop' Element
 
 The 'stop' element instructs a `Job` to
-        stop with a `BatchStatus` of STOPPED. Stopping a
-        `Job` can provide a temporary break in processing
+        stop with a `BatchStatus` of `STOPPED`. Stopping a
+        `Job` can provide a temporary break in processing,
         so that the operator can take some action before restarting the
         `Job`. The 'stop' element requires a 'restart'
         attribute that specifies the step where execution should pick up when
-        the `Job is restarted`.
+        the "Job is restarted".
 
-In the following scenario, if step1 finishes with COMPLETE, then
-        the job will then stop. Once it is restarted, execution will begin on
-        step2.
+In the following scenario, if `step1` finishes with `COMPLETE`, then
+        the job will then stop. Once it is restarted, execution begins on
+        `step2`.
 
 
 [source, xml]
@@ -1563,7 +1571,7 @@ In some situations, more information than the
       `ExitStatus` may be required to decide which step
       to execute next. In this case, a
       `JobExecutionDecider` can be used to assist in the
-      decision.
+      decision, as shown in the following example:
 
 
 [source, java]
@@ -1580,8 +1588,8 @@ public class MyDecider implements JobExecutionDecider {
 }
 ----
 
-In the job configuration, a "decision" tag will specify the
-      decider to use as well as all of the transitions.
+In the following sample job configuration, a `decision` element specifies the
+      decider to use as well as all of the transitions:
 
 
 [source, xml]
@@ -1611,10 +1619,10 @@ Every scenario described so far has involved a
       `Steps` one at a time in a linear fashion. In
       addition to this typical style, the Spring Batch namespace also allows
       for a job to be configured with parallel flows using the 'split'
-      element. As is seen below, the 'split' element contains one or more
+      element. As the following example shows, the 'split' element contains one or more
       'flow' elements, where entire separate flows can be defined. A 'split'
       element may also contain any of the previously discussed transition
-      elements such as the 'next' attribute or the 'next', 'end', 'fail', or
+      elements, such as the 'next' attribute or the 'next', 'end', 'fail', or
       'pause' elements.
 
 
@@ -1638,9 +1646,9 @@ Every scenario described so far has involved a
 ==== Externalizing Flow Definitions and Dependencies Between Jobs
 
 Part of the flow in a job can be externalized as a separate bean
-      definition, and then re-used. There are two ways to do this, and the
+      definition and then re-used. There are two ways to do so. The
       first is to simply declare the flow as a reference to one defined
-      elsewhere:
+      elsewhere, as shown in the following example:
 
 
 [source, xml]
@@ -1656,18 +1664,18 @@ Part of the flow in a job can be externalized as a separate bean
 </flow>
 ----
 
-The effect of defining an external flow like this is simply to
+The effect of defining an external flow as shown in the preceding example is to
       insert the steps from the external flow into the job as if they had been
-      declared inline. In this way many jobs can refer to the same template
+      declared inline. In this way, many jobs can refer to the same template
       flow and compose such templates into different logical flows. This is
       also a good way to separate the integration testing of the individual
       flows.
 
 The other form of an externalized flow is to use a
       `JobStep`. A `JobStep` is
-      similar to a `FlowStep`, but actually creates and
+      similar to a `FlowStep` but actually creates and
       launches a separate job execution for the steps in the flow specified.
-      Here is an example:
+      The following XML snippet shows an example of a `JobStep`:
 
 
 [source, xml]
@@ -1686,28 +1694,28 @@ The other form of an externalized flow is to use a
 </bean>
 ----
 
-The job parameters extractor is a strategy that determines how a
+The job parameters extractor is a strategy that determines how
       the `ExecutionContext` for the
       `Step` is converted into
-      JobParameters for the `Job` that is executed. The
+      `JobParameters` for the `Job` that is run. The
       `JobStep` is useful when you want to have some more
       granular options for monitoring and reporting on jobs and steps. Using
       `JobStep` is also often a good answer to the
-      question: "How do I create dependencies between jobs?". It is a good way
+      question: "How do I create dependencies between jobs?" It is a good way
       to break up a large system into smaller modules and control the flow of
       jobs.
 
 [[late-binding]]
 
 
-=== Late Binding of Job and Step Attributes
+=== Late Binding of `Job` and `Step` Attributes
 
-Both the XML and Flat File examples above use the Spring
+Both the XML and flat file examples shown earlier use the Spring
     `Resource` abstraction to obtain a file. This works
-    because `Resource` has a getFile
-    method, which returns a java.io.File. Both XML and
-    Flat File resources can be configured using standard Spring
-    constructs:
+    because `Resource` has a `getFile`
+    method, which returns a `java.io.File`. Both XML and
+    flat file resources can be configured using standard Spring
+    constructs, as shown in the following example:
 
 
 [source, xml]
@@ -1719,13 +1727,13 @@ Both the XML and Flat File examples above use the Spring
 </bean>
 ----
 
-The above `Resource` will load the file from
-    the file system location specified. Note that absolute locations have to
-    start with a double slash ("//"). In most spring applications, this
-    solution is good enough because the names of these are known at compile
+The preceding `Resource` loads the file from
+    the specified file system location. Note that absolute locations have to
+    start with a double slash (`//`). In most Spring applications, this
+    solution is good enough, because the names of these resources are known at compile
     time. However, in batch scenarios, the file name may need to be determined
-    at runtime as a parameter to the job. This could be solved using '-D'
-    parameters, i.e. a system property:
+    at runtime as a parameter to the job. This can be solved using '-D'
+    parameters to read a system property. The following XML snippet shows how to read a file from a property:
 
 
 [source, xml]
@@ -1737,17 +1745,17 @@ The above `Resource` will load the file from
 ----
 
 All that would be required for this solution to work would be a
-    system argument (-Dinput.file.name="file://file.txt"). (Note that although
+    system argument (such as `-Dinput.file.name="file://file.txt"`). (Note that, although
     a `PropertyPlaceholderConfigurer` can be used here,
     it is not necessary if the system property is always set because the
     `ResourceEditor` in Spring already filters and does
     placeholder replacement on system properties.)
 
-Often in a batch setting it is preferable to parameterize the file
+Often, in a batch setting, it is preferable to parameterize the file
     name in the `JobParameters` of the
     job, instead of through system properties, and access them that way. To
     accomplish this, Spring Batch allows for the late binding of various `Job`
-    and `Step` attributes:
+    and `Step` attributes, as shown in the following XML snippet:
 
 
 [source, xml]
@@ -1758,10 +1766,10 @@ Often in a batch setting it is preferable to parameterize the file
 </bean>
 ----
 
-Both the JobExecution and
+Both the `JobExecution` and
     `StepExecution` level
     `ExecutionContext` can be accessed in the same
-    way:
+    way, as shown in the following two examples:
 
 
 [source, xml]
@@ -1785,7 +1793,7 @@ Both the JobExecution and
 [NOTE]
 ====
 Any bean that uses late-binding must be declared with
-      scope="step". See for <<step.adoc#step-scope,Step Scope>> more
+      scope="step". See <<step.adoc#step-scope,Step Scope>> for more
       information.
 ====
 
@@ -1793,16 +1801,19 @@ Any bean that uses late-binding must be declared with
 
 [NOTE]
 ====
-If you are using Spring 3.0 (or above) the expressions in
+If you are using Spring 3.0 (or above), the expressions in
       step-scoped beans are in the Spring Expression Language, a powerful
       general purpose language with many interesting features. To provide
       backward compatibility, if Spring Batch detects the presence of older
-      versions of Spring it uses a native expression language that is less
-      powerful, and has slightly different parsing rules. The main difference
+      versions of Spring, it uses a native expression language that is less
+      powerful and that has slightly different parsing rules. The main difference
       is that the map keys in the example above do not need to be quoted with
       Spring 2.5, but the quotes are mandatory in Spring 3.0.
 ====
-
+// Where is that older language described? It'd be good to have a link to it here.
+// Also, given that we're up to version 5 of Spring, should we still be talking about
+// things from before version 3? (In other words, we should provide a link or drop the
+// whole thing.)
 
 [[step-scope]]
 
@@ -1810,7 +1821,7 @@ If you are using Spring 3.0 (or above) the expressions in
 ==== Step Scope
 
 All of the late binding examples from above have a scope of "step"
-      declared on the bean definition:
+      declared on the bean definition, as shown in the following example:
 
 
 [source, xml]
@@ -1822,11 +1833,12 @@ All of the late binding examples from above have a scope of "step"
 ----
 
 Using a scope of `Step` is required in order
-      to use late binding since the bean cannot actually be instantiated until
-      the `Step` starts, which allows the attributes to
+      to use late binding, because the bean cannot actually be instantiated until
+      the `Step` starts, to allow the attributes to
       be found. Because it is not part of the Spring container by default, the
       scope must be added explicitly, either by using the
-      `batch` namespace:
+      `batch` namespace or by including a bean definition explicitly for the
+      StepScope (but not both). The following example uses the `batch` namespace:
 
 
 [source, xml]
@@ -1840,8 +1852,7 @@ Using a scope of `Step` is required in order
 </beans>
 ----
 
-or by including a bean definition explicitly for the
-      StepScope (but not both):
+The following example includes the bean definition explicitly:
 
 
 [source, xml]
@@ -1854,13 +1865,13 @@ or by including a bean definition explicitly for the
 
 ==== Job Scope
 
-`Job` scope, introduced in Spring Batch 3.0 is similar to `Step` scope
-		in configuration but is a Scope for the `Job` context so there is only one
-		instance of such a bean per executing job. Additionally, support is provided
-		for late binding of references accessible from the JobContext using
-		#{..} placeholders. Using this feature, bean properties can be pulled from
-		the job or job execution context and the job parameters. E.g.
-		
+`Job` scope, introduced in Spring Batch 3.0, is similar to `Step` scope
+		in configuration but is a Scope for the `Job` context, so that there is only one
+		instance of such a bean per running job. Additionally, support is provided
+		for late binding of references accessible from the `JobContext` using
+		`#{..}` placeholders. Using this feature, bean properties can be pulled from
+		the job or job execution context and the job parameters, as shown in the following two examples:
+
 
 
 [source, xml]
@@ -1879,7 +1890,9 @@ or by including a bean definition explicitly for the
 ----
 
 Because it is not part of the Spring container by default, the scope
-		must be added explicitly, either by using the `batch` namespace:
+		must be added explicitly, either by using the `batch` namespace or by including a
+    bean definition explicitly for the JobScope (but not both). The following example
+    uses the `batch` namespace:
 
 
 [source, xml]
@@ -1894,10 +1907,9 @@ Because it is not part of the Spring container by default, the scope
 		  </beans>
 ----
 
-Or by including a bean definition explicitly for the JobScope (but not both):
+The following example includes a bean that explicitly defines the `JobScope`:
 
 [source, xml]
 ----
 <bean class="org.springframework.batch.core.scope.JobScope" />
 ----
-
