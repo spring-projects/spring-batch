@@ -10,7 +10,7 @@ All batch processing can be described in its most simple form as
   reading in large amounts of data, performing some type of calculation or
   transformation, and writing the result out. Spring Batch provides three key
   interfaces to help perform bulk reading and writing:
-  `ItemReader`, `ItemProcessor` and
+  `ItemReader`, `ItemProcessor`, and
   `ItemWriter`.
 
 [[itemReader]]
@@ -20,29 +20,29 @@ Although a simple concept, an `ItemReader` is
 the means for providing data from many different types of input. The most
 general examples include:
 
-* Flat File- Flat File Item Readers read lines of data from a
-flat file that typically describe records with fields of data
+* Flat File: Flat File Item Readers read lines of data from a
+flat file that typically describes records with fields of data
 defined by fixed positions in the file or delimited by some special
-character (e.g. Comma).
+character (such as a comma).
 
-* XML - XML `ItemReaders` process XML independently of
+* XML: XML `ItemReaders` process XML independently of
 technologies used for parsing, mapping and validating objects. Input
 data allows for the validation of an XML file against an XSD
 schema.
 
-* Database - A database resource is accessed to return
+* Database: A database resource is accessed to return
 resultsets which can be mapped to objects for processing. The
-default SQL `ItemReaders` invoke a `RowMapper` to
+default SQL `ItemReader` implementations invoke a `RowMapper` to
 return objects, keep track of the current row if restart is
 required, store basic statistics, and provide some transaction
-enhancements that will be explained later.
+enhancements that are explained later.
 
-There are many more possibilities, but we'll focus on the
-basic ones for this chapter. A complete list of all available `ItemReaders`
+There are many more possibilities, but we focus on the
+basic ones for this chapter. A complete list of all available `ItemReader` implementations
 can be found in Appendix A.
 
 `ItemReader` is a basic interface for generic
-input operations:
+input operations, as shown in the following interface definition:
 
 
 [source, java]
@@ -55,20 +55,20 @@ public interface ItemReader<T> {
 ----
 
 The read method defines the most essential
-contract of the `ItemReader`; calling it returns one
-Item or null if no more items are left. An item might represent a line in
+contract of the `ItemReader`. Calling it returns one
+item or `null` if no more items are left. An item might represent a line in
 a file, a row in a database, or an element in an XML file. It is generally
-expected that these will be mapped to a usable domain object (i.e. Trade,
-Foo, etc) but there is no requirement in the contract to do so.
+expected that these are mapped to a usable domain object (such as `Trade`,
+`Foo`, or others), but there is no requirement in the contract to do so.
 
 It is expected that implementations of the
-`ItemReader` interface will be forward only. However,
+`ItemReader` interface are forward only. However,
 if the underlying resource is transactional (such as a JMS queue) then
-calling read may return the same logical item on subsequent calls in a
+calling `read` may return the same logical item on subsequent calls in a
 rollback scenario. It is also worth noting that a lack of items to process
-by an `ItemReader` will not cause an exception to be
+by an `ItemReader` does not cause an exception to be
 thrown. For example, a database `ItemReader` that is
-configured with a query that returns 0 results will simply return null on
+configured with a query that returns 0 results returns `null` on
 the first invocation of read.
 
 [[itemWriter]]
@@ -77,15 +77,15 @@ the first invocation of read.
 === ItemWriter
 
 `ItemWriter` is similar in functionality to an
-`ItemReader`, but with inverse operations. Resources
-still need to be located, opened and closed but they differ in that an
+`ItemReader` but with inverse operations. Resources
+still need to be located, opened, and closed but they differ in that an
 `ItemWriter` writes out, rather than reading in. In
-the case of databases or queues these may be inserts, updates, or sends.
+the case of databases or queues, these operations may be inserts, updates, or sends.
 The format of the serialization of the output is specific to each batch
 job.
 
 As with `ItemReader`,
-`ItemWriter` is a fairly generic interface:
+`ItemWriter` is a fairly generic interface, as shown in the following interface definition:
 
 
 [source, java]
@@ -99,14 +99,14 @@ public interface ItemWriter<T> {
 
 As with `read` on
 `ItemReader`, `write` provides
-the basic contract of `ItemWriter`; it will attempt
+the basic contract of `ItemWriter`. It attempts
 to write out the list of items passed in as long as it is open. Because it
-is generally expected that items will be 'batched' together into a chunk
+is generally expected that items are 'batched' together into a chunk
 and then output, the interface accepts a list of items, rather than an
 item by itself. After writing out the list, any flushing that may be
 necessary can be performed before returning from the write method. For
 example, if writing to a Hibernate DAO, multiple calls to write can be
-made, one for each item. The writer can then call close on the hibernate
+made, one for each item. The writer can then call `close` on the hibernate
 Session before returning.
 
 [[itemProcessor]]
@@ -117,9 +117,9 @@ Session before returning.
 The `ItemReader` and `ItemWriter` interfaces are both very useful for
 their specific tasks, but what if you want to insert business logic before
 writing? One option for both reading and writing is to use the composite
-pattern: create an `ItemWriter` that contains another
-`ItemWriter`, or an `ItemReader`
-that contains another `ItemReader`. For
+pattern: Create an `ItemWriter` that contains another
+`ItemWriter` or an `ItemReader`
+that contains another `ItemReader`. The following code shows an
 example:
 
 
@@ -144,17 +144,17 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 }
 ----
 
-The class above contains another `ItemWriter`
+The preceding class contains another `ItemWriter`
 to which it delegates after having provided some business logic. This
 pattern could easily be used for an `ItemReader` as
 well, perhaps to obtain more reference data based upon the input that was
 provided by the main `ItemReader`. It is also useful
 if you need to control the call to `write` yourself.
 However, if you only want to 'transform' the item passed in for writing
-before it is actually written, there isn't much need to call
-`write` yourself: you just want to modify the item.
+before it is actually written, you need not
+`write` yourself. You can just modify the item.
 For this scenario, Spring Batch provides the
-`ItemProcessor` interface:
+`ItemProcessor` interface, as shown in the following interface definition:
 
 
 [source, java]
@@ -165,14 +165,14 @@ public interface ItemProcessor<I, O> {
 }
 ----
 
-An `ItemProcessor` is very simple; given one
+An `ItemProcessor` is simple. Given one
 object, transform it and return another. The provided object may or may
 not be of the same type. The point is that business logic may be applied
-within process, and is completely up to the developer to create. An
-`ItemProcessor` can be wired directly into a step,
-For example, assuming an `ItemReader` provides a
-class of type Foo, and it needs to be converted to type Bar before being
-written out. An `ItemProcessor` can be written that
+within the process, and it is completely up to the developer to create that logic. An
+`ItemProcessor` can be wired directly into a step.
+For example, assume an `ItemReader` provides a
+class of type `Foo` and that it needs to be converted to type Bar before being
+written out. The following example shows an `ItemProcessor` that
 performs the conversion:
 
 
@@ -198,17 +198,17 @@ public class BarWriter implements ItemWriter<Bar>{
 }
 ----
 
-In the very simple example above, there is a class
+In the preceding example, there is a class
 `Foo`, a class `Bar`, and a
 class `FooProcessor` that adheres to the
 `ItemProcessor` interface. The transformation is
 simple, but any type of transformation could be done here. The
-`BarWriter` will be used to write out
+`BarWriter` writes
 `Bar` objects, throwing an exception if any other
-type is provided. Similarly, the `FooProcessor` will
-throw an exception if anything but a `Foo` is
+type is provided. Similarly, the `FooProcessor`
+throws an exception if anything but a `Foo` is
 provided. The `FooProcessor` can then be injected
-into a `Step`:
+into a `Step`, as shown in the following example:
 
 
 [source, xml]
@@ -230,11 +230,11 @@ into a `Step`:
 
 Performing a single transformation is useful in many scenarios,
 but what if you want to 'chain' together multiple
-`ItemProcessors`? This can be accomplished using
+`ItemProcessor` implementations? This can be accomplished using
 the composite pattern mentioned previously. To update the previous,
-single transformation, example, `Foo` will be
-transformed to `Bar`, which will be transformed to
-`Foobar` and written out:
+single transformation, example, `Foo` is
+transformed to `Bar`, which is transformed to
+`Foobar` and written out, as shown in the following example:
 
 
 [source, java]
@@ -269,9 +269,9 @@ public class FoobarWriter implements ItemWriter<FooBar>{
 }
 ----
 
-A `FooProcessor` and
+A `FooProcessor` and a
       `BarProcessor` can be 'chained' together to give
-      the resultant `Foobar`:
+      the resultant `Foobar`, as shown in the following example:
 
 
 [source, java]
@@ -317,8 +317,8 @@ Just as with the previous example, the composite processor can be
 
 One typical use for an item processor is to filter out records
 before they are passed to the `ItemWriter`. Filtering is an action
-distinct from skipping; skipping indicates that a record is invalid
-whereas filtering simply indicates that a record should not be
+distinct from skipping. Skipping indicates that a record is invalid,
+while filtering simply indicates that a record should not be
 written.
 
 For example, consider a batch job that reads a file containing
@@ -326,16 +326,16 @@ three different types of records: records to insert, records to update,
 and records to delete. If record deletion is not supported by the
 system, then we would not want to send any "delete" records to the
 `ItemWriter`. But, since these records are not
-actually bad records, we would want to filter them out, rather than
-skip. As a result, the `ItemWriter` would receive only "insert" and
+actually bad records, we would want to filter them out rather than
+skip them. As a result, the `ItemWriter` would receive only "insert" and
 "update" records.
 
-To filter a record, one simply returns "null" from the
-`ItemProcessor`. The framework will detect that the
-result is "null" and avoid adding that item to the list of records
+To filter a record, you can return `null` from the
+`ItemProcessor`. The framework detects that the
+result is `null` and avoids adding that item to the list of records
 delivered to the `ItemWriter`. As usual, an
-exception thrown from the `ItemProcessor` will
-result in a skip.
+exception thrown from the `ItemProcessor`
+results in a skip.
 
 [[faultTolerant]]
 
@@ -344,7 +344,7 @@ result in a skip.
 
 When a chunk is rolled back, items that have been cached
           during reading may be reprocessed.  If a step is configured to
-          be fault tolerant (uses skip or retry processing typically),
+          be fault tolerant (typically by using skip or retry processing),
           any `ItemProcessor` used should be implemented in a way that is
           idempotent.  Typically that would consist of performing no changes
           on the input item for the `ItemProcessor` and only updating the
@@ -359,7 +359,7 @@ Both `ItemReaders` and
 but there is a common concern among both of them that necessitates another
 interface. In general, as part of the scope of a batch job, readers and
 writers need to be opened, closed, and require a mechanism for persisting
-state:
+state. The `ItemStream` interface serves that purpose, as shown in the following example:
 
 
 [source, java]
@@ -376,20 +376,20 @@ public interface ItemStream {
 
 Before describing each method, we should mention the
 `ExecutionContext`. Clients of an `ItemReader` that also implement
-ItemStream should call
+`ItemStream` should call
 `open` before any calls to
-`read` in order to open any resources such as files
+`read`, in order to open any resources such as files
 or to obtain connections. A similar restriction applies to an
 `ItemWriter` that implements
-ItemStream. As mentioned in Chapter 2, if expected
+`ItemStream`. As mentioned in Chapter 2, if expected
 data is found in the `ExecutionContext`, it may be
 used to start the `ItemReader` or
 `ItemWriter` at a location other than its initial
-state. Conversely, `close` will be called to ensure
-that any resources allocated during open will be
+state. Conversely, `close` is called to ensure
+that any resources allocated during open are
 released safely. `update` is called primarily to
 ensure that any state currently being held is loaded into the provided
-`ExecutionContext`. This method will be called before
+`ExecutionContext`. This method is called before
 committing, to ensure that the current state is persisted in the database
 before commit.
 
@@ -398,7 +398,7 @@ In the special case where the client of an
 the Spring Batch Core), an `ExecutionContext` is
 created for each StepExecution to allow users to
 store the state of a particular execution, with the expectation that it
-will be returned if the same `JobInstance` is started
+is returned if the same `JobInstance` is started
 again. For those familiar with Quartz, the semantics are very similar to a
 Quartz `JobDataMap`.
 
@@ -408,16 +408,16 @@ Quartz `JobDataMap`.
 
 Note that the `CompositeItemWriter` is an
     example of the delegation pattern, which is common in Spring Batch. The
-    delegates themselves might implement callback interfaces `StepListener`.
-    If they do, and they are being used in conjunction with Spring Batch Core
+    delegates themselves might implement callback interfaces, such as `StepListener`.
+    If they do and if they are being used in conjunction with Spring Batch Core
     as part of a `Step` in a `Job`,
     then they almost certainly need to be registered manually with the
     `Step`. A reader, writer, or processor that is
-    directly wired into the `Step` will be registered automatically if it
+    directly wired into the `Step` gets registered automatically if it
     implements `ItemStream` or a
-    `StepListener` interface. But because the delegates
+    `StepListener` interface. However, because the delegates
     are not known to the `Step`, they need to be injected
-    as listeners or streams (or both if appropriate):
+    as listeners or streams (or both if appropriate), as shown in the following example:
 
 [source, xml]
 ----
@@ -449,7 +449,7 @@ One of the most common mechanisms for interchanging bulk data has
 always been the flat file. Unlike XML, which has an agreed upon standard
 for defining how it is structured (XSD), anyone reading a flat file must
 understand ahead of time exactly how the file is structured. In general,
-all flat files fall into two types: Delimited and Fixed Length. Delimited
+all flat files fall into two types: delimited and fixed length. Delimited
 files are those in which fields are separated by a delimiter, such as a
 comma. Fixed Length files have fields that are a set length.
 
@@ -461,16 +461,16 @@ When working with flat files in Spring Batch, regardless of
 whether it is for input or output, one of the most important classes is
 the `FieldSet`. Many architectures and libraries
 contain abstractions for helping you read in from a file, but they
-usually return a String or an array of Strings. This really only gets
+usually return a `String` or an array of `String` objects. This really only gets
 you halfway there. A `FieldSet` is Spring Batch's
 abstraction for enabling the binding of fields from a file resource. It
 allows developers to work with file input in much the same way as they
 would work with database input. A `FieldSet` is
-conceptually very similar to a Jdbc ResultSet.
-`FieldSets` only require one argument, a String
-array of tokens. Optionally, you can also configure in the names of the
+conceptually similar to a JDBC `ResultSet`.
+`FieldSets` only require one argument: a `String`
+array of tokens. Optionally, you can also configure the names of the
 fields so that the fields may be accessed either by index or name as
-patterned after ResultSet:
+patterned after ResultSet, as shown in the following example:
 
 
 [source, java]
@@ -484,7 +484,7 @@ boolean booleanValue = fs.readBoolean(2);
 
 There are many more options on the `FieldSet`
 interface, such as `Date`, long,
-`BigDecimal`, etc. The biggest advantage of the
+`BigDecimal`, and so on. The biggest advantage of the
 `FieldSet` is that it provides consistent parsing
 of flat file input. Rather than each batch job parsing differently in
 potentially unexpected ways, it can be consistent, both when handling
@@ -497,32 +497,31 @@ conversions.
 
 A flat file is any type of file that contains at most
 two-dimensional (tabular) data. Reading flat files in the Spring Batch
-framework is facilitated by the class
+framework is facilitated by the class called
 `FlatFileItemReader`, which provides basic
 functionality for reading and parsing flat files. The two most important
 required dependencies of `FlatFileItemReader` are
 `Resource` and `LineMapper`.
-The `LineMapper` interface will be
+The `LineMapper` interface is
 explored more in the next sections. The resource property represents a
 Spring Core `Resource`. Documentation explaining
 how to create beans of this type can be found in link:$$http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/resources.html$$[Spring
-Framework, Chapter 5.Resources]. Therefore, this
-guide will not go into the details of creating
-`Resource` objects. However, a simple example of a
-file system resource can be found below:
+Framework, Chapter 5. Resources]. Therefore, this
+guide does not go into the details of creating
+`Resource` objects beyond showing the following simple example:
 
 [source, java]
 ----
 Resource resource = new FileSystemResource("resources/trades.csv");
 ----
 
-In complex batch environments the directory structures are often
-  managed by the EAI infrastructure where drop zones for external
-  interfaces are established for moving files from ftp locations to batch
+In complex batch environments, the directory structures are often
+  managed by the EAI infrastructure, where drop zones for external
+  interfaces are established for moving files from FTP locations to batch
   processing locations and vice versa. File moving utilities are beyond
-  the scope of the spring batch architecture but it is not unusual for
+  the scope of the Spring Batch architecture, but it is not unusual for
   batch job streams to include file moving utilities as steps in the job
-  stream. It is sufficient that the batch architecture only needs to know
+  stream. The batch architecture only needs to know
   how to locate the files to be processed. Spring Batch begins the process
   of feeding the data into the pipe from this starting point. However,
   link:$$http://projects.spring.io/spring-integration/$$[Spring
@@ -530,30 +529,31 @@ In complex batch environments the directory structures are often
   services.
 
 The other properties in `FlatFileItemReader`
-allow you to further specify how your data will be interpreted: `FlatFileItemReader` Properties
+let you further specify how your data is interpreted, as described in the following table:
 
+.`FlatFileItemReader` Properties
 [options="header"]
 |===============
 |Property|Type|Description
 |comments|String[]|Specifies line prefixes that indicate
-                comment rows
-|encoding|String|Specifies what text encoding to use -
-                default is "ISO-8859-1"
+                comment rows.
+|encoding|String|Specifies what text encoding to use. The
+                default is "ISO-8859-1".
 |lineMapper|`LineMapper`|Converts a `String`
                 to an `Object` representing the
                 item.
 |linesToSkip|int|Number of lines to ignore at the top of
-                the file
+                the file.
 |recordSeparatorPolicy|RecordSeparatorPolicy|Used to determine where the line endings
                 are and do things like continue over a line ending if inside a
                 quoted string.
 |resource|`Resource`|The resource from which to read.
-|skippedLinesCallback|LineCallbackHandler|Interface which passes the raw line
-                content of the lines in the file to be skipped. If linesToSkip
-                is set to 2, then this interface will be called twice.
-|strict|boolean|In strict mode, the reader will throw an
+|skippedLinesCallback|LineCallbackHandler|Interface that passes the raw line
+                content of the lines in the file to be skipped. If `linesToSkip`
+                is set to 2, then this interface is called twice.
+|strict|boolean|In strict mode, the reader throws an
                 exception on `ExecutionContext` if the input resource does not
-                exist.
+                exist. Otherwise, it logs the problem and continues.
 
 |===============
 
@@ -562,11 +562,10 @@ allow you to further specify how your data will be interpreted: `FlatFileItemRea
 
 ===== LineMapper
 
-As with `RowMapper`, which takes a low
-level construct such as ResultSet and returns
-an Object, flat file processing requires the
-same construct to convert a String line into an
-Object:
+As with `RowMapper`, which takes a low-level construct such as `ResultSet` and returns
+an `Object`, flat file processing requires the
+same construct to convert a `String` line into an
+`Object`, as shown in the following interface definition:
 
 
 
@@ -582,23 +581,23 @@ public interface LineMapper<T> {
 The basic contract is that, given the current line and the line
 number with which it is associated, the mapper should return a
 resulting domain object. This is similar to
-`RowMapper` in that each line is associated with
+`RowMapper`, in that each line is associated with
 its line number, just as each row in a
-ResultSet is tied to its row number. This
+`ResultSet` is tied to its row number. This
 allows the line number to be tied to the resulting domain object for
 identity comparison or for more informative logging. However, unlike
 `RowMapper`, the
 `LineMapper` is given a raw line which, as
 discussed above, only gets you halfway there. The line must be
 tokenized into a `FieldSet`, which can then be
-mapped to an object, as described below.
+mapped to an object, as described later in this document.
 
 [[lineTokenizer]]
 
 
 ===== LineTokenizer
 
-An abstraction for turning a line of input into a line into a
+An abstraction for turning a line of input into a
 `FieldSet` is necessary because there can be many
 formats of flat file data that need to be converted to a
 `FieldSet`. In Spring Batch, this interface is
@@ -617,25 +616,25 @@ public interface LineTokenizer {
 The contract of a `LineTokenizer` is such
 that, given a line of input (in theory the
 `String` could encompass more than one line), a
-`FieldSet` representing the line will be
+`FieldSet` representing the line is
 returned. This `FieldSet` can then be passed to a
 `FieldSetMapper`. Spring Batch contains the
 following `LineTokenizer` implementations:
 
 
-* `DelmitedLineTokenizer` - Used for
+* `DelmitedLineTokenizer`: Used for
 files where fields in a record are separated by a delimiter. The
 most common delimiter is a comma, but pipes or semicolons are
 often used as well.
 
 
-* `FixedLengthTokenizer` - Used for files
+* `FixedLengthTokenizer`: Used for files
 where fields in a record are each a 'fixed width'. The width of
 each field must be defined for each record type.
 
 
-* `PatternMatchingCompositeLineTokenizer`
-- Determines which among a list of
+* `PatternMatchingCompositeLineTokenizer`:
+Determines which among a list of
 `LineTokenizers` should be used on a
 particular line by checking against a pattern.
 
@@ -646,11 +645,11 @@ particular line by checking against a pattern.
 The `FieldSetMapper` interface defines a
 single method, `mapFieldSet`, which takes a
 `FieldSet` object and maps its contents to an
-object. This object may be a custom DTO, a domain object, or a simple
+object. This object may be a custom DTO, a domain object, or an
 array, depending on the needs of the job. The
 `FieldSetMapper` is used in conjunction with the
 `LineTokenizer` to translate a line of data from
-a resource into an object of the desired type:
+a resource into an object of the desired type, as shown in the following interface definition:
 
 
 [source, java]
@@ -677,8 +676,8 @@ required:
 
 . Read one line from the file.
 
-. Pass the string line into the `LineTokenizer#tokenize()` method, in
-order to retrieve a `FieldSet`.
+. Pass the `String` line into the `LineTokenizer#tokenize()` method
+to retrieve a `FieldSet`.
 
 
 . Pass the `FieldSet` returned from tokenizing to a `FieldSetMapper`, returning
@@ -687,16 +686,16 @@ the result from the `ItemReader#read()` method.
 
 
 The two interfaces described above represent two separate tasks:
-converting a line into a `FieldSet`, and mapping
+converting a line into a `FieldSet` and mapping
 a `FieldSet` to a domain object. Because the
 input of a `LineTokenizer` matches the input of
 the `LineMapper` (a line), and the output of a
 `FieldSetMapper` matches the output of the
 `LineMapper`, a default implementation that uses
-both a `LineTokenizer` and
+both a `LineTokenizer` and a
 `FieldSetMapper` is provided. The
-`DefaultLineMapper` represents the behavior most
-users will need:
+`DefaultLineMapper`, shown in the following class definition, represents the behavior most
+users need:
 
 
 [source, java]
@@ -724,7 +723,7 @@ public class DefaultLineMapper<T>; implements LineMapper<>, InitializingBean {
 
 The above functionality is provided in a default implementation,
 rather than being built into the reader itself (as was done in
-previous versions of the framework) in order to allow users greater
+previous versions of the framework) to allow users greater
 flexibility in controlling the parsing process, especially if access
 to the raw line is needed.
 
@@ -732,7 +731,7 @@ to the raw line is needed.
 
 ===== Simple Delimited File Reading Example
 
-The following example will be used to illustrate this using an
+The following example illustrates how to read a flat file with an
 actual domain scenario. This particular batch job reads in football
 players from the following file:
 
@@ -748,7 +747,7 @@ ID,lastName,firstName,position,birthYear,debutYear
 "AdamCh00,Adams,Charlie,wr,1979,2003"
 ----
 
-The contents of this file will be mapped to the following
+The contents of this file are mapped to the following
 `Player` domain object:
 
 [source, java]
@@ -773,10 +772,10 @@ public class Player implements Serializable {
 }
 ----
 
-In order to map a `FieldSet` into a
+To map a `FieldSet` into a
         `Player` object, a
         `FieldSetMapper` that returns players needs to be
-        defined:
+        defined, as shown in the following example:
 
 
 [source, java]
@@ -799,7 +798,7 @@ protected static class PlayerFieldSetMapper implements FieldSetMapper<Player> {
 
 The file can then be read by correctly constructing a
         `FlatFileItemReader` and calling
-        read:
+        `read`, as shown in the following example:
 
 
 [source, java]
@@ -815,9 +814,9 @@ itemReader.open(new ExecutionContext());
 Player player = itemReader.read();
 ----
 
-Each call to read will return a new
+Each call to `read` returns a new
         `Player` object from each line in the file. When the end of the file is
-        reached, null will be returned.
+        reached, `null` is returned.
 
 [[mappingFieldsByName]]
 
@@ -825,12 +824,12 @@ Each call to read will return a new
 
 There is one additional piece of functionality that is allowed
 by both `DelimitedLineTokenizer` and
-`FixedLengthTokenizer` that is similar in
-function to a Jdbc `ResultSet`. The names of the
+`FixedLengthTokenizer` and that is similar in
+function to a JDBC `ResultSet`. The names of the
 fields can be injected into either of these
 `LineTokenizer` implementations to increase the
 readability of the mapping function. First, the column names of all
-fields in the flat file are injected into the tokenizer:
+fields in the flat file are injected into the tokenizer, as shown in the following example:
 
 
 [source, java]
@@ -892,12 +891,12 @@ like the following:
 ----
 
 For each entry in the `FieldSet`, the
-mapper will look for a corresponding setter on a new instance of the
+mapper looks for a corresponding setter on a new instance of the
 `Player` object (for this reason, prototype scope
-is required) in the same way the Spring container will look for
+is required) in the same way the Spring container looks for
 setters matching a property name. Each available field in the
-`FieldSet` will be mapped, and the resultant
-`Player` object will be returned, with no code
+`FieldSet` is mapped, and the resultant
+`Player` object is returned, with no code
 required.
 
 [[fixedLengthFileFormats]]
@@ -905,10 +904,10 @@ required.
 
 ===== Fixed Length File Formats
 
-So far only delimited files have been discussed in much detail,
-        however, they represent only half of the file reading picture. Many
+So far, only delimited files have been discussed in much detail.
+        However, they represent only half of the file reading picture. Many
         organizations that use flat files use fixed length formats. An example
-        fixed length file is below:
+        fixed length file follows:
 
 
 ----
@@ -922,19 +921,19 @@ UK21341EAH4521535.11customer5
 While this looks like one large field, it actually represent 4 distinct fields:
 
 
-. ISIN: Unique identifier for the item being order - 12 characters long.
+. ISIN: Unique identifier for the item being ordered - 12 characters long.
 
 
-. Quantity: Number of this item being ordered - 3 characters long.
+. Quantity: Number of the item being ordered - 3 characters long.
 
 
 . Price: Price of the item - 5 characters long.
 
 
-. Customer: Id of the customer ordering the item - 9 characters long.
+. Customer: ID of the customer ordering the item - 9 characters long.
 
 When configuring the `FixedLengthLineTokenizer`, each of these lengths
-must be provided in the form of ranges:
+must be provided in the form of ranges, as shown in the following example:
 
 
 [source, xml]
@@ -948,7 +947,7 @@ must be provided in the form of ranges:
 
 Because the `FixedLengthLineTokenizer` uses
 the same `LineTokenizer` interface as discussed
-above, it will return the same `FieldSet` as if a
+above, it returns the same `FieldSet` as if a
 delimiter had been used. This allows the same approaches to be used in
 handling its output, such as using the
 `BeanWrapperFieldSetMapper`.
@@ -983,19 +982,19 @@ LINEB;2134776319DEF422.99M005LI
 ----
 
 In this file we have three types of records, "USER", "LINEA",
-and "LINEB". A "USER" line corresponds to a User object. "LINEA" and
-"LINEB" both correspond to Line objects, though a "LINEA" has more
+and "LINEB". A "USER" line corresponds to a `User` object. "LINEA" and
+"LINEB" both correspond to `Line` objects, though a "LINEA" has more
 information than a "LINEB".
 
-The `ItemReader` will read each line
+The `ItemReader` reads each line
 individually, but we must specify different
 `LineTokenizer` and
 `FieldSetMapper` objects so that the
-`ItemWriter` will receive the correct items. The
+`ItemWriter` receives the correct items. The
 `PatternMatchingCompositeLineMapper` makes this
 easy by allowing maps of patterns to
 `LineTokenizers` and patterns to
-`FieldSetMappers` to be configured:
+`FieldSetMappers` to be configured, as shown in the following example:
 
 
 [source, xml]
@@ -1019,7 +1018,7 @@ easy by allowing maps of patterns to
 ----
 
 In this example, "LINEA" and "LINEB" have separate
-`LineTokenizers` but they both use the same
+`LineTokenizers`, but they both use the same
 `FieldSetMapper`.
 
 The `PatternMatchingCompositeLineMapper`
@@ -1027,16 +1026,16 @@ makes use of the `PatternMatcher's`
 match method in order to select the correct
 delegate for each line. The `PatternMatcher`
 allows for two wildcard characters with special meaning: the question
-mark ("?") will match exactly one character, while the asterisk ("\*")
-will match zero or more characters. Note that in the configuration
+mark ("?") matches exactly one character, while the asterisk ("\*")
+matches zero or more characters. Note that, in the configuration
 above, all patterns end with an asterisk, making them effectively
-prefixes to lines. The `PatternMatcher` will
-always match the most specific pattern possible, regardless of the
+prefixes to lines. The `PatternMatcher`
+always matches the most specific pattern possible, regardless of the
 order in the configuration. So if "LINE*" and "LINEA*" were both
 listed as patterns, "LINEA" would match pattern "LINEA*", while
 "LINEB" would match pattern "LINE*". Additionally, a single asterisk
 ("*") can serve as a default by matching any line not matched by any
-other pattern.
+other pattern, as shown in the following example.
 
 
 [source, xml]
