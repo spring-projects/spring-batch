@@ -7,20 +7,20 @@
 == Common Batch Patterns
 
 Some batch jobs can be assembled purely from off-the-shelf components
-  in Spring Batch. For instance the `ItemReader` and
+  in Spring Batch. For instance, the `ItemReader` and
   `ItemWriter` implementations can be configured to cover
   a wide range of scenarios. However, for the majority of cases, custom code
-  will have to be written. The main API entry points for application
+  must be written. The main API entry points for application
   developers are the `Tasklet`,
-  `ItemReader`, `ItemWriter` and the
-  various listener interfaces. Most simple batch jobs will be able to use
+  the `ItemReader`, the `ItemWriter`, and the
+  various listener interfaces. Most simple batch jobs can use
   off-the-shelf input from a Spring Batch `ItemReader`,
   but it is often the case that there are custom concerns in the processing
-  and writing, which require developers to implement an
+  and writing that require developers to implement an
   `ItemWriter` or
   `ItemProcessor`.
 
-Here, we provide a few examples of common patterns in custom business
+In this chapter, we provide a few examples of common patterns in custom business
   logic. These examples primarily feature the listener interfaces. It should
   be noted that an `ItemReader` or
   `ItemWriter` can implement a listener interface as
@@ -30,12 +30,12 @@ Here, we provide a few examples of common patterns in custom business
 === Logging Item Processing and Failures
 
 A common use case is the need for special handling of errors in a
-    step, item by item, perhaps logging to a special channel, or inserting a
+    step, item by item, perhaps logging to a special channel or inserting a
     record into a database. A chunk-oriented `Step`
-    (created from the step factory beans) allows users to implement this use
-    case with a simple `ItemReadListener`, for errors on
-    read, and an `ItemWriteListener`, for errors on
-    write. The below code snippets illustrate a listener that logs both read
+    (created from the step factory beans) lets users implement this use
+    case with a simple `ItemReadListener` for errors on
+    `read` and an `ItemWriteListener` for errors on
+    `write`. The following code snippet illustrates a listener that logs both read
     and write failures:
 
 [source, java]
@@ -54,7 +54,7 @@ public class ItemFailureLoggerListener extends ItemListenerSupport {
 }
 ----
 
-Having implemented this listener it must be registered with the step:
+Having implemented this listener it, must be registered with a step, as shown in the following example:
 [source, xml]
 ----
 <step id="simpleStep">
@@ -67,14 +67,14 @@ Having implemented this listener it must be registered with the step:
 </step>
 ----
 
-Remember that if your listener does anything in an
-    `onError()` method, it will be inside a transaction that is
-    going to be rolled back. If you need to use a transactional resource such
-    as a database inside an `onError()` method, consider adding a
+Remember that, if your listener does anything in an
+    `onError()` method, it must be inside a transaction that is
+    going to be rolled back. If you need to use a transactional resource, such
+    as a database, inside an `onError()` method, consider adding a
     declarative transaction to that method (see Spring Core Reference Guide
-    for details), and giving its propagation attribute the value
-    REQUIRES_NEW.
-  
+    for details), and giving its propagation attribute a value of
+    `REQUIRES_NEW`.
+
 
 [[stoppingAJobManuallyForBusinessReasons]]
 === Stopping a Job Manually for Business Reasons
@@ -82,13 +82,13 @@ Remember that if your listener does anything in an
 Spring Batch provides a `stop()` method
     through the `JobLauncher` interface, but this is
     really for use by the operator rather than the application programmer.
-    Sometimes it is more convenient or makes more sense to stop a job
+    Sometimes, it is more convenient or makes more sense to stop a job
     execution from within the business logic.
 
 The simplest thing to do is to throw a
-    `RuntimeException` (one that isn't retried
-    indefinitely or skipped). For example, a custom exception type could be
-    used, as in the example below:
+    `RuntimeException` (one that is neither retried
+    indefinitely nor skipped). For example, a custom exception type could be
+    used, as shown in the following example:
 
 [source, java]
 ----
@@ -102,8 +102,8 @@ public class PoisonPillItemWriter implements ItemWriter<T> {
 }
 ----
 
-Another simple way to stop a step from executing is to simply return
-`null` from the `ItemReader`:
+Another simple way to stop a step from executing is to return
+`null` from the `ItemReader`, as shown in the following example:
 
 [source, java]
 ----
@@ -125,10 +125,10 @@ public class EarlyCompletionItemReader implements ItemReader<T> {
 ----
 The previous example actually relies on the fact that there is a
     default implementation of the `CompletionPolicy`
-    strategy which signals a complete batch when the item to be processed is
+    strategy that signals a complete batch when the item to be processed is
     `null`. A more sophisticated completion policy could be implemented and
     injected into the `Step` through the
-    `SimpleStepFactoryBean`:
+    `SimpleStepFactoryBean`, as shown in the following example:
 
 [source, xml]
 ----
@@ -148,7 +148,7 @@ An alternative is to set a flag in the
     item processing. To implement this alternative, we need access to the
     current `StepExecution`, and this can be achieved by
     implementing a `StepListener` and registering it with
-    the `Step`. Here is an example of a listener that
+    the `Step`. The following example shows a listener that
     sets the flag:
 
 [source, java]
@@ -170,23 +170,23 @@ public class CustomItemWriter extends ItemListenerSupport implements StepListene
 }
 ----
 
-The default behavior here when the flag is set is for the step to
-    throw a `JobInterruptedException`. This can be
-    controlled through the `StepInterruptionPolicy`, but
+When the flag is set, the default behavior is for the step to
+    throw a `JobInterruptedException`. This behavior can be
+    controlled through the `StepInterruptionPolicy`. However,
     the only choice is to throw or not throw an exception, so this is always
     an abnormal ending to a job.
-  
+
 
 [[addingAFooterRecord]]
 ===  Adding a Footer Record
 
-Often when writing to flat files, a "footer" record must be appended
+Often, when writing to flat files, a "footer" record must be appended
     to the end of the file, after all processing has be completed. This can
-    also be achieved using the `FlatFileFooterCallback`
+    be achieved using the `FlatFileFooterCallback`
     interface provided by Spring Batch. The
     `FlatFileFooterCallback` (and its counterpart, the
     `FlatFileHeaderCallback`) are optional properties of
-    the `FlatFileItemWriter`:
+    the `FlatFileItemWriter` and can be added to an item writer as shown in the following example:
 
 [source, xml]
 ----
@@ -198,8 +198,8 @@ Often when writing to flat files, a "footer" record must be appended
 </bean>
 ----
 
-The footer callback interface is very simple. It has just one method
-that is called when the footer must be written:
+The footer callback interface has just one method
+that is called when the footer must be written, as shown in the following interface definition:
 
 [source, java]
 ----
@@ -213,9 +213,9 @@ public interface FlatFileFooterCallback {
 [[writingASummaryFooter]]
 ==== Writing a Summary Footer
 
-A very common requirement involving footer records is to aggregate
+A common requirement involving footer records is to aggregate
       information during the output process and to append this information to
-      the end of the file. This footer serves as a summarization of the file
+      the end of the file. This footer often serves as a summarization of the file
       or provides a checksum.
 
 For example, if a batch job is writing
@@ -255,24 +255,24 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 
 This `TradeItemWriter` stores a
       `totalAmount` value that is increased with the
-      `amount` from each Trade item written.
-      After the last Trade is processed, the framework
-      will call `writeFooter`, which will put that
+      `amount` from each `Trade` item written.
+      After the last `Trade` is processed, the framework
+      calls `writeFooter`, which puts the
       `totalAmount` into the file. Note that the
       `write` method makes use of a temporary variable,
-      chunkTotalAmount, that stores the total of the `Trades`
-      in the chunk. This is done to ensure that if a skip occurs in the
-      `write` method, that the
-      `totalAmount` will be left unchanged. It is only at
+      `chunkTotalAmount`, that stores the total of the `Trade` amounts
+      in the chunk. This is done to ensure that, if a skip occurs in the
+      `write` method, the
+      `totalAmount` is left unchanged. It is only at
       the end of the `write` method, once we are
-      guaranteed that no exceptions will be thrown, that we update the
+      guaranteed that no exceptions are thrown, that we update the
       `totalAmount`.
 
 In order for the `writeFooter` method to be
       called, the `TradeItemWriter` (which implements
       `FlatFileFooterCallback`) must be wired into the
       `FlatFileItemWriter` as the
-      `footerCallback`:
+      `footerCallback`. The following example shows how to do so:
 
 [source, xml]
 ----
@@ -287,15 +287,15 @@ In order for the `writeFooter` method to be
 </bean>
 ----
 
-The way that the `TradeItemWriter` has been
-      so far will only function correctly if the `Step`
+The way that the `TradeItemWriter` has been written
+      so far functions correctly only if the `Step`
       is not restartable. This is because the class is stateful (since it
       stores the `totalAmount`), but the `totalAmount`
-      is not persisted to the database, and therefore, it cannot be retrieved
+      is not persisted to the database. Therefore, it cannot be retrieved
       in the event of a restart. In order to make this class restartable, the
       `ItemStream` interface should be implemented along
       with the methods `open` and
-      `update`:
+      `update`, as shown in the following example:
 
 [source, java]
 ----
@@ -310,41 +310,41 @@ public void update(ExecutionContext executionContext) {
 }
 ----
 
-The update method will store the most
+The update method stores the most
       current version of `totalAmount` to the
       `ExecutionContext` just before that object is
-      persisted to the database. The open method will
-      retrieve any existing `totalAmount` from the
-      `ExecutionContext` and use it as the starting point
+      persisted to the database. The open method
+      retrieves any existing `totalAmount` from the
+      `ExecutionContext` and uses it as the starting point
       for processing, allowing the `TradeItemWriter` to
       pick up on restart where it left off the previous time the
-      `Step` was executed.
-    
-  
+      `Step` was run.
+
+
 
 [[drivingQueryBasedItemReaders]]
 === Driving Query Based ItemReaders
 
-In the chapter on readers and writers, database input using paging
+In the link:readersAndWriters.html[chapter on readers and writers], database input using paging
     was discussed. Many database vendors, such as DB2, have extremely
     pessimistic locking strategies that can cause issues if the table being
     read also needs to be used by other portions of the online application.
     Furthermore, opening cursors over extremely large datasets can cause
-    issues on certain vendors. Therefore, many projects prefer to use a
+    issues on databases from certain vendors. Therefore, many projects prefer to use a
     'Driving Query' approach to reading in data. This approach works by
     iterating over keys, rather than the entire object that needs to be
-    returned, as the following example illustrates:
+    returned, as the following image illustrates:
 
 .Driving Query Job
 image::{batch-asciidoc}images/drivingQueryExample.png[Driving Query Job, scaledwidth="60%"]
 
 
-As you can see, this example uses the same 'FOO' table as was used
-    in the cursor based example. However, rather than selecting the entire
-    row, only the ID's were selected in the SQL statement. So, rather than a
-    FOO object being returned from `read`, an Integer
-    will be returned. This number can then be used to query for the 'details',
-    which is a complete Foo object:
+As you can see, the example shown in the preceding image uses the same 'FOO' table as was used
+    in the cursor-based example. However, rather than selecting the entire
+    row, only the IDs were selected in the SQL statement. So, rather than a
+    FOO object being returned from `read`, an `Integer`
+    is returned. This number can then be used to query for the 'details',
+    which is a complete `Foo` object, as shown in the following image:
 
 .Driving Query Example
 image::{batch-asciidoc}images/drivingQueryJob.png[Driving Query Example, scaledwidth="60%"]
@@ -352,15 +352,15 @@ image::{batch-asciidoc}images/drivingQueryJob.png[Driving Query Example, scaledw
 An `ItemProcessor` should be used to transform the key obtained from
     the driving query into a full 'Foo' object. An existing DAO can be used to
     query for the full object based on the key.
-  
+
 
 [[multiLineRecords]]
 ==== Multi-Line Records
 
-While it is usually the case with flat files that one each record is
+While it is usually the case with flat files that each record is
     confined to a single line, it is common that a file might have records
     spanning multiple lines with multiple formats. The following excerpt from
-    a file illustrates this:
+    a file shows an example of such an arrangement:
 
 ----
 HEA;0013100345;2007-02-15
@@ -373,24 +373,24 @@ Everything between the line starting with 'HEA' and the line
     considerations that must be made in order to handle this situation
     correctly:
 
-    
-      
-Instead of reading one record at a time, the
+
+
+* Instead of reading one record at a time, the
         `ItemReader` must read every line of the
         multi-line record as a group, so that it can be passed to the
         `ItemWriter` intact.
-      
 
-      
-Each line type may need to be tokenized differently.
-      
-    
 
-Because a single record spans multiple lines, and we may not know
+
+* Each line type may need to be tokenized differently.
+
+
+
+Because a single record spans multiple lines and because we may not know
     how many lines there are, the `ItemReader` must be
     careful to always read an entire record. In order to do this, a custom
     `ItemReader` should be implemented as a wrapper for
-    the `FlatFileItemReader`.
+    the `FlatFileItemReader`, as shown in the following example:
 
 [source, xml]
 ----
@@ -412,12 +412,12 @@ Because a single record spans multiple lines, and we may not know
 ----
 
 To ensure that each line is tokenized properly, which is especially
-    important for fixed length input, the
+    important for fixed-length input, the
     `PatternMatchingCompositeLineTokenizer` can be used
-    on the delegate `FlatFileItemReader`. See  for more details. The delegate
-    reader will then use a `PassThroughFieldSetMapper` to
+    on the delegate `FlatFileItemReader`. See link:readersAndWriters.html#flatFileItemReader[`FlatFileItemReader` in the Readers and Writers chapter] for more details. The delegate
+    reader then uses a `PassThroughFieldSetMapper` to
     deliver a `FieldSet` for each line back to the
-    wrapping `ItemReader`.
+    wrapping `ItemReader`, as shown in the following example:
 
 [source, xml]
 ----
@@ -433,12 +433,12 @@ To ensure that each line is tokenized properly, which is especially
 </bean>
 ----
 
-This wrapper will have to be able recognize the end of a record so
+This wrapper has to be able to recognize the end of a record so
     that it can continually call `read()` on its
     delegate until the end is reached. For each line that is read, the wrapper
     should build up the item to be returned. Once the footer is reached, the
     item can be returned for delivery to the
-    `ItemProcessor` and `ItemWriter`.
+    `ItemProcessor` and `ItemWriter`, as  shown in the following example:
 
 [source, java]
 ----
@@ -476,15 +476,15 @@ public Trade read() throws Exception {
 [[executingSystemCommands]]
 === Executing System Commands
 
-Many batch jobs may require that an external command be called from
+Many batch jobs require that an external command be called from
     within the batch job. Such a process could be kicked off separately by the
-    scheduler, but the advantage of common meta-data about the run would be
+    scheduler, but the advantage of common metadata about the run would be
     lost. Furthermore, a multi-step job would also need to be split up into
     multiple jobs as well.
 
 Because the need is so common, Spring Batch provides a
     `Tasklet` implementation for calling system
-    commands:
+    commands, as shown in the following example:
 
 [source, xml]
 ----
@@ -503,14 +503,14 @@ In many batch scenarios, finding no rows in a database or file to
     considered to have found no work and completes with 0 items read. All of
     the `ItemReader` implementations provided out of the
     box in Spring Batch default to this approach. This can lead to some
-    confusion if nothing is written out even when input is present. (which
-    usually happens if a file was misnamed, etc) For this reason, the meta
-    data itself should be inspected to determine how much work the framework
+    confusion if nothing is written out even when input is present (which
+    usually happens if a file was misnamed or some similar issue arises) For this reason, the
+    metadata itself should be inspected to determine how much work the framework
     found to be processed. However, what if finding no input is considered
-    exceptional? In this case, programmatically checking the meta data for no
+    exceptional? In this case, programmatically checking the metadata for no
     items processed and causing failure is the best solution. Because this is
-    a common use case, a listener is provided with just this
-    functionality:
+    a common use case, Spring Batch provides a listener is provided with exactly this
+    functionality, as shown in the class definition for `NoWorkFoundStepExecutionListener`:
 
 [source, java]
 ----
@@ -526,12 +526,12 @@ public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSuppo
 }
 ----
 
-The above `StepExecutionListener` inspects the
-    readCount property of the `StepExecution` during the
+The preceding `StepExecutionListener` inspects the
+    `readCount` property of the `StepExecution` during the
     'afterStep' phase to determine if no items were read. If that is the case,
     an exit code of FAILED is returned, indicating that the
     `Step` should fail. Otherwise, `null` is returned,
-    which will not affect the status of the
+    which does not affect the status of the
     `Step`.
 
 
@@ -539,27 +539,27 @@ The above `StepExecutionListener` inspects the
 === Passing Data to Future Steps
 
 It is often useful to pass information from one step to another.
-    This can be done using the `ExecutionContext`. The
+    This can be done through the `ExecutionContext`. The
     catch is that there are two `ExecutionContexts`: one
     at the `Step` level and one at the
     `Job` level. The `Step`
-    `ExecutionContext` lives only as long as the step
+    `ExecutionContext` remains only as long as the step,
     while the `Job`
-    `ExecutionContext` lives through the whole
+    `ExecutionContext` remains through the whole
     `Job`. On the other hand, the
     `Step` `ExecutionContext` is
-    updated every time the `Step` commits a chunk while
+    updated every time the `Step` commits a chunk, while
     the `Job` `ExecutionContext` is
     updated only at the end of each `Step`.
 
 The consequence of this separation is that all data must be placed
     in the `Step` `ExecutionContext`
-    while the `Step` is executing. This will ensure that
-    the data will be stored properly while the `Step` is
-    on-going. If data is stored to the `Job`
-    `ExecutionContext`, then it will not be persisted
-    during `Step` execution and if the
-    `Step` fails, that data will be lost.
+    while the `Step` is executing. Doing so ensures that
+    the data is stored properly while the `Step` runs.
+    If data is stored to the `Job`
+    `ExecutionContext`, then it is not persisted
+    during `Step` execution. If the
+    `Step` fails, that data is lost.
 
 [source, java]
 ----
@@ -581,16 +581,16 @@ public class SavingItemWriter implements ItemWriter<Object> {
 ----
 
 To make the data available to future `Steps`,
-    it will have to be "promoted" to the `Job`
+    it must be "promoted" to the `Job`
     `ExecutionContext` after the step has finished.
     Spring Batch provides the
     `ExecutionContextPromotionListener` for this purpose.
     The listener must be configured with the keys related to the data in the
     `ExecutionContext` that must be promoted. It can
     also, optionally, be configured with a list of exit code patterns for
-    which the promotion should occur ("COMPLETED" is the default). As with all
+    which the promotion should occur (`COMPLETED` is the default). As with all
     listeners, it must be registered on the
-    `Step`.
+    `Step` as shown in the following example:
 [source, xml]
 ----
 <job id="job1">
@@ -614,7 +614,7 @@ To make the data available to future `Steps`,
 ----
 
 Finally, the saved values must be retrieved from the
-    `Job` `ExecutionContext`:
+    `Job` `ExecutionContext`, as shown in the following example:
 
 [source, java]
 ----
