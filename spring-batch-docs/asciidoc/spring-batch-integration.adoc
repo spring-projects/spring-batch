@@ -11,32 +11,32 @@
 === Spring Batch Integration Introduction
 
 Many users of Spring Batch may encounter requirements that are
-outside the scope of Spring Batch, yet may be efficiently and
-concisely implemented using Spring Integration. Conversely, Spring
+outside the scope of Spring Batch but that may be efficiently and
+concisely implemented by using Spring Integration. Conversely, Spring
 Batch users may encounter Spring Batch requirements and need a way
-to efficiently integrate both frameworks. In this context several
-patterns and use-cases emerge and Spring Batch Integration will
-address those requirements.
+to efficiently integrate both frameworks. In this context, several
+patterns and use-cases emerge, and Spring Batch Integration
+addresses those requirements.
 
 The line between Spring Batch and Spring Integration is not always
-clear, but there are guidelines that one can follow. Principally,
-these are: think about granularity, and apply common patterns. Some
+clear, but two pieces of advice can
+help: Think about granularity, and apply common patterns. Some
 of those common patterns are described in this reference manual
 section.
 
 Adding messaging to a batch process enables automation of
-operations, and also separation and strategizing of key concerns.
-For example a message might trigger a job to execute, and then the
-sending of the message can be exposed in a variety of ways. Or when
-a job completes or fails that might trigger a message to be sent,
+operations and also separation and strategizing of key concerns.
+For example, a message might trigger a job to execute, and then the
+sending of the message can be exposed in a variety of ways. Alternatively, when
+a job completes or fails, that event might trigger a message to be sent,
 and the consumers of those messages might have operational concerns
 that have nothing to do with the application itself. Messaging can
-also be embedded in a job, for example reading or writing items for
-processing via channels. Remote partitioning and remote chunking
-provide methods to distribute workloads over an number of workers.
+also be embedded in a job (for example reading or writing items for
+processing via channels). Remote partitioning and remote chunking
+provide methods to distribute workloads over a number of workers.
 
 
-Some key concepts that we will cover are:
+This section covers the following key concepts:
 
 * <<spring-batch-integration.adoc#namespace-support,Namespace Support>>
 
@@ -108,11 +108,11 @@ Batch Integration may look like the following:
 ----
 
 Appending version numbers to the referenced XSD file is also
-allowed but, as a version-less declaration will always use the
-latest schema, we generally don't recommend appending the version
-number to the XSD name. Adding a version number, for instance,
-would create possibly issues when updating the Spring Batch
-Integration dependencies as they may require more recent versions
+allowed, but, as a version-less declaration always uses the
+latest schema, we generally do not recommend appending the version
+number to the XSD name. Adding a version number
+could possibly create issues when updating the Spring Batch
+Integration dependencies, as they may require more recent versions
 of the XML schema.
 
 
@@ -121,24 +121,24 @@ of the XML schema.
 ==== Launching Batch Jobs through Messages
 
 
-When starting batch jobs using the core Spring Batch API you
+When starting batch jobs by using the core Spring Batch API, you
 basically have 2 options:
 
-* Command line via the `CommandLineJobRunner`
-* Programatically via either `JobOperator.start()` or `JobLauncher.run()`.
+* From the command line, with the `CommandLineJobRunner`
+* Programatically, with either `JobOperator.start()` or `JobLauncher.run()`
 
 
 
 For example, you may want to use the
-`CommandLineJobRunner` when invoking Batch Jobs
+`CommandLineJobRunner` when invoking Batch Jobs by
 using a shell script. Alternatively, you may use the
-JobOperator directly, for example when using
-Spring Batch as part of a web application. However, what about
-more complex use-cases? Maybe you need to poll a remote (S)FTP
-server to retrieve the data for the Batch Job. Or your application
+`JobOperator` directly (for example, when using
+Spring Batch as part of a web application). However, what about
+more complex use cases? Maybe you need to poll a remote (S)FTP
+server to retrieve the data for the Batch Job or your application
 has to support multiple different data sources simultaneously. For
-example, you may receive data files not only via the web, but also
-FTP etc. Maybe additional transformation of the input files is
+example, you may receive data files not only from the web, but also from
+FTP and other sources. Maybe additional transformation of the input files is
 needed before invoking Spring Batch.
 
 
@@ -147,12 +147,12 @@ Therefore, it would be much more powerful to execute the batch job
 using Spring Integration and its numerous adapters. For example,
 you can use a __File Inbound Channel Adapter__ to
 monitor a directory in the file-system and start the Batch Job as
-soon as the input file arrives. Additionally you can create Spring
+soon as the input file arrives. Additionally, you can create Spring
 Integration flows that use multiple different adapters to easily
-ingest data for your Batch Jobs from multiple sources
-simultaneously using configuration only. Implementing all these
-scenarios with Spring Integration is easy as it allow for an
-decoupled event-driven execution of the
+ingest data for your batch jobs from multiple sources
+simultaneously using only configuration. Implementing all these
+scenarios with Spring Integration is easy, as it allows for
+decoupled, event-driven execution of the
 `JobLauncher`.
 
 
@@ -161,16 +161,16 @@ Spring Batch Integration provides the
 `JobLaunchingMessageHandler` class that you can
 use to launch batch jobs. The input for the
 `JobLaunchingMessageHandler` is provided by a
-Spring Integration message, which payload is of type
-JobLaunchRequest. This class is a wrapper around the Job
-    that needs to be launched as well as the JobParameters
+Spring Integration message, which has a payload of type
+`JobLaunchRequest`. This class is a wrapper around the `Job`
+    that needs to be launched and around the `JobParameters`
 necessary to launch the Batch job.
 
 
 
 The following image illustrates the typical Spring Integration
 message flow in order to start a Batch job. The
-link:$$http://www.eaipatterns.com/toc.html$$[EIP (Enterprise IntegrationPatterns) website]
+link:$$http://www.eaipatterns.com/toc.html$$[EIP (Enterprise Integration Patterns) website]
 provides a full overview of messaging icons and their descriptions.
 
 .Launch Batch Job
@@ -221,14 +221,14 @@ public class FileMessageToJobRequest {
 
 [[the-jobexecution-response]]
 
-===== The JobExecution Response
+===== The `JobExecution` Response
 
-When a Batch Job is being executed, a
+When a batch job is being executed, a
 `JobExecution` instance is returned. This
 instance can be used to determine the status of an execution. If
-a `JobExecution` was able to be created
-successfully, it will always be returned, regardless of whether
-or not the actual execution was successful.
+a `JobExecution` is able to be created
+successfully, it is always returned, regardless of whether
+or not the actual execution is successful.
 
 
 
@@ -237,14 +237,14 @@ instance is returned depends on the provided
 `TaskExecutor`. If a
 `synchronous` (single-threaded)
 `TaskExecutor` implementation is used, the
-`JobExecution` response is only returned
+`JobExecution` response is returned only
 `after` the job completes. When using an
 `asynchronous`
 `TaskExecutor`, the
 `JobExecution` instance is returned
 immediately. Users can then take the `id` of
 `JobExecution` instance
-(`JobExecution.getJobId()`) and query the
+(with `JobExecution.getJobId()`) and query the
 `JobRepository` for the job's updated status
 using the `JobExplorer`. For more
 information, please refer to the Spring
@@ -253,19 +253,17 @@ link:$$http://docs.spring.io/spring-batch/reference/html/configureJob.html#query
 
 
 
-The following configuration will create a file
-`inbound-channel-adapter` to listen for CSV
-files in the provided directory, hand them off to our
-transformer (`FileMessageToJobRequest`),
-launch the job via the __Job Launching Gateway__ then simply log the output of the
-`JobExecution` via the
-`logging-channel-adapter`.
-
-
 [[spring-batch-integration-configuration]]
 
 ===== Spring Batch Integration Configuration
 
+The following configuration creates a file
+`inbound-channel-adapter` to listen for CSV
+files in the provided directory, hand them off to our
+transformer (`FileMessageToJobRequest`),
+launch the job via the __Job Launching Gateway__, and then log the output of the
+`JobExecution` with the
+`logging-channel-adapter`.
 
 [source, xml]
 ----
@@ -295,15 +293,15 @@ launch the job via the __Job Launching Gateway__ then simply log the output of t
 ----
 
 
-Now that we are polling for files and launching jobs, we need to
-configure for example our Spring Batch
-`ItemReader` to utilize found file
-represented by the job parameter "input.file.name":
 
 [[example-itemreader-configuration]]
 
 ===== Example ItemReader Configuration
 
+Now that we are polling for files and launching jobs, we need to
+configure our Spring Batch
+`ItemReader` (for example) to use the files found at the location defined
+by the job parameter called "input.file.name", as shown in the following bean configuration:
 
 [source, xml]
 ----
@@ -315,58 +313,57 @@ represented by the job parameter "input.file.name":
 ----
 
 
-The main points of interest here are injecting the value of
+The main points of interest in the preceding example are injecting the value of
 `#{jobParameters['input.file.name']}`
 as the Resource property value and setting the `ItemReader` bean
-to be of __Step scope__ to take advantage of
-the late binding support which allows access to the
+to have __Step scope__. Setting the bean to have Step scope takes advantage of
+the late binding support, which allows access to the
 `jobParameters` variable.
 
 
 [[availableAttributesOfTheJobLaunchingGateway]]
 === Available Attributes of the Job-Launching Gateway
 
-* `id` Identifies the underlying Spring bean definition, which is an instance of either:
+The job-launching gateway has the following attributes that you can set to control a job:
+
+* `id`: Identifies the underlying Spring bean definition, which is an instance of either:
 ** `EventDrivenConsumer`
 ** `PollingConsumer`
-
-The exact implementation depends on whether the component's input channel is a:
-`SubscribableChannel` or `PollableChannel`
-
-* `auto-startup` Boolean flag to indicate that the endpoint should start automatically on
+(The exact implementation depends on whether the component's input channel is a
+`SubscribableChannel` or `PollableChannel`.)
+* `auto-startup`: Boolean flag to indicate that the endpoint should start automatically on
 startup. The default is __true__.
-* `request-channel` The input `MessageChannel` of this endpoint.
-* `reply-channel` `Message Channel` to which the resulting `JobExecution` payload will be sent.
-* `reply-timeout` Allows you to specify how long this gateway will wait for the reply message
+* `request-channel`: The input `MessageChannel` of this endpoint.
+* `reply-channel`: `MessageChannel` to which the resulting `JobExecution` payload is sent.
+* `reply-timeout`: Lets you specify how long (in milliseconds) this gateway waits for the reply message
 to be sent successfully to the reply channel before throwing
 an exception. This attribute only applies when the channel
-might block, for example when using a bounded queue channel
-that is currently full. Also, keep in mind that when sending to a
-`DirectChannel`, the invocation will occur
+might block (for example, when using a bounded queue channel
+that is currently full). Also, keep in mind that, when sending to a
+`DirectChannel`, the invocation occurs
 in the sender's thread. Therefore, the failing of the send
 operation may be caused by other components further downstream.
 The `reply-timeout` attribute maps to the
 `sendTimeout` property of the underlying
-`MessagingTemplate` instance. The attribute
-will default, if not specified, to<emphasis>-1</emphasis>,
-meaning that by default, the `Gateway` will wait indefinitely.
-The value is specified in milliseconds.
-* `job-launcher` Pass in a
+`MessagingTemplate` instance. If not specified, the attribute
+defaults to<emphasis>-1</emphasis>,
+meaning that, by default, the `Gateway` waits indefinitely.
+* `job-launcher`: Optional. Accepts a
 custom
 `JobLauncher`
-bean reference. This
-attribute is optional. If not specified the adapter will
-re-use the instance that is registered under the id
+bean reference.
+If not specified the adapter
+re-uses the instance that is registered under the `id` of
 `jobLauncher`. If no default instance
-exists an exception is thrown.
-* `order` Specifies the order for invocation when this endpoint is connected as a subscriber
+exists, an exception is thrown.
+* `order`: Specifies the order of invocation when this endpoint is connected as a subscriber
 to a `SubscribableChannel`.
 
 === Sub-Elements
 When this `Gateway` is receiving messages from a
 `PollableChannel`, you must either provide
-a global default Poller or provide a Poller sub-element to the
-`Job Launching Gateway`:
+a global default `Poller` or provide a `Poller` sub-element to the
+`Job Launching Gateway`, as shown in the following example:
 [source, xml]
 ----
 <batch-int:job-launching-gateway request-channel="queueChannel"
@@ -381,55 +378,55 @@ a global default Poller or provide a Poller sub-element to the
 
 
 As Spring Batch jobs can run for long times, providing progress
-information will be critical. For example, stake-holders may want
-to be notified if a some or all parts of a Batch Job has failed.
+information is often critical. For example, stake-holders may want
+to be notified if a some or all parts of a batch job have failed.
 Spring Batch provides support for this information being gathered
 through:
 
 
 
-* Active polling or
+* Active polling
 
-* Event-driven, using listeners.
+* Event-driven listeners
 
 
-When starting a Spring Batch job asynchronously, e.g. by using the
-`Job Launching Gateway`, a
+When starting a Spring Batch job asynchronously (for example, by using the
+`Job Launching Gateway`), a
 `JobExecution` instance is returned. Thus,
 `JobExecution.getJobId()` can be used to
 continuously poll for status updates by retrieving updated
 instances of the `JobExecution` from the
-`JobRepository` using the
+`JobRepository` by using the
 `JobExplorer`. However, this is considered
-sub-optimal and an event-driven approach should be preferred.
+sub-optimal, and an event-driven approach should be preferred.
 
 
-Therefore, Spring Batch provides listeners such as:
+Therefore, Spring Batch provides listeners, including the three most commonly used listeners:
 
 * StepListener
 * ChunkListener
 * JobExecutionListener
 
-In the following example, a Spring Batch job was configured with a
+In the example shown in the following image, a Spring Batch job has been configured with a
 `StepExecutionListener`. Thus, Spring
-Integration will receive and process any step before/after step
+Integration receives and processes any step before or after
 events. For example, the received
-`StepExecution` can be inspected using a
+`StepExecution` can be inspected by using a
 `Router`. Based on the results of that
-inspection, various things can occur for example routing a message
-to a Mail Outbound Channel Adapter, so that an Email notification
+inspection, various things can occur (such as routing a message
+to a Mail Outbound Channel Adapter), so that an Email notification
 can be sent out based on some condition.
 
 .Handling Informational Messages
 image::{batch-asciidoc}images/handling-informational-messages.png[Handling Informational Messages, scaledwidth="60%"]
 
 
-Below is an example of how a listener is configured to send a
-message to a `Gateway` for
+The following two-part example shows how a listener is configured to send a
+message to a `Gateway` for a
 `StepExecution` events and log its output to a
-`logging-channel-adapter`:
+`logging-channel-adapter`.
 
-First create the notifications integration beans:
+First, create the notification integration beans:
 
 [source, xml]
 ----
@@ -443,7 +440,7 @@ First create the notifications integration beans:
 ----
 
 
-Then modify your job to add a step level listener:
+Second, modify your job to add a step-level listener:
 
 [source, xml]
 ----
@@ -465,28 +462,25 @@ Then modify your job to add a step level listener:
 ==== Asynchronous Processors
 
 
-Asynchronous Processors help you to to scale the processing of
-items. In the asynchronous processor use-case, an
+Asynchronous Processors help you to scale the processing of
+items. In the asynchronous processor use case, an
 `AsyncItemProcessor` serves as a dispatcher,
-executing the `ItemProcessor's` logic for an
-item on a new thread. The `Future` is passed to
-the AsynchItemWriter to be written once the
-processor completes.
+executing the logic of the `ItemProcessor` for an
+item on a new thread. Once the item completes, the `Future` is passed to
+the `AsynchItemWriter` to be written.
 
 
 
 Therefore, you can increase performance by using asynchronous item
 processing, basically allowing you to implement
 __fork-join__ scenarios. The
-`AsyncItemWriter` will gather the results and
-write back the chunk as soon as all the results become available.
+`AsyncItemWriter` gathers the results and
+writes back the chunk as soon as all the results become available.
 
 
 
-Configuration of both the `AsyncItemProcessor`
-and `AsyncItemWriter` are simple, first the
-`AsyncItemProcessor`:
-			
+The following example shows how to configuration the `AsyncItemProcessor`:
+
 
 
 [source, xml]
@@ -503,12 +497,12 @@ and `AsyncItemWriter` are simple, first the
 ----
 
 
-The property "`delegate`" is actually
-a reference to your `ItemProcessor` bean and
-the "taskExecutor" property is a
-reference to the `TaskExecutor` of your choice.
+The `delegate` property refers
+to your `ItemProcessor` bean, and
+the `taskExecutor` property
+refers to the `TaskExecutor` of your choice.
 
-Then we configure the `AsyncItemWriter`:
+The following example shows how to configure the `AsyncItemWriter`:
 
 [source, xml]
 ----
@@ -521,7 +515,7 @@ Then we configure the `AsyncItemWriter`:
 ----
 
 
-Again, the property "`delegate`" is
+Again, the `delegate` property is
 actually a reference to your `ItemWriter` bean.
 
 
@@ -530,7 +524,7 @@ actually a reference to your `ItemWriter` bean.
 ==== Externalizing Batch Process Execution
 
 
-The integration approaches discussed so far suggest use-cases
+The integration approaches discussed so far suggest use cases
 where Spring Integration wraps Spring Batch like an outer-shell.
 However, Spring Batch can also use Spring Integration internally.
 Using this approach, Spring Batch users can delegate the
@@ -555,24 +549,24 @@ provides dedicated support for:
 image::{batch-asciidoc}images/remote-chunking-sbi.png[Remote Chunking, scaledwidth="60%"]
 
 Taking things one step further, one can also externalize the
-chunk processing using the
-`ChunkMessageChannelItemWriter` which is
-provided by Spring Batch Integration which will send items out
-and collect the result. Once sent, Spring Batch will continue the
+chunk processing by using the
+`ChunkMessageChannelItemWriter`
+(provided by Spring Batch Integration), which sends items out
+and collects the result. Once sent, Spring Batch continues the
 process of reading and grouping items, without waiting for the results.
-Rather it is the responsibility of the `ChunkMessageChannelItemWriter`
+Rather, it is the responsibility of the `ChunkMessageChannelItemWriter`
 to gather the results and integrate them back into the Spring Batch process.
 
 
-Using Spring Integration you have full
-control over the concurrency of your processes, for instance by
+With Spring Integration, you have full
+control over the concurrency of your processes (for instance, by
 using a `QueueChannel` instead of a
-`DirectChannel`. Furthermore, by relying on
-Spring Integration's rich collection of Channel Adapters (E.g.
-JMS or AMQP), you can distribute chunks of a Batch job to
+`DirectChannel`). Furthermore, by relying on
+Spring Integration's rich collection of Channel Adapters (such as
+JMS and AMQP), you can distribute chunks of a Batch job to
 external systems for processing.
 
-A simple job with a step to be remotely chunked would have a
+A simple job with a step to be remotely chunked might have a
 configuration similar to the following:
 
 [source, xml]
@@ -587,15 +581,15 @@ configuration similar to the following:
 </job>
 ----
 
-The `ItemReader` reference would point to the bean you would like
+The `ItemReader` reference points to the bean you want
 to use for reading data on the master. The `ItemWriter` reference
 points to a special `ItemWriter`
-"`ChunkMessageChannelItemWriter`"
+(called `ChunkMessageChannelItemWriter`),
 as described above. The processor (if any) is left off the
-master configuration as it is configured on the slave. The
-following configuration provides a basic master setup. It's
-advised to check any additional component properties such as
-throttle limits and so on when implementing your use case.
+master configuration, as it is configured on the slave. The
+following configuration provides a basic master setup. You
+should check any additional component properties, such as
+throttle limits and so on, when implementing your use case.
 
 [source, xml]
 ----
@@ -634,15 +628,15 @@ throttle limits and so on when implementing your use case.
 ----
 
 
-This configuration provides us with a number of beans. We
-configure our messaging middleware using ActiveMQ and
+The preceding configuration provides us with a number of beans. We
+configure our messaging middleware using ActiveMQ and the
 inbound/outbound JMS adapters provided by Spring Integration. As
-shown, our `itemWriter` bean which is
-referenced by our job step utilizes the
+shown, our `itemWriter` bean, which is
+referenced by our job step, uses the
 `ChunkMessageChannelItemWriter` for writing chunks over the
 configured middleware.
 
-Now lets move on to the slave configuration:
+Now we can move on to the slave configuration, as shown in the following example:
 
 
 
@@ -687,18 +681,17 @@ Now lets move on to the slave configuration:
 
 
 Most of these configuration items should look familiar from the
-master configuration. Slaves do not need access to things like
-the Spring Batch `JobRepository` nor access
+master configuration. Slaves do not need access to
+the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
-is the "`chunkProcessorChunkHandler`". The
+is the `chunkProcessorChunkHandler`. The
 `chunkProcessor` property of `ChunkProcessorChunkHandler` takes a
-configured `SimpleChunkProcessor` which is where you would provide a reference to your
-`ItemWriter` and optionally your
-`ItemProcessor` that will run on the slave
+configured `SimpleChunkProcessor`, which is where you would provide a reference to your
+`ItemWriter` (and, optionally, your
+`ItemProcessor`) that will run on the slave
 when it receives chunks from the master.
 
-For more information, please also consult the Spring Batch
-manual, specifically the chapter on
+For more information, see the section of the "Scalability" chapter on
 link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
 
 
@@ -710,43 +703,43 @@ link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#remote
 image::{batch-asciidoc}images/remote-partitioning.png[Remote Partitioning, scaledwidth="60%"]
 
 
-Remote Partitioning, on the other hand, is useful when the
-problem is not the processing of items, but the associated I/O
-represents the bottleneck. Using Remote Partitioning, work can
+Remote Partitioning, on the other hand, is useful when it
+is not the processing of items but rather the associated I/O that
+causes the bottleneck. Using Remote Partitioning, work can
 be farmed out to slaves that execute complete Spring Batch
-steps. Thus, each slave has its own `ItemReader`, `ItemProcessor` and
+steps. Thus, each slave has its own `ItemReader`, `ItemProcessor`, and
 `ItemWriter`. For this purpose, Spring Batch
 Integration provides the `MessageChannelPartitionHandler`.
 
 
 
 This implementation of the `PartitionHandler`
-interface uses MessageChannel instances to
+interface uses `MessageChannel` instances to
 send instructions to remote workers and receive their responses.
-This provides a nice abstraction from the transports (E.g. JMS
-or AMQP) being used to communicate with the remote workers.
+This provides a nice abstraction from the transports (such as JMS
+and AMQP) being used to communicate with the remote workers.
 
 
 
-The reference manual section
-link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#partitioning$$[Remote Partitioning] provides an overview of the concepts and
-components needed to configure Remote Partitioning and shows an
+The section of the "Scalability" chapter that addresses
+link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#partitioning$$[remote partitioning] provides an overview of the concepts and
+components needed to configure remote partitioning and shows an
 example of using the default
 `TaskExecutorPartitionHandler` to partition
-in separate local threads of execution. For Remote Partitioning
-to multiple JVM's, two additional components are required:
+in separate local threads of execution. For remote partitioning
+to multiple JVMs, two additional components are required:
 
-* Remoting fabric or grid environment
+* A remoting fabric or grid environment
 * A `PartitionHandler` implementation that supports the desired
 remoting fabric or grid environment
 
 
 
-Similar to Remote Chunking JMS can be used as the "remoting
-fabric" and the `PartitionHandler` implementation to be used
-as described above is the
-`MessageChannelPartitionHandler`. The example
-shown below assumes an existing partitioned job and focuses on
+Similar to remote chunking, JMS can be used as the "remoting
+fabric". In that case, use a `MessageChannelPartitionHandler` instance as the `PartitionHandler` implementation,
+as described above.
+The following example
+assumes an existing partitioned job and focuses on
 the `MessageChannelPartitionHandler` and JMS
 configuration:
 
@@ -803,7 +796,7 @@ configuration:
     class="org.springframework.batch.integration.partition.BeanFactoryStepLocator" />
 ----
 
-Also ensure the partition `handler` attribute maps to the `partitionHandler` bean:
+You must also ensure that the partition `handler` attribute maps to the `partitionHandler` bean, as shown in the following example:
 
 [source, xml]
 ----
@@ -814,4 +807,3 @@ Also ensure the partition `handler` attribute maps to the `partitionHandler` bea
   </step>
 </job>
 ----
-
