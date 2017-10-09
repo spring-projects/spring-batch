@@ -10,11 +10,7 @@ The Spring Batch 4.0 release has three major themes:
 
 
 * Java 8 Requirement
-
-
 * Dependencies Re-baseline
-
-
 * Builders for ItemReaders and ItemWriters
 
 [[whatsNewJava]]
@@ -22,58 +18,55 @@ The Spring Batch 4.0 release has three major themes:
 
 === Java 8 Requirement
 
-Spring Batch has historically followed Spring Framework's baselines for both
-		java version and third party dependencies.  With Spring Batch 4, the Spring
-		Framework version is being upgraded to Spring Framework 5.  As a result, the Java
-		version requirement for Spring Batch is also increasing to Java 8.  This should be
-		mainly an internal change, in that most of the framework has supported things like
-		functional interfaces and lambdas since they were released.
+Spring Batch has historically followed Spring Framework's baselines for both java version
+and third party dependencies.  With Spring Batch 4, the Spring Framework version is being
+upgraded to Spring Framework 5.  As a result, the Java version requirement for Spring
+Batch is also increasing to Java 8.  This should be mainly an internal change, in that
+most of the framework has supported things like functional interfaces and lambdas since
+they were released.
 
 
 [[whatsNewDependencies]]
-
-
 === Dependencies Re-baseline
 
-In order to continue to integrate with supported versions of the third party
-		libraries Spring Batch uses, Spring Batch 4 is updating the dependencies across
-		the board.  The new dependency versions align with Spring Framework 5.
+In order to continue to integrate with supported versions of the third party libraries
+Spring Batch uses, Spring Batch 4 is updating the dependencies across the board.  The new
+dependency versions align with Spring Framework 5.
 
 
 [[whatsNewBuilders]]
-
-
 === Provide builders for the ItemReaders, ItemProcessors, and ItemWriters
 
-Spring Batch 4 is providing a collection of builders for all of the `ItemReader` implementations
-		and `ItemWriter` implementations that come with the framework.  As of this release, builders for the
-		following components (as well as some related utility builders) are available:
+Spring Batch 4 is providing a collection of builders for all of the `ItemReader`
+implementations and `ItemWriter` implementations that come with the framework.  As of
+this release, builders for the following components (as well as some related utility
+builders) are available:
 
-		* `AmqpItemReader` - `AmqpItemReaderBuilder`
-		* `ClassifierCompositeItemProcessor` - `ClassifierCompositeItemProcessorBuilder`
-		* `ClassifierCompositeItemWriter` - `ClassifierCompositeItemWriterBuilder`
-		* `CompositeItemWriter` - `CompositeItemWriterBuilder`
-		* `FlatFileItemReader` - `FlatFileItemReaderBuilder`
-		* `FlatFileItemWriter` - `FlatFileItemWriterBuilder`
-		* `GemfireItemWriter` - `GemfireItemWriterBuilder`
-		* `HibernateCursorItemReader` - `HibernateCursorItemReaderBuilder`
-		* `HibernateItemWriter` - `HibernateItemWriterBuilder`
-		* `HibernatePagingItemReader` - `HibernatePagingItemReaderBuilder`
-		* `JdbcBatchItemWriter` - `JdbcBatchItemWriterBuilder`
-		* `JdbcCursorItemReader` - `JdbcCursorItemReaderBuilder`
-		* `JdbcPagingItemReader` - `JdbcCursorItemReaderBuilder`
-		* `JmsItemReader` - `JmsItemReaderBuilder`
-		* `JmsItemWriter` - `JmsItemWriterBuilder`
-		* `JpaPagingItemReader` - `JpaPagingItemReaderBuilder`
-		* `MongoItemReader` - `MongoItemReaderBuilder`
-		* `MultiResourceItemReader` - `MultiResourceItemReaderBuilder`
-		* `MultiResourceItemWriter` - `MultiResourceItemWriterBuilder`
-		* `Neo4jItemWriter` - `Neo4jItemWriterBuilder`
-		* `RepositoryItemReader` - `RepositoryItemReaderBuilder`
-		* `RepositoryItemWriter` - `RepositoryItemWriterBuilder`
-		* `ScriptItemProcessor` - `ScriptItemProcessorBuilder`
-		* `SimpleMailMessageItemWriter` - `SimpleMailMessageItemWriterBuilder`
-		* `SingleItemPeekableItemReader` - `SingleItemPeekableItemReaderBuilder`
-		* `StaxEventItemReader` - `StaxEventItemReaderBuilder`
-		* `StaxEventItemWriter` - `StaxEventItemWriterBuilder`
-		* `SynchronizedItemStreamReader` - `SynchronizedItemStreamReaderBuilder`
+* `AmqpItemReader` - `AmqpItemReaderBuilder`
+* `ClassifierCompositeItemProcessor` - `ClassifierCompositeItemProcessorBuilder`
+* `ClassifierCompositeItemWriter` - `ClassifierCompositeItemWriterBuilder`
+* `CompositeItemWriter` - `CompositeItemWriterBuilder`
+* `FlatFileItemReader` - `FlatFileItemReaderBuilder`
+* `FlatFileItemWriter` - `FlatFileItemWriterBuilder`
+* `GemfireItemWriter` - `GemfireItemWriterBuilder`
+* `HibernateCursorItemReader` - `HibernateCursorItemReaderBuilder`
+* `HibernateItemWriter` - `HibernateItemWriterBuilder`
+* `HibernatePagingItemReader` - `HibernatePagingItemReaderBuilder`
+* `JdbcBatchItemWriter` - `JdbcBatchItemWriterBuilder`
+* `JdbcCursorItemReader` - `JdbcCursorItemReaderBuilder`
+* `JdbcPagingItemReader` - `JdbcCursorItemReaderBuilder`
+* `JmsItemReader` - `JmsItemReaderBuilder`
+* `JmsItemWriter` - `JmsItemWriterBuilder`
+* `JpaPagingItemReader` - `JpaPagingItemReaderBuilder`
+* `MongoItemReader` - `MongoItemReaderBuilder`
+* `MultiResourceItemReader` - `MultiResourceItemReaderBuilder`
+* `MultiResourceItemWriter` - `MultiResourceItemWriterBuilder`
+* `Neo4jItemWriter` - `Neo4jItemWriterBuilder`
+* `RepositoryItemReader` - `RepositoryItemReaderBuilder`
+* `RepositoryItemWriter` - `RepositoryItemWriterBuilder`
+* `ScriptItemProcessor` - `ScriptItemProcessorBuilder`
+* `SimpleMailMessageItemWriter` - `SimpleMailMessageItemWriterBuilder`
+* `SingleItemPeekableItemReader` - `SingleItemPeekableItemReaderBuilder`
+* `StaxEventItemReader` - `StaxEventItemReaderBuilder`
+* `StaxEventItemWriter` - `StaxEventItemWriterBuilder`
+* `SynchronizedItemStreamReader` - `SynchronizedItemStreamReaderBuilder`
