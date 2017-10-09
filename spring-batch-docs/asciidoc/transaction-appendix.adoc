@@ -13,8 +13,8 @@
 === Simple Batching with No Retry
 
 Consider the following simple example of a nested batch with no
-			retries.  This is a very common scenario for batch processing, where
-			an input source is processed until exhausted, but we commit
+			retries.  It shows a common scenario for batch processing:
+			An input source is processed until exhausted, and we commit
 			periodically at the end of a "chunk" of processing.
 
 
@@ -30,17 +30,17 @@ Consider the following simple example of a nested batch with no
 |    }
 |
 |  }
-		
+
 ----
 
 The input operation (3.1) could be a message-based receive
-		(e.g. JMS), or a file-based read, but to recover and continue
+		(such as from JMS), or a file-based read, but to recover and continue
 		processing with a chance of completing the whole job, it must be
-		transactional.  The same applies to the operation at (3.2) - it must
+		transactional. The same applies to the operation at 3.2. It must
 		be either transactional or idempotent.
 
-If the chunk at REPEAT(3) fails because of a database exception at
-		(3.2), then TX(2) will roll back the whole chunk.
+If the chunk at `REPEAT` (3) fails because of a database exception at
+		3.2, then `TX` (2) must roll back the whole chunk.
 
 [[transactionStatelessRetry]]
 
@@ -48,8 +48,8 @@ If the chunk at REPEAT(3) fails because of a database exception at
 === Simple Stateless Retry
 
 It is also useful to use a retry for an operation which is not
-			transactional, like a call to a web-service or other remote
-			resource.  For example:
+			transactional, such as a call to a web-service or other remote
+			resource, as shown in the following example:
 
 
 ----
@@ -61,14 +61,14 @@ It is also useful to use a retry for an operation which is not
 2.1 |      remote access;
 |    }
 |  }
-		
+
 ----
 
 This is actually one of the most useful applications of a retry,
 			since a remote call is much more likely to fail and be retryable
 			than a database update.  As long as the remote access (2.1)
-			eventually succeeds, the transaction TX(0) will commit.  If the
-			remote access (2.1) eventually fails, then the transaction TX(0) is
+			eventually succeeds, the transaction, `TX` (0), commits.  If the
+			remote access (2.1) eventually fails, then the transaction, `TX` (0), is
 			guaranteed to roll back.
 
 [[repeatRetry]]
@@ -77,8 +77,7 @@ This is actually one of the most useful applications of a retry,
 === Typical Repeat-Retry Pattern
 
 The most typical batch processing pattern is to add a retry to the
-			inner block of the chunk in the Simple Batching example.
-			Consider this:
+			inner block of the chunk, as shown in the following example:
 
 
 ----
@@ -100,68 +99,68 @@ The most typical batch processing pattern is to add a retry to the
 |    }
 |
 |  }
-		
+
 ----
 
-The inner RETRY(4) block is marked as "stateful" - see the
-			typical use case for a description of a stateful
-			retry.  This means that if the the retry PROCESS(5) block fails, the
-			behaviour of the RETRY(4) is as follows.
+The inner `RETRY` (4) block is marked as "stateful". See <<transactionsNoRetry,the
+			typical use case>> for a description of a stateful
+			retry.  This means that if the the retry `PROCESS` (5) block fails, the
+			behavior of the `RETRY` (4) is as follows:
 
 
-* Throw an exception, rolling back the transaction TX(2) at the
+. Throw an exception, rolling back the transaction, `TX` (2), at the
 					chunk level, and allowing the item to be re-presented to the input
 					queue.
 
 
-* When the item re-appears, it might be retried depending on the
-					retry policy in place, executing PROCESS(5) again.  The second and
-					subsequent attempts might fail again and rethrow the exception.
+. When the item re-appears, it might be retried depending on the
+					retry policy in place, executing `PROCESS` (5) again.  The second and
+					subsequent attempts might fail again and re-throw the exception.
 
 
-* Eventually the item re-appears for the final time: the retry
-					policy disallows another attempt, so PROCESS(5) is never
-					executed. In this case we follow a RECOVER(6) path, effectively
+. Eventually, the item reappears for the final time. The retry
+					policy disallows another attempt, so `PROCESS` (5) is never
+					executed. In this case, we follow the `RECOVER` (6) path, effectively
 					"skipping" the item that was received and is being processed.
 
-Notice that the notation used for the RETRY(4) in the plan above
-			shows explictly that the the input step (4.1) is part of the retry.
+Note that the notation used for the `RETRY` (4) in the plan above
+			explicitly shows that the the input step (4.1) is part of the retry.
 			It also makes clear that there are two alternate paths for
-			processing: the normal case is denoted by PROCESS(5), and the
-			recovery path is a separate block, RECOVER(6).  The two alternate
-			paths are completely distinct: only one is ever taken in normal
+			processing: the normal case, as denoted by `PROCESS` (5), and the
+			recovery path, as denoted in a separate block by `RECOVER` (6).  The two alternate
+			paths are completely distinct. Only one is ever taken in normal
 			circumstances.
 
-In special cases (e.g. a special TranscationValidException
+In special cases (such as a special `TranscationValidException`
 			type), the retry policy might be able to determine that the
-			RECOVER(6) path can be taken on the last attempt after PROCESS(5)
+			`RECOVER` (6) path can be taken on the last attempt after `PROCESS` (5)
 			has just failed, instead of waiting for the item to be re-presented.
-			This is not the default behavior because it requires detailed
-			knowledge of what has happened inside the PROCESS(5) block, which is
-			not usually available - e.g. if the output included write
-			access before the failure, then the exception should be rethrown to
+			This is not the default behavior, because it requires detailed
+			knowledge of what has happened inside the `PROCESS` (5) block, which is
+			not usually available. For example, if the output included write
+			access before the failure, then the exception should be re-thrown to
 			ensure transactional integrity.
 
-The completion policy in the outer, REPEAT(1) is crucial to the
-			success of the above plan.  If the output(5.1) fails it may throw an
+The completion policy in the outer `REPEAT` (1) is crucial to the
+			success of the above plan.  If the output (5.1) fails, it may throw an
 			exception (it usually does, as described), in which case the
-			transaction TX(2) fails and the exception could propagate up through
-			the outer batch REPEAT(1).  We do not want the whole batch to stop
-			because the RETRY(4) might still be successful if we try again, so
-			we add the exception=not critical to the outer REPEAT(1).
+			transaction, `TX` (2), fails, and the exception could propagate up through
+			the outer batch `REPEAT` (1).  We do not want the whole batch to stop,
+			because the `RETRY` (4) might still be successful if we try again, so
+			we add `exception=not critical` to the outer `REPEAT` (1).
 
-Note, however, that if the TX(2) fails and we __do__ try again, by
+Note, however, that if the `TX` (2) fails and we __do__ try again, by
 			virtue of the outer completion policy, the item that is next
-			processed in the inner REPEAT(3) is not guaranteed to be the one
-			that just failed.  It might well be, but it depends on the
-			implementation of the input(4.1).  Thus the output(5.1) might fail
-			again, on a new item, or on the old one.  The client of the batch
-			should not assume that each RETRY(4) attempt is going to process the
-			same items as the last one that failed.  E.g. if the termination
-			policy for REPEAT(1) is to fail after 10 attempts, it will fail
-			after 10 consecutive attempts, but not necessarily at the same item.
-			This is consistent with the overall retry strategy: it is the inner
-			RETRY(4) that is aware of the history of each item, and can decide
+			processed in the inner `REPEAT` (3) is not guaranteed to be the one
+			that just failed.  It might be, but it depends on the
+			implementation of the input (4.1).  Thus, the output (5.1) might fail
+			again on either a new item or the old one.  The client of the batch
+			should not assume that each `RETRY` (4) attempt is going to process the
+			same items as the last one that failed.  For example, if the termination
+			policy for `REPEAT` (1) is to fail after 10 attempts, it fails
+			after 10 consecutive attempts but not necessarily at the same item.
+			This is consistent with the overall retry strategy. The inner
+			`RETRY` (4) is aware of the history of each item and can decide
 			whether or not to have another attempt at it.
 
 [[asyncChunkProcessing]]
@@ -169,10 +168,10 @@ Note, however, that if the TX(2) fails and we __do__ try again, by
 
 === Asynchronous Chunk Processing
 
-The inner batches or chunks in the typical example
-			above can be executed concurrently by configuring the outer batch to
-			use an AsyncTaskExecutor.  The outer batch waits for all the
-			chunks to complete before completing.
+The inner batches or chunks in the <<repeatRetry,typical example>>
+			can be executed concurrently by configuring the outer batch to
+			use an `AsyncTaskExecutor`.  The outer batch waits for all the
+			chunks to complete before completing. The following example shows asynchronous chunk processing:
 
 
 ----
@@ -194,7 +193,7 @@ The inner batches or chunks in the typical example
 |    }
 |
 |  }
-		
+
 ----
 
 [[asyncItemProcessing]]
@@ -202,11 +201,11 @@ The inner batches or chunks in the typical example
 
 === Asynchronous Item Processing
 
-The individual items in chunks in the typical
-			can also in principle be processed concurrently.  In this case the
+The individual items in chunks in the <<repeatRetry,typical example>>
+			can also, in principle, be processed concurrently.  In this case, the
 			transaction boundary has to move to the level of the individual
-			item, so that each transaction is on a single thread:
-		
+			item, so that each transaction is on a single thread, as shown in the following example:
+
 
 
 ----
@@ -228,10 +227,10 @@ The individual items in chunks in the typical
 |    }
 |
 |  }
-		
+
 ----
 
-This plan sacrifices the optimisation benefit, that the simple plan
+This plan sacrifices the optimization benefit, which the simple plan
 			had, of having all the transactional resources chunked together.  It
 			is only useful if the cost of the processing (5) is much higher than
 			the cost of transaction management (3).
@@ -241,13 +240,13 @@ This plan sacrifices the optimisation benefit, that the simple plan
 
 === Interactions Between Batching and Transaction Propagation
 
-There is a tighter coupling between batch-retry and TX management
-			than we would ideally like.  In particular a stateless retry cannot
+There is a tighter coupling between batch-retry and transaction management
+			than we would ideally like.  In particular, a stateless retry cannot
 			be used to retry database operations with a transaction manager that
-			doesn't support NESTED propagation.
-		
+			does not support NESTED propagation.
 
-For a simple example using retry without repeat, consider this:
+
+The following example uses retry without repeat:
 
 
 ----
@@ -263,15 +262,15 @@ For a simple example using retry without repeat, consider this:
 |    }
 |
 |  }
-		
+
 ----
 
-Again, and for the same reason, the inner transaction TX(3) can
-			cause the outer transaction TX(1) to fail, even if the RETRY(2) is
+Again, and for the same reason, the inner transaction, `TX` (3), can
+			cause the outer transaction, `TX` (1), to fail, even if the `RETRY` (2) is
 			eventually successful.
 
-Unfortunately the same effect percolates from the retry block up to
-			the surrounding repeat batch if there is one:
+Unfortunately, the same effect percolates from the retry block up to
+			the surrounding repeat batch if there is one, as shown in the following example:
 
 
 ----
@@ -289,32 +288,32 @@ Unfortunately the same effect percolates from the retry block up to
 |    }
 |
 |  }
-		
+
 ----
 
-Now if TX(3) rolls back it can pollute the whole batch at TX(1) and
+Now, if TX (3) rolls back, it can pollute the whole batch at TX (1) and
 			force it to roll back at the end.
 
 What about non-default propagation?
 
 
-* In the last example PROPAGATION_REQUIRES_NEW at TX(3) will
-					prevent the outer TX(1) from being polluted if both transactions
-					are eventually successful.  But if TX(3) commits and TX(1) rolls
-					back, then TX(3) stays committed, so we violate the transaction
-					contract for TX(1).  If TX(3) rolls back, TX(1) does not necessarily (but it probably
-					will in practice because the retry will throw a roll back
+* In the preceding example, `PROPAGATION_REQUIRES_NEW` at `TX` (3)
+					prevents the outer `TX` (1) from being polluted if both transactions
+					are eventually successful.  But if `TX` (3) commits and `TX` (1) rolls
+					back, then `TX` (3) stays committed, so we violate the transaction
+					contract for `TX` (1).  If `TX` (3) rolls back, `TX` (1) does not necessarily (but it probably
+					does in practice, because the retry throws a roll back
 					exception).
 
 
-* PROPAGATION_NESTED at TX(3) works as we require in the retry
-					case (and for a batch with skips): TX(3) can commit, but
-					subsequently be rolled back by the outer transaction TX(1).  If
-					TX(3) rolls back, again TX(1) will roll back in practice.  This
-					option is only available on some platforms, e.g. not Hibernate or
-					JTA, but it is the only one that works consistently.
+* `PROPAGATION_NESTED` at `TX` (3) works as we require in the retry
+					case (and for a batch with skips): `TX` (3) can commit but
+					subsequently be rolled back by the outer transaction, `TX` (1).  If
+					`TX` (3) rolls back, `TX` (1) rolls back in practice.  This
+					option is only available on some platforms, not including Hibernate or
+					JTA, but it is the only one that consistently works.
 
-So NESTED is best if the retry block contains any database access.
+Consequently, the `NESTED` pattern is best if the retry block contains any database access.
 
 [[specialTransactionOrthonogonal]]
 
@@ -322,9 +321,9 @@ So NESTED is best if the retry block contains any database access.
 === Special Case: Transactions with Orthogonal Resources
 
 Default propagation is always OK for simple cases where there are no
-			nested database transactions.  Consider this (where the SESSION and
-			TX are not global XA resources, so their resources are orthogonal):
-		
+			nested database transactions.  Consider the following example, where the `SESSION` and
+			`TX` are not global `XA` resources, so their resources are orthogonal:
+
 
 
 ----
@@ -337,19 +336,19 @@ Default propagation is always OK for simple cases where there are no
 |      }
 |    }
 |  }
-		
+
 ----
 
-Here there is a transactional message SESSION(0), but it doesn't
+Here there is a transactional message `SESSION` (0), but it does nt
 			participate in other transactions with
-			PlatformTransactionManager, so doesn't propagate when TX(3)
-			starts.  There is no database access outside the RETRY(2) block. If
-			TX(3) fails and then eventually succeeds on a retry, SESSION(0) can
-			commit (it can do this independent of a TX block).  This is similar
-			to the vanilla "best-efforts-one-phase-commit" scenario - the worst
-			that can happen is a duplicate message when the RETRY(2) succeeds
-			and the SESSION(0) cannot commit, e.g. because the message system is
-			unavailable.
+			`PlatformTransactionManager`, so it does not propagate when `TX` (3)
+			starts.  There is no database access outside the `RETRY` (2) block. If
+			`TX` (3) fails and then eventually succeeds on a retry, `SESSION` (0) can
+			commit (independently of a `TX` block).  This is similar
+			to the vanilla "best-efforts-one-phase-commit" scenario. The worst
+			that can happen is a duplicate message when the `RETRY` (2) succeeds
+			and the `SESSION` (0) cannot commit (for example, because the message system is
+			unavailable).
 
 [[statelessRetryCannotRecover]]
 
@@ -361,12 +360,12 @@ The distinction between a stateless and a stateful retry in the
 			ultimately a transactional constraint that forces the distinction,
 			and this constraint also makes it obvious why the distinction
 			exists.
-		
+
 
 We start with the observation that there is no way to skip an item
 			that failed and successfully commit the rest of the chunk unless we
-			wrap the item processing in a transaction.  So we simplify the
-			typical batch execution plan to look like this:
+			wrap the item processing in a transaction.  Consequently, we simplify the
+			typical batch execution plan to be as follows:
 
 
 ----
@@ -389,23 +388,22 @@ We start with the observation that there is no way to skip an item
 |    }
 |
 |  }
-		
+
 ----
 
-Here we have a stateless RETRY(3) with a RECOVER(5) path that kicks
-			in after the final attempt fails.  The "stateless" label just means
-			that the block will be repeated without rethrowing any exception up
-			to some limit.  This will only work if the transaction TX(4) has
+The preceding example shows a stateless `RETRY` (3) with a `RECOVER` (5) path that kicks
+			in after the final attempt fails.  The `stateless` label means
+			that the block is repeated without re-throwing any exception up
+			to some limit.  This only works if the transaction, `TX` (4), has
 			propagation NESTED.
 
-If the TX(3) has default propagation properties and it rolls back,
-			it will pollute the outer TX(1). The inner transaction is assumed by
+If the inner `TX` (4) has default propagation properties and rolls back,
+			it pollutes the outer `TX` (1). The inner transaction is assumed by
 			the transaction manager to have corrupted the transactional
-			resource, and so it cannot be used again.
+			resource, so it cannot be used again.
 
 Support for NESTED propagation is sufficiently rare that we choose
-			not to support recovery with stateless retries in current versions of
+			not to support recovery with stateless retries in the current versions of
 			Spring Batch.  The same effect can always be achieved (at the
-			expense of repeating more processing) using the
+			expense of repeating more processing) by using the
 			typical pattern above.
-
