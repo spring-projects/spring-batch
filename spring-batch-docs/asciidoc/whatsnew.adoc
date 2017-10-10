@@ -61,7 +61,7 @@ Spring Batch 4 is providing a collection of builders for all of the `ItemReader`
 		* `HibernatePagingItemReader` - `HibernatePagingItemReaderBuilder`
 		* `JdbcBatchItemWriter` - `JdbcBatchItemWriterBuilder`
 		* `JdbcCursorItemReader` - `JdbcCursorItemReaderBuilder`
-		* `JdbcPagingItemReader` - `JdbcCursorItemReaderBuilder`
+		* `JdbcPagingItemReader` - `JdbcPagingItemReaderBuilder`
 		* `JmsItemReader` - `JmsItemReaderBuilder`
 		* `JmsItemWriter` - `JmsItemWriterBuilder`
 		* `JpaPagingItemReader` - `JpaPagingItemReaderBuilder`
