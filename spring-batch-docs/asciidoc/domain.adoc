@@ -56,13 +56,13 @@ top of an overall hierarchy, as shown in the following diagram:
 .Job Hierarchy
 image::{batch-asciidoc}images/job-heirarchy.png[Job Hierarchy, scaledwidth="60%"]
 
-In Spring Batch, a `Job` is simply a container for `Step` items. It combines
+In Spring Batch, a `Job` is simply a container for `Step` instances. It combines
 multiple steps that belong logically together in a flow and allows for
 configuration of properties global to all steps, such as restartability.
 The job configuration contains:
 
 * The simple name of the job.
-* Definition and ordering of Step items.
+* Definition and ordering of `Step` instances.
 * Whether or not the job is restartable.
 
 ifdef::backend-html5[]
@@ -102,7 +102,6 @@ Instead, the `<job>` tag can be used as shown in the following example:
 ----
 endif::backend-html5[]
 
-// TODO Why different content for HTML versus PDF?
 ifdef::backend-pdf[]
 A default simple implementation of the Job
 interface is provided by Spring Batch in the form of the
@@ -230,8 +229,8 @@ controlled and persisted, as shown in the following table:
 |Status
 |A `BatchStatus` object that
 indicates the status of the execution. While running, it is
-BatchStatus#STARTED. If it fails, it is BatchStatus.FAILED.
-If it finishes successfully, it is BatchStatus.COMPLETED
+`BatchStatus#STARTED`. If it fails, it is `BatchStatus#FAILED`.
+If it finishes successfully, it is `BatchStatus#COMPLETED`
 
 |startTime
 |A `java.util.Date` representing the
