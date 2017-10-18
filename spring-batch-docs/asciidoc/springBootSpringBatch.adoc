@@ -1,0 +1,61 @@
+== Using Spring Batch with Spring Boot
+
+A number of things work differently when you use Spring Batch from within a Spring Boot
+application. This chapter describes the following differences:
+
+* <<runningCommandLine>>
+* <<storingJobRepository>>
+
+[[runningCommandLine]]
+=== Running from the Command Line
+
+Running Spring Batch with Spring Boot from the command line differs from running Spring
+Batch by itself from the command line. Spring Boot uses a class called
+`JobLaunchingCommandLineRunner`. Spring Batch uses a class called `CommandLineJobRunner`.
+They work a bit differently. However, for the most part, the differences do not cause
+trouble. However, they parse command line arguments differently, which can cause trouble,
+as described in the next section.
+// TODO What are the other differences between the two?
+
+==== Passing Command-line Arguments
+
+If you run Spring Batch with Spring Boot, Spring Boot strips the first `-` character (a
+hyphen) from each command line argument. For example, `--exampleArgument` becomes
+`-exampleArgument`. Whether a command-line option has one hyphen or two often makes no
+difference in Spring Boot. However, in Spring Batch, putting a single `-` character
+before the `jobParameters` parameter indicates that Spring Batch should not use the
+`jobParameters` value as the identifier for the `Job`. Best practice is to use the
+`jobParameters` value as the identifier for the `Job`, so this issue may cause problems.
+To avoid the issue, you should generally use no `-` characters for the command-line
+options that you pass to Spring Boot on behalf of Spring Batch, as shown in the following
+example:
+
+[source]
+jobParameters="someParameter"
+
+However, if you mean to not use the `jobParameters` value as the identifier for the
+`Job`, use two hyphens, as shown in the following example:
+
+[source]
+--jobParameters="someParameter"
+
+In the second example, Spring Boot passes the parameter to Spring Batch as
+`-jobParameters="someParameter"`, and "someParameter" does not become the name of the
+`Job`.
+// TODO In that case, what is the name of the job?
+
+[[storingJobRepository]]
+=== Storing the `Job` Repository
+
+Spring Batch requires a memory store for the `Job` repository. If you use Spring Boot,
+you must use an actual database. Note that it can be an in-memory database. Using Spring
+Batch without Spring Boot does not require a database. If you use Spring Batch without
+Spring Boot, you may provide a database (including an in-memory database), but it is not
+required. If you do not provide a database, Spring Batch uses a `Map` object as the `Job`
+repository.
+
+See also
+https://docs.spring.io/spring-batch/trunk/reference/html/configureJob.html#configuringJobRepository[Configuring
+a Job Repository]
+// TODO Is it best practice to use a database (rather than the default Map object) for
+// the Job Repository, even when Spring Boot isn't present?
