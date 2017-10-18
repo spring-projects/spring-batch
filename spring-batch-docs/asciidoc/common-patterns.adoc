@@ -1,4 +1,4 @@
-:batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
+:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
