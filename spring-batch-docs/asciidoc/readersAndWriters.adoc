@@ -20,7 +20,7 @@ Although a simple concept, an `ItemReader` is
 the means for providing data from many different types of input. The most
 general examples include:
 
-* Flat File: Flat File Item Readers read lines of data from a
+* Flat File: Flat-file item readers read lines of data from a
 flat file that typically describes records with fields of data
 defined by fixed positions in the file or delimited by some special
 character (such as a comma).
@@ -1300,8 +1300,7 @@ public interface FieldExtractor<T> {
 Implementations of the `FieldExtractor`
 interface should create an array from the fields of the provided
 object, which can then be written out with a delimiter between the
-elements or as part of a field-width line.
-// TODO "fixed-width" rather than "field-width"?
+elements or as part of a fixed-width line.
 
 [[PassThroughFieldExtractor]]
 
@@ -1453,7 +1452,7 @@ The underlying implementation is built using the same
 `Formatter` is based on the
 `printf` functionality of the C programming
 language. Most details on how to configure a formatter can be found in
-the Javadoc of link:$$http://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html$$[Formatter].
+the Javadoc of link:$$https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html$$[Formatter].
 
 [[handlingFileCreation]]
 
@@ -1798,8 +1797,8 @@ orientated mechanism for manipulating a cursor. A
 `ResultSet` maintains a cursor to the current row
 of data. Calling `next` on a
 `ResultSet` moves this cursor to the next row.
-Spring Batch cursor-based `ItemReader` implementation open a cursor on
-initialization and move the cursor forward one row for every call to
+The Spring Batch cursor-based `ItemReader` implementation opens a cursor on
+initialization and moves the cursor forward one row for every call to
 `read`, returning a mapped object that can be
 used for processing. The `close` method is then
 called to ensure all resources are freed up. The Spring core
@@ -2276,7 +2275,7 @@ This configured `ItemReader` returns
 'pageSize' property determines the number of entities read from the
 database for each query run.
 
-The 'parameterValues' property can be used to specify a map of
+The 'parameterValues' property can be used to specify a `Map` of
 parameter values for the query. If you use named parameters in the
 `where` clause, the key for each entry should match the name of the named
 parameter. If you use a traditional '?' placeholder, then the key for
@@ -2373,8 +2372,6 @@ solve this issue is to flush after each item, as shown in the following image:
 .Error On Write
 image::{batch-asciidoc}images/errorOnWrite.png[Error On Write, scaledwidth="60%"]
 
-http://docs.spring.io/spring-batch/reference/html/images/errorOnWrite.png.pagespeed.ce.SKTuwx-ca1.png
-// Why is this image line here? Also, it's weird that it has two ".png" strings in it.
 This is a common use case, especially when using Hibernate, and
 the simple guideline for implementations of `ItemWriter` is to flush on each call to
 `write()`. Doing so allows for items to be
@@ -2806,6 +2803,9 @@ Spring Batch includes the following decorators:
 * <<synchronizedItemStreamReader>>
 * <<singleItemPeekableItemReader>>
 * <<multiResourceItemWriter>>
+* <<classifierCompositeItemWriter>>
+* <<classifierCompositeItemProcessor>>
+
 
 [[synchronizedItemStreamReader]]
 ===== `SynchronizedItemStreamReader`
@@ -2835,13 +2835,29 @@ resource exceeds the `itemCountLimitPerResource`.
 Spring Batch provides a `MultiResourceItemWriterBuilder` to construct an
 instance of the `MultiResourceItemWriter`.
 
+[[classifierCompositeItemWriter]]
+===== `ClassifierCompositeItemWriter`
+The `ClassifierCompositeItemWriter` calls one of a collection of `ItemWriter` implementations for
+each item, based on a router pattern implemented through the provided
+`Classifier`.  The implementation is thread-safe if all delegates are thread-safe.
+Spring Batch provides a `ClassifierCompositeItemWriterBuilder` to construct an
+instance of the `ClassifierCompositeItemWriter`.
+
+[[classifierCompositeItemProcessor]]
+===== ClassifierCompositeItemProcessor
+The `ClassifierCompositeItemProcessor` is an `ItemProcessor` that calls one of a collection
+of `ItemProcessor` implemenations, based on a router pattern implemented through the provided
+`Classifier`.
+Spring Batch provides a `ClassifierCompositeItemProcessorBuilder` to construct an
+instance of the `ClassifierCompositeItemProcessor`.
+
 
 [[messagingReadersAndWriters]]
 ==== Messaging Readers And Writers
 Spring Batch offers the following readers and writers for commonly used messaging systems:
 
-* <<AmqpItemReader>>
-* <<AmqpItemWriter>>
+* <<amqpItemReader>>
+* <<amqpItemWriter>>
 * <<jmsItemReader>>
 * <<jmsItemWriter>>
 
@@ -2926,6 +2942,7 @@ Spring Batch offers the following database writers:
 * <<hibernateItemWriter>>
 * <<jdbcBatchItemWriter>>
 * <<jpaItemWriter>>
+* <<gemfireItemWriter>>
 
 [[neo4jItemWriter]]
 ===== `Neo4jItemWriter`
@@ -2968,6 +2985,13 @@ to merge any entities that are not part of the persistence context.
 Spring Batch provides a `JpaItemWriterBuilder` to construct an instance
 of the `JpaItemWriter`.
 
+[[gemfireItemWriter]]
+===== `GemfireItemWriter`
+The `GemfireItemWriter` is an `ItemWriter` that uses a `GemfireTemplate` that
+stores items in GemFire as key/value pairs.
+Spring Batch provides a `GemfireItemWriterBuilder` to construct an
+instance of the `GemfireItemWriter`.
+
 [[specializedReaders]]
 ==== Specialized Readers
 Spring Batch offers the following specialized readers:
@@ -2992,17 +3016,7 @@ Spring Batch provides a `MappingLdifReaderBuilder` to construct an instance of t
 ==== Specialized Writers
 Spring Batch offers the following specialized writers:
 
-* <<classifierCompositeItemWriter>>
 * <<simpleMailMessageItemWriter>>
-* <<gemfireItemWriter>>
-
-[[classifierCompositeItemWriter]]
-===== `ClassifierCompositeItemWriter`
-The `ClassifierCompositeItemWriter` calls one of a collection of `ItemWriter` implementations for
-each item, based on a router pattern implemented through the provided
-`Classifier`.  The implementation is thread-safe if all delegates are thread-safe.
-Spring Batch provides a `ClassifierCompositeItemWriterBuilder` to construct an
-instance of the `ClassifierCompositeItemWriter`.
 
 [[simpleMailMessageItemWriter]]
 ===== `SimpleMailMessageItemWriter`
@@ -3012,19 +3026,11 @@ Spring Batch provides a `SimpleMailMessageItemWriterBuilder` to construct an
 instance of the `SimpleMailMessageItemWriter`.
 
 
-[[gemfireItemWriter]]
-===== `GemfireItemWriter`
-The `GemfireItemWriter` is an `ItemWriter` that uses a `GemfireTemplate` that
-stores items in GemFire as key/value pairs.
-Spring Batch provides a `GemfireItemWriterBuilder` to construct an
-instance of the `GemfireItemWriter`.
-
 [[specializedProcessors]]
 ==== Specialized Processors
 Spring Batch offers the following specialized processors:
 
 * <<scriptItemProcessor>>
-* <<classifierCompositeItemProcessor>>
 
 [[scriptItemProcessor]]
 ===== `ScriptItemProcessor`
@@ -3032,11 +3038,3 @@ The `ScriptItemProcessor` is an `ItemProcessor` that passes the current item to
 process to the provided script and the result of the script is returned by the processor.
 Spring Batch provides a `ScriptItemProcessorBuilder` to construct an
 instance of the `ScriptItemProcessor`.
-
-[[classifierCompositeItemProcessor]]
-===== ClassifierCompositeItemProcessor
-The `ClassifierCompositeItemProcessor` is an `ItemProcessor` that calls one of a collection
-of `ItemProcessor` implemenations, based on a router pattern implemented through the provided
-`Classifier`.
-Spring Batch provides a `ClassifierCompositeItemProcessorBuilder` to construct an
-instance of the `ClassifierCompositeItemProcessor`.
