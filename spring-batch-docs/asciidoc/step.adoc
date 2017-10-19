@@ -2154,6 +2154,21 @@ Any bean that uses late-binding must be declared with scope="step". See
 <<step.adoc#step-scope,Step Scope>> for more information.
 ====
 
+[NOTE]
+====
+If you are using Spring 3.0 (or above), the expressions in step-scoped beans are in the
+Spring Expression Language, a powerful general purpose language with many interesting
+features. To provide backward compatibility, if Spring Batch detects the presence of
+older versions of Spring, it uses a native expression language that is less powerful and
+that has slightly different parsing rules. The main difference is that the map keys in
+the example above do not need to be quoted with Spring 2.5, but the quotes are mandatory
+in Spring 3.0.
+====
+// TODO Where is that older language described? It'd be good to have a link to it here.
+// Also, given that we're up to version 5 of Spring, should we still be talking about
+// things from before version 3? (In other words, we should provide a link or drop the
+// whole thing.)
+
 [[step-scope]]
 ==== Step Scope
 
