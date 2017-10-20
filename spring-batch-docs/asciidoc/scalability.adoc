@@ -34,7 +34,10 @@ First, we review the single-process options. Then we review the multi-process op
 === Multi-threaded Step
 
 The simplest way to start parallel processing is to add a `TaskExecutor` to your Step
-configuration. For example, you might add an attribute of the `tasklet`, as shown in the
+configuration.
+
+[role="xmlContent"]
+For example, you might add an attribute of the `tasklet`, as shown in the
 following example:
 
 [source, xml]
@@ -42,6 +45,29 @@ following example:
 <step id="loading">
     <tasklet task-executor="taskExecutor">...</tasklet>
 </step>
+----
+
+[role="javaContent"]
+When using java configuration, a `TaskExecutor` can be added to the step
+as shown in the following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public TaskExecutor taskExecutor(){
+    return new SimpleAsyncTaskExecutor("spring_batch");
+}
+
+@Bean
+public Step sampleStep(TaskExecutor taskExecutor) {
+	return this.stepBuilderFactory.get("sampleStep")
+				.<String, String>chunk(10)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.taskExecutor(taskExecutor())
+				.build();
+}
 ----
 
 In this example, the taskExecutor is a reference to another bean definition that
@@ -57,8 +83,10 @@ Note that this means there is no fixed order for the items to be processed, and 
 might contain items that are non-consecutive compared to the single-threaded case. In
 addition to any limits placed by the task executor (such as whether it is backed by a
 thread pool), there is a throttle limit in the tasklet configuration which defaults to 4.
-You may need to increase this to ensure that a thread pool is fully utilized, as shown in
-the following example:
+You may need to increase this to ensure that a thread pool is fully utilized.
+
+[role="xmlContent"]
+For example you might increase threads, as shown in the following example:
 
 [source, xml]
 ----
@@ -66,6 +94,21 @@ the following example:
     task-executor="taskExecutor"
     throttle-limit="20">...</tasklet>
 </step>
+----
+
+[role="javaContent"]
+When using java configuration, threads can be increased on the `TaskExecutor`,
+as shown in the following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public TaskExecutor taskExecutor(){
+    SimpleAsyncTaskExecutor asyncTaskExecutor=new SimpleAsyncTaskExecutor("spring_batch");
+    asyncTaskExecutor.setConcurrencyLimit(20);
+    return asyncTaskExecutor;
+}
 ----
 
 Note also that there may be limits placed on concurrency by any pooled resources used in
