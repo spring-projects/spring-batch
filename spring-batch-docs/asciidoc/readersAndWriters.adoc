@@ -6,6 +6,8 @@
 
 == ItemReaders and ItemWriters
 
+include::toggle.adoc[]
+
 All batch processing can be described in its most simple form as
   reading in large amounts of data, performing some type of calculation or
   transformation, and writing the result out. Spring Batch provides three key
@@ -210,8 +212,8 @@ throw an exception if anything but a `Foo` is
 provided. The `FooProcessor` can then be injected
 into a `Step`:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="ioSampleJob">
     <step name="step1">
@@ -221,6 +223,28 @@ into a `Step`:
         </tasklet>
     </step>
 </job>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job ioSampleJob() {
+	return this.jobBuilderFactory.get("ioSampleJOb")
+				.start(step1())
+				.end()
+				.build();
+}
+
+@Bean
+public Step step1() {
+	return this.stepBuilderFactory.get("step1")
+				.<String, String>chunk(2)
+				.reader(fooReader())
+				.processor(fooProcessor())
+				.writer(barWriter())
+				.build();
+}
 ----
 
 [[chainingItemProcessors]]
@@ -287,8 +311,8 @@ compositeProcessor.setDelegates(itemProcessors);
 Just as with the previous example, the composite processor can be
       configured into the `Step`:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="ioSampleJob">
     <step name="step1">
@@ -308,6 +332,41 @@ Just as with the previous example, the composite processor can be
         </list>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job ioSampleJob() {
+	return this.jobBuilderFactory.get("ioSampleJob")
+				.start(step1())
+				.end()
+				.build();
+}
+
+@Bean
+public Step step1() {
+	return this.stepBuilderFactory.get("step1")
+				.<String, String>chunk(2)
+				.reader(fooReader())
+				.processor(compositeProcessor())
+				.writer(foobarWriter())
+				.build();
+}
+
+@Bean
+public CompositeItemProcessor compositeProcessor() {
+	List<ItemProcessor> delegates = new ArrayList<>(2);
+	delegates.add(new FooProcessor());
+	delegates.add(new BarProcessor());
+
+	CompositeItemProcessor processor = new CompositeItemProcessor();
+
+	processor.setDelegates(delegates);
+
+	return processor;
+}
 ----
 
 [[filiteringRecords]]
@@ -419,14 +478,15 @@ Note that the `CompositeItemWriter` is an
     are not known to the `Step`, they need to be injected
     as listeners or streams (or both if appropriate):
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="ioSampleJob">
     <step name="step1">
         <tasklet>
             <chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter"
                    commit-interval="2">
-                    <streams>
+                <streams>
                     <stream ref="barWriter" />
                 </streams>
             </chunk>
@@ -439,6 +499,44 @@ Note that the `CompositeItemWriter` is an
 </bean>
 
 <bean id="barWriter" class="...BarWriter" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job ioSampleJob() {
+	return this.jobBuilderFactory.get("ioSampleJob")
+				.start(step1())
+				.end()
+				.build();
+}
+
+@Bean
+public Step step1() {
+	return this.stepBuilderFactory.get("step1")
+				.<String, String>chunk(2)
+				.reader(fooReader())
+				.processor(fooProcessor())
+				.writer(compositeItemWriter())
+				.stream(barWriter())
+				.build();
+}
+
+@Bean
+public CustomCompositeItemWriter compositeItemWriter() {
+
+	CustomCompositeItemWriter writer = new CustomCompositeItemWriter();
+
+	writer.setDelegate(barWriter());
+
+	return writer;
+}
+
+@Bean
+public BarWriter barWriter() {
+	return new BarWriter();
+}
 ----
 
 [[flatFiles]]
@@ -878,8 +976,8 @@ the JavaBean specification. Again using the football example, the
 `BeanWrapperFieldSetMapper` configuration looks
 like the following:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="fieldSetMapper"
       class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
@@ -889,6 +987,25 @@ like the following:
 <bean id="player"
       class="org.springframework.batch.sample.domain.Player"
       scope="prototype" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FieldSetMapper fieldSetMapper() {
+	BeanWrapperFieldSetMapper fieldSetMapper = new BeanWrapperFieldSetMapper();
+
+	fieldSetMapper.setPrototypeBeanName("player");
+
+	return fieldSetMapper;
+}
+
+@Bean
+@Scope("prototype")
+public Player player() {
+	return new Player();
+}
 ----
 
 For each entry in the `FieldSet`, the
@@ -936,8 +1053,8 @@ While this looks like one large field, it actually represent 4 distinct fields:
 When configuring the `FixedLengthLineTokenizer`, each of these lengths
 must be provided in the form of ranges:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="fixedLengthLineTokenizer"
       class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
@@ -946,14 +1063,7 @@ must be provided in the form of ranges:
 </bean>
 ----
 
-Because the `FixedLengthLineTokenizer` uses
-the same `LineTokenizer` interface as discussed
-above, it will return the same `FieldSet` as if a
-delimiter had been used. This allows the same approaches to be used in
-handling its output, such as using the
-`BeanWrapperFieldSetMapper`.
-
-
+[role="xmlContent"]
 [NOTE]
 ====
 Supporting the above syntax for ranges requires that a
@@ -964,6 +1074,30 @@ is automatically declared in an
 `ApplicationContext` where the batch
 namespace is used.
 ====
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FixedLengthTokenizer fixedLengthTokenizer() {
+	FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
+
+	tokenizer.setNames("ISIN", "Quantity", "Price", "Customer");
+	tokenizer.setColumns(new Range(1-12),
+						new Range(13-15),
+						new Range(16-20),
+						new Range(21-29));
+
+	return tokenizer;
+}
+----
+
+Because the `FixedLengthLineTokenizer` uses
+the same `LineTokenizer` interface as discussed
+above, it will return the same `FieldSet` as if a
+delimiter had been used. This allows the same approaches to be used in
+handling its output, such as using the
+`BeanWrapperFieldSetMapper`.
 
 [[prefixMatchingLineMapper]]
 
@@ -997,8 +1131,8 @@ easy by allowing maps of patterns to
 `LineTokenizers` and patterns to
 `FieldSetMappers` to be configured:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="orderFileLineMapper"
       class="org.spr...PatternMatchingCompositeLineMapper">
@@ -1016,6 +1150,31 @@ easy by allowing maps of patterns to
         </map>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public PatternMatchingCompositeLineMapper orderFileLineMapper() {
+	PatternMatchingCompositeLineMapper lineMapper =
+		new PatternMatchingCompositeLineMapper();
+
+	Map<String, LineTokenizer> tokenizers = new HashMap<>(3);
+	tokenizers.put("USER*", userTokenizer());
+	tokenizers.put("LINEA*", lineATokenizer());
+	tokenizers.put("LINEB*", lineBTokenizer());
+
+	lineMapper.setTokenizers(tokenizers);
+
+	Map<String, FieldSetMapper> mappers = new HashMap<>(2);
+	mappers.put("USER*", userFieldSetMapper());
+	mappers.put("LINE*", lineFieldSetMapper());
+
+	lineMapper.setFieldSetMappers(mappers);
+
+	return lineMapper;
+}
 ----
 
 In this example, "LINEA" and "LINEB" have separate
@@ -1038,10 +1197,18 @@ listed as patterns, "LINEA" would match pattern "LINEA*", while
 ("*") can serve as a default by matching any line not matched by any
 other pattern.
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <entry key="*" value-ref="defaultLineTokenizer" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+...
+tokenizers.put("*", defaultLineTokenizer());
+...
 ----
 
 There is also a
@@ -1244,8 +1411,8 @@ public void write(T item) throws Exception {
 
 A simple configuration would look like the following:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.spr...FlatFileItemWriter">
     <property name="resource" value="file:target/test-outputs/output.txt" />
@@ -1253,6 +1420,19 @@ A simple configuration would look like the following:
         <bean class="org.spr...PassThroughLineAggregator"/>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter itemWriter() {
+	return  new FlatFileItemWriterBuilder<Foo>()
+           				.name("itemWriter")
+           				.resource(new FileSystemResource("file:target/test-outputs/output.txt"))
+           				.lineAggregator(new PassThroughLineAggregator<>())
+           				.build();
+}
 ----
 
 [[FieldExtractor]]
@@ -1385,8 +1565,8 @@ Because a domain object is being used, an implementation of the
 `FieldExtractor` interface must be provided, along with the delimiter to
 use:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
     <property name="resource" ref="outputResource" />
@@ -1401,6 +1581,27 @@ use:
         </bean>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter<Foo> itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<Foo> fieldExtractor = new BeanWrapperFieldExtractor<>();
+	fieldExtractor.setNames(new String[] {"name", "credit"});
+	fieldExtractor.afterPropertiesSet();
+
+	DelimitedLineAggregator<Foo> lineAggregator = new DelimitedLineAggregator<>();
+	lineAggregator.setDelimiter(",");
+	lineAggregator.setFieldExtractor(fieldExtractor);
+
+	return new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(outputResource)
+				.lineAggregator(lineAggregator)
+				.build();
+}
 ----
 
 In this case, the
@@ -1421,8 +1622,8 @@ file writing via the `FormatterLineAggregator`.
 Using the same `CustomerCredit` domain object
 described above, it can be configured as follows:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
     <property name="resource" ref="outputResource" />
@@ -1439,13 +1640,42 @@ described above, it can be configured as follows:
 </bean>
 ----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<Foo> fieldExtractor = new BeanWrapperFieldExtractor<>();
+	fieldExtractor.setNames(new String[] {"name", "credit"});
+	fieldExtractor.afterPropertiesSet();
+
+	FormatterLineAggregator<Foo> lineAggregator = new FormatterLineAggregator<>();
+	lineAggregator.setFormat("%-9s%-2.0f");
+	lineAggregator.setFieldExtractor(fieldExtractor);
+
+	return new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(outputResource)
+				.lineAggregator(lineAggregator)
+				.build();
+}
+----
+
 Most of the above example should look familiar. However, the
 value of the format property is new:
 
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <property name="format" value="%-9s%-2.0f" />
+----
+
+[source, java, role="javaContent"]
+----
+...
+FormatterLineAggregator<Foo> lineAggregator = new FormatterLineAggregator<>();
+lineAggregator.setFormat("%-9s%-2.0f");
+...
 ----
 
 The underlying implementation is built using the same
@@ -1576,14 +1806,29 @@ object.
 
 
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
     <property name="fragmentRootElementName" value="trade" />
     <property name="resource" value="data/iosample/input/input.xml" />
     <property name="unmarshaller" ref="tradeMarshaller" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StaxEventItemReader itemReader() {
+	return new StaxEventItemReaderBuilder<Foo>()
+			.name("itemReader")
+			.resource(new FileSystemResource("data/iosample/input/input.xml"))
+			.addFragmentRootElements("trade")
+			.unmarshaller(tradeMarshaller())
+			.build();
+
+}
 ----
 
 Notice that in this example we have chosen to use an
@@ -1595,8 +1840,8 @@ map to fields within the object type are described as key/value pairs in
 the map. In the configuration file we can use a Spring configuration
 utility to describe the required alias as follows:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="tradeMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller">
@@ -1609,6 +1854,24 @@ utility to describe the required alias as follows:
         </util:map>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public XStreamMarshaller tradeMarshaller() {
+	Map<String, Class> aliases = new HashMap<>();
+	aliases.put("trade", Trade.class);
+	aliases.put("price", BigDecimal.class);
+	aliases.put("name", String.class);
+
+	XStreamMarshaller marshaller = new XStreamMarshaller();
+
+	marshaller.setAliases(aliases);
+
+	return marshaller;
+}
 ----
 
 On input the reader reads the XML resource until it recognizes
@@ -1670,8 +1933,8 @@ the OXM tools. We'll show this in an example using the
 MarshallingEventWriterSerializer. The Spring
 configuration for this setup looks as follows:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
     <property name="resource" ref="outputResource" />
@@ -1681,14 +1944,30 @@ configuration for this setup looks as follows:
 </bean>
 ----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StaxEventItemWriter itemWriter(Resource outputResource) {
+	return new StaxEventItemWriterBuilder<Foo>()
+			.name("fooWriter")
+			.marshaller(customerCreditMarshaller())
+			.resource(outputResource)
+			.rootTagName("customers")
+			.overwriteOutput(true)
+			.build();
+
+}
+----
+
 The configuration sets up the three required properties and
 optionally sets the overwriteOutput=true, mentioned earlier in the
 chapter for specifying whether an existing file can be overwritten. It
 should be noted the marshaller used for the writer is the exact same as
 the one used in the reading example from earlier in the chapter:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="customerCreditMarshaller"
       class="org.springframework.oxm.xstream.XStreamMarshaller">
@@ -1703,6 +1982,24 @@ the one used in the reading example from earlier in the chapter:
 </bean>
 ----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public XStreamMarshaller customerCreditMarshaller() {
+	XStreamMarshaller marshaller = new XStreamMarshaller();
+
+	Map<String, Class> aliases = new HashMap<>();
+	aliases.put("customer", CustomerCredit.class);
+	aliases.put("credit", BigDecimal.class);
+	aliases.put("name", String.class);
+
+	marshaller.setAliases(aliases);
+
+	return marshaller;
+}
+----
+
 To summarize with a Java example, the following code illustrates
 all of the points discussed, demonstrating the programmatic setup of the
 required properties:
@@ -1710,7 +2007,6 @@ required properties:
 
 [source, java]
 ----
-StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
 FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
 
 Map aliases = new HashMap();
@@ -1720,10 +2016,16 @@ aliases.put("name","java.lang.String");
 Marshaller marshaller = new XStreamMarshaller();
 marshaller.setAliases(aliases);
 
-staxItemWriter.setResource(resource);
-staxItemWriter.setMarshaller(marshaller);
-staxItemWriter.setRootTagName("trades");
-staxItemWriter.setOverwriteOutput(true);
+StaxEventItemWriter staxItemWriter =
+	new StaxEventItemWriterBuilder<Foo>()
+				.name("creditWriter")
+				.marshaller(marshaller)
+				.resource(resource)
+				.rootTagName("trades")
+				.overwriteOutput(true)
+				.build();
+
+staxItemWriter.afterPropertiesSet();
 
 ExecutionContext executionContext = new ExecutionContext();
 staxItemWriter.open(executionContext);
@@ -1754,13 +2056,25 @@ file-1.txt and file-2.txt are formatted the same and for business
     MuliResourceItemReader can be used to read in both
     files by using wildcards:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="multiResourceReader" class="org.spr...MultiResourceItemReader">
     <property name="resources" value="classpath:data/input/file-*.txt" />
     <property name="delegate" ref="flatFileItemReader" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public MultiResourceItemReader multiResourceReader() {
+	return  new MultiResourceItemReaderBuilder<Foo>()
+					.delegate(flatFileItemReader())
+           			.resources(resources())
+					.build();
+}
 ----
 
 The referenced delegate is a simple
@@ -1932,8 +2246,8 @@ of high performance batch processing. Furthermore, it is very easily
 configured for injection into a Spring Batch
 `Step`:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.spr...JdbcCursorItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -1942,6 +2256,21 @@ configured for injection into a Spring Batch
         <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JdbcCursorItemReader<CustomerCredit> itemReader() {
+	return new JdbcCursorItemReaderBuilder<CustomerCredit>()
+			.dataSource(this.dataSource)
+			.name("creditReader")
+			.sql("select ID, NAME, CREDIT from CUSTOMER")
+			.rowMapper(new CustomerCreditRowMapper())
+			.build();
+
+}
 ----
 
 [[JdbcCursorItemReaderProperties]]
@@ -2070,14 +2399,27 @@ underlying cursor can be set via the setFetchSize property. As with
 `JdbcCursorItemReader`, configuration is
 straightforward:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader"
       class="org.springframework.batch.item.database.HibernateCursorItemReader">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="queryString" value="from CustomerCredit" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public HibernateCursorItemReader itemReader(SessionFactory sessionFactory) {
+	return new HibernateCursorItemReaderBuilder<Foo>()
+			.name("creditReader")
+			.sessionFactory(sessionFactory)
+			.queryString("from CustomerCredit")
+			.build();
+}
 ----
 
 [[StoredProcedureItemReader]]
@@ -2101,8 +2443,8 @@ cursor in three different ways:
 Below is a basic example configuration using the same 'customer
 credit' example as earlier:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -2111,8 +2453,23 @@ credit' example as earlier:
         <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
-
 ----
+
+.Java Configuration
+[source, xml, role="javaContent"]
+----
+@Bean
+public StoredProcedureItemReader reader(DataSource dataSource) {
+	StoredProcedureItemReader reader = new StoredProcedureItemReader();
+
+	reader.setDataSource(dataSource);
+	reader.setProcedureName("sp_customer_credit");
+	reader.setRowMapper(new CustomerCreditRowMapper());
+
+	return reader;
+}
+----
+//TODO: Fix the above config to use a builder once we have one for it.
 
 This example relies on the stored procedure to provide a
 `ResultSet` as a returned result (option 1 above).
@@ -2122,7 +2479,8 @@ would need to provide the position of the out parameter that is the
 returned ref-cursor. Here is an example where the first parameter is
 the returned ref-cursor:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -2132,7 +2490,22 @@ the returned ref-cursor:
         <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
+----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StoredProcedureItemReader reader(DataSource dataSource) {
+	StoredProcedureItemReader reader = new StoredProcedureItemReader();
+
+	reader.setDataSource(dataSource);
+	reader.setProcedureName("sp_customer_credit");
+	reader.setRowMapper(new CustomerCreditRowMapper());
+	reader.setRefCursorPosition(1);
+
+	return reader;
+}
 ----
 
 If the cursor was returned from a stored function (option 3) we
@@ -2140,8 +2513,8 @@ would need to set the property "[maroon]#function#" to
 `true`. It defaults to `false`. Here
 is what that would look like:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -2151,7 +2524,22 @@ is what that would look like:
         <bean class="org.springframework.batch.sample.domain.CustomerCreditRowMapper"/>
     </property>
 </bean>
+----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StoredProcedureItemReader reader(DataSource dataSource) {
+	StoredProcedureItemReader reader = new StoredProcedureItemReader();
+
+	reader.setDataSource(dataSource);
+	reader.setProcedureName("sp_customer_credit");
+	reader.setRowMapper(new CustomerCreditRowMapper());
+	reader.setFunction(true);
+
+	return reader;
+}
 ----
 
 In all of these cases we need to define a
@@ -2165,8 +2553,8 @@ If the stored procedure or function takes in parameter then they
         the out parameter that returns the ref-cursor, the second and third
         are in parameters that takes a value of type INTEGER:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="reader" class="o.s.batch.item.database.StoredProcedureItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -2197,6 +2585,29 @@ If the stored procedure or function takes in parameter then they
     <property name="rowMapper" ref="rowMapper"/>
     <property name="preparedStatementSetter" ref="parameterSetter"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public StoredProcedureItemReader reader(DataSource dataSource) {
+	List<SqlParameter> parameters = new ArrayList<>();
+	parameters.add(new SqlOutParameter("newId", OracleTypes.CURSOR));
+	parameters.add(new SqlParameter("amount", Types.INTEGER);
+	parameters.add(new SqlParameter("custId", Types.INTEGER);
+
+	StoredProcedureItemReader reader = new StoredProcedureItemReader();
+
+	reader.setDataSource(dataSource);
+	reader.setProcedureName("spring.cursor_func");
+	reader.setParameters(parameters);
+	reader.setRefCursorPosition(1);
+	reader.setRowMapper(rowMapper());
+	reader.setPreparedStatementSetter(parameterSetter());
+
+	return reader;
+}
 ----
 
 In addition to the parameter declarations we need to specify a
@@ -2247,8 +2658,8 @@ After the reader has been opened, it will pass back one item per
 Below is an example configuration using a similar 'customer
         credit' example as the cursor based `ItemReaders` above:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.spr...JdbcPagingItemReader">
     <property name="dataSource" ref="dataSource"/>
@@ -2268,6 +2679,37 @@ Below is an example configuration using a similar 'customer
     <property name="pageSize" value="1000"/>
     <property name="rowMapper" ref="customerMapper"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JdbcPagingItemReader itemReader(DataSource dataSource) {
+	Map<String, Object> parameterValues = new HashMap<>();
+	parameterValues.put("status", "NEW");
+
+	return new JdbcPagingItemReaderBuilder<Credit>()
+           				.name("creditReader")
+           				.dataSource(dataSource)
+           				.queryProvider(queryProvider())
+           				.parameterValues(parameterValues)
+           				.rowMapper(customerMapper())
+           				.pageSize(1000)
+           				.build();
+}
+
+@Bean
+public SqlPagingQueryProviderFactoryBean queryProvider() {
+	SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
+
+	provider.setSelectClause("select id, name, credit");
+	provider.setFromClause("from customer");
+	provider.setWhereClause("where status=:status");
+	provider.setSortKey("id");
+
+	return provider;
+}
 ----
 
 This configured `ItemReader` will return
@@ -2307,14 +2749,28 @@ happens behind the scenes when additional entities are needed. Below
 is an example configuration using the same 'customer credit' example
 as the JDBC reader above:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.spr...JpaPagingItemReader">
     <property name="entityManagerFactory" ref="entityManagerFactory"/>
     <property name="queryString" value="select c from CustomerCredit c"/>
     <property name="pageSize" value="1000"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JpaPagingItemReader itemReader() {
+	return new JpaPagingItemReaderBuilder<CustomerCredit>()
+           				.name("credit")
+           				.entityManagerFactory(entityManagerFactory())
+           				.queryString("select c from CustomerCredit c")
+           				.pageSize(1000)
+           				.build();
+}
 ----
 
 This configured `ItemReader` will return
@@ -2404,8 +2860,8 @@ it is such a common concern, Spring Batch provides implementations:
 standard Spring method invoking the delegate pattern and are fairly simple
 to set up. Below is an example of the reader:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
     <property name="targetObject" ref="fooService" />
@@ -2413,6 +2869,25 @@ to set up. Below is an example of the reader:
 </bean>
 
 <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public ItemReaderAdapter itemReader() {
+	ItemReaderAdapter reader = new ItemReaderAdapter();
+
+	reader.setTargetObject(fooService());
+	reader.setTargetMethod("generateFoo");
+
+	return reader;
+}
+
+@Bean
+public FooService fooService() {
+	return new FooService();
+}
 ----
 
 One important point to note is that the contract of the targetMethod
@@ -2424,8 +2899,8 @@ depending upon the implementation of the
 `ItemWriter`. The `ItemWriter`
 implementation is equally as simple:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
     <property name="targetObject" ref="fooService" />
@@ -2433,7 +2908,25 @@ implementation is equally as simple:
 </bean>
 
 <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public ItemWriterAdapter itemWriter() {
+	ItemWriterAdapter writer = new ItemWriterAdapter();
+
+	writer.setTargetObject(fooService());
+	writer.setTargetMethod("processFoo");
+
+	return writer;
+}
+
+@Bean
+public FooService fooService() {
+	return new FooService();
+}
 ----
 
 [[validatingInput]]
@@ -2473,42 +2966,41 @@ will throw an exception if the object is invalid, and return normally if
 it is valid. Spring Batch provides an out of the box
 `ItemProcessor`:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
     <property name="validator" ref="validator" />
 </bean>
 
-<bean id="validator"
-      class="org.springframework.batch.item.validator.SpringValidator">
-    <property name="validator">
-        <bean id="orderValidator"
-              class="org.springmodules.validation.valang.ValangValidator">
-            <property name="valang">
-                <value>
-                    <![CDATA[
-           { orderId : ? > 0 AND ? <= 9999999999 : 'Incorrect order ID' : 'error.order.id' }
-           { totalLines : ? = size(lineItems) : 'Bad count of order lines'
-                                              : 'error.order.lines.badcount'}
-           { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE
-                                 : 'Business customer must be registered'
-                                 : 'error.customer.registration'}
-           { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT
-                                  : 'Company name for business customer is mandatory'
-                                  :'error.customer.companyname'}
-                    ]]>
-                </value>
-            </property>
-        </bean>
-    </property>
+<bean id="validator" class="org.springframework.batch.item.validator.SpringValidator">
+	<property name="validator">
+		<bean class="org.springframework.batch.sample.domain.trade.internal.validator.TradeValidator"/>
+	</property>
 </bean>
 ----
 
-This simple example shows a simple
-`ValangValidator` that is used to validate an order
-object. The intent is not to show Valang functionality as much as to show
-how a validator could be added.
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public ValidatingItemProcessor itemProcessor() {
+	ValidatingItemProcessor processor = new ValidatingItemProcessor();
+
+	processor.setValidator(validator());
+
+	return processor;
+}
+
+@Bean
+public SpringValidator validator() {
+	SpringValidator validator = new SpringValidator();
+
+	validator.setValidator(new TradeValidator());
+
+	return validator;
+}
+----
 
 [[process-indicator]]
 
@@ -2531,8 +3023,8 @@ state, such as the current row number, since it will be irrelevant upon
 restart. For this reason, all readers and writers include the 'saveState'
 property:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="playerSummarizationSource" class="org.spr...JdbcCursorItemReader">
     <property name="dataSource" ref="dataSource" />
@@ -2551,6 +3043,26 @@ property:
         </value>
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JdbcCursorItemReader playerSummarizationSource(DataSource dataSource) {
+	return new JdbcCursorItemReaderBuilder<PlayerSummary>()
+				.dataSource(dataSource)
+				.rowMapper(new PlayerSummaryMapper())
+				.saveState(false)
+				.sql("SELECT games.player_id, games.year_no, SUM(COMPLETES),"
+				  + "SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),"
+				  + "SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),"
+				  + "SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)"
+				  + "from games, players where players.player_id ="
+				  + "games.player_id group by games.player_id, games.year_no")
+				.build();
+
+}
 ----
 
 The `ItemReader` configured above will not make
