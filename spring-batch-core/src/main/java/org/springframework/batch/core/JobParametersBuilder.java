@@ -223,6 +223,19 @@ public class JobParametersBuilder {
 	}
 
 	/**
+	 * Copy job parameters into the current state.
+	 * @param jobParameters parameters to copy in
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
+		Assert.notNull(jobParameters, "jobParameters must not be null");
+
+		this.parameterMap.putAll(jobParameters.getParameters());
+
+		return this;
+	}
+
+	/**
 	 * Initializes the {@link JobParameters} based on the state of the {@link Job}.  This
 	 * should be called after all parameters have been entered into the builder.
 	 *
@@ -267,7 +280,10 @@ public class JobParametersBuilder {
 				nextParameters = incrementer.getNext(previousExecution.getJobParameters());
 			}
 		}
-		this.parameterMap = merge(nextParameters, this.parameterMap);
+
+		this.parameterMap = addJobParameters(nextParameters)
+								.toJobParameters()
+								.getParameters();
 		return this;
 	}
 
@@ -278,14 +294,6 @@ public class JobParametersBuilder {
 				parameters.remove(parameter.getKey());
 			}
 		}
-	}
-
-	private LinkedHashMap<String, JobParameter> merge(JobParameters parameters,
-			Map<String, JobParameter> additionals) {
-		Map<String, JobParameter> merged = new HashMap<>();
-		merged.putAll(parameters.getParameters());
-		merged.putAll(additionals);
-		return new LinkedHashMap<>(merged);
 	}
 
 	private boolean isStoppedOrFailed(JobExecution execution) {

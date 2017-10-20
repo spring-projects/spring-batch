@@ -65,6 +65,28 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
+	public void testAddingExistingJobParameters() {
+		JobParameters params1 = new JobParametersBuilder()
+				.addString("foo", "bar")
+				.addString("bar", "baz")
+				.toJobParameters();
+
+		JobParameters params2 = new JobParametersBuilder()
+				.addString("foo", "baz")
+				.toJobParameters();
+
+		JobParameters finalParams = new JobParametersBuilder()
+				.addString("baz", "quix")
+				.addJobParameters(params1)
+				.addJobParameters(params2)
+				.toJobParameters();
+
+		assertEquals(finalParams.getString("foo"), "baz");
+		assertEquals(finalParams.getString("bar"), "baz");
+		assertEquals(finalParams.getString("baz"), "quix");
+	}
+
+	@Test
 	public void testNonIdentifyingParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date, false);
 		this.parametersBuilder.addLong("LONG", new Long(1), false);
