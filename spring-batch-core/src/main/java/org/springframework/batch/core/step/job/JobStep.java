@@ -124,6 +124,9 @@ public class JobStep extends AbstractStep {
 			// AbstractStep will take care of the step execution status
 			throw new UnexpectedJobExecutionException("Step failure: the delegate Job failed in JobStep.");
 		}
+		else if(jobExecution.getStatus().equals(BatchStatus.STOPPED)) {
+			stepExecution.setStatus(BatchStatus.STOPPED);
+		}
 	}
 	
 	/**
