@@ -57,11 +57,11 @@ public class JobParametersBuilderTests {
 
 	@Before
 	public void initialize() {
-		this.parametersBuilder = new JobParametersBuilder();
 		this.job = new SimpleJob("simpleJob");
 		this.jobExplorer = mock(JobExplorer.class);
 		this.jobInstanceList = new ArrayList<>(1);
 		this.jobExecutionList = new ArrayList<>(1);
+		this.parametersBuilder = new JobParametersBuilder(this.jobExplorer);
 	}
 
 	@Test
@@ -169,14 +169,14 @@ public class JobParametersBuilderTests {
 	public void testGetNextJobParametersFirstRun(){
 		job.setJobParametersIncrementer(new RunIdIncrementer());
 		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job, this.jobExplorer);
+		this.parametersBuilder.getNextJobParameters(this.job);
 		defaultNextJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
 	}
 
 	@Test
 	public void testGetNextJobParametersNoIncrementer(){
 		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job, this.jobExplorer);
+		this.parametersBuilder.getNextJobParameters(this.job);
 		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
 	}
 
@@ -188,7 +188,7 @@ public class JobParametersBuilderTests {
 		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job, this.jobExplorer);
+		this.parametersBuilder.getNextJobParameters(this.job);
 		defaultNextJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
 	}
 
@@ -202,7 +202,7 @@ public class JobParametersBuilderTests {
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
 		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", new Long(1), false);
-		this.parametersBuilder.getNextJobParameters(this.job, this.jobExplorer);
+		this.parametersBuilder.getNextJobParameters(this.job);
 		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
 	}
 
@@ -214,8 +214,14 @@ public class JobParametersBuilderTests {
 		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job, this.jobExplorer);
+		this.parametersBuilder.getNextJobParameters(this.job);
 		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 4);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testMissingJobExplorer() {
+		this.parametersBuilder = new JobParametersBuilder();
+		this.parametersBuilder.getNextJobParameters(this.job);
 	}
 
 	private void initializeForNextJobParameters() {

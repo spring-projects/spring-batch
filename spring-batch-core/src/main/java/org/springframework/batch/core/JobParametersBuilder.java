@@ -16,15 +16,15 @@
 
 package org.springframework.batch.core;
 
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.util.Assert;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.util.Assert;
 
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
@@ -48,11 +48,20 @@ public class JobParametersBuilder {
 
 	private Map<String, JobParameter> parameterMap;
 
+	private JobExplorer jobExplorer;
+
 	/**
 	 * Default constructor. Initializes the builder with empty parameters.
 	 */
 	public JobParametersBuilder() {
+		this.parameterMap = new LinkedHashMap<>();
+	}
 
+	/**
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 */
+	public JobParametersBuilder(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
 		this.parameterMap = new LinkedHashMap<>();
 	}
 
@@ -61,7 +70,7 @@ public class JobParametersBuilder {
 	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
 	 */
 	public JobParametersBuilder(JobParameters jobParameters) {
-		this.parameterMap = new LinkedHashMap<>(jobParameters.getParameters());
+		this(jobParameters, null);
 	}
 
 	/**
@@ -78,6 +87,16 @@ public class JobParametersBuilder {
 				this.parameterMap.put((String) curProperty.getKey(), new JobParameter((String) curProperty.getValue(), false));
 			}
 		}
+	}
+
+	/**
+	 * Copy constructor. Initializes the builder with the supplied parameters.
+	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 */
+	public JobParametersBuilder(JobParameters jobParameters, JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+		this.parameterMap = new LinkedHashMap<>(jobParameters.getParameters());
 	}
 
 	/**
@@ -208,15 +227,18 @@ public class JobParametersBuilder {
 	 * should be called after all parameters have been entered into the builder.
 	 *
 	 * @param job the job for which the {@link JobParameters} are being constructed.
-	 * @param jobExplorer instance to a {@link JobExplorer}
 	 * @return a reference to this object.
 	 *
 	 * @since 4.0
 	 */
-	public JobParametersBuilder getNextJobParameters(Job job, JobExplorer jobExplorer) {
+	public JobParametersBuilder getNextJobParameters(Job job) {
+		if(this.jobExplorer == null) {
+			throw new IllegalStateException("A JobExplore is required to get next job parameters");
+		}
+
 		String name = job.getName();
 		JobParameters nextParameters = new JobParameters();
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(name, 0, 1);
+		List<JobInstance> lastInstances = this.jobExplorer.getJobInstances(name, 0, 1);
 		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
 		if (lastInstances.isEmpty()) {
 			// Start from a completely clean sheet
@@ -225,7 +247,7 @@ public class JobParametersBuilder {
 			}
 		}
 		else {
-			List<JobExecution> previousExecutions = jobExplorer
+			List<JobExecution> previousExecutions = this.jobExplorer
 					.getJobExecutions(lastInstances.get(0));
 			JobExecution previousExecution = previousExecutions.get(0);
 			if (previousExecution == null) {
