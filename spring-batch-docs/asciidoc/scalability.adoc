@@ -6,6 +6,8 @@
 
 == Scaling and Parallel Processing
 
+include::toggle.adoc[]
+
 Many batch processing problems can be solved with single threaded, single process jobs,
 so it is always a good idea to properly check if that meets your needs before thinking
 about more complex implementations. Measure the performance of a realistic job and see if
@@ -40,7 +42,7 @@ configuration.
 For example, you might add an attribute of the `tasklet`, as shown in the
 following example:
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <step id="loading">
     <tasklet task-executor="taskExecutor">...</tasklet>
@@ -88,7 +90,7 @@ You may need to increase this to ensure that a thread pool is fully utilized.
 [role="xmlContent"]
 For example you might increase threads, as shown in the following example:
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <step id="loading"> <tasklet
     task-executor="taskExecutor"
@@ -143,11 +145,13 @@ single threaded configuration.
 
 As long as the application logic that needs to be parallelized can be split into distinct
 responsibilities and assigned to individual steps, then it can be parallelized in a
-single process. Parallel Step execution is easy to configure and use, for example, to
-execute steps `(step1,step2)` in parallel with `step3`, as shown in the following
-example:
+single process. Parallel Step execution is easy to configure and use.
 
-[source, xml]
+[role="xmlContent"]
+For example, executing steps `(step1,step2)` in parallel with `step3` is straightforward,
+as shown in the following example:
+
+[source, xml, role="xmlContent"]
 ----
 <job id="job1">
     <split id="split1" task-executor="taskExecutor" next="step4">
@@ -163,6 +167,51 @@ example:
 </job>
 
 <beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/>
+----
+
+[role="javaContent"]
+When using java configuration, executing steps `(step1,step2)` in parallel with `step3`
+is straightforward, as shown in the following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job job() {
+    return jobBuilderFactory.get("job")
+        .start(splitFlow())
+        .next(step4())
+        .build()        //builds FlowJobBuilder instance
+        .build();       //builds Job instance
+}
+
+@Bean
+public Flow splitFlow() {
+    return new FlowBuilder<SimpleFlow>("splitFlow")
+        .split(taskExecutor())
+        .add(flow1(), flow2())
+        .build();
+}
+
+@Bean
+public Flow flow1() {
+    return new FlowBuilder<SimpleFlow>("flow1")
+        .start(step1())
+        .next(step2())
+        .build();
+}
+
+@Bean
+public Flow flow2() {
+    return new FlowBuilder<SimpleFlow>("flow2")
+        .start(step3())
+        .build();
+}
+
+@Bean
+public TaskExecutor taskExecutor(){
+    return new SimpleAsyncTaskExecutor("spring_batch");
+}
 ----
 
 The configurable "task-executor" attribute is used to specify which `TaskExecutor`
@@ -234,15 +283,35 @@ image::{batch-asciidoc}images/partitioning-spi.png[Partitioning SPI, scaledwidth
 
 The `Step` on the right in this case is the "remote" slave, so, potentially, there are
 many objects and or processes playing this role, and the `PartitionStep` is shown driving
-the execution. The following example shows the `PartitionStep` configuration:
+the execution.
 
-[source, xml]
+[role="xmlContent"]
+The following example shows the `PartitionStep` configuration:
+
+[source, xml, role="xmlContent"]
 ----
 <step id="step1.master">
     <partition step="step1" partitioner="partitioner">
         <handler grid-size="10" task-executor="taskExecutor"/>
     </partition>
 </step>
+----
+
+[role="javaContent"]
+The following example shows the `PartitionStep` configuration using java configuration:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step step1Master() {
+    return stepBuilderFactory.get("step1.master")
+        .<String, String>partitioner("step1", partitioner())
+        .step(step1())
+        .gridSize(10)
+        .taskExecutor(taskExecutor())
+        .build();
+}
 ----
 
 Similar to the multi-threaded step's `throttle-limit` attribute, the `grid-size`
@@ -280,11 +349,14 @@ or remoting fabrics.
 Spring Batch does, however, provide a useful implementation of `PartitionHandler` that
 executes `Step` instances locally in separate threads of execution, using the
 `TaskExecutor` strategy from Spring. The implementation is called
-`TaskExecutorPartitionHandler`, and it is the default for a step configured with the XML
+`TaskExecutorPartitionHandler`.
+
+[role="xmlContent"]
+The `TaskExecutorPartitionHandler` is the default for a step configured with the XML
 namespace shown previously. It can also be configured explicitly, as shown in the
 following example:
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <step id="step1.master">
     <partition step="step1" handler="handler"/>
@@ -295,6 +367,31 @@ following example:
     <property name="step" ref="step1" />
     <property name="gridSize" value="10" />
 </bean>
+----
+
+[role="javaContent"]
+The `TaskExecutorPartitionHandler` can be configured explicitly within java configuration,
+as shown in the following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step step1Master() {
+    return stepBuilderFactory.get("step1.master")
+        .partitioner("step1", partitioner())
+        .partitionHandler(partitionHandler())
+        .build();
+}
+
+@Bean
+public PartitionHandler partitionHandler() {
+    TaskExecutorPartitionHandler retVal = new TaskExecutorPartitionHandler();
+    retVal.setTaskExecutor(taskExecutor());
+    retVal.setStep(step1());
+    retVal.setGridSize(10);
+    return retVal;
+}
 ----
 
 The `gridSize` attribute determines the number of separate step executions to create, so
