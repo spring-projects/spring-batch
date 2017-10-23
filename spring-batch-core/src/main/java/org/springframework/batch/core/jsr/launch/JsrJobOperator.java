@@ -104,7 +104,7 @@ import org.springframework.util.Assert;
  * 	&lt;/bean&gt;
  *
  * 	&lt;bean id="dataSource"
- * 		class="org.apache.commons.dbcp.BasicDataSource"&gt;
+ * 		class="org.apache.commons.dbcp2.BasicDataSource"&gt;
  * 		...
  * 	&lt;/bean&gt;
  *
