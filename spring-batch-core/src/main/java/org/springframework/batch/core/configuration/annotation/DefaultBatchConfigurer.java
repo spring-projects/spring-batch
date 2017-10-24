@@ -49,7 +49,15 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-		this.transactionManager = new DataSourceTransactionManager(dataSource);
+	}
+
+	protected DataSource getDataSource() {
+		return dataSource;
+	}
+
+	@Autowired(required = false)
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
 	}
 
 	protected DefaultBatchConfigurer() {}
@@ -96,6 +104,10 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 				jobExplorerFactory.afterPropertiesSet();
 				this.jobExplorer = jobExplorerFactory.getObject();
 			} else {
+				if(this.transactionManager == null) {
+					this.transactionManager = new DataSourceTransactionManager(dataSource);
+				}
+
 				this.jobRepository = createJobRepository();
 
 				JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
