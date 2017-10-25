@@ -11,12 +11,12 @@
         <jdbc:script location="${batch.business.schema.script}"/>
     </jdbc:initialize-database>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
 		<property name="password" value="${batch.jdbc.password}" />
-		<property name="maxActive" value="${batch.jdbc.pool.size}"/>
+		<property name="maxTotal" value="${batch.jdbc.pool.size}"/>
 		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
 		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}"/>
 	</bean>

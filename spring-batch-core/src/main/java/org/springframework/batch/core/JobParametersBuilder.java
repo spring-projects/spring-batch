@@ -16,12 +16,15 @@
 
 package org.springframework.batch.core;
 
-import org.springframework.util.Assert;
-
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.util.Assert;
 
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
@@ -36,20 +39,30 @@ import java.util.Properties;
  *
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Glenn Renfro
  * @since 1.0
  * @see JobParameters
  * @see JobParameter
  */
 public class JobParametersBuilder {
 
-	private final Map<String, JobParameter> parameterMap;
+	private Map<String, JobParameter> parameterMap;
+
+	private JobExplorer jobExplorer;
 
 	/**
 	 * Default constructor. Initializes the builder with empty parameters.
 	 */
 	public JobParametersBuilder() {
+		this.parameterMap = new LinkedHashMap<>();
+	}
 
-		this.parameterMap = new LinkedHashMap<String, JobParameter>();
+	/**
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 */
+	public JobParametersBuilder(JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+		this.parameterMap = new LinkedHashMap<>();
 	}
 
 	/**
@@ -57,7 +70,7 @@ public class JobParametersBuilder {
 	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
 	 */
 	public JobParametersBuilder(JobParameters jobParameters) {
-		this.parameterMap = new LinkedHashMap<String, JobParameter>(jobParameters.getParameters());
+		this(jobParameters, null);
 	}
 
 	/**
@@ -67,13 +80,23 @@ public class JobParametersBuilder {
 	 * @param properties the job parameters to be used
 	 */
 	public JobParametersBuilder(Properties properties) {
-		this.parameterMap = new LinkedHashMap<String, JobParameter>();
+		this.parameterMap = new LinkedHashMap<>();
 
 		if(properties != null) {
 			for (Map.Entry<Object, Object> curProperty : properties.entrySet()) {
 				this.parameterMap.put((String) curProperty.getKey(), new JobParameter((String) curProperty.getValue(), false));
 			}
 		}
+	}
+
+	/**
+	 * Copy constructor. Initializes the builder with the supplied parameters.
+	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 */
+	public JobParametersBuilder(JobParameters jobParameters, JobExplorer jobExplorer) {
+		this.jobExplorer = jobExplorer;
+		this.parameterMap = new LinkedHashMap<>(jobParameters.getParameters());
 	}
 
 	/**
@@ -84,7 +107,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
-		parameterMap.put(key, new JobParameter(parameter, true));
+		this.parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
 
@@ -97,7 +120,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, String parameter, boolean identifying) {
-		parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
@@ -109,7 +132,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter) {
-		parameterMap.put(key, new JobParameter(parameter, true));
+		this.parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
 
@@ -122,7 +145,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter, boolean identifying) {
-		parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
@@ -134,7 +157,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
-		parameterMap.put(key, new JobParameter(parameter, true));
+		this.parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
 
@@ -147,7 +170,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter, boolean identifying) {
-		parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
@@ -159,7 +182,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter) {
-		parameterMap.put(key, new JobParameter(parameter, true));
+		this.parameterMap.put(key, new JobParameter(parameter, true));
 		return this;
 	}
 
@@ -172,7 +195,7 @@ public class JobParametersBuilder {
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter, boolean identifying) {
-		parameterMap.put(key, new JobParameter(parameter, identifying));
+		this.parameterMap.put(key, new JobParameter(parameter, identifying));
 		return this;
 	}
 
@@ -183,7 +206,7 @@ public class JobParametersBuilder {
 	 * @return a valid {@link JobParameters} object.
 	 */
 	public JobParameters toJobParameters() {
-		return new JobParameters(parameterMap);
+		return new JobParameters(this.parameterMap);
 	}
 
 	/**
@@ -195,7 +218,86 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addParameter(String key, JobParameter jobParameter) {
 		Assert.notNull(jobParameter, "JobParameter must not be null");
-		parameterMap.put(key, jobParameter);
+		this.parameterMap.put(key, jobParameter);
 		return this;
+	}
+
+	/**
+	 * Copy job parameters into the current state.
+	 * @param jobParameters parameters to copy in
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
+		Assert.notNull(jobParameters, "jobParameters must not be null");
+
+		this.parameterMap.putAll(jobParameters.getParameters());
+
+		return this;
+	}
+
+	/**
+	 * Initializes the {@link JobParameters} based on the state of the {@link Job}.  This
+	 * should be called after all parameters have been entered into the builder.
+	 *
+	 * @param job the job for which the {@link JobParameters} are being constructed.
+	 * @return a reference to this object.
+	 *
+	 * @since 4.0
+	 */
+	public JobParametersBuilder getNextJobParameters(Job job) {
+		if(this.jobExplorer == null) {
+			throw new IllegalStateException("A JobExplore is required to get next job parameters");
+		}
+
+		String name = job.getName();
+		JobParameters nextParameters = new JobParameters();
+		List<JobInstance> lastInstances = this.jobExplorer.getJobInstances(name, 0, 1);
+		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
+		if (lastInstances.isEmpty()) {
+			// Start from a completely clean sheet
+			if (incrementer != null) {
+				nextParameters = incrementer.getNext(new JobParameters());
+			}
+		}
+		else {
+			List<JobExecution> previousExecutions = this.jobExplorer
+					.getJobExecutions(lastInstances.get(0));
+			JobExecution previousExecution = previousExecutions.get(0);
+			if (previousExecution == null) {
+				// Normally this will not happen - an instance exists with no executions
+				if (incrementer != null) {
+					nextParameters = incrementer.getNext(new JobParameters());
+				}
+			}
+			else if (isStoppedOrFailed(previousExecution) && job.isRestartable()) {
+				// Retry a failed or stopped execution
+				nextParameters = previousExecution.getJobParameters();
+				// Non-identifying additional parameters can be removed to a retry
+				removeNonIdentifying(this.parameterMap);
+			}
+			else if (incrementer != null) {
+				// New instance so increment the parameters if we can
+				nextParameters = incrementer.getNext(previousExecution.getJobParameters());
+			}
+		}
+
+		this.parameterMap = addJobParameters(nextParameters)
+								.toJobParameters()
+								.getParameters();
+		return this;
+	}
+
+	private void removeNonIdentifying(Map<String, JobParameter> parameters) {
+		HashMap<String, JobParameter> copy = new HashMap<>(parameters);
+		for (Map.Entry<String, JobParameter> parameter : copy.entrySet()) {
+			if (!parameter.getValue().isIdentifying()) {
+				parameters.remove(parameter.getKey());
+			}
+		}
+	}
+
+	private boolean isStoppedOrFailed(JobExecution execution) {
+		BatchStatus status = execution.getStatus();
+		return (status == BatchStatus.STOPPED || status == BatchStatus.FAILED);
 	}
 }

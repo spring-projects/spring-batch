@@ -48,7 +48,7 @@
 	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		  p:location="classpath:batch-${ENVIRONMENT:hsql}.properties"/>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		  p:driverClassName="${batch.jdbc.driver}" p:url="${batch.jdbc.url}"
 		  p:username="${batch.jdbc.user}" p:password="${batch.jdbc.password}"/>
 

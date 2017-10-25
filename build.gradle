@@ -46,56 +46,55 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '5.0.0.RC3'
+		springVersionDefault = '5.0.0.RELEASE'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
-		springRetryVersion = '1.2.0.RELEASE'
-		springAmqpVersion = '2.0.0.M5'
-		springDataCommonsVersion = '2.0.0.RC2'
-		springDataGemfireVersion = '2.0.0.RC2'
-		springDataJpaVersion = '2.0.0.RC2'
-		springDataMongodbVersion = '2.0.0.RC2'
-		springDataNeo4jVersion = '5.0.0.RC2'
-		springIntegrationVersion = '5.0.0.M6'
-		springLdapVersion = '2.3.1.RELEASE'
+		springRetryVersion = '1.2.1.RELEASE'
+		springAmqpVersion = '2.0.0.RELEASE'
+		springDataCommonsVersion = '2.0.0.RELEASE'
+		springDataGemfireVersion = '2.0.0.RELEASE'
+		springDataJpaVersion = '2.0.0.RELEASE'
+		springDataMongodbVersion = '2.0.0.RELEASE'
+		springDataNeo4jVersion = '5.0.0.RELEASE'
+		springIntegrationVersion = '5.0.0.M7'
+		springLdapVersion = '2.3.2.RELEASE'
 
-		activemqVersion = '5.14.5'
-		aspectjVersion = '1.8.10'
+		activemqVersion = '5.15.1'
+		aspectjVersion = '1.8.12'
 		castorVersion = '1.4.1'
 		commonsCollectionsVersion = '3.2.2'
-		commonsDdbcpVersion = '1.4'
-		commonsIoVersion = '2.4'
-		commonsLangVersion = '2.6'
+		commonsDdbcpVersion = '2.1.1'
+		commonsIoVersion = '2.6'
+		commonsLangVersion = '3.6'
 		commonsPoolVersion = '1.6'
-		derbyVersion = '10.13.1.1'
-		groovyVersion = '2.4.11'
+		derbyVersion = '10.14.1.0'
+		groovyVersion = '2.5.0-beta-1'
 		hamcrestVersion = '1.3'
-		h2databaseVersion = '1.4.195'
-		hibernateVersion = '5.2.10.Final'
-		hibernateValidatorVersion = '5.4.1.Final'
+		h2databaseVersion = '1.4.196'
+		hibernateVersion = '5.2.12.Final'
+		hibernateValidatorVersion = '6.0.3.Final'
 		hsqldbVersion = '2.4.0'
-		jackson2Version = "2.9.0.pr3"
-		javaMailVersion = '1.6.0-rc1'
+		jackson2Version = "2.9.2"
+		javaMailVersion = '1.6.0'
 		javaxBatchApiVersion = '1.0'
 		javaxInjectVersion = '1'
 		javaxTransactionVersion = '1.2'
 		jbatchTckSpi = '1.0'
-		jettisonVersion = '1.2'
+		jettisonVersion = '1.2' //?
 		jmsVersion = '2.0.1'
-		jtdsVersion = '1.3.1' //?
 		junitVersion = '4.12'
 		log4jVersion = '2.8.2'
-		mysqlVersion = '5.1.42'
-		mockitoVersion = '2.7.22'
-		postgresqlVersion = '42.1.1'
+		mysqlVersion = '5.1.44'
+		mockitoVersion = '2.11.0'
+		postgresqlVersion = '42.1.4'
 		quartzVersion = '2.3.0'
 		servletApiVersion = '3.1.0'
 		slf4jVersion = '1.7.25'
-		sqlfireclientVersion = '1.0.3' //?
-		sqliteVersion = '3.8.11.2' //?
-		woodstoxVersion = '4.2.1'
+		sqlfireclientVersion = '1.0.3'
+		sqliteVersion = '3.20.1'
+		woodstoxVersion = '5.0.3'
 		xercesVersion = '2.11.0' //?
-		xmlunitVersion = '1.5'
-		xstreamVersion = '1.4.9'
+		xmlunitVersion = '2.5.0'
+		xstreamVersion = '1.4.10'
 		jrubyVersion = '1.7.26'
 		beanshellVersion = '2.0b5'
 	}
@@ -278,7 +277,7 @@ project('spring-batch-core') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
-		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		optional "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
@@ -309,7 +308,7 @@ project('spring-batch-infrastructure') {
 		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
-		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
@@ -361,7 +360,7 @@ project('spring-batch-infrastructure') {
 			exclude group: "org.springframework", module: "spring-aspects"
 		}
 		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
-		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") { dep ->
+		compile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") { dep ->
 			optional dep
 			exclude group: 'stax', module: 'stax-api'
 		}
@@ -395,7 +394,7 @@ project('spring-batch-core-tests') {
 	dependencies {
 		compile project(":spring-batch-core")
 		compile project(":spring-batch-infrastructure")
-		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
 		compile "org.springframework.retry:spring-retry:$springRetryVersion"
 		compile "org.springframework:spring-tx:$springVersion"
@@ -432,7 +431,7 @@ project('spring-batch-infrastructure-tests') {
 	dependencies {
 		compile project(":spring-batch-infrastructure")
 		compile "javax.jms:javax.jms-api:$jmsVersion"
-		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework:spring-aop:$springVersion"
 
@@ -444,7 +443,8 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
-		testCompile "xmlunit:xmlunit:$xmlunitVersion"
+		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
+		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
 		testCompile ("org.codehaus.castor:castor-xml:$castorVersion") {
 			exclude group: 'stax', module: 'stax'
 			exclude group: 'commons-lang', module: 'commons-lang'
@@ -453,10 +453,10 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "xerces:xercesImpl:$xercesVersion"
 		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
-		testCompile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
+		testCompile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
-		testCompile "commons-lang:commons-lang:$commonsLangVersion"
+		testCompile "org.apache.commons:commons-lang3:$commonsLangVersion"
 		testCompile("org.springframework:spring-oxm:$springVersion") {
 			exclude group: 'commons-lang', module: 'commons-lang'
 		}
@@ -499,7 +499,7 @@ project('spring-batch-test') {
 		compile "commons-io:commons-io:$commonsIoVersion"
 		compile "commons-collections:commons-collections:$commonsCollectionsVersion"
 
-        testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+        testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
@@ -528,7 +528,7 @@ project('spring-batch-integration') {
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		testCompile "org.aspectj:aspectjrt:$aspectjVersion"
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
-		testCompile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "mysql:mysql-connector-java:$mysqlVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
@@ -563,9 +563,9 @@ project('spring-batch-samples') {
 		compile "org.aspectj:aspectjweaver:$aspectjVersion"
 		compile "org.quartz-scheduler:quartz:$quartzVersion"
 		compile "commons-io:commons-io:$commonsIoVersion"
-		compile "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		compile "com.thoughtworks.xstream:xstream:$xstreamVersion"
-		compile("org.codehaus.woodstox:woodstox-core-asl:$woodstoxVersion") {
+		compile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
 		}
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
@@ -589,7 +589,8 @@ project('spring-batch-samples') {
 		compile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
 		compile "javax.mail:javax.mail-api:$javaMailVersion"
 
-		testCompile "xmlunit:xmlunit:$xmlunitVersion"
+		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
+		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
 		testCompile project(":spring-batch-test")
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
@@ -604,7 +605,6 @@ project('spring-batch-samples') {
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 
 		provided "mysql:mysql-connector-java:$mysqlVersion"
-		provided "net.sourceforge.jtds:jtds:$jtdsVersion"
 		provided "com.h2database:h2:$h2databaseVersion"
 		provided "javax.servlet:javax.servlet-api:$servletApiVersion"
 
@@ -673,10 +673,10 @@ sonarqube {
 task api(type: Javadoc) {
 	group = 'Documentation'
 	description = 'Generates aggregated Javadoc API documentation.'
-	title = "${rootProject.description} ${version} API"
+	title = "Spring Batch ${version} API"
 	options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
 	options.author = true
-	options.header = rootProject.description
+	options.header = 'Spring Batch'
 	options.overview = 'src/api/overview.html'
     if (JavaVersion.current().isJava8Compatible()) {
         options.addStringOption('Xdoclint:none', '-quiet')
@@ -866,7 +866,7 @@ task runTck(dependsOn: subprojects.compileJava) {
 		tck "org.springframework:spring-jdbc:$springVersion"
 		tck "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		tck "org.codehaus.jettison:jettison:$jettisonVersion"
-		tck "commons-dbcp:commons-dbcp:$commonsDdbcpVersion"
+		tck "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		tck "org.apache.derby:derby:$derbyVersion"
 
 		antcp "ant-contrib:ant-contrib:1.0b3"

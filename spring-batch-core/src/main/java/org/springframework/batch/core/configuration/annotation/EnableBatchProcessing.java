@@ -97,7 +97,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <li>a {@link JobRepository} (bean name "jobRepository")</li>
  * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry")</li>
- * <li>a {@link org.springframework.batch.core.launch.JobOperator} (bean name "jobOperator")</li>
  * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer")</li>
  * <li>a {@link PlatformTransactionManager} (bean name "transactionManager")</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the

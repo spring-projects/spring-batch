@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,18 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -44,11 +50,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -64,7 +65,7 @@ public class AsyncChunkOrientedStepIntegrationTests {
 
 	private Job job;
 
-	private List<String> written = new ArrayList<String>();
+	private List<String> written = new ArrayList<>();
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -88,18 +89,18 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	@After
 	public void reset() {
 		// Reset concurrency settings to something reasonable
-		dataSource.setMaxActive(maxActive);
+		dataSource.setMaxTotal(maxActive);
 		dataSource.setMaxIdle(maxIdle);
 	}
 
 	@Before
 	public void init() throws Exception {
 
-		maxActive = dataSource.getMaxActive();
+		maxActive = dataSource.getMaxTotal();
 		maxIdle = dataSource.getMaxIdle();
 
 		// Force deadlock with batch waiting for DB pool and vice versa
-		dataSource.setMaxActive(1);
+		dataSource.setMaxTotal(1);
 		dataSource.setMaxIdle(1);
 
 		step = new TaskletStep("stepName");
@@ -123,7 +124,7 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	@Ignore
 	public void testStatus() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c", "a", "b", "c",
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c", "a", "b", "c",
 				"a", "b", "c", "a", "b", "c" }), new ItemWriter<String>() {
 			@Override
 			public void write(List<? extends String> data) throws Exception {

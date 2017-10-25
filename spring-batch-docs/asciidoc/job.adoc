@@ -1,10 +1,12 @@
-:batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
+:batch-asciidoc: ./
 :toc: left
 :toclevels: 4
 
 [[configureJob]]
 
 == Configuring and Running a Job
+
+include::toggle.adoc[]
 
 In the <<domain.adoc#domainLanguageOfBatch,domain section>> , the overall
   architecture design was discussed, using the following diagram as a
@@ -24,12 +26,93 @@ options and runtime concerns of a `Job`.
 
 === Configuring a Job
 
+ifdef::backend-html5[]
+[role="javaContent"]
+There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however
+builders abstract away the difference in configuration.
+
+[source, java, role="javaContent"]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .start(playerLoad())
+                     .next(gameLoad())
+                     .next(playerSummarization())
+                     .end()
+                     .build();
+}
+----
+
+[role="javaContent"]
+A `Job` (and typically any `Step` within it) requires a `JobRepository`.  The
+configuration of the `JobRepository` is handled via the <<java.adoc#javaConfig,`BatchConfigurer`>>.
+
+[role="javaContent"]
+The above example illustrates a `Job` that consists of three `Step` instances.  The job related
+builders can also contain other elements that help with parallelisation (`Split`),
+declarative flow control (`Decision`) and externalization of flow definitions (`Flow`).
+
+[role="xmlContent"]
 There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however, the namespace
 abstracts away the differences in configuration. It has only three
 required dependencies: a name, `JobRepository` , and
 a list of `Step` s.
 
+[source, xml, role="xmlContent"]
+----
+<job id="footballJob">
+    <step id="playerload"          parent="s1" next="gameLoad"/>
+    <step id="gameLoad"            parent="s2" next="playerSummarization"/>
+    <step id="playerSummarization" parent="s3"/>
+</job>
+----
 
+[role="xmlContent"]
+The examples here use a parent bean definition to create the steps;
+see the section on <<step.adoc#configureStep, step configuration>>
+for more options declaring specific step details inline. The XML namespace
+defaults to referencing a repository with an id of 'jobRepository', which
+is a sensible default. However, this can be overridden explicitly:
+
+
+[source, xml, role="xmlContent"]
+----
+<job id="footballJob" job-repository="specialRepository">
+    <step id="playerload"          parent="s1" next="gameLoad"/>
+    <step id="gameLoad"            parent="s3" next="playerSummarization"/>
+    <step id="playerSummarization" parent="s3"/>
+</job>
+----
+
+[role="xmlContent"]
+In addition to steps a job configuration can contain other elements
+    that help with parallelisation (`<split>`),
+    declarative flow control (`<decision>`) and
+    externalization of flow definitions
+    (`<flow/>`).
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however
+this is abstracted behind either the builders provided for java configuration or the XML
+namespace when using XML based configuration.
+
+.Java Configuration
+[source, java]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .start(playerLoad())
+                     .next(gameLoad())
+                     .next(playerSummarization())
+                     .end()
+                     .build();
+}
+----
+
+.XML Configuration
 [source, xml]
 ----
 <job id="footballJob">
@@ -61,6 +144,9 @@ In addition to steps a job configuration can contain other elements
     externalization of flow definitions
     (`<flow/>`).
 
+
+endif::backend-pdf[]
+
 [[restartability]]
 
 ==== Restartability
@@ -77,11 +163,24 @@ be run as part of a new `JobInstance`, then the
 restartable property may be set to 'false':
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="footballJob" restartable="false">
     ...
 </job>
+----
+
+.Java Configuration
+[source, xml, role="javaContent"]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .preventRestart()
+                     ...
+                     .build();
+}
 ----
 
 To phrase it another way, setting restartable to false means "this
@@ -139,7 +238,8 @@ public interface JobExecutionListener {
 job:
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="footballJob">
     <step id="playerload"          parent="s1" next="gameLoad"/>
@@ -149,6 +249,18 @@ job:
         <listener ref="sampleListener"/>
     </listeners>
 </job>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+                     .listener(sampleListener())
+                     ...
+                     .build();
+}
 ----
 
 It should be noted that afterJob will be
@@ -171,15 +283,16 @@ public void afterJob(JobExecution jobExecution){
 
 The annotations corresponding to this interface are:
 
-
 * `@BeforeJob`
 * `@AfterJob`
 
 [[inheritingFromAParentJob]]
 
 
+[role="xmlContent"]
 ==== Inheriting from a Parent Job
 
+[role="xmlContent"]
 If a group of Jobs share similar, but not
       identical, configurations, then it may be helpful to define a "parent"
       `Job` from which the concrete
@@ -187,6 +300,7 @@ If a group of Jobs share similar, but not
       inheritance in Java, the "child" `Job` will combine
       its elements and attributes with the parent's.
 
+[role="xmlContent"]
 In the following example, "baseJob" is an abstract
       `Job` definition that defines only a list of
       listeners. The `Job` "job1" is a concrete
@@ -196,7 +310,7 @@ In the following example, "baseJob" is an abstract
       `Step`, "step1".
 
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <job id="baseJob" abstract="true">
     <listeners>
@@ -213,10 +327,15 @@ In the following example, "baseJob" is an abstract
 </job>
 ----
 
+[role="xmlContent"]
 Please see the section on <<step.adoc#inheritingFromParentStep,Inheriting from a Parent Step>>
       for more detailed information.
 
+ifdef::backend-pdf[]
+This section only applies to XML based configuration as java configuration provides better
+reuse capabilities.
 
+endif::backend-pdf[]
 
 ==== JobParametersValidator
 
@@ -224,12 +343,58 @@ A job declared in the XML namespace or using any subclass of
       AbstractJob can optionally declare a validator for the job parameters at
       runtime. This is useful when for instance you need to assert that a job
       is started with all its mandatory parameters. There is a
-      DefaultJobParametersValidator that can be used to constrain combinations
+      `DefaultJobParametersValidator` that can be used to constrain combinations
       of simple mandatory and optional parameters, and for more complex
-      constraints you can implement the interface yourself. The configuration
-      of a validator is supported through the XML namespace through a child
+      constraints you can implement the interface yourself.
+
+ifdef::backend-html5[]
+[role="xmlContent"]
+The configuration of a validator is supported through the XML namespace through a child
       element of the job, e.g:
 
+[source, xml, role="xmlContent"]
+----
+<job id="job1" parent="baseJob3">
+    <step id="step1" parent="standaloneStep"/>
+    <validator ref="paremetersValidator"/>
+</job>
+----
+
+[role="xmlContent"]
+The validator can be specified as a reference (as above) or as a
+      nested bean definition in the beans namespace.
+
+[role="javaContent"]
+The configuration of a validator is supported through the java builders, e.g:
+
+[source, java, role="javaContent"]
+----
+@Bean
+public Job job1() {
+    return this.jobBuilderFactory.get("job1")
+                     .validator(parametersValidator())
+                     ...
+                     .build();
+}
+----
+
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+The configuration of a validator is supported through the java builders, e.g:
+
+[source, java]
+----
+@Bean
+public Job job1() {
+    return this.jobBuilderFactory.get("job1")
+                     .validator(parametersValidator())
+                     ...
+                     .build();
+}
+----
+
+XML namespace support is also available for configuration of a `JobParametersValidator`:
 
 [source, xml]
 ----
@@ -241,6 +406,8 @@ A job declared in the XML namespace or using any subclass of
 
 The validator can be specified as a reference (as above) or as a
       nested bean definition in the beans namespace.
+
+endif::backend-pdf[]
 
 [[javaConfig]]
 
@@ -318,7 +485,9 @@ public class AppConfig {
     }
 
     @Bean
-    protected Step step1(ItemReader<Person> reader, ItemProcessor<Person, Person> processor, ItemWriter<Person> writer) {
+    protected Step step1(ItemReader<Person> reader,
+                         ItemProcessor<Person, Person> processor,
+                         ItemWriter<Person> writer) {
         return steps.get("step1")
             .<Person, Person> chunk(10)
             .reader(reader)
@@ -340,19 +509,27 @@ public class AppConfig {
 
 === Configuring a JobRepository
 
+[role="javaContent"]
+When using `@EnableBatchProcessing`, a `JobRepository` is provided out of the box for you.
+This section addresses configuring your own.
+
+
 As described in earlier, the <<job.adoc#configureJob,`JobRepository`>> is used for basic CRUD operations of the various persisted
     domain objects within Spring Batch, such as
     `JobExecution` and
     `StepExecution`. It is required by many of the major
     framework features, such as the JobLauncher,
-    Job, and `Step`. The batch
+    Job, and `Step`.
+
+[role="xmlContent"]
+The batch
     namespace abstracts away many of the implementation details of the
     `JobRepository` implementations and their
     collaborators. However, there are still a few configuration options
     available:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job-repository id="jobRepository"
     data-source="dataSource"
@@ -362,18 +539,51 @@ As described in earlier, the <<job.adoc#configureJob,`JobRepository`>> is used f
 	max-varchar-length="1000"/>
 ----
 
+[role="xmlContent"]
 None of the configuration options listed above are required except
     the id. If they are not set, the defaults shown above will be used. They
     are shown above for awareness purposes. The
     `max-varchar-length` defaults to 2500, which is the
     length of the long `VARCHAR` columns in the <<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
 
+[role="javaContent"]
+When using java configuration, a `JobRepository` is provided for you.  A JDBC based one is
+provided out of the box if a `DataSource` is provided, the `Map` based one if not.  However
+you can customize the configuration of the `JobRepository` via an implementation of the
+`BatchConfigurer` interface.
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+...
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobRepository createJobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setTransactionManager(transactionManager);
+    factory.setIsolationLevelForCreate("SERIALIZABLE");
+    factory.setTablePrefix("BATCH_");
+    factory.setMaxVarCharLength(1000);
+    return factory.getObject();
+}
+...
+----
+
+[role="javaContent"]
+None of the configuration options listed above are required except
+    the dataSource and transactionManager. If they are not set, the defaults shown above
+    will be used. They are shown above for awareness purposes. The
+    max varchar length defaults to 2500, which is the
+    length of the long `VARCHAR` columns in the
+    <<schema-appendix.adoc#metaDataSchemaOverview,sample schema scripts>>
+
 [[txConfigForJobRepository]]
 
 
 ==== Transaction Configuration for the JobRepository
 
-If the namespace is used, transactional advice will be
+If the namespace or the provided `FactoryBean` is used, transactional advice will be
       automatically created around the repository. This is to ensure that the
       batch meta data, including state that is necessary for restarts after a
       failure, is persisted correctly. The behavior of the framework is not
@@ -389,24 +599,34 @@ If the namespace is used, transactional advice will be
       that the SERIALIZED will cause problems, as long as the database
       platform supports it. However, this can be overridden:
 
-
-        
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job-repository id="jobRepository"
                 isolation-level-for-create="REPEATABLE_READ" />
 ----
 
-
-      
+.Java Configuration
+[source, java, role="javaContent"]
+----
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobRepository createJobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setTransactionManager(transactionManager);
+    factory.setIsolationLevelForCreate("REPEATABLE_READ");
+    return factory.getObject();
+}
+----
 
 If the namespace or factory beans aren't used then it is also
       essential to configure the transactional behavior of the repository
       using AOP:
 
 
-        
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <aop:config>
     <aop:advisor
@@ -421,13 +641,26 @@ If the namespace or factory beans aren't used then it is also
 </tx:advice>
 ----
 
-
-      
-
+[role="xmlContent"]
 This fragment can be used as is, with almost no changes. Remember
       also to include the appropriate namespace declarations and to make sure
       spring-tx and spring-aop (or the whole of spring) are on the
       classpath.
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public TransactionProxyFactoryBean baseProxy() {
+	TransactionProxyFactoryBean transactionProxyFactoryBean = new TransactionProxyFactoryBean();
+	Properties transactionAttributes = new Properties();
+	transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+	transactionProxyFactoryBean.setTransactionAttributes(transactionAttributes);
+	transactionProxyFactoryBean.setTarget(jobRepository());
+	transactionProxyFactoryBean.setTransactionManager(transactionManager());
+	return transactionProxyFactoryBean;
+}
+----
 
 [[repositoryTablePrefix]]
 
@@ -444,10 +677,25 @@ Another modifiable property of the
       will need to be changed:
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job-repository id="jobRepository"
                 table-prefix="SYSTEM.TEST_" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobRepository createJobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setTransactionManager(transactionManager);
+    factory.setTablePrefix("SYSTEM.TEST_");
+    return factory.getObject();
+}
 ----
 
 Given the above changes, every query to the meta data tables will
@@ -476,12 +724,28 @@ There are scenarios in which you may not want to persist your
       repository:
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobRepository"
   class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
     <property name="transactionManager" ref="transactionManager"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobRepository createJobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setTransactionManager(transactionManager);
+    factory.setIsolationLevelForCreate("REPEATABLE_READ");
+    return factory.getObject();
+}
+
 ----
 
 Note that the in-memory repository is volatile and so does not
@@ -509,13 +773,28 @@ If you are using a database platform that is not in the list of
       shortcut and use it to set the database type to the closest
       match:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobRepository" class="org...JobRepositoryFactoryBean">
     <property name="databaseType" value="db2"/>
     <property name="dataSource" ref="dataSource"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobRepository createJobRepository() throws Exception {
+    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setDatabaseType("db2");
+    factory.setTransactionManager(transactionManager);
+    return factory.getObject();
+}
+
 ----
 
 (The `JobRepositoryFactoryBean` tries to
@@ -536,19 +815,38 @@ If even that doesn't work, or you are not using an RDBMS, then the
 
 === Configuring a JobLauncher
 
+[role="javaContent"]
+When using `@EnableBatchProcessing`, a `JobRegistry` is provided out of the box for you.
+This section addresses configuring your own.
+
 The most basic implementation of the
     `JobLauncher` interface is the
     `SimpleJobLauncher`. Its only required dependency is
-    a JobRepository, in order to obtain an
+    a `JobRepository`, in order to obtain an
     execution:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobLauncher"
       class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
     <property name="jobRepository" ref="jobRepository" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+...
+// This would reside in your BatchConfigurer implementation
+@Override
+protected JobLauncher createJobLauncher() throws Exception {
+	SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+	jobLauncher.setJobRepository(jobRepository);
+	jobLauncher.afterPropertiesSet();
+	return jobLauncher;
+}
+...
 ----
 
 Once a <<domain.adoc#domainLanguageOfBatch,JobExecution>> is
@@ -575,7 +873,8 @@ The `SimpleJobLauncher` can easily be
     configured to allow for this scenario by configuring a
     `TaskExecutor`:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobLauncher"
       class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
@@ -584,6 +883,19 @@ The `SimpleJobLauncher` can easily be
         <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
     </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JobLauncher jobLauncher() {
+		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		jobLauncher.setJobRepository(jobRepository());
+		jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		jobLauncher.afterPropertiesSet();
+		return jobLauncher;
+}
 ----
 
 Any implementation of the spring `TaskExecutor`
@@ -597,7 +909,7 @@ Any implementation of the spring `TaskExecutor`
 
 At a minimum, launching a batch job requires two things: the
     `Job` to be launched and a
-    JobLauncher. Both can be contained within the same
+    `JobLauncher`. Both can be contained within the same
     context or different contexts. For example, if launching a job from the
     command line, a new JVM will be instantiated for each Job, and thus every
     job will have its own `JobLauncher`. However, if
@@ -670,11 +982,18 @@ These arguments must be passed in with the path first and the
         JobParameters and must be in the format of 'name=value':
 
 
-[source]
+[source, role="xmlContent"]
 ----
 <bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2007/05/05
 ----
 
+[source, role="javaContent"]
+----
+<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date(date)=2007/05/05
+----
+
+ifdef::backend-html5[]
+[role="xmlContent"]
 In most cases you would want to use a manifest to declare your
         main class in a jar, but for simplicity, the class was used directly.
         This example is using the same 'EndOfDay' example from the <<domain.adoc#domainLanguageOfBatch,domainLanguageOfBatch>>. The first argument is
@@ -686,7 +1005,7 @@ In most cases you would want to use a manifest to declare your
         example of the XML configuration is below:
 
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <job id="endOfDay">
     <step id="step1" parent="simpleStep" />
@@ -696,6 +1015,99 @@ In most cases you would want to use a manifest to declare your
 <beans:bean id="jobLauncher"
          class="org.springframework.batch.core.launch.support.SimpleJobLauncher" />
 ----
+
+[role="javaContent"]
+In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from the <<domain.adoc#domainLanguageOfBatch,domainLanguageOfBatch>>. The first argument is
+        'io.spring.EndOfDayJobConfiguration', which is the fully qualified class name to
+         the configuration class containing the
+        Job. The second argument, 'endOfDay' represents
+        the job name. The final argument, 'schedule.date(date)=2007/05/05'
+        will be converted into JobParameters. An
+        example of the java configuration is below:
+
+[source, java, role="javaContent"]
+----
+@Configuration
+@EnableBatchProcessing
+public class EndOfDayJobConfiguration {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+   	public Job endOfDay() {
+   	    return this.jobBuilderFactory.get("endOfDay")
+   	    			.start(step1())
+   	    			.build();
+   	}
+
+   	@Bean
+   	public Step step1() {
+   		return this.stepBuilderFactory.get("step1")
+   					.tasklet((contribution, chunkContext) -> null)
+   					.build();
+   	}
+}
+----
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from the <<domain.adoc#domainLanguageOfBatch,domainLanguageOfBatch>>. The first argument is
+        where your job is configured (either an XML file or a fully qualified class name).
+        The second argument, 'endOfDay' represents
+        the job name. The final argument, 'schedule.date(date)=2007/05/05'
+        will be converted into JobParameters. An
+        example of the configuration is below:
+
+.XML Configuration
+[source, xml, role="xmlContent"]
+----
+<job id="endOfDay">
+    <step id="step1" parent="simpleStep" />
+</job>
+
+<!-- Launcher details removed for clarity -->
+<beans:bean id="jobLauncher"
+         class="org.springframework.batch.core.launch.support.SimpleJobLauncher" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Configuration
+@EnableBatchProcessing
+public class EndOfDayJobConfiguration {
+
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+   	public Job endOfDay() {
+   	    return this.jobBuilderFactory.get("endOfDay")
+   	    			.start(step1())
+   	    			.build();
+   	}
+
+   	@Bean
+   	public Step step1() {
+   		return this.stepBuilderFactory.get("step1")
+   					.tasklet((contribution, chunkContext) -> null)
+   					.build();
+   	}
+}
+----
+
+endif::backend-pdf[]
 
 This example is overly simplistic, since there are many more
         requirements to a run a batch job in Spring Batch in general, but it
@@ -784,7 +1196,7 @@ image::{batch-asciidoc}images/launch-from-request.png[Async Job Launcher Sequenc
 
 
 The controller in this case is a Spring MVC controller. More
-      information on Spring MVC can be found here: link:$$http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html$$[http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html].
+      information on Spring MVC can be found here: link:$$https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc$$[https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc].
       The controller launches a `Job` using a
       `JobLauncher` that has been configured to launch
       <<job.adoc#runningJobsFromWebContainer,asynchronously>>, which
@@ -838,8 +1250,8 @@ A `JobLauncher` uses the
 .Advanced Job Repository Access
 image::{batch-asciidoc}images/job-repository-advanced.png[Job Repository Advanced, scaledwidth="80%"]
 
-The JobExplorer and
-    JobOperator interfaces, which will be discussed
+The `JobExplorer` and
+    `JobOperator` interfaces, which will be discussed
     below, add additional functionality for querying and controlling the meta
     data.
 
@@ -850,7 +1262,7 @@ The JobExplorer and
 
 The most basic need before any advanced features is the ability to
       query the repository for existing executions. This functionality is
-      provided by the JobExplorer interface:
+      provided by the `JobExplorer` interface:
 
 
 [source, java]
@@ -872,16 +1284,30 @@ public interface JobExplorer {
 ----
 
 As is evident from the method signatures above,
-      JobExplorer is a read-only version of the
-      JobRepository, and like the
-      JobRepository, it can be easily configured via a
+      `JobExplorer` is a read-only version of the
+      `JobRepository`, and like the
+      `JobRepository`, it can be easily configured via a
       factory bean:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
       p:dataSource-ref="dataSource" />
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+...
+// This would reside in your BatchConfigurer implementation
+@Override
+public JobExplorer getJobExplorer() {
+	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
+	factoryBean.setDataSource(this.dataSource);
+	return factoryBean;
+}}
+...
 ----
 
 <<job.adoc#repositoryTablePrefix,Earlier in this chapter>>, it was mentioned that the table prefix of the
@@ -890,17 +1316,32 @@ As is evident from the method signatures above,
       JobExplorer is working with the same tables, it
       too needs the ability to set a prefix:
 
-
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobExplorer" class="org.spr...JobExplorerFactoryBean"
+		p:tablePrefix="SYSTEM."/>
 ----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+...
+// This would reside in your BatchConfigurer implementation
+@Override
+public JobExplorer getJobExplorer() {
+	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
+	factoryBean.setDataSource(this.dataSource);
+	factoryBean.setTablePrefix("SYSTEM.");
+	return factoryBean;
+}
+...
+----
 
 
 ==== JobRegistry
 
-A `JobRegistry` (and its parent interface JobLocator) is not
+A `JobRegistry` (and its parent interface `JobLocator`) is not
       mandatory, but it can be useful if you want to keep track of which jobs
       are available in the context. It is also useful for collecting jobs
       centrally in an application context when they have been created
@@ -908,12 +1349,28 @@ A `JobRegistry` (and its parent interface JobLocator) is not
       can also be used to manipulate the names and other properties of the
       jobs that are registered. There is only one implementation provided by
       the framework and this is based on a simple map from job name to job
-      instance. It is configured simply like this:
+      instance.
 
-
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobRegistry" class="org.spr...MapJobRegistry" p:dataSource-ref="dataSource" p:tablePrefix="BATCH_"/>
+----
+
+[role="javaContent"]
+When using `@EnableBatchProcessing`, a `JobRegistry` is provided out of the box for you.
+If you want to configure your own:
+
+[source, java, role="javaContent"]
+----
+...
+// This is already provided via the @EnableBatchProcessing but can be customized via
+// overriding the getter in the SimpleBatchConfiguration
+@Override
+@Bean
+public JobRegistry jobRegistry() throws Exception {
+	return new new MapJobRegistry();
+}
+...
 ----
 
 There are two ways to populate a `JobRegistry` automatically: using
@@ -926,17 +1383,29 @@ This is a bean post-processor that can register all jobs as they
         are created:
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobRegistryBeanPostProcessor" class="org.spr...JobRegistryBeanPostProcessor">
     <property name="jobRegistry" ref="jobRegistry"/>
 </bean>
 ----
 
-Athough it is not strictly necessary the post-processor in the
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
+    JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
+    postProcessor.setJobRegistry(jobRegistry());
+    return postProcessor;
+}
+----
+
+Although it is not strictly necessary the post-processor in the
         example has been given an id so that it can be included in child
         contexts (e.g. as a parent bean definition) and cause all jobs created
-        there to also be regsistered automatically.
+        there to also be registered automatically.
 
 
 
@@ -957,7 +1426,8 @@ This is a lifecycle component that creates child contexts and
         application.
 
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean class="org.spr...AutomaticJobRegistrar">
    <property name="applicationContextFactories">
@@ -971,6 +1441,16 @@ This is a lifecycle component that creates child contexts and
       </bean>
    </property>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public AutomaticJobRegistrar registrar() {
+
+    AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
+
 ----
 
 The registrar has two mandatory properties, one is an array of
@@ -1059,7 +1539,7 @@ The above operations represent methods from many different
       SimpleJobOperator, has many dependencies:
 
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <bean id="jobOperator" class="org.spr...SimpleJobOperator">
     <property name="jobExplorer">
@@ -1071,6 +1551,28 @@ The above operations represent methods from many different
     <property name="jobRegistry" ref="jobRegistry" />
     <property name="jobLauncher" ref="jobLauncher" />
 </bean>
+----
+
+[source, java, role="javaContent"]
+----
+ /**
+  * All injected dependcies for this bean are provided by the @EnableBatchProcessing
+  * infrastructure out of the box.
+  */
+ @Bean
+ public SimpleJobOperator jobOperator(JobExplorer jobExplorer,
+                                JobRepository jobRepository,
+                                JobRegistry jobRegistry) {
+
+	SimpleJobOperator jobOperator = new SimpleJobOperator();
+
+	jobOperator.setJobExplorer(jobExplorer);
+	jobOperator.setJobRepository(jobRepository);
+	jobOperator.setJobRegistry(jobRegistry);
+	jobOperator.setJobLauncher(jobLauncher);
+
+	return jobOperator;
+ }
 ----
 
 
@@ -1146,10 +1648,42 @@ In this example, the value with a key of 'run.id' is used to
       `JobParameters` passed in is null, it can be
       assumed that the `Job` has never been run before
       and thus its initial state can be returned. However, if not, the old
-      value is obtained, incremented by one, and returned. An incrementer can
+      value is obtained, incremented by one, and returned.
+
+ifdef::backend-html5[]
+[role="xmlContent"]
+An incrementer can
       be associated with `Job` via the 'incrementer'
       attribute in the namespace:
 
+
+[source, xml, role="xmlContent"]
+----
+<job id="footballJob" incrementer="sampleIncrementer">
+    ...
+</job>
+----
+
+[role="javaContent"]
+An incrementer can be associated with a 'Job' via the `incrementer` method provided in the
+builders:
+
+[source, java, role="javaContent"]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+    				 .incrementer(sampleIncrementer())
+    				 ...
+                     .build();
+}
+----
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+An incrementer can
+      be associated with `Job` via the 'incrementer'
+      attribute in the namespace:
 
 [source, xml]
 ----
@@ -1157,6 +1691,21 @@ In this example, the value with a key of 'run.id' is used to
     ...
 </job>
 ----
+
+The java config builders also provide facilities for the configuration of an incrementer:
+
+[source, java]
+----
+@Bean
+public Job footballJob() {
+    return this.jobBuilderFactory.get("footballJob")
+    				 .incrementer(sampleIncrementer())
+    				 ...
+                     .build();
+}
+----
+endif::backend-pdf[]
+
 
 [[stoppingAJob]]
 

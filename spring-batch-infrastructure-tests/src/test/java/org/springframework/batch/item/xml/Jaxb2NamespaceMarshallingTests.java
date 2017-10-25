@@ -15,26 +15,22 @@
  */
 package org.springframework.batch.item.xml;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
-import java.io.FileReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.Input;
+import org.xmlunit.matchers.CompareMatcher;
+
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.domain.QualifiedTrade;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.ClassPathResource;
@@ -47,6 +43,9 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StopWatch;
+
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class Jaxb2NamespaceMarshallingTests {
 	
@@ -99,11 +98,10 @@ public class Jaxb2NamespaceMarshallingTests {
 		writer.close();
 		stopWatch.stop();
 		logger.info("Timing for XML writer: " + stopWatch);
-		XMLUnit.setIgnoreWhitespace(true);
-		// String content = FileUtils.readFileToString(resource.getFile());
-		// System.err.println(content);
-		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
 
+		assertThat(
+				Input.from(expected.getFile()),
+				CompareMatcher.isSimilarTo(Input.from(resource.getFile())));
 	}
 
 	@Before

@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -35,6 +33,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author mminella
