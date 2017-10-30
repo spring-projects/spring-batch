@@ -6,6 +6,8 @@
 
 == Repeat
 
+include::toggle.adoc[]
+
 [[repeatTemplate]]
 
 === RepeatTemplate
@@ -214,11 +216,12 @@ interceptor that wraps a method call in a `RepeatOperations` object for just thi
 purpose. The `RepeatOperationsInterceptor` executes the intercepted method and repeats
 according to the `CompletionPolicy` in the provided `RepeatTemplate`.
 
+[role="xmlContent"]
 The following example shows declarative iteration using the Spring AOP namespace to
 repeat a service call to a method called `processMessage` (for more detail on how to
 configure AOP interceptors, see the Spring User Guide):
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <aop:config>
     <aop:pointcut id="transactional"
@@ -228,6 +231,26 @@ configure AOP interceptors, see the Spring User Guide):
 </aop:config>
 
 <bean id="retryAdvice" class="org.spr...RepeatOperationsInterceptor"/>
+----
+
+[role="javaContent"]
+The following example demonstrates using java configuration to
+repeat a service call to a method called `processMessage` (for more detail on how to
+configure AOP interceptors, see the Spring User Guide):
+
+[source, java, role="javaContent"]
+----
+@Bean
+public MyService myService() {
+	ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
+	factory.setInterfaces(MyService.class);
+	factory.setTarget(target);
+	service = (Service) factory.getProxy();
+	JdkRegexpMethodPointcut pointcut = new JdkRegexpMethodPointcut();
+	pointcut.setPatterns(".*processMessage.*");
+	((Advised) service).addAdvice(new DefaultPointcutAdvisor(pointcut, interceptor));
+	return service;
+}
 ----
 
 The preceding example uses a default `RepeatTemplate` inside the interceptor. To change
