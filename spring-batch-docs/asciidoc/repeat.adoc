@@ -244,11 +244,16 @@ configure AOP interceptors, see the Spring User Guide):
 public MyService myService() {
 	ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
 	factory.setInterfaces(MyService.class);
-	factory.setTarget(target);
-	service = (Service) factory.getProxy();
+	factory.setTarget(new MyService());
+
+	MyService service = (MyService) factory.getProxy();
 	JdkRegexpMethodPointcut pointcut = new JdkRegexpMethodPointcut();
 	pointcut.setPatterns(".*processMessage.*");
-	((Advised) service).addAdvice(new DefaultPointcutAdvisor(pointcut, interceptor));
+
+	RepeatOperationsInterceptor interceptor = new RepeatOperationsInterceptor();
+
+	((Advised) service).addAdvisor(new DefaultPointcutAdvisor(pointcut, interceptor));
+
 	return service;
 }
 ----

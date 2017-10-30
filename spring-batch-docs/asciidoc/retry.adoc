@@ -6,6 +6,8 @@
 
 == Retry
 
+include::toggle.adoc[]
+
 To make processing more robust and less prone to failure, it sometimes
     helps to automatically retry a failed operation in case it might
     succeed on a subsequent attempt. Errors that are susceptible to intermittent failure
@@ -399,13 +401,14 @@ Sometimes, there is some business processing that you know you want
     `RetryPolicy` in the provided
     `RepeatTemplate`.
 
-The following example shows a declarative iteration that uses the Spring AOP
-    namespace to repeat a service call to a method called
+[role="xmlContent"]
+The following example shows a declarative retry that uses the Spring AOP
+    namespace to retry a service call to a method called
     `remoteCall` (for more detail on how to configure
     AOP interceptors, see the Spring User Guide):
 
 
-[source, xml]
+[source, xml, role="xmlContent"]
 ----
 <aop:config>
     <aop:pointcut id="transactional"
@@ -416,6 +419,33 @@ The following example shows a declarative iteration that uses the Spring AOP
 
 <bean id="retryAdvice"
     class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/>
+----
+
+[role="javaContent"]
+The following example shows a declarative retry that uses java configuration
+    to retry a service call to a method called
+    `remoteCall` (for more detail on how to configure
+    AOP interceptors, see the Spring User Guide):
+
+
+[source, java, role="javaContent"]
+----
+@Bean
+public MyService myService() {
+	ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
+	factory.setInterfaces(MyService.class);
+	factory.setTarget(new MyService());
+
+	MyService service = (MyService) factory.getProxy();
+	JdkRegexpMethodPointcut pointcut = new JdkRegexpMethodPointcut();
+	pointcut.setPatterns(".*remoteCall.*");
+
+	RetryOperationsInterceptor interceptor = new RetryOperationsInterceptor();
+
+	((Advised) service).addAdvisor(new DefaultPointcutAdvisor(pointcut, interceptor));
+
+	return service;
+}
 ----
 
 The preceding example uses a default
