@@ -67,7 +67,7 @@ public Step sampleStep(TaskExecutor taskExecutor) {
 				.<String, String>chunk(10)
 				.reader(itemReader())
 				.writer(itemWriter())
-				.taskExecutor(taskExecutor())
+				.taskExecutor(taskExecutor)
 				.build();
 }
 ----
@@ -88,7 +88,7 @@ thread pool), there is a throttle limit in the tasklet configuration which defau
 You may need to increase this to ensure that a thread pool is fully utilized.
 
 [role="xmlContent"]
-For example you might increase threads, as shown in the following example:
+For example you might increase the throttle-limit, as shown in the following example:
 
 [source, xml, role="xmlContent"]
 ----
@@ -99,17 +99,20 @@ For example you might increase threads, as shown in the following example:
 ----
 
 [role="javaContent"]
-When using java configuration, threads can be increased on the `TaskExecutor`,
-as shown in the following example:
+When using java configuration, the builders provide access to the throttle limit:
 
 .Java Configuration
 [source, java, role="javaContent"]
 ----
 @Bean
-public TaskExecutor taskExecutor(){
-    SimpleAsyncTaskExecutor asyncTaskExecutor=new SimpleAsyncTaskExecutor("spring_batch");
-    asyncTaskExecutor.setConcurrencyLimit(20);
-    return asyncTaskExecutor;
+public Step sampleStep(TaskExecutor taskExecutor) {
+	return this.stepBuilderFactory.get("sampleStep")
+				.<String, String>chunk(10)
+				.reader(itemReader())
+				.writer(itemWriter())
+				.taskExecutor(taskExecutor)
+				.throttleLimit(20)
+				.build();
 }
 ----
 
@@ -214,13 +217,13 @@ public TaskExecutor taskExecutor(){
 }
 ----
 
-The configurable "task-executor" attribute is used to specify which `TaskExecutor`
+The configurable task executor is used to specify which `TaskExecutor`
 implementation should be used to execute the individual flows. The default is
 `SyncTaskExecutor`, but an asynchronous `TaskExecutor` is required to run the steps in
 parallel. Note that the job ensures that every flow in the split completes before
 aggregating the exit statuses and transitioning.
 
-See the section on <<step.adoc#split-flows,Split Flows>> for moredetail.
+See the section on <<step.adoc#split-flows,Split Flows>> for more detail.
 
 [[remoteChunking]]
 
@@ -251,6 +254,10 @@ consumers, then load balancing is automatic.
 The middleware has to be durable, with guaranteed delivery and a single consumer for each
 message. JMS is the obvious candidate, but other options (such as Java Spaces exist in
 the grid computing and shared memory product space.
+
+See the section on
+<<spring-batch-integration.adoc#remote-chunking,Spring Batch Integration - Remote Chunking>>
+for more detail.
 
 [[partitioning]]
 
@@ -463,10 +470,25 @@ the `Partitioner` output might resemble the content of the following table:
 Then the file name can be bound to a step using late binding to the execution context, as
 shown in the following example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" scope="step"
       class="org.spr...MultiResourceItemReader">
-    <property name="resource" value="#{stepExecutionContext[fileName]}/*"/>
+    <property name="resources" value="#{stepExecutionContext[fileName]}/*"/>
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public MultiResourceItemReader itemReader(
+	@Value("#{stepExecutionContext['fileName']}/*") Resource [] resources) {
+	return new MultiResourceItemReaderBuilder<String>()
+			.delegate(fileReader())
+			.name("itemReader")
+			.resources(resources)
+			.build();
+}
 ----
