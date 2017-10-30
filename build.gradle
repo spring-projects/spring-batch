@@ -337,7 +337,7 @@ project('spring-batch-infrastructure') {
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
 		}
-		optional "org.hibernate:hibernate-validator:$hibernateValidatorVersion"
+		optional "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
 		optional "javax.transaction:javax.transaction-api:$javaxTransactionVersion"
 		optional "javax.mail:javax.mail-api:$javaMailVersion"
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
