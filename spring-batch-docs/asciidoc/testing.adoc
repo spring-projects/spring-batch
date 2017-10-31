@@ -6,6 +6,8 @@
 
 == Unit Testing
 
+include::toggle.adoc[]
+
 As with other application styles, it is extremely important to
   unit test any code written as part of a batch job. The Spring core
   documentation covers how to unit and integration test with Spring in great
@@ -28,12 +30,21 @@ In order for the unit test to run a batch job, the framework must
         Indicates that the class should use Spring's JUnit facilities
 
 
-* `@ContextConfiguration(locations = {...})`:
-        Indicates which XML files contain the ApplicationContext.
+* `@ContextConfiguration(...)`:
+        Indicates which resources to configure the `ApplicationContext` with.
 
 The following example shows the two annotations in use:
 
-[source, java]
+.Using Java Configuration
+[source, java, role="javaContent"]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=SkipSampleConfiguration.class)
+public class SkipSampleFunctionalTests { ... }
+----
+
+.Using XML Configuration
+[source, java, role="xmlContent"]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
@@ -65,12 +76,45 @@ In the following example, the batch job reads from the database and
     following case, the test verifies that the `Job` ended
     with status "COMPLETED":
 
-
-[source, java]
+.XML Based Configuration
+[source, java, role="xmlContent"]
 ----
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml",
                                     "/jobs/skipSampleJob.xml" })
+public class SkipSampleFunctionalTests {
+
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+
+    private SimpleJdbcTemplate simpleJdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+    }
+
+    @Test
+    public void testJob() throws Exception {
+        simpleJdbcTemplate.update("delete from CUSTOMER");
+        for (int i = 1; i <= 10; i++) {
+            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)",
+                                      i, "customer" + i);
+        }
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
+
+        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus().getExitCode());
+    }
+}
+----
+
+.Java Based Configuration
+[source, java, role="javaContent"]
+----
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=SkipSampleConfiguration.class)
 public class SkipSampleFunctionalTests {
 
     @Autowired
