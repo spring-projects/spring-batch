@@ -6,6 +6,8 @@
 
 == Common Batch Patterns
 
+include::toggle.adoc[]
+
 Some batch jobs can be assembled purely from off-the-shelf components in Spring Batch.
 For instance, the `ItemReader` and `ItemWriter` implementations can be configured to
 cover a wide range of scenarios. However, for the majority of cases, custom code must be
@@ -48,7 +50,8 @@ public class ItemFailureLoggerListener extends ItemListenerSupport {
 Having implemented this listener it, must be registered with a step, as shown in the
 following example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <step id="simpleStep">
 ...
@@ -58,6 +61,18 @@ following example:
     </listener>
 </listeners>
 </step>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step simpleStep() {
+	return this.stepBuilderFactory.get("simpleStep")
+				...
+				.listener(new ItemFailureLoggerListener())
+				.build();
+}
 ----
 
 Remember that, if your listener does anything in an `onError()` method, it must be inside
@@ -117,7 +132,8 @@ processed is `null`. A more sophisticated completion policy could be implemented
 injected into the `Step` through the `SimpleStepFactoryBean`, as shown in the following
 example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <step id="simpleStep">
     <tasklet>
@@ -127,6 +143,19 @@ example:
 </step>
 
 <bean id="completionPolicy" class="org.example...SpecialCompletionPolicy"/>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Step simpleStep() {
+	return this.stepBuilderFactory.get("simpleStep")
+				.<String, String>chunk(new SpecialCompletionPolicy())
+				.reader(reader())
+				.writer(writer())
+				.build();
+}
 ----
 
 An alternative is to set a flag in the `StepExecution`, which is checked by the `Step`
@@ -169,7 +198,8 @@ file, after all processing has be completed. This can be achieved using the
 `FlatFileItemWriter` and can be added to an item writer as shown in the following
 example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.spr...FlatFileItemWriter">
     <property name="resource" ref="outputResource" />
@@ -177,6 +207,21 @@ example:
     <property name="headerCallback" ref="headerCallback" />
     <property name="footerCallback" ref="footerCallback" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter<String> itemWriter(Resource outputResource) {
+	return new FlatFileItemWriterBuilder<String>()
+			.name("itemWriter")
+			.resource(outputResource)
+			.lineAggregator(lineAggregator())
+			.headerCallback(headerCallback())
+			.footerCallback(footerCallback())
+			.build();
+}
 ----
 
 The footer callback interface has just one method that is called when the footer must be
@@ -244,7 +289,8 @@ In order for the `writeFooter` method to be called, the `TradeItemWriter` (which
 implements `FlatFileFooterCallback`) must be wired into the `FlatFileItemWriter` as the
 `footerCallback`. The following example shows how to do so:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="tradeItemWriter" class="..TradeItemWriter">
     <property name="delegate" ref="flatFileItemWriter" />
@@ -255,6 +301,29 @@ implements `FlatFileFooterCallback`) must be wired into the `FlatFileItemWriter`
    <property name="lineAggregator" ref="lineAggregator"/>
    <property name="footerCallback" ref="tradeItemWriter" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public TradeItemWriter tradeItemWriter() {
+	TradeItemWriter itemWriter = new TradeItemWriter();
+
+	itemWriter.setDelegate(flatFileItemWriter(null));
+
+	return itemWriter;
+}
+
+@Bean
+public FlatFileItemWriter<String> flatFileItemWriter(Resource outputResource) {
+	return new FlatFileItemWriterBuilder<String>()
+			.name("itemWriter")
+			.resource(outputResource)
+			.lineAggregator(lineAggregator())
+			.footerCallback(tradeItemWriter())
+			.build();
+}
 ----
 
 The way that the `TradeItemWriter` has been written so far functions correctly only if
@@ -337,7 +406,8 @@ there are, the `ItemReader` must be careful to always read an entire record. In 
 do this, a custom `ItemReader` should be implemented as a wrapper for the
 `FlatFileItemReader`, as shown in the following example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean id="itemReader" class="org.spr...MultiLineTradeItemReader">
     <property name="delegate">
@@ -356,6 +426,29 @@ do this, a custom `ItemReader` should be implemented as a wrapper for the
 </bean>
 ----
 
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public MultiLineTradeItemReader itemReader() {
+	MultiLineTradeItemReader itemReader = new MultiLineTradeItemReader();
+
+	itemReader.setDelegate(flatFileItemReader());
+
+	return itemReader;
+}
+
+@Bean
+public FlatFileItemReader flatFileItemReader() {
+	FlatFileItemReader<Trade> reader = new FlatFileItemReaderBuilder<Trade>()
+			.name("flatFileItemReader")
+			.resource(new ClasspathResource("data/iosample/input/multiLine.txt"))
+			.lineTokenizer(orderFileTokenizer())
+			.fieldSetMapper(new PassThroughFieldSetMapper())
+			.build();
+}
+----
+
 To ensure that each line is tokenized properly, which is especially important for
 fixed-length input, the `PatternMatchingCompositeLineTokenizer` can be used on the
 delegate `FlatFileItemReader`. See
@@ -364,7 +457,8 @@ Writers chapter] for more details. The delegate reader then uses a
 `PassThroughFieldSetMapper` to deliver a `FieldSet` for each line back to the wrapping
 `ItemReader`, as shown in the following example:
 
-[source, xml]
+.XML Content
+[source, xml, role="xmlContent"]
 ----
 <bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer">
     <property name="tokenizers">
@@ -376,6 +470,27 @@ Writers chapter] for more details. The delegate reader then uses a
         </map>
     </property>
 </bean>
+----
+
+.Java Content
+[source, java, role="javaContent"]
+----
+@Bean
+public PatternMatchingCompositeLineTokenizer orderFileTokenizer() {
+	PatternMatchingCompositeLineTokenizer tokenizer =
+			new PatternMatchingCompositeLineTokenizer();
+
+	Map<String, LineTokenizer> tokenizers = new HashMap<>(4);
+
+	tokenizers.put("HEA*", headerRecordTokenizer());
+	tokenizers.put("FOT*", footerRecordTokenizer());
+	tokenizers.put("NCU*", customerLineTokenizer());
+	tokenizers.put("BAD*", billingAddressLineTokenizer());
+
+	tokenizer.setTokenizers(tokenizers());
+
+	return tokenizer;
+}
 ----
 
 This wrapper has to be able to recognize the end of a record so that it can continually
@@ -428,13 +543,28 @@ need to be split up into multiple jobs as well.
 Because the need is so common, Spring Batch provides a `Tasklet` implementation for
 calling system commands, as shown in the following example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet">
     <property name="command" value="echo hello" />
     <!-- 5 second timeout for the command to complete -->
     <property name="timeout" value="5000" />
 </bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public SystemCommandTasklet tasklet() {
+	SystemCommandTasklet tasklet = new SystemCommandTasklet();
+
+	tasklet.setCommand("echo hello");
+	tasklet.setTimeout(5000);
+
+	return tasklet;
+}
 ----
 
 [[handlingStepCompletionWhenNoInputIsFound]]
@@ -513,7 +643,8 @@ also, optionally, be configured with a list of exit code patterns for which the 
 should occur (`COMPLETED` is the default). As with all listeners, it must be registered
 on the`Step` as shown in the following example:
 
-[source, xml]
+.XML Configuration
+[source, xml, role="xmlContent"]
 ----
 <job id="job1">
     <step id="step1">
@@ -533,6 +664,38 @@ on the`Step` as shown in the following example:
 <beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener">
     <beans:property name="keys" value="someKey"/>
 </beans:bean>
+----
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public Job job1() {
+	return this.jobBuilderFactory.get("job1")
+				.start(step1())
+				.next(step1())
+				.end()
+				.build();
+}
+
+@Bean
+public Step step1() {
+	return this.stepBuilderFactory.get("step1")
+				.<String, String>chunk(10)
+				.reader(reader())
+				.writer(savingWriter())
+				.listener(promotionListener())
+				.build();
+}
+
+@Bean
+public ExecutionContextPromotionListener promotionListener() {
+	ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+
+	listener.setKeys("someKey");
+
+	return listener;
+}
 ----
 
 Finally, the saved values must be retrieved from the `Job` `ExecutionContext`, as shown
