@@ -399,9 +399,8 @@ public class FlatFileItemReaderBuilder<T> {
 	 * Builds the {@link FlatFileItemReader}.
 	 *
 	 * @return a {@link FlatFileItemReader}
-	 * @throws Exception if an error occurs during construction
 	 */
-	public FlatFileItemReader<T> build() throws Exception {
+	public FlatFileItemReader<T> build() {
 		if(this.saveState) {
 			Assert.state(StringUtils.hasText(this.name),
 					"A name is required when saveState is set to true.");
@@ -453,7 +452,12 @@ public class FlatFileItemReaderBuilder<T> {
 				mapper.setBeanFactory(this.beanFactory);
 				mapper.setDistanceLimit(this.distanceLimit);
 				mapper.setCustomEditors(this.customEditors);
-				mapper.afterPropertiesSet();
+				try {
+					mapper.afterPropertiesSet();
+				}
+				catch (Exception e) {
+					throw new IllegalStateException("Unable to initialize BeanWrapperFieldSetMapper", e);
+				}
 
 				lineMapper.setFieldSetMapper(mapper);
 			}
@@ -595,9 +599,8 @@ public class FlatFileItemReaderBuilder<T> {
 		 * Returns a {@link DelimitedLineTokenizer}
 		 *
 		 * @return {@link DelimitedLineTokenizer}
-		 * @throws Exception if an error occurs during construction
 		 */
-		public DelimitedLineTokenizer build() throws Exception {
+		public DelimitedLineTokenizer build() {
 			Assert.notNull(this.fieldSetFactory, "A FieldSetFactory is required.");
 			Assert.notEmpty(this.names, "A list of field names is required");
 
@@ -630,7 +633,12 @@ public class FlatFileItemReaderBuilder<T> {
 			tokenizer.setFieldSetFactory(this.fieldSetFactory);
 			tokenizer.setStrict(this.strict);
 
-			tokenizer.afterPropertiesSet();
+			try {
+				tokenizer.afterPropertiesSet();
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Unable to intialize DelimitedLineTokenizer", e);
+			}
 
 			return tokenizer;
 		}
