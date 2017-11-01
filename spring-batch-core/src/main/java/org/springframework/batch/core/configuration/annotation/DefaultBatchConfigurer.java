@@ -15,12 +15,8 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
@@ -36,6 +32,9 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
 	private static final Log logger = LogFactory.getLog(DefaultBatchConfigurer.class);
@@ -46,10 +45,17 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobLauncher jobLauncher;
 	private JobExplorer jobExplorer;
 
-	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 		this.transactionManager = new DataSourceTransactionManager(dataSource);
+	}
+
+	@Autowired(required = false)
+	private void setDataSourceByAutowire(DataSource dataSource) {
+		if(this.dataSource != null) {
+			return;
+		}
+		setDataSource(dataSource);
 	}
 
 	protected DefaultBatchConfigurer() {}
