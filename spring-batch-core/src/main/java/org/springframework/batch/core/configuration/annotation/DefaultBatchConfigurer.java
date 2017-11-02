@@ -46,10 +46,22 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobLauncher jobLauncher;
 	private JobExplorer jobExplorer;
 
+	/**
+	 * Sets the dataSource.  If the {@link DataSource} has been set once, all future
+	 * values are passed are ignored (to prevent {@code}@Autowired{@code} from overwriting
+	 * the value).
+	 *
+	 * @param dataSource
+	 */
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.transactionManager = new DataSourceTransactionManager(dataSource);
+		if(this.dataSource == null) {
+			this.dataSource = dataSource;
+		}
+
+		if(this.transactionManager == null) {
+			this.transactionManager = new DataSourceTransactionManager(this.dataSource);
+		}
 	}
 
 	protected DefaultBatchConfigurer() {}
