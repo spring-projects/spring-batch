@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.batch.item.ExecutionContext;
 
@@ -44,7 +44,7 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = new CopyOnWriteArraySet<StepExecution>();
+	private volatile Collection<StepExecution> stepExecutions = Collections.synchronizedSet(new LinkedHashSet<>());
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -60,7 +60,7 @@ public class JobExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
 	private final String jobConfigurationName;
 
@@ -212,7 +212,7 @@ public class JobExecution extends Entity {
 	 * @return the step executions that were registered
 	 */
 	public Collection<StepExecution> getStepExecutions() {
-		return Collections.unmodifiableList(new ArrayList<StepExecution>(stepExecutions));
+		return Collections.unmodifiableList(new ArrayList<>(stepExecutions));
 	}
 
 	/**
@@ -299,7 +299,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Package private method for re-constituting the step executions from
 	 * existing instances.
-	 * @param stepExecution
+	 * @param stepExecution execution to be added
 	 */
 	void addStepExecution(StepExecution stepExecution) {
 		stepExecutions.add(stepExecution);
@@ -346,12 +346,12 @@ public class JobExecution extends Entity {
 	 */
 	public synchronized List<Throwable> getAllFailureExceptions() {
 
-		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
+		Set<Throwable> allExceptions = new HashSet<>(failureExceptions);
 		for (StepExecution stepExecution : stepExecutions) {
 			allExceptions.addAll(stepExecution.getFailureExceptions());
 		}
 
-		return new ArrayList<Throwable>(allExceptions);
+		return new ArrayList<>(allExceptions);
 	}
 
 	/**
@@ -365,7 +365,7 @@ public class JobExecution extends Entity {
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		failureExceptions = new ArrayList<Throwable>();
+		failureExceptions = new ArrayList<>();
 	}
 
 	/*
@@ -390,5 +390,4 @@ public class JobExecution extends Entity {
 			this.stepExecutions.addAll(stepExecutions);
 		}
 	}
-
 }
