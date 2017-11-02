@@ -307,56 +307,24 @@ public FileMessageToJobRequest fileMessageToJobRequest() {
 }
 
 @Bean
-public DirectChannel inboundFileChannel() {
-    return new DirectChannel();
-}
-
-@Bean
-public DirectChannel outboundJobRequestChannel() {
-    return new DirectChannel();
-}
-
-@Bean
-public DirectChannel jobLaunchReplyChannel() {
-    return new DirectChannel();
-}
-
-@Bean
-public FileReadingMessageSource fileReader() {
-    FileReadingMessageSource source = new FileReadingMessageSource();
-    source.setDirectory(new File("/tmp/myfiles"));
-    source.setFilter(new SimplePatternFileListFilter("*.csv"));
-    return source;
-}
-
-@Bean
 public JobLaunchingGateway jobLaunchingGateway() {
     SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
     simpleJobLauncher.setJobRepository(jobRepository);
     simpleJobLauncher.setTaskExecutor(new SyncTaskExecutor());
     JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(simpleJobLauncher);
+
     return jobLaunchingGateway;
 }
 
 @Bean
-public LoggingHandler logging() {
-    LoggingHandler adapter = new LoggingHandler(LoggingHandler.Level.DEBUG);
-    adapter.setLoggerName("TEST_LOGGER");
-    adapter.setLogExpressionString("headers.id + ': ' + payload");
-    return adapter;
-}
-
-@Bean
 public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) {
-    return IntegrationFlows.from(fileReader(),
-            c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
-            .channel(inboundFileChannel()).
-                    handle(fileMessageToJobRequest()).
-                    channel(outboundJobRequestChannel()).
-                    handle(jobLaunchingGateway).
-                    channel(jobLaunchReplyChannel()).
-                    handle(logging())
-            .get();
+    return IntegrationFlows.from(Files.inboundAdapter(new File("/tmp/myfiles")).
+                    filter(new SimplePatternFileListFilter("*.csv")),
+            c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1))).
+            handle(fileMessageToJobRequest()).
+            handle(jobLaunchingGateway).
+            log(LoggingHandler.Level.WARN, "headers.id + ': ' + payload").
+            get();
 }
 ----
 
@@ -549,7 +517,6 @@ public LoggingHandler loggingHandler() {
 
 @MessagingGateway(name = "notificationExecutionsListener", defaultRequestChannel = "stepExecutionsChannel")
 public interface NotificationExecutionListener extends StepExecutionListener {}
-
 ----
 
 [role="javaContent"]
@@ -800,73 +767,62 @@ throttle limits and so on, when implementing your use case.
 ----
 @Bean
 public org.apache.activemq.ActiveMQConnectionFactory connectionFactory() {
-	ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-	factory.setBrokerURL("tcp://localhost:61616");
-	return factory;
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+    factory.setBrokerURL("tcp://localhost:61616");
+    return factory;
 }
 
 @Bean
 public DirectChannel requests() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-public QueueChannel replies() {
-	return new QueueChannel();
+public IntegrationFlow jmsOutboundFlow() {
+    return IntegrationFlows.from("requests")
+            .handle(Jms.outboundGateway(connectionFactory())
+                    .requestDestination("requests"))
+            .get();
 }
-
 
 @Bean
 public MessagingTemplate messagingTemplate() {
-	MessagingTemplate template = new MessagingTemplate();
-	template.setDefaultChannel(requests());
-	template.setReceiveTimeout(2000);
-	return template;
-}
-
-@Bean
-@ServiceActivator(inputChannel = "requests")
-public JmsSendingMessageHandler jmsOutboundChannelAdapter() {
-	JmsSendingMessageHandler jmsSendingMessageHandler = new JmsSendingMessageHandler(jmsTemplate());
-	jmsSendingMessageHandler.setDestinationName("requests");
-	return jmsSendingMessageHandler;
+    MessagingTemplate template = new MessagingTemplate();
+    template.setDefaultChannel(requests());
+    template.setReceiveTimeout(2000);
+    return template;
 }
 
 @Bean
 @StepScope()
 public ChunkMessageChannelItemWriter itemWriter() {
-	ChunkMessageChannelItemWriter chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter();
-	chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate());
-	chunkMessageChannelItemWriter.setReplyChannel(replies());
-	return chunkMessageChannelItemWriter;
+    ChunkMessageChannelItemWriter chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter();
+    chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate());
+    chunkMessageChannelItemWriter.setReplyChannel(replies());
+    return chunkMessageChannelItemWriter;
 }
 
 @Bean
 public RemoteChunkHandlerFactoryBean chunkHandler() {
-	RemoteChunkHandlerFactoryBean remoteChunkHandlerFactoryBean = new RemoteChunkHandlerFactoryBean();
-	remoteChunkHandlerFactoryBean.setChunkWriter(itemWriter());
-	remoteChunkHandlerFactoryBean.setStep(step1());
-	return remoteChunkHandlerFactoryBean;
+    RemoteChunkHandlerFactoryBean remoteChunkHandlerFactoryBean = new RemoteChunkHandlerFactoryBean();
+    remoteChunkHandlerFactoryBean.setChunkWriter(itemWriter());
+    remoteChunkHandlerFactoryBean.setStep(step1());
+    return remoteChunkHandlerFactoryBean;
 }
 
 @Bean
-public DefaultMessageListenerContainer defaultMessageListenerContainer() {
-	DefaultMessageListenerContainer defaultMessageListenerContainer = new DefaultMessageListenerContainer();
-	defaultMessageListenerContainer.setDestinationName("replies");
-	return defaultMessageListenerContainer;
+public QueueChannel replies() {
+    return new QueueChannel();
 }
 
 @Bean
-public ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener() {
-	ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener = new  ChannelPublishingJmsMessageListener();
-	return channelPublishingJmsMessageListener;
-}
-
-@Bean
-public JmsMessageDrivenEndpoint jmsReplies() {
-	JmsMessageDrivenEndpoint jmsMessageDrivenEndpoint = new JmsMessageDrivenEndpoint(defaultMessageListenerContainer(), channelPublishingJmsMessageListener());
-	jmsMessageDrivenEndpoint.setOutputChannel(replies());
-	return jmsMessageDrivenEndpoint;
+public IntegrationFlow jmsReplies() {
+    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
+                    .configureJmsTemplate(t ->
+                            t.deliveryPersistent(true).jmsMessageConverter(new SimpleMessageConverter()))
+                    .destination("replies"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+            .channel(replies())
+            .get();
 }
 ----
 
@@ -926,60 +882,53 @@ Now we can move on to the slave configuration, as shown in the following example
 ----
 @Bean
 public org.apache.activemq.ActiveMQConnectionFactory connectionFactory() {
-	ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
-	factory.setBrokerURL("tcp://localhost:61616");
-	return factory;
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+    factory.setBrokerURL("tcp://localhost:61616");
+    return factory;
 }
 
 @Bean
 public DirectChannel requests() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
-
 @Bean
 public DirectChannel replies() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-public DefaultMessageListenerContainer defaultMessageListenerContainer() {
-	DefaultMessageListenerContainer defaultMessageListenerContainer = new DefaultMessageListenerContainer();
-	defaultMessageListenerContainer.setDestinationName("requests");
-	return defaultMessageListenerContainer;
+public IntegrationFlow jmsIn() {
+    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
+                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
+                                    .jmsMessageConverter(new SimpleMessageConverter()))
+                    .destination("requests"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+            .channel(requests())
+            .get();
 }
 
 @Bean
-public ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener() {
-	ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener = new  ChannelPublishingJmsMessageListener();
-	return channelPublishingJmsMessageListener;
+public IntegrationFlow outgoingReplies() {
+    return IntegrationFlows.from("replies")
+            .handle(Jms.outboundGateway(connectionFactory())
+                    .requestDestination("replies"))
+            .get();
 }
 
 @Bean
-public JmsMessageDrivenEndpoint jmsIn() {
-	JmsMessageDrivenEndpoint jmsMessageDrivenEndpoint = new JmsMessageDrivenEndpoint(defaultMessageListenerContainer(), channelPublishingJmsMessageListener());
-	jmsMessageDrivenEndpoint.setOutputChannel(requests());
-	return jmsMessageDrivenEndpoint;
-}
-
-@Bean
-@ServiceActivator(inputChannel = "replies")
-public MessageHandler outgoingReplies() {
-	JmsSendingMessageHandler handler = new JmsSendingMessageHandler(jmsTemplate());
-	handler.setDestinationName("replies");
-	return handler;
-}
-
-@Bean
-@ServiceActivator(inputChannel = "requests", outputChannel = "replies")
-public ChunkResponse serviceActivator(ChunkRequest chunkRequest) throws Exception{
-	return chunkProcessorChunkHandler().handleChunk(chunkRequest);
+@ServiceActivator(inputChannel = "requests")
+public MessageHandler serviceActivator() throws Exception{
+    AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
+    aggregatorFactoryBean.setProcessorBean(chunkProcessorChunkHandler());
+    aggregatorFactoryBean.setOutputChannel(replies());
+    ...
+    return aggregatorFactoryBean.getObject();
 }
 
 @Bean
 public ChunkProcessorChunkHandler chunkProcessorChunkHandler() {
-	ChunkProcessorChunkHandler chunkProcessorChunkHandler = new ChunkProcessorChunkHandler();
-	chunkProcessorChunkHandler.setChunkProcessor(new SimpleChunkProcessor(personItemProcessor(), personItemWriter()));
-	return chunkProcessorChunkHandler();
+    ChunkProcessorChunkHandler chunkProcessorChunkHandler = new ChunkProcessorChunkHandler();
+    chunkProcessorChunkHandler.setChunkProcessor(new SimpleChunkProcessor(personItemProcessor(), personItemWriter()));
+    return chunkProcessorChunkHandler;
 }
 ----
 
@@ -1104,125 +1053,100 @@ configuration:
 ----
 @Bean
 public PartitionHandler partitionHandler() {
-	MessageChannelPartitionHandler partitionHandler = new MessageChannelPartitionHandler();
-	partitionHandler.setStepName("step1");
-	partitionHandler.setGridSize(3);
-	partitionHandler.setReplyChannel(outboundReplies());
-	MessagingTemplate template = new MessagingTemplate();
-	template.setDefaultChannel(outboundRequests());
-	template.setReceiveTimeout(100000);
-	partitionHandler.setMessagingOperations(template);
-	return partitionHandler;
+    MessageChannelPartitionHandler partitionHandler = new MessageChannelPartitionHandler();
+    partitionHandler.setStepName("step1");
+    partitionHandler.setGridSize(3);
+    partitionHandler.setReplyChannel(outboundReplies());
+    MessagingTemplate template = new MessagingTemplate();
+    template.setDefaultChannel(outboundRequests());
+    template.setReceiveTimeout(100000);
+    partitionHandler.setMessagingOperations(template);
+    return partitionHandler;
 }
 
 @Bean
 public DirectChannel outboundRequests() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-@ServiceActivator(inputChannel = "outboundRequests")
-public MessageHandler outboundRequestsJmsSendingHandler() {
-	JmsSendingMessageHandler handler = new JmsSendingMessageHandler(jmsTemplate());
-	handler.setDestinationName("requestsQueue");
-	return handler;
+public IntegrationFlow outboundJmsRequests() {
+    return IntegrationFlows.from("outboundRequests")
+            .handle(Jms.outboundGateway(connectionFactory())
+                    .requestDestination("requestsQueue"))
+            .get();
 }
 
 @Bean
 public DirectChannel inboundRequests() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-public DefaultMessageListenerContainer outBoundRequestsListenerContainer() {
-	DefaultMessageListenerContainer defaultMessageListenerContainer = new DefaultMessageListenerContainer();
-	defaultMessageListenerContainer.setDestinationName("requestsQueue");
-	return defaultMessageListenerContainer;
-}
-
-@Bean
-public ChannelPublishingJmsMessageListener outBoundRequestsJmsMessageListener() {
-	ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener = new  ChannelPublishingJmsMessageListener();
-	return channelPublishingJmsMessageListener;
-}
-
-@Bean
-public JmsMessageDrivenEndpoint outBoundRequestsAdapter() {
-	JmsMessageDrivenEndpoint jmsMessageDrivenEndpoint = new JmsMessageDrivenEndpoint(outBoundRequestsListenerContainer(), outBoundRequestsJmsMessageListener());
-	jmsMessageDrivenEndpoint.setOutputChannel(inboundRequests());
-	return jmsMessageDrivenEndpoint;
+public IntegrationFlow inboundJmsRequests() {
+    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
+                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
+                            .jmsMessageConverter(new SimpleMessageConverter()))
+                    .destination("requestsQueue"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+            .channel(inboundRequests())
+            .get();
 }
 
 @Bean
 public StepExecutionRequestHandler stepExecutionRequestHandler() {
-	StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
-	stepExecutionRequestHandler.setJobExplorer(jobExplorer());
-	stepExecutionRequestHandler.setStepLocator(stepLocator());
-	return stepExecutionRequestHandler;
+    StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
+    stepExecutionRequestHandler.setJobExplorer(jobExplorer);
+    stepExecutionRequestHandler.setStepLocator(stepLocator());
+    return stepExecutionRequestHandler;
 }
 
 @Bean
 @ServiceActivator(inputChannel = "inboundRequests", outputChannel = "outboundStaging")
-public StepExecutionRequestHandler serviceActivator() throws Exception{
-	return stepExecutionRequestHandler();
+public StepExecutionRequestHandler serviceActivator() throws Exception {
+    return stepExecutionRequestHandler();
 }
 
 @Bean
 public DirectChannel outboundStaging() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-@ServiceActivator(inputChannel = "outboundStaging")
-public MessageHandler outboundStagingJmsSendingHandler() {
-	JmsSendingMessageHandler handler = new JmsSendingMessageHandler(jmsTemplate());
-	handler.setDestinationName("stagingQueue");
-	return handler;
+public IntegrationFlow outboundJmsStaging() {
+    return IntegrationFlows.from("outboundStaging")
+            .handle(Jms.outboundGateway(connectionFactory())
+                    .requestDestination("stagingQueue"))
+            .get();
 }
 
 @Bean
 public DirectChannel inboundStaging() {
-	return new DirectChannel();
+    return new DirectChannel();
 }
 
 @Bean
-public DefaultMessageListenerContainer inboundStagingListenerContainer() {
-	DefaultMessageListenerContainer defaultMessageListenerContainer = new DefaultMessageListenerContainer();
-	defaultMessageListenerContainer.setDestinationName("stagingQueue");
-	return defaultMessageListenerContainer;
-}
-
-@Bean
-public ChannelPublishingJmsMessageListener inboundStagingJmsMessageListener() {
-	ChannelPublishingJmsMessageListener channelPublishingJmsMessageListener = new  ChannelPublishingJmsMessageListener();
-	return channelPublishingJmsMessageListener;
-}
-
-@Bean
-public JmsMessageDrivenEndpoint inboundStagingAdapter() {
-	JmsMessageDrivenEndpoint jmsMessageDrivenEndpoint = new JmsMessageDrivenEndpoint(inboundStagingListenerContainer(), inboundStagingJmsMessageListener());
-	jmsMessageDrivenEndpoint.setOutputChannel(inboundStaging());
-	return jmsMessageDrivenEndpoint;
+public IntegrationFlow inboundJmsStaging() {
+    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
+                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
+                            .jmsMessageConverter(new SimpleMessageConverter()))
+                    .destination("stagingQueue"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+            .channel(inboundStaging())
+            .get();
 }
 
 @Bean
 @ServiceActivator(inputChannel = "inboundStaging")
-public MessageHandler partitioningMessageHandler() throws Exception{
-	AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
-	aggregatorFactoryBean.setProcessorBean(partitioningMessageHandler());
-	aggregatorFactoryBean.setOutputChannel(outboundReplies());
-	...
-	return aggregatorFactoryBean.getObject();
+public MessageHandler partitioningMessageHandler() throws Exception {
+    AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
+    aggregatorFactoryBean.setProcessorBean(partitionHandler());
+    aggregatorFactoryBean.setOutputChannel(outboundReplies());
+    ...
+    return aggregatorFactoryBean.getObject();
 }
 
 @Bean
 public QueueChannel outboundReplies() {
-	return new QueueChannel();
-}
-
-@Bean
-public BeanFactoryStepLocator stepLocator() {
-		return new BeanFactoryStepLocator();
+    return new QueueChannel();
 }
 ----
 
