@@ -817,10 +817,10 @@ public QueueChannel replies() {
 
 @Bean
 public IntegrationFlow jmsReplies() {
-    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
-                    .configureJmsTemplate(t ->
-                            t.deliveryPersistent(true).jmsMessageConverter(new SimpleMessageConverter()))
-                    .destination("replies"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
+                    .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .destination("replies"))
             .channel(replies())
             .get();
 }
@@ -898,10 +898,10 @@ public DirectChannel replies() {
 
 @Bean
 public IntegrationFlow jmsIn() {
-    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
-                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
-                                    .jmsMessageConverter(new SimpleMessageConverter()))
-                    .destination("requests"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
+                    .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .destination("requests"))
             .channel(requests())
             .get();
 }
@@ -916,12 +916,12 @@ public IntegrationFlow outgoingReplies() {
 
 @Bean
 @ServiceActivator(inputChannel = "requests")
-public MessageHandler serviceActivator() throws Exception{
+public AggregatorFactoryBean serviceActivator() throws Exception{
     AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
     aggregatorFactoryBean.setProcessorBean(chunkProcessorChunkHandler());
     aggregatorFactoryBean.setOutputChannel(replies());
     ...
-    return aggregatorFactoryBean.getObject();
+    return aggregatorFactoryBean;
 }
 
 @Bean
@@ -1082,15 +1082,14 @@ public DirectChannel inboundRequests() {
     return new DirectChannel();
 }
 
-@Bean
 public IntegrationFlow inboundJmsRequests() {
-    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
-                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
-                            .jmsMessageConverter(new SimpleMessageConverter()))
-                    .destination("requestsQueue"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
+                    .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .destination("requestsQueue"))
             .channel(inboundRequests())
             .get();
-}
+	}
 
 @Bean
 public StepExecutionRequestHandler stepExecutionRequestHandler() {
@@ -1126,22 +1125,22 @@ public DirectChannel inboundStaging() {
 
 @Bean
 public IntegrationFlow inboundJmsStaging() {
-    return IntegrationFlows.from(Jms.inboundAdapter(connectionFactory())
-                    .configureJmsTemplate(t -> t.deliveryPersistent(true)
-                            .jmsMessageConverter(new SimpleMessageConverter()))
-                    .destination("stagingQueue"), c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1)))
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
+                    .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .destination("stagingQueue"))
             .channel(inboundStaging())
             .get();
 }
 
 @Bean
 @ServiceActivator(inputChannel = "inboundStaging")
-public MessageHandler partitioningMessageHandler() throws Exception {
+public AggregatorFactoryBean partitioningMessageHandler() throws Exception {
     AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
     aggregatorFactoryBean.setProcessorBean(partitionHandler());
     aggregatorFactoryBean.setOutputChannel(outboundReplies());
     ...
-    return aggregatorFactoryBean.getObject();
+    return aggregatorFactoryBean;
 }
 
 @Bean
