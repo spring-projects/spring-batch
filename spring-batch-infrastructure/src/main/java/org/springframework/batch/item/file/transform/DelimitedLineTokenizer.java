@@ -222,7 +222,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
         String value;
 
-        if ((chars.length > 2) && (chars[start] == quoteCharacter) && (chars[start + len - 1] == quoteCharacter)) {
+        if ((chars.length >= 2) && (chars[start] == quoteCharacter) && (chars[start + len - 1] == quoteCharacter)) {
             value = new String(chars, start + 1, len - 2);
             if (value.contains(escapedQuoteString)) {
                 value = StringUtils.replace(value, escapedQuoteString, quoteString);
