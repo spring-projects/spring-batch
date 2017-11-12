@@ -185,16 +185,23 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	/**
 	 * Wait until all the results that are in the pipeline come back to the reply channel.
 	 *
-	 * @return true if successfully received a result, false if timed out
+	 * @return true if successfully received all pending results, false if timed out
 	 */
 	private boolean waitForResults() throws AsynchronousFailureException {
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
 		logger.info("Waiting for " + localState.getExpecting() + " results");
+
+		// Read replies until we had maxCount successive timeouts.
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			try {
+				int expecting = localState.getExpecting();
 				getNextResult();
+				if( localState.getExpecting() < expecting ) {
+					// We read a reply, so reset the timeout counter
+					count = 0;
+				}
 			}
 			catch (Throwable t) {
 				logger.error("Detected error in remote result. Trying to recover " + localState.getExpecting()

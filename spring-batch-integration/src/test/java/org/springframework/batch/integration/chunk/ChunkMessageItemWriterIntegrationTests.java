@@ -131,6 +131,30 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	@Test
+	public void testMaxtimeoutsLessThanThrottleLimit() throws Exception {
+
+		// Make certain throttle limit is larger than max wait 
+		// timeouts, this is not the default
+		writer.setMaxWaitTimeouts(2);
+		writer.setThrottleLimit(10);
+
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10"))));
+
+
+		Step step = factory.getObject();
+
+		StepExecution stepExecution = getStepExecution(step);
+		step.execute(stepExecution);
+
+		waitForResults(10, 10);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(10, TestItemWriter.count);
+		assertEquals(10, stepExecution.getReadCount());
+	}
+
+	@Test
 	public void testSimulatedRestart() throws Exception {
 
 		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
