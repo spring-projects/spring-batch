@@ -197,17 +197,17 @@ public interface JobOperator {
 	 */
 	Set<String> getJobNames();
 
-    /**
-     * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored
-     * because the process died this is the best way to mark a job as finished
-     * with (as opposed to STOPPED). An abandoned job execution can be
-     * restarted, but a stopping one cannot.
-     *
-     * @param jobExecutionId the job execution id to abort
-     * @return the {@link JobExecution} that was aborted
-     * @throws NoSuchJobExecutionException
-     * @throws JobExecutionAlreadyRunningException if the job is running (it
-     * should be stopped first)
-     */
-    JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
+	/**
+	 * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored
+	 * because the process died this is the best way to mark a job as finished
+	 * with (as opposed to STOPPED). An abandoned job execution cannot be
+	 * restarted by the framework.
+	 *
+	 * @param jobExecutionId the job execution id to abort
+	 * @return the {@link JobExecution} that was aborted
+	 * @throws NoSuchJobExecutionException thrown if there is no job execution for the jobExecutionId.
+	 * @throws JobExecutionAlreadyRunningException if the job is running (it
+	 * should be stopped first)
+	 */
+	JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
 }
