@@ -88,7 +88,6 @@ allprojects {
 		postgresqlVersion = '42.1.4'
 		quartzVersion = '2.3.0'
 		servletApiVersion = '3.1.0'
-		slf4jVersion = '1.7.25'
 		sqlfireclientVersion = '1.0.3'
 		sqliteVersion = '3.20.1'
 		woodstoxVersion = '5.0.3'
@@ -285,7 +284,6 @@ project('spring-batch-core') {
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
 		optional "org.aspectj:aspectjweaver:$aspectjVersion"
 		optional "org.springframework:spring-jdbc:$springVersion"
-		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
 	}
@@ -327,7 +325,6 @@ project('spring-batch-infrastructure') {
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
-		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
@@ -464,7 +461,6 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 
-		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
 			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
@@ -542,7 +538,6 @@ project('spring-batch-integration') {
 		testCompile "org.springframework.integration:spring-integration-jdbc:$springIntegrationVersion"
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
-		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		optional "org.springframework.integration:spring-integration-jms:$springIntegrationVersion"
@@ -609,7 +604,6 @@ project('spring-batch-samples') {
 		provided "javax.servlet:javax.servlet-api:$servletApiVersion"
 
 		optional "com.vmware.sqlfire:sqlfireclient:$sqlfireclientVersion"
-		optional "org.slf4j:slf4j-log4j12:$slf4jVersion"
 		optional "org.apache.derby:derby:$derbyVersion"
 		optional "org.postgresql:postgresql:$postgresqlVersion"
 		optional "org.springframework:spring-web:$springVersion"
