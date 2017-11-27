@@ -59,6 +59,12 @@ import org.springframework.util.MethodInvoker;
  * <code>saveState=false</code> if used in a multi-threaded client (no restart available).
  * </p>
  *
+ * <p>It is important to note that this is a paging item reader and exceptions that are
+ * thrown while reading the page itself (mapping results to objects, etc in the
+ * {@link RepositoryItemReader#doPageRead()}) will not be skippable since this reader has
+ * no way of knowing if an exception should be skipped and therefore will continue to read
+ * the same page until the skip limit is exceeded.</p>
+ *
  * <p>
  * NOTE: The {@code RepositoryItemReader} only reads Java Objects i.e. non primitives.
  * </p>
