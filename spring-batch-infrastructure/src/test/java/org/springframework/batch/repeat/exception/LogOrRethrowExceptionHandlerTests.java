@@ -20,9 +20,16 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.WriterAppender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.WriterAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.classify.ClassifierSupport;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler.Level;
@@ -38,12 +45,17 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
     @Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		Logger logger = Logger.getLogger(LogOrRethrowExceptionHandler.class);
-		logger.setLevel(org.apache.log4j.Level.DEBUG);
+		Logger logger = LoggerFactory.getLogger(LogOrRethrowExceptionHandler.class);
 		writer = new StringWriter();
-		logger.removeAllAppenders();
-		logger.getParent().removeAllAppenders();
-		logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
+		LoggerContext loggerContext = (LoggerContext) LogManager.getContext();
+		Configuration configuration = loggerContext.getConfiguration();
+
+		LoggerConfig rootLoggerConfig = configuration.getLoggerConfig(logger.getName());
+		rootLoggerConfig.getAppenders().forEach((name, appender) -> {
+			rootLoggerConfig.removeAppender(name);
+		});
+		Appender appender = WriterAppender.createAppender(PatternLayout.createDefaultLayout(), null, writer,"TESTWriter", false, false);
+		rootLoggerConfig.addAppender(appender, org.apache.logging.log4j.Level.DEBUG, null);
 	}
 
 	public void testRuntimeException() throws Throwable {
