@@ -63,7 +63,7 @@ public class MongoItemReaderTests {
 
 	@Test
 	public void testAfterPropertiesSetForQueryString() throws Exception{
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 
 		try {
 			reader.afterPropertiesSet();
@@ -114,25 +114,13 @@ public class MongoItemReaderTests {
 	
 	@Test
 	public void testAfterPropertiesSetForQueryObject() throws Exception{
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 		
 		reader.setTemplate(template);
 		reader.setTargetType(String.class);
 		
-		Query query1 = new Query();
+		Query query1 = new Query().with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query1);
-
-		try {
-			reader.afterPropertiesSet();
-			fail("Sort was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
-			assertEquals("A Sort in Query object is required.", iae.getMessage());
-		} catch (Throwable t) {
-			fail("Wrong exception was thrown.");
-		}
-
-		Query query2 = new Query().with(new Sort(new Order(Sort.Direction.ASC, "_id")));
-		reader.setQuery(query2);
 
 		reader.afterPropertiesSet();
 	}
@@ -253,18 +241,18 @@ public class MongoItemReaderTests {
 	
 	@Test
 	public void testQueryObject() throws Exception {
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 		
 		Query query = new Query()
-				.with(new Sort(new Order(Sort.Direction.ASC, "_id")));
+				.with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
 		reader.setTargetType(String.class);
 		
 		reader.afterPropertiesSet();
 		
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 		
 		assertFalse(reader.doPageRead().hasNext());
 		
@@ -276,19 +264,19 @@ public class MongoItemReaderTests {
 	
 	@Test
 	public void testQueryObjectWithIgnoredPageSize() throws Exception {
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 		
 		Query query = new Query()
-				.with(new Sort(new Order(Sort.Direction.ASC, "_id")))
-				.with(new PageRequest(0, 50));
+				.with(Sort.by(new Order(Sort.Direction.ASC, "_id")))
+				.with(PageRequest.of(0, 50));
 		reader.setQuery(query);
 		reader.setTargetType(String.class);
 		
 		reader.afterPropertiesSet();
 		
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 		
 		assertFalse(reader.doPageRead().hasNext());
 		
@@ -300,12 +288,12 @@ public class MongoItemReaderTests {
 	
 	@Test
 	public void testQueryObjectWithPageSize() throws Exception {
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 		
 		Query query = new Query()
-				.with(new Sort(new Order(Sort.Direction.ASC, "_id")))
-				.with(new PageRequest(30, 50));
+				.with(Sort.by(new Order(Sort.Direction.ASC, "_id")))
+				.with(PageRequest.of(30, 50));
 		reader.setQuery(query);
 		reader.setTargetType(String.class);
 		reader.setPageSize(100);
@@ -313,7 +301,7 @@ public class MongoItemReaderTests {
 		reader.afterPropertiesSet();
 		
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
-		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 		
 		assertFalse(reader.doPageRead().hasNext());
 		
@@ -325,11 +313,11 @@ public class MongoItemReaderTests {
 	
 	@Test
 	public void testQueryObjectWithCollection() throws Exception {
-		reader = new MongoItemReader<String>();
+		reader = new MongoItemReader<>();
 		reader.setTemplate(template);
 		
 		Query query = new Query()
-				.with(new Sort(new Order(Sort.Direction.ASC, "_id")));
+				.with(Sort.by(new Order(Sort.Direction.ASC, "_id")));
 		reader.setQuery(query);
 		reader.setTargetType(String.class);
 		reader.setCollection("collection");
@@ -338,7 +326,7 @@ public class MongoItemReaderTests {
 		
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
 		ArgumentCaptor<String> stringContainer = ArgumentCaptor.forClass(String.class);
-		when(template.find(queryContainer.capture(), eq(String.class), stringContainer.capture())).thenReturn(new ArrayList<String>());
+		when(template.find(queryContainer.capture(), eq(String.class), stringContainer.capture())).thenReturn(new ArrayList<>());
 		
 		assertFalse(reader.doPageRead().hasNext());
 		

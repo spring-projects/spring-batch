@@ -188,11 +188,11 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	@SuppressWarnings("unchecked")
 	protected Iterator<T> doPageRead() {
 		if (queryString != null) {
-			Pageable pageRequest = new PageRequest(page, pageSize, sort);
+			Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 	
 			String populatedQuery = replacePlaceholders(queryString, parameterValues);
 	
-			Query mongoQuery = null;
+			Query mongoQuery;
 	
 			if(StringUtils.hasText(fields)) {
 				mongoQuery = new BasicQuery(populatedQuery, fields);
@@ -214,7 +214,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 			}
 			
 		} else {
-			Pageable pageRequest = new PageRequest(page, pageSize);
+			Pageable pageRequest = PageRequest.of(page, pageSize);
 			query.with(pageRequest);
 			
 			if(StringUtils.hasText(collection)) {
@@ -239,10 +239,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		if (queryString != null) {
 			Assert.state(sort != null, "A sort is required.");
 		}
-		if (query != null) {
-			Assert.state(query.getSortObject() != null, "A Sort in Query object is required.");
-		}
-		
+
 		if (query != null && query.getLimit() != 0) {
 			log.warn("PageSize in Query object was ignored. Please set it by MongoItemReader.setPageSize().");
 		}
