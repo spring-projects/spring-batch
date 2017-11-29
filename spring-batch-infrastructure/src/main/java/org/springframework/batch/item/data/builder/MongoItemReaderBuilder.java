@@ -22,7 +22,9 @@ import java.util.Map;
 import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link MongoItemReader}
@@ -34,7 +36,7 @@ import org.springframework.util.Assert;
 public class MongoItemReaderBuilder<T> {
 	private MongoOperations template;
 
-	private String query;
+	private String jsonQuery;
 
 	private Class<? extends T> targetType;
 
@@ -57,6 +59,8 @@ public class MongoItemReaderBuilder<T> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
+
+	private Query query;
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -129,16 +133,16 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A JSON formatted MongoDB query. Parameterization of the provided query is allowed
+	 * A JSON formatted MongoDB jsonQuery. Parameterization of the provided jsonQuery is allowed
 	 * via ?&lt;index&gt; placeholders where the &lt;index&gt; indicates the index of the
 	 * parameterValue to substitute.
 	 *
-	 * @param query JSON formatted Mongo query
+	 * @param query JSON formatted Mongo jsonQuery
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setQuery(String)
 	 */
-	public MongoItemReaderBuilder<T> query(String query) {
-		this.query = query;
+	public MongoItemReaderBuilder<T> jsonQuery(String query) {
+		this.jsonQuery = query;
 
 		return this;
 	}
@@ -238,6 +242,20 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Provide a Spring Data Mongo {@link Query}.  This will take precidence over a JSON
+	 * configured query.
+	 *
+	 * @param query Query to execute
+	 * @return this instance for method chaining
+	 * @see MongoItemReader#setQuery(Query)
+	 */
+	public MongoItemReaderBuilder<T> query(Query query) {
+		this.query = query;
+
+		return this;
+	}
+
+	/**
 	 * Validates and builds a {@link MongoItemReader}.
 	 *
 	 * @return a {@link MongoItemReader}
@@ -248,18 +266,25 @@ public class MongoItemReaderBuilder<T> {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
 		Assert.notNull(this.targetType, "targetType is required.");
-		Assert.notNull(this.query, "query is required.");
-		Assert.notNull(this.sorts, "sorts map is required.");
+		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
+
+		if(StringUtils.hasText(this.jsonQuery)) {
+			Assert.notNull(this.sorts, "sorts map is required.");
+		}
+		else {
+			Assert.state(this.query.getLimit() != 0, "PageSize in Query object was ignored.");
+		}
 
 		MongoItemReader<T> reader = new MongoItemReader<>();
 		reader.setTemplate(this.template);
 		reader.setTargetType(this.targetType);
-		reader.setQuery(this.query);
+		reader.setQuery(this.jsonQuery);
 		reader.setSort(this.sorts);
 		reader.setHint(this.hint);
 		reader.setFields(this.fields);
 		reader.setCollection(this.collection);
 		reader.setParameterValues(this.parameterValues);
+		reader.setQuery(this.query);
 
 		reader.setPageSize(this.pageSize);
 		reader.setName(this.name);
