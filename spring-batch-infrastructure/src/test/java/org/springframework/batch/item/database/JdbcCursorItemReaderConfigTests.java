@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.item.database;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -25,8 +29,9 @@ import java.sql.ResultSet;
 import javax.sql.DataSource;
 
 import org.junit.Test;
-import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -98,6 +103,41 @@ public class JdbcCursorItemReaderConfigTests {
 						return null;
 					}
 				});
+	}
+
+	@Test
+	public void testOverrideConnectionAutoCommit() throws Exception {
+        boolean initialAutoCommit= false;
+        boolean neededAutoCommit = true;
+
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		when(con.getAutoCommit()).thenReturn(initialAutoCommit);
+		PreparedStatement ps = mock(PreparedStatement.class);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY,
+				ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
+		when(ds.getConnection()).thenReturn(con);
+
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		reader.setDataSource(ds);
+		reader.setSql("select foo from bar");
+		reader.setConnectionAutoCommit(neededAutoCommit);
+
+		// Check "open" outside of a transaction (see AbstractStep#execute())
+		final ExecutionContext ec = new ExecutionContext();
+		reader.open(ec);
+
+		ArgumentCaptor<Boolean> autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
+		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
+		assertEquals(neededAutoCommit, autoCommitCaptor.getValue());
+
+		reset(con);
+		reader.close();
+
+		// Check restored autocommit value
+		autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
+		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
+		assertEquals(initialAutoCommit, autoCommitCaptor.getValue());
 	}
 
 }
