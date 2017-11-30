@@ -102,6 +102,7 @@ import org.springframework.util.Assert;
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Thomas Risberg
+ * @author Michael Minella
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 implements InitializingBean {
@@ -134,9 +135,9 @@ implements InitializingBean {
 
 	private boolean useSharedExtendedConnection = false;
 
-	private Boolean connectionAutoCommit;
+	private boolean connectionAutoCommit;
 
-	private Boolean initialConnectionAutoCommit;
+	private boolean initialConnectionAutoCommit;
 
 	public AbstractCursorItemReader() {
 		super();
@@ -364,18 +365,10 @@ implements InitializingBean {
 	 * Connection / Datasource default configuration.
 	 *
 	 * @param autoCommit value used for {@link Connection#setAutoCommit(boolean)}.
+	 * @since 4.0
 	 */
 	public void setConnectionAutoCommit(boolean autoCommit) {
 		this.connectionAutoCommit = autoCommit;
-	}
-
-	/**
-	 * Return whether "autoCommit" should be overridden for the connection used by the cursor.
-	 *
-	 * @return the "autoCommit" value, or {@code null} if none to be applied.
-	 */
-	public Boolean getConnectionAutoCommit() {
-		return this.connectionAutoCommit;
 	}
 
 	public abstract String getSql();
@@ -402,9 +395,9 @@ implements InitializingBean {
 		JdbcUtils.closeResultSet(this.rs);
 		rs = null;
 		cleanupOnClose();
-		if (this.initialConnectionAutoCommit != null) {
-			this.con.setAutoCommit(initialConnectionAutoCommit);
-		}
+
+		this.con.setAutoCommit(initialConnectionAutoCommit);
+
 		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
 			((ExtendedConnectionDataSourceProxy)dataSource).stopCloseSuppression(this.con);
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -449,8 +442,10 @@ implements InitializingBean {
 			else {
 				this.con = dataSource.getConnection();
 			}
-			if (this.connectionAutoCommit != null && this.con.getAutoCommit() != this.connectionAutoCommit) {
-				this.initialConnectionAutoCommit = this.con.getAutoCommit();
+
+			this.initialConnectionAutoCommit = this.con.getAutoCommit();
+
+			if (this.con.getAutoCommit() != this.connectionAutoCommit) {
 				this.con.setAutoCommit(this.connectionAutoCommit);
 			}
 		}
