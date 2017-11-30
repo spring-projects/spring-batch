@@ -135,7 +135,7 @@ implements InitializingBean {
 
 	private boolean useSharedExtendedConnection = false;
 
-	private boolean connectionAutoCommit;
+	private Boolean connectionAutoCommit;
 
 	private boolean initialConnectionAutoCommit;
 
@@ -396,7 +396,9 @@ implements InitializingBean {
 		rs = null;
 		cleanupOnClose();
 
-		this.con.setAutoCommit(initialConnectionAutoCommit);
+		if(this.con != null) {
+			this.con.setAutoCommit(this.initialConnectionAutoCommit);
+		}
 
 		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
 			((ExtendedConnectionDataSourceProxy)dataSource).stopCloseSuppression(this.con);
@@ -445,7 +447,7 @@ implements InitializingBean {
 
 			this.initialConnectionAutoCommit = this.con.getAutoCommit();
 
-			if (this.con.getAutoCommit() != this.connectionAutoCommit) {
+			if (this.connectionAutoCommit != null && this.con.getAutoCommit() != this.connectionAutoCommit) {
 				this.con.setAutoCommit(this.connectionAutoCommit);
 			}
 		}
