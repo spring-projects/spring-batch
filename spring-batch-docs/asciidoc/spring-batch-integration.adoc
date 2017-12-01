@@ -794,7 +794,7 @@ public MessagingTemplate messagingTemplate() {
 }
 
 @Bean
-@StepScope()
+@StepScope
 public ChunkMessageChannelItemWriter itemWriter() {
     ChunkMessageChannelItemWriter chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter();
     chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate());
