@@ -526,9 +526,8 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	/**
 	 * Subclasses can override to customize the STAX result.
 	 * @return a result for writing to
-	 * @throws Exception
 	 */
-	protected Result createStaxResult() throws Exception {
+	protected Result createStaxResult() {
 		return StaxUtils.getResult(eventWriter);
 	}
 
@@ -729,7 +728,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * @throws XmlMappingException
 	 */
 	@Override
-	public void write(List<? extends T> items) throws XmlMappingException, Exception {
+	public void write(List<? extends T> items) throws XmlMappingException, IOException {
 
 		currentRecordCount += items.size();
 

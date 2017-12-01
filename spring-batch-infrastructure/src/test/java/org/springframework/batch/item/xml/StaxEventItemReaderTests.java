@@ -662,7 +662,7 @@ public class StaxEventItemReaderTests {
 
 			List<XMLEvent> fragmentContent;
 			try {
-				XMLEventReader eventReader = StaxUtils.getXmlEventReader(source);
+				XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source);
 
 				// first event should be StartDocument
 				XMLEvent event1 = eventReader.nextEvent();
