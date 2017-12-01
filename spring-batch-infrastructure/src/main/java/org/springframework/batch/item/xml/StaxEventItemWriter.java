@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -751,7 +751,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * 
 	 * @param items the value object
 	 *
-	 * @throws Exception thrown if general error occurs.
+	 * @throws IOException thrown if general error occurs.
 	 * @throws XmlMappingException thrown if error occurs during XML Mapping.
 	 */
 	@Override
@@ -775,13 +775,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 				channel.force(false);
 			}			
 		}
-		catch (XMLStreamException e) {
+		catch (XMLStreamException | IOException e) {
 			throw new WriteFailedException("Failed to flush the events", e);
 		} 
-		catch (IOException e) {
-			throw new WriteFailedException("Failed to flush the events", e);
-		}
-
 	}
 
 	/**
