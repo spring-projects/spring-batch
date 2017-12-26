@@ -89,7 +89,7 @@
 
     public void write(T item) throws Exception {
         if (isPoisonPill(item)) {
-            throw new PoisonPillException("Posion pill detected: " + item);
+            throw new PoisonPillException("Poison pill detected: " + item);
        }
     }
 
