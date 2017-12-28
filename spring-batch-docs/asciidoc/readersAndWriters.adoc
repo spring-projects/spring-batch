@@ -5,7 +5,9 @@
 [[readersAndWriters]]
 == ItemReaders and ItemWriters
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 All batch processing can be described in its most simple form as reading in large amounts
 of data, performing some type of calculation or transformation, and writing the result
