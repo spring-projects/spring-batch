@@ -38,8 +38,8 @@ import org.springframework.util.Assert;
  * If the cursor of a stax-StaxXmlPathReader is at a position in the document then the started elements form a stack of
  * QName element names that are currently open.
  * <p>
- * At the starttag of a element, the element QName is pushed at the top of the stack. At the endtag the element is closed
- * and disappears with a pop from the stack
+ * At the starttag of a element, the element QName is pushed at the top of the stack. At the endtag the element is
+ * closed and disappears with a pop from the stack
  * <p>
  * Attributes nodes push and pop the attribute name with the prefix {@literal @} to the stack.
  * <p>
@@ -75,7 +75,7 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 	protected static final String THE_CURRENT_SHOULD_NOT_BE_NULL = "The current should not be null";
 
 	protected static final String THE_SETTER_SHOULD_NOT_BE_NULL = "The setter should not be null";
-	
+
 	protected static final Logger log = LoggerFactory.getLogger(ValuesAndAttributesContainer.class);
 
 	private static final long serialVersionUID = 773837341597279034L;
@@ -106,16 +106,14 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 	public CurrentObject getCurrent() {
 		return current;
 	}
-	
+
 	protected ValueContainer getValueMap() {
 		return valueContainer;
 	}
-	
+
 	protected AttributeContainer getAttributeMap() {
 		return attributeContainer;
 	}
-
-	
 
 	/**
 	 * create a path, that represent the current state of the stack, as a String, with delimiter {@literal /}
@@ -131,7 +129,6 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 		}
 		return new XmlElementPath(qNames);
 	}
-
 
 	/**
 	 * Add a @{Value} to a path of XML Elements
@@ -156,7 +153,6 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 		attributeWithValueContainer.put(attributeWithValue);
 	}
 
-	
 	/**
 	 * push a element name on the stack, calls a push method of a Value if it exists
 	 * 
@@ -235,7 +231,7 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 	 * call a setter for a attribute in a XML document
 	 * 
 	 * @param name the name of the XML attribute
-	 * @param value the object to that the {@link Attribute} will be set 
+	 * @param value the object to that the {@link Attribute} will be set
 	 */
 	public void setAttribute(String name, String value) {
 		Assert.hasText(name, THE_ITEM_SHOULD_NOT_BE_EMPTY);
@@ -255,26 +251,24 @@ public class ValuesAndAttributesBag extends ArrayDeque<QName> {
 		attributeContainer.setValue(path, value);
 	}
 
-
-	
 	protected Value checkArguments(XmlElementPath valuePath, XmlElementPath attributePath, String field) {
 		Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
 		Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
 		Assert.hasText(field, THE_FIELD_SHOULD_NOT_BE_EMPTY);
-		
+
 		checkName(valuePath);
 		return checkValue(valuePath);
 	}
-	
+
 	private Object checkName(XmlElementPath valueName) {
-		
+
 		Object o = valueContainer.searchTheBestMatchingEntity(valueName);
 		if (o == null) {
 			throw new IllegalArgumentException("Value " + valueName + " ist nicht vorhanden");
 		}
 		return o;
 	}
-	
+
 	protected Value checkValue(XmlElementPath valueName) {
 		return valueContainer.searchTheBestMatchingEntity(valueName);
 	}

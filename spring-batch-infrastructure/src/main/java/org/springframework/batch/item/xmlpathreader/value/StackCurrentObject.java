@@ -25,22 +25,19 @@ import org.slf4j.LoggerFactory;
 /**
  * A CurrentObject that is based on a Stack
  * <p>
- * If the path of a {@link org.springframework.batch.item.xmlpathreader.value.Value} is relative, then
- * the creation of the object for the XML can be recursive.
- * {@code
+ * If the path of a {@link org.springframework.batch.item.xmlpathreader.value.Value} is relative, then the creation of
+ * the object for the XML can be recursive. {@code
  *   <a name="A">
  *      <a name="B">
  *         <a name="C">
  *         </a>
  *      </a>
  *   </a>
- * }
- * <code><br><br>  
+ * } <code><br><br>  
  *  {@literal @}XmlPath(path = "a")<br>
  * public class Child {<br><br>
- *               </code> 
- * creates three Child objects that are recursive created. They are pushed on a CurrentObject that is a stack. 
- * Only the one on the top, the current object is in active use.
+ *               </code> creates three Child objects that are recursive created. They are pushed on a CurrentObject that
+ * is a stack. Only the one on the top, the current object is in active use.
  * @author Thomas Nill
  * @since 4.0.1
  * @see Stack
@@ -58,7 +55,7 @@ public class StackCurrentObject implements CurrentObject {
 		super();
 		current = new ArrayDeque<>();
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return current.isEmpty();

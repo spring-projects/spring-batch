@@ -20,8 +20,8 @@ import org.springframework.batch.item.xmlpathreader.path.PathEntryContainer;
 import org.springframework.batch.item.xmlpathreader.path.XmlElementPath;
 
 /**
- * The ValueContainer contains Value Objects of the different XmlElementPath paths. Its a set of
- * Values. It connects the path, with the Value.
+ * The ValueContainer contains Value Objects of the different XmlElementPath paths. Its a set of Values. It connects the
+ * path, with the Value.
  * 
  * 
  * @author Thomas Nill

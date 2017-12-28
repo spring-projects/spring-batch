@@ -21,8 +21,8 @@ package org.springframework.batch.item.xmlpathreader.attribute;
  * @author Thomas Nill
  * @since 4.0.1
  * 
- * @param <T> a tape of the objects with will be set 
- * @param <V> the type of the parameters 
+ * @param <T> a tape of the objects with will be set
+ * @param <V> the type of the parameters
  * @see Setter
  */
 @FunctionalInterface

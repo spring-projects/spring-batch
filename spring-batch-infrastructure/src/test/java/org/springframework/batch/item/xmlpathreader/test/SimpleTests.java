@@ -136,7 +136,6 @@ public class SimpleTests {
 		assertEquals(e, new XmlElementPath(parts));
 	}
 
-
 	/**
 	 * Tests XmlElementPath.startsWith
 	 */
@@ -196,7 +195,7 @@ public class SimpleTests {
 	/**
 	 * Tests XmlElementPath.parent
 	 */
-	
+
 	@Test
 	public void testXmlElementPath_parent() {
 		XmlElementPath child = new XmlElementPath("/a/b/cc");
@@ -280,7 +279,7 @@ public class SimpleTests {
 		CurrentObject current = new SimpleCurrentObject();
 		Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current, new SimpleCurrentObject());
 		// no value.push() create a value for /value
-		
+
 		ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
 		Attribute action = container.createAttribute(value, new XmlElementPath("/value/first"), "Name");

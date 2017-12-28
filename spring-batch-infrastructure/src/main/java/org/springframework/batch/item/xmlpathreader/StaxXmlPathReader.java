@@ -34,8 +34,8 @@ import org.springframework.batch.item.xmlpathreader.value.ValueContainer;
 import org.springframework.util.Assert;
 
 /**
- * The StaxXmlPathReader emit the Objects of the configured Classes. If a end -tag is reached 
- * the next method, emits a instance of the class of this element
+ * The StaxXmlPathReader emit the Objects of the configured Classes. If a end -tag is reached the next method, emits a
+ * instance of the class of this element
  * 
  * The reader must be configured before it is used.
  * 
@@ -59,14 +59,13 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 
 	private ValuesAndAttributesContainer valuesAndAttributesContainer;
 
-
 	/**
 	 * Constructor of an uninitialized StaxXmlPathReader
 	 * 
 	 */
 	public StaxXmlPathReader() {
 		super();
-		valuesAndAttributesContainer = new ValuesAndAttributesContainer(new SimpleCurrentObject(),new ValueContainer());
+		valuesAndAttributesContainer = new ValuesAndAttributesContainer(new SimpleCurrentObject(), new ValueContainer());
 	}
 
 	/**
@@ -100,7 +99,7 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 	/**
 	 * Add the creation of a class instance to a path of XML Elements
 	 * 
-	 * @param valuePath path of XML Element, at which the {@link Value} object will be created 
+	 * @param valuePath path of XML Element, at which the {@link Value} object will be created
 	 * @param clazz class of the generated instance
 	 * @return a {@link Value}
 	 */
@@ -127,7 +126,6 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 		return valuesAndAttributesContainer.addValue(valuePath, clazz, creator);
 	}
 
-
 	/**
 	 * Create a {@link CreatorValue}
 	 * 
@@ -144,12 +142,11 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 		return addValue(new XmlElementPath(valuePath), clazz, creator);
 	}
 
-	
 	/**
 	 * Delagate to an AttributeWithValueContainer
 	 * 
 	 * @param valuePath the path of XML elements to the object instance, that will be set
-	 * @param attributePath the path of XML elements witch text-value, set the {@link Value} attribute 
+	 * @param attributePath the path of XML elements witch text-value, set the {@link Value} attribute
 	 * @param field the name of the setter Method
 	 * @return an {@link Attribute}
 	 */
@@ -161,8 +158,8 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 		return valuesAndAttributesContainer.addAttribute(valuePath, attributePath, field);
 	}
 
-	/**------
-	 * create a Attribute from a Setter
+	/**
+	 * ------ create a Attribute from a Setter
 	 * 
 	 * @param <T> the type of the value
 	 * @param <V> the type of the attribute
@@ -183,9 +180,9 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 	 * 
 	 * @param <T> the type of the value
 	 * @param <V> the type of the attribute
-	 * @param valuePath      the path of XML elements to the object instance, that will be set
-	 * @param attributePath  the path of XML elements witch text-value, set the {@link Value} object
-	 * @param handle         the Setter that is setting the attribute
+	 * @param valuePath the path of XML elements to the object instance, that will be set
+	 * @param attributePath the path of XML elements witch text-value, set the {@link Value} object
+	 * @param handle the Setter that is setting the attribute
 	 * @return an {@link Attribute}
 	 */
 	public <T, V> Attribute addAttribute(String valuePath, String attributePath, Setter<T, V> handle) {
@@ -195,11 +192,10 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 		return addAttribute(new XmlElementPath(valuePath), new XmlElementPath(attributePath), handle);
 	}
 
-	
 	/**
 	 * Created Object for a Class, perhaps it is not fully instantiated
 	 *
-	 * @param valuePath  the path of XML elements to the object instance, that will be get
+	 * @param valuePath the path of XML elements to the object instance, that will be get
 	 * @return the current object of the {@link Value}
 	 */
 	public Object getValueObject(XmlElementPath valuePath) {
@@ -212,7 +208,7 @@ public class StaxXmlPathReader extends BasisReader implements ItemReader<Object>
 	 * Created Object for a Class, perhaps it is not fully instantiated with a Exception if the value or Object does not
 	 * exist
 	 * 
-	 * @param valuePath  the path of XML elements to the object instance, that will be get
+	 * @param valuePath the path of XML elements to the object instance, that will be get
 	 * @return the current object of the {@link Value}
 	 */
 	public Object getValueObjectWithException(XmlElementPath valuePath) {

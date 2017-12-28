@@ -41,7 +41,7 @@ public class ReaderRuntimeException extends RuntimeException {
 	/**
 	 * Constructor
 	 * 
-	 * @param message the message the explains the exception 
+	 * @param message the message the explains the exception
 	 * @param cause the cause of the exception
 	 */
 	public ReaderRuntimeException(String message, Throwable cause) {

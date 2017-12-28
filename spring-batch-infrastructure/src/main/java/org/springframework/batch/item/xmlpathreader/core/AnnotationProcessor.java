@@ -29,16 +29,21 @@ import org.springframework.util.Assert;
 /**
  * Processor for the XmlPath annotations
  * <ul>
- * <li>The annotation of a class is transformed to an object fabric of type {@link org.springframework.batch.item.xmlpathreader.value.ClassValue}</li> 
- * <li>The static methods of a class are transformed to an object fabric of type {@link org.springframework.batch.item.xmlpathreader.value.StaticMethodValue}</li>
- * <li>The annotation of a setter transforms to an implementation of the interface {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute}</li>
+ * <li>The annotation of a class is transformed to an object fabric of type
+ * {@link org.springframework.batch.item.xmlpathreader.value.ClassValue}</li>
+ * <li>The static methods of a class are transformed to an object fabric of type
+ * {@link org.springframework.batch.item.xmlpathreader.value.StaticMethodValue}</li>
+ * <li>The annotation of a setter transforms to an implementation of the interface
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute}</li>
  * </ul>
- * The rules for the annotation of a setter depends on the type of the parameter of the setter Method.
- * If the type of the parameter is a
+ * The rules for the annotation of a setter depends on the type of the parameter of the setter Method. If the type of
+ * the parameter is a
  * <ul>
- * <li>String then create a {@link org.springframework.batch.item.xmlpathreader.attribute.MethodAttribute}</li> 
- * <li>is a class with a corresponding Adapter in {@link org.springframework.batch.item.xmlpathreader.adapters} then create a {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithAdapter}</li>
- * <li>if the class has a {@literal @}XmlPath annotation then create a  {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithValue}</li>
+ * <li>String then create a {@link org.springframework.batch.item.xmlpathreader.attribute.MethodAttribute}</li>
+ * <li>is a class with a corresponding Adapter in {@link org.springframework.batch.item.xmlpathreader.adapters} then
+ * create a {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithAdapter}</li>
+ * <li>if the class has a {@literal @}XmlPath annotation then create a
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithValue}</li>
  * </ul>
  *
  * @author Thomas Nill
@@ -73,7 +78,7 @@ public class AnnotationProcessor {
 	/**
 	 * Process a single class
 	 * 
-	 * @param container  container that will be used and changed
+	 * @param container container that will be used and changed
 	 * @param clazz a class with {@link XmlPath} annotations
 	 */
 	public void processClass(ValuesAndAttributesContainer container, Class<?> clazz) {

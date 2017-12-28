@@ -49,7 +49,7 @@ public class XmlTests {
 
 	private static final String CHILDS_XML = RESOURCES + "childs.xml";
 
-	private static final String WRONG_XML = RESOURCES + "wrongChilds.xmlw";
+	private static final String WRONG_XML = RESOURCES + "wrongChilds.xml";
 
 	private static final String CHILDSANDCITY_XML = RESOURCES + "childsAndCity.xml";
 
@@ -133,7 +133,6 @@ public class XmlTests {
 
 	}
 
-
 	/**
 	 * Tests if the {@link StaxXmlPathReader} can read in the correct object and attribute from a file
 	 */
@@ -190,8 +189,8 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can read in the correct object and attribute of a superclass from a file
-	 * [{@link TObject}, {@link TSuper}
+	 * Tests if the {@link StaxXmlPathReader} can read in the correct object and attribute of a superclass from a file [
+	 * {@link TObject}, {@link TSuper}
 	 */
 	@Test
 	public void readerWithSuperClass() {
@@ -219,8 +218,8 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can read in the correct object and attribute from a file
-	 * if two attributes have the same name
+	 * Tests if the {@link StaxXmlPathReader} can read in the correct object and attribute from a file if two attributes
+	 * have the same name
 	 */
 	@Test
 	public void readerNoAttributNameConflict() {
@@ -383,8 +382,7 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML
-	 * with {@link Child} 
+	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML with {@link Child}
 	 */
 	@Test
 	public void readChilds() {
@@ -415,8 +413,8 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML
-	 * with {@link Creator} and {@link Setter} initialization of the reader. 
+	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML with {@link Creator} and {@link Setter}
+	 * initialization of the reader.
 	 */
 	@Test
 	public void readChildsWithCreatorAndSetter() {
@@ -449,8 +447,7 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML
-	 * with {@link LinkChild} 
+	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDS_XML with {@link LinkChild}
 	 */
 	@Test
 	public void readLinkChilds() {
@@ -480,10 +477,9 @@ public class XmlTests {
 
 	}
 
-
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDSANDCITY_XML
-	 * with {@link LinkChild} and {@link City}
+	 * Tests if the {@link StaxXmlPathReader} can correctly read CHILDSANDCITY_XML with {@link LinkChild} and
+	 * {@link City}
 	 */
 	@Test
 	public void readLinkChildsAndCity() {
@@ -534,8 +530,8 @@ public class XmlTests {
 	}
 
 	/**
-	 * Tests if the {@link StaxXmlPathReader} can correctly read DEEPCHILDS_XML
-	 * with {@link DeepChild} and {@link DeepCity}
+	 * Tests if the {@link StaxXmlPathReader} can correctly read DEEPCHILDS_XML with {@link DeepChild} and
+	 * {@link DeepCity}
 	 */
 	@Test
 	public void readDeepChildsAndCity() {

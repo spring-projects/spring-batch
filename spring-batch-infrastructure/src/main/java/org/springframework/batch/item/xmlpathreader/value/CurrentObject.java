@@ -26,7 +26,7 @@ package org.springframework.batch.item.xmlpathreader.value;
  *
  */
 public interface CurrentObject {
-	
+
 	/**
 	 * Is there a current Object?
 	 * 

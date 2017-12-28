@@ -40,7 +40,7 @@ public class StaticMethodValue extends Value {
 
 	/**
 	 * Constructor
-     *
+	 *
 	 * @param path the path to the {@link Value}
 	 * @param clazz the clazz of the objects that are created
 	 * @param current the global {@link CurrentObject}

@@ -26,12 +26,11 @@ package org.springframework.batch.item.xmlpathreader.value;
 public class SimpleCurrentObject implements CurrentObject {
 	private Object current;
 
-	
 	@Override
 	public boolean isEmpty() {
 		return current == null;
 	}
-	
+
 	/**
 	 * emit the next value
 	 * 
@@ -48,6 +47,7 @@ public class SimpleCurrentObject implements CurrentObject {
 	public void pushCurrentObject(Object current) {
 		this.current = current;
 	}
+
 	@Override
 	public Object peekCurrentObject() {
 		return current;

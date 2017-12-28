@@ -23,12 +23,13 @@ import javax.xml.namespace.QName;
 import org.springframework.util.Assert;
 
 /**
- * The Path of XML Elements. 
+ * The Path of XML Elements.
  * <p>
- * If a cursor run through a XML file at every position it pick a path through the current
- * active elements. The path is a ordered list of QName of the xml elements.
+ * If a cursor run through a XML file at every position it pick a path through the current active elements. The path is
+ * a ordered list of QName of the xml elements.
  * <p>
  * In a xml structure eg
+ * 
  * <pre>
  * {@code
  * <a>
@@ -39,13 +40,14 @@ import org.springframework.util.Assert;
  * </a>
  * }
  * </pre>
+ * 
  * the document begins with the path /a, then change to /a/b then expands to /a/b/c then reduces to /a/b then reduces
  * again to /a.
  * <p>
  * An attribute has a path like /a/b/c/{@literal @}name.
  * <p>
- * A path can be absolute, with a leading {@literal /} or is otherwise relative.
- * Relative paths describe potential recursive creation of objects.
+ * A path can be absolute, with a leading {@literal /} or is otherwise relative. Relative paths describe potential
+ * recursive creation of objects.
  * 
  * 
  * @author Thomas Nill
@@ -57,9 +59,10 @@ public class XmlElementPath {
 	private static final String THE_PATH_SHOULD_NOT_BE_NULL = "The path should not be null";
 
 	/**
-	 * The path as a String eg: "/a", "/a/b", "a/b", "a" 
+	 * The path as a String eg: "/a", "/a/b", "a/b", "a"
 	 */
 	private String path;
+
 	/**
 	 * The path as a array of QName
 	 */
@@ -100,7 +103,6 @@ public class XmlElementPath {
 		this.path = path.path;
 		this.parts = path.parts;
 	}
-
 
 	private String[] splitInStrings(String path) {
 		String splitPath = ignoreFirstSlash(path);
@@ -200,7 +202,6 @@ public class XmlElementPath {
 		return builder.toString();
 	}
 
-
 	/**
 	 * is a absolute path example: /a/b/c
 	 * 
@@ -225,14 +226,13 @@ public class XmlElementPath {
 	 */
 	public XmlElementPath parent() {
 		Assert.notNull(path, THE_PATH_SHOULD_NOT_BE_NULL);
-		
+
 		int lastIndex = this.path.lastIndexOf('/');
 		if (lastIndex >= 0) {
 			return new XmlElementPath(this.path.substring(0, lastIndex));
 		}
 		return null;
 	}
-
 
 	/**
 	 * concatenation of paths
@@ -270,7 +270,7 @@ public class XmlElementPath {
 	/**
 	 * starts with this XmlElementPath Example /a/b/c starts with /a or /a/b or /a/b/c
 	 * 
-	 * @param path the parameter path 
+	 * @param path the parameter path
 	 * @return starts the path with the parameter path
 	 */
 	public boolean startsWith(XmlElementPath path) {
@@ -308,16 +308,16 @@ public class XmlElementPath {
 	}
 
 	/**
-	 * This compare is asymmetric, because perhapsWithoutNamespace came from the class annotations and
-	 * withNameSpace came from the StaxReader in the XML.
+	 * This compare is asymmetric, because perhapsWithoutNamespace came from the class annotations and withNameSpace
+	 * came from the StaxReader in the XML.
 	 * 
 	 * If the annotation has no namespace, it should be equal to a XML element with the default namespace of the
 	 * document. If the annotation has a prefix, it should not be equal to a any XML element with another prefix or no
 	 * prefix.
 	 * 
-	 * @param perhapsWithoutNamespace a QName probably without the namespace part 
+	 * @param perhapsWithoutNamespace a QName probably without the namespace part
 	 * @param withNameSpace a QName probably with a namespace part
-	 * @return are the QNames match 
+	 * @return are the QNames match
 	 */
 	private static boolean asymmetricCompare(QName perhapsWithoutNamespace, QName withNameSpace) {
 		String nsW = withNameSpace.getNamespaceURI();
@@ -373,6 +373,5 @@ public class XmlElementPath {
 		result = prime * result + Arrays.hashCode(parts);
 		return prime * result + ((path == null) ? 0 : path.hashCode());
 	}
-
 
 }

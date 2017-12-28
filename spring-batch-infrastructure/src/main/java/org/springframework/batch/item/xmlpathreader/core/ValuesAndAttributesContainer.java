@@ -43,8 +43,8 @@ import org.springframework.batch.item.xmlpathreader.value.ValueContainer;
 import org.springframework.util.Assert;
 
 /**
- * A Container of the Element Names in a XML document
- * There a creation methods for the different types of Value and @Attribute classes.
+ * A Container of the Element Names in a XML document There a creation methods for the different types of Value and @Attribute
+ * classes.
  * @author Thomas Nill
  * @since 4.0.1
  * @see Value
@@ -52,7 +52,6 @@ import org.springframework.util.Assert;
  */
 
 public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
-	
 
 	/**
 	 * constructor with a empty configuration
@@ -76,7 +75,7 @@ public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
 	/**
 	 * Add the creation of a class instance to a path of XML Elements
 	 * 
-	 * @param valuePath path of XML Elements 
+	 * @param valuePath path of XML Elements
 	 * @param clazz class of the generated instance
 	 * @param creator the {@link Creator} that is used
 	 * @return a {@link Value}
@@ -138,7 +137,7 @@ public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
 	 * @param field the name of the setter Method
 	 * @return an {@link Attribute}
 	 */
-	public Attribute  addRelativAttribute(XmlElementPath valuePath, XmlElementPath attributePath, String field) {
+	public Attribute addRelativAttribute(XmlElementPath valuePath, XmlElementPath attributePath, String field) {
 		Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
 		Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
 		Assert.hasText(field, THE_FIELD_SHOULD_NOT_BE_EMPTY);
@@ -150,7 +149,7 @@ public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
 	 * Add the setXXXX setter to a path of XML Elements
 	 * 
 	 * @param valuePath the path of XML elements to the object instance, that will be set
-	 * @param attributePath the absolute path of XML elements to a text-value, for the attribute parameter  
+	 * @param attributePath the absolute path of XML elements to a text-value, for the attribute parameter
 	 * @param field (the name of the setter Method)
 	 * @return an {@link Attribute}
 	 */
@@ -182,12 +181,11 @@ public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
 		Assert.notNull(value, THE_VALUE_SHOULD_NOT_BE_NULL);
 		Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
 		Assert.notNull(handle, THE_SETTER_SHOULD_NOT_BE_NULL);
-    
+
 		Attribute attribute = new SetterAttribute(attributePath, handle, value);
 		addAttribute(attribute);
 		return attribute;
 	}
-
 
 	/**
 	 * create SetAction from a Setter
@@ -203,17 +201,16 @@ public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
 		Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
 		Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
 		Assert.notNull(handle, THE_SETTER_SHOULD_NOT_BE_NULL);
-        Value value = checkValue(valuePath);
+		Value value = checkValue(valuePath);
 		return addAttribute(value, valuePath.concat(attributePath), handle);
 	}
 
-	
 	/**
 	 * create a Attribute form a method name
 	 * 
 	 * @param value the [@link Value} that is set
 	 * @param valuePath the path to the value
-	 * @param fieldName the name of the property that will be set 
+	 * @param fieldName the name of the property that will be set
 	 * 
 	 * @return an {@link Attribute}
 	 */

@@ -24,12 +24,12 @@ import org.springframework.batch.item.xmlpathreader.path.XmlElementPathEntry;
 import org.springframework.util.Assert;
 
 /**
- * A Value holds a instance of a class. In the push method, this instance is generated and in the pop method this
- * object is transfered to the CurrentObject.
- * The Value uses implementations of {@link org.springframework.batch.item.xmlpathreader.value.CurrentObject}.
- * If the path of the Value is absolute, the objectValue is a {@link org.springframework.batch.item.xmlpathreader.value.SimpleCurrentObject}
- * that holds only one object. If the path is relative, then there can be recursive creation of objects and the 
- * objectValue is a {@link org.springframework.batch.item.xmlpathreader.value.StackCurrentObject}
+ * A Value holds a instance of a class. In the push method, this instance is generated and in the pop method this object
+ * is transfered to the CurrentObject. The Value uses implementations of
+ * {@link org.springframework.batch.item.xmlpathreader.value.CurrentObject}. If the path of the Value is absolute, the
+ * objectValue is a {@link org.springframework.batch.item.xmlpathreader.value.SimpleCurrentObject} that holds only one
+ * object. If the path is relative, then there can be recursive creation of objects and the objectValue is a
+ * {@link org.springframework.batch.item.xmlpathreader.value.StackCurrentObject}
  * @author Thomas Nill
  * @since 4.0.1
  * @see CurrentObject
@@ -60,7 +60,7 @@ public abstract class Value extends XmlElementPathEntry {
 	 * 
 	 * @param path the path to the {@link Value}
 	 * @param clazz the clazz of the objects that are created
-	 * @param current the global {@link CurrentObject}	 
+	 * @param current the global {@link CurrentObject}
 	 * @param objectValue the {@link CurrentObject} that is used to hold the created objects
 	 */
 	public Value(XmlElementPath path, Class<?> clazz, CurrentObject current, CurrentObject objectValue) {

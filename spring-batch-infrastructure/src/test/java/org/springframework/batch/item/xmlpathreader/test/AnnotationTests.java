@@ -65,9 +65,9 @@ public class AnnotationTests {
 		}
 	}
 
-/**
- * 	{@link TWrongFunctionParameterCountAnnotated} has a method with two parameters annotated
- */
+	/**
+	 * {@link TWrongFunctionParameterCountAnnotated} has a method with two parameters annotated
+	 */
 	@Test
 	public void wrongFunctionParameterCountName() {
 		try {
@@ -80,7 +80,7 @@ public class AnnotationTests {
 	}
 
 	/**
-	 * 	{@link TWrongStaticFunctionParameterCountAnnotated} has a method with two parameters annotated
+	 * {@link TWrongStaticFunctionParameterCountAnnotated} has a method with two parameters annotated
 	 */
 
 	@Test
@@ -95,8 +95,8 @@ public class AnnotationTests {
 	}
 
 	/**
-	 * {@link TWrongStaticFunctionReturnWrongTypeAnnotated} has a static method that return Double annotated,
-	 * but it should be TWrongStaticFunctionReturnWrongTypeAnnotated  
+	 * {@link TWrongStaticFunctionReturnWrongTypeAnnotated} has a static method that return Double annotated, but it
+	 * should be TWrongStaticFunctionReturnWrongTypeAnnotated
 	 */
 	@Test
 	public void wrongStaticFunctionReturnType() {

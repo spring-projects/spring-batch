@@ -22,50 +22,49 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * XmlPath annotation to mark the connection between xml paths and properties of classes. 
+ * XmlPath annotation to mark the connection between xml paths and properties of classes.
  * <p>
- * With this annotation you can annotate 
+ * With this annotation you can annotate
  * <ul>
- *  <li>a class</li> 
- *  <li>a static method of a class without parameters</li>
- *  <li>a setMethod of a property</li>
+ * <li>a class</li>
+ * <li>a static method of a class without parameters</li>
+ * <li>a setMethod of a property</li>
  * </ul>
  * <p>
  * Examples:
  * <ul>
- *  <li>a class <code><br><br>  
+ * <li>a class <code><br><br>  
  *  {@literal @}XmlPath(path = "child")<br>
  * public class Child {<br><br>
- *               </code> </li> 
- *  <li>a static method of a class without parameters
- *    <code> <br><br>
+ *               </code></li>
+ * <li>a static method of a class without parameters <code> <br><br>
  * 
  *  {@literal @}XmlPath(path = "/D")<br>
- *	public static TStaticAnnotated namedThomas() {<br>
- *	    TStaticAnnotated o = new TStaticAnnotated();<br>
- *	    o.setVorName("Thomas");<br>
- *	    return o;<br>
+ * 	public static TStaticAnnotated namedThomas() {<br>
+ * 	    TStaticAnnotated o = new TStaticAnnotated();<br>
+ * 	    o.setVorName("Thomas");<br>
+ * 	    return o;<br>
  * 	} <br><br>
-
  *     </code></li>
- *  <li>a setMethod of a property<code><br><br>
+ * <li>a setMethod of a property<code><br><br>
  *  {@literal @}XmlPath(path = "name")<br>
  *  public void setName(String name) {<br>
  *      this.name = name;<br>
  *  }<br>
- *  <br></code>
- *  </li>
+ *  <br></code></li>
  * </ul>
  * 
  * <p>
  * The annotation is processed with {@link org.springframework.batch.item.xmlpathreader.core.AnnotationProcessor}
  * 
  * <ul>
- * <li>The annotation of a class is transformed to an object fabric of type {@link org.springframework.batch.item.xmlpathreader.value.ClassValue}</li> 
- * <li>The static methods of a class are transformed to an object fabric of type {@link org.springframework.batch.item.xmlpathreader.value.StaticMethodValue}</li>
- * <li>The annotation of a setter transforms to an implementation of the interface {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute}</li>
+ * <li>The annotation of a class is transformed to an object fabric of type
+ * {@link org.springframework.batch.item.xmlpathreader.value.ClassValue}</li>
+ * <li>The static methods of a class are transformed to an object fabric of type
+ * {@link org.springframework.batch.item.xmlpathreader.value.StaticMethodValue}</li>
+ * <li>The annotation of a setter transforms to an implementation of the interface
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute}</li>
  * </ul>
  * 
  * @author Thomas Nill

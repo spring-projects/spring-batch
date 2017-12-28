@@ -48,25 +48,22 @@ public abstract class BasisReader {
 		super();
 	}
 
-
 	/**
 	 * start to read from a Resource
-	 *  
+	 * 
 	 * @param input the Resource with the XML content
-	 *  
+	 * 
 	 */
 	public void read(Resource input) {
 		Assert.notNull(input, "The resource should not be null");
 		try {
 			read(input.getInputStream());
-		} catch ( IOException e) {
+		}
+		catch (IOException e) {
 			Messages.throwReaderRuntimeException(e, "Runtime.FILE_PROCESSING");
 		}
 	}
 
-
-	
-	
 	/**
 	 * start to read from an InputStream
 	 * 
@@ -79,12 +76,11 @@ public abstract class BasisReader {
 		try {
 			xmlr = xmlif.createXMLStreamReader(inputStream);
 		}
-		catch ( XMLStreamException e) {
+		catch (XMLStreamException e) {
 			Messages.throwReaderRuntimeException(e, "Runtime.FILE_PROCESSING");
 		}
 	}
 
-	
 	/**
 	 * start to read a file
 	 * 
@@ -102,7 +98,6 @@ public abstract class BasisReader {
 		}
 	}
 
-	
 	protected void next(XMLStreamReader xmlr) {
 		switch (xmlr.getEventType()) {
 		case XMLStreamConstants.START_ELEMENT:
@@ -125,7 +120,7 @@ public abstract class BasisReader {
 		}
 
 	}
-	
+
 	/**
 	 * close the stream
 	 * 

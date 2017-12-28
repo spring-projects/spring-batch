@@ -25,8 +25,8 @@ import org.springframework.batch.item.xmlpathreader.value.ValueContainer;
 import org.springframework.util.Assert;
 
 /**
- * Set a property of a class with that has a XmlPath annotation. The property is an object of another class that
- * has a XmlPath annotation too.
+ * Set a property of a class with that has a XmlPath annotation. The property is an object of another class that has a
+ * XmlPath annotation too.
  * @author Thomas Nill
  * @since 4.0.1
  * @see XmlPath

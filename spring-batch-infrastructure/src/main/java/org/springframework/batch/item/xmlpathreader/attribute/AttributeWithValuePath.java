@@ -23,8 +23,8 @@ import org.springframework.batch.item.xmlpathreader.value.Value;
 import org.springframework.util.Assert;
 
 /**
- * The AttributeWithValuePath is a special XmlElementPath. This is a path to an Attribute
- * together with a path to a Value
+ * The AttributeWithValuePath is a special XmlElementPath. This is a path to an Attribute together with a path to a
+ * Value
  * @author Thomas Nill
  * @since 4.0.1
  * @see Attribute
