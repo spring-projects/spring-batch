@@ -1,0 +1,14 @@
+$(document).ready(function(){
+    $("#xmlButton").click(function(){
+        $("*.xmlContent").show();
+        $("*.javaContent").hide();
+    });
+    $("#javaButton").click(function(){
+        $("*.javaContent").show();
+        $("*.xmlContent").hide();
+    });
+    $("#bothButton").click(function(){
+        $("*.javaContent").show();
+        $("*.xmlContent").show();
+    });
+});
