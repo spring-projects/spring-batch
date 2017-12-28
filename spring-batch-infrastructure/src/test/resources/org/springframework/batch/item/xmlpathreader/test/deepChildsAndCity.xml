@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document>
+	<child>
+		<deep>
+			<name>Hans</name>
+			<city>
+				<city>
+					<deep>
+						<name>A</name>
+					</deep>
+				</city>
+			</city>
+			<child>
+				<child>
+					<deep>
+						<name>Thomas</name>
+						<child>
+							<child>
+								<deep>
+									<name>Vera</name>
+									<city>
+										<city>
+											<deep>
+												<name>C</name>
+											</deep>
+										</city>
+									</city>
+									<second>
+										<city>
+											<deep>
+												<name>D</name>
+											</deep>
+										</city>
+									</second>
+								</deep>
+							</child>
+						</child>
+					</deep>
+				</child>
+			</child>
+		</deep>
+	</child>
+</Document>

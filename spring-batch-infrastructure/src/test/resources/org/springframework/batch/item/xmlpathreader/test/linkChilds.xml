@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document>
+	<child>
+		<name>Hans</name>
+		<child>
+			<name>Thomas</name>
+			<child>
+				<name>Vera</name>
+			</child>
+		</child>
+	</child>
+</Document>

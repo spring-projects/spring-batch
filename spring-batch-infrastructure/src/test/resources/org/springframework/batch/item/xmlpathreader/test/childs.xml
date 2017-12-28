@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd">
+	<child>
+		<name>Hans</name>
+		<child>
+			<name>Thomas</name>
+			<child>
+				<name>Vera</name>
+			</child>
+		</child>
+	</child>
+</Document>
