@@ -6,7 +6,9 @@
 
 == Configuring and Running a Job
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 In the <<domain.adoc#domainLanguageOfBatch,domain section>> , the overall
   architecture design was discussed, using the following diagram as a
@@ -425,7 +427,7 @@ The `@EnableBatchProcessing` works similarly to the other
   	building batch jobs.  Within this base configuration, an instance of
   	`StepScope` is created in addition to a number of beans made
   	available to be autowired:
-  	
+
 
 
 * `JobRepository` - bean name "jobRepository"
@@ -449,7 +451,7 @@ The core interface for this configuration is the `BatchConfigurer`.
     The default implementation provides the beans mentioned above and requires a
     `DataSource` as a bean within the context to be provided.  This data
     source will be used by the JobRepository.
-    
+
 
 
 [NOTE]
@@ -1761,4 +1763,3 @@ If the process died (`"kill -9"` or server
       status to `FAILED` if it is not restartable, or if
       you know the restart data is valid. There is a utility in Spring Batch
       Admin `JobService` to abort a job execution.
-

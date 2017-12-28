@@ -6,7 +6,9 @@
 
 == The Domain Language of Batch
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 To any experienced batch architect, the overall concepts of batch processing used in
 Spring Batch should be familiar and comfortable. There are "Jobs" and "Steps" and

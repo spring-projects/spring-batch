@@ -6,7 +6,9 @@
 
 == Unit Testing
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 As with other application styles, it is extremely important to
   unit test any code written as part of a batch job. The Spring core

@@ -6,7 +6,9 @@
 
 == Spring Batch Integration
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 [[spring-batch-integration-introduction]]
 

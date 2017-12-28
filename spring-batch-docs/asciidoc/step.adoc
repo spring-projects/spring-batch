@@ -5,7 +5,9 @@
 [[configureStep]]
 == Configuring a `Step`
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 As discussed in <<domain.adoc#domainLanguageOfBatch,the domain chapter>>, a `Step` is a
 domain object that encapsulates an independent, sequential phase of a batch job and
