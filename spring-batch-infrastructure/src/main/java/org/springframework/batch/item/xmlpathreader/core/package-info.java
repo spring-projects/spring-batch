@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 /**
- * Central classes for the processing of annotations {@link org.springframework.batch.item.xmlpathreader.core.AnnotationProcessor} and the contral container {@link org.springframework.batch.item.xmlpathreader.core.ValuesAndAttributesContainer}
+ * Central classes for the processing of annotations 
+ * {@link org.springframework.batch.item.xmlpathreader.core.AnnotationProcessor} 
+ * and the central container 
+ * {@link org.springframework.batch.item.xmlpathreader.core.ValuesAndAttributesContainer}
  * @author Thomas Nill
  * @since 4.0.1
  *

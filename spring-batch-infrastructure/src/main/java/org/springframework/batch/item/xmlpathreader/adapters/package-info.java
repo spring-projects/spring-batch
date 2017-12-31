@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 /**
- * The different adapters classes of this package are used in {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithAdapter}.
+ * The different adapters classes of this package are used in 
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeWithAdapter}.
  * <p>
  * They all marshal an Object to a String and unmarshal a String to an Object.
  * They all implements {@link javax.xml.bind.annotation.adapters.XmlAdapter}

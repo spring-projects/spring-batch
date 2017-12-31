@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 /**
- * Contains the path classes and entry classes for containers that are addressed with paths.
+ * Contains the path classes and entry classes for containers that are addressed 
+ * with paths.
  *  
  * @author Thomas Nill
  * @since 4.0.1

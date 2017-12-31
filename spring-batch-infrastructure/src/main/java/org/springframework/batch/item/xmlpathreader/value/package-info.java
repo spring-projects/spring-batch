@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 /**
- * Contains the subclasses of {@link org.springframework.batch.item.xmlpathreader.value.Value} and the implementation of the interface {@link org.springframework.batch.item.xmlpathreader.value.CurrentObject}.
+ * Contains the subclasses of 
+ * {@link org.springframework.batch.item.xmlpathreader.value.Value} and the 
+ * implementation of the interface 
+ * {@link org.springframework.batch.item.xmlpathreader.value.CurrentObject}.
  * <p>
- * This classes are used as containers for the objects that are created in the steps of the processing of the XML file.
+ * This classes are used as containers for the objects that are created in 
+ * the steps of the processing of the XML file.
  * 
  * @author Thomas Nill
  * @since 4.0.1

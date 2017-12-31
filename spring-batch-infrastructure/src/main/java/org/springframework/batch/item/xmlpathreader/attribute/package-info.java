@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 /**
- * Contains the different implementations of the interface {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute} and a container for attributes {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeContainer}
+ * Contains the different implementations of the interface 
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.Attribute} 
+ * and a container for attributes 
+ * {@link org.springframework.batch.item.xmlpathreader.attribute.AttributeContainer}
  *  
  * @author Thomas Nill
  * @since 4.0.1
