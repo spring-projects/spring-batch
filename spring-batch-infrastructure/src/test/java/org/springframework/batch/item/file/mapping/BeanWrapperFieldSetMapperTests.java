@@ -27,7 +27,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
@@ -54,6 +57,20 @@ import static org.junit.Assert.fail;
 
 public class BeanWrapperFieldSetMapperTests {
 	
+	private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
+	
+	private TimeZone defaultTimeZone = TimeZone.getDefault();
+
+	@Before
+	public void setUp() {
+		TimeZone.setDefault(UTC_TIME_ZONE);
+	}
+
+	@After
+	public void tearDown() {
+		TimeZone.setDefault(defaultTimeZone);
+	}
+
 	@Test
 	public void testNameAndTypeSpecified() throws Exception {
 		boolean errorCaught = false;
