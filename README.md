@@ -10,7 +10,7 @@ If you are looking for a runtime container for your Batch applications, or need 
 
 Clone the git repository using the URL on the Github home page:
 
-    $ git clone git://github.com/SpringSource/spring-batch.git
+    $ git clone git@github.com:spring-projects/spring-batch.git
     $ cd spring-batch
 
 ## Command Line
@@ -19,7 +19,7 @@ Gradle is the build tool used for Spring Batch.  You can perform a full build of
     $ ./gradlew build
 
 ## Spring Tool Suite (STS)
-In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
+In STS (or any Eclipse distro or other IDE with Gradle support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 
 # Getting Started Using Spring Boot
 This is the quickest way to get started with a new Spring Batch project.  You find the Getting Started Guide for Spring
@@ -44,7 +44,7 @@ Here are some ways for you to get involved in the community:
 
 * Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](http://forum.spring.io/forum/spring-projects/batch) by responding to questions and joining the debate.
 * Create [JIRA](https://jira.spring.io/browse/BATCH) tickets for bugs and new features and comment and vote on the ones that you are interested in.
-* Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/).  If you want to contribute code this way, please familiarize yourself with the process oulined for contributing to Spring projects here: [Contributor Guidelines](https://github.com/SpringSource/spring-integration/wiki/Contributor-Guidelines).
+* Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/).  If you want to contribute code this way, please familiarize yourself with the process outlined for contributing to Spring projects here: [Contributor Guidelines](https://github.com/spring-projects/spring-batch/blob/master/CONTRIBUTING.md).
 * Watch for upcoming articles on Spring by [subscribing](feed://assets.spring.io/drupal/node/feed.xml) to spring.io
 
 Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
