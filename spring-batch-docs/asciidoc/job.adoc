@@ -1302,11 +1302,11 @@ As is evident from the method signatures above,
 ...
 // This would reside in your BatchConfigurer implementation
 @Override
-public JobExplorer getJobExplorer() {
+public JobExplorer getJobExplorer() throws Exception {
 	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
 	factoryBean.setDataSource(this.dataSource);
-	return factoryBean;
-}}
+	return factoryBean.getObject();
+}
 ...
 ----
 
@@ -1329,11 +1329,11 @@ public JobExplorer getJobExplorer() {
 ...
 // This would reside in your BatchConfigurer implementation
 @Override
-public JobExplorer getJobExplorer() {
+public JobExplorer getJobExplorer() throws Exception {
 	JobExplorerFactoryBean factoryBean = new JobExplorerFactoryBean();
 	factoryBean.setDataSource(this.dataSource);
 	factoryBean.setTablePrefix("SYSTEM.");
-	return factoryBean;
+	return factoryBean.getObject();
 }
 ...
 ----
@@ -1353,7 +1353,7 @@ A `JobRegistry` (and its parent interface `JobLocator`) is not
 
 [source, xml, role="xmlContent"]
 ----
-<bean id="jobRegistry" class="org.spr...MapJobRegistry" p:dataSource-ref="dataSource" p:tablePrefix="BATCH_"/>
+<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 ----
 
 [role="javaContent"]
@@ -1368,7 +1368,7 @@ If you want to configure your own:
 @Override
 @Bean
 public JobRegistry jobRegistry() throws Exception {
-	return new new MapJobRegistry();
+	return new MapJobRegistry();
 }
 ...
 ----
@@ -1450,7 +1450,12 @@ This is a lifecycle component that creates child contexts and
 public AutomaticJobRegistrar registrar() {
 
     AutomaticJobRegistrar registrar = new AutomaticJobRegistrar();
+    registrar.setJobLoader(jobLoader());
+    registrar.setApplicationContextFactories(applicationContextFactories());
+    registrar.afterPropertiesSet();
+    return registrar;
 
+}
 ----
 
 The registrar has two mandatory properties, one is an array of
