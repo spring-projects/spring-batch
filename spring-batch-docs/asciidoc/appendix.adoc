@@ -78,7 +78,7 @@
 |AmqpItemWriter|Given a Spring `AmqpTemplate`, it provides
             for a synchronous `send` method. The `convertAndSend(Object)`
              method lets you send POJO objects.
-|CompositeItemWriter|Passes an item to the `process` method of each
+|CompositeItemWriter|Passes an item to the `write` method of each
             in an injected `List` of `ItemWriter` objects.
 |FlatFileItemWriter|Writes to a flat file. Includes `ItemStream` and
             Skippable functionality. See link:readersAndWriters.html#flatFileItemWriter[`FlatFileItemWriter`].
@@ -116,7 +116,7 @@
             names.
 |RepositoryItemWriter|Given a Spring Data `CrudRepository` implementation,
             items are saved through the method specified in the configuration.
-|StaxEventItemWriter|Uses an `ObjectToXmlSerializer` implementation to
+|StaxEventItemWriter|Uses a `Marshaller` implementation to
             convert each item to XML and then writes it to an XML file using
             StAX.
 

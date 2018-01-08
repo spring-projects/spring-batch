@@ -24,7 +24,7 @@ As with other application styles, it is extremely important to
 === Creating a Unit Test Class
 
 In order for the unit test to run a batch job, the framework must
-    load the job's ApplicationContext. Two annotations are used to trigger
+    load the job's `ApplicationContext`. Two annotations are used to trigger
     this behavior:
 
 
@@ -153,12 +153,12 @@ public class SkipSampleFunctionalTests {
 For complex batch jobs, test cases in the end-to-end testing
     approach may become unmanageable. It these cases, it may be more useful to
     have test cases to test individual steps on their own. The
-    `AbstractJobTests` class contains a method called
+    `JobLauncherTestUtils` class contains a method called
     `launchStep`, which takes a step name and runs just
     that particular `Step`. This approach allows for more
     targeted tests letting the test set up data for only that step and
     to validate its results directly. The following example shows how to use the
-    `launchStep` method to load a `Step` by name
+    `launchStep` method to load a `Step` by name:
 
 
 [source, java]
@@ -289,9 +289,9 @@ public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSuppo
 
     public ExitStatus afterStep(StepExecution stepExecution) {
         if (stepExecution.getReadCount() == 0) {
-            throw new NoWorkFoundException("Step has not processed any items");
+            return ExitStatus.FAILED;
         }
-        return stepExecution.getExitStatus();
+        return null;
     }
 }
 ----
@@ -309,20 +309,17 @@ The preceding listener example is provided by the framework and checks a
 private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
 @Test
-public void testAfterStep() {
+public void noWork() {
     StepExecution stepExecution = new StepExecution("NoProcessingStep",
                 new JobExecution(new JobInstance(1L, new JobParameters(),
                                  "NoProcessingJob")));
 
+    stepExecution.setExitStatus(ExitStatus.COMPLETED);
     stepExecution.setReadCount(0);
 
-    try {
-        tested.afterStep(stepExecution);
-        fail();
-    } catch (NoWorkFoundException e) {
-        assertEquals("Step has not processed any items", e.getMessage());
-    }
-}</pre>
+    ExitStatus exitStatus = tested.afterStep(stepExecution);
+    assertEquals(ExitStatus.FAILED.getExitCode(), exitStatus.getExitCode());
+}
 ----
 
 Because the Spring Batch domain model follows good object-oriented
@@ -346,15 +343,12 @@ private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionLi
 public void testAfterStep() {
     StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
 
+    stepExecution.setExitStatus(ExitStatus.COMPLETED);
     stepExecution.setReadCount(0);
 
-    try {
-        tested.afterStep(stepExecution);
-        fail();
-    } catch (NoWorkFoundException e) {
-        assertEquals("Step has not processed any items", e.getMessage());
-    }
-}</pre>
+    ExitStatus exitStatus = tested.afterStep(stepExecution);
+    assertEquals(ExitStatus.FAILED.getExitCode(), exitStatus.getExitCode());
+}
 ----
 
 The preceding method for creating a simple
