@@ -172,7 +172,7 @@ restartable property may be set to 'false':
 ----
 
 .Java Configuration
-[source, xml, role="javaContent"]
+[source, java, role="javaContent"]
 ----
 @Bean
 public Job footballJob() {
