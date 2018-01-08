@@ -2,10 +2,13 @@ ifdef::backend-html5[]
 +++
 <div>
   <script type="text/javascript" src="jsfiles/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="jsfiles/js.cookie.js"></script>
   <script type="text/javascript" src="jsfiles/DocumentToggle.js"></script>
-  <input id="xmlButton" type="radio" name="docToggle" value="XML"><label for="xmlButton" style="display:inline; margin-left:.5em; margin-right:1em">XML</label>
-  <input id="javaButton" type="radio" name="docToggle" value="Java"><label for="javaButton" style="display:inline; margin-left:.5em; margin-right:1em">Java</label>
-  <input id="bothButton" type="radio" name="docToggle" value="Both" checked><label for="bothButton" style="display:inline; margin-left:.5em">Both</label>
+  <div class="docToggle-button">
+    <input id="xmlButton" type="radio" name="docToggle" value="XML"><label for="xmlButton">XML</label>
+    <input id="javaButton" type="radio" name="docToggle" value="Java"><label for="javaButton">Java</label>
+    <input id="bothButton" type="radio" name="docToggle" value="Both" checked><label for="bothButton">Both</label>
+  </div>
 </div>
 +++
 endif::backend-html5[]

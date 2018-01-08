@@ -6,7 +6,10 @@
 
 == Common Batch Patterns
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
+
 
 Some batch jobs can be assembled purely from off-the-shelf components in Spring Batch.
 For instance, the `ItemReader` and `ItemWriter` implementations can be configured to

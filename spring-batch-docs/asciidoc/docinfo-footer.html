@@ -13,10 +13,8 @@
         headingSelector: 'h1, h2, h3, h4, h5',
         smoothScroll: false });
     var handleTocRefresh = function() {
-        tocbot.refresh({ contentSelector: '#content',
-            headingSelector: 'h1, h2, h3, h4, h5',
-            smoothScroll: false });
-    };
+        tocbot.refresh();
+    }
     var handleTocOnResize = function() {
         var width = window.innerWidth
                     || document.documentElement.clientWidth
@@ -38,5 +36,4 @@
     window.addEventListener('resize', handleTocOnResize);
     window.addEventListener('tocRefresh', handleTocRefresh);
     handleTocOnResize();
-    handleToCRefresh();
 </script>

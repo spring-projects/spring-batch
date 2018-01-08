@@ -691,3 +691,104 @@ b.conum * { color: inherit !important; }
 .admonitionblock > table td.content { border-left: none; }
 
 .js-download-widget-selector{display:inline;}.navbar{margin-bottom:0;}.item-slider-widget{display:inline-block;margin-left:15px;}.item-slider-widget .item--slider{height:32px;position:absolute;width:40px;border-radius:2px;margin-top:-4px;z-index:800;background:#68605a;background:-moz-linear-gradient(top,#68605a 0%,#34302d 100%,#020202 100%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#68605a),color-stop(100%,#34302d),color-stop(100%,#020202));background:-webkit-linear-gradient(top,#68605a 0%,#34302d 100%,#020202 100%);background:-o-linear-gradient(top,#68605a 0%,#34302d 100%,#020202 100%);background:-ms-linear-gradient(top,#68605a 0%,#34302d 100%,#020202 100%);background:linear-gradient(to bottom,#68605a 0%,#34302d 100%,#020202 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#68605a',endColorstr='#020202',GradientType=0);cursor:pointer;transition:all 0.25s;-webkit-transition:all 0.25s;-moz-webkit-transition:all 0.25s;-ms--webkit-transition:all 0.25s;-o-webkit-transition:all 0.25s;}.item-slider-widget .item-slider--container{background-color:white;border:1px solid #999;padding:0 3px;}.item-slider-widget .item-slider--container .item{display:inline-block;color:#c3c3c3;font-family:"Montserrat",sans-serif;font-size:12px;line-height:12px;text-transform:uppercase;padding:7px 6px 5px;cursor:pointer;transition:color 0.25s;-webkit-transition:color 0.25s;-moz-webkit-transition:color 0.25s;-ms--webkit-transition:color 0.25s;-o-webkit-transition:color 0.25s;}.item-slider-widget .item-slider--container .item:hover{color:black;}.item-slider-widget .item-slider--container .item.js-active{z-index:801;position:relative;color:#f1f1f1;}
+
+/* Styling for the toggle buttons */
+/* Borrowed from http://jeremyworboys.com/writing/toggle-buttons-without-javascript */
+/* Micro clearfix (http://nicolasgallagher.com/micro-clearfix-hack/) */
+.cf:before,.cf:after{content:"";display:table}.cf:after{clear:both}.cf{zoom:1}
+
+/* = Function = */
+
+.docToggle-button input {
+    display: none;
+}
+.docToggle-button label {
+    background: #ccc;
+    border: 1px solid #888;
+    color: #666;
+    padding: 5px 10px;
+}
+.docToggle-button label:hover {
+    background-color: #ddd;
+}
+.docToggle-button label:active,
+.docToggle-button input:focus + label {
+    background-color: #aaa;
+}
+.docToggle-button input:checked + label {
+    background-color: #b4b4b4;
+}
+
+.docToggle-button label {
+    background-color: #f5f5f5;
+    background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+    background-image: linear-gradient(top, #ffffff, #e6e6e6);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border: 1px solid #cccccc;
+    border-bottom-color: #b3b3b3;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    color: #333333;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 0;
+    margin-left: -1px;
+    padding: 4px 10px;
+    font-size: 13px;
+    line-height: 18px;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+    vertical-align: middle;
+}
+.docToggle-button label:hover {
+    background-color: #e6e6e6;
+    background-position: 0 -15px;
+    color: #333333;
+    text-decoration: none;
+    -webkit-transition: background-position 0.1s linear;
+    -moz-transition: background-position 0.1s linear;
+    -ms-transition: background-position 0.1s linear;
+    -o-transition: background-position 0.1s linear;
+    transition: background-position 0.1s linear;
+}
+.docToggle-button label:active,
+.docToggle-button input:focus + label {
+    background-color: #d9d9d9;
+    background-image: none;
+    -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    outline: 0;
+}
+
+.docToggle-button input:checked + label {
+    background: #404040;
+    color: #ffffff;
+    -webkit-box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.15), 0 1px 2px  rgba(0, 0, 0, 0.05);
+}
+.docToggle-button:first-child label {
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-bottom-left-radius: 4px;
+  margin-left: 0;
+}
+.docToggle-button:last-child label {
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-bottom-right-radius: 4px;
+}

@@ -6,7 +6,9 @@
 
 == Scaling and Parallel Processing
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 Many batch processing problems can be solved with single threaded, single process jobs,
 so it is always a good idea to properly check if that meets your needs before thinking
