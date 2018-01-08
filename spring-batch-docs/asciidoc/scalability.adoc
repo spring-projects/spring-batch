@@ -74,7 +74,7 @@ public Step sampleStep(TaskExecutor taskExecutor) {
 }
 ----
 
-In this example, the taskExecutor is a reference to another bean definition that
+In this example, the `taskExecutor` is a reference to another bean definition that
 implements the `TaskExecutor` interface.
 https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/task/TaskExecutor.html[`TaskExecutor`]
 is a standard Spring interface, so consult the Spring User Guide for details of available
@@ -130,7 +130,7 @@ writers from Spring Batch are not designed for multi-threaded use. It is, howeve
 possible to work with stateless or thread safe readers and writers, and there is a sample
 (called `parallelJob`) in the
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring
-Batch Samples] that show the use of a process indicator (see
+Batch Samples] that shows the use of a process indicator (see
 <<readersAndWriters.adoc#process-indicator,Preventing State Persistence>>) to keep track
 of items that have been processed in a database input table.
 
@@ -138,10 +138,10 @@ Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Us
 they say in the Javadoc if they are thread safe or not or what you have to do to avoid
 problems in a concurrent environment.  If there is no information in the Javadoc, you can
 check the implementation to see if there is any state.  If a reader is not thread safe,
-it may still be efficient to use it in your own synchronizing delegator. You can
-synchronize the call to `read()` and as long as the processing and writing is the most
-expensive part of the chunk, your step may still complete much faster than it would in a
-single threaded configuration.
+you can decorate it with the built-in `SynchronizedItemStreamReader` or use it in your own
+synchronizing delegator. You can synchronize the call to `read()` and as long as the
+processing and writing is the most expensive part of the chunk, your step may still
+complete much faster than it would in a single threaded configuration.
 
 [[scalabilityParallelSteps]]
 
@@ -254,7 +254,7 @@ and work is shared through the middleware, so that, if the listeners are all eag
 consumers, then load balancing is automatic.
 
 The middleware has to be durable, with guaranteed delivery and a single consumer for each
-message. JMS is the obvious candidate, but other options (such as Java Spaces exist in
+message. JMS is the obvious candidate, but other options (such as Java Spaces) exist in
 the grid computing and shared memory product space.
 
 See the section on
@@ -279,7 +279,7 @@ instances of a `Step`, which could in fact take the place of the master, resulti
 same outcome for the `Job`. The slaves are typically going to be remote services but
 could also be local threads of execution. The messages sent by the master to the slaves
 in this pattern do not need to be durable or have guaranteed delivery. Spring Batch
-metadata in the JobRepository ensures that each slave is executed once and only once for
+metadata in the `JobRepository` ensures that each slave is executed once and only once for
 each `Job` execution.
 
 The SPI in Spring Batch consists of a special implementation of `Step` (called the

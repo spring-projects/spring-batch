@@ -282,7 +282,7 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchJobExecutionContext]]
-=== BATCH_JOB_EXECUTION_CONTEXT
+=== `BATCH_JOB_EXECUTION_CONTEXT`
 
 The `BATCH_JOB_EXECUTION_CONTEXT` table holds all information relevant to the
 `ExecutionContext` of a `Job`. There is exactly one `Job` `ExecutionContext` per

@@ -44,13 +44,13 @@ public class ItemFailureLoggerListener extends ItemListenerSupport {
         logger.error("Encountered error on read", e);
     }
 
-    public void onWriteError(Exception ex, Object item) {
+    public void onWriteError(Exception ex, List<? extends Object> items) {
         logger.error("Encountered error on write", ex);
     }
 }
 ----
 
-Having implemented this listener it, must be registered with a step, as shown in the
+Having implemented this listener, it must be registered with a step, as shown in the
 following example:
 
 .XML Configuration
@@ -78,7 +78,7 @@ public Step simpleStep() {
 }
 ----
 
-Remember that, if your listener does anything in an `onError()` method, it must be inside
+NOTE: if your listener does anything in an `onError()` method, it must be inside
 a transaction that is going to be rolled back. If you need to use a transactional
 resource, such as a database, inside an `onError()` method, consider adding a declarative
 transaction to that method (see Spring Core Reference Guide for details), and giving its
@@ -98,12 +98,14 @@ in the following example:
 
 [source, java]
 ----
-public class PoisonPillItemWriter implements ItemWriter<T> {
+public class PoisonPillItemProcessor<T> implements ItemProcessor<T, T> {
 
-    public void write(T item) throws Exception {
+    @Override
+    public T process(T item) throws Exception {
         if (isPoisonPill(item)) {
             throw new PoisonPillException("Poison pill detected: " + item);
-       }
+        }
+        return item;
     }
 }
 ----
@@ -259,7 +261,7 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    public void write(List<? extends Trade> items) {
+    public void write(List<? extends Trade> items) throws Exception {
         BigDecimal chunkTotal = BigDecimal.ZERO;
         for (Trade trade : items) {
             chunkTotal = chunkTotal.add(trade.getAmount());
@@ -282,7 +284,7 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 This `TradeItemWriter` stores a `totalAmount` value that is increased with the `amount`
 from each `Trade` item written. After the last `Trade` is processed, the framework calls
 `writeFooter`, which puts the `totalAmount` into the file. Note that the `write` method
-makes use of a temporary variable, `chunkTotalAmount`, that stores the total of the
+makes use of a temporary variable, `chunkTotal`, that stores the total of the
 `Trade` amounts in the chunk. This is done to ensure that, if a skip occurs in the
 `write` method, the `totalAmount` is left unchanged. It is only at the end of the `write`
 method, once we are guaranteed that no exceptions are thrown, that we update the
@@ -384,7 +386,7 @@ into a full 'Foo' object. An existing DAO can be used to query for the full obje
 on the key.
 
 [[multiLineRecords]]
-==== Multi-Line Records
+=== Multi-Line Records
 
 While it is usually the case with flat files that each record is confined to a single
 line, it is common that a file might have records spanning multiple lines with multiple
@@ -419,9 +421,7 @@ do this, a custom `ItemReader` should be implemented as a wrapper for the
             <property name="lineMapper">
                 <bean class="org.spr...DefaultLineMapper">
                     <property name="lineTokenizer" ref="orderFileTokenizer"/>
-                    <property name="fieldSetMapper">
-                        <bean class="org.spr...PassThroughFieldSetMapper" />
-                    </property>
+                    <property name="fieldSetMapper" ref="orderFieldSetMapper"/>
                 </bean>
             </property>
         </bean>
@@ -445,10 +445,11 @@ public MultiLineTradeItemReader itemReader() {
 public FlatFileItemReader flatFileItemReader() {
 	FlatFileItemReader<Trade> reader = new FlatFileItemReaderBuilder<Trade>()
 			.name("flatFileItemReader")
-			.resource(new ClasspathResource("data/iosample/input/multiLine.txt"))
+			.resource(new ClassPathResource("data/iosample/input/multiLine.txt"))
 			.lineTokenizer(orderFileTokenizer())
-			.fieldSetMapper(new PassThroughFieldSetMapper())
+			.fieldSetMapper(orderFieldSetMapper())
 			.build();
+	return reader;
 }
 ----
 
@@ -490,7 +491,7 @@ public PatternMatchingCompositeLineTokenizer orderFileTokenizer() {
 	tokenizers.put("NCU*", customerLineTokenizer());
 	tokenizers.put("BAD*", billingAddressLineTokenizer());
 
-	tokenizer.setTokenizers(tokenizers());
+	tokenizer.setTokenizers(tokenizers);
 
 	return tokenizer;
 }
@@ -578,11 +579,11 @@ exceptional. The `Step` is simply considered to have found no work and completes
 items read. All of the `ItemReader` implementations provided out of the box in Spring
 Batch default to this approach. This can lead to some confusion if nothing is written out
 even when input is present (which usually happens if a file was misnamed or some similar
-issue arises) For this reason, the metadata itself should be inspected to determine how
+issue arises). For this reason, the metadata itself should be inspected to determine how
 much work the framework found to be processed. However, what if finding no input is
 considered exceptional? In this case, programmatically checking the metadata for no items
 processed and causing failure is the best solution. Because this is a common use case,
-Spring Batch provides a listener is provided with exactly this functionality, as shown in
+Spring Batch provides a listener with exactly this functionality, as shown in
 the class definition for `NoWorkFoundStepExecutionListener`:
 
 [source, java]
@@ -644,7 +645,7 @@ To make the data available to future `Steps`, it must be "promoted" to the `Job`
 with the keys related to the data in the `ExecutionContext` that must be promoted. It can
 also, optionally, be configured with a list of exit code patterns for which the promotion
 should occur (`COMPLETED` is the default). As with all listeners, it must be registered
-on the`Step` as shown in the following example:
+on the `Step` as shown in the following example:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -665,7 +666,11 @@ on the`Step` as shown in the following example:
 </job>
 
 <beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener">
-    <beans:property name="keys" value="someKey"/>
+    <beans:property name="keys">
+        <list>
+            <value>someKey</value>
+        </list>
+    </beans:property>
 </beans:bean>
 ----
 
@@ -677,7 +682,6 @@ public Job job1() {
 	return this.jobBuilderFactory.get("job1")
 				.start(step1())
 				.next(step1())
-				.end()
 				.build();
 }
 
@@ -695,7 +699,7 @@ public Step step1() {
 public ExecutionContextPromotionListener promotionListener() {
 	ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-	listener.setKeys("someKey");
+	listener.setKeys(new String[] {"someKey" });
 
 	return listener;
 }
