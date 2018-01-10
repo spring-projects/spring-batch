@@ -916,7 +916,7 @@ itemWriter.write(items);</programlisting>
 
         <para><classname>ItemReadListener</classname>,
         <classname>ItemProcessListener</classname>, and
-        <classname>ItemWriteListner</classname> all provide mechanisms for
+        <classname>ItemWriteListener</classname> all provide mechanisms for
         being notified of errors, but none will inform you that a record has
         actually been skipped. <methodname>onWriteError</methodname>, for
         example, will be called even if an item is retried and successful. For
