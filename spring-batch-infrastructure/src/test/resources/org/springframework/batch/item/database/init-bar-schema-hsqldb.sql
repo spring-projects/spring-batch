@@ -1,0 +1,12 @@
+DROP TABLE T_BARS if exists;
+
+CREATE TABLE T_BARS (
+       ID BIGINT NOT NULL,
+       NAME VARCHAR(45),
+       VALUE INTEGER
+);
+
+ALTER TABLE T_BARS ADD PRIMARY KEY (ID);
+
+INSERT INTO t_bars (id, name, value) VALUES (1, 'baz1', 1);
+

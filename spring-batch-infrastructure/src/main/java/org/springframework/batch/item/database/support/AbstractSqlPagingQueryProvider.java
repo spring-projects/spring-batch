@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,8 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String whereClause;
 	
 	private Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+
+	private Map<String, String> sortKeyResultNames = new LinkedHashMap<String, String>();
 
 	private String groupClause;
 
@@ -246,6 +248,40 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		else {
 			return temp;
 		}
+	}
+
+	/**
+	 * Set the names of sort keys as they are to be retrieved from a result set.
+	 *
+	 * Keys that are not included will be determined as described in {@link #getSortKeyResultName}.
+	 */
+	public void setSortKeyResultNames(Map<String, String> sortKeyResultNames) {
+		this.sortKeyResultNames = sortKeyResultNames;
+	}
+
+	/**
+	 * Determines the name to be used for looking up the given key in a result set.
+	 *
+	 * First, if the key is set through {@link #setSortKeyResultNames}, the
+	 *	corresponding result will be returned.
+	 * Second, if the key contains a table separator ('.'), then only the portion
+	 *	of the key after the table separator is returned.
+	 * Otherwise, the key is returned as it was given.
+	 *
+	 * @return the name of the key, in the context of a {@link java.sql.ResultSet}.
+	 */
+	@Override
+	public String getSortKeyResultName(String key) {
+		if (sortKeyResultNames.containsKey(key)) {
+			return sortKeyResultNames.get(key);
+		}
+
+		int tableSeparatorIndex = key.lastIndexOf('.');
+		if (tableSeparatorIndex != -1) {
+			return key.substring(tableSeparatorIndex + 1);
+		}
+
+		return key;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,10 +330,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		public T mapRow(ResultSet rs, int rowNum) throws SQLException {
 			startAfterValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
-				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
+				startAfterValues.put(sortKey.getKey(), findObject(rs, sortKey.getKey()));
 			}
 
 			return rowMapper.mapRow(rs, rowNum);
+		}
+
+		private Object findObject(ResultSet rs, String columnName) throws SQLException{
+			return rs.getObject(queryProvider.getSortKeyResultName(columnName));
 		}
 	}
 

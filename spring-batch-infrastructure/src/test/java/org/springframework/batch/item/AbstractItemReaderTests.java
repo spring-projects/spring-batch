@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010 the original author or authors.
+ * Copyright 2009-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,9 @@ public abstract class AbstractItemReaderTests {
 	@Test
 	public void testEmptyInput() throws Exception {
 		pointToEmptyInput(tested);
-		tested.read();
-		assertNull(tested.read());
+
+		final Foo nullFoo = tested.read();
+		assertNull(nullFoo);
 	}
 
 	/**

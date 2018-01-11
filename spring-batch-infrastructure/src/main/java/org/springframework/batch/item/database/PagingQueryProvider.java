@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,14 @@ public interface PagingQueryProvider {
 	 * @return the sort keys used to order the query
 	 */
 	Map<String, Order> getSortKeys();
-	
+
+	/**
+	 * Gives the name of the specified sort key, as it should be reffered in the context of a {@link java.sql.ResultSet}.
+	 *
+	 * @return the key's name, as it is used in a {@link java.sql.ResultSet}.
+	 */
+	String getSortKeyResultName(String key);
+
 	/**
 	 * Returns either a String to be used as the named placeholder for a sort key value (based on the column name)
 	 * or a ? for unnamed parameters.
