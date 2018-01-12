@@ -45,7 +45,7 @@ $(document).ready(function(){
         $("*.javaContent > *").removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
         Cookies.set('docToggle', 'java', { expires: 3652 });
-    }
+    };
 
     function setBoth() {
         $("*.javaContent").show();
@@ -54,6 +54,6 @@ $(document).ready(function(){
         $("*.xmlContent > *").removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
         Cookies.set('docToggle', 'both', { expires: 3652 });
-    }
+    };
 
 });
