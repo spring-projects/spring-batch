@@ -122,6 +122,61 @@ public class FaultTolerantChunkProcessorTests {
 		assertEquals(1, contribution.getSkipCount());
 		assertEquals(1, contribution.getFilterCount());
 	}
+	
+	@Test
+	// BATCH-2663
+	public void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Override
+			public String process(String item) throws Exception {
+				if (item.equals("1")) {
+					return null;
+				}
+				return item;
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("fail", "1", "2"));
+		processAndExpectPlannedRuntimeException(inputs); // (first attempt) Process fail, 1, 2
+		// item 1 is filtered out so it is removed from the chunk => now inputs = [fail, 2]
+		// using NeverRetryPolicy by default => now scanning
+		processAndExpectPlannedRuntimeException(inputs); // (scanning) Process fail
+		processor.process(contribution, inputs); // (scanning) Process 2
+		assertEquals(1, list.size());
+		assertEquals("[2]", list.toString());
+		assertEquals(1, contribution.getWriteSkipCount());
+		assertEquals(1, contribution.getFilterCount());
+	}
+	
+	@Test
+	// BATCH-2663
+	public void testFilterCountOnSkipInWriteWithRetry() throws Exception {
+		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+		retryPolicy.setMaxAttempts(3);
+		batchRetryTemplate.setRetryPolicy(retryPolicy);
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Override
+			public String process(String item) throws Exception {
+				if (item.equals("1")) {
+					return null;
+				}
+				return item;
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("fail", "1", "2"));
+		processAndExpectPlannedRuntimeException(inputs); // (first attempt) Process fail, 1, 2
+		// item 1 is filtered out so it is removed from the chunk => now inputs = [fail, 2]
+		processAndExpectPlannedRuntimeException(inputs); // (first retry) Process fail, 2
+		processAndExpectPlannedRuntimeException(inputs); // (second retry) Process fail, 2
+		// retry exhausted (maxAttempts = 3) => now scanning
+		processAndExpectPlannedRuntimeException(inputs); // (scanning) Process fail
+		processor.process(contribution, inputs); // (scanning) Process 2
+		assertEquals(1, list.size());
+		assertEquals("[2]", list.toString());
+		assertEquals(1, contribution.getWriteSkipCount());
+		assertEquals(3, contribution.getFilterCount());
+	}
 
 	/**
 	 * An Error can be retried or skipped but by default it is just propagated

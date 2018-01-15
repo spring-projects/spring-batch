@@ -149,6 +149,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			inputs.setUserData(data);
 			data.setOutputs(new Chunk<O>());
 		}
+		else {
+			// BATCH-2663: re-initialize filter count when scanning the chunk
+			if (data.scanning()) {
+				data.filterCount = 0;
+			}
+		}
 	}
 
 	@Override
