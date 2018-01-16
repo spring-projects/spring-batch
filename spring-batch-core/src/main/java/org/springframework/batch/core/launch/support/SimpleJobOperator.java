@@ -425,7 +425,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			}
 		}
 		catch (NoSuchJobException e) {
-			logger.warn("Cannot find Job object",e);
+			logger.warn("Cannot find Job object in the job registry. StoppableTasklet#stop() will not be called",e);
 		}
 
 		return true;

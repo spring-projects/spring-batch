@@ -60,6 +60,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -364,6 +366,24 @@ public class SimpleJobOperatorTests {
 		jobRepository.update(jobExecution);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+	}
+	
+	@Test
+	public void testStopTaskletWhenJobNotRegistered() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		StoppableTasklet tasklet = mock(StoppableTasklet.class);
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		verify(tasklet, never()).stop();
 	}
 
 	@Test
