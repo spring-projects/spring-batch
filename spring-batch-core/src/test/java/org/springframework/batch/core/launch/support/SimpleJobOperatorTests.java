@@ -15,14 +15,6 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +26,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -63,6 +56,16 @@ import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
@@ -382,6 +385,24 @@ public class SimpleJobOperatorTests {
 		jobRepository.update(jobExecution);
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+	}
+	
+	@Test
+	public void testStopTaskletWhenJobNotRegistered() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		StoppableTasklet tasklet = mock(StoppableTasklet.class);
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		verify(tasklet, never()).stop();
 	}
 
 	@Test
