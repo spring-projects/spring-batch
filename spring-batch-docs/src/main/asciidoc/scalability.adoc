@@ -123,7 +123,9 @@ your step, such as a `DataSource`.  Be sure to make the pool in those resources 
 as large as the desired number of concurrent threads in the step.
 
 There are some practical limitations of using multi-threaded `Step` implementations for
-some common batch use cases. Many participants in a `Step` (such as readers and writers)
+some common batch use cases:
+
+* Many participants in a `Step` (such as readers and writers)
 are stateful. If the state is not segregated by thread, then those components are not
 usable in a multi-threaded `Step`. In particular, most of the off-the-shelf readers and
 writers from Spring Batch are not designed for multi-threaded use. It is, however,
@@ -132,9 +134,8 @@ possible to work with stateless or thread safe readers and writers, and there is
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring
 Batch Samples] that shows the use of a process indicator (see
 <<readersAndWriters.adoc#process-indicator,Preventing State Persistence>>) to keep track
-of items that have been processed in a database input table.
-
-Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Usually,
+of items that have been processed in a database input table. Spring Batch provides some
+ implementations of `ItemWriter` and `ItemReader`. Usually,
 they say in the Javadoc if they are thread safe or not or what you have to do to avoid
 problems in a concurrent environment.  If there is no information in the Javadoc, you can
 check the implementation to see if there is any state.  If a reader is not thread safe,
@@ -142,6 +143,11 @@ you can decorate it with the provided `SynchronizedItemStreamReader` or use it i
 synchronizing delegator. You can synchronize the call to `read()` and as long as the
 processing and writing is the most expensive part of the chunk, your step may still
 complete much faster than it would in a single threaded configuration.
+
+* In a multi-threaded `Step`, each thread runs in its own transaction and the `ChunkContext`
+is shared between threads. This shared state might end up in an inconsistent state
+if one of the transactions is rolled back. Hence, we recommend avoiding `ExecutionContext`
+manipulation in a multi-threaded `Step`.
 
 [[scalabilityParallelSteps]]
 

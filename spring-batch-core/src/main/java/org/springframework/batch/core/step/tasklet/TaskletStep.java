@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -339,6 +340,7 @@ public class TaskletStep extends AbstractStep {
 		private boolean stepExecutionUpdated = false;
 
 		private StepExecution oldVersion;
+		private ExecutionContext oldExecutionContext;
 
 		private boolean locked = false;
 
@@ -360,6 +362,7 @@ public class TaskletStep extends AbstractStep {
 						logger.info("Commit failed while step execution data was already updated. "
 								+ "Reverting to old version.");
 						copy(oldVersion, stepExecution);
+						stepExecution.setExecutionContext(oldExecutionContext);
 						if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
 							rollback(stepExecution);
 						}
@@ -371,7 +374,6 @@ public class TaskletStep extends AbstractStep {
 					logger.error("Rolling back with transaction in unknown state");
 					rollback(stepExecution);
 					stepExecution.upgradeStatus(BatchStatus.UNKNOWN);
-					stepExecution.setTerminateOnly();
 				}
 			}
 			finally {
@@ -397,8 +399,7 @@ public class TaskletStep extends AbstractStep {
 
 			// In case we need to push it back to its old value
 			// after a commit fails...
-			oldVersion = new StepExecution(stepExecution.getStepName(), stepExecution.getJobExecution());
-			copy(stepExecution, oldVersion);
+			oldExecutionContext = new ExecutionContext(stepExecution.getExecutionContext());
 
 			try {
 
@@ -432,6 +433,23 @@ public class TaskletStep extends AbstractStep {
 						stepExecution.setTerminateOnly();
 						Thread.currentThread().interrupt();
 					}
+
+					// Refresh stepExecution to the latest correctly persisted
+					// state in order to apply the contribution on the latest version
+					String stepName = stepExecution.getStepName();
+					JobExecution jobExecution = stepExecution.getJobExecution();
+					StepExecution lastStepExecution = getJobRepository()
+							.getLastStepExecution(jobExecution.getJobInstance(), stepName);
+					if (lastStepExecution != null &&
+							!lastStepExecution.getVersion().equals(stepExecution.getVersion())) {
+						copy(lastStepExecution, stepExecution);
+					}
+
+					// Take a copy of the stepExecution in case we need to
+					// undo the current contribution to the in memory instance
+					// if the commit fails
+					oldVersion = new StepExecution(stepName, jobExecution);
+					copy(stepExecution, oldVersion);
 
 					// Apply the contribution to the step
 					// even if unsuccessful
@@ -499,11 +517,9 @@ public class TaskletStep extends AbstractStep {
 		}
 
 		private void copy(final StepExecution source, final StepExecution target) {
-			target.setVersion(source.getVersion());
 			target.setWriteCount(source.getWriteCount());
 			target.setFilterCount(source.getFilterCount());
 			target.setCommitCount(source.getCommitCount());
-			target.setExecutionContext(new ExecutionContext(source.getExecutionContext()));
 		}
 
 	}
