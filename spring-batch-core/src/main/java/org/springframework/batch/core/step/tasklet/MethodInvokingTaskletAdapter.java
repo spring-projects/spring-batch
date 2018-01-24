@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @see AbstractMethodInvokingDelegator
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
@@ -44,6 +45,9 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 */
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		if (getArguments() == null) {
+			setArguments(new Object[]{contribution, chunkContext});
+		}
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;
 	}
