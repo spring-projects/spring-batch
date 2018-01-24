@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,6 +42,7 @@ public class TaskletJobFunctionalTests {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder().addString("value", "foo")
 				.toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals("yes", jobExecution.getExecutionContext().getString("done"));
 	}
 
 	public static class TestBean {
@@ -56,6 +58,19 @@ public class TaskletJobFunctionalTests {
 			assertEquals(3, integerValue.intValue());
 			assertEquals(3.14, doubleValue, 0.01);
 		}
+	}
+	
+	public static class Task {
+		
+		public boolean doWork(ChunkContext chunkContext) {
+			chunkContext.
+					getStepContext().
+					getStepExecution().
+					getJobExecution().
+					getExecutionContext().put("done", "yes");
+			return true;
+		}
+		
 	}
 
 }

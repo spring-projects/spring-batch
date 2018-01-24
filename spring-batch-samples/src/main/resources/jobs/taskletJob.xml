@@ -16,10 +16,17 @@
 		p:proxyTargetClass="true" />
 
 	<job id="loopJob" xmlns="http://www.springframework.org/schema/batch">
-		<step id="step1">
+		<!-- this step tests the usage of MethodInvokingTaskletAdapter declared as a bean -->
+		<step id="step1" next="step2">
 			<tasklet ref="adapter">
 				<transaction-attributes propagation="REQUIRED"/>
 			</tasklet>
+		</step>
+
+		<!-- this step tests the shortcut version that automatically wraps a bean
+			 in a MethodInvokingTaskletAdapter -->
+		<step id="step2">
+			<tasklet ref="task" method="doWork"/>
 		</step>
 	</job>
 
@@ -41,4 +48,7 @@
 		scope="step">
 		<property name="value" value="#{jobParameters[value]}" />
 	</bean>
+
+	<bean id="task" class="org.springframework.batch.sample.TaskletJobFunctionalTests$Task"/>
+
 </beans>
