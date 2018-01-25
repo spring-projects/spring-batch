@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,14 @@ import org.springframework.util.StringUtils;
  * Provides properties and preparation for the mandatory "selectClause" and
  * "fromClause" as well as for the optional "whereClause". Also provides
  * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
- * the sort key must be a true key and not just a column to order by.
+ * the sort key must be a true key and not just a column to order by. It is important
+ * to have a unique key constraint on the sort key to guarantee that no data is lost
+ * between executions.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
