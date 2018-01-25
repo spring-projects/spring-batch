@@ -2247,6 +2247,9 @@ The `SqlPagingQueryProviderFactoryBean` requires that you specify a `select` cla
 `from` clause. You can also provide an optional `where` clause. These clauses and the
 required `sortKey` are used to build an SQL statement.
 
+NOTE: It is important to have a unique key constraint on the `sortKey` to guarantee that
+ no data is lost between executions.
+
 After the reader has been opened, it passes back one item per call to `read` in the same
 basic fashion as any other `ItemReader`. The paging happens behind the scenes when
 additional rows are needed.
