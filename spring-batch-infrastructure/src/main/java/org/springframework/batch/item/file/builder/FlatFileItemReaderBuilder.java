@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -61,6 +62,8 @@ public class FlatFileItemReaderBuilder<T> {
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private boolean strict = true;
+
+	private String encoding = FlatFileItemReader.DEFAULT_CHARSET;
 
 	private RecordSeparatorPolicy recordSeparatorPolicy =
 			new SimpleRecordSeparatorPolicy();
@@ -219,6 +222,19 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public FlatFileItemReaderBuilder<T> strict(boolean strict) {
 		this.strict = strict;
+		return this;
+	}
+
+	/**
+	 * Configure the encoding used by the reader to read the input source.
+	 * Default value is {@link FlatFileItemReader#DEFAULT_CHARSET}.
+	 *
+	 * @param encoding to use to read the input source.
+	 * @return The current instance of the builder.
+	 * @see FlatFileItemReader#setEncoding(String)
+	 */
+	public FlatFileItemReaderBuilder<T> encoding(String encoding) {
+		this.encoding = encoding;
 		return this;
 	}
 
@@ -418,6 +434,10 @@ public class FlatFileItemReaderBuilder<T> {
 
 		if(StringUtils.hasText(this.name)) {
 			reader.setName(this.name);
+		}
+
+		if(StringUtils.hasText(this.encoding)) {
+			reader.setEncoding(this.encoding);
 		}
 
 		reader.setResource(this.resource);

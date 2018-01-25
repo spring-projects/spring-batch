@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -43,6 +44,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class FlatFileItemReaderBuilderTests {
 
@@ -401,6 +403,36 @@ public class FlatFileItemReaderBuilderTests {
 				.name("foobar")
 				.build());
 
+	}
+
+	@Test
+	public void testDefaultEncoding() {
+		String encoding = FlatFileItemReader.DEFAULT_CHARSET;
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1,2,3"))
+				.delimited()
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		assertEquals(encoding, ReflectionTestUtils.getField(reader, "encoding"));
+	}
+
+	@Test
+	public void testCustomEncoding() {
+		String encoding = "UTF-8";
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1  2  3"))
+				.encoding(encoding)
+				.fixedLength()
+				.columns(new Range[] {new Range(1, 3), new Range(4, 6), new Range(7)})
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		assertEquals(encoding, ReflectionTestUtils.getField(reader, "encoding"));
 	}
 
 	private Resource getResource(String contents) {
