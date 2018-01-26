@@ -629,6 +629,7 @@ asciidoctor {
 		from(sourceDir) {
 			include 'images/**'
 			include 'jsfiles/**'
+			include 'tocbot-3.0.2/**'
 		}
 	}
 	logDocuments = true
@@ -637,7 +638,7 @@ asciidoctor {
 	attributes  'icons': 'font',
 			'idprefix': '',
 			'idseparator': '-',
-			docinfo: '',
+			docinfo: 'shared',
 			revnumber: project.version,
 			sectanchors: '',
 			sectnums: '',

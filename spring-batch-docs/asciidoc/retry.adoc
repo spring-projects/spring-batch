@@ -6,7 +6,9 @@
 
 == Retry
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 To make processing more robust and less prone to failure, it sometimes
     helps to automatically retry a failed operation in case it might
