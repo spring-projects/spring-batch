@@ -743,7 +743,7 @@ task docsZip(type: Zip) {
 			exclude 'pdf/common-patterns.pdf'
 			exclude 'pdf/domain.pdf'
 			exclude 'pdf/index.pdf'
-			exclude 'pdf/index-single.pdf'
+			exclude 'pdf/toggle.pdf'
 			exclude 'pdf/job.pdf'
 			exclude 'pdf/jsr-352.pdf'
 			exclude 'pdf/readersAndWriters.pdf'
@@ -758,6 +758,8 @@ task docsZip(type: Zip) {
 			exclude 'pdf/transaction-appendix.pdf'
 			exclude 'pdf/whatsnew.pdf'
 			exclude 'pdf/glossary.pdf'
+
+			rename  'index-single.pdf', 'spring-batch-reference.pdf'
 
 			into 'reference'
 		}
