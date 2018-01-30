@@ -63,10 +63,11 @@ global to all steps, such as restartability. The job configuration contains:
 
 ifdef::backend-html5[]
 [role="javaContent"]
-A default simple implementation of the Job interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-When using java based configuration, a collection of builders is made available for the
-instantiation of a `Job`, as shown in the following example:
+For those who use Java configuration, Spring Batch provices a default implementation of
+the Job interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. When using java based configuration, a collection of
+builders is made available for the instantiation of a `Job`, as shown in the following
+example:
 
 [source, java, role="javaContent"]
 ----
@@ -82,10 +83,11 @@ public Job footballJob() {
 ----
 
 [role="xmlContent"]
-A default simple implementation of the `Job` interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-However, the batch namespace abstracts away the need to instantiate it directly. Instead,
-the `<job>` tag can be used as shown in the following example:
+For those who use XML configuration, Spring Batch provides a default implementation of the
+`Job` interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. However, the batch namespace abstracts away the need to
+instantiate it directly. Instead, the `<job>` element can be used, as shown in the
+following example:
 
 [source, xml, role="xmlContent"]
 ----
@@ -98,9 +100,9 @@ the `<job>` tag can be used as shown in the following example:
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-A default simple implementation of the Job interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-When using java based configuration, a collection of builders are made available for the
+Spring Batch provides a default implementation of the Job interface in the form of the
+`SimpleJob` class, which creates some standard functionality on top of `Job`. When using
+Java-based configuration, a collection of builders are made available for the
 instantiation of a `Job`, as shown in the following example:
 
 [source, java]
@@ -565,8 +567,8 @@ the course of execution, `StepExecution` and `JobExecution` implementations are 
 by passing them to the repository.
 
 [role="xmlContent"]
-The batch namespace provides support for configuring a `JobRepository` instance with the
-`<job-repository>` tag, as shown in the following example:
+The Spring Batch XML namespace provides support for configuring a `JobRepository` instance
+with the `<job-repository>` tag, as shown in the following example:
 
 [source, xml, role="xmlContent"]
 ----
@@ -574,7 +576,7 @@ The batch namespace provides support for configuring a `JobRepository` instance 
 ----
 
 [role="javaContent"]
-When using java configuration, `@EnableBatchProcessing` annotation provides a
+When using Java configuration, the `@EnableBatchProcessing` annotation provides a
 `JobRepository` as one of the components automatically configured out of the box.
 
 === JobLauncher

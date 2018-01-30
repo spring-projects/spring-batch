@@ -174,7 +174,10 @@ In the preceding example, there is a class `Foo`, a class `Bar`, and a class
 simple, but any type of transformation could be done here. The `BarWriter` writes `Bar`
 objects, throwing an exception if any other type is provided. Similarly, the
 `FooProcessor` throws an exception if anything but a `Foo` is provided. The
-`FooProcessor` can then be injected into a `Step`, as shown in the following example:
+`FooProcessor` can then be injected into a `Step`.
+
+[role="xmlContent"]
+The following example shows how to inject the `FooProcessor` into a step in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -188,6 +191,9 @@ objects, throwing an exception if any other type is provided. Similarly, the
     </step>
 </job>
 ----
+
+[role="javaContent"]
+The following example shows how to inject the `FooProcessor` into a step in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -267,7 +273,10 @@ compositeProcessor.setDelegates(itemProcessors);
 ----
 
 Just as with the previous example, the composite processor can be configured into the
-`Step`:
+`Step`.
+
+[role="xmlContent"]
+The following example shows how to configure the composite processor into the step in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -291,6 +300,10 @@ Just as with the previous example, the composite processor can be configured int
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to configure the composite processor into the step in
+Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -405,8 +418,10 @@ Batch Core as part of a `Step` in a `Job`, then they almost certainly need to be
 registered manually with the `Step`. A reader, writer, or processor that is directly
 wired into the `Step` gets registered automatically if it implements `ItemStream` or a
 `StepListener` interface. However, because the delegates are not known to the `Step`,
-they need to be injected as listeners or streams (or both if appropriate), as shown in
-the following example:
+they need to be injected as listeners or streams (or both if appropriate).
+
+[role="xmlContent"]
+The following example shows how to inject a delegate as a stream in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -430,6 +445,9 @@ the following example:
 
 <bean id="barWriter" class="...BarWriter" />
 ----
+
+[role="xmlContent"]
+The following example shows how to inject a delegate as a stream in XML:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -808,8 +826,11 @@ public class PlayerMapper implements FieldSetMapper<Player> {
 For many, having to write a specific `FieldSetMapper` is equally as cumbersome as writing
 a specific `RowMapper` for a `JdbcTemplate`. Spring Batch makes this easier by providing
 a `FieldSetMapper` that automatically maps fields by matching a field name with a setter
-on the object using the JavaBean specification. Again using the football example, the
-`BeanWrapperFieldSetMapper` configuration looks like the following snippet:
+on the object using the JavaBean specification.
+
+[role="xmlContent"]
+Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
+the following snippet in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -823,6 +844,10 @@ on the object using the JavaBean specification. Again using the football example
       class="org.springframework.batch.sample.domain.Player"
       scope="prototype" />
 ----
+
+[role="javaContent"]
+Again using the football example, the `BeanWrapperFieldSetMapper` configuration looks like
+the following snippet in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -872,7 +897,11 @@ While this looks like one large field, it actually represent 4 distinct fields:
 . Customer: ID of the customer ordering the item - 9 characters long.
 
 When configuring the `FixedLengthLineTokenizer`, each of these lengths must be provided
-in the form of ranges, as shown in the following example:
+in the form of ranges.
+
+[role="xmlContent"]
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -886,16 +915,20 @@ in the form of ranges, as shown in the following example:
 
 [role="xmlContent"]
 Because the `FixedLengthLineTokenizer` uses the same `LineTokenizer` interface as
-discussed above, it returns the same `FieldSet` as if a delimiter had been used. This
+discussed earlier, it returns the same `FieldSet` as if a delimiter had been used. This
 allows the same approaches to be used in handling its output, such as using the
 `BeanWrapperFieldSetMapper`.
 
 [NOTE]
 ====
-Supporting the above syntax for ranges requires that a specialized property editor,
+Supporting the preceding syntax for ranges requires that a specialized property editor,
 `RangeArrayPropertyEditor`, be configured in the `ApplicationContext`. However, this bean
 is automatically declared in an `ApplicationContext` where the batch namespace is used.
 ====
+
+[role="javaContent"]
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -941,8 +974,11 @@ though a "LINEA" has more information than a "LINEB".
 The `ItemReader` reads each line individually, but we must specify different
 `LineTokenizer` and `FieldSetMapper` objects so that the `ItemWriter` receives the
 correct items. The `PatternMatchingCompositeLineMapper` makes this easy by allowing maps
-of patterns to `LineTokenizer` instances and patterns to `FieldSetMapper` instances to be
-configured, as shown in the following example:
+of patterns to `LineTokenizers` and patterns to `FieldSetMappers` to be configured.
+
+[role="xmlContent"]
+The following example shows how to define ranges for the `FixedLengthLineTokenizer` in
+XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1002,13 +1038,19 @@ prefixes  to lines. The `PatternMatcher` always matches the most specific patter
 possible, regardless of the order in the configuration. So if "LINE*" and "LINEA*" were
 both listed as patterns, "LINEA" would match pattern "LINEA*", while "LINEB" would match
 pattern "LINE*". Additionally, a single asterisk ("*") can serve as a default by matching
-any line not matched by any other pattern, as shown in the following example.
+any line not matched by any other pattern.
+
+[role="xmlContent"]
+The following example shows how to match a line not matched by any other pattern in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
 ----
 <entry key="*" value-ref="defaultLineTokenizer" />
 ----
+
+[role="javaContent"]
+The following example shows how to match a line not matched by any other pattern in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1178,7 +1220,8 @@ public void write(T item) throws Exception {
 }
 ----
 
-A simple configuration might look like the following:
+[role="xmlContent"]
+In XML, a simple example of configuration might look like the following:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1190,6 +1233,9 @@ A simple configuration might look like the following:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+In Java, a simple example of configuration might look like the following:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1302,8 +1348,10 @@ public class CustomerCredit {
 ----
 
 Because a domain object is being used, an implementation of the `FieldExtractor`
-interface must be provided, along with the delimiter to use, as shown in the following
-example:
+interface must be provided, along with the delimiter to use.
+
+[role="xmlContent"]
+The following example shows how to use the `FieldExtractor` with a delimiter in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1322,6 +1370,9 @@ example:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to use the `FieldExtractor` with a delimiter in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1372,8 +1423,11 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 
 Delimited is not the only type of flat file format. Many prefer to use a set width for
 each column to delineate between fields, which is usually referred to as 'fixed width'.
-Spring Batch supports this in file writing with the `FormatterLineAggregator`. Using the
-same `CustomerCredit` domain object described above, it can be configured as follows:
+Spring Batch supports this in file writing with the `FormatterLineAggregator`.
+
+[role="xmlContent"]
+Using the same `CustomerCredit` domain object described above, it can be configured as
+follows in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1392,6 +1446,10 @@ same `CustomerCredit` domain object described above, it can be configured as fol
     </property>
 </bean>
 ----
+
+[role="xmlContent"]
+Using the same `CustomerCredit` domain object described above, it can be configured as
+follows in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1415,12 +1473,18 @@ public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) th
 ----
 
 Most of the preceding example should look familiar. However, the value of the format
-property is new and is shown in the following element:
+property is new.
+
+[role="xmlContent"]
+The following example shows the format property in XML:
 
 [source, xml, role="xmlContent"]
 ----
 <property name="format" value="%-9s%-2.0f" />
 ----
+
+[role="javaContent"]
+The following example shows the format property in Java:
 
 [source, java, role="javaContent"]
 ----
@@ -1551,9 +1615,10 @@ object to be mapped. The example configuration demonstrates this with the value 
 * `Unmarshaller`: An unmarshalling facility provided by Spring OXM for mapping the XML
 fragment to an object.
 
+[role="xmlContent"]
 The following example shows how to define a `StaxEventItemReader` that works with a root
-element named `trade`, a resource of `org/springframework/batch/item/xml/domain/trades.xml`, and an unmarshaller
-called `tradeMarshaller`.
+element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+called `tradeMarshaller` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1564,6 +1629,11 @@ called `tradeMarshaller`.
     <property name="unmarshaller" ref="tradeMarshaller" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to define a `StaxEventItemReader` that works with a root
+element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+called `tradeMarshaller` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1585,7 +1655,10 @@ an alias passed in as a map with the first key and value being the name of the f
 (that is, a root element) and the object type to bind. Then, similar to a `FieldSet`, the
 names of the other elements that map to fields within the object type are described as
 key/value pairs in the map. In the configuration file, we can use a Spring configuration
-utility to describe the required alias, as follows:
+utility to describe the required alias.
+
+[role="xmlContent"]
+The following example shows how to describe the alias in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1604,6 +1677,9 @@ utility to describe the required alias, as follows:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to describe the alias in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1674,8 +1750,12 @@ Output works symmetrically to input. The `StaxEventItemWriter` needs a `Resource
 marshaller, and a `rootTagName`. A Java object is passed to a marshaller (typically a
 standard Spring OXM Marshaller) which writes to a `Resource` by using a custom event
 writer that filters the `StartDocument` and `EndDocument` events produced for each
-fragment by the OXM tools. The following example uses the
-`StaxEventItemWriter`:
+fragment by the OXM tools.
+// TODO How does `MarshallingEventWriterSerializer` get involved? Because there's a
+// property whose name is `marshaller`?
+
+[role="xmlContent"]
+The following XML example uses the `MarshallingEventWriterSerializer`:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1687,6 +1767,9 @@ fragment by the OXM tools. The following example uses the
     <property name="overwriteOutput" value="true" />
 </bean>
 ----
+
+[role="javaContent"]
+The following Java example uses the `MarshallingEventWriterSerializer`:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1705,10 +1788,12 @@ public StaxEventItemWriter itemWriter(Resource outputResource) {
 ----
 
 The preceding configuration sets up the three required properties and sets the optional
-`overwriteOutput=true` attribute, mentioned earlier in this chapter for specifying whether
-an existing file can be overwritten. It should be noted the marshaller used for the
-writer in the following example is the exact same as the one used in the reading example
-from earlier in the chapter:
+`overwriteOutput=true` attrbute, mentioned earlier in this chapter for specifying whether
+an existing file can be overwritten.
+
+[role="xmlContent"]
+The following XML example uses the same marshaller as the one used in the reading example
+shown earlier in the chapter:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1727,6 +1812,10 @@ from earlier in the chapter:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following Java example uses the same marshaller as the one used in the reading example
+shown earlier in the chapter:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1883,9 +1972,12 @@ input for both XML and flat file processing. Consider the following files in a d
 file-1.txt  file-2.txt  ignored.txt
 ----
 
-`file-1.txt` and `file-2.txt` are formatted the same and, for business reasons, should be
-processed together. The `MultiResourceItemReader` can be used to read in both files by
-using wildcards, as shown in the following example:
+file-1.txt and file-2.txt are formatted the same and, for business reasons, should be
+processed together. The `MuliResourceItemReader` can be used to read in both files by
+using wildcards.
+
+[role="xmlContent"]
+The following example shows how to read files with wildcards in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1895,6 +1987,9 @@ using wildcards, as shown in the following example:
     <property name="delegate" ref="flatFileItemReader" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to read files with wildcards in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2040,8 +2135,10 @@ is that it allows items to be 'streamed'. The `read` method can be called once, 
 can be written out by an `ItemWriter`, and then the next item can be obtained with
 `read`. This allows item reading and writing to be done in 'chunks' and committed
 periodically, which is the essence of high performance batch processing. Furthermore, it
-is very easily configured for injection into a Spring Batch `Step`, as shown in the
-following example:
+is  easily configured for injection into a Spring Batch `Step`.
+
+[role="xmlContent"]
+The following example shows how to inject an `ItemReader` into a `Step` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2054,6 +2151,9 @@ following example:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to inject an `ItemReader` into a `Step` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2156,9 +2256,12 @@ This configured `ItemReader` returns `CustomerCredit` objects in the exact same 
 as described by the `JdbcCursorItemReader`, assuming hibernate mapping files have been
 created correctly for the `Customer` table. The 'useStatelessSession' property defaults
 to true but has been added here to draw attention to the ability to switch it on or off.
-It is also worth noting that the fetch size of the underlying cursor can be set via the
+It is also worth noting that the fetch size of the underlying cursor can be set with the
 `setFetchSize` property. As with `JdbcCursorItemReader`, configuration is
-straightforward, as shown in the following example:
+straightforward.
+
+[role="xmlContent"]
+The following example shows how to inject a Hibernate `ItemReader` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2169,6 +2272,9 @@ straightforward, as shown in the following example:
     <property name="queryString" value="from CustomerCredit" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to inject a Hibernate `ItemReader` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2196,7 +2302,8 @@ The stored procedure can return the cursor in three different ways:
 * As a ref-cursor returned as an out parameter (used by Oracle and PostgreSQL).
 * As the return value of a stored function call.
 
-The following example configuration uses the same 'customer credit' example as earlier
+[role="xmlContent"]
+The following XML example configuration uses the same 'customer credit' example as earlier
 examples:
 
 .XML Configuration
@@ -2210,6 +2317,10 @@ examples:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following Java example configuration uses the same 'customer credit' example as
+earlier examples:
 
 .Java Configuration
 [source, xml, role="javaContent"]
@@ -2231,8 +2342,11 @@ The preceding example relies on the stored procedure to provide a `ResultSet` as
 returned result (option 1 from earlier).
 
 If the stored procedure returned a `ref-cursor` (option 2), then we would need to provide
-the position of the out parameter that is the returned `ref-cursor`. The following
-example shows how to work with the first parameter being a ref-cursor:
+the position of the out parameter that is the returned `ref-cursor`.
+
+[role="xmlContent"]
+The following example shows how to work with the first parameter being a ref-cursor in
+XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2246,6 +2360,10 @@ example shows how to work with the first parameter being a ref-cursor:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to work with the first parameter being a ref-cursor in
+Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2264,8 +2382,10 @@ public StoredProcedureItemReader reader(DataSource dataSource) {
 ----
 
 If the cursor was returned from a stored function (option 3), we would need to set the
-property "[maroon]#function#" to `true`. It defaults to `false`. The following example
-shows what that would look like:
+property "[maroon]#function#" to `true`. It defaults to `false`.
+
+[role="xmlContent"]
+The following example shows property to `true` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2279,6 +2399,9 @@ shows what that would look like:
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows property to `true` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2300,9 +2423,12 @@ In all of these cases, we need to define a `RowMapper` as well as a `DataSource`
 actual procedure name.
 
 If the stored procedure or function takes in parameters, then they must be declared and
-set via the `parameters` property. The following example, for Oracle, declares three
-parameters. The first one is the out parameter that returns the ref-cursor, and the
+set by using the `parameters` property. The following example, for Oracle, declares three
+parameters. The first one is the `out` parameter that returns the ref-cursor, and the
 second and third are in parameters that takes a value of type `INTEGER`.
+
+[role="xmlContent"]
+The following example shows how to work with parameters in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2337,6 +2463,9 @@ second and third are in parameters that takes a value of type `INTEGER`.
     <property name="preparedStatementSetter" ref="parameterSetter"/>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to work with parameters in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2396,7 +2525,8 @@ After the reader has been opened, it passes back one item per call to `read` in 
 basic fashion as any other `ItemReader`. The paging happens behind the scenes when
 additional rows are needed.
 
-The following example configuration uses a similar 'customer credit' example as the
+[role="xmlContent"]
+The following XML example configuration uses a similar 'customer credit' example as the
 cursor-based `ItemReaders` shown previously:
 
 .XML Configuration
@@ -2421,6 +2551,10 @@ cursor-based `ItemReaders` shown previously:
     <property name="rowMapper" ref="customerMapper"/>
 </bean>
 ----
+
+[role="javaContent"]
+The following Java example configuration uses a similar 'customer credit' example as the
+cursor-based `ItemReaders` shown previously:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2475,8 +2609,11 @@ be garbage collected once the page is processed.
 The `JpaPagingItemReader` lets you declare a JPQL statement and pass in a
 `EntityManagerFactory`. It then passes back one item per call to read in the same basic
 fashion as any other `ItemReader`. The paging happens behind the scenes when additional
-entities are needed. The following example configuration uses the same 'customer credit'
-example as the JDBC reader shown previously:
+entities are needed.
+
+[role="xmlContent"]
+The following XML example configuration uses the same 'customer credit' example as the
+JDBC reader shown previously:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2487,6 +2624,10 @@ example as the JDBC reader shown previously:
     <property name="pageSize" value="1000"/>
 </bean>
 ----
+
+[role="xmlContent"]
+The following Java example configuration uses the same 'customer credit' example as the
+JDBC reader shown previously:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2563,8 +2704,10 @@ another Spring Batch class or because it truly is the main `ItemReader` for a st
 fairly trivial to write an adapter class for each service that needs wrapping, but
 because it is such a common concern, Spring Batch provides implementations:
 `ItemReaderAdapter` and `ItemWriterAdapter`. Both classes implement the standard Spring
-method by invoking the delegate pattern and are fairly simple to set up. The following
-example uses the `ItemReaderAdapter`:
+method by invoking the delegate pattern and are fairly simple to set up.
+
+[role="xmlContent"]
+The following XML example uses the `ItemReaderAdapter`:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2576,6 +2719,9 @@ example uses the `ItemReaderAdapter`:
 
 <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
 ----
+
+[role="javaContent"]
+The following Java example uses the `ItemReaderAdapter`:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2600,7 +2746,10 @@ One important point to note is that the contract of the `targetMethod` must be t
 as the contract for `read`: When exhausted, it returns `null`. Otherwise, it returns an
 `Object`. Anything else prevents the framework from knowing when processing should end,
 either causing an infinite loop or incorrect failure, depending upon the implementation
-of the `ItemWriter`. The following example uses the `ItemWriterAdapter`:
+of the `ItemWriter`.
+
+[role="xmlContent"]
+The following XML example uses the `ItemWriterAdapter`:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2612,6 +2761,9 @@ of the `ItemWriter`. The following example uses the `ItemWriterAdapter`:
 
 <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
 ----
+
+[role="javaContent"]
+The following Java example uses the `ItemWriterAdapter`:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2659,7 +2811,10 @@ public interface Validator<T> {
 
 The contract is that the `validate` method throws an exception if the object is invalid
 and returns normally if it is valid. Spring Batch provides an out of the box
-`ValidatingItemProcessor`, as shown in the following bean definition:
+`ValidatingItemProcessor`.
+
+[role="xmlContent"]
+The following bean definition shows how to configure a `ValidatingItemProcessor` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2674,6 +2829,9 @@ and returns normally if it is valid. Spring Batch provides an out of the box
 	</property>
 </bean>
 ----
+
+[role="javaContent"]
+The following bean definition shows how to configure a `ValidatingItemProcessor` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2749,7 +2907,10 @@ contain an extra statement in the `where` clause, such as `where PROCESSED_IND =
 thereby ensuring that only unprocessed records are returned in the case of a restart. In
 this scenario, it is preferable to not store any state, such as the current row number,
 since it is irrelevant upon restart. For this reason, all readers and writers include the
-'saveState' property, as shown in the following example:
+'saveState' property.
+
+[role="xmlContent"]
+The following bean definition shows how to prevent state persistence in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2772,6 +2933,9 @@ since it is irrelevant upon restart. For this reason, all readers and writers in
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following bean definition shows how to prevent state persistence in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]

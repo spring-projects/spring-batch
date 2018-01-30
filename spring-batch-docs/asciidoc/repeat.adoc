@@ -236,7 +236,7 @@ configure AOP interceptors, see the Spring User Guide):
 ----
 
 [role="javaContent"]
-The following example demonstrates using java configuration to
+The following example demonstrates using Java configuration to
 repeat a service call to a method called `processMessage` (for more detail on how to
 configure AOP interceptors, see the Spring User Guide):
 

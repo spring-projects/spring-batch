@@ -11,7 +11,6 @@ include::toggle.adoc[]
 endif::onlyonetoggle[]
 
 [[spring-batch-integration-introduction]]
-
 === Spring Batch Integration Introduction
 
 Many users of Spring Batch may encounter requirements that are
@@ -39,27 +38,17 @@ also be embedded in a job (for example reading or writing items for
 processing via channels). Remote partitioning and remote chunking
 provide methods to distribute workloads over a number of workers.
 
-
 This section covers the following key concepts:
 
 [role="xmlContent"]
 * <<spring-batch-integration.adoc#namespace-support,Namespace Support>>
-
 [[continue-section-list]]
 * <<spring-batch-integration.adoc#launching-batch-jobs-through-messages,Launching Batch Jobs through Messages>>
-
-
-
 * <<spring-batch-integration.adoc#providing-feedback-with-informational-messages,Providing Feedback with Informational Messages>>
-
-
-
 * <<spring-batch-integration.adoc#asynchronous-processors,Asynchronous Processors>>
-
-
-
 * <<spring-batch-integration.adoc#externalizing-batch-process-execution,Externalizing
 Batch Process Execution>>
+
 
 
 [[namespace-support]]
@@ -261,13 +250,13 @@ Batch reference documentation on
 
 ===== Spring Batch Integration Configuration
 
-The following configuration creates a file
-`inbound-channel-adapter` to listen for CSV
-files in the provided directory, hand them off to our
-transformer (`FileMessageToJobRequest`),
-launch the job via the __Job Launching Gateway__, and then log the output of the
-`JobExecution` with the
-`logging-channel-adapter`.
+Consider a case where someone needs to create a file `inbound-channel-adapter` to listen
+for CSV files in the provided directory, hand them off to a transformer
+(`FileMessageToJobRequest`), launch the job through the _Job Launching Gateway_, and then
+log the output of the `JobExecution` with the `logging-channel-adapter`.
+
+[role="xmlContent"]
+The following example shows how that common case can be configured in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -296,6 +285,9 @@ launch the job via the __Job Launching Gateway__, and then log the output of the
 
 <int:logging-channel-adapter channel="jobLaunchReplyChannel"/>
 ----
+
+[role="javaContent"]
+The following example shows how that common case can be configured in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -332,13 +324,14 @@ public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) 
 
 
 [[example-itemreader-configuration]]
-
 ===== Example ItemReader Configuration
 
-Now that we are polling for files and launching jobs, we need to
-configure our Spring Batch
-`ItemReader` (for example) to use the files found at the location defined
-by the job parameter called "input.file.name", as shown in the following bean configuration:
+Now that we are polling for files and launching jobs, we need to configure our Spring
+Batch `ItemReader` (for example) to use the files found at the location defined by the job
+parameter called "input.file.name", as shown in the following bean configuration:
+
+[role="xmlContent"]
+The following XML example shows the necessary bean configuration:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -349,6 +342,9 @@ by the job parameter called "input.file.name", as shown in the following bean co
     ...
 </bean>
 ----
+
+[role="javaContent"]
+The following Java example shows the necessary bean configuration:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -414,7 +410,10 @@ to a `SubscribableChannel`.
 When this `Gateway` is receiving messages from a
 `PollableChannel`, you must either provide
 a global default `Poller` or provide a `Poller` sub-element to the
-`Job Launching Gateway`, as shown in the following example:
+`Job Launching Gateway`.
+
+[role="xmlContent"]
+The following example shows how to provide a poller in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -424,6 +423,9 @@ a global default `Poller` or provide a `Poller` sub-element to the
   <int:poller fixed-rate="1000">
 </batch-int:job-launching-gateway>
 ----
+
+[role="javaContent"]
+The following example shows how to provide a poller in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -438,9 +440,7 @@ public JobLaunchingGateway sampleJobLaunchingGateway() {
 ----
 
 [[providing-feedback-with-informational-messages]]
-
 ==== Providing Feedback with Informational Messages
-
 
 As Spring Batch jobs can run for long times, providing progress
 information is often critical. For example, stake-holders may want
@@ -448,50 +448,41 @@ to be notified if some or all parts of a batch job have failed.
 Spring Batch provides support for this information being gathered
 through:
 
-
-
 * Active polling
-
 * Event-driven listeners
 
+When starting a Spring Batch job asynchronously (for example, by using the `Job Launching
+Gateway`), a `JobExecution` instance is returned. Thus, `JobExecution.getJobId()` can be
+used to continuously poll for status updates by retrieving updated instances of the
+`JobExecution` from the `JobRepository` by using the `JobExplorer`. However, this is
+considered sub-optimal, and an event-driven approach should be preferred.
 
-When starting a Spring Batch job asynchronously (for example, by using the
-`Job Launching Gateway`), a
-`JobExecution` instance is returned. Thus,
-`JobExecution.getJobId()` can be used to
-continuously poll for status updates by retrieving updated
-instances of the `JobExecution` from the
-`JobRepository` by using the
-`JobExplorer`. However, this is considered
-sub-optimal, and an event-driven approach should be preferred.
+Therefore, Spring Batch provides listeners, including the three most commonly used
+listeners:
 
-
-Therefore, Spring Batch provides listeners, including the three most commonly used listeners:
-
-* StepListener
-* ChunkListener
-* JobExecutionListener
+* `StepListener`
+* `ChunkListener`
+* `JobExecutionListener`
 
 In the example shown in the following image, a Spring Batch job has been configured with a
-`StepExecutionListener`. Thus, Spring
-Integration receives and processes any step before or after
-events. For example, the received
-`StepExecution` can be inspected by using a
-`Router`. Based on the results of that
-inspection, various things can occur (such as routing a message
-to a Mail Outbound Channel Adapter), so that an Email notification
-can be sent out based on some condition.
+`StepExecutionListener`. Thus, Spring Integration receives and processes any step before
+or after events. For example, the received `StepExecution` can be inspected by using a
+`Router`. Based on the results of that inspection, various things can occur (such as
+routing a message to a Mail Outbound Channel Adapter), so that an Email notification can
+be sent out based on some condition.
 
 .Handling Informational Messages
 image::{batch-asciidoc}images/handling-informational-messages.png[Handling Informational Messages, scaledwidth="60%"]
 
 
 The following two-part example shows how a listener is configured to send a
-message to a `Gateway` for a
-`StepExecution` events and log its output to a
+message to a `Gateway` for a `StepExecution` events and log its output to a
 `logging-channel-adapter`.
 
-First, create the notification integration beans:
+First, create the notification integration beans.
+
+[role="xmlContent"]
+The following example shows the how to create the notification integration beans in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -504,6 +495,9 @@ First, create the notification integration beans:
 
 <int:logging-channel-adapter channel="stepExecutionsChannel"/>
 ----
+
+[role="javaContent"]
+The following example shows the how to create the notification integration beans in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -522,11 +516,14 @@ public interface NotificationExecutionListener extends StepExecutionListener {}
 ----
 
 [role="javaContent"]
-NOTE: You will need to add the `@IntegrationComponentScan` annotation to your configuration.
+NOTE: You need to add the `@IntegrationComponentScan` annotation to your configuration.
 
 [[message-gateway-entry-list]]
 
-Second, modify your job to add a step-level listener:
+Second, modify your job to add a step-level listener.
+
+[role="xmlContent"]
+The following example shows the how to add a step-level listener in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -543,6 +540,9 @@ Second, modify your job to add a step-level listener:
     </step>
 </job>
 ----
+
+[role="javaContent"]
+The following example shows the how to add a step-level listener in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -561,25 +561,17 @@ public Job importPaymentsJob() {
 ==== Asynchronous Processors
 
 
-Asynchronous Processors help you to scale the processing of
-items. In the asynchronous processor use case, an
-`AsyncItemProcessor` serves as a dispatcher,
-executing the logic of the `ItemProcessor` for an
-item on a new thread. Once the item completes, the `Future` is passed to
-the `AsynchItemWriter` to be written.
+Asynchronous Processors help you to scale the processing of items. In the asynchronous
+processor use case, an `AsyncItemProcessor` serves as a dispatcher, executing the logic of
+the `ItemProcessor` for an item on a new thread. Once the item completes, the `Future` is
+passed to the `AsynchItemWriter` to be written.
 
-
-
-Therefore, you can increase performance by using asynchronous item
-processing, basically allowing you to implement
-__fork-join__ scenarios. The
-`AsyncItemWriter` gathers the results and
+Therefore, you can increase performance by using asynchronous item processing, basically
+letting you implement _fork-join_ scenarios. The `AsyncItemWriter` gathers the results and
 writes back the chunk as soon as all the results become available.
 
-
-
-The following example shows how to configuration the `AsyncItemProcessor`:
-
+[role="xmlContent"]
+The following example shows how to configuration the `AsyncItemProcessor` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -595,6 +587,9 @@ The following example shows how to configuration the `AsyncItemProcessor`:
 </bean>
 ----
 
+[role="xmlContent"]
+The following example shows how to configuration the `AsyncItemProcessor` in XML:
+
 .Java Configuration
 [source, java, role="javaContent"]
 ----
@@ -607,12 +602,11 @@ public AsyncItemProcessor processor(ItemProcessor itemProcessor, TaskExecutor ta
 }
 ----
 
-The `delegate` property refers
-to your `ItemProcessor` bean, and
-the `taskExecutor` property
-refers to the `TaskExecutor` of your choice.
+The `delegate` property refers to your `ItemProcessor` bean, and the `taskExecutor`
+property refers to the `TaskExecutor` of your choice.
 
-The following example shows how to configure the `AsyncItemWriter`:
+[role="xmlContent"]
+The following example shows how to configure the `AsyncItemWriter` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -624,6 +618,9 @@ The following example shows how to configure the `AsyncItemWriter`:
   </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to configure the `AsyncItemWriter` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -687,8 +684,9 @@ Spring Integration's rich collection of Channel Adapters (such as
 JMS and AMQP), you can distribute chunks of a Batch job to
 external systems for processing.
 
-A simple job with a step to be remotely chunked might have a
-configuration similar to the following:
+[role="xmlContent"]
+A job with a step to be remotely chunked might have a configuration similar to the
+following in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -702,6 +700,10 @@ configuration similar to the following:
   </step>
 </job>
 ----
+
+[role="javaContent"]
+A job with a step to be remotely chunked might have a configuration similar to the
+following in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -717,15 +719,15 @@ public Job chunkJob() {
  }
 ----
 
-The `ItemReader` reference points to the bean you want
-to use for reading data on the manager. The `ItemWriter` reference
-points to a special `ItemWriter`
-(called `ChunkMessageChannelItemWriter`),
-as described above. The processor (if any) is left off the
-manager configuration, as it is configured on the worker. The
-following configuration provides a basic manager setup. You
-should check any additional component properties, such as
-throttle limits and so on, when implementing your use case.
+The `ItemReader` reference points to the bean you want to use for reading data on the
+master. The `ItemWriter` reference points to a special `ItemWriter` (called
+`ChunkMessageChannelItemWriter`), as described above. The processor (if any) is left off
+the master configuration, as it is configured on the slave. You should check any
+additional component properties, such  as throttle limits and so on, when implementing
+your use case.
+
+[role="xmlContent"]
+The following XML configuration  provides a basic master setup:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -757,6 +759,9 @@ throttle limits and so on, when implementing your use case.
     destination-name="replies"
     channel="replies"/>
 ----
+
+[role="javaContent"]
+The following Java configuration  provides a basic master setup:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -824,8 +829,10 @@ referenced by our job step, uses the
 `ChunkMessageChannelItemWriter` for writing chunks over the
 configured middleware.
 
-Now we can move on to the worker configuration, as shown in the following example:
+Now we can move on to the slave configuration.
 
+[role="xmlContent"]
+The following example shows the slave configuration in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -866,6 +873,9 @@ Now we can move on to the worker configuration, as shown in the following exampl
   </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows the slave configuration in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1064,14 +1074,13 @@ remoting fabric or grid environment
 
 
 
-Similar to remote chunking, JMS can be used as the "remoting
-fabric". In that case, use a `MessageChannelPartitionHandler` instance as the `PartitionHandler` implementation,
-as described above.
-The following example
-assumes an existing partitioned job and focuses on
-the `MessageChannelPartitionHandler` and JMS
-configuration:
+Similar to remote chunking, JMS can be used as the "`remoting fabric`". In that case, use
+a `MessageChannelPartitionHandler` instance as the `PartitionHandler` implementation,
+as described earlier.
 
+[role="xmlContent"]
+The following example assumes an existing partitioned job and focuses on the
+`MessageChannelPartitionHandler` and JMS configuration in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1124,6 +1133,10 @@ configuration:
 <bean id="stepLocator"
     class="org.springframework.batch.integration.partition.BeanFactoryStepLocator" />
 ----
+
+[role="javaContent"]
+The following example assumes an existing partitioned job and focuses on the
+`MessageChannelPartitionHandler` and JMS configuration in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1233,7 +1246,12 @@ public IntegrationFlow outboundJmsStaging() {
 }
 ----
 
-You must also ensure that the partition `handler` attribute maps to the `partitionHandler` bean, as shown in the following example:
+You must also ensure that the partition `handler` attribute maps to the `partitionHandler`
+bean.
+
+[role="xmlContent"]
+The following example maps the partition `handler` attribute to the `partitionHandler` in
+XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1245,6 +1263,10 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
   </step>
 </job>
 ----
+
+[role="javaContent"]
+The following example maps the partition `handler` attribute to the `partitionHandler` in
+Java:
 
 .Java Configuration
 [source, java, role="javaContent"]

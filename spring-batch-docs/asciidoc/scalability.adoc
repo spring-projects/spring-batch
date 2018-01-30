@@ -41,8 +41,7 @@ The simplest way to start parallel processing is to add a `TaskExecutor` to your
 configuration.
 
 [role="xmlContent"]
-For example, you might add an attribute of the `tasklet`, as shown in the
-following example:
+For example, you might add an attribute of the `tasklet`, as follows:
 
 [source, xml, role="xmlContent"]
 ----
@@ -52,7 +51,7 @@ following example:
 ----
 
 [role="javaContent"]
-When using java configuration, a `TaskExecutor` can be added to the step
+When using java configuration, a `TaskExecutor` can be added to the step,
 as shown in the following example:
 
 .Java Configuration
@@ -101,7 +100,8 @@ For example you might increase the throttle-limit, as shown in the following exa
 ----
 
 [role="javaContent"]
-When using java configuration, the builders provide access to the throttle limit:
+When using Java configuration, the builders provide access to the throttle limit, as shown
+in the following example:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -175,7 +175,7 @@ as shown in the following example:
 ----
 
 [role="javaContent"]
-When using java configuration, executing steps `(step1,step2)` in parallel with `step3`
+When using Java configuration, executing steps `(step1,step2)` in parallel with `step3`
 is straightforward, as shown in the following example:
 
 .Java Configuration
@@ -295,7 +295,8 @@ many objects and or processes playing this role, and the `PartitionStep` is show
 the execution.
 
 [role="xmlContent"]
-The following example shows the `PartitionStep` configuration:
+The following example shows the `PartitionStep` configuration when using XML
+configuration:
 
 [source, xml, role="xmlContent"]
 ----
@@ -307,7 +308,8 @@ The following example shows the `PartitionStep` configuration:
 ----
 
 [role="javaContent"]
-The following example shows the `PartitionStep` configuration using java configuration:
+The following example shows the `PartitionStep` configuration when using Java
+configuration:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -469,8 +471,10 @@ the `Partitioner` output might resemble the content of the following table:
 |filecopy:partition2|fileName=/home/data/three
 |===============
 
-Then the file name can be bound to a step using late binding to the execution context, as
-shown in the following example:
+Then the file name can be bound to a step using late binding to the execution context.
+
+[role="xmlContent"]
+The following example shows how to define late binding in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -480,6 +484,9 @@ shown in the following example:
     <property name="resources" value="#{stepExecutionContext[fileName]}/*"/>
 </bean>
 ----
+
+[role="xmlContent"]
+The following example shows how to define late binding in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]

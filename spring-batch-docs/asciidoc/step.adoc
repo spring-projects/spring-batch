@@ -56,8 +56,8 @@ Despite the relatively short list of required dependencies for a `Step`, it is a
 extremely complex class that can potentially contain many collaborators.
 
 [role="xmlContent"]
-In order to ease configuration, the Spring Batch namespace can be used, as shown in the
-following example:
+In order to ease configuration, the Spring Batch XML namespace can be used, as shown in
+the following example:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -72,7 +72,7 @@ following example:
 ----
 
 [role="javaContent"]
-When using java configuration, the Spring Batch builders can be used, as shown in the
+When using Java configuration, the Spring Batch builders can be used, as shown in the
 following example:
 
 .Java Configuration
@@ -121,31 +121,32 @@ transactions during processing.
 transactions during processing.
 
 [role="xmlContent"]
-* `job-repository`: The `JobRepository` that periodically stores the `StepExecution` and
-`ExecutionContext` during processing (just before committing). For an in-line <step/>
-(one defined within a <job/>), it is an attribute on the <job/> element. For a standalone
-step, it is defined as an attribute of the <tasklet/>.
+* `job-repository`: The XML-specific name of the `JobRepository` that periodically stores
+the `StepExecution` and `ExecutionContext` during processing (just before committing). For
+an in-line `<step/>` (one defined within a `<job/>`), it is an attribute on the `<job/>`
+element. For a standalone `<step/>`, it is defined as an attribute of the <tasklet/>.
 
 [role="javaContent"]
-* `repository`: The `JobRepository` that periodically stores the `StepExecution` and
-`ExecutionContext` during processing (just before committing).
+* `repository`: The The Java-specific name of the `JobRepository` that periodically stores
+the `StepExecution` and `ExecutionContext` during processing (just before committing).
 
 [role="xmlContent"]
-* `commit-interval`: The number of items to be processed before the transaction is
-committed.
+* `commit-interval`: The XML-specific name of the the number of items to be processed
+before the transaction is committed.
 
 [role="javaContent"]
-* `chunk`: Indicates that this is an item based step and the number of items to be
-processed before the transaction is committed.
+* `chunk`: The XML-specific name of the dependency that indicates that this is an
+item-based step and the number of items to be processed before the transaction is
+committed.
 
 [role="xmlContent"]
 It should be noted that `job-repository` defaults to `jobRepository` and
-`transaction-manager` defaults to `transactionManger`. Also, the `ItemProcessor` is
+`transaction-manager` defaults to `transactionManager`. Also, the `ItemProcessor` is
 optional, since the item could be directly passed from the reader to the writer.
 
 [role="javaContent"]
 It should be noted that `repository` defaults to `jobRepository` and `transactionManager`
-defaults to `transactionManger` (all provided through the infrastructure from
+defaults to `transactionManager` (all provided through the infrastructure from
 `@EnableBatchProcessing`). Also, the `ItemProcessor` is optional, since the item could be
 directly passed from the reader to the writer.
 endif::backend-html5[]
@@ -289,8 +290,11 @@ since beginning and committing a transaction is expensive. Ideally, it is prefer
 process as many items as possible in each transaction, which is completely dependent upon
 the type of data being processed and the resources with which the step is interacting.
 For this reason, the number of items that are processed within a commit can be
-configured. The following example shows a `step` whose `tasklet` has a `commit-interval`
-value of 10.
+configured.
+
+[role="xmlContent"]
+The following example shows a `step` whose `tasklet` has a `commit-interval`
+value of 10 as it would be defined in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -303,6 +307,10 @@ value of 10.
     </step>
 </job>
 ----
+
+[role="javaContent"]
+The following example shows a `step` whose `tasklet` has a `commit-interval`
+value of 10 as it would be defined in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -345,8 +353,10 @@ be started. For example, a particular `Step` might need to be configured so that
 runs once because it invalidates some resource that must be fixed manually before it can
 be run again. This is configurable on the step level, since different steps may have
 different requirements. A `Step` that may only be executed once can exist as part of the
-same `Job` as a `Step` that can be run infinitely. The following code fragment shows an
-example of a start limit configuration:
+same `Job` as a `Step` that can be run infinitely.
+
+[role="xmlContent"]
+The following code fragment shows an example of a start limit configuration in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -357,6 +367,9 @@ example of a start limit configuration:
     </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following code fragment shows an example of a start limit configuration in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -372,8 +385,8 @@ public Step step1() {
 }
 ----
 
-The step above can be run only once. Attempting to run it again causes a
-`StartLimitExceededException` to be thrown. Note that the default value for the
+The step shown in the preceding example can be run only once. Attempting to run it again
+causes a `StartLimitExceededException` to be thrown. Note that the default value for the
 start-limit is `Integer.MAX_VALUE`.
 
 [[allowStartIfComplete]]
@@ -384,7 +397,10 @@ run, regardless of whether or not they were successful the first time. An exampl
 be a validation step or a `Step` that cleans up resources before processing. During
 normal processing of a restarted job, any step with a status of 'COMPLETED', meaning it
 has already been completed successfully, is skipped. Setting `allow-start-if-complete` to
-"true" overrides this so that the step always runs, as shown in the following example:
+"true" overrides this so that the step always runs.
+
+[role="xmlContent"]
+The following code fragment shows how to define a restartable job in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -395,6 +411,9 @@ has already been completed successfully, is skipped. Setting `allow-start-if-com
     </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following code fragment shows how to define a restartable job in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -413,7 +432,9 @@ public Step step1() {
 [[stepRestartExample]]
 ===== `Step` Restart Configuration Example
 
-The following example shows how to configure a job to have steps that can be restarted:
+[role="xmlContent"]
+The following XML example shows how to configure a job to have steps that can be
+restarted:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -439,6 +460,10 @@ The following example shows how to configure a job to have steps that can be res
     </step>
 </job>
 ----
+
+[role="javaContent"]
+The following Java example shows how to configure a job to have steps that can be
+restarted:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -552,7 +577,8 @@ allow for skips. If a vendor is not loaded because it was formatted incorrectly 
 missing necessary information, then there probably are not issues. Usually, these bad
 records are logged as well, which is covered later when discussing listeners.
 
-The following example shows an example of using a skip limit:
+[role="xmlContent"]
+The following XML example shows an example of using a skip limit:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -568,6 +594,9 @@ The following example shows an example of using a skip limit:
    </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following Java example shows an example of using a skip limit:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -598,8 +627,10 @@ skip triggers the exception, not the tenth.
 One problem with the preceding example is that any other exception besides a
 `FlatFileParseException` causes the `Job` to fail. In certain scenarios, this may be the
 correct behavior. However, in other scenarios, it may be easier to identify which
-exceptions should cause failure and skip everything else, as shown in the following
-example:
+exceptions should cause failure and skip everything else.
+
+[role="xmlContent"]
+The following XML example shows an example excluding a particular exception:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -616,6 +647,9 @@ example:
     </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following Java example shows an example excluding a particular exception:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -648,11 +682,11 @@ ifdef::backend-html5[]
 The order of the `<include/>` and `<exclude/>` elements does not matter.
 
 [role="javaContent"]
-The order of the `skip` and `noSkip` calls does not matter.
+The order of the `skip` and `noSkip` method calls does not matter.
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-The order of specifying include vs exclude (by using either the XML tags or `skip` and
+The order of specifying include versus exclude (by using either the XML tags or `skip` and
 `noSkip` method calls) does not matter.
 endif::backend-pdf[]
 
@@ -664,8 +698,10 @@ not all exceptions are deterministic. If a `FlatFileParseException` is encounter
 reading, it is always thrown for that record. Resetting the `ItemReader` does not help.
 However, for other exceptions, such as a `DeadlockLoserDataAccessException`, which
 indicates that the current process has attempted to update a record that another process
-holds a lock on, waiting and trying again might result in success. In this case, retry
-should be configured as follows:
+holds a lock on. Waiting and trying again might result in success.
+
+[role="xmlContent"]
+In XML, retry should be configured as follows:
 
 [source, xml, role="xmlContent"]
 ----
@@ -680,6 +716,9 @@ should be configured as follows:
    </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+In Java, retry should be configured as follows:
 
 [source, java, role="javaContent"]
 ----
@@ -709,7 +748,10 @@ described earlier, exceptions thrown from the `ItemReader` do not cause a rollba
 However, there are many scenarios in which exceptions thrown from the `ItemWriter` should
 not cause a rollback, because no action has taken place to invalidate the transaction.
 For this reason, the `Step` can be configured with a list of exceptions that should not
-cause rollback, as shown in the following example:
+cause rollback.
+
+[role="xmlContent"]
+In XML, you can control rollback as follows:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -723,6 +765,9 @@ cause rollback, as shown in the following example:
    </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+In Java, you can control rollback as follows:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -748,7 +793,10 @@ from the reader. However, there are certain scenarios in which the reader is bui
 top of a transactional resource, such as a JMS queue. In this case, since the queue is
 tied to the transaction that is rolled back, the messages that have been pulled from the
 queue are put back on. For this reason, the step can be configured to not buffer the
-items, as shown in the following example:
+items.
+
+[role="xmlContent"]
+The following example shows how to create reader that does not buffer items in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -760,6 +808,9 @@ items, as shown in the following example:
     </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following example shows how to create reader that does not buffer items in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -782,8 +833,11 @@ Transaction attributes can be used to control the `isolation`, `propagation`, an
 `timeout` settings. More information on setting transaction attributes can be found in
 the
 https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction[Spring
-core documentation]. The following example sets the `isolation`, `propagation`, and
-`timeout` transaction attributes:
+core documentation].
+
+[role="xmlContent"]
+The following example sets the `isolation`, `propagation`, and `timeout` transaction
+attributes in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -797,6 +851,10 @@ core documentation]. The following example sets the `isolation`, `propagation`, 
     </tasklet>
 </step>
 ----
+
+[role="javaContent"]
+The following example sets the `isolation`, `propagation`, and `timeout` transaction
+attributes in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -830,7 +888,10 @@ If the `ItemReader`, `ItemProcessor`, or `ItemWriter` itself implements the `Ite
 interface, then these are registered automatically. Any other streams need to be
 registered separately. This is often the case where indirect dependencies, such as
 delegates, are injected into the reader and writer. A stream can be registered on the
-`Step` through the 'streams' element, as illustrated in the following example:
+`step` through the 'stream' element.
+
+[role="xmlContent"]
+The following example shows how to register a `stream` on a `step` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -845,6 +906,9 @@ delegates, are injected into the reader and writer. A stream can be registered o
         </chunk>
     </tasklet>
 </step>
+
+[role="javaContent"]
+The following example shows how to register a `stream` on a `step` in Java:
 
 <beans:bean id="compositeWriter"
             class="org.springframework.batch.item.support.CompositeItemWriter">
@@ -910,8 +974,10 @@ itself since it is empty) can be applied to a step through the `listeners` eleme
 The `listeners` element is valid inside a step, tasklet, or chunk declaration.  It is
 recommended that you declare the listeners at the level at which its function applies,
 or, if it is multi-featured (such as `StepExecutionListener` and `ItemReadListener`),
-then declare it at the most granular level where it applies. The following example shows
-a listener applied at the chunk level:
+then declare it at the most granular level where it applies.
+
+[role="xmlContent"]
+The following example shows a listener applied at the chunk level in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -925,6 +991,9 @@ a listener applied at the chunk level:
     </tasklet>
 </step>
 ----
+
+[role="xmlContent"]
+The following example shows a listener applied at the chunk level in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1165,10 +1234,9 @@ statement.
 
 ifdef::backend-html5[]
 [role="xmlContent"]
-To create a `TaskletStep`, the 'ref' attribute of the
-    <tasklet/> element should reference a bean that defines a
-    `Tasklet` object. No <chunk/> element should be
-    used within the <tasklet/>. The following example shows a simple tasklet:
+To create a `TaskletStep` in XML, the 'ref' attribute of the `<tasklet/>` element should
+reference  a bean that defines a `Tasklet` object. No `<chunk/>` element should be used
+within the `<tasklet/>`. The following example shows a simple tasklet:
 
 [source, xml, role="xmlContent"]
 ----
@@ -1178,9 +1246,9 @@ To create a `TaskletStep`, the 'ref' attribute of the
 ----
 
 [role="javaContent"]
-To create a `TaskletStep`, the bean passed to the `tasklet` method of the builder should
-implement the `Tasklet` interface.  No call to `chunk` should be called when building a
-`TaskletStep`.  The following example shows  a simple tasklet:
+To create a `TaskletStep` in Java, the bean passed to the `tasklet` method of the builder
+should implement the `Tasklet` interface.  No call to `chunk` should be called when
+building a `TaskletStep`. The following example shows a simple tasklet:
 
 [source, java, role="javaContent"]
 ----
@@ -1233,8 +1301,10 @@ As with other adapters for the `ItemReader` and `ItemWriter` interfaces, the `Ta
 interface contains an implementation that allows for adapting itself to any pre-existing
 class: `TaskletAdapter`. An example where this may be useful is an existing DAO that is
 used to update a flag on a set of records. The `TaskletAdapter` can be used to call this
-class without having to write an adapter for the `Tasklet` interface, as shown in the
-following example:
+class without having to write an adapter for the `Tasklet` interface.
+
+[role="xmlContent"]
+The following example shows how to define a `TaskletAdapter` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1246,6 +1316,9 @@ following example:
     <property name="targetMethod" value="updateFoo" />
 </bean>
 ----
+
+[role="JavaContent"]
+The following example shows how to define a `TaskletAdapter` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1304,9 +1377,12 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
 }
 ----
 
-The preceding `Tasklet` implementation deletes all files within a given directory. It
+The preceding `tasklet` implementation deletes all files within a given directory. It
 should be noted that the `execute` method is called only once. All that is left is to
-reference the `Tasklet` from the `Step`:
+reference the `tasklet` from the `step`.
+
+[role="xmlContent"]
+The following example shows how to reference the `tasklet` from the `step` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1327,6 +1403,9 @@ reference the `Tasklet` from the `Step`:
     </beans:property>
 </beans:bean>
 ----
+
+[role="javaContent"]
+The following example shows how to reference the `tasklet` from the `step` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1373,8 +1452,10 @@ in the following image:
 .Sequential Flow
 image::{batch-asciidoc}images/sequential-flow.png[Sequential Flow, scaledwidth="60%"]
 
-This can be achieved by using the 'next' attribute of the step element, as shown in the
-following example:
+This can be achieved by using the 'next' in a `step`.
+
+[role="xmlContent"]
+The following example shows how to use the `next` attribute in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1385,6 +1466,9 @@ following example:
     <step id="stepC" parent="s3" />
 </job>
 ----
+
+[role="javaContent"]
+The following example shows how to use the `next()` method in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1406,11 +1490,9 @@ then the entire `Job` fails and 'step B' does not execute.
 [role="xmlContent"]
 [NOTE]
 ====
-With the Spring Batch namespace, the first step listed in the
-        configuration is __always__ the first step
-        run by the `Job`. The order of the other
-        step elements does not matter, but the first step must always appear
-        first in the xml.
+With the Spring Batch XML namespace, the first step listed in the configuration is
+_always_ the first step run by the `Job`. The order of the other step elements does not
+matter, but the first step must always appear first in the xml.
 ====
 
 [[conditionalFlow]]
@@ -1418,18 +1500,20 @@ With the Spring Batch namespace, the first step listed in the
 
 In the example above, there are only two possibilities:
 
-. The `Step` is successful and the next `Step` should be executed.
-. The `Step` failed and, thus, the `Job` should fail.
+. The `step` is successful and the next `step` should be executed.
+. The `step` failed and, thus, the `job` should fail.
 
 In many cases, this may be sufficient. However, what about a scenario in which the
-failure of a `Step` should trigger a different `Step`, rather than causing failure? The
+failure of a `step` should trigger a different `step`, rather than causing failure? The
 following image shows such a flow:
 
 .Conditional Flow
 image::{batch-asciidoc}images/conditional-flow.png[Conditional Flow, scaledwidth="60%"]
 
+
 [[nextElement]]
-In order to handle more complex scenarios, the Spring Batch namespace allows transition
+[role="xmlContent"]
+In order to handle more complex scenarios, the Spring Batch XML namespace allows transitions
 elements to be defined within the step element. One such transition is the `next`
 element. Like the `next` attribute, the `next` element tells the `Job` which `Step` to
 execute next. However, unlike the attribute, any number of `next` elements are allowed on
@@ -1438,6 +1522,7 @@ transition elements are used, then all of the behavior for the `Step` transition
 defined explicitly. Note also that a single step cannot have both a `next` attribute and
 a `transition` element.
 
+[role="xmlContent"]
 The `next` element specifies a pattern to match and the step to execute next, as shown in
 the following example:
 
@@ -1453,6 +1538,12 @@ the following example:
     <step id="stepC" parent="s3" />
 </job>
 ----
+
+[role="javaContent"]
+The Java API offers a fluent set of methods that let you specify the flow and what to do
+when a step fails. The following example shows how to specify one step (`stepA`) and then
+proceed to either of two different steps (`stepB` and `stepC`), depending on whether
+`stepA` succeeds:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1474,7 +1565,7 @@ pattern-matching scheme to match the `ExitStatus` that results from the executio
 `Step`.
 
 [role="javaContent"]
-When using java configuration the `on` method uses a simple pattern-matching scheme to
+When using java configuration, the `on()` method uses a simple pattern-matching scheme to
 match the `ExitStatus` that results from the execution of the `Step`.
 
 Only two special characters are allowed in the pattern:
@@ -1532,13 +1623,16 @@ More specifically, when using XML configuration, the 'next' element shown in the
 preceding XML configuration example references the exit code of `ExitStatus`.
 
 [role="xmlContent"]
-When using Java configuration, the 'on' method shown in the preceding
+When using Java configuration, the 'on()' method shown in the preceding
 Java configuration example references the exit code of `ExitStatus`.
 
 In English, it says: "go to stepB if the exit code is `FAILED` ". By default, the exit
 code is always the same as the `BatchStatus` for the `Step`, which is why the entry above
 works. However, what if the exit code needs to be different? A good example comes from
 the skip sample job within the samples project:
+
+[role="xmlContent"]
+The following example shows how to work with a different exit code in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1549,6 +1643,9 @@ the skip sample job within the samples project:
     <next on="*" to="step2" />
 </step>
 ----
+
+[role="javaContent"]
+The following example shows how to work with a different exit code in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1571,7 +1668,7 @@ public Job job() {
 . The `Step` completed successfully but with an exit code of 'COMPLETED WITH SKIPS'. In
 this case, a different step should be run to handle the errors.
 
-The above configuration works. However, something needs to change the exit code based on
+The preceding configuration works. However, something needs to change the exit code based on
 the condition of the execution having skipped records, as shown in the following example:
 
 [source, java]
@@ -1604,13 +1701,18 @@ While these statuses are determined for the `Step` by the code that is executed,
 statuses for the `Job` are determined based on the configuration.
 
 So far, all of the job configurations discussed have had at least one final `Step` with
-no transitions. For example, after the following step executes, the `Job` ends, as shown
-in the following example:
+no transitions.
+
+[role="xmlContent"]
+In the following XML example, after the `step` executes, the `Job` ends:
 
 [source, xml, role="xmlContent"]
 ----
 <step id="stepC" parent="s3"/>
 ----
+
+[role="javaContent"]
+In the following Java example, after the `step` executes, the `Job` ends:
 
 [source, java, role="javaContent"]
 ----
@@ -1659,10 +1761,13 @@ also allows for an optional 'exitStatus' parameter that can be used to customize
 `ExitStatus` of the `Job`. If no 'exitStatus' value is provided, then the `ExitStatus` is
 `COMPLETED` by default, to match the `BatchStatus`.
 
-In the following scenario, if `step2` fails, then the `Job` stops with a `BatchStatus` of
-`COMPLETED` and an `ExitStatus` of `COMPLETED` and `step3` does not run. Otherwise,
-execution moves to `step3`. Note that if `step2` fails, the `Job` is not restartable
-(because the status is `COMPLETED`).
+Consider the following scenario: if `step2` fails, then the `Job` stops with a
+`BatchStatus` of `COMPLETED` and an `ExitStatus` of `COMPLETED` and `step3` does not run.
+Otherwise, execution moves to `step3`. Note that if `step2` fails, the `Job` is not
+restartable (because the status is `COMPLETED`).
+
+[role="xmlContent"]
+The following example shows the scenario in XML:
 
 [source, xml, role="xmlContent"]
 ----
@@ -1675,6 +1780,9 @@ execution moves to `step3`. Note that if `step2` fails, the `Job` is not restart
 
 <step id="step3" parent="s3">
 ----
+
+[role="javaContent"]
+The following example shows the scenario in Java:
 
 [source, java, role="javaContent"]
 ----
@@ -1703,10 +1811,13 @@ attribute that can be used to customize the `ExitStatus` of the `Job`. If no 'ex
 attribute is given, then the `ExitStatus` is `FAILED` by default, to match the
 `BatchStatus`.
 
-In the following scenario, if `step2` fails, then the `Job` stops with a `BatchStatus` of
-`FAILED` and an `ExitStatus` of `EARLY TERMINATION` and `step3` does not execute.
-Otherwise, execution moves to `step3`. Additionally, if `step2` fails and the `Job` is
-restarted, then execution begins again on `step2`.
+Consider the following scenario if `step2` fails, then the `Job` stops with a
+`BatchStatus` of `FAILED` and an `ExitStatus` of `EARLY TERMINATION` and `step3` does not
+execute. Otherwise, execution moves to `step3`. Additionally, if `step2` fails and the
+`Job` is restarted, then execution begins again on `step2`.
+
+[role="xmlContent"]
+The following example shows the scenario in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1720,6 +1831,9 @@ restarted, then execution begins again on `step2`.
 
 <step id="step3" parent="s3">
 ----
+
+[role="javaContent"]
+The following example shows the scenario in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -1743,15 +1857,18 @@ Configuring a job to stop at a particular step instructs a `Job` to stop with a
 so that the operator can take some action before restarting the `Job`.
 
 [role="xmlContent"]
-When using XML configuration 'stop' element requires a 'restart' attribute that specifies
-the step where execution should pick up when the "Job is restarted".
+When using XML configuration, a 'stop' element requires a 'restart' attribute that specifies
+the step where execution should pick up when the Job is restarted.
 
 [role="javaContent"]
-When using java configuration, the `stopAndRestart` method requires a 'restart' attribute
-that specifies the step where execution should pick up when the "Job is restarted".
+When using Java configuration, the `stopAndRestart` method requires a 'restart' attribute
+that specifies the step where execution should pick up when the Job is restarted.
 
-In the following scenario, if `step1` finishes with `COMPLETE`, then the job stops.
-Once it is restarted, execution begins on `step2`.
+Consider the following scenario: if `step1` finishes with `COMPLETE`, then the job then
+stops. Once it is restarted, execution begins on `step2`.
+
+[role="xmlContent"]
+The following listing shows the scenario in XML:
 
 [source, xml, role="xmlContent"]
 ----
@@ -1761,6 +1878,9 @@ Once it is restarted, execution begins on `step2`.
 
 <step id="step2" parent="s2"/>
 ----
+
+[role="javaContent"]
+The following example shows the scenario in Java:
 
 [source, java, role="javaContent"]
 ----
@@ -1904,7 +2024,11 @@ public Job job(Flow flow1, Flow flow2) {
 
 Part of the flow in a job can be externalized as a separate bean definition and then
 re-used. There are two ways to do so. The first is to simply declare the flow as a
-reference to one defined elsewhere, as shown in the following example:
+reference to one defined elsewhere.
+
+[role="xmlContent"]
+The following example shows how to declare a flow as a reference to a flow defined
+elsewhere in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1920,7 +2044,11 @@ reference to one defined elsewhere, as shown in the following example:
 </flow>
 ----
 
-.Java Configuration
+[role="javaContent"]
+The following example shows how to declare a flow as a reference to a flow defined
+elsewhere in Java:
+
+.Java Confguration
 [source, java, role="javaContent"]
 ----
 @Bean
@@ -1952,7 +2080,7 @@ The other form of an externalized flow is to use a `JobStep`. A `JobStep` is sim
 the flow specified.
 
 [role="xmlContent"]
-The following XML snippet shows an example of a `JobStep`:
+The following example hows an example of a `JobStep` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -1972,7 +2100,7 @@ The following XML snippet shows an example of a `JobStep`:
 ----
 
 [role="javaContent"]
-The following Java snippet shows an example of a `JobStep`:
+The following example shows an example of a `JobStep` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2023,7 +2151,10 @@ smaller modules and control the flow of jobs.
 Both the XML and flat file examples shown earlier use the Spring `Resource` abstraction
 to obtain a file. This works because `Resource` has a `getFile` method, which returns a
 `java.io.File`. Both XML and flat file resources can be configured using standard Spring
-constructs, as shown in the following example:
+constructs:
+
+[role="xmlContent"]
+The following example shows late binding in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2034,6 +2165,9 @@ constructs, as shown in the following example:
               value="file://outputs/file.txt" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows late binding in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2055,7 +2189,7 @@ determined at runtime as a parameter to the job. This can be solved using '-D' p
 to read a system property.
 
 [role="xmlContent"]
-The following XML snippet shows how to read a file name from a property:
+The following example shows how to read a file name from a property in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2067,7 +2201,7 @@ The following XML snippet shows how to read a file name from a property:
 ----
 
 [role="javaContent"]
-The following Java snippet shows how to read a file name from a property:
+The following shows how to read a file name from a property in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2091,7 +2225,10 @@ already filters and does placeholder replacement on system properties.
 Often, in a batch setting, it is preferable to parametrize the file name in the
 `JobParameters` of the job, instead of through system properties, and access them that
 way. To accomplish this, Spring Batch allows for the late binding of various `Job` and
-`Step` attributes, as shown in the following snippet:
+`Step` attributes.
+
+[role="xmlContent"]
+The following example shows how to parameterize a file name in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2101,6 +2238,9 @@ way. To accomplish this, Spring Batch allows for the late binding of various `Jo
     <property name="resource" value="#{jobParameters['input.file.name']}" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to parameterize a file name in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2116,7 +2256,10 @@ public FlatFileItemReader flatFileItemReader(@Value("#{jobParameters['input.file
 ----
 
 Both the `JobExecution` and `StepExecution` level `ExecutionContext` can be accessed in
-the same way, as shown in the following examples:
+the same way.
+
+[role="xmlContent"]
+The following example shows how to access the `ExecutionContext` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2135,6 +2278,9 @@ the same way, as shown in the following examples:
     <property name="resource" value="#{stepExecutionContext['input.file.name']}" />
 </bean>
 ----
+
+[role="xmlContent"]
+The following example shows how to access the `ExecutionContext` in XML:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2168,11 +2314,29 @@ Any bean that uses late-binding must be declared with scope="step". See
 <<step.adoc#step-scope,Step Scope>> for more information.
 ====
 
+[NOTE]
+====
+If you are using Spring 3.0 (or above), the expressions in step-scoped beans are in the
+Spring Expression Language, a powerful general purpose language with many interesting
+features. To provide backward compatibility, if Spring Batch detects the presence of
+older versions of Spring, it uses a native expression language that is less powerful and
+that has slightly different parsing rules. The main difference is that the map keys in
+the example above do not need to be quoted with Spring 2.5, but the quotes are mandatory
+in Spring 3.0.
+====
+// TODO Where is that older language described? It'd be good to have a link to it here.
+// Also, given that we're up to version 5 of Spring, should we still be talking about
+// things from before version 3? (In other words, we should provide a link or drop the
+// whole thing.)
+
 [[step-scope]]
 ==== Step Scope
 
-All of the late binding examples from above have a scope of "step" declared on the bean
-definition, as shown in the following example:
+All of the late binding examples shown earlier have a scope of "`step`" declared on the
+bean definition.
+
+[role="xmlContent"]
+The following example shows an example of binding to step scope in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2182,6 +2346,9 @@ definition, as shown in the following example:
     <property name="resource" value="#{jobParameters[input.file.name]}" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows an example of binding to step scope in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2228,8 +2395,10 @@ The following example includes the bean definition explicitly:
 but is a Scope for the `Job` context, so that there is only one instance of such a bean
 per running job. Additionally, support is provided for late binding of references
 accessible from the `JobContext` using `#{..}` placeholders. Using this feature, bean
-properties can be pulled from the job or job execution context and the job parameters, as
-shown in the following examples:
+properties can be pulled from the job or job execution context and the job parameters.
+
+[role="xmlContent"]
+The following example shows an example of binding to job scope in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -2247,7 +2416,10 @@ shown in the following examples:
 </bean>
 ----
 
-.Java Configuration
+[role="javaContent"]
+The following example shows an example of binding to job scope in Java:
+
+.Java Configurtation
 [source, java, role="javaContent"]
 ----
 @JobScope
