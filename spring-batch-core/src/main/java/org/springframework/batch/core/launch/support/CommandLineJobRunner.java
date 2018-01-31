@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,22 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -43,19 +57,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * <p>
@@ -157,6 +158,7 @@ import java.util.Set;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  */
 public class CommandLineJobRunner {
@@ -552,7 +554,7 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		Set<String> opts = new HashSet<String>();
+		Set<String> opts = new LinkedHashSet<String>();
 		List<String> params = new ArrayList<String>();
 
 		int count = 0;
