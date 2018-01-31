@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -158,6 +158,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  */
 public class CommandLineJobRunner {
@@ -556,7 +557,7 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		Set<String> opts = new HashSet<String>();
+		Set<String> opts = new LinkedHashSet<String>();
 		List<String> params = new ArrayList<String>();
 
 		int count = 0;
