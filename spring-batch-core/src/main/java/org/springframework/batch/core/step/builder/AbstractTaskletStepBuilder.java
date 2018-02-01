@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,18 @@
  */
 package org.springframework.batch.core.step.builder;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterChunkError;
+import org.springframework.batch.core.annotation.BeforeChunk;
+import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -29,6 +35,7 @@ import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
+import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.interceptor.TransactionAttribute;
@@ -39,6 +46,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  *
@@ -134,6 +142,32 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	public AbstractTaskletStepBuilder<B> listener(ChunkListener listener) {
 		chunkListeners.add(listener);
 		return this;
+	}
+
+	/**
+	 * Registers objects using the annotation based listener configuration.
+	 *
+	 * @param listener the object that has a method configured with listener annotation
+	 * @return this for fluent chaining
+	 */
+	@Override
+	public B listener(Object listener) {
+		super.listener(listener);
+
+		Set<Method> chunkListenerMethods = new HashSet<Method>();
+		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
+		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
+		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunkError.class));
+
+		if(chunkListenerMethods.size() > 0) {
+			StepListenerFactoryBean factory = new StepListenerFactoryBean();
+			factory.setDelegate(listener);
+			this.listener((ChunkListener) factory.getObject());
+		}
+
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**

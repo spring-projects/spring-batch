@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.annotation.AfterChunk;
-import org.springframework.batch.core.annotation.AfterChunkError;
-import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
 import org.springframework.batch.core.annotation.OnSkipInRead;
 import org.springframework.batch.core.annotation.OnSkipInWrite;
@@ -93,6 +90,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Chris Schaefer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  */
@@ -206,21 +204,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
-		Set<Method> chunkListenerMethods = new HashSet<Method>();
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeChunk.class));
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
-		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunkError.class));
-
 		if(skipListenerMethods.size() > 0) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			skipListeners.add((SkipListener) factory.getObject());
-		}
-
-		if(chunkListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			super.listener(new TerminateOnExceptionChunkListenerDelegate((ChunkListener) factory.getObject()));
 		}
 
 		@SuppressWarnings("unchecked")
