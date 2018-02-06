@@ -36,4 +36,14 @@
     window.addEventListener('resize', handleTocOnResize);
     window.addEventListener('tocRefresh', handleTocRefresh);
     handleTocOnResize();
+
+    var link = document.createElement("a");
+    link.setAttribute("href", "index.html");
+    link.innerHTML = "<i class=\"fa fa-chevron-left\"></i>&nbsp;&nbsp;Back to index";
+    var p = document.createElement("p");
+    p.setAttribute("id", "backToIndex");
+    p.appendChild(link);
+    var toc = document.getElementById('toc');
+    toc.insertBefore(p, toctitle);
+
 </script>
