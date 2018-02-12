@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,12 @@ import org.springframework.util.Assert;
  * cumulative result.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
+
+	private static final int DEFAULT_POLLING_INTERVAL = 500;
 
 	// TODO: Replace with proper Channel and Messages once minimum support level for Spring is 4
 	private Queue<Serializable> partitionDataQueue;
@@ -72,6 +75,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	private JobRepository jobRepository;
 	private boolean allowStartIfComplete = false;
 	private Set<String> partitionStepNames = new HashSet<String>();
+	private int pollingInterval = DEFAULT_POLLING_INTERVAL;
 
 	/**
 	 * @return the step that will be executed by each partition
@@ -156,6 +160,14 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		this.jobRepository = jobRepository;
 	}
 
+	/**
+	 * @param pollingInterval the duration of partitions completion polling interval
+	 *                       (in milliseconds). The default value is 500ms.
+	 */
+	public void setPollingInterval(int pollingInterval) {
+		this.pollingInterval = pollingInterval;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.partition.PartitionHandler#handle(org.springframework.batch.core.partition.StepExecutionSplitter, org.springframework.batch.core.StepExecution)
 	 */
@@ -224,6 +236,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			final List<Future<StepExecution>> tasks,
 			final Set<StepExecution> result) throws Exception {
 		while(true) {
+			Thread.sleep(pollingInterval);
 			try {
 				lock.lock();
 				while(!partitionDataQueue.isEmpty()) {
@@ -385,6 +398,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		Assert.notNull(propertyContext, "A BatchPropertyContext is required");
 		Assert.isTrue(mapper != null || (threads > 0 || partitions > 0), "Either a mapper implementation or the number of partitions/threads is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
+		Assert.isTrue(pollingInterval >= 0, "The polling interval must be positive");
 
 		if(partitionDataQueue == null) {
 			partitionDataQueue = new LinkedBlockingQueue<Serializable>();
