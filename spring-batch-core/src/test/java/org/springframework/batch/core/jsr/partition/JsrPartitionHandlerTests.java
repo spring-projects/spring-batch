@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.util.StopWatch;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionAnalyzer;
@@ -46,6 +47,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
@@ -114,6 +116,14 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 
 		handler.setJobRepository(repository);
 		handler.afterPropertiesSet();
+
+		handler.setPollingInterval(-1);
+		try {
+			handler.afterPropertiesSet();
+			fail("Polling interval was not checked for");
+		} catch(IllegalArgumentException iae) {
+			assertEquals("The polling interval must be positive", iae.getMessage());
+		}
 	}
 
 	@Test
@@ -126,6 +136,23 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 
 		assertEquals(3, executions.size());
 		assertEquals(3, count);
+	}
+
+	@Test
+	public void testPollingPartitionsCompletion() throws Exception {
+		handler.setThreads(3);
+		handler.setPartitions(3);
+		handler.setPollingInterval(1000);
+		handler.afterPropertiesSet();
+
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		Collection<StepExecution> executions = handler.handle(stepSplitter, stepExecution);
+		stopWatch.stop();
+
+		assertEquals(3, executions.size());
+		assertEquals(3, count);
+		assertTrue(stopWatch.getLastTaskTimeMillis() >= 1000);
 	}
 
 	@Test
