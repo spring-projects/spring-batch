@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.springframework.batch.core.repository.dao;
 
 import org.junit.Test;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 import java.io.*;
@@ -34,6 +36,7 @@ import static org.hamcrest.Matchers.hasEntry;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Marten Deinum
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractExecutionContextSerializerTests {
 
@@ -45,6 +48,79 @@ public abstract class AbstractExecutionContextSerializerTests {
         // Use a date after 1971 (otherwise daylight saving screws up)...
         m1.put("object3", new Date(123456790123L));
         m1.put("object4", new Double(1234567.1234D));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeStringJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("name", new JobParameter("foo"));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeDateJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("birthDate", new JobParameter(new Date(123456790123L)));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeDoubleJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("weight", new JobParameter(80.5D));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeLongJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("age", new JobParameter(20L));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeNonIdentifyingJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("name", new JobParameter("foo", false));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeJobParameters() throws Exception {
+        Map<String, JobParameter> jobParametersMap = new HashMap<>();
+        jobParametersMap.put("paramName", new JobParameter("paramValue"));
+
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("params", new JobParameters(jobParametersMap));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeEmptyJobParameters() throws IOException {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("params", new JobParameters());
 
         Map<String, Object> m2 = serializationRoundTrip(m1);
 
