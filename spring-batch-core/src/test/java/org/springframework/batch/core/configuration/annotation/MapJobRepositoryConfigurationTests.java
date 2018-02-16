@@ -33,9 +33,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.stereotype.Component;
@@ -57,9 +59,19 @@ public class MapJobRepositoryConfigurationTests {
 		testConfigurationClass(HsqlBatchConfiguration.class);
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testMultipleDataSources() throws Exception {
+	@Test(expected = UnsatisfiedDependencyException.class)
+	public void testMultipleDataSources_whenNoneOfThemIsPrimary() throws Exception {
 		testConfigurationClass(InvalidBatchConfiguration.class);
+	}
+
+	@Test
+	public void testMultipleDataSources_whenNoneOfThemIsPrimaryButOneOfThemIsNamed_dataSource_() throws Exception {
+		testConfigurationClass(ValidBatchConfigurationWithoutPrimaryDataSource.class);
+	}
+
+	@Test
+	public void testMultipleDataSources_whenOneOfThemIsPrimary() throws Exception {
+		testConfigurationClass(ValidBatchConfigurationWithPrimaryDataSource.class);
 	}
 
 	private void testConfigurationClass(Class<?> clazz) throws Exception {
@@ -85,11 +97,37 @@ public class MapJobRepositoryConfigurationTests {
 		}
 	}
 
+	public static class ValidBatchConfigurationWithPrimaryDataSource extends HsqlBatchConfiguration {
+
+		@Primary
+		@Bean
+		DataSource dataSource2() {
+			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
+					setName("dataSource2").
+					addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
+					addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
+					build());
+		}
+	}
+
+	public static class ValidBatchConfigurationWithoutPrimaryDataSource extends HsqlBatchConfiguration {
+
+		@Bean
+		DataSource dataSource() { // will be autowired by name
+			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
+					setName("dataSource").
+					addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
+					addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
+					build());
+		}
+	}
+
 	public static class HsqlBatchConfiguration extends MapRepositoryBatchConfiguration {
 
 		@Bean
-		DataSource dataSource() {
+		DataSource dataSource1() {
 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
+					setName("dataSource1").
 				addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
 				addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
 				build());
