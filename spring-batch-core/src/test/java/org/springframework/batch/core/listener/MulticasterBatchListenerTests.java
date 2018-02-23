@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -26,10 +27,20 @@ import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterProcess;
+import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterWrite;
+import org.springframework.batch.core.annotation.BeforeChunk;
+import org.springframework.batch.core.annotation.BeforeProcess;
+import org.springframework.batch.core.annotation.BeforeRead;
+import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MulticasterBatchListenerTests {
@@ -510,6 +521,188 @@ public class MulticasterBatchListenerTests {
 			assertEquals("Wrong message: " + message, "foo", message);
 		}
 		assertEquals(1, count);
+	}
+
+	@Test
+	public void testBeforeReadFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.beforeRead();
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testAfterReadFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.afterRead(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testBeforeProcessFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.beforeProcess(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testAfterProcessFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.afterProcess(null, null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testBeforeWriteFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.beforeWrite(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testAfterWriteFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.afterWrite(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testBeforeChunkFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.beforeChunk(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	@Test
+	public void testAfterChunkFails_withAnnotatedListener() {
+		StepListener listener = StepListenerFactoryBean.getListener(new AnnotationBasedStepListener());
+		multicast.register(listener);
+
+		try {
+			multicast.afterChunk(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			Throwable cause = e.getCause();
+			String message = cause.getMessage();
+			assertTrue(cause instanceof IllegalStateException);
+			assertEquals("Wrong message: " + message, "listener error", message);
+		}
+	}
+
+	private final class AnnotationBasedStepListener {
+
+		private IllegalStateException exception = new IllegalStateException("listener error");
+
+		@BeforeRead
+		public void beforeRead() {
+			throw exception;
+		}
+
+		@AfterRead
+		public void afterRead() {
+			throw exception;
+		}
+
+		@BeforeProcess
+		public void beforeProcess() {
+			throw exception;
+		}
+
+		@AfterProcess
+		public void afterProcess() {
+			throw exception;
+		}
+
+		@BeforeWrite
+		public void beforeWrite() {
+			throw exception;
+		}
+
+		@AfterWrite
+		public void afterWrite() {
+			throw exception;
+		}
+
+		@BeforeChunk
+		public void beforeChunk() {
+			throw exception;
+		}
+
+		@AfterChunk
+		public void afterChunk() {
+			throw exception;
+		}
+
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.batch.api.chunk.listener.RetryProcessListener;
@@ -37,6 +38,7 @@ import org.springframework.batch.item.ItemStream;
  * @author Dave Syer
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
 ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadListener, RetryProcessListener, RetryWriteListener {
@@ -133,7 +135,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemProcessListener.afterProcess(item, result);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterProcess.", e);
+			throw new StepListenerFailedException("Error in afterProcess.", getTargetException(e));
 		}
 	}
 
@@ -146,7 +148,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemProcessListener.beforeProcess(item);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeProcess.", e);
+			throw new StepListenerFailedException("Error in beforeProcess.", getTargetException(e));
 		}
 	}
 
@@ -199,7 +201,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			chunkListener.afterChunk(context);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterChunk.", e);
+			throw new StepListenerFailedException("Error in afterChunk.", getTargetException(e));
 		}
 	}
 
@@ -212,7 +214,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			chunkListener.beforeChunk(context);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeChunk.", e);
+			throw new StepListenerFailedException("Error in beforeChunk.", getTargetException(e));
 		}
 	}
 
@@ -225,7 +227,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemReadListener.afterRead(item);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterRead.", e);
+			throw new StepListenerFailedException("Error in afterRead.", getTargetException(e));
 		}
 	}
 
@@ -238,7 +240,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemReadListener.beforeRead();
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeRead.", e);
+			throw new StepListenerFailedException("Error in beforeRead.", getTargetException(e));
 		}
 	}
 
@@ -264,7 +266,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemWriteListener.afterWrite(items);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterWrite.", e);
+			throw new StepListenerFailedException("Error in afterWrite.", getTargetException(e));
 		}
 	}
 
@@ -277,7 +279,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemWriteListener.beforeWrite(items);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeWrite.", e);
+			throw new StepListenerFailedException("Error in beforeWrite.", getTargetException(e));
 		}
 	}
 
@@ -355,5 +357,18 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
+	}
+
+	/**
+	 * Unwrap the target exception from a wrapped {@link InvocationTargetException}.
+	 * @param e the exception to introspect
+	 * @return the target exception if any
+	 */
+	private Throwable getTargetException(RuntimeException e) {
+		Throwable cause = e.getCause();
+		if (cause != null && cause instanceof InvocationTargetException) {
+			return ((InvocationTargetException) cause).getTargetException();
+		}
+		return e;
 	}
 }
