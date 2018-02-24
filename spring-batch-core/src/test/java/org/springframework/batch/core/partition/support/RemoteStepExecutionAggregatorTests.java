@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 the original author or authors.
+ * Copyright 2011-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  */
 package org.springframework.batch.core.partition.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -24,12 +31,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-
-import java.util.Arrays;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class RemoteStepExecutionAggregatorTests {
 
@@ -51,7 +52,9 @@ public class RemoteStepExecutionAggregatorTests {
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		result = jobExecution.createStepExecution("aggregate");
 		stepExecution1 = jobExecution.createStepExecution("foo:1");
+		stepExecution1.getExecutionContext().put("key1", "value1");
 		stepExecution2 = jobExecution.createStepExecution("foo:2");
+		stepExecution2.getExecutionContext().put("key2", "value2");
 		jobRepository.add(stepExecution1);
 		jobRepository.add(stepExecution2);
 	}
@@ -83,6 +86,19 @@ public class RemoteStepExecutionAggregatorTests {
 		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
+	}
+
+	@Test
+	public void testAggregateContextExecution() {
+		stepExecution1.setStatus(BatchStatus.COMPLETED);
+		stepExecution2.setStatus(BatchStatus.COMPLETED);
+		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		assertNotNull(result);
+		assertEquals(BatchStatus.STARTING, result.getStatus());
+		assertTrue(result.getExecutionContext().containsKey("key1"));
+		assertEquals(result.getExecutionContext().get("key1"), "value1");
+		assertTrue(result.getExecutionContext().containsKey("key2"));
+		assertEquals(result.getExecutionContext().get("key2"), "value2");
 	}
 
 }

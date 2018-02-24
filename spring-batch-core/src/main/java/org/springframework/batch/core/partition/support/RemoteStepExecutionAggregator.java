@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.partition.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -78,7 +79,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 	}
 
 	/**
-	 * Aggregates the input executions into the result {@link StepExecution}
+	 * Aggregates the input executions and contexts into the result {@link StepExecution}
 	 * delegating to the delegate aggregator once the input has been refreshed
 	 * from the {@link JobExplorer}.
 	 *
@@ -96,6 +97,9 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 			Assert.state(id != null, "StepExecution has null id. It must be saved first: " + stepExecution);
 			StepExecution update = jobExplorer.getStepExecution(stepExecution.getJobExecutionId(), id);
 			Assert.state(update != null, "Could not reload StepExecution from JobRepository: " + stepExecution);
+			for(Map.Entry<String, Object> entry : update.getExecutionContext().entrySet()){
+				result.getExecutionContext().put(entry.getKey(), entry.getValue());
+			}
 			updates.add(update);
 		}
 		delegate.aggregate(result, updates);
