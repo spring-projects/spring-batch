@@ -18,7 +18,7 @@ As of Spring Batch 3.0 support for JSR-352 has been fully implemented. This sect
 [[jsrGeneralNotes]]
 
 
-=== General Notes Spring Batch and JSR-352
+=== General Notes about Spring Batch and JSR-352
 
 Spring Batch and JSR-352 are structurally the same.  They both have jobs that are made up of steps.  They
             both have readers, processors, writers, and listeners.  However, their interactions are subtly different.
@@ -48,7 +48,7 @@ Spring Batch and JSR-352 are structurally the same.  They both have jobs that ar
 All JSR-352 based jobs within Spring Batch consist of two application contexts.  A parent context, that
 			contains beans related to the infrastructure of Spring Batch such as the `JobRepository`,
 			`PlatformTransactionManager`, etc and a child context that consists of the configuration
-			of the job to be run.  The parent context is defined via the `baseContext.xml` provided
+			of the job to be run.  The parent context is defined via the `jsrBaseContext.xml` provided
 			by the framework.  This context may be overridden via the `JSR-352-BASE-CONTEXT` system
 			property.
 
@@ -333,8 +333,8 @@ Supported operators:
 ----
 
 The left hand side of the assignment is the expected value, the right hand side is the default value. In
-this example, the result will resolve to a value of the system property file.separator as
-#{jobParameters['unresolving.prop']} is assumed to not be resolvable. If neither expressions can be
+this example, the result will resolve to a value of the system property `file.separator` as
+`#{jobParameters['unresolving.prop']}` is assumed to not be resolvable. If neither expressions can be
 resolved, an empty String will be returned. Multiple conditions can be used, which are separated by a
 ';'.
 
@@ -402,7 +402,7 @@ JSR-352 calls the process around the commit interval within a step "checkpointin
                 implementing the `javax.batch.api.chunk.CheckpointAlgorithm` interface.  This
                 functionality is functionally the same as Spring Batch's custom completion policy.  To use an
                 implementation of `CheckpointAlgorithm`, configure your step with the custom
-                `checkpoint-policy` as shown below where fooCheckpointer refers to an
+                `checkpoint-policy` as shown below where `fooCheckpointer` refers to an
                 implementation of `CheckpointAlgorithm`.
 
 
@@ -427,7 +427,7 @@ JSR-352 calls the process around the commit interval within a step "checkpointin
 === Running a job
 
 The entrance to executing a JSR-352 based job is through the
-            `javax.batch.operations.JobOperator`.  Spring Batch provides our own implementation to
+            `javax.batch.operations.JobOperator`. Spring Batch provides its own implementation of
             this interface (`org.springframework.batch.core.jsr.launch.JsrJobOperator`).  This
             implementation is loaded via the `javax.batch.runtime.BatchRuntime`.  Launching a
             JSR-352 based batch job is implemented as follows:
@@ -488,7 +488,7 @@ JSR-352 defines two context objects that are used to interact with the meta-data
             `javax.batch.runtime.context.StepContext`.  Both of these are available in any step
             level artifact (`Batchlet`, `ItemReader`, etc) with the
             `JobContext` being available to job level artifacts as well
-            (JobListener for example).
+            (`JobListener` for example).
 
 To obtain a reference to the `JobContext` or `StepContext`
             within the current scope, simply use the `@Inject` annotation:
@@ -512,7 +512,7 @@ Using Spring's @Autowire is not supported for the injection of these contexts.
 In Spring Batch, the `JobContext` and `StepContext` wrap their
             corresponding execution objects (`JobExecution` and
             `StepExecution` respectively).  Data stored via
-            `StepContext#persistent#setPersistentUserData(Serializable data)` is stored in the
+            `StepContext#setPersistentUserData(Serializable data)` is stored in the
             Spring Batch `StepExecution#executionContext`.
 
 [[jsrStepFlow]]
@@ -614,6 +614,7 @@ Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Met
                             not get official `StepExecutions`.  Because of that, calls to
                             `JsrJobOperator#getStepExecutions(long jobExecutionId)` will only
                             return the `StepExecution` for the master.
+
 [NOTE]
 ====
 The child `StepExecutions` still exist in the job repository and are available
@@ -647,6 +648,6 @@ via the `JobExplorer` and Spring Batch Admin.
 
 Since all JSR-352 based jobs are executed asynchronously, it can be difficult to determine when a job has
             completed.  To help with testing, Spring Batch provides the
-            `org.springframework.batch.core.jsr.JsrTestUtils`.  This utility class provides the
+            `org.springframework.batch.test.JsrTestUtils`.  This utility class provides the
             ability to start a job and restart a job and wait for it to complete.  Once the job completes, the
             associated `JobExecution` is returned.

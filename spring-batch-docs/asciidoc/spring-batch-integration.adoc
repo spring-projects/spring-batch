@@ -17,7 +17,7 @@ endif::onlyonetoggle[]
 Many users of Spring Batch may encounter requirements that are
 outside the scope of Spring Batch but that may be efficiently and
 concisely implemented by using Spring Integration. Conversely, Spring
-Batch users may encounter Spring Batch requirements and need a way
+Integration users may encounter Spring Batch requirements and need a way
 to efficiently integrate both frameworks. In this context, several
 patterns and use-cases emerge, and Spring Batch Integration
 addresses those requirements.
@@ -129,7 +129,7 @@ When starting batch jobs by using the core Spring Batch API, you
 basically have 2 options:
 
 * From the command line, with the `CommandLineJobRunner`
-* Programatically, with either `JobOperator.start()` or `JobLauncher.run()`
+* Programmatically, with either `JobOperator.start()` or `JobLauncher.run()`
 
 
 
@@ -253,7 +253,7 @@ immediately. Users can then take the `id` of
 using the `JobExplorer`. For more
 information, please refer to the Spring
 Batch reference documentation on
-link:$$http://docs.spring.io/spring-batch/reference/html/configureJob.html#queryingRepository$$[Querying the Repository].
+<<job.adoc#queryingRepository,Querying the Repository>>.
 
 
 
@@ -444,7 +444,7 @@ public JobLaunchingGateway sampleJobLaunchingGateway() {
 
 As Spring Batch jobs can run for long times, providing progress
 information is often critical. For example, stake-holders may want
-to be notified if a some or all parts of a batch job have failed.
+to be notified if some or all parts of a batch job have failed.
 Spring Batch provides support for this information being gathered
 through:
 
@@ -629,7 +629,7 @@ The following example shows how to configure the `AsyncItemWriter`:
 [source, java, role="javaContent"]
 ----
 @Bean
-public AsyncItemWriter processor(ItemWriter itemWriter) {
+public AsyncItemWriter writer(ItemWriter itemWriter) {
     AsyncItemWriter asyncItemWriter = new AsyncItemWriter();
     asyncItemWriter.setDelegate(itemWriter);
     return asyncItemWriter;
@@ -976,7 +976,7 @@ and AMQP) being used to communicate with the remote workers.
 
 
 The section of the "Scalability" chapter that addresses
-link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#partitioning$$[remote partitioning] provides an overview of the concepts and
+<<scalability.adoc#partitioning,remote partitioning>> provides an overview of the concepts and
 components needed to configure remote partitioning and shows an
 example of using the default
 `TaskExecutorPartitionHandler` to partition

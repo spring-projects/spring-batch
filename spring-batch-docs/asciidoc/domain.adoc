@@ -170,8 +170,8 @@ image::{batch-asciidoc}images/job-stereotypes-parameters.png[Job Parameters, sca
 In the preceding example, where there are two instances, one for January 1st, and another
 for January 2nd, there is really only one `Job`, but it has two `JobParameter` objects:
 one that was started with a job parameter of 01-01-2017 and another that was started with
-a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job` +
-identifying `JobParameters`. This allows a developer to effectively control how a
+a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job`
+ + identifying `JobParameters`. This allows a developer to effectively control how a
 `JobInstance` is defined, since they control what parameters are passed in.
 
 NOTE: Not all job parameters are required to contribute to the identification of a
@@ -384,12 +384,12 @@ finishes successfully, the status is `BatchStatus.COMPLETED`.
 
 |startTime
 |A `java.util.Date` representing the current system time when the execution was started.
-This field is empty if the job has yet to start.
+This field is empty if the step has yet to start.
 
 |endTime
 
 |A `java.util.Date` representing the current system time when the execution finished,
-regardless of whether or not it was successful. This field is empty if the job has yet to
+regardless of whether or not it was successful. This field is empty if the step has yet to
 exit.
 
 |exitStatus
@@ -456,7 +456,7 @@ the metadata tables would look like the following example:
 |EndOfDayJob
 |===
 
-.BATCH_JOB_PARAMS
+.BATCH_JOB_EXECUTION_PARAMS
 |===
 |JOB_INST_ID|TYPE_CD|KEY_NAME|DATE_VAL
 |1
@@ -587,7 +587,8 @@ When using java configuration, `@EnableBatchProcessing` annotation provides a
 public interface JobLauncher {
 
 public JobExecution run(Job job, JobParameters jobParameters)
-            throws JobExecutionAlreadyRunningException, JobRestartException;
+            throws JobExecutionAlreadyRunningException, JobRestartException,
+                   JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 }
 ----
 It is expected that implementations obtain a valid `JobExecution` from the

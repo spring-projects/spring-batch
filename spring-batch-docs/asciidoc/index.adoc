@@ -14,7 +14,7 @@ include::header/index-header.adoc[]
 
 * <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>>
 
-* <<scalability.adoc#scalability,Scaling and Parallel Processings>>
+* <<scalability.adoc#scalability,Scaling and Parallel Processing>>
 
 * <<repeat.adoc#repeat,Repeat>>
 

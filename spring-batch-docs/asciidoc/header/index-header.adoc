@@ -1,11 +1,11 @@
 = Spring Batch - Reference Documentation
 
 Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund,
-Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro, Jay Bryant
+Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro, Jay Bryant, Mahmoud Ben Hassine
 
 :batch-asciidoc: http://docs.spring.io/spring-batch/reference/html/
 
-Copyright © 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Pivotal, Inc. All Rights
+Copyright © 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Pivotal, Inc. All Rights
 Reserved.
 
 Copies of this document may be made for your own use and for

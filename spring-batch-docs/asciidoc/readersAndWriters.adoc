@@ -34,7 +34,8 @@ to return objects, keep track of the current row if restart is required, store b
 statistics, and provide some transaction enhancements that are explained later.
 
 There are many more possibilities, but we focus on the basic ones for this chapter. A
-complete list of all available `ItemReader` implementations can be found in Appendix A.
+complete list of all available `ItemReader` implementations can be found in
+<<appendix.adoc#listOfReadersAndWriters, Appendix A>>.
 
 `ItemReader` is a basic interface for generic
 input operations, as shown in the following interface definition:
@@ -43,12 +44,12 @@ input operations, as shown in the following interface definition:
 ----
 public interface ItemReader<T> {
 
-    T read() throws Exception, UnexpectedInputException, ParseException;
+    T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException;
 
 }
 ----
 
-The read method defines the most essential contract of the `ItemReader`. Calling it
+The `read` method defines the most essential contract of the `ItemReader`. Calling it
 returns one item or `null` if no more items are left. An item might represent a line in a
 file, a row in a database, or an element in an XML file. It is generally expected that
 these are mapped to a usable domain object (such as `Trade`, `Foo`, or others), but there
@@ -88,7 +89,7 @@ generally expected that items are 'batched' together into a chunk and then outpu
 interface accepts a list of items, rather than an item by itself. After writing out the
 list, any flushing that may be necessary can be performed before returning from the write
 method. For example, if writing to a Hibernate DAO, multiple calls to write can be made,
-one for each item. The writer can then call `close` on the hibernate session before
+one for each item. The writer can then call `flush` on the hibernate session before
 returning.
 
 [[itemProcessor]]
@@ -112,7 +113,7 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 
     public void write(List<? extends T> items) throws Exception {
         //Add business logic here
-       itemWriter.write(item);
+       itemWriter.write(items);
     }
 
     public void setDelegate(ItemWriter<T> itemWriter){
@@ -142,7 +143,7 @@ An `ItemProcessor` is simple. Given one object, transform it and return another.
 provided object may or may not be of the same type. The point is that business logic may
 be applied within the process, and it is completely up to the developer to create that
 logic. An `ItemProcessor` can be wired directly into a step. For example, assume an
-`ItemReader` provides a class of type `Foo` and that it needs to be converted to type Bar
+`ItemReader` provides a class of type `Foo` and that it needs to be converted to type `Bar`
 before being written out. The following example shows an `ItemProcessor` that performs
 the conversion:
 
@@ -227,7 +228,7 @@ public class Bar {
     public Bar(Foo foo) {}
 }
 
-public class Foobar{
+public class Foobar {
     public Foobar(Bar bar) {}
 }
 
@@ -238,14 +239,14 @@ public class FooProcessor implements ItemProcessor<Foo,Bar>{
     }
 }
 
-public class BarProcessor implements ItemProcessor<Bar,FooBar>{
-    public FooBar process(Bar bar) throws Exception {
+public class BarProcessor implements ItemProcessor<Bar,Foobar>{
+    public Foobar process(Bar bar) throws Exception {
         return new Foobar(bar);
     }
 }
 
-public class FoobarWriter implements ItemWriter<FooBar>{
-    public void write(List<? extends FooBar> items) throws Exception {
+public class FoobarWriter implements ItemWriter<Foobar>{
+    public void write(List<? extends Foobar> items) throws Exception {
         //write items
     }
 }
@@ -274,7 +275,7 @@ Just as with the previous example, the composite processor can be configured int
 <job id="ioSampleJob">
     <step name="step1">
         <tasklet>
-            <chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter"
+            <chunk reader="fooReader" processor="compositeItemProcessor" writer="foobarWriter"
                    commit-interval="2"/>
         </tasklet>
     </step>
@@ -326,7 +327,7 @@ public CompositeItemProcessor compositeProcessor() {
 }
 ----
 
-[[filiteringRecords]]
+[[filteringRecords]]
 ==== Filtering Records
 
 One typical use for an item processor is to filter out records before they are passed to
@@ -488,9 +489,9 @@ return a `String` or an array of `String` objects. This really only gets you hal
 there. A `FieldSet` is Spring Batch's abstraction for enabling the binding of fields from
 a file resource. It allows developers to work with file input in much the same way as
 they would work with database input. A `FieldSet` is conceptually similar to a JDBC
-`ResultSet`. `FieldSets` only require one argument: a `String` array of tokens.
+`ResultSet`. A `FieldSet` requires only one argument: a `String` array of tokens.
 Optionally, you can also configure the names of the fields so that the fields may be
-accessed either by index or name as patterned after ResultSet, as shown in the following
+accessed either by index or name as patterned after `ResultSet`, as shown in the following
 example:
 
 [source, java]
@@ -533,7 +534,7 @@ from FTP locations to batch processing locations and vice versa. File moving uti
 are beyond the scope of the Spring Batch architecture, but it is not unusual for batch
 job streams to include file moving utilities as steps in the job stream. The batch
 architecture only needs to know how to locate the files to be processed. Spring Batch
-begins the proces of feeding the data into the pipe from this starting point. However,
+begins the process of feeding the data into the pipe from this starting point. However,
 link:$$http://projects.spring.io/spring-integration/$$[Spring Integration] provides many
 of these types of services.
 
@@ -604,13 +605,13 @@ The contract of a `LineTokenizer` is such that, given a line of input (in theory
 returned. This `FieldSet` can then be passed to a `FieldSetMapper`. Spring Batch contains
 the following `LineTokenizer` implementations:
 
-* `DelmitedLineTokenizer`: Used for files where fields in a record are separated by a
+* `DelimitedLineTokenizer`: Used for files where fields in a record are separated by a
 delimiter. The most common delimiter is a comma, but pipes or semicolons are often used
 as well.
 * `FixedLengthTokenizer`: Used for files where fields in a record are each a "fixed
 width". The width of each field must be defined for each record type.
-* `PatternMatchingCompositeLineTokenizer`: Determines which among a list of
-`LineTokenizers` should be used on a particular line by checking against a pattern.
+* `PatternMatchingCompositeLineTokenizer`: Determines which `LineTokenizer` among a list of
+tokenizers should be used on a particular line by checking against a pattern.
 
 [[fieldSetMapper]]
 ===== FieldSetMapper
@@ -625,7 +626,7 @@ into an object of the desired type, as shown in the following interface definiti
 ----
 public interface FieldSetMapper<T> {
 
-    T mapFieldSet(FieldSet fieldSet);
+    T mapFieldSet(FieldSet fieldSet) throws BindException;
 
 }
 ----
@@ -654,7 +655,7 @@ shown in the following class definition, represents the behavior most users need
 [source, java]
 ----
 
-public class DefaultLineMapper<T>; implements LineMapper<>, InitializingBean {
+public class DefaultLineMapper<T> implements LineMapper<>, InitializingBean {
 
     private LineTokenizer tokenizer;
 
@@ -668,7 +669,7 @@ public class DefaultLineMapper<T>; implements LineMapper<>, InitializingBean {
         this.tokenizer = tokenizer;
     }
 
-    public void setFieldSetMapper(FieldSetMapper<T>; fieldSetMapper) {
+    public void setFieldSetMapper(FieldSetMapper<T> fieldSetMapper) {
         this.fieldSetMapper = fieldSetMapper;
     }
 }
@@ -781,7 +782,7 @@ A `FieldSetMapper` can use this information as follows:
 
 [source, java]
 ----
-<public class PlayerMapper implements FieldSetMapper<Player> {
+public class PlayerMapper implements FieldSetMapper<Player> {
     public Player mapFieldSet(FieldSet fs) {
 
        if(fs == null){
@@ -940,8 +941,8 @@ though a "LINEA" has more information than a "LINEB".
 The `ItemReader` reads each line individually, but we must specify different
 `LineTokenizer` and `FieldSetMapper` objects so that the `ItemWriter` receives the
 correct items. The `PatternMatchingCompositeLineMapper` makes this easy by allowing maps
-of patterns to `LineTokenizers` and patterns to `FieldSetMappers` to be configured, as
-shown in the following example:
+of patterns to `LineTokenizer` instances and patterns to `FieldSetMapper` instances to be
+configured, as shown in the following example:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -989,10 +990,10 @@ public PatternMatchingCompositeLineMapper orderFileLineMapper() {
 }
 ----
 
-In this example, "LINEA" and "LINEB" have separate `LineTokenizers`, but they both use
+In this example, "LINEA" and "LINEB" have separate `LineTokenizer` instances, but they both use
 the same `FieldSetMapper`.
 
-The `PatternMatchingCompositeLineMapper` makes use of the `PatternMatcher's` match method
+The `PatternMatchingCompositeLineMapper` uses the `PatternMatcher#match` method
 in order to select the correct delegate for each line. The `PatternMatcher` allows for
 two wildcard characters with special meaning: the question mark ("?") matches exactly one
 character, while the asterisk ("\*") matches zero or more characters. Note that, in the
@@ -1022,7 +1023,7 @@ alone.
 
 It is also common for a flat file to contain records that each span multiple lines. To
 handle this situation, a more complex strategy is required. A demonstration of this
-common pattern can be found in <<multiLineRecords>>.
+common pattern can be found in the `multiLineRecords` sample.
 
 [[exceptionHandlingInFlatFiles]]
 ===== Exception Handling in Flat Files
@@ -1104,7 +1105,7 @@ assertEquals("", tokens.readString(1));
 ----
 
 The preceding example is almost identical to the one before it, except that
-tokenizer.setStrict(false) was called. This setting tells the tokenizer to not enforce
+`tokenizer.setStrict(false)` was called. This setting tells the tokenizer to not enforce
 line lengths when tokenizing the line. A `FieldSet` is now correctly created and
 returned. However, it contains only empty tokens for the remaining values.
 
@@ -1196,10 +1197,10 @@ A simple configuration might look like the following:
 @Bean
 public FlatFileItemWriter itemWriter() {
 	return  new FlatFileItemWriterBuilder<Foo>()
-           				.name("itemWriter")
-           				.resource(new FileSystemResource("file:target/test-outputs/output.txt"))
-           				.lineAggregator(new PassThroughLineAggregator<>())
-           				.build();
+           			.name("itemWriter")
+           			.resource(new FileSystemResource("target/test-outputs/output.txt"))
+           			.lineAggregator(new PassThroughLineAggregator<>())
+           			.build();
 }
 ----
 
@@ -1326,17 +1327,17 @@ example:
 [source, java, role="javaContent"]
 ----
 @Bean
-public FlatFileItemWriter<Foo> itemWriter(Resource outputResource) throws Exception {
-	BeanWrapperFieldExtractor<Foo> fieldExtractor = new BeanWrapperFieldExtractor<>();
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<CustomerCredit> fieldExtractor = new BeanWrapperFieldExtractor<>();
 	fieldExtractor.setNames(new String[] {"name", "credit"});
 	fieldExtractor.afterPropertiesSet();
 
-	DelimitedLineAggregator<Foo> lineAggregator = new DelimitedLineAggregator<>();
+	DelimitedLineAggregator<CustomerCredit> lineAggregator = new DelimitedLineAggregator<>();
 	lineAggregator.setDelimiter(",");
 	lineAggregator.setFieldExtractor(fieldExtractor);
 
-	return new FlatFileItemWriterBuilder<Foo>()
-				.name("foo")
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
 				.resource(outputResource)
 				.lineAggregator(lineAggregator)
 				.build();
@@ -1377,17 +1378,17 @@ same `CustomerCredit` domain object described above, it can be configured as fol
 [source, java, role="javaContent"]
 ----
 @Bean
-public FlatFileItemWriter itemWriter(Resource outputResource) throws Exception {
-	BeanWrapperFieldExtractor<Foo> fieldExtractor = new BeanWrapperFieldExtractor<>();
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	BeanWrapperFieldExtractor<CustomerCredit> fieldExtractor = new BeanWrapperFieldExtractor<>();
 	fieldExtractor.setNames(new String[] {"name", "credit"});
 	fieldExtractor.afterPropertiesSet();
 
-	FormatterLineAggregator<Foo> lineAggregator = new FormatterLineAggregator<>();
+	FormatterLineAggregator<CustomerCredit> lineAggregator = new FormatterLineAggregator<>();
 	lineAggregator.setFormat("%-9s%-2.0f");
 	lineAggregator.setFieldExtractor(fieldExtractor);
 
-	return new FlatFileItemWriterBuilder<Foo>()
-				.name("foo")
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
 				.resource(outputResource)
 				.lineAggregator(lineAggregator)
 				.build();
@@ -1405,7 +1406,7 @@ property is new and is shown in the following element:
 [source, java, role="javaContent"]
 ----
 ...
-FormatterLineAggregator<Foo> lineAggregator = new FormatterLineAggregator<>();
+FormatterLineAggregator<CustomerCredit> lineAggregator = new FormatterLineAggregator<>();
 lineAggregator.setFormat("%-9s%-2.0f");
 ...
 ----
@@ -1449,7 +1450,7 @@ the parsing process by allowing the user to provide only callbacks).
 
 We need to consider how XML input and output works in Spring Batch. First, there are a
 few concepts that vary from file reading and writing but are common across Spring Batch
-XML processing. With XML processing, instead of lines of records (`FieldSets`) that need
+XML processing. With XML processing, instead of lines of records (`FieldSet` instances) that need
 to be tokenized, it is assumed an XML resource is a collection of 'fragments'
 corresponding to individual records, as shown in the following image:
 
@@ -1460,7 +1461,7 @@ The 'trade' tag is defined as the 'root element' in the scenario above. Everythi
 between '&lt;trade&gt;' and '&lt;/trade&gt;' is considered one 'fragment'. Spring Batch
 uses Object/XML Mapping (OXM) to bind fragments to objects. However, Spring Batch is not
 tied to any particular XML binding technology. Typical use is to delegate to
-link:$$http://docs.spring.io/spring-ws/site/reference/html/oxm.html$$[Spring OXM], which
+link:$$https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm$$[Spring OXM], which
 provides uniform abstraction for the most popular OXM technologies. The dependency on
 Spring OXM is optional and you can choose to implement Spring Batch specific interfaces
 if desired. The relationship to the technologies that OXM supports is shown in the
@@ -1514,7 +1515,7 @@ read.
 fragment to an object.
 
 The following example shows how to define a `StaxEventItemReader` that works with a root
-element named `trade`, a resource of `data/iosample/input/input.xml`, and an unmarshaller
+element named `trade`, a resource of `org/springframework/batch/item/xml/domain/trades.xml`, and an unmarshaller
 called `tradeMarshaller`.
 
 .XML Configuration
@@ -1522,7 +1523,7 @@ called `tradeMarshaller`.
 ----
 <bean id="itemReader" class="org.springframework.batch.item.xml.StaxEventItemReader">
     <property name="fragmentRootElementName" value="trade" />
-    <property name="resource" value="data/iosample/input/input.xml" />
+    <property name="resource" value="org/springframework/batch/item/xml/domain/trades.xml" />
     <property name="unmarshaller" ref="tradeMarshaller" />
 </bean>
 ----
@@ -1532,9 +1533,9 @@ called `tradeMarshaller`.
 ----
 @Bean
 public StaxEventItemReader itemReader() {
-	return new StaxEventItemReaderBuilder<Foo>()
+	return new StaxEventItemReaderBuilder<Trade>()
 			.name("itemReader")
-			.resource(new FileSystemResource("data/iosample/input/input.xml"))
+			.resource(new FileSystemResource("org/springframework/batch/item/xml/domain/trades.xml"))
 			.addFragmentRootElements("trade")
 			.unmarshaller(tradeMarshaller())
 			.build();
@@ -1557,9 +1558,11 @@ utility to describe the required alias, as follows:
     <property name="aliases">
         <util:map id="aliases">
             <entry key="trade"
-                   value="org.springframework.batch.sample.domain.Trade" />
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
             <entry key="price" value="java.math.BigDecimal" />
-            <entry key="name" value="java.lang.String" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
         </util:map>
     </property>
 </bean>
@@ -1573,7 +1576,9 @@ public XStreamMarshaller tradeMarshaller() {
 	Map<String, Class> aliases = new HashMap<>();
 	aliases.put("trade", Trade.class);
 	aliases.put("price", BigDecimal.class);
-	aliases.put("name", String.class);
+	aliases.put("isin", String.class);
+	aliases.put("customer", String.class);
+	aliases.put("quantity", Long.class);
 
 	XStreamMarshaller marshaller = new XStreamMarshaller();
 
@@ -1594,13 +1599,15 @@ injection provided by the Spring configuration:
 
 [source, java]
 ----
-StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
-Resource resource = new ByteArrayResource(xmlResource.getBytes())
+StaxEventItemReader<Trade> xmlStaxEventItemReader = new StaxEventItemReader<>();
+Resource resource = new ByteArrayResource(xmlResource.getBytes());
 
 Map aliases = new HashMap();
-aliases.put("trade","org.springframework.batch.sample.domain.Trade");
+aliases.put("trade","org.springframework.batch.sample.domain.trade.Trade");
 aliases.put("price","java.math.BigDecimal");
 aliases.put("customer","java.lang.String");
+aliases.put("isin","java.lang.String");
+aliases.put("quantity","java.lang.Long");
 XStreamMarshaller unmarshaller = new XStreamMarshaller();
 unmarshaller.setAliases(aliases);
 xmlStaxEventItemReader.setUnmarshaller(unmarshaller);
@@ -1608,17 +1615,17 @@ xmlStaxEventItemReader.setResource(resource);
 xmlStaxEventItemReader.setFragmentRootElementName("trade");
 xmlStaxEventItemReader.open(new ExecutionContext());
 
-boolean hasNext = true
+boolean hasNext = true;
 
-CustomerCredit credit = null;
+Trade trade = null;
 
 while (hasNext) {
-    credit = xmlStaxEventItemReader.read();
-    if (credit == null) {
+    trade = xmlStaxEventItemReader.read();
+    if (trade == null) {
         hasNext = false;
     }
     else {
-        System.out.println(credit);
+        System.out.println(trade);
     }
 }
 ----
@@ -1631,17 +1638,15 @@ marshaller, and a `rootTagName`. A Java object is passed to a marshaller (typica
 standard Spring OXM Marshaller) which writes to a `Resource` by using a custom event
 writer that filters the `StartDocument` and `EndDocument` events produced for each
 fragment by the OXM tools. The following example uses the
-`MarshallingEventWriterSerializer`:
-// TODO How does `MarshallingEventWriterSerializer` get involved? Because there's a
-// property whose name is `marshaller`?
+`StaxEventItemWriter`:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
 ----
 <bean id="itemWriter" class="org.springframework.batch.item.xml.StaxEventItemWriter">
     <property name="resource" ref="outputResource" />
-    <property name="marshaller" ref="customerCreditMarshaller" />
-    <property name="rootTagName" value="customers" />
+    <property name="marshaller" ref="tradeMarshaller" />
+    <property name="rootTagName" value="trade" />
     <property name="overwriteOutput" value="true" />
 </bean>
 ----
@@ -1651,11 +1656,11 @@ fragment by the OXM tools. The following example uses the
 ----
 @Bean
 public StaxEventItemWriter itemWriter(Resource outputResource) {
-	return new StaxEventItemWriterBuilder<Foo>()
-			.name("fooWriter")
-			.marshaller(customerCreditMarshaller())
+	return new StaxEventItemWriterBuilder<Trade>()
+			.name("tradesWriter")
+			.marshaller(tradeMarshaller())
 			.resource(outputResource)
-			.rootTagName("customers")
+			.rootTagName("trade")
 			.overwriteOutput(true)
 			.build();
 
@@ -1663,7 +1668,7 @@ public StaxEventItemWriter itemWriter(Resource outputResource) {
 ----
 
 The preceding configuration sets up the three required properties and sets the optional
-`overwriteOutput=true` attrbute, mentioned earlier in this chapter for specifying whether
+`overwriteOutput=true` attribute, mentioned earlier in this chapter for specifying whether
 an existing file can be overwritten. It should be noted the marshaller used for the
 writer in the following example is the exact same as the one used in the reading example
 from earlier in the chapter:
@@ -1676,9 +1681,11 @@ from earlier in the chapter:
     <property name="aliases">
         <util:map id="aliases">
             <entry key="customer"
-                   value="org.springframework.batch.sample.domain.CustomerCredit" />
-            <entry key="credit" value="java.math.BigDecimal" />
-            <entry key="name" value="java.lang.String" />
+                   value="org.springframework.batch.sample.domain.trade.Trade" />
+            <entry key="price" value="java.math.BigDecimal" />
+            <entry key="isin" value="java.lang.String" />
+            <entry key="customer" value="java.lang.String" />
+            <entry key="quantity" value="java.lang.Long" />
         </util:map>
     </property>
 </bean>
@@ -1692,9 +1699,11 @@ public XStreamMarshaller customerCreditMarshaller() {
 	XStreamMarshaller marshaller = new XStreamMarshaller();
 
 	Map<String, Class> aliases = new HashMap<>();
-	aliases.put("customer", CustomerCredit.class);
-	aliases.put("credit", BigDecimal.class);
-	aliases.put("name", String.class);
+	aliases.put("trade", Trade.class);
+	aliases.put("price", BigDecimal.class);
+	aliases.put("isin", String.class);
+	aliases.put("customer", String.class);
+	aliases.put("quantity", Long.class);
 
 	marshaller.setAliases(aliases);
 
@@ -1710,18 +1719,20 @@ discussed, demonstrating the programmatic setup of the required properties:
 FileSystemResource resource = new FileSystemResource("data/outputFile.xml")
 
 Map aliases = new HashMap();
-aliases.put("customer","org.springframework.batch.sample.domain.CustomerCredit");
-aliases.put("credit","java.math.BigDecimal");
-aliases.put("name","java.lang.String");
+aliases.put("trade","org.springframework.batch.sample.domain.trade.Trade");
+aliases.put("price","java.math.BigDecimal");
+aliases.put("customer","java.lang.String");
+aliases.put("isin","java.lang.String");
+aliases.put("quantity","java.lang.Long");
 Marshaller marshaller = new XStreamMarshaller();
 marshaller.setAliases(aliases);
 
 StaxEventItemWriter staxItemWriter =
-	new StaxEventItemWriterBuilder<Foo>()
-				.name("creditWriter")
+	new StaxEventItemWriterBuilder<Trade>()
+				.name("tradesWriter")
 				.marshaller(marshaller)
 				.resource(resource)
-				.rootTagName("trades")
+				.rootTagName("trade")
 				.overwriteOutput(true)
 				.build();
 
@@ -1729,9 +1740,11 @@ staxItemWriter.afterPropertiesSet();
 
 ExecutionContext executionContext = new ExecutionContext();
 staxItemWriter.open(executionContext);
-CustomerCredit Credit = new CustomerCredit();
+Trade trade = new Trade();
 trade.setPrice(11.39);
-credit.setName("Customer1");
+trade.setIsin("XYZ0001");
+trade.setQuantity(5L);
+trade.setCustomer("Customer1");
 staxItemWriter.write(trade);
 ----
 
@@ -1746,8 +1759,8 @@ input for both XML and flat file processing. Consider the following files in a d
 file-1.txt  file-2.txt  ignored.txt
 ----
 
-file-1.txt and file-2.txt are formatted the same and, for business reasons, should be
-processed together. The `MuliResourceItemReader` can be used to read in both files by
+`file-1.txt` and `file-2.txt` are formatted the same and, for business reasons, should be
+processed together. The `MultiResourceItemReader` can be used to read in both files by
 using wildcards, as shown in the following example:
 
 .XML Configuration
@@ -1764,9 +1777,9 @@ using wildcards, as shown in the following example:
 ----
 @Bean
 public MultiResourceItemReader multiResourceReader() {
-	return  new MultiResourceItemReaderBuilder<Foo>()
+	return new MultiResourceItemReaderBuilder<Foo>()
 					.delegate(flatFileItemReader())
-           			.resources(resources())
+					.resources(resources())
 					.build();
 }
 ----
@@ -1776,6 +1789,9 @@ input from both files, handling rollback and restart scenarios. It should be not
 as with any `ItemReader`, adding extra input (in this case a file) could cause potential
 issues when restarting. It is recommended that batch jobs work with their own individual
 directories until completed successfully.
+
+NOTE: Input resources are ordered by using `MultiResourceItemReader#setComparator(Comparator)`
+ to make sure resource ordering is preserved between job runs in restart scenario.
 
 [[database]]
 === Database
@@ -1839,13 +1855,13 @@ implementation of the `RowMapper` interface to map a `CustomerCredit` object:
 
 [source, java]
 ----
-public class CustomerCreditRowMapper implements RowMapper {
+public class CustomerCreditRowMapper implements RowMapper<CustomerCredit> {
 
     public static final String ID_COLUMN = "id";
     public static final String NAME_COLUMN = "name";
     public static final String CREDIT_COLUMN = "credit";
 
-    public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public CustomerCredit mapRow(ResultSet rs, int rowNum) throws SQLException {
         CustomerCredit customerCredit = new CustomerCredit();
 
         customerCredit.setId(rs.getInt(ID_COLUMN));
@@ -1890,7 +1906,7 @@ while(customerCredit != null){
     customerCredit = itemReader.read();
     counter++;
 }
-itemReader.close(executionContext);
+itemReader.close();
 ----
 
 After running the preceding code snippet, the counter equals 1,000. If the code above had
@@ -1934,7 +1950,7 @@ public JdbcCursorItemReader<CustomerCredit> itemReader() {
 ====== Additional Properties
 
 Because there are so many varying options for opening a cursor in Java, there are many
-properties on the `JdbcCustorItemReader` that can be set, as described in the following
+properties on the `JdbcCursorItemReader` that can be set, as described in the following
 table:
 
 .JdbcCursorItemReader Properties
@@ -1956,13 +1972,13 @@ could cause issues with the reader's internal count. Setting this value to `true
 an exception to be thrown if the cursor position is not the same after the `RowMapper`
 call as it was before.
 |saveState|Indicates whether or not the reader's state should be saved in the
-`ExecutionContext` provided by `ItemStream#update(ExecutionContext)` The default is
+`ExecutionContext` provided by `ItemStream#update(ExecutionContext)`. The default is
 `true`.
-|driverSupportsAbsolute|Defaults to `false`. Indicates whether the JDBC driver supports
+|driverSupportsAbsolute|Indicates whether the JDBC driver supports
 setting the absolute row on a `ResultSet`. It is recommended that this is set to `true`
-for JDBC drivers that support `ResultSet`.absolute(), as it may improve performance,
-especially if a step fails while working with a large data set.
-|setUseSharedExtendedConnection|Defaults to `false`. Indicates whether the connection
+for JDBC drivers that support `ResultSet.absolute()`, as it may improve performance,
+especially if a step fails while working with a large data set. Defaults to `false`.
+|setUseSharedExtendedConnection| Indicates whether the connection
 used for the cursor should be used by all other processing, thus sharing the same
 transaction. If this is set to `false`, then the cursor is opened with its own connection
 and does not participate in any transactions started for the rest of the step processing.
@@ -1972,7 +1988,7 @@ released after each commit. When you set this option to `true`, the statement us
 open the cursor is created with both 'READ_ONLY' and 'HOLD_CURSORS_OVER_COMMIT' options.
 This allows holding the cursor open over transaction start and commits performed in the
 step processing. To use this feature, you need a database that supports this and a JDBC
-driver supporting JDBC 3.0 or later.
+driver supporting JDBC 3.0 or later. Defaults to `false`.
 |===============
 
 [[HibernateCursorItemReader]]
@@ -2009,7 +2025,7 @@ while(customerCredit != null){
     customerCredit = itemReader.read();
     counter++;
 }
-itemReader.close(executionContext);
+itemReader.close();
 ----
 
 This configured `ItemReader` returns `CustomerCredit` objects in the exact same manner
@@ -2035,7 +2051,7 @@ straightforward, as shown in the following example:
 ----
 @Bean
 public HibernateCursorItemReader itemReader(SessionFactory sessionFactory) {
-	return new HibernateCursorItemReaderBuilder<Foo>()
+	return new HibernateCursorItemReaderBuilder<CustomerCredit>()
 			.name("creditReader")
 			.sessionFactory(sessionFactory)
 			.queryString("from CustomerCredit")
@@ -2290,12 +2306,12 @@ public JdbcPagingItemReader itemReader(DataSource dataSource) {
 	Map<String, Object> parameterValues = new HashMap<>();
 	parameterValues.put("status", "NEW");
 
-	return new JdbcPagingItemReaderBuilder<Credit>()
+	return new JdbcPagingItemReaderBuilder<CustomerCredit>()
            				.name("creditReader")
            				.dataSource(dataSource)
            				.queryProvider(queryProvider())
            				.parameterValues(parameterValues)
-           				.rowMapper(customerMapper())
+           				.rowMapper(customerCreditMapper())
            				.pageSize(1000)
            				.build();
 }
@@ -2354,7 +2370,7 @@ example as the JDBC reader shown previously:
 @Bean
 public JpaPagingItemReader itemReader() {
 	return new JpaPagingItemReaderBuilder<CustomerCredit>()
-           				.name("credit")
+           				.name("creditReader")
            				.entityManagerFactory(entityManagerFactory())
            				.queryString("select c from CustomerCredit c")
            				.pageSize(1000)
@@ -2363,16 +2379,16 @@ public JpaPagingItemReader itemReader() {
 ----
 
 This configured `ItemReader` returns `CustomerCredit` objects in the exact same manner as
-described for the `JdbcPagingItemReader` above, assuming the `Customer` object has the
+described for the `JdbcPagingItemReader` above, assuming the `CustomerCredit` object has the
 correct JPA annotations or ORM mapping file. The 'pageSize' property determines the
 number of entities read from the database for each query execution.
 
 [[databaseItemWriters]]
 ==== Database ItemWriters
 
-While both flat files and XML have specific `ItemWriters`, there is no exact equivalent
+While both flat files and XML files have a specific `ItemWriter` instance, there is no exact equivalent
 in the database world. This is because transactions provide all the needed functionality.
-`ItemWriters` are necessary for files because they must act as if they're transactional,
+`ItemWriter` implementations are necessary for files because they must act as if they're transactional,
 keeping track of written items and flushing or clearing at the appropriate times.
 Databases have no need for this functionality, since the write is already contained in a
 transaction. Users can create their own DAOs that implement the `ItemWriter` interface or
@@ -2420,7 +2436,7 @@ their batch jobs. The Spring container itself makes this fairly easy by allowing
 necessary class to be injected. However, there may be cases where the existing service
 needs to act as an `ItemReader` or `ItemWriter`, either to satisfy the dependency of
 another Spring Batch class or because it truly is the main `ItemReader` for a step. It is
-fairly trivial to write an adaptor class for each service that needs wrapping, but
+fairly trivial to write an adapter class for each service that needs wrapping, but
 because it is such a common concern, Spring Batch provides implementations:
 `ItemReaderAdapter` and `ItemWriterAdapter`. Both classes implement the standard Spring
 method by invoking the delegate pattern and are fairly simple to set up. The following
@@ -2457,7 +2473,7 @@ public FooService fooService() {
 ----
 
 One important point to note is that the contract of the `targetMethod` must be the same
-as the contract for `read`: When exhausted, it return nulls. Otherwise, it returns an
+as the contract for `read`: When exhausted, it returns `null`. Otherwise, it returns an
 `Object`. Anything else prevents the framework from knowing when processing should end,
 either causing an infinite loop or incorrect failure, depending upon the implementation
 of the `ItemWriter`. The following example uses the `ItemWriterAdapter`:
@@ -2510,9 +2526,9 @@ frameworks, as shown in the following interface definition:
 
 [source, java]
 ----
-public interface Validator {
+public interface Validator<T> {
 
-    void validate(Object value) throws ValidationException;
+    void validate(T value) throws ValidationException;
 
 }
 ----
@@ -2646,7 +2662,7 @@ public class CustomItemReader<T> implements ItemReader<T>{
     }
 
     public T read() throws Exception, UnexpectedInputException,
-       NoWorkFoundException, ParseException {
+       NonTransientResourceException, ParseException {
 
         if (!items.isEmpty()) {
             return items.remove(0);
@@ -2701,7 +2717,7 @@ public class CustomItemReader<T> implements ItemReader<T>, ItemStream {
     }
 
     public T read() throws Exception, UnexpectedInputException,
-        ParseException {
+        ParseException, NonTransientResourceException {
 
         if (currentIndex < items.size()) {
             return items.get(currentIndex++);
@@ -2758,7 +2774,7 @@ It is also worth noting that the key used within the `ExecutionContext` should n
 trivial. That is because the same `ExecutionContext` is used for all `ItemStreams` within
 a `Step`. In most cases, simply prepending the key with the class name should be enough
 to guarantee uniqueness. However, in the rare cases where two of the same type of
-`ItemStream` are used in the same step (which can happen if two files are need for
+`ItemStream` are used in the same step (which can happen if two files are needed for
 output), a more unique name is needed. For this reason, many of the Spring Batch
 `ItemReader` and `ItemWriter` implementations have a `setName()` property that lets this
 key name be overridden.
@@ -2846,7 +2862,7 @@ would get that item in the next call to read.
 
 [[multiResourceItemWriter]]
 ===== `MultiResourceItemWriter`
-The MultiResourceItemWriter wraps a `ResourceAwareItemWriterItemStream` and creates a new
+The `MultiResourceItemWriter` wraps a `ResourceAwareItemWriterItemStream` and creates a new
 output resource when the count of items written in the current resource exceeds the
 `itemCountLimitPerResource`. Spring Batch provides a `MultiResourceItemWriterBuilder` to
 construct an instance of the `MultiResourceItemWriter`.
