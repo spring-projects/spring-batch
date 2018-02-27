@@ -258,7 +258,7 @@ If the element specifies that `merge="true"`, then the child's list is combined 
 parent's instead of overriding it.
 
 [role="xmlContent"]
-In the following example, the `Step` "concreteStep3" is created with two listeners:
+In the following example, the `Step` "concreteStep3", is created with two listeners:
 `listenerOne` and `listenerTwo`:
 
 [source, xml, role="xmlContent"]
@@ -1620,7 +1620,7 @@ public Job job() {
 }
 ----
 
-If no transitions are defined for a `Step`, then the ``Job``'s statuses is defined as
+If no transitions are defined for a `Step`, then the status of the `Job` is defined as
 follows:
 
 * If the `Step` ends with `ExitStatus` FAILED, then the `BatchStatus` and `ExitStatus` of
@@ -1837,7 +1837,7 @@ public Job job() {
 [[split-flows]]
 ==== Split Flows
 
-Every scenario described so far has involved a `Job` that executes its ``Step``s one at a
+Every scenario described so far has involved a `Job` that executes its steps one at a
 time in a linear fashion. In addition to this typical style, Spring Batch also allows
 for a job to be configured with parallel flows.
 

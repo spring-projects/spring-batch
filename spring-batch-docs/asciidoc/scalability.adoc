@@ -138,7 +138,7 @@ Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Us
 they say in the Javadoc if they are thread safe or not or what you have to do to avoid
 problems in a concurrent environment.  If there is no information in the Javadoc, you can
 check the implementation to see if there is any state.  If a reader is not thread safe,
-you can decorate it with the built-in `SynchronizedItemStreamReader` or use it in your own
+you can decorate it with the provided `SynchronizedItemStreamReader` or use it in your own
 synchronizing delegator. You can synchronize the call to `read()` and as long as the
 processing and writing is the most expensive part of the chunk, your step may still
 complete much faster than it would in a single threaded configuration.
@@ -254,7 +254,7 @@ and work is shared through the middleware, so that, if the listeners are all eag
 consumers, then load balancing is automatic.
 
 The middleware has to be durable, with guaranteed delivery and a single consumer for each
-message. JMS is the obvious candidate, but other options (such as Java Spaces) exist in
+message. JMS is the obvious candidate, but other options (such as JavaSpaces) exist in
 the grid computing and shared memory product space.
 
 See the section on

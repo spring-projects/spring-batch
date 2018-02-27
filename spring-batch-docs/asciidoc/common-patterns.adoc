@@ -78,7 +78,7 @@ public Step simpleStep() {
 }
 ----
 
-NOTE: if your listener does anything in an `onError()` method, it must be inside
+IMPORTANT: if your listener does anything in an `onError()` method, it must be inside
 a transaction that is going to be rolled back. If you need to use a transactional
 resource, such as a database, inside an `onError()` method, consider adding a declarative
 transaction to that method (see Spring Core Reference Guide for details), and giving its
