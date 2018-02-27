@@ -59,7 +59,7 @@ declarative flow control (`Decision`) and externalization of flow definitions (`
 There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however, the namespace
 abstracts away the differences in configuration. It has only three
 required dependencies: a name, a `JobRepository` , and
-a list of ``Step``s.
+a list of `Step` instances.
 
 [source, xml, role="xmlContent"]
 ----

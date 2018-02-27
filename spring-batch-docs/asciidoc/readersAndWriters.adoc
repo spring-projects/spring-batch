@@ -489,7 +489,7 @@ return a `String` or an array of `String` objects. This really only gets you hal
 there. A `FieldSet` is Spring Batch's abstraction for enabling the binding of fields from
 a file resource. It allows developers to work with file input in much the same way as
 they would work with database input. A `FieldSet` is conceptually similar to a JDBC
-`ResultSet`. ``FieldSet``s only require one argument: a `String` array of tokens.
+`ResultSet`. A `FieldSet` requires only one argument: a `String` array of tokens.
 Optionally, you can also configure the names of the fields so that the fields may be
 accessed either by index or name as patterned after `ResultSet`, as shown in the following
 example:
@@ -610,8 +610,8 @@ delimiter. The most common delimiter is a comma, but pipes or semicolons are oft
 as well.
 * `FixedLengthTokenizer`: Used for files where fields in a record are each a "fixed
 width". The width of each field must be defined for each record type.
-* `PatternMatchingCompositeLineTokenizer`: Determines which among a list of
-``LineTokenizer``s should be used on a particular line by checking against a pattern.
+* `PatternMatchingCompositeLineTokenizer`: Determines which `LineTokenizer` among a list of
+tokenizers should be used on a particular line by checking against a pattern.
 
 [[fieldSetMapper]]
 ===== FieldSetMapper
@@ -941,8 +941,8 @@ though a "LINEA" has more information than a "LINEB".
 The `ItemReader` reads each line individually, but we must specify different
 `LineTokenizer` and `FieldSetMapper` objects so that the `ItemWriter` receives the
 correct items. The `PatternMatchingCompositeLineMapper` makes this easy by allowing maps
-of patterns to ``LineTokenizer``s and patterns to ``FieldSetMapper``s to be configured, as
-shown in the following example:
+of patterns to `LineTokenizer` instances and patterns to `FieldSetMapper` instances to be
+configured, as shown in the following example:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -990,10 +990,10 @@ public PatternMatchingCompositeLineMapper orderFileLineMapper() {
 }
 ----
 
-In this example, "LINEA" and "LINEB" have separate ``LineTokenizer``s, but they both use
+In this example, "LINEA" and "LINEB" have separate `LineTokenizer` instances, but they both use
 the same `FieldSetMapper`.
 
-The `PatternMatchingCompositeLineMapper` makes use of the ``PatternMatcher``'s match method
+The `PatternMatchingCompositeLineMapper` uses the `PatternMatcher#match` method
 in order to select the correct delegate for each line. The `PatternMatcher` allows for
 two wildcard characters with special meaning: the question mark ("?") matches exactly one
 character, while the asterisk ("\*") matches zero or more characters. Note that, in the
@@ -1023,8 +1023,7 @@ alone.
 
 It is also common for a flat file to contain records that each span multiple lines. To
 handle this situation, a more complex strategy is required. A demonstration of this
-common pattern can be found in the
- link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#multiline$$[multiLineRecords] sample.
+common pattern can be found in the `multiLineRecords` sample.
 
 [[exceptionHandlingInFlatFiles]]
 ===== Exception Handling in Flat Files
@@ -1451,7 +1450,7 @@ the parsing process by allowing the user to provide only callbacks).
 
 We need to consider how XML input and output works in Spring Batch. First, there are a
 few concepts that vary from file reading and writing but are common across Spring Batch
-XML processing. With XML processing, instead of lines of records (``FieldSet``s) that need
+XML processing. With XML processing, instead of lines of records (`FieldSet` instances) that need
 to be tokenized, it is assumed an XML resource is a collection of 'fragments'
 corresponding to individual records, as shown in the following image:
 
@@ -1791,7 +1790,7 @@ as with any `ItemReader`, adding extra input (in this case a file) could cause p
 issues when restarting. It is recommended that batch jobs work with their own individual
 directories until completed successfully.
 
-NOTE: Input resources are ordered using `MultiResourceItemReader#setComparator(Comparator)`
+NOTE: Input resources are ordered by using `MultiResourceItemReader#setComparator(Comparator)`
  to make sure resource ordering is preserved between job runs in restart scenario.
 
 [[database]]
@@ -2387,9 +2386,9 @@ number of entities read from the database for each query execution.
 [[databaseItemWriters]]
 ==== Database ItemWriters
 
-While both flat files and XML have specific ``ItemWriter``s, there is no exact equivalent
+While both flat files and XML files have a specific `ItemWriter` instance, there is no exact equivalent
 in the database world. This is because transactions provide all the needed functionality.
-``ItemWriter``s are necessary for files because they must act as if they're transactional,
+`ItemWriter` implementations are necessary for files because they must act as if they're transactional,
 keeping track of written items and flushing or clearing at the appropriate times.
 Databases have no need for this functionality, since the write is already contained in a
 transaction. Users can create their own DAOs that implement the `ItemWriter` interface or
