@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.util.CollectionUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -57,7 +58,10 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * Set the {@link Neo4jOperations} to be used to save items
 	 *
 	 * @param template the template implementation to be used
+	 * @deprecated This API will be removed in v4.x in favor of
+	 * {@code setSessionFactory(org.neo4j.ogm.session.SessionFactory sessionFactory)}.
 	 */
+	@Deprecated
 	public void setTemplate(Neo4jOperations template) {
 		this.template = template;
 	}

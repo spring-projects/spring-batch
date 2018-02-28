@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.07
  */
 public abstract class AbstractNeo4jItemReader<T> extends
@@ -148,11 +149,22 @@ public abstract class AbstractNeo4jItemReader<T> extends
 	 *
 	 * @param template the Neo4jOperations instance to use
 	 * @see Neo4jOperations
+	 * @deprecated This API will be removed in v4.x in favor of
+	 * {@code setSessionFactory(org.neo4j.ogm.session.SessionFactory sessionFactory)}.
 	 */
+	@Deprecated
 	public void setTemplate(Neo4jOperations template) {
 		this.template = template;
 	}
 
+	/**
+	 * Get the Neo4jOperations instance used by this reader.
+	 *
+	 * @return the Neo4jOperations instance used by this reader
+	 * @deprecated This API will be removed in v4.x in favor of
+	 * {@code org.neo4j.ogm.session.SessionFactory getSessionFactory()}.
+	 */
+	@Deprecated
 	protected final Neo4jOperations getTemplate() {
 		return this.template;
 	}
