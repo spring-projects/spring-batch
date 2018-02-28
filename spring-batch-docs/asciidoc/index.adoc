@@ -3,7 +3,7 @@ include::header/index-header.adoc[]
 // ======================================================================================
 
 Welcome to the Spring Batch reference documentation! This documentation is also available
-as single link:index-single.html[html] and link:../pdf/index-single.pdf[pdf] documents.
+as single link:index-single.html[html] and link:../pdf/spring-batch-reference.pdf[pdf] documents.
 
 The reference documentation is divided into several sections:
 
