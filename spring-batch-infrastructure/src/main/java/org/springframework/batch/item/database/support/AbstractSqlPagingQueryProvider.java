@@ -16,18 +16,18 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.database.JdbcParameterUtils;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided
@@ -42,7 +42,9 @@ import java.util.Map;
  * Provides properties and preparation for the mandatory "selectClause" and
  * "fromClause" as well as for the optional "whereClause". Also provides
  * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
- * the sort key must be a true key and not just a column to order by.
+ * the sort key must be a true key and not just a column to order by.  It is important
+ * to have a unique key constraint on the sort key to guarantee that no data is lost
+ * between executions.
  * 
  * @author Thomas Risberg
  * @author Dave Syer

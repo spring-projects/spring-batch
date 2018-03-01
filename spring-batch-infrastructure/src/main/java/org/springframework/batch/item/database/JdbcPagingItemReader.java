@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ import org.springframework.util.ClassUtils;
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position. On restart it uses the last sort key value to locate the
  * first page to read (so it doesn't matter if the successfully processed items
- * have been removed or modified).
+ * have been removed or modified).  It is important to have a unique key constraint on the
+ * sort key to guarantee that no data is lost between executions.
  * </p>
  * 
  * <p>

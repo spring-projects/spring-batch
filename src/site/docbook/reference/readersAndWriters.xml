@@ -2192,6 +2192,9 @@ itemReader.close(executionContext);</programlisting>
         also provide an optional where clause. These clauses will be used to
         build an SQL statement combined with the required sortKey.</para>
 
+        <note>It is important to have a unique key constraint on the `sortKey` to
+          guarantee that no data is lost between executions.</note>
+
         <para>After the reader has been opened, it will pass back one item per
         call to <methodname>read</methodname> in the same basic fashion as any
         other <classname>ItemReader</classname>. The paging happens behind the
