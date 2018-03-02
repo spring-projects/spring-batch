@@ -121,7 +121,7 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 }
 
 /**
- * Extract step scope configuration into a separate unit so that it can be non-static.
+ * Extract job/step scope configuration into a separate unit.
  * 
  * @author Dave Syer
  * 
