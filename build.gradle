@@ -382,7 +382,7 @@ project('spring-batch-infrastructure') {
 }
 
 project('spring-batch-docs') {
-
+	description = 'Spring Batch Docs'
 }
 
 project('spring-batch-core-tests') {
