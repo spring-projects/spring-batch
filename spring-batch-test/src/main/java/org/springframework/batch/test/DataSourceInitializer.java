@@ -17,11 +17,19 @@
 package org.springframework.batch.test;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -126,8 +134,8 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
 				try {
-					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-							.getInputStream(), "UTF-8")), ";");
+					scripts = StringUtils
+							.delimitedListToStringArray(stripComments(getScriptLines(scriptResource)), ";");
 				}
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
@@ -153,6 +161,24 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 		});
 
+	}
+
+	private List<String> getScriptLines(Resource scriptResource) throws IOException {
+		URI uri = scriptResource.getURI();
+		initFileSystem(uri);
+		return Files.readAllLines(Paths.get(uri), StandardCharsets.UTF_8);
+	}
+
+	private void initFileSystem(URI uri) throws IOException {
+		try {
+			FileSystems.getFileSystem(uri);
+		}
+		catch (FileSystemNotFoundException e) {
+			FileSystems.newFileSystem(uri, Collections.emptyMap());
+		}
+		catch (IllegalArgumentException e) {
+			FileSystems.getDefault();
+		}
 	}
 
 	private String stripComments(List<String> list) {
