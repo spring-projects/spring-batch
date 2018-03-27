@@ -3,6 +3,8 @@ package org.springframework.batch.core.test.step;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
@@ -22,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -139,7 +142,55 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(19, stepExecution.getWriteCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
-	
+
+	@Test(timeout = 3000)
+	public void testExceptionInProcessDuringChunkScan() throws Exception {
+		// Given
+		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
+			int cpt;
+
+			@Override
+			public Integer process(Integer item) throws Exception {
+				cpt++;
+				if (cpt == 7) { // item 2 succeeds the first time but fails during the scan
+					throw new Exception("Error during process");
+				}
+				return item;
+			}
+		};
+		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
+			int cpt;
+
+			@Override
+			public void write(List<? extends Integer> items) throws Exception {
+				cpt++;
+				if (cpt == 1) {
+					throw new Exception("Error during write");
+				}
+			}
+		};
+		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step")
+				.<Integer, Integer>chunk(5)
+				.reader(itemReader)
+				.processor(itemProcessor)
+				.writer(itemWriter)
+				.faultTolerant()
+				.skip(Exception.class)
+				.skipLimit(3)
+				.build();
+
+		// When
+		StepExecution stepExecution = execute(step);
+
+		// Then
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		assertEquals(7, stepExecution.getReadCount());
+		assertEquals(6, stepExecution.getWriteCount());
+		assertEquals(1, stepExecution.getProcessSkipCount());
+	}
+
 	private List<Integer> createItems() {
 		List<Integer> items = new ArrayList<>(TOTAL_ITEMS);
 		for (int i = 1; i <= TOTAL_ITEMS; i++) {
