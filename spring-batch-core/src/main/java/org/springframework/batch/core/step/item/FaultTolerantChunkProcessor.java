@@ -16,8 +16,16 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
@@ -34,13 +42,6 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.support.DefaultRetryState;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
@@ -571,6 +572,14 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 		Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
 		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
+
+		//BATCH-2442 : do not scan skipped items
+		if (!inputs.getSkips().isEmpty()) {
+			if (outputIterator.hasNext()) {
+				outputIterator.remove();
+				return;
+			}
+		}
 
 		List<O> items = Collections.singletonList(outputIterator.next());
 		inputIterator.next();
