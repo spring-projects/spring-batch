@@ -1,8 +1,13 @@
 package org.springframework.batch.core.test.step;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -22,10 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -158,8 +159,9 @@ public class FaultTolerantStepIntegrationTests {
 	public void testExceptionInProcessDuringChunkScan() throws Exception {
 		// Given
 		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+
 		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
-			int cpt;
+			private int cpt;
 
 			@Override
 			public Integer process(Integer item) throws Exception {
@@ -170,8 +172,9 @@ public class FaultTolerantStepIntegrationTests {
 				return item;
 			}
 		};
+
 		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
-			int cpt;
+			private int cpt;
 
 			@Override
 			public void write(List<? extends Integer> items) throws Exception {
@@ -181,6 +184,7 @@ public class FaultTolerantStepIntegrationTests {
 				}
 			}
 		};
+
 		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step")
 				.<Integer, Integer>chunk(5)
 				.reader(itemReader)
