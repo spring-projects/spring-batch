@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -64,6 +65,9 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  */
 public class SimpleStepFactoryBeanTests {
 
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	private List<Exception> listened = new ArrayList<Exception>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -78,7 +82,7 @@ public class SimpleStepFactoryBeanTests {
 		}
 	};
 
-	private ItemReader<String> reader;
+	private ItemReader<String> reader = new ListItemReader<>(Arrays.asList("a", "b", "c"));
 
 	private SimpleJob job = new SimpleJob();
 
@@ -91,6 +95,28 @@ public class SimpleStepFactoryBeanTests {
 	@Test(expected = IllegalStateException.class)
 	public void testMandatoryProperties() throws Exception {
 		new SimpleStepFactoryBean<String, String>().getObject();
+	}
+
+	@Test
+	public void testMandatoryReader() throws Exception {
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setItemWriter(writer);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemReader must be provided");
+
+		factory.getObject();
+	}
+
+	@Test
+	public void testMandatoryWriter() throws Exception {
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setItemReader(reader);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemWriter must be provided");
+
+		factory.getObject();
 	}
 
 	@Test
