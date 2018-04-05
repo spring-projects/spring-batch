@@ -20,7 +20,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import org.junit.rules.ExpectedException;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -75,6 +78,9 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 public class FaultTolerantStepFactoryBeanTests {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -132,6 +138,28 @@ public class FaultTolerantStepFactoryBeanTests {
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
+	}
+
+	@Test
+	public void testMandatoryReader() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setItemWriter(writer);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemReader must be provided");
+
+		factory.getObject();
+	}
+
+	@Test
+	public void testMandatoryWriter() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setItemReader(reader);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemWriter must be provided");
+
+		factory.getObject();
 	}
 
 	/**
