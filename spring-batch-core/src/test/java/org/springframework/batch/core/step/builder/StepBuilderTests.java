@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.annotation.AfterChunk;
+import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -36,7 +37,9 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemReader;
@@ -51,6 +54,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -87,6 +91,85 @@ public class StepBuilderTests {
 		assertEquals(1, InterfaceBasedStepExecutionListener.afterStepCount);
 		assertEquals(1, AnnotationBasedStepExecutionListener.beforeStepCount);
 		assertEquals(1, AnnotationBasedStepExecutionListener.afterStepCount);
+		assertEquals(1, AnnotationBasedStepExecutionListener.beforeChunkCount);
+		assertEquals(1, AnnotationBasedStepExecutionListener.afterChunkCount);
+	}
+
+	@Test
+	public void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		jobRepository.add(execution);
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		TaskletStepBuilder builder = new StepBuilder("step")
+				.repository(jobRepository)
+				.transactionManager(transactionManager)
+				.tasklet((contribution, chunkContext) -> null)
+				.listener(new AnnotationBasedChunkListener());
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
+		assertEquals(1, AnnotationBasedChunkListener.afterChunkCount);
+	}
+
+	@Test
+	public void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		jobRepository.add(execution);
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		SimpleStepBuilder builder = new StepBuilder("step")
+				.repository(jobRepository)
+				.transactionManager(transactionManager)
+				.chunk(5)
+				.reader(new DummyItemReader())
+				.writer(new DummyItemWriter())
+				.listener(new AnnotationBasedChunkListener());
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
+		assertEquals(1, AnnotationBasedChunkListener.afterChunkCount);
+	}
+
+	@Test
+	public void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		jobRepository.add(execution);
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		SimpleStepBuilder builder = new StepBuilder("step")
+				.repository(jobRepository)
+				.transactionManager(transactionManager)
+				.chunk(5)
+				.reader(new DummyItemReader())
+				.writer(new DummyItemWriter())
+				.faultTolerant()
+				.listener(new AnnotationBasedChunkListener()); // TODO should this return FaultTolerantStepBuilder?
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
+		assertEquals(1, AnnotationBasedChunkListener.afterChunkCount);
+	}
+
+	@Test
+	public void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
+		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		jobRepository.add(execution);
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		SimpleJob job = new SimpleJob("job");
+		job.setJobRepository(jobRepository);
+		JobStepBuilder builder = new StepBuilder("step")
+				.repository(jobRepository)
+				.transactionManager(transactionManager)
+				.job(job)
+				.listener(new AnnotationBasedChunkListener());
+		builder.build().execute(execution);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+
+		// it makes no sense to register a ChunkListener on a step which is not of type tasklet, so it should not be invoked
+		assertEquals(0, AnnotationBasedChunkListener.beforeChunkCount);
+		assertEquals(0, AnnotationBasedChunkListener.afterChunkCount);
 	}
 
 	@Test
@@ -256,6 +339,34 @@ public class StepBuilderTests {
 		@AfterChunk
 		public void afterChunk() {
 			afterChunkCount++;
+		}
+	}
+
+	public static class AnnotationBasedChunkListener {
+
+		static int beforeChunkCount = 0;
+		static int afterChunkCount = 0;
+		static int afterChunkErrorCount = 0;
+
+		public AnnotationBasedChunkListener() {
+			beforeChunkCount = 0;
+			afterChunkCount = 0;
+			afterChunkErrorCount = 0;
+		}
+
+		@BeforeChunk
+		public void beforeChunk() {
+			beforeChunkCount++;
+		}
+
+		@AfterChunk
+		public void afterChunk() {
+			afterChunkCount++;
+		}
+
+		@AfterChunkError
+		public void afterChunkError() {
+			afterChunkErrorCount++;
 		}
 	}
 }

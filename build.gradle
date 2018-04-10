@@ -382,7 +382,7 @@ project('spring-batch-infrastructure') {
 }
 
 project('spring-batch-docs') {
-
+	description = 'Spring Batch Docs'
 }
 
 project('spring-batch-core-tests') {
@@ -733,13 +733,17 @@ task docsZip(type: Zip) {
 			exclude '*.pdf'
 			exclude '*.html'
 			exclude 'images'
+			exclude 'jsfiles'
+			exclude 'tocbot-3.0.2'
 			exclude  'html/index-pdf.html'
 			exclude 'pdf/images'
+			exclude 'pdf/jsfiles'
+			exclude 'pdf/tocbot-3.0.2'
 			exclude 'pdf/appendix.pdf'
 			exclude 'pdf/common-patterns.pdf'
 			exclude 'pdf/domain.pdf'
 			exclude 'pdf/index.pdf'
-			exclude 'pdf/index-single.pdf'
+			exclude 'pdf/toggle.pdf'
 			exclude 'pdf/job.pdf'
 			exclude 'pdf/jsr-352.pdf'
 			exclude 'pdf/readersAndWriters.pdf'
@@ -754,6 +758,8 @@ task docsZip(type: Zip) {
 			exclude 'pdf/transaction-appendix.pdf'
 			exclude 'pdf/whatsnew.pdf'
 			exclude 'pdf/glossary.pdf'
+
+			rename  'index-single.pdf', 'spring-batch-reference.pdf'
 
 			into 'reference'
 		}

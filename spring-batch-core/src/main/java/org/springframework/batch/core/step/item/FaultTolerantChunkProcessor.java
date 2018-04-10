@@ -580,6 +580,14 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
 		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
 
+		//BATCH-2442 : do not scan skipped items
+		if (!inputs.getSkips().isEmpty()) {
+			if (outputIterator.hasNext()) {
+				outputIterator.remove();
+				return;
+			}
+		}
+
 		List<O> items = Collections.singletonList(outputIterator.next());
 		inputIterator.next();
 		try {

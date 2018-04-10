@@ -26,7 +26,7 @@ To make processing more robust and less prone to failure, it sometimes
 [NOTE]
 ====
 The retry functionality was pulled out of Spring Batch as of 2.2.0.
-		It is now part of a new library, Spring Retry.
+It is now part of a new library, https://github.com/spring-projects/spring-retry[Spring Retry].
 ====
 
 
@@ -39,16 +39,16 @@ To automate retry
 ----
 public interface RetryOperations {
 
-    <T> T execute(RetryCallback<T> retryCallback) throws Exception;
+    <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback) throws E;
 
-    <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback)
-        throws Exception;
+    <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback)
+        throws E;
 
-    <T> T execute(RetryCallback<T> retryCallback, RetryState retryState)
-        throws Exception, ExhaustedRetryException;
+    <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RetryState retryState)
+        throws E, ExhaustedRetryException;
 
-    <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
-        RetryState retryState) throws Exception;
+    <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
+        RetryState retryState) throws E;
 
 }
 ----
@@ -59,9 +59,9 @@ The basic callback is a simple interface that lets you
 
 [source, java]
 ----
-public interface RetryCallback<T> {
+public interface RetryCallback<T, E extends Throwable> {
 
-    T doWithRetry(RetryContext context) throws Throwable;
+    T doWithRetry(RetryContext context) throws E;
 
 }
 ----
@@ -368,11 +368,11 @@ The following code shows the interface definition for `RetryListener`:
 ----
 public interface RetryListener {
 
-    void open(RetryContext context, RetryCallback<T> callback);
+    <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback);
 
-    void onError(RetryContext context, RetryCallback<T> callback, Throwable e);
+    <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable);
 
-    void close(RetryContext context, RetryCallback<T> callback, Throwable e);
+    <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable);
 }
 ----
 
@@ -401,7 +401,7 @@ Sometimes, there is some business processing that you know you want
     The `RetryOperationsInterceptor` executes the
     intercepted method and retries on failure according to the
     `RetryPolicy` in the provided
-    `RepeatTemplate`.
+    `RetryTemplate`.
 
 [role="xmlContent"]
 The following example shows a declarative retry that uses the Spring AOP

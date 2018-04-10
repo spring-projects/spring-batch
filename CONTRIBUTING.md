@@ -95,20 +95,9 @@ This command, will provide the following output, which in this case shows a nice
 ````
 If you see intersecting lines, that usually means that you forgot to rebase you branch. As mentioned earlier, **please rebase against master** before issuing a pull request.
 
-## Mind the whitespace
+## Code style
 
-Please carefully follow the whitespace and formatting conventions already present in the framework.
-
-1. Tabs, not spaces
-2. Unix (LF), not DOS (CRLF) line endings
-3. Eliminate all trailing whitespace
-4. Wrap Javadoc at 90 characters
-5. Aim to wrap code at 90 characters, but favor readability over wrapping
-6. Preserve existing formatting; i.e. do not reformat code for its own sake
-7. Search the codebase using `git grep` and other tools to discover common
-   naming conventions, etc.
-8. Latin-1 (ISO-8859-1) encoding for Java sources; use `native2ascii` to convert
-   if necessary
+Please carefully follow the same [code style as Spring Framework](https://github.com/spring-projects/spring-framework/wiki/Code-Style).
 
 ## Add Apache license header to all new classes
 
@@ -166,7 +155,7 @@ Search the codebase to find related unit tests and add additional @Test methods 
 
 ## Squash commits
 
-Use `git rebase --interactive`, `git add --patch` and other tools to "squash" multiple commits into atomic changes. In addition to the man pages for git, there are many resources online to help you understand how these tools work. Here is one: http://book.git-scm.com/4_interactive_rebasing.html.
+Use `git rebase --interactive`, `git add --patch` and other tools to "squash" multiple commits into atomic changes. In addition to the man pages for git, there are many resources online to help you understand how these tools work. Here is one: https://book.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_squashing .
 
 ## Use your real name in git commits
 

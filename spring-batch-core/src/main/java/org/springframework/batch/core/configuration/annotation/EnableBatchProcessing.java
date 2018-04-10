@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.configuration.support.ApplicationContextFa
 import org.springframework.batch.core.configuration.support.AutomaticJobRegistrar;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -85,7 +86,12 @@ import org.springframework.transaction.PlatformTransactionManager;
  * </pre>
  *
  * If a user does not provide a {@link javax.sql.DataSource} within the context, a Map based
- * {@link org.springframework.batch.core.repository.JobRepository} will be used.
+ * {@link org.springframework.batch.core.repository.JobRepository} will be used. If multiple
+ * {@link javax.sql.DataSource}s are defined in the context, the one annotated with
+ * {@link org.springframework.context.annotation.Primary} will be used (Note that if none
+ * of them is annotated with {@link org.springframework.context.annotation.Primary}, the one
+ * named <code>dataSource</code> will be used if any, otherwise a {@link UnsatisfiedDependencyException}
+ * will be thrown).
  *
  * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an
@@ -156,6 +162,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * </pre>
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @Target(ElementType.TYPE)
