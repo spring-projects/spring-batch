@@ -155,7 +155,7 @@ Search the codebase to find related unit tests and add additional @Test methods 
 
 ## Squash commits
 
-Use `git rebase --interactive`, `git add --patch` and other tools to "squash" multiple commits into atomic changes. In addition to the man pages for git, there are many resources online to help you understand how these tools work. Here is one: http://book.git-scm.com/4_interactive_rebasing.html.
+Use `git rebase --interactive`, `git add --patch` and other tools to "squash" multiple commits into atomic changes. In addition to the man pages for git, there are many resources online to help you understand how these tools work. Here is one: https://book.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#_squashing .
 
 ## Use your real name in git commits
 
