@@ -301,15 +301,7 @@ public class JdbcCursorItemReaderBuilderTests {
 				.ignoreWarnings(true)
 				.driverSupportsAbsolute(true)
 				.useSharedExtendedConnection(true)
-				.rowMapper((rs, rowNum) -> {
-					Foo foo = new Foo();
-
-					foo.setFirst(rs.getInt("FIRST"));
-					foo.setSecond(rs.getString("SECOND"));
-					foo.setThird(rs.getString("THIRD"));
-
-					return foo;
-				})
+				.beanRowMapper(Foo.class)
 				.build();
 
 		assertEquals(1, ReflectionTestUtils.getField(reader, "fetchSize"));
