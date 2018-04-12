@@ -48,7 +48,8 @@ public enum DatabaseType {
 	POSTGRES("PostgreSQL"),
 	SYBASE("Sybase"),
 	H2("H2"),
-	SQLITE("SQLite");
+	SQLITE("SQLite"),
+	HANA("HDB");
 
 	private static final Map<String, DatabaseType> nameMap;
 
