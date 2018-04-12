@@ -1,0 +1,2 @@
+#macro (sequence $name $value)CREATE SEQUENCE ${name} START WITH ${value} MINVALUE 0;
+#end

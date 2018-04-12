@@ -25,6 +25,7 @@ import org.springframework.batch.item.database.support.AbstractSqlPagingQueryPro
 import org.springframework.batch.item.database.support.Db2PagingQueryProvider;
 import org.springframework.batch.item.database.support.DerbyPagingQueryProvider;
 import org.springframework.batch.item.database.support.H2PagingQueryProvider;
+import org.springframework.batch.item.database.support.HanaPagingQueryProvider;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.OraclePagingQueryProvider;
@@ -359,6 +360,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 				case DB2ZOS:
 				case DB2AS400: provider = new Db2PagingQueryProvider(); break;
 				case H2: provider = new H2PagingQueryProvider(); break;
+				case HANA: provider = new HanaPagingQueryProvider(); break;
 				case HSQL: provider = new HsqlPagingQueryProvider(); break;
 				case SQLSERVER: provider = new SqlServerPagingQueryProvider(); break;
 				case MYSQL: provider = new MySqlPagingQueryProvider(); break;

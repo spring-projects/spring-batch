@@ -25,6 +25,7 @@ import org.springframework.jdbc.support.incrementer.Db2MainframeMaxValueIncremen
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.H2SequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HanaSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
@@ -37,6 +38,7 @@ import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
@@ -97,6 +99,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		}
 		else if (databaseType == H2) {
 			return new H2SequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
+		else if (databaseType == HANA) {
+			return new HanaSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == MYSQL) {
 			MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
