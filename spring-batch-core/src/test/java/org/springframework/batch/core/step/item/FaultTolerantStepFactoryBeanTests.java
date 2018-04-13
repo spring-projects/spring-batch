@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -366,30 +366,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
 		assertEquals(expectedOutput, writer.getWritten());
-
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
-	}
-
-	@Test
-	public void testNullWriter() throws Exception {
-
-		factory.setItemWriter(null);
-		Step step = factory.getObject();
-
-		step.execute(stepExecution);
-
-		assertEquals(0, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount());
-		assertEquals(5, stepExecution.getReadCount());
-		// Write count is incremented even if nothing happens
-		assertEquals(5, stepExecution.getWriteCount());
-		assertEquals(0, stepExecution.getFilterCount());
-		assertEquals(0, stepExecution.getRollbackCount());
-
-		// writer skips "4"
-		assertTrue(reader.getRead().contains("4"));
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
