@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean<DataSource> 
 
 	private static Log logger = LogFactory.getLog(DerbyDataSourceFactoryBean.class);
 
-	private String dataDirectory = "derby-home";
+	private String dataDirectory = "build/derby-home";
 
 	public void setDataDirectory(String dataDirectory) {
 		this.dataDirectory = dataDirectory;
@@ -42,7 +42,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean<DataSource> 
 		System.setProperty("derby.storage.pageCacheSize", "100");
 
 		final EmbeddedDataSource ds = new EmbeddedDataSource();
-		ds.setDatabaseName("derbydb");
+		ds.setDatabaseName("build/derbydb");
 		ds.setCreateDatabase("create");
 
 		logger.info("Created instance of " + ds.toString());

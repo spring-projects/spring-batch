@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class DatabaseTypeIntegrationTests {
 	@Test
 	public void testDerby() throws Exception {
 		DataSource dataSource = DatabaseTypeTestUtils.getDataSource(org.apache.derby.jdbc.EmbeddedDriver.class,
-				"jdbc:derby:derby-home/test;create=true", "sa", "");
+				"jdbc:derby:./build/derby-home/test;create=true", "sa", "");
 		assertEquals(DatabaseType.DERBY, DatabaseType.fromMetaData(dataSource));
 		dataSource.getConnection();
 	}
