@@ -331,7 +331,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	private PagingQueryProvider determineQueryProvider(DataSource dataSource) {
 
 		try {
-			DatabaseType databaseType = DatabaseType.fromMetaData(this.dataSource);
+			DatabaseType databaseType = DatabaseType.fromMetaData(dataSource);
 
 			AbstractSqlPagingQueryProvider provider;
 
