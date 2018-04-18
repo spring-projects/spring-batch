@@ -22,9 +22,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
+import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
+import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
@@ -48,6 +47,7 @@ import org.springframework.integration.jms.dsl.Jms;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableBatchIntegration
 @EnableIntegration
 @PropertySource("classpath:remote-chunking.properties")
 public class MasterConfiguration {
@@ -59,7 +59,7 @@ public class MasterConfiguration {
 	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
-	private StepBuilderFactory stepBuilderFactory;
+	private RemoteChunkingMasterStepBuilderFactory masterStepBuilderFactory;
 
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory() {
@@ -110,22 +110,12 @@ public class MasterConfiguration {
 	}
 
 	@Bean
-	public ChunkMessageChannelItemWriter<Integer> itemWriter() {
-		MessagingTemplate messagingTemplate = new MessagingTemplate();
-		messagingTemplate.setDefaultChannel(requests());
-		ChunkMessageChannelItemWriter<Integer> chunkMessageChannelItemWriter
-				= new ChunkMessageChannelItemWriter<>();
-		chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate);
-		chunkMessageChannelItemWriter.setReplyChannel(replies());
-		return chunkMessageChannelItemWriter;
-	}
-
-	@Bean
 	public TaskletStep masterStep() {
-		return this.stepBuilderFactory.get("masterStep")
+		return this.masterStepBuilderFactory.get("masterStep")
 				.<Integer, Integer>chunk(3)
 				.reader(itemReader())
-				.writer(itemWriter())
+				.outputChannel(requests())
+				.inputChannel(replies())
 				.build();
 	}
 

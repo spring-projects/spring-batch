@@ -651,11 +651,10 @@ This sample shows how to configure a remote chunking job. The master step will
 read numbers from 1 to 6 and send two chunks ({1, 2, 3} and {4, 5, 6}) to workers
 for processing and writing.
 
-This example shows how to:
+This example shows how to use:
 
-* configure a `ChunkMessageChannelItemWriter` on the master side to send chunks to workers
-* configure a `ChunkProcessorChunkHandler` on the worker side to process chunks and
-send replies back to the master
+* the `RemoteChunkingMasterStepBuilderFactory` to create a master step
+* the `RemoteChunkingWorkerBuilder` to configure an integration flow on the worker side.
 
 The sample uses an embedded JMS broker as a communication middleware between the
 master and workers. The usage of an embedded broker is only for simplicity's sake,

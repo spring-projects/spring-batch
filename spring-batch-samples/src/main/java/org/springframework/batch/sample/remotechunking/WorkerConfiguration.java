@@ -18,16 +18,15 @@ package org.springframework.batch.sample.remotechunking;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.step.item.ChunkProcessor;
-import org.springframework.batch.core.step.item.SimpleChunkProcessor;
-import org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler;
+import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
+import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -36,7 +35,8 @@ import org.springframework.integration.jms.dsl.Jms;
 
 /**
  * This configuration class is for the worker side of the remote chunking sample.
- * It configures a {@link ChunkProcessorChunkHandler} as a service activator to:
+ * It uses the {@link RemoteChunkingWorkerBuilder} to configure an
+ * {@link IntegrationFlow} in order to:
  * <ul>
  *     <li>receive requests from the master</li>
  *     <li>process chunks with the configured item processor and writer</li>
@@ -47,12 +47,16 @@ import org.springframework.integration.jms.dsl.Jms;
  */
 @Configuration
 @EnableBatchProcessing
+@EnableBatchIntegration
 @EnableIntegration
 @PropertySource("classpath:remote-chunking.properties")
 public class WorkerConfiguration {
 
 	@Value("${broker.url}")
 	private String brokerUrl;
+
+	@Autowired
+	private RemoteChunkingWorkerBuilder<Integer, Integer> remoteChunkingWorkerBuilder;
 
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory() {
@@ -115,12 +119,13 @@ public class WorkerConfiguration {
 	}
 
 	@Bean
-	@ServiceActivator(inputChannel = "requests", outputChannel = "replies")
-	public ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler() {
-		ChunkProcessor<Integer> chunkProcessor = new SimpleChunkProcessor<>(itemProcessor(), itemWriter());
-		ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler = new ChunkProcessorChunkHandler<>();
-		chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
-		return chunkProcessorChunkHandler;
+	public IntegrationFlow workerIntegrationFlow() {
+		return this.remoteChunkingWorkerBuilder
+				.itemProcessor(itemProcessor())
+				.itemWriter(itemWriter())
+				.inputChannel(requests())
+				.outputChannel(replies())
+				.build();
 	}
 
 }
