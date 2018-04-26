@@ -246,10 +246,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		try {
 			return type.newInstance();
 		}
-		catch (InstantiationException e) {
-			ReflectionUtils.handleReflectionException(e);
-		}
-		catch (IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -370,10 +367,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException e) {
-				ReflectionUtils.handleReflectionException(e);
-			}
-			catch (IllegalAccessException e) {
+			catch (InstantiationException | IllegalAccessException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}
