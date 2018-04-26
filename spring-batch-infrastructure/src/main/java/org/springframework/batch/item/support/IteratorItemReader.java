@@ -64,7 +64,7 @@ public class IteratorItemReader<T> implements ItemReader<T> {
 	 * iterator provided.
 	 */
     @Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public T read() {
 		if (iterator.hasNext())
 			return iterator.next();
 		else

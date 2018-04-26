@@ -30,7 +30,7 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	private LineAggregator<T> delegate = new PassThroughLineAggregator<T>();
+	private LineAggregator<T> delegate = new PassThroughLineAggregator<>();
 
 	/**
 	 * Public setter for the {@link LineAggregator} to use on single items, that
@@ -47,13 +47,13 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public String aggregate(Collection<T> items) {
 		StringBuilder builder = new StringBuilder();
 		for (T value : items) {
-			builder.append(delegate.aggregate(value) + LINE_SEPARATOR);
+			builder.append(delegate.aggregate(value)).append(LINE_SEPARATOR);
 		}
-		return builder.delete(builder.length()-LINE_SEPARATOR.length(),builder.length()).toString();
+		return builder.delete(builder.length() - LINE_SEPARATOR.length(), builder.length()).toString();
 	}
 
 }
