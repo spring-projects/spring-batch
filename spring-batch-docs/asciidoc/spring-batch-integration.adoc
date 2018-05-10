@@ -706,10 +706,10 @@ configuration similar to the following:
 .Java Configuration
 [source, java, role="javaContent"]
 ----
-public Job chunkJob(ItemReader itemReader) {
+public Job chunkJob() {
      return jobBuilderFactory.get("personJob")
              .start(stepBuilderFactory.get("step1")
-                     .chunk(200)
+                     .<Person, Person>chunk(200)
                      .reader(itemReader())
                      .writer(itemWriter())
                      .build())
@@ -722,7 +722,7 @@ to use for reading data on the master. The `ItemWriter` reference
 points to a special `ItemWriter`
 (called `ChunkMessageChannelItemWriter`),
 as described above. The processor (if any) is left off the
-master configuration, as it is configured on the slave. The
+master configuration, as it is configured on the worker. The
 following configuration provides a basic master setup. You
 should check any additional component properties, such as
 throttle limits and so on, when implementing your use case.
@@ -734,7 +734,7 @@ throttle limits and so on, when implementing your use case.
   <property name="brokerURL" value="tcp://localhost:61616"/>
 </bean>
 
-<int-jms:outbound-channel-adapter id="requests" destination-name="requests"/>
+<int-jms:outbound-channel-adapter id="jmsRequests" destination-name="requests"/>
 
 <bean id="messagingTemplate"
     class="org.springframework.integration.core.MessagingTemplate">
@@ -747,12 +747,6 @@ throttle limits and so on, when implementing your use case.
     scope="step">
   <property name="messagingOperations" ref="messagingTemplate"/>
   <property name="replyChannel" ref="replies"/>
-</bean>
-
-<bean id="chunkHandler"
-    class="org.springframework.batch.integration.chunk.RemoteChunkHandlerFactoryBean">
-  <property name="chunkWriter" ref="itemWriter"/>
-  <property name="step" ref="step1"/>
 </bean>
 
 <int:channel id="replies">
@@ -774,43 +768,26 @@ public org.apache.activemq.ActiveMQConnectionFactory connectionFactory() {
     return factory;
 }
 
+/*
+ * Configure outbound flow (requests going to workers)
+ */
+
 @Bean
 public DirectChannel requests() {
     return new DirectChannel();
 }
 
 @Bean
-public IntegrationFlow jmsOutboundFlow() {
-    return IntegrationFlows.from("requests")
-            .handle(Jms.outboundGateway(connectionFactory())
-                    .requestDestination("requests"))
+public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
+    return IntegrationFlows
+            .from(requests())
+            .handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
             .get();
 }
 
-@Bean
-public MessagingTemplate messagingTemplate() {
-    MessagingTemplate template = new MessagingTemplate();
-    template.setDefaultChannel(requests());
-    template.setReceiveTimeout(2000);
-    return template;
-}
-
-@Bean
-@StepScope
-public ChunkMessageChannelItemWriter itemWriter() {
-    ChunkMessageChannelItemWriter chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter();
-    chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate());
-    chunkMessageChannelItemWriter.setReplyChannel(replies());
-    return chunkMessageChannelItemWriter;
-}
-
-@Bean
-public RemoteChunkHandlerFactoryBean chunkHandler() {
-    RemoteChunkHandlerFactoryBean remoteChunkHandlerFactoryBean = new RemoteChunkHandlerFactoryBean();
-    remoteChunkHandlerFactoryBean.setChunkWriter(itemWriter());
-    remoteChunkHandlerFactoryBean.setStep(step1());
-    return remoteChunkHandlerFactoryBean;
-}
+/*
+ * Configure inbound flow (replies coming from workers)
+ */
 
 @Bean
 public QueueChannel replies() {
@@ -818,13 +795,27 @@ public QueueChannel replies() {
 }
 
 @Bean
-public IntegrationFlow jmsReplies() {
+public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlows
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
-                    .configureListenerContainer(c -> c.subscriptionDurable(false))
-                    .destination("replies"))
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
             .channel(replies())
             .get();
+}
+
+/*
+ * Configure the ChunkMessageChannelItemWriter
+ */
+
+@Bean
+public ItemWriter<Integer> itemWriter() {
+    MessagingTemplate messagingTemplate = new MessagingTemplate();
+    messagingTemplate.setDefaultChannel(requests());
+    messagingTemplate.setReceiveTimeout(2000);
+    ChunkMessageChannelItemWriter<Integer> chunkMessageChannelItemWriter
+            = new ChunkMessageChannelItemWriter<>();
+    chunkMessageChannelItemWriter.setMessagingOperations(messagingTemplate);
+    chunkMessageChannelItemWriter.setReplyChannel(replies());
+    return chunkMessageChannelItemWriter;
 }
 ----
 
@@ -836,7 +827,7 @@ referenced by our job step, uses the
 `ChunkMessageChannelItemWriter` for writing chunks over the
 configured middleware.
 
-Now we can move on to the slave configuration, as shown in the following example:
+Now we can move on to the worker configuration, as shown in the following example:
 
 
 .XML Configuration
@@ -849,7 +840,7 @@ Now we can move on to the slave configuration, as shown in the following example
 <int:channel id="requests"/>
 <int:channel id="replies"/>
 
-<int-jms:message-driven-channel-adapter id="jmsIn"
+<int-jms:message-driven-channel-adapter id="incomingRequests"
     destination-name="requests"
     channel="requests"/>
 
@@ -889,65 +880,72 @@ public org.apache.activemq.ActiveMQConnectionFactory connectionFactory() {
     return factory;
 }
 
+/*
+ * Configure inbound flow (requests coming from the master)
+ */
+
 @Bean
 public DirectChannel requests() {
     return new DirectChannel();
 }
+
+@Bean
+public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("requests"))
+            .channel(requests())
+            .get();
+}
+
+/*
+ * Configure outbound flow (replies going to the master)
+ */
+
 @Bean
 public DirectChannel replies() {
     return new DirectChannel();
 }
 
 @Bean
-public IntegrationFlow jmsIn() {
+public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
     return IntegrationFlows
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
-                    .configureListenerContainer(c -> c.subscriptionDurable(false))
-                    .destination("requests"))
-            .channel(requests())
+            .from(replies())
+            .handle(Jms.outboundAdapter(connectionFactory).destination("replies"))
             .get();
 }
 
-@Bean
-public IntegrationFlow outgoingReplies() {
-    return IntegrationFlows.from("replies")
-            .handle(Jms.outboundGateway(connectionFactory())
-                    .requestDestination("replies"))
-            .get();
-}
+/*
+ * Configure the ChunkProcessorChunkHandler
+ */
 
 @Bean
-@ServiceActivator(inputChannel = "requests")
-public AggregatorFactoryBean serviceActivator() throws Exception{
-    AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
-    aggregatorFactoryBean.setProcessorBean(chunkProcessorChunkHandler());
-    aggregatorFactoryBean.setOutputChannel(replies());
-    ...
-    return aggregatorFactoryBean;
-}
-
-@Bean
-public ChunkProcessorChunkHandler chunkProcessorChunkHandler() {
-    ChunkProcessorChunkHandler chunkProcessorChunkHandler = new ChunkProcessorChunkHandler();
-    chunkProcessorChunkHandler.setChunkProcessor(new SimpleChunkProcessor(personItemProcessor(), personItemWriter()));
+@ServiceActivator(inputChannel = "requests", outputChannel = "replies")
+public ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler() {
+    ChunkProcessor<Integer> chunkProcessor
+            = new SimpleChunkProcessor<>(itemProcessor(), itemWriter());
+    ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler
+            = new ChunkProcessorChunkHandler<>();
+    chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
     return chunkProcessorChunkHandler;
 }
 ----
 
 Most of these configuration items should look familiar from the
-master configuration. Slaves do not need access to
+master configuration. Workers do not need access to
 the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
 is the `chunkProcessorChunkHandler`. The
 `chunkProcessor` property of `ChunkProcessorChunkHandler` takes a
 configured `SimpleChunkProcessor`, which is where you would provide a reference to your
 `ItemWriter` (and, optionally, your
-`ItemProcessor`) that will run on the slave
+`ItemProcessor`) that will run on the worker
 when it receives chunks from the master.
 
 For more information, see the section of the "Scalability" chapter on
 link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
 
+You can find a complete example of a remote chunking job
+link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-chunking-sample$$[here].
 
 [[remote-partitioning]]
 
@@ -960,8 +958,8 @@ image::{batch-asciidoc}images/remote-partitioning.png[Remote Partitioning, scale
 Remote Partitioning, on the other hand, is useful when it
 is not the processing of items but rather the associated I/O that
 causes the bottleneck. Using Remote Partitioning, work can
-be farmed out to slaves that execute complete Spring Batch
-steps. Thus, each slave has its own `ItemReader`, `ItemProcessor`, and
+be farmed out to workers that execute complete Spring Batch
+steps. Thus, each worker has its own `ItemReader`, `ItemProcessor`, and
 `ItemWriter`. For this purpose, Spring Batch
 Integration provides the `MessageChannelPartitionHandler`.
 
