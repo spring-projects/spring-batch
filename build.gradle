@@ -553,7 +553,7 @@ project('spring-batch-samples') {
 
 	dependencies {
 
-		compile project(":spring-batch-core")
+		compile project(":spring-batch-integration")
 		compile "org.aspectj:aspectjrt:$aspectjVersion"
 		compile "org.aspectj:aspectjweaver:$aspectjVersion"
 		compile "org.quartz-scheduler:quartz:$quartzVersion"
@@ -583,6 +583,8 @@ project('spring-batch-samples') {
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
 		compile "javax.mail:javax.mail-api:$javaMailVersion"
+		compile "org.apache.activemq:activemq-client:$activemqVersion"
+		compile "org.apache.activemq:activemq-broker:$activemqVersion"
 
 		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
 		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
@@ -596,6 +598,7 @@ project('spring-batch-samples') {
 		testCompile "org.codehaus.groovy:groovy-ant:$groovyVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
+		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 

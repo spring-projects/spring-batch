@@ -39,6 +39,7 @@ Job/Feature                                       | skip | retry | restart | aut
 [multilineOrder](#multilineOrder)                 |      |       |         |                   |               |            |     X      |              |                |                |           
 [parallel](#parallel)                             |      |       |         |                   |               |            |            |              |                |         X      |           
 [partition](#partition)                           |      |       |         |                   |               |            |            |              |                |         X      |           
+[remoteChunking](#remoteChunking)                 |      |       |         |                   |               |            |            |              |                |         X      |           
 [quartz](#quartz)                                 |      |       |         |                   |        X      |            |            |              |                |                |           
 [restart](#restart)                               |      |       |   X     |                   |               |            |            |              |                |                |           
 [retry](#retry)                                   |      |   X   |         |                   |               |            |            |              |                |                |           
@@ -643,6 +644,23 @@ per thread.  The key components are the `PartitionStep` and the
 the work.  Notice that the readers and writers in the `Step`
 that is being partitioned are step-scoped, so that their state does
 not get shared across threads of execution.
+
+### [Remote Chunking Sample](id:remoteChunking)
+
+This sample shows how to configure a remote chunking job. The master step will
+read numbers from 1 to 6 and send two chunks ({1, 2, 3} and {4, 5, 6}) to workers
+for processing and writing.
+
+This example shows how to:
+
+* configure a `ChunkMessageChannelItemWriter` on the master side to send chunks to workers
+* configure a `ChunkProcessorChunkHandler` on the worker side to process chunks and
+send replies back to the master
+
+The sample uses an embedded JMS broker as a communication middleware between the
+master and workers. The usage of an embedded broker is only for simplicity's sake,
+the communication between the master and workers is still done through JMS queues
+and Spring Integration channels and messages are sent over the wire through a TCP port.
 
 ### [Quartz Sample](id:quartz)
 
