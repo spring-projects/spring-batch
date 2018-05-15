@@ -374,7 +374,7 @@ implements InitializingBean {
 	public abstract String getSql();
 
 	/**
-	 * Check the result set is in synch with the currentRow attribute. This is
+	 * Check the result set is in sync with the currentRow attribute. This is
 	 * important to ensure that the user hasn't modified the current row.
 	 */
 	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
@@ -485,7 +485,7 @@ implements InitializingBean {
 
 	/**
 	 * Read the cursor and map to the type of object this reader should return. This method must be
-	 * overriden by subclasses.
+	 * overridden by subclasses.
 	 *
 	 * @param rs The current result set
 	 * @param currentRow Current position of the result set

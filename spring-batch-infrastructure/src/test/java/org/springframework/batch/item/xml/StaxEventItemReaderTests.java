@@ -94,7 +94,7 @@ public class StaxEventItemReaderTests {
 	@Before
 	public void setUp() throws Exception {
 		this.executionContext = new ExecutionContext();
-		source = createNewInputSouce();
+		source = createNewInputSource();
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testAfterPropertesSetException() throws Exception {
 
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.setFragmentRootElementName("");
 		try {
 			source.afterPropertiesSet();
@@ -115,7 +115,7 @@ public class StaxEventItemReaderTests {
 			// expected
 		}
 
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.setUnmarshaller(null);
 		try {
 			source.afterPropertiesSet();
@@ -144,7 +144,7 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testItemCountAwareFragment() throws Exception {
-		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
+		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSource();
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		assertEquals(1, source.read().getItemCount());
@@ -156,13 +156,13 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testItemCountAwareFragmentRestart() throws Exception {
-		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSouce();
+		StaxEventItemReader<ItemCountAwareFragment> source = createNewItemCountAwareInputSource();
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		assertEquals(1, source.read().getItemCount());
 		source.update(executionContext);
 		source.close();
-		source = createNewItemCountAwareInputSouce();
+		source = createNewItemCountAwareInputSource();
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		assertEquals(2, source.read().getItemCount());
@@ -267,7 +267,7 @@ public class StaxEventItemReaderTests {
 		
 		source.close();
 		
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
@@ -311,7 +311,7 @@ public class StaxEventItemReaderTests {
 		
 		source.close();
 		
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
@@ -374,7 +374,7 @@ public class StaxEventItemReaderTests {
 		assertEquals(1, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
 		List<XMLEvent> expectedAfterRestart = source.read();
 
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.open(executionContext);
 		List<XMLEvent> afterRestart = source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
@@ -396,7 +396,7 @@ public class StaxEventItemReaderTests {
 
 		assertEquals(3, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
 
-		source = createNewInputSouce();
+		source = createNewInputSource();
 		source.open(executionContext);
 		assertNull(source.read());
 	}
@@ -596,7 +596,7 @@ public class StaxEventItemReaderTests {
 
 	}
 
-	private StaxEventItemReader<List<XMLEvent>> createNewInputSouce() {
+	private StaxEventItemReader<List<XMLEvent>> createNewInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
 		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<List<XMLEvent>>();
@@ -609,7 +609,7 @@ public class StaxEventItemReaderTests {
 		return newSource;
 	}
 
-	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSouce() {
+	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
 		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<ItemCountAwareFragment>();

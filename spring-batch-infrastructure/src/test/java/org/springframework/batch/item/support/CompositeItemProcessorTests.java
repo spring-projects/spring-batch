@@ -61,12 +61,12 @@ public class CompositeItemProcessorTests {
 	@Test
 	public void testTransform() throws Exception {
 		Object item = new Object();
-		Object itemAfterFirstTransfromation = new Object();
+		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
 
-		when(processor2.process(itemAfterFirstTransfromation)).thenReturn(itemAfterSecondTransformation);
+		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
 
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 

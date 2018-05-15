@@ -82,7 +82,7 @@ public class ReflectionUtilsTests {
 
 		@Transactional
 		public String toString() {
-			return "AnnoatedClass";
+			return "AnnotatedClass";
 		}
 	}
 

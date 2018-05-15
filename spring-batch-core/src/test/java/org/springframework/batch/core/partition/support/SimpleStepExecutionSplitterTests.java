@@ -140,7 +140,7 @@ public class SimpleStepExecutionSplitterTests {
 	}
 
 	@Test
-	public void testUnkownStatus() throws Exception {
+	public void testUnknownStatus() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, true, step.getName(),
 				new SimplePartitioner());
 		Set<StepExecution> split = provider.split(stepExecution, 2);

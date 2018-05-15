@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see ExecutionContextSerializer
  * @deprecated Due to the incompattabilities between current Jettison versions and XStream
- * 		versions, this serializer is depricated in favor of
+ * 		versions, this serializer is deprecated in favor of
  * 		{@link Jackson2ExecutionContextStringSerializer}
  */
 @Deprecated

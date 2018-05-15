@@ -99,7 +99,7 @@ public class ConcurrentTransactionTests {
 
 		/**
 		 * This datasource configuration configures the HSQLDB instance using MVCC.  When
-		 * configurd using the default behavior, transaction serialization errors are
+		 * configured using the default behavior, transaction serialization errors are
 		 * thrown (default configuration example below).
 		 *
 		 * 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().

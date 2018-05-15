@@ -21,7 +21,7 @@ import java.util.Arrays;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Composiste {@link ExceptionHandler} that loops though a list of delegates.
+ * Composite {@link ExceptionHandler} that loops though a list of delegates.
  * 
  * @author Dave Syer
  * 

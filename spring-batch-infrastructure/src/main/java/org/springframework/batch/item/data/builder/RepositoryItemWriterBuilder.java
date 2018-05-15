@@ -122,13 +122,13 @@ public class RepositoryItemWriterBuilder<T> {
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
-		private RepositoryItemWriterBuilder.RepositoryMethodIterceptor repositoryInvocationHandler;
+		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private CrudRepository<?, ?> repository;
 
 		public RepositoryMethodReference(CrudRepository<?, ?> repository) {
 			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryItemWriterBuilder.RepositoryMethodIterceptor();
+			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
 		}
 
 		/**
@@ -152,7 +152,7 @@ public class RepositoryItemWriterBuilder<T> {
 		}
 	}
 
-	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 		private String methodName;
 
 		@Override

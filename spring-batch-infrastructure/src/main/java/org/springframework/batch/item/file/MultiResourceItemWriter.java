@@ -143,7 +143,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
     @Override
 	public void close() throws ItemStreamException {
-                super.close();
+		super.close();
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
 		if (opened) {
@@ -153,7 +153,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 1);
 		currentResourceItemCount = executionContext.getInt(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
 
@@ -176,7 +176,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (saveState) {
 			if (opened) {
 				delegate.update(executionContext);
