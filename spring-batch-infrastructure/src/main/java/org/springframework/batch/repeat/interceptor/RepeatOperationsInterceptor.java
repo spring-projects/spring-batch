@@ -47,12 +47,12 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	/**
 	 * Setter for the {@link RepeatOperations}.
 	 * 
-	 * @param batchTempate template to be used
+	 * @param batchTemplate template to be used
 	 * @throws IllegalArgumentException if the argument is null.
 	 */
-	public void setRepeatOperations(RepeatOperations batchTempate) {
-		Assert.notNull(batchTempate, "'repeatOperations' cannot be null.");
-		this.repeatOperations = batchTempate;
+	public void setRepeatOperations(RepeatOperations batchTemplate) {
+		Assert.notNull(batchTemplate, "'repeatOperations' cannot be null.");
+		this.repeatOperations = batchTemplate;
 	}
 
 	/**

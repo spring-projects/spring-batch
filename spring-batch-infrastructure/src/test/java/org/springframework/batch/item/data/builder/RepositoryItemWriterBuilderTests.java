@@ -85,7 +85,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepsository() throws Exception {
+	public void testWriteItemsTestRepository() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
 				.methodName("foo")
 				.repository(this.repository)
@@ -99,7 +99,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepsositoryMethodIs() throws Exception {
+	public void testWriteItemsTestRepositoryMethodIs() throws Exception {
 		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository>
 				repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
 				this.repository);
