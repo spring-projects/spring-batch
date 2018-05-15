@@ -29,8 +29,8 @@ public class SkipListenerAdapter<T, S> implements SkipListener<T, S> {
 	private final SkipProcessListener skipProcessDelegate;
 	private final SkipWriteListener skipWriteDelegate;
 
-	public SkipListenerAdapter(SkipReadListener skipReadDelgate, SkipProcessListener skipProcessDelegate, SkipWriteListener skipWriteDelegate) {
-		this.skipReadDelegate = skipReadDelgate;
+	public SkipListenerAdapter(SkipReadListener skipReadDelegate, SkipProcessListener skipProcessDelegate, SkipWriteListener skipWriteDelegate) {
+		this.skipReadDelegate = skipReadDelegate;
 		this.skipProcessDelegate = skipProcessDelegate;
 		this.skipWriteDelegate = skipWriteDelegate;
 	}

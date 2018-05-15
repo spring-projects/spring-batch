@@ -197,7 +197,7 @@ public abstract class AbstractJobDaoTests {
 	}
 
 	@Transactional @Test
-	public void testUpdateNullIdJobExection() {
+	public void testUpdateNullIdJobExecution() {
 
 		JobExecution execution = new JobExecution(jobInstance, jobParameters);
 		try {

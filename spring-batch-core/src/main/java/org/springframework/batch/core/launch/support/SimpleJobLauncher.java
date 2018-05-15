@@ -173,7 +173,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
-	 * Set the JobRepsitory.
+	 * Set the JobRepository.
 	 *
 	 * @param jobRepository instance of {@link JobRepository}.
 	 */
