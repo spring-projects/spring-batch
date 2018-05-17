@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,6 +50,7 @@ import org.springframework.util.Assert;
  * the transaction.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao implements InitializingBean {
 
@@ -95,6 +97,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		setDataSource(dataSource);
 	}
 
+	@Autowired
 	public final void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -109,6 +112,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	/**
 	 * @param jobRepository the jobRepository to set
 	 */
+	@Autowired
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
