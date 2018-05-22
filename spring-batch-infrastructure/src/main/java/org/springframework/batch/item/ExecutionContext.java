@@ -167,11 +167,11 @@ public class ExecutionContext implements Serializable {
 	 * default otherwise
 	 */
 	public String getString(String key, String defaultString) {
-		if (!map.containsKey(key)) {
+		if (!containsKey(key)) {
 			return defaultString;
 		}
 
-		return (String) readAndValidate(key, String.class);
+		return getString(key);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public long getLong(String key) {
 
-		return ((Long) readAndValidate(key, Long.class)).longValue();
+		return (Long) readAndValidate(key, Long.class);
 	}
 
 	/**
@@ -195,11 +195,11 @@ public class ExecutionContext implements Serializable {
 	 * default otherwise
 	 */
 	public long getLong(String key, long defaultLong) {
-		if (!map.containsKey(key)) {
+		if (!containsKey(key)) {
 			return defaultLong;
 		}
 
-		return ((Long) readAndValidate(key, Long.class)).longValue();
+		return getLong(key);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public int getInt(String key) {
 
-		return ((Integer) readAndValidate(key, Integer.class)).intValue();
+		return (Integer) readAndValidate(key, Integer.class);
 	}
 
 	/**
@@ -223,11 +223,11 @@ public class ExecutionContext implements Serializable {
 	 * default otherwise
 	 */
 	public int getInt(String key, int defaultInt) {
-		if (!map.containsKey(key)) {
+		if (!containsKey(key)) {
 			return defaultInt;
 		}
 
-		return ((Integer) readAndValidate(key, Integer.class)).intValue();
+		return getInt(key);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class ExecutionContext implements Serializable {
 	 * @return The <code>Double</code> value
 	 */
 	public double getDouble(String key) {
-		return ((Double) readAndValidate(key, Double.class)).doubleValue();
+		return (Double) readAndValidate(key, Double.class);
 	}
 
 	/**
@@ -250,11 +250,11 @@ public class ExecutionContext implements Serializable {
 	 * default otherwise
 	 */
 	public double getDouble(String key, double defaultDouble) {
-		if (!map.containsKey(key)) {
+		if (!containsKey(key)) {
 			return defaultDouble;
 		}
 
-		return ((Double) readAndValidate(key, Double.class)).doubleValue();
+		return getDouble(key);
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	private Object readAndValidate(String key, Class<?> type) {
 
-		Object value = map.get(key);
+		Object value = get(key);
 
 		if (!type.isInstance(value)) {
 			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type + "], it is ["
