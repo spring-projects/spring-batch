@@ -45,6 +45,7 @@ import org.springframework.context.annotation.Import;
  * <pre class="code">
  * &#064;Configuration
  * &#064;EnableBatchIntegration
+ * &#064;EnableBatchProcessing
  * public class RemoteChunkingAppConfig {
  *
  * 	&#064;Autowired

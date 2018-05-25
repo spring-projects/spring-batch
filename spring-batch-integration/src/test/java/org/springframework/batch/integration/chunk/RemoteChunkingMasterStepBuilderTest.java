@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.integration.chunk;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -23,32 +25,47 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.listener.ChunkListenerSupport;
-import org.springframework.batch.core.listener.CompositeItemReadListener;
-import org.springframework.batch.core.listener.CompositeItemWriteListener;
-import org.springframework.batch.core.listener.SkipListenerSupport;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
+import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.PollableChannel;
+import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.NoBackOffPolicy;
-import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.retry.policy.MapRetryContextCache;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 /**
  * @author Mahmoud Ben Hassine
  */
@@ -216,44 +233,136 @@ public class RemoteChunkingMasterStepBuilderTest {
 	 * The following test is to cover setters that override those from parent builders.
 	 */
 	@Test
-	public void testSetters() {
+	public void testSetters() throws Exception {
 		// when
+		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+
+		Object annotatedListener = new Object();
+		MapRetryContextCache retryCache = new MapRetryContextCache();
+		RepeatTemplate stepOperations = new RepeatTemplate();
+		NoBackOffPolicy backOffPolicy = new NoBackOffPolicy();
+		ItemStreamSupport stream = new ItemStreamSupport() {
+		};
+		StepExecutionListener stepExecutionListener = mock(StepExecutionListener.class);
+		ItemReadListener<String> itemReadListener = mock(ItemReadListener.class);
+		ItemWriteListener<String> itemWriteListener = mock(ItemWriteListener.class);
+		ChunkListener chunkListener = mock(ChunkListener.class);
+		SkipListener<String, String> skipListener = mock(SkipListener.class);
+		RetryListener retryListener = mock(RetryListener.class);
+
+		when(retryListener.open(any(), any())).thenReturn(true);
+
+		ItemProcessor<String, String> itemProcessor = item -> {
+			System.out.println("processing item " + item);
+			if(item.equals("b")) {
+				throw new Exception("b was found");
+			}
+			else {
+				return item;
+			}
+		};
+
+		ItemReader<String> itemReader = new ItemReader<String>() {
+
+			int count = 0;
+			List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
+
+			@Override
+			public String read() throws Exception {
+				System.out.println(">> count == " + count);
+				if(count == 6) {
+					count++;
+					throw new IOException("6th item");
+				}
+				else if(count == 7) {
+					count++;
+					throw new RuntimeException("7th item");
+				}
+				else if(count < items.size()){
+					String item = items.get(count++);
+					System.out.println(">> item read was " + item);
+					return item;
+				}
+				else {
+					return null;
+				}
+			}
+		};
+
 		TaskletStep taskletStep = new RemoteChunkingMasterStepBuilder<String, String>("step")
-				.reader(this.itemReader)
+				.reader(itemReader)
 				.readerIsTransactionalQueue()
+				.processor(itemProcessor)
 				.repository(this.jobRepository)
 				.transactionManager(this.transactionManager)
-				.transactionAttribute(new DefaultTransactionAttribute())
+				.transactionAttribute(transactionAttribute)
 				.inputChannel(this.inputChannel)
 				.outputChannel(this.outputChannel)
-				.listener(new Object())
-				.listener(new SkipListenerSupport<>())
-				.listener(new ChunkListenerSupport())
-				.listener(new StepExecutionListenerSupport())
-				.listener(new CompositeItemReadListener<>())
-				.listener(new CompositeItemWriteListener<>())
-				.listener(new RetryListenerSupport())
+				.listener(annotatedListener)
+				.listener(skipListener)
+				.listener(chunkListener)
+				.listener(stepExecutionListener)
+				.listener(itemReadListener)
+				.listener(itemWriteListener)
+				.listener(retryListener)
 				.skip(Exception.class)
 				.noSkip(RuntimeException.class)
 				.skipLimit(10)
-				.retry(Exception.class)
+				.retry(IOException.class)
 				.noRetry(RuntimeException.class)
 				.retryLimit(10)
-				.retryContextCache(new MapRetryContextCache())
+				.retryContextCache(retryCache)
 				.noRollback(Exception.class)
-				.chunk(10)
 				.startLimit(3)
 				.allowStartIfComplete(true)
-				.exceptionHandler(new DefaultExceptionHandler())
-				.stepOperations(new RepeatTemplate())
-				.chunkOperations(new RepeatTemplate())
-				.backOffPolicy(new NoBackOffPolicy())
-				.stream(new ItemStreamSupport() {})
+				.stepOperations(stepOperations)
+				.chunk(3)
+				.backOffPolicy(backOffPolicy)
+				.stream(stream)
 				.keyGenerator(Object::hashCode)
 				.build();
 
+		JobExecution jobExecution = this.jobRepository.createJobExecution("job1", new JobParameters());
+		StepExecution stepExecution = new StepExecution("step1", jobExecution);
+		this.jobRepository.add(stepExecution);
+
+		taskletStep.execute(stepExecution);
+
 		// then
 		Assert.assertNotNull(taskletStep);
+		ChunkOrientedTasklet tasklet = (ChunkOrientedTasklet) ReflectionTestUtils.getField(taskletStep, "tasklet");
+		SimpleChunkProvider provider = (SimpleChunkProvider) ReflectionTestUtils.getField(tasklet, "chunkProvider");
+		SimpleChunkProcessor processor = (SimpleChunkProcessor) ReflectionTestUtils.getField(tasklet, "chunkProcessor");
+		ItemWriter itemWriter = (ItemWriter) ReflectionTestUtils.getField(processor, "itemWriter");
+		MessagingTemplate messagingTemplate = (MessagingTemplate) ReflectionTestUtils.getField(itemWriter, "messagingGateway");
+		CompositeItemStream compositeItemStream = (CompositeItemStream) ReflectionTestUtils.getField(taskletStep, "stream");
+
+		Assert.assertEquals(ReflectionTestUtils.getField(provider, "itemReader"), itemReader);
+		Assert.assertFalse((Boolean) ReflectionTestUtils.getField(tasklet, "buffering"));
+		Assert.assertEquals(ReflectionTestUtils.getField(taskletStep, "jobRepository"), this.jobRepository);
+		Assert.assertEquals(ReflectionTestUtils.getField(taskletStep, "transactionManager"), this.transactionManager);
+		Assert.assertEquals(ReflectionTestUtils.getField(taskletStep, "transactionAttribute"), transactionAttribute);
+		Assert.assertEquals(ReflectionTestUtils.getField(itemWriter, "replyChannel"), this.inputChannel);
+		Assert.assertEquals(ReflectionTestUtils.getField(messagingTemplate, "defaultDestination"), this.outputChannel);
+		Assert.assertEquals(ReflectionTestUtils.getField(processor, "itemProcessor"), itemProcessor);
+
+		Assert.assertEquals((int) ReflectionTestUtils.getField(taskletStep, "startLimit"), 3);
+		Assert.assertTrue((Boolean) ReflectionTestUtils.getField(taskletStep, "allowStartIfComplete"));
+		Object stepOperationsUsed = ReflectionTestUtils.getField(taskletStep, "stepOperations");
+		Assert.assertEquals(stepOperationsUsed, stepOperations);
+
+		Assert.assertEquals(((List)ReflectionTestUtils.getField(compositeItemStream, "streams")).size(), 2);
+		Assert.assertNotNull(ReflectionTestUtils.getField(processor, "keyGenerator"));
+
+		verify(skipListener, atLeastOnce()).onSkipInProcess(any(), any());
+		verify(retryListener, atLeastOnce()).open(any(), any());
+		verify(stepExecutionListener, atLeastOnce()).beforeStep(any());
+		verify(chunkListener, atLeastOnce()).beforeChunk(any());
+		verify(itemReadListener, atLeastOnce()).beforeRead();
+		verify(itemWriteListener, atLeastOnce()).beforeWrite(any());
+
+		Assert.assertEquals(stepExecution.getSkipCount(), 2);
+		Assert.assertEquals(stepExecution.getRollbackCount(), 3);
 	}
 
 	@Configuration

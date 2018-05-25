@@ -434,7 +434,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 		SkipPolicy readSkipPolicy = createSkipPolicy();
 		readSkipPolicy = getFatalExceptionAwareProxy(readSkipPolicy);
-		FaultTolerantChunkProvider<I> chunkProvider = new FaultTolerantChunkProvider<I>(getReader(),
+		FaultTolerantChunkProvider<I> chunkProvider = new FaultTolerantChunkProvider<>(getReader(),
 				createChunkOperations());
 		chunkProvider.setMaxSkipsOnRead(Math.max(getChunkSize(), FaultTolerantChunkProvider.DEFAULT_MAX_SKIPS_ON_READ));
 		chunkProvider.setSkipPolicy(readSkipPolicy);

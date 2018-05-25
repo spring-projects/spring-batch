@@ -939,7 +939,7 @@ For more information, see the section of the "Scalability" chapter on
 link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
 
 Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
-annotation that can be used to simplify remote chunking setup. This annotation provides
+annotation that can be used to simplify a remote chunking setup. This annotation provides
 two beans that can be autowired in the application context:
 
 * `RemoteChunkingMasterStepBuilderFactory`: used to configure the master step
@@ -957,8 +957,8 @@ configure a master step by declaring:
 * the output channel ("Outgoing requests") to send requests to workers
 * the input channel ("Incoming replies") to receive replies from workers
 
-There is no need anymore to explicitly configure the `ChunkMessageChannelItemWriter`
-and the `MessagingTemplate` (Those can still be explicitly configured if required).
+A `ChunkMessageChannelItemWriter` and the `MessagingTemplate` are not needed to be explicitly configured
+(Those can still be explicitly configured if required).
 
 On the worker side, the `RemoteChunkingWorkerBuilder` allows you to configure a worker to:
 
@@ -967,14 +967,15 @@ On the worker side, the `RemoteChunkingWorkerBuilder` allows you to configure a 
 with the configured `ItemProcessor` and `ItemWriter`
 * send replies on the output channel ("Outgoing replies") to the master
 
-There is no need anymore to explicitly configure the `SimpleChunkProcessor`
-and the `ChunkProcessorChunkHandler` (Those can still be explicitly configured if required).
+There is no need to explicitly configure the `SimpleChunkProcessor`
+and the `ChunkProcessorChunkHandler` (Those can be explicitly configured if required).
 
 The following example shows how to use these APIs:
 
 [source, java]
 ----
 @EnableBatchIntegration
+@EnableBatchProcessing
 public class RemoteChunkingJobConfiguration {
 
     @Configuration

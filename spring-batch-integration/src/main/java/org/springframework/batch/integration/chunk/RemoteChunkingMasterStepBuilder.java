@@ -26,6 +26,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.item.KeyGenerator;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -398,6 +399,12 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	@Override
 	public RemoteChunkingMasterStepBuilder<I, O> allowStartIfComplete(boolean allowStartIfComplete) {
 		super.allowStartIfComplete(allowStartIfComplete);
+		return this;
+	}
+
+	@Override
+	public RemoteChunkingMasterStepBuilder<I, O> processor(ItemProcessor<? super I, ? extends O> itemProcessor) {
+		super.processor(itemProcessor);
 		return this;
 	}
 }
