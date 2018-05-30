@@ -16,13 +16,17 @@
 
 package org.springframework.batch.item.json;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
+import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -74,8 +78,12 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	@Override
 	public T read() throws Exception {
-		if (this.jsonReader.hasNext()) {
-			return this.mapper.fromJson(this.jsonReader, this.itemType);
+		try {
+			if (this.jsonReader.hasNext()) {
+				return this.mapper.fromJson(this.jsonReader, this.itemType);
+			}
+		} catch (IOException |JsonIOException | JsonSyntaxException e) {
+			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;
 	}

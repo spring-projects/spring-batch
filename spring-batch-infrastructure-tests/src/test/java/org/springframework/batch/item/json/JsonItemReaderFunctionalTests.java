@@ -18,6 +18,7 @@ package org.springframework.batch.item.json;
 
 import java.math.BigDecimal;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.batch.item.json.domain.Trade;
 import org.springframework.core.io.ByteArrayResource;
@@ -102,7 +104,8 @@ public abstract class JsonItemReaderFunctionalTests {
 
 	@Test
 	public void testInvalidResourceContent() throws Exception {
-		this.expectedException.expect(getJsonParsingException());
+		this.expectedException.expect(ParseException.class);
+		this.expectedException.expectCause(Matchers.instanceOf(getJsonParsingException()));
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
 				.jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("[{]".getBytes()))

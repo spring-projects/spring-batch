@@ -16,12 +16,14 @@
 
 package org.springframework.batch.item.json;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -72,8 +74,12 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 
 	@Override
 	public T read() throws Exception {
-		if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
-			return this.mapper.readValue(this.jsonParser, this.itemType);
+		try {
+			if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
+				return this.mapper.readValue(this.jsonParser, this.itemType);
+			}
+		} catch (IOException e) {
+			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;
 	}
