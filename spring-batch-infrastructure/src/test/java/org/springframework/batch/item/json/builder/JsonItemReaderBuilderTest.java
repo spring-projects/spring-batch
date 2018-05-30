@@ -72,7 +72,6 @@ public class JsonItemReaderBuilderTest {
 			new JsonItemReaderBuilder<String>()
 					.jsonObjectReader(this.jsonObjectReader)
 					.resource(this.resource)
-					.saveState(true)
 					.build();
 			fail("A name is required when saveState is set to true.");
 		}
