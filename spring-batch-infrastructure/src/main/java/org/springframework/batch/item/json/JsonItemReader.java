@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -50,7 +49,7 @@ import org.springframework.util.Assert;
  * @since 4.1
  */
 public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T>, InitializingBean {
+		ResourceAwareItemReaderItemStream<T> {
 
 	private static final Log LOGGER = LogFactory.getLog(JsonItemReader.class);
 
@@ -59,6 +58,18 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	private JsonObjectReader<T> jsonObjectReader;
 
 	private boolean strict = true;
+
+	/**
+	 * Create a new {@link JsonItemReader} instance.
+	 * @param resource the input json resource
+	 * @param jsonObjectReader the json object reader to use
+	 */
+	public JsonItemReader(Resource resource, JsonObjectReader<T> jsonObjectReader) {
+		Assert.notNull(resource, "The resource must not be null.");
+		Assert.notNull(jsonObjectReader, "The json object reader must not be null.");
+		this.resource = resource;
+		this.jsonObjectReader = jsonObjectReader;
+	}
 
 	/**
 	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain objects.
@@ -110,12 +121,6 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	@Override
 	protected void doClose() throws Exception {
 		this.jsonObjectReader.close();
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.jsonObjectReader, "The json object reader must not be null.");
-		Assert.notNull(this.resource, "The resource must not be null.");
 	}
 
 }

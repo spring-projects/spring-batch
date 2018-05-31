@@ -145,9 +145,7 @@ public class JsonItemReaderBuilder<T> {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
-		JsonItemReader<T> reader = new JsonItemReader<>();
-		reader.setJsonObjectReader(this.jsonObjectReader);
-		reader.setResource(this.resource);
+		JsonItemReader<T> reader = new JsonItemReader<>(this.resource, this.jsonObjectReader);
 		reader.setName(this.name);
 		reader.setStrict(this.strict);
 		reader.setSaveState(this.saveState);

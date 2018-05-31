@@ -22,60 +22,77 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.ByteArrayResource;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Mahmoud Ben Hassine
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JsonItemReaderTests {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
-	private JsonItemReader<String> itemReader = new JsonItemReader<>();
+	@Mock
+	private JsonObjectReader<String> jsonObjectReader;
+
+	private JsonItemReader<String> itemReader;
 
 	@Test
-	public void testMandatoryJsonObjectReader() throws Exception {
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The json object reader must not be null.");
+	public void testValidation() {
+		try {
+			new JsonItemReader<>(null, this.jsonObjectReader);
+			fail("A resource is required.");
+		} catch (IllegalArgumentException iae) {
+			assertEquals("The resource must not be null.", iae.getMessage());
+		}
 
-		this.itemReader.afterPropertiesSet();
+		try {
+			new JsonItemReader<>(new ByteArrayResource("[{}]".getBytes()), null);
+			fail("A json object reader is required.");
+		} catch (IllegalArgumentException iae) {
+			assertEquals("The json object reader must not be null.", iae.getMessage());
+		}
 	}
 
 	@Test
-	public void testMandatoryResource() throws Exception {
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The resource must not be null.");
-		this.itemReader.setJsonObjectReader(() -> null);
-
-		this.itemReader.afterPropertiesSet();
-	}
-
-	@Test
-	public void testNonExistentResource() throws Exception {
+	public void testNonExistentResource() {
+		// given
 		this.expectedException.expect(ItemStreamException.class);
 		this.expectedException.expectMessage("Failed to initialize the reader");
 		this.expectedException.expectCause(Matchers.instanceOf(IllegalStateException.class));
-		this.itemReader.setJsonObjectReader(() -> null);
-		this.itemReader.setResource(new NonExistentResource());
-		this.itemReader.afterPropertiesSet();
+		this.itemReader = new JsonItemReader<>(new NonExistentResource(), this.jsonObjectReader);
 
+		// when
 		this.itemReader.open(new ExecutionContext());
+
+		// then
+		// expected exception
 	}
 
 	@Test
-	public void testNonReadableResource() throws Exception {
+	public void testNonReadableResource() {
+		// given
 		this.expectedException.expect(ItemStreamException.class);
 		this.expectedException.expectMessage("Failed to initialize the reader");
 		this.expectedException.expectCause(Matchers.instanceOf(IllegalStateException.class));
-		this.itemReader.setJsonObjectReader(() -> null);
-		this.itemReader.setResource(new NonReadableResource());
-		this.itemReader.afterPropertiesSet();
+		this.itemReader = new JsonItemReader<>(new NonReadableResource(), this.jsonObjectReader);
 
+		// when
 		this.itemReader.open(new ExecutionContext());
+
+		// then
+		// expected exception
 	}
 
 	private static class NonExistentResource extends AbstractResource {

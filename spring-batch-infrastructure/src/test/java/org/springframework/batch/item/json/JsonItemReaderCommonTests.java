@@ -38,21 +38,18 @@ public abstract class JsonItemReaderCommonTests extends AbstractItemStreamItemRe
 	protected abstract JsonObjectReader<Foo> getJsonObjectReader();
 
 	@Override
-	protected ItemReader<Foo> getItemReader() throws Exception {
-		JsonItemReader<Foo> itemReader = new JsonItemReader<>();
-		itemReader.setResource(new ByteArrayResource(FOOS.getBytes()));
+	protected ItemReader<Foo> getItemReader() {
+		ByteArrayResource resource = new ByteArrayResource(FOOS.getBytes());
+		JsonObjectReader<Foo> jsonObjectReader = getJsonObjectReader();
+		JsonItemReader<Foo> itemReader = new JsonItemReader<>(resource, jsonObjectReader);
 		itemReader.setName("fooJsonItemReader");
-		itemReader.setSaveState(true);
-		itemReader.setJsonObjectReader(getJsonObjectReader());
-		itemReader.afterPropertiesSet();
 		return itemReader;
 	}
 
 	@Override
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+	protected void pointToEmptyInput(ItemReader<Foo> tested) {
 		JsonItemReader<Foo> reader = (JsonItemReader<Foo>) tested;
 		reader.setResource(new ByteArrayResource("[]".getBytes()));
-		reader.afterPropertiesSet();
 
 		reader.open(new ExecutionContext());
 	}
