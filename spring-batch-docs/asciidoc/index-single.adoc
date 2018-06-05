@@ -5,6 +5,8 @@
 
 include::header/index-header.adoc[]
 
+include::toggle.adoc[]
+
 include::spring-batch-intro.adoc[]
 
 include::whatsnew.adoc[]
