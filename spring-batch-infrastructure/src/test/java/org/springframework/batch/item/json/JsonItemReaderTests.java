@@ -24,12 +24,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -93,6 +95,19 @@ public class JsonItemReaderTests {
 
 		// then
 		// expected exception
+	}
+
+	@Test
+	public void testReadItem() throws Exception {
+		// given
+		Resource resource = new ByteArrayResource("[]".getBytes());
+		itemReader = new JsonItemReader<>(resource, this.jsonObjectReader);
+
+		// when
+		itemReader.read();
+
+		// then
+		Mockito.verify(this.jsonObjectReader).read();
 	}
 
 	private static class NonExistentResource extends AbstractResource {
