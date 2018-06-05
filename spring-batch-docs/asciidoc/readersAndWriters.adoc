@@ -1748,6 +1748,70 @@ trade.setCustomer("Customer1");
 staxItemWriter.write(trade);
 ----
 
+[[jsonReadingWriting]]
+=== JSON Item Readers
+
+Spring Batch provides support for reading JSON resources in the following format:
+
+[source, json]
+----
+[
+  {
+    "isin": "123",
+    "quantity": 1,
+    "price": 1.2,
+    "customer": "foo"
+  },
+  {
+    "isin": "456",
+    "quantity": 2,
+    "price": 1.4,
+    "customer": "bar"
+  }
+]
+----
+
+It is assumed that the JSON resource is an array of JSON objects corresponding to
+individual items. Spring Batch is not tied to any particular JSON library.
+
+[[JsonItemReader]]
+==== JsonItemReader
+
+The `JsonItemReader` delegate JSON parsing and binding to implementations of the
+`org.springframework.batch.item.json.JsonObjectReader` interface. This interface
+is intended to be implemented using a streaming API in order to read JSON objects
+in chunks. Two libraries are supported:
+
+* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.item.json.JacksonJsonObjectReader`
+* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.item.json.GsonJsonObjectReader`
+
+To be able to process JSON records, the following is needed:
+
+* `Resource`: A Spring Resource that represents the JSON file to be read.
+* `JsonObjectReader`: A json object reader to parse and bind JSON objects to items
+
+The following example shows how to define a `JsonItemReader` that works with the
+previous JSON resource `org/springframework/batch/item/json/trades.json`, and a
+`JsonObjectReader` based on Jackson:
+
+[source, java]
+----
+@Bean
+public JsonItemReader<Trade> jsonItemReader() {
+
+   ObjectMapper objectMapper = new ObjectMapper();
+   // configure the objectMapper as required
+   JacksonJsonObjectReader<Trade> jsonObjectReader = new JacksonJsonObjectReader<>(Trade.class);
+   jsonObjectReader.setMapper(objectMapper);
+
+   return new JsonItemReaderBuilder<Trade>()
+                 .jsonObjectReader(jsonObjectReader)
+                 .resource(new ClassPathResource("trades.json"))
+                 .name("tradeJsonItemReader")
+                 .build();
+}
+----
+
 [[multiFileInput]]
 === Multi-File Input
 

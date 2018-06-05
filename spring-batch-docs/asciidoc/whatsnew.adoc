@@ -4,69 +4,150 @@
 
 [[whatsNew]]
 
-== What's New in Spring Batch 4.0
+== What's New in Spring Batch 4.1
 
-The Spring Batch 4.0 release has three major themes:
+The Spring Batch 4.1 release adds the following features:
+
+* A new `@SpringBatchTest` annotation to simplify testing batch components
+* A new `@EnableBatchIntegration` annotation to simplify remote chunking configuration
+* A new `JsonItemReader` to support JSON format
+
+[[whatsNewTesting]]
+=== `@SpringBatchTest` annotation
+
+Spring Batch provides some nice utility classes (such as the `JobLauncherTestUtils` and
+`JobRepositoryTestUtils`) and test execution listeners (`StepScopeTestExecutionListener`
+and `JobScopeTestExecutionListener`) to test batch components. However, in order
+to use these utilities, you must configure them explicitly. This release introduces
+a new annotation named `@SpringBatchTest` that automatically adds utility beans and
+listeners to the test context and makes them  available for autowiring,
+as the following example shows:
+
+[source, java]
+----
+@RunWith(SpringRunner.class)
+@SpringBatchTest
+@ContextConfiguration(classes = {JobConfiguration.class})
+public class JobTest {
+
+   @Autowired
+   private JobLauncherTestUtils jobLauncherTestUtils;
+
+   @Autowired
+   private JobRepositoryTestUtils jobRepositoryTestUtils;
 
 
-* Java 8 Requirement
-* Dependencies Re-baseline
-* Builders for ItemReaders and ItemWriters
+   @Before
+   public void clearMetadata() {
+      jobRepositoryTestUtils.removeJobExecutions();
+   }
 
-[[whatsNewJava]]
+   @Test
+   public void testJob() throws Exception {
+      // given
+      JobParameters jobParameters =
+            jobLauncherTestUtils.getUniqueJobParameters();
 
+      // when
+      JobExecution jobExecution =
+            jobLauncherTestUtils.launchJob(jobParameters);
 
-=== Java 8 Requirement
+      // then
+      Assert.assertEquals(ExitStatus.COMPLETED,
+                          jobExecution.getExitStatus());
+   }
 
-Spring Batch has historically followed Spring Framework's baselines for both java version
-and third party dependencies.  With Spring Batch 4, the Spring Framework version is being
-upgraded to Spring Framework 5.  As a result, the Java version requirement for Spring
-Batch is also increasing to Java 8.  This should be mainly an internal change, in that
-most of the framework has supported things like functional interfaces and lambdas since
-they were released.
+}
+----
 
+For more details about this new annotation, see the
+<<testing.adoc#creatingUnitTestClass,Unit Testing>> chapter.
 
-[[whatsNewDependencies]]
-=== Dependencies Re-baseline
+[[whatsNewIntegration]]
+=== `@EnableBatchIntegration` annotation
 
-In order to continue to integrate with supported versions of the third party libraries
-Spring Batch uses, Spring Batch 4 is updating the dependencies across the board.  The new
-dependency versions align with Spring Framework 5.
+Setting up a remote chunking job requires the definition of a number of beans:
 
+* A connection factory to acquire connections from the messaging middleware (JMS, AMQP, and others)
+* A `MessagingTemplate` to send requests from the master to the workers and back again
+* An input channel and an output channel for Spring Integration to get messages from the messaging middleware
+* A special item writer (`ChunkMessageChannelItemWriter`) on the master side that knows how to send chunks of data to workers for processing and writing
+* A message listener (`ChunkProcessorChunkHandler`) on the worker side to receive data from the master
 
-[[whatsNewBuilders]]
-=== Provide builders for the ItemReaders, ItemProcessors, and ItemWriters
+This can be a bit daunting at first glance. This release introduces a new annotation
+named `@EnableBatchIntegration` as well as new APIs (`RemoteChunkingMasterStepBuilder`
+ and `RemoteChunkingWorkerBuilder`) to simplify the configuration. Here is an example:
 
-Spring Batch 4 is providing a collection of builders for all of the `ItemReader`
-implementations and `ItemWriter` implementations that come with the framework.  As of
-this release, builders for the following components (as well as some related utility
-builders) are available:
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing
+@EnableBatchIntegration
+public class RemoteChunkingAppConfig {
 
-* `AmqpItemReader` - `AmqpItemReaderBuilder`
-* `ClassifierCompositeItemProcessor` - `ClassifierCompositeItemProcessorBuilder`
-* `ClassifierCompositeItemWriter` - `ClassifierCompositeItemWriterBuilder`
-* `CompositeItemWriter` - `CompositeItemWriterBuilder`
-* `FlatFileItemReader` - `FlatFileItemReaderBuilder`
-* `FlatFileItemWriter` - `FlatFileItemWriterBuilder`
-* `GemfireItemWriter` - `GemfireItemWriterBuilder`
-* `HibernateCursorItemReader` - `HibernateCursorItemReaderBuilder`
-* `HibernateItemWriter` - `HibernateItemWriterBuilder`
-* `HibernatePagingItemReader` - `HibernatePagingItemReaderBuilder`
-* `JdbcBatchItemWriter` - `JdbcBatchItemWriterBuilder`
-* `JdbcCursorItemReader` - `JdbcCursorItemReaderBuilder`
-* `JdbcPagingItemReader` - `JdbcPagingItemReaderBuilder`
-* `JmsItemReader` - `JmsItemReaderBuilder`
-* `JmsItemWriter` - `JmsItemWriterBuilder`
-* `JpaPagingItemReader` - `JpaPagingItemReaderBuilder`
-* `MongoItemReader` - `MongoItemReaderBuilder`
-* `MultiResourceItemReader` - `MultiResourceItemReaderBuilder`
-* `MultiResourceItemWriter` - `MultiResourceItemWriterBuilder`
-* `Neo4jItemWriter` - `Neo4jItemWriterBuilder`
-* `RepositoryItemReader` - `RepositoryItemReaderBuilder`
-* `RepositoryItemWriter` - `RepositoryItemWriterBuilder`
-* `ScriptItemProcessor` - `ScriptItemProcessorBuilder`
-* `SimpleMailMessageItemWriter` - `SimpleMailMessageItemWriterBuilder`
-* `SingleItemPeekableItemReader` - `SingleItemPeekableItemReaderBuilder`
-* `StaxEventItemReader` - `StaxEventItemReaderBuilder`
-* `StaxEventItemWriter` - `StaxEventItemWriterBuilder`
-* `SynchronizedItemStreamReader` - `SynchronizedItemStreamReaderBuilder`
+   @Autowired
+   private RemoteChunkingMasterStepBuilderFactory masterStepBuilderFactory;
+
+   @Autowired
+   private RemoteChunkingWorkerBuilder workerBuilder;
+
+   @Bean
+   public TaskletStep masterStep() {
+         return this.masterStepBuilderFactory
+         	        .get("masterStep")
+         	        .chunk(100)
+         	        .reader(itemReader())
+         	        .outputChannel(outgoingRequestsToWorkers())
+         	        .inputChannel(incomingRepliesFromWorkers())
+         	        .build();
+   }
+
+   @Bean
+   public IntegrationFlow worker() {
+         return this.workerBuilder
+         	        .itemProcessor(itemProcessor())
+         	        .itemWriter(itemWriter())
+         	        .inputChannel(incomingRequestsFromMaster())
+         	        .outputChannel(outgoingRepliesToMaster())
+         	        .build();
+   }
+}
+----
+
+This new annotation and builders take care of the heavy lifting of configuring
+infrastructure beans. You can now easily configure a master step as well as
+a Spring Integration flow on the worker side. You can find a remote chunking sample
+that uses these new APIs in the
+link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-chunking-sample$$[samples module]
+as well as more details in the <<spring-batch-integration.adoc#remote-chunking,Spring Batch Integration>> chapter.
+
+[[whatsNewJson]]
+=== JSON support
+
+Spring Batch 4.1 adds support for JSON format. This release introduces a new
+item reader that is able to read a JSON resource in the following format:
+
+[source, json]
+----
+[
+  {
+    "isin": "123",
+    "quantity": 1,
+    "price": 1.2,
+    "customer": "foo"
+  },
+  {
+    "isin": "456",
+    "quantity": 2,
+    "price": 1.4,
+    "customer": "bar"
+  }
+]
+----
+
+Similar to the `StaxEventItemReader` for XML, the new `JsonItemReader` uses streaming
+APIs in order to read JSON objects in chunks. Two JSON libraries are supported:
+link:$$https://github.com/FasterXML/jackson$$[Jackson] and
+link:$$https://github.com/google/gson$$[Gson]. For more details about JSON support,
+see the <<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
+
