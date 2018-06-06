@@ -15,7 +15,7 @@ out. Spring Batch provides three key interfaces to help perform bulk reading and
 `ItemReader`, `ItemProcessor`, and `ItemWriter`.
 
 [[itemReader]]
-=== ItemReader
+=== `ItemReader`
 
 Although a simple concept, an `ItemReader` is the means for providing data from many
 different types of input. The most general examples include:
@@ -63,7 +63,7 @@ exception to be thrown. For example, a database `ItemReader` that is configured 
 query that returns 0 results returns `null` on the first invocation of read.
 
 [[itemWriter]]
-=== ItemWriter
+=== `ItemWriter`
 
 `ItemWriter` is similar in functionality to an `ItemReader` but with inverse operations.
 Resources still need to be located, opened, and closed but they differ in that an
@@ -93,7 +93,7 @@ one for each item. The writer can then call `flush` on the hibernate session bef
 returning.
 
 [[itemProcessor]]
-=== ItemProcessor
+=== `ItemProcessor`
 
 The `ItemReader` and `ItemWriter` interfaces are both very useful for their specific
 tasks, but what if you want to insert business logic before writing? One option for both
@@ -358,7 +358,7 @@ the `ItemProcessor` and only updating the
 instance that is the result.
 
 [[itemStream]]
-=== ItemStream
+=== `ItemStream`
 
 Both `ItemReaders` and `ItemWriters` serve their individual purposes well, but there is a
 common concern among both of them that necessitates another interface. In general, as
@@ -480,7 +480,7 @@ Delimited files are those in which fields are separated by a delimiter, such as 
 Fixed Length files have fields that are a set length.
 
 [[fieldSet]]
-==== The FieldSet
+==== The `FieldSet`
 
 When working with flat files in Spring Batch, regardless of whether it is for input or
 output, one of the most important classes is the `FieldSet`. Many architectures and
@@ -510,7 +510,7 @@ potentially unexpected ways, it can be consistent, both when handling errors cau
 format exception, or when doing simple data conversions.
 
 [[flatFileItemReader]]
-==== FlatFileItemReader
+==== `FlatFileItemReader`
 
 A flat file is any type of file that contains at most two-dimensional (tabular) data.
 Reading flat files in the Spring Batch framework is facilitated by the class called
@@ -560,7 +560,7 @@ the input resource does not exist. Otherwise, it logs the problem and continues.
 |===============
 
 [[lineMapper]]
-===== LineMapper
+===== `LineMapper`
 
 As with `RowMapper`, which takes a low-level construct such as `ResultSet` and returns
 an `Object`, flat file processing requires the same construct to convert a `String` line
@@ -585,7 +585,7 @@ gets you halfway there. The line must be tokenized into a `FieldSet`, which can 
 mapped to an object, as described later in this document.
 
 [[lineTokenizer]]
-===== LineTokenizer
+===== `LineTokenizer`
 
 An abstraction for turning a line of input into a `FieldSet` is necessary because there
 can be many formats of flat file data that need to be converted to a `FieldSet`. In
@@ -614,7 +614,7 @@ width". The width of each field must be defined for each record type.
 tokenizers should be used on a particular line by checking against a pattern.
 
 [[fieldSetMapper]]
-===== FieldSetMapper
+===== `FieldSetMapper`
 
 The `FieldSetMapper` interface defines a single method, `mapFieldSet`, which takes a
 `FieldSet` object and maps its contents to an object. This object may be a custom DTO, a
@@ -634,7 +634,7 @@ public interface FieldSetMapper<T> {
 The pattern used is the same as the `RowMapper` used by `JdbcTemplate`.
 
 [[defaultLineMapper]]
-===== DefaultLineMapper
+===== `DefaultLineMapper`
 
 Now that the basic interfaces for reading in flat files have been defined, it becomes
 clear that three basic steps are required:
@@ -1039,7 +1039,7 @@ file. `FlatFileFormatException` is thrown by implementations of the `LineTokeniz
 interface and indicates a more specific error encountered while tokenizing.
 
 [[incorrectTokenCountException]]
-====== IncorrectTokenCountException
+====== `IncorrectTokenCountException`
 
 Both `DelimitedLineTokenizer` and `FixedLengthLineTokenizer` have the ability to specify
 column names that can be used for creating a `FieldSet`. However, if the number of column
@@ -1064,7 +1064,7 @@ Because the tokenizer was configured with 4 column names but only 3 tokens were 
 the file, an `IncorrectTokenCountException` was thrown.
 
 [[incorrectLineLengthException]]
-====== IncorrectLineLengthException
+====== `IncorrectLineLengthException`
 
 Files formatted in a fixed-length format have additional requirements when parsing
 because, unlike a delimited format, each column must strictly adhere to its predefined
@@ -1110,14 +1110,14 @@ line lengths when tokenizing the line. A `FieldSet` is now correctly created and
 returned. However, it contains only empty tokens for the remaining values.
 
 [[flatFileItemWriter]]
-==== FlatFileItemWriter
+==== `FlatFileItemWriter`
 
 Writing out to flat files has the same problems and issues that reading in from a file
 must overcome. A step must be able to write either delimited or fixed length formats in a
 transactional manner.
 
 [[lineAggregator]]
-===== LineAggregator
+===== `LineAggregator`
 
 Just as the `LineTokenizer` interface is necessary to take an item and turn it into a
 `String`, file writing must have a way to aggregate multiple fields into a single string
@@ -1138,7 +1138,7 @@ The `LineAggregator` is the logical opposite of `LineTokenizer`.  `LineTokenizer
 `String`.
 
 [[PassThroughLineAggregator]]
-====== PassThroughLineAggregator
+====== `PassThroughLineAggregator`
 
 The most basic implementation of the `LineAggregator` interface is the
 `PassThroughLineAggregator`, which assumes that the object is already a string or that
@@ -1205,7 +1205,7 @@ public FlatFileItemWriter itemWriter() {
 ----
 
 [[FieldExtractor]]
-===== FieldExtractor
+===== `FieldExtractor`
 
 The preceding example may be useful for the most basic uses of a writing to a file.
 However, most users of the `FlatFileItemWriter` have a domain object that needs to be
@@ -1242,7 +1242,7 @@ of the provided object, which can then be written out with a delimiter between t
 elements or as part of a fixed-width line.
 
 [[PassThroughFieldExtractor]]
-====== PassThroughFieldExtractor
+====== `PassThroughFieldExtractor`
 
 There are many cases where a collection, such as an array, `Collection`, or `FieldSet`,
 needs to be written out. "Extracting" an array from one of these collection types is very
@@ -1252,7 +1252,7 @@ the object passed in is not a type of collection, then the `PassThroughFieldExtr
 returns an array containing solely the item to be extracted.
 
 [[BeanWrapperFieldExtractor]]
-====== BeanWrapperFieldExtractor
+====== `BeanWrapperFieldExtractor`
 
 As with the `BeanWrapperFieldSetMapper` described in the file reading section, it is
 often preferable to configure how to convert a domain object to an object array, rather
@@ -1474,7 +1474,7 @@ With an introduction to OXM and how one can use XML fragments to represent recor
 can now more closely examine readers and writers.
 
 [[StaxEventItemReader]]
-==== StaxEventItemReader
+==== `StaxEventItemReader`
 
 The `StaxEventItemReader` configuration provides a typical setup for the processing of
 records from an XML input stream. First, consider the following set of XML records that
@@ -1509,8 +1509,7 @@ To be able to process the XML records, the following is needed:
 
 * Root Element Name: The name of the root element of the fragment that constitutes the
 object to be mapped. The example configuration demonstrates this with the value of trade.
-* Resource: A Spring Resource that represents the file to be
-read.
+* Resource: A Spring Resource that represents the file to read.
 * `Unmarshaller`: An unmarshalling facility provided by Spring OXM for mapping the XML
 fragment to an object.
 
@@ -1631,7 +1630,7 @@ while (hasNext) {
 ----
 
 [[StaxEventItemWriter]]
-==== StaxEventItemWriter
+==== `StaxEventItemWriter`
 
 Output works symmetrically to input. The `StaxEventItemWriter` needs a `Resource`, a
 marshaller, and a `rootTagName`. A Java object is passed to a marshaller (typically a
@@ -1775,11 +1774,11 @@ It is assumed that the JSON resource is an array of JSON objects corresponding t
 individual items. Spring Batch is not tied to any particular JSON library.
 
 [[JsonItemReader]]
-==== JsonItemReader
+==== `JsonItemReader`
 
-The `JsonItemReader` delegate JSON parsing and binding to implementations of the
+The `JsonItemReader` delegates JSON parsing and binding to implementations of the
 `org.springframework.batch.item.json.JsonObjectReader` interface. This interface
-is intended to be implemented using a streaming API in order to read JSON objects
+is intended to be implemented by using a streaming API to read JSON objects
 in chunks. Two libraries are supported:
 
 * link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.item.json.JacksonJsonObjectReader`
@@ -1787,11 +1786,11 @@ in chunks. Two libraries are supported:
 
 To be able to process JSON records, the following is needed:
 
-* `Resource`: A Spring Resource that represents the JSON file to be read.
-* `JsonObjectReader`: A json object reader to parse and bind JSON objects to items
+* `Resource`: A Spring Resource that represents the JSON file to read.
+* `JsonObjectReader`: A JSON object reader to parse and bind JSON objects to items
 
 The following example shows how to define a `JsonItemReader` that works with the
-previous JSON resource `org/springframework/batch/item/json/trades.json`, and a
+previous JSON resource `org/springframework/batch/item/json/trades.json` and a
 `JsonObjectReader` based on Jackson:
 
 [source, java]
@@ -1899,7 +1898,7 @@ which is the `Foo` with an ID of 3. The results of these reads are written out a
 maintaining references to them).
 
 [[JdbcCursorItemReader]]
-===== JdbcCursorItemReader
+===== `JdbcCursorItemReader`
 
 `JdbcCursorItemReader` is the JDBC implementation of the cursor-based technique. It works
 directly with a `ResultSet` and requires an SQL statement to run against a connection
@@ -2314,7 +2313,7 @@ fetches a portion of the results. We refer to this portion as a page. Each query
 specify the starting row number and the number of rows that we want returned in the page.
 
 [[JdbcPagingItemReader]]
-===== JdbcPagingItemReader
+===== `JdbcPagingItemReader`
 
 One implementation of a paging `ItemReader` is the `JdbcPagingItemReader`. The
 `JdbcPagingItemReader` needs a `PagingQueryProvider` responsible for providing the SQL
@@ -2403,7 +2402,7 @@ match the name of the named parameter. If you use a traditional '?' placeholder,
 key for each entry should be the number of the placeholder, starting with 1.
 
 [[JpaPagingItemReader]]
-===== JpaPagingItemReader
+===== `JpaPagingItemReader`
 
 Another implementation of a paging `ItemReader` is the `JpaPagingItemReader`. JPA does
 not have a concept similar to the Hibernate `StatelessSession`, so we have to use other
@@ -2709,7 +2708,7 @@ implementations. This section shows, by using a simple example, how to create a 
 writer restartable.
 
 [[customReader]]
-==== Custom ItemReader Example
+==== Custom `ItemReader` Example
 
 For the purpose of this example, we create a simple `ItemReader` implementation that
 reads from a provided list. We start by implementing the most basic contract of
@@ -2755,7 +2754,7 @@ assertNull(itemReader.read());
 ----
 
 [[restartableReader]]
-===== Making the ItemReader Restartable
+===== Making the `ItemReader` Restartable
 
 The final challenge is to make the `ItemReader` restartable. Currently, if processing is
 interrupted and begins again, the `ItemReader` must start at the beginning. This is
@@ -2844,7 +2843,7 @@ output), a more unique name is needed. For this reason, many of the Spring Batch
 key name be overridden.
 
 [[customWriter]]
-==== Custom ItemWriter Example
+==== Custom `ItemWriter` Example
 
 Implementing a Custom `ItemWriter` is similar in many ways to the `ItemReader` example
 above but differs in enough ways as to warrant its own example. However, adding
@@ -2869,7 +2868,7 @@ public class CustomItemWriter<T> implements ItemWriter<T> {
 ----
 
 [[restartableWriter]]
-===== Making the ItemWriter Restartable
+===== Making the `ItemWriter` Restartable
 
 To make the `ItemWriter` restartable, we would follow the same process as for the
 `ItemReader`, adding and implementing the `ItemStream` interface to synchronize the
@@ -2940,7 +2939,7 @@ Batch provides a `ClassifierCompositeItemWriterBuilder` to construct an instance
 `ClassifierCompositeItemWriter`.
 
 [[classifierCompositeItemProcessor]]
-===== ClassifierCompositeItemProcessor
+===== `ClassifierCompositeItemProcessor`
 The `ClassifierCompositeItemProcessor` is an `ItemProcessor` that calls one of a
 collection of `ItemProcessor` implementations, based on a router pattern implemented
 through the provided `Classifier`. Spring Batch provides a

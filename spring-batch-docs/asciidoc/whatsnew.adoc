@@ -10,10 +10,10 @@ The Spring Batch 4.1 release adds the following features:
 
 * A new `@SpringBatchTest` annotation to simplify testing batch components
 * A new `@EnableBatchIntegration` annotation to simplify remote chunking configuration
-* A new `JsonItemReader` to support JSON format
+* A new `JsonItemReader` to support the JSON format
 
 [[whatsNewTesting]]
-=== `@SpringBatchTest` annotation
+=== `@SpringBatchTest` Annotation
 
 Spring Batch provides some nice utility classes (such as the `JobLauncherTestUtils` and
 `JobRepositoryTestUtils`) and test execution listeners (`StepScopeTestExecutionListener`
@@ -64,7 +64,7 @@ For more details about this new annotation, see the
 <<testing.adoc#creatingUnitTestClass,Unit Testing>> chapter.
 
 [[whatsNewIntegration]]
-=== `@EnableBatchIntegration` annotation
+=== `@EnableBatchIntegration` Annotation
 
 Setting up a remote chunking job requires the definition of a number of beans:
 
@@ -76,7 +76,8 @@ Setting up a remote chunking job requires the definition of a number of beans:
 
 This can be a bit daunting at first glance. This release introduces a new annotation
 named `@EnableBatchIntegration` as well as new APIs (`RemoteChunkingMasterStepBuilder`
- and `RemoteChunkingWorkerBuilder`) to simplify the configuration. Here is an example:
+and `RemoteChunkingWorkerBuilder`) to simplify the configuration. The following
+example shows how to use the new annotation and APIs:
 
 [source, java]
 ----
@@ -124,8 +125,8 @@ as well as more details in the <<spring-batch-integration.adoc#remote-chunking,S
 [[whatsNewJson]]
 === JSON support
 
-Spring Batch 4.1 adds support for JSON format. This release introduces a new
-item reader that is able to read a JSON resource in the following format:
+Spring Batch 4.1 adds support for the JSON format. This release introduces a new
+item reader that can read a JSON resource in the following format:
 
 [source, json]
 ----
@@ -146,7 +147,7 @@ item reader that is able to read a JSON resource in the following format:
 ----
 
 Similar to the `StaxEventItemReader` for XML, the new `JsonItemReader` uses streaming
-APIs in order to read JSON objects in chunks. Two JSON libraries are supported:
+APIs to read JSON objects in chunks. Two JSON libraries are supported:
 link:$$https://github.com/FasterXML/jackson$$[Jackson] and
 link:$$https://github.com/google/gson$$[Gson]. For more details about JSON support,
 see the <<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
