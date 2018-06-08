@@ -1128,6 +1128,10 @@ configuration:
 .Java Configuration
 [source, java, role="javaContent"]
 ----
+
+/*
+ * Configuration of the master side
+ */
 @Bean
 public PartitionHandler partitionHandler() {
     MessageChannelPartitionHandler partitionHandler = new MessageChannelPartitionHandler();
@@ -1139,6 +1143,11 @@ public PartitionHandler partitionHandler() {
     template.setReceiveTimeout(100000);
     partitionHandler.setMessagingOperations(template);
     return partitionHandler;
+}
+
+@Bean
+public QueueChannel outboundReplies() {
+    return new QueueChannel();
 }
 
 @Bean
@@ -1155,44 +1164,13 @@ public IntegrationFlow outboundJmsRequests() {
 }
 
 @Bean
-public DirectChannel inboundRequests() {
-    return new DirectChannel();
-}
-
-public IntegrationFlow inboundJmsRequests() {
-    return IntegrationFlows
-            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
-                    .configureListenerContainer(c -> c.subscriptionDurable(false))
-                    .destination("requestsQueue"))
-            .channel(inboundRequests())
-            .get();
-	}
-
-@Bean
-public StepExecutionRequestHandler stepExecutionRequestHandler() {
-    StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
-    stepExecutionRequestHandler.setJobExplorer(jobExplorer);
-    stepExecutionRequestHandler.setStepLocator(stepLocator());
-    return stepExecutionRequestHandler;
-}
-
-@Bean
-@ServiceActivator(inputChannel = "inboundRequests", outputChannel = "outboundStaging")
-public StepExecutionRequestHandler serviceActivator() throws Exception {
-    return stepExecutionRequestHandler();
-}
-
-@Bean
-public DirectChannel outboundStaging() {
-    return new DirectChannel();
-}
-
-@Bean
-public IntegrationFlow outboundJmsStaging() {
-    return IntegrationFlows.from("outboundStaging")
-            .handle(Jms.outboundGateway(connectionFactory())
-                    .requestDestination("stagingQueue"))
-            .get();
+@ServiceActivator(inputChannel = "inboundStaging")
+public AggregatorFactoryBean partitioningMessageHandler() throws Exception {
+    AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
+    aggregatorFactoryBean.setProcessorBean(partitionHandler());
+    aggregatorFactoryBean.setOutputChannel(outboundReplies());
+    // configure other propeties of the aggregatorFactoryBean
+    return aggregatorFactoryBean;
 }
 
 @Bean
@@ -1210,19 +1188,48 @@ public IntegrationFlow inboundJmsStaging() {
             .get();
 }
 
+/*
+ * Configuration of the worker side
+ */
 @Bean
-@ServiceActivator(inputChannel = "inboundStaging")
-public AggregatorFactoryBean partitioningMessageHandler() throws Exception {
-    AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
-    aggregatorFactoryBean.setProcessorBean(partitionHandler());
-    aggregatorFactoryBean.setOutputChannel(outboundReplies());
-    ...
-    return aggregatorFactoryBean;
+public StepExecutionRequestHandler stepExecutionRequestHandler() {
+    StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
+    stepExecutionRequestHandler.setJobExplorer(jobExplorer);
+    stepExecutionRequestHandler.setStepLocator(stepLocator());
+    return stepExecutionRequestHandler;
 }
 
 @Bean
-public QueueChannel outboundReplies() {
-    return new QueueChannel();
+@ServiceActivator(inputChannel = "inboundRequests", outputChannel = "outboundStaging")
+public StepExecutionRequestHandler serviceActivator() throws Exception {
+    return stepExecutionRequestHandler();
+}
+
+@Bean
+public DirectChannel inboundRequests() {
+    return new DirectChannel();
+}
+
+public IntegrationFlow inboundJmsRequests() {
+    return IntegrationFlows
+            .from(Jms.messageDrivenChannelAdapter(connectionFactory())
+                    .configureListenerContainer(c -> c.subscriptionDurable(false))
+                    .destination("requestsQueue"))
+            .channel(inboundRequests())
+            .get();
+}
+
+@Bean
+public DirectChannel outboundStaging() {
+    return new DirectChannel();
+}
+
+@Bean
+public IntegrationFlow outboundJmsStaging() {
+    return IntegrationFlows.from("outboundStaging")
+            .handle(Jms.outboundGateway(connectionFactory())
+                    .requestDestination("stagingQueue"))
+            .get();
 }
 ----
 
@@ -1245,8 +1252,12 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
 	public Job personJob() {
 		return jobBuilderFactory.get("personJob")
 				.start(stepBuilderFactory.get("step1.master")
-						.partitioner(partitionHandler())
+						.partitioner("step1.worker", partitioner())
+						.partitionHandler(partitionHandler())
 						.build())
 				.build();
 	}
 ----
+
+You can find a complete example of a remote partitioning job
+link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-partitioning-sample$$[here].
