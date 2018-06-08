@@ -112,6 +112,8 @@ public class RemoteChunkingAppConfig {
          	        .outputChannel(outgoingRepliesToMaster())
          	        .build();
    }
+
+   // Middleware beans setup omitted
 }
 ----
 
@@ -147,8 +149,12 @@ item reader that can read a JSON resource in the following format:
 ----
 
 Similar to the `StaxEventItemReader` for XML, the new `JsonItemReader` uses streaming
-APIs to read JSON objects in chunks. Two JSON libraries are supported:
-link:$$https://github.com/FasterXML/jackson$$[Jackson] and
-link:$$https://github.com/google/gson$$[Gson]. For more details about JSON support,
-see the <<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
+APIs to read JSON objects in chunks. Spring Batch supports two libraries:
+
+* link:$$https://github.com/FasterXML/jackson$$[Jackson]
+* link:$$https://github.com/google/gson$$[Gson]
+
+To add other libraries, you can implement the `JsonObjectReader` interface.
+For more details about JSON support, see the
+<<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
 
