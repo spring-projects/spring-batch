@@ -638,12 +638,26 @@ happens inside the main step transaction).
 The purpose of this sample is to show multi-threaded step execution
 using the `PartitionHandler` SPI.  The example uses a
 `TaskExecutorPartitionHandler` to spread the work of reading
-some files acrosss multiple threads, with one `Step` execution
+some files across multiple threads, with one `Step` execution
 per thread.  The key components are the `PartitionStep` and the
 `MultiResourcePartitioner` which is responsible for dividing up
 the work.  Notice that the readers and writers in the `Step`
 that is being partitioned are step-scoped, so that their state does
 not get shared across threads of execution.
+
+### [Remote Partitioning Sample](id:remotePartitioning)
+
+This sample shows how to configure a remote partitioning job. The master step
+uses a `MessageChannelPartitionHandler` to send partitions to and receive 
+replies from workers. Two examples are shown:
+
+* A master step that polls the job repository to see if all workers have finished
+their work
+* A master step that aggregates replies from workers to notify work completion
+
+The sample uses an embedded JMS broker and an embedded database for simplicity
+but any option supported via Spring Integration for communication is technically
+acceptable. 
 
 ### [Remote Chunking Sample](id:remoteChunking)
 
