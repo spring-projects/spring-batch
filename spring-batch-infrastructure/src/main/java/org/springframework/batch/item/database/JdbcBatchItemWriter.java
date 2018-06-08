@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
  * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
  * provided.</p>
  *
- * The user must provide an SQL query and a special callback in the for of either
+ * The user must provide an SQL query and a special callback for either of
  * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}.
  * You can use either named parameters or the traditional '?' placeholders. If you use the
  * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
