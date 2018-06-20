@@ -10,7 +10,7 @@ The Spring Batch 4.1 release adds the following features:
 
 * A new `@SpringBatchTest` annotation to simplify testing batch components
 * A new `@EnableBatchIntegration` annotation to simplify remote chunking configuration
-* A new `JsonItemReader` to support the JSON format
+* A new `JsonItemReader` and `JsonFileItemWriter` to support the JSON format
 
 [[whatsNewTesting]]
 === `@SpringBatchTest` Annotation
@@ -155,6 +155,8 @@ APIs to read JSON objects in chunks. Spring Batch supports two libraries:
 * link:$$https://github.com/google/gson$$[Gson]
 
 To add other libraries, you can implement the `JsonObjectReader` interface.
+
+Writing JSON data is also supported through the `JsonFileItemWriter`.
 For more details about JSON support, see the
 <<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
 
