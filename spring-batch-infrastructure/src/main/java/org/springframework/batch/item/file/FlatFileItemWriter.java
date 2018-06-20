@@ -76,9 +76,9 @@ InitializingBean {
 
 	private Resource resource;
 
-	private OutputState state = null;
+	protected OutputState state = null;
 
-	private LineAggregator<T> lineAggregator;
+	protected LineAggregator<T> lineAggregator;
 
 	private boolean saveState = true;
 
@@ -94,7 +94,7 @@ InitializingBean {
 
 	private FlatFileFooterCallback footerCallback;
 
-	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
+	protected String lineSeparator = DEFAULT_LINE_SEPARATOR;
 
 	private boolean transactional = DEFAULT_TRANSACTIONAL;
 
@@ -389,7 +389,7 @@ InitializingBean {
 	}
 
 	// Returns object representing state.
-	private OutputState getOutputState() {
+	protected OutputState getOutputState() {
 		if (state == null) {
 			File file;
 			try {
@@ -411,7 +411,7 @@ InitializingBean {
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
-	private class OutputState {
+	protected class OutputState {
 
 		private FileOutputStream os;
 
@@ -493,6 +493,14 @@ InitializingBean {
 		 */
 		public void setEncoding(String encoding) {
 			this.encoding = encoding;
+		}
+
+		public long getLinesWritten() {
+			return linesWritten;
+		}
+
+		public void setLinesWritten(long linesWritten) {
+			this.linesWritten = linesWritten;
 		}
 
 		/**
