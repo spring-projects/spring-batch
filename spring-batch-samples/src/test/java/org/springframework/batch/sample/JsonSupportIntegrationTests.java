@@ -35,11 +35,11 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.json.GsonJsonObjectReader;
-import org.springframework.batch.item.json.JacksonLineAggregator;
+import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JsonItemReader;
-import org.springframework.batch.item.json.JsonItemWriter;
+import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
-import org.springframework.batch.item.json.builder.JsonItemWriterBuilder;
+import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -72,7 +72,7 @@ public class JsonSupportIntegrationTests {
 		@Autowired
 		private StepBuilderFactory steps;
 
-		@Bean()
+		@Bean
 		public JsonItemReader<Trade> itemReader() {
 			return new JsonItemReaderBuilder<Trade>()
 					.name("tradesJsonItemReader")
@@ -82,11 +82,11 @@ public class JsonSupportIntegrationTests {
 		}
 
 		@Bean
-		public JsonItemWriter<Trade> itemWriter() {
-			return new JsonItemWriterBuilder<Trade>()
+		public JsonFileItemWriter<Trade> itemWriter() {
+			return new JsonFileItemWriterBuilder<Trade>()
 					.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json"))
-					.lineAggregator(new JacksonLineAggregator<>())
-					.name("tradesJsonItemWriter")
+					.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
+					.name("tradesJsonFileItemWriter")
 					.build();
 		}
 

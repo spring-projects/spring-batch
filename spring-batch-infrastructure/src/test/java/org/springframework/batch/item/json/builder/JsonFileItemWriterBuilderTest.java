@@ -25,9 +25,8 @@ import org.mockito.Mockito;
 
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
-import org.springframework.batch.item.json.JsonItemWriter;
+import org.springframework.batch.item.json.JsonFileItemWriter;
+import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -38,43 +37,42 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JsonItemWriterBuilderTest {
+public class JsonFileItemWriterBuilderTest {
 
 	private Resource resource;
-	private LineAggregator<String> lineAggregator;
+	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@Before
 	public void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
-		this.lineAggregator = new PassThroughLineAggregator<>();
+		this.jsonObjectMarshaller = object -> object;
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMissingResource() {
-		new JsonItemWriterBuilder<String>()
-				.lineAggregator(this.lineAggregator)
+		new JsonFileItemWriterBuilder<String>()
+				.jsonObjectMarshaller(this.jsonObjectMarshaller)
 				.build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testMissingLineAggregator() {
-		new JsonItemWriterBuilder<String>()
+	public void testMissingJsonObjectMarshaller() {
+		new JsonFileItemWriterBuilder<String>()
 				.resource(this.resource)
 				.build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryNameWhenSaveStateIsSet() {
-		new JsonItemWriterBuilder<String>()
+		new JsonFileItemWriterBuilder<String>()
 				.resource(this.resource)
-				.lineAggregator(this.lineAggregator)
-				.saveState(true)
+				.jsonObjectMarshaller(this.jsonObjectMarshaller)
 				.build();
 	}
 
 	@Test
-	public void testJsonItemWriterCreation() {
+	public void testJsonFileItemWriterCreation() {
 		// given
 		boolean append = true;
 		boolean forceSync = true;
@@ -87,10 +85,10 @@ public class JsonItemWriterBuilderTest {
 		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
 
 		// when
-		JsonItemWriter<String> writer = new JsonItemWriterBuilder<String>()
-				.name("jsonItemWriter")
+		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>()
+				.name("jsonFileItemWriter")
 				.resource(this.resource)
-				.lineAggregator(this.lineAggregator)
+				.jsonObjectMarshaller(this.jsonObjectMarshaller)
 				.append(append)
 				.encoding(encoding)
 				.forceSync(forceSync)

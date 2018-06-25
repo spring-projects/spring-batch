@@ -22,15 +22,15 @@ import org.junit.Test;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JacksonLineAggregatorTest {
+public class JacksonJsonObjectMarshallerTest {
 
 	@Test
-	public void testJsonAggregation() {
+	public void testJsonMarshalling() {
 		// given
-		JacksonLineAggregator<Foo> lineAggregator = new JacksonLineAggregator<>();
+		JacksonJsonObjectMarshaller<Foo> jsonObjectMarshaller = new JacksonJsonObjectMarshaller<>();
 
 		// when
-		String foo = lineAggregator.aggregate(new Foo(1, "foo"));
+		String foo = jsonObjectMarshaller.marshal(new Foo(1, "foo"));
 
 		// then
 		Assert.assertEquals("{\"id\":1,\"name\":\"foo\"}", foo);

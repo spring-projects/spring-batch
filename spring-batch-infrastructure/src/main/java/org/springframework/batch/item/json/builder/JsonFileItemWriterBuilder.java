@@ -18,35 +18,35 @@ package org.springframework.batch.item.json.builder;
 
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.json.JsonItemWriter;
+import org.springframework.batch.item.json.JsonFileItemWriter;
+import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Builder for {@link JsonItemWriter}.
+ * Builder for {@link JsonFileItemWriter}.
  *
  * @param <T> type of objects to write as Json output.
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
-public class JsonItemWriterBuilder<T> {
+public class JsonFileItemWriterBuilder<T> {
 
 	private Resource resource;
-	private LineAggregator<T> lineAggregator;
+	private JsonObjectMarshaller<T> jsonObjectMarshaller;
 	private FlatFileHeaderCallback headerCallback;
 	private FlatFileFooterCallback footerCallback;
 
 	private String name;
-	private String encoding = JsonItemWriter.DEFAULT_CHARSET;
-	private String lineSeparator = JsonItemWriter.DEFAULT_LINE_SEPARATOR;
+	private String encoding = JsonFileItemWriter.DEFAULT_CHARSET;
+	private String lineSeparator = JsonFileItemWriter.DEFAULT_LINE_SEPARATOR;
 
 	private boolean append = false;
 	private boolean forceSync = false;
 	private boolean saveState = true;
 	private boolean shouldDeleteIfExists = true;
 	private boolean shouldDeleteIfEmpty = false;
-	private boolean transactional = JsonItemWriter.DEFAULT_TRANSACTIONAL;
+	private boolean transactional = JsonFileItemWriter.DEFAULT_TRANSACTIONAL;
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -56,7 +56,7 @@ public class JsonItemWriterBuilder<T> {
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
-	public JsonItemWriterBuilder<T> saveState(boolean saveState) {
+	public JsonFileItemWriterBuilder<T> saveState(boolean saveState) {
 		this.saveState = saveState;
 
 		return this;
@@ -71,7 +71,7 @@ public class JsonItemWriterBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
 	 */
-	public JsonItemWriterBuilder<T> name(String name) {
+	public JsonFileItemWriterBuilder<T> name(String name) {
 		this.name = name;
 
 		return this;
@@ -83,9 +83,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param forceSync value to set the flag to
 	 * @return The current instance of the builder.
-	 * @see JsonItemWriter#setForceSync(boolean)
+	 * @see JsonFileItemWriter#setForceSync(boolean)
 	 */
-	public JsonItemWriterBuilder<T> forceSync(boolean forceSync) {
+	public JsonFileItemWriterBuilder<T> forceSync(boolean forceSync) {
 		this.forceSync = forceSync;
 
 		return this;
@@ -93,27 +93,27 @@ public class JsonItemWriterBuilder<T> {
 
 	/**
 	 * String used to separate lines in output.  Defaults to the System property
-	 * line.separator.
+	 * <code>line.separator</code>.
 	 *
 	 * @param lineSeparator value to use for a line separator
 	 * @return The current instance of the builder.
-	 * @see JsonItemWriter#setLineSeparator(String)
+	 * @see JsonFileItemWriter#setLineSeparator(String)
 	 */
-	public JsonItemWriterBuilder<T> lineSeparator(String lineSeparator) {
+	public JsonFileItemWriterBuilder<T> lineSeparator(String lineSeparator) {
 		this.lineSeparator = lineSeparator;
 
 		return this;
 	}
 
 	/**
-	 * Set the {@link LineAggregator} to use to aggregate json objects.
+	 * Set the {@link JsonObjectMarshaller} to use to marshal objects to json.
 	 *
-	 * @param lineAggregator to use
+	 * @param jsonObjectMarshaller to use
 	 * @return The current instance of the builder.
-	 * @see JsonItemWriter#setLineAggregator(LineAggregator)
+	 * @see JsonFileItemWriter#setJsonObjectMarshaller(JsonObjectMarshaller)
 	 */
-	public JsonItemWriterBuilder<T> lineAggregator(LineAggregator<T> lineAggregator) {
-		this.lineAggregator = lineAggregator;
+	public JsonFileItemWriterBuilder<T> jsonObjectMarshaller(JsonObjectMarshaller<T> jsonObjectMarshaller) {
+		this.jsonObjectMarshaller = jsonObjectMarshaller;
 
 		return this;
 	}
@@ -123,9 +123,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
-	 * @see JsonItemWriter#setResource(Resource)
+	 * @see JsonFileItemWriter#setResource(Resource)
 	 */
-	public JsonItemWriterBuilder<T> resource(Resource resource) {
+	public JsonFileItemWriterBuilder<T> resource(Resource resource) {
 		this.resource = resource;
 
 		return this;
@@ -136,23 +136,23 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param encoding encoding type.
 	 * @return The current instance of the builder.
-	 * @see JsonItemWriter#setEncoding(String)
+	 * @see JsonFileItemWriter#setEncoding(String)
 	 */
-	public JsonItemWriterBuilder<T> encoding(String encoding) {
+	public JsonFileItemWriterBuilder<T> encoding(String encoding) {
 		this.encoding = encoding;
 
 		return this;
 	}
 
 	/**
-	 * If set to true, once the step is complete, if the resource previously provdied is
+	 * If set to true, once the step is complete, if the resource previously provided is
 	 * empty, it will be deleted.
 	 *
 	 * @param shouldDelete defaults to false
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setShouldDeleteIfEmpty(boolean)
+	 * @see JsonFileItemWriter#setShouldDeleteIfEmpty(boolean)
 	 */
-	public JsonItemWriterBuilder<T> shouldDeleteIfEmpty(boolean shouldDelete) {
+	public JsonFileItemWriterBuilder<T> shouldDeleteIfEmpty(boolean shouldDelete) {
 		this.shouldDeleteIfEmpty = shouldDelete;
 
 		return this;
@@ -164,9 +164,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param shouldDelete defaults to true
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setShouldDeleteIfExists(boolean)
+	 * @see JsonFileItemWriter#setShouldDeleteIfExists(boolean)
 	 */
-	public JsonItemWriterBuilder<T> shouldDeleteIfExists(boolean shouldDelete) {
+	public JsonFileItemWriterBuilder<T> shouldDeleteIfExists(boolean shouldDelete) {
 		this.shouldDeleteIfExists = shouldDelete;
 
 		return this;
@@ -178,9 +178,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param append defaults to false
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setAppendAllowed(boolean)
+	 * @see JsonFileItemWriter#setAppendAllowed(boolean)
 	 */
-	public JsonItemWriterBuilder<T> append(boolean append) {
+	public JsonFileItemWriterBuilder<T> append(boolean append) {
 		this.append = append;
 
 		return this;
@@ -191,9 +191,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param callback {@link FlatFileHeaderCallback} implementation
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setHeaderCallback(FlatFileHeaderCallback)
+	 * @see JsonFileItemWriter#setHeaderCallback(FlatFileHeaderCallback)
 	 */
-	public JsonItemWriterBuilder<T> headerCallback(FlatFileHeaderCallback callback) {
+	public JsonFileItemWriterBuilder<T> headerCallback(FlatFileHeaderCallback callback) {
 		this.headerCallback = callback;
 
 		return this;
@@ -204,9 +204,9 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param callback {@link FlatFileFooterCallback} implementation
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setFooterCallback(FlatFileFooterCallback)
+	 * @see JsonFileItemWriter#setFooterCallback(FlatFileFooterCallback)
 	 */
-	public JsonItemWriterBuilder<T> footerCallback(FlatFileFooterCallback callback) {
+	public JsonFileItemWriterBuilder<T> footerCallback(FlatFileFooterCallback callback) {
 		this.footerCallback = callback;
 
 		return this;
@@ -217,45 +217,45 @@ public class JsonItemWriterBuilder<T> {
 	 *
 	 * @param transactional defaults to true
 	 * @return The current instance of the builder
-	 * @see JsonItemWriter#setTransactional(boolean)
+	 * @see JsonFileItemWriter#setTransactional(boolean)
 	 */
-	public JsonItemWriterBuilder<T> transactional(boolean transactional) {
+	public JsonFileItemWriterBuilder<T> transactional(boolean transactional) {
 		this.transactional = transactional;
 
 		return this;
 	}
 
 	/**
-	 * Validate the configuration and build a new {@link JsonItemWriter}.
+	 * Validate the configuration and build a new {@link JsonFileItemWriter}.
 	 *
-	 * @return a new instance of the {@link JsonItemWriter}
+	 * @return a new instance of the {@link JsonFileItemWriter}
 	 */
-	public JsonItemWriter<T> build() {
+	public JsonFileItemWriter<T> build() {
 		Assert.notNull(this.resource, "A resource is required.");
-		Assert.notNull(this.lineAggregator, "A line aggregator is required.");
+		Assert.notNull(this.jsonObjectMarshaller, "A json object marshaller is required.");
 
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is true");
 		}
 
-		JsonItemWriter<T> jsonItemWriter = new JsonItemWriter<>(this.resource, this.lineAggregator);
+		JsonFileItemWriter<T> jsonFileItemWriter = new JsonFileItemWriter<>(this.resource, this.jsonObjectMarshaller);
 
-		jsonItemWriter.setName(this.name);
-		jsonItemWriter.setAppendAllowed(this.append);
-		jsonItemWriter.setEncoding(this.encoding);
+		jsonFileItemWriter.setName(this.name);
+		jsonFileItemWriter.setAppendAllowed(this.append);
+		jsonFileItemWriter.setEncoding(this.encoding);
 		if (this.headerCallback != null) {
-			jsonItemWriter.setHeaderCallback(this.headerCallback);
+			jsonFileItemWriter.setHeaderCallback(this.headerCallback);
 		}
 		if (this.footerCallback != null) {
-			jsonItemWriter.setFooterCallback(this.footerCallback);
+			jsonFileItemWriter.setFooterCallback(this.footerCallback);
 		}
-		jsonItemWriter.setForceSync(this.forceSync);
-		jsonItemWriter.setLineSeparator(this.lineSeparator);
-		jsonItemWriter.setSaveState(this.saveState);
-		jsonItemWriter.setShouldDeleteIfEmpty(this.shouldDeleteIfEmpty);
-		jsonItemWriter.setShouldDeleteIfExists(this.shouldDeleteIfExists);
-		jsonItemWriter.setTransactional(this.transactional);
+		jsonFileItemWriter.setForceSync(this.forceSync);
+		jsonFileItemWriter.setLineSeparator(this.lineSeparator);
+		jsonFileItemWriter.setSaveState(this.saveState);
+		jsonFileItemWriter.setShouldDeleteIfEmpty(this.shouldDeleteIfEmpty);
+		jsonFileItemWriter.setShouldDeleteIfExists(this.shouldDeleteIfExists);
+		jsonFileItemWriter.setTransactional(this.transactional);
 
-		return jsonItemWriter;
+		return jsonFileItemWriter;
 	}
 }

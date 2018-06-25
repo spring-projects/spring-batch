@@ -32,8 +32,7 @@ import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.json.builder.JsonItemWriterBuilder;
+import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.batch.item.json.domain.Trade;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
@@ -51,7 +50,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Mahmoud Ben Hassine
  */
-public abstract class JsonItemWriterFunctionalTests {
+public abstract class JsonFileItemWriterFunctionalTests {
 
 	private static final String EXPECTED_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
 
@@ -61,11 +60,11 @@ public abstract class JsonItemWriterFunctionalTests {
 	private Trade trade1 = new Trade("123", 5, new BigDecimal("10.5"), "foo");
 	private Trade trade2 = new Trade("456", 10, new BigDecimal("20.5"), "bar");
 
-	protected abstract LineAggregator<Trade> getLineAggregator();
-	protected abstract LineAggregator<Trade> getLineAggregatorWithPrettyPrint();
+	protected abstract JsonObjectMarshaller<Trade> getJsonObjectMarshaller();
+	protected abstract JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint();
 	protected abstract String getExpectedPrettyPrintedFile();
 
-	private JsonItemWriter<Trade> writer;
+	private JsonFileItemWriter<Trade> writer;
 
 	@Before
 	public void setUp() throws Exception {
@@ -74,19 +73,21 @@ public abstract class JsonItemWriterFunctionalTests {
 		this.resource = new FileSystemResource(outputFilePath.toFile());
 		this.executionContext = new ExecutionContext();
 		this.items = Arrays.asList(this.trade1, this.trade2);
-		this.writer = new JsonItemWriterBuilder<Trade>()
+		this.writer = new JsonFileItemWriterBuilder<Trade>()
 				.name("tradesItemWriter")
 				.resource(this.resource)
-				.lineAggregator(getLineAggregator())
+				.jsonObjectMarshaller(getJsonObjectMarshaller())
 				.build();
 	}
 
 	@Test
 	public void testJsonWriting() throws Exception {
+		// when
 		this.writer.open(this.executionContext);
 		this.writer.write(this.items);
 		this.writer.close();
 
+		// then
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + "expected-trades.json"),
 				this.resource.getFile());
@@ -94,15 +95,19 @@ public abstract class JsonItemWriterFunctionalTests {
 
 	@Test
 	public void testJsonWritingWithPrettyPrinting() throws Exception {
-		this.writer = new JsonItemWriterBuilder<Trade>()
+		// given
+		this.writer = new JsonFileItemWriterBuilder<Trade>()
 				.name("tradesItemWriter")
 				.resource(this.resource)
-				.lineAggregator(getLineAggregatorWithPrettyPrint())
+				.jsonObjectMarshaller(getJsonObjectMarshallerWithPrettyPrint())
 				.build();
+
+		// when
 		this.writer.open(this.executionContext);
 		this.writer.write(this.items);
 		this.writer.close();
 
+		// when
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + getExpectedPrettyPrintedFile()),
 				this.resource.getFile());
@@ -110,12 +115,16 @@ public abstract class JsonItemWriterFunctionalTests {
 
 	@Test
 	public void testJsonWritingWithEnclosingObject() throws Exception {
+		// given
 		this.writer.setHeaderCallback(writer -> writer.write("{\"trades\":["));
-		this.writer.setFooterCallback(writer -> writer.write(JsonItemWriter.DEFAULT_LINE_SEPARATOR + "]}"));
+		this.writer.setFooterCallback(writer -> writer.write(JsonFileItemWriter.DEFAULT_LINE_SEPARATOR + "]}"));
+
+		// when
 		this.writer.open(this.executionContext);
 		this.writer.write(this.items);
 		this.writer.close();
 
+		// then
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + "expected-trades-with-wrapper-object.json"),
 				this.resource.getFile());
@@ -123,11 +132,15 @@ public abstract class JsonItemWriterFunctionalTests {
 
 	@Test
 	public void testForcedWrite() throws Exception {
+		// given
 		this.writer.setForceSync(true);
+
+		// when
 		this.writer.open(this.executionContext);
 		this.writer.write(Collections.singletonList(this.trade1));
 		this.writer.close();
 
+		// then
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + "expected-trades1.json"),
 				this.resource.getFile());
@@ -135,7 +148,10 @@ public abstract class JsonItemWriterFunctionalTests {
 
 	@Test
 	public void testWriteWithDelete() throws Exception {
+		// given
 		this.writer.setShouldDeleteIfExists(true);
+
+		// when
 		this.writer.open(this.executionContext);
 		this.writer.write(Collections.singletonList(this.trade1));
 		this.writer.close();
@@ -143,6 +159,7 @@ public abstract class JsonItemWriterFunctionalTests {
 		this.writer.write(Collections.singletonList(this.trade2));
 		this.writer.close();
 
+		// then
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + "expected-trades2.json"),
 				this.resource.getFile());
@@ -224,8 +241,8 @@ public abstract class JsonItemWriterFunctionalTests {
 	}
 
 	@Test
-	public void testItemAggregationFailure() throws Exception {
-		this.writer.setLineAggregator(item -> {
+	public void testItemMarshallingFailure() throws Exception {
+		this.writer.setJsonObjectMarshaller(item -> {
 			throw new IllegalArgumentException("Bad item");
 		});
 		this.writer.open(this.executionContext);

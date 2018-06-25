@@ -20,17 +20,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.transform.LineAggregator;
 
 /**
- * A line aggregator that uses <a href="https://github.com/FasterXML/jackson">Jackson</a>
- * to aggregate an object into a json representation.
+ * A json object marshaller that uses <a href="https://github.com/FasterXML/jackson">Jackson</a>
+ * to marshal an object into a json representation.
  *
- * @param <T> type of object to serialize
+ * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
-public class JacksonLineAggregator<T> implements LineAggregator<T> {
+public class JacksonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,11 +42,11 @@ public class JacksonLineAggregator<T> implements LineAggregator<T> {
 	}
 
 	@Override
-	public String aggregate(T item)  {
+	public String marshal(T item)  {
 		try {
 			return objectMapper.writeValueAsString(item);
 		} catch (JsonProcessingException e) {
-			throw new ItemStreamException("Unable to transform object " + item + " to Json", e);
+			throw new ItemStreamException("Unable to marshal object " + item + " to Json", e);
 		}
 	}
 }

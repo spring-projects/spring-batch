@@ -25,39 +25,38 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JsonItemWriterTests {
+public class JsonFileItemWriterTests {
 
 	private Resource resource;
-	private LineAggregator<String> lineAggregator;
+	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@Before
 	public void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
-		this.lineAggregator = Mockito.mock(LineAggregator.class);
+		this.jsonObjectMarshaller = Mockito.mock(JsonObjectMarshaller.class);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void resourceMustNotBeNull() {
-		new JsonItemWriter<>(null, this.lineAggregator);
+		new JsonFileItemWriter<>(null, this.jsonObjectMarshaller);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void lineAggregatorMustNotBeNull() {
-		new JsonItemWriter<>(this.resource, null);
+	public void jsonObjectMarshallerMustNotBeNull() {
+		new JsonFileItemWriter<>(this.resource, null);
 	}
 
 	@Test
-	public void itemsShouldBeTransformedToJsonWithTheLineAggregator() throws Exception {
+	public void itemsShouldBeMarshalledToJsonWithTheJsonObjectMarshaller() throws Exception {
 		// given
-		JsonItemWriter<String> writer = new JsonItemWriter<>(this.resource, this.lineAggregator);
+		JsonFileItemWriter<String> writer = new JsonFileItemWriter<>(this.resource, this.jsonObjectMarshaller);
 
 		// when
 		writer.open(new ExecutionContext());
@@ -65,7 +64,7 @@ public class JsonItemWriterTests {
 		writer.close();
 
 		// then
-		Mockito.verify(this.lineAggregator).aggregate("foo");
-		Mockito.verify(this.lineAggregator).aggregate("bar");
+		Mockito.verify(this.jsonObjectMarshaller).marshal("foo");
+		Mockito.verify(this.jsonObjectMarshaller).marshal("bar");
 	}
 }

@@ -16,50 +16,30 @@
 
 package org.springframework.batch.item.json;
 
-import org.junit.Assert;
-import org.junit.Test;
+import com.google.gson.Gson;
 
 /**
+ * A json object marshaller that uses <a href="https://github.com/google/gson">Google Gson</a>
+ * to marshal an object into a json representation.
+ *
+ * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
+ * @since 4.1
  */
-public class GsonLineAggregatorTest {
+public class GsonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
-	@Test
-	public void testJsonAggregation() {
-		// given
-		GsonLineAggregator<Foo> lineAggregator = new GsonLineAggregator<>();
+	private Gson gson = new Gson();
 
-		// when
-		String foo = lineAggregator.aggregate(new Foo(1, "foo"));
-
-		// then
-		Assert.assertEquals("{\"id\":1,\"name\":\"foo\"}", foo);
+	/**
+	 * Set the {@link Gson} object to use.
+	 * @param gson object to use
+	 */
+	public void setGson(Gson gson) {
+		this.gson = gson;
 	}
 
-	public static class Foo {
-		private int id;
-		private String name;
-
-		public Foo(int id, String name) {
-			this.id = id;
-			this.name = name;
-		}
-
-		public int getId() {
-			return id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
+	@Override
+	public String marshal(T item) {
+		return gson.toJson(item);
 	}
-
 }

@@ -16,33 +16,33 @@
 
 package org.springframework.batch.item.json;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
-import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.json.domain.Trade;
 
 /**
  * @author Mahmoud Ben Hassine
  */
-public class GsonJsonItemWriterFunctionalTests extends JsonItemWriterFunctionalTests {
+public class JacksonJsonFileItemWriterFunctionalTests extends JsonFileItemWriterFunctionalTests {
 
 	@Override
-	protected LineAggregator<Trade> getLineAggregator() {
-		return new GsonLineAggregator<>();
+	protected JsonObjectMarshaller<Trade> getJsonObjectMarshaller() {
+		return new JacksonJsonObjectMarshaller<>();
 	}
 
 	@Override
-	protected LineAggregator<Trade> getLineAggregatorWithPrettyPrint() {
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		GsonLineAggregator<Trade> lineAggregator = new GsonLineAggregator<>();
-		lineAggregator.setGson(gson);
-		return lineAggregator;
+	protected JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		JacksonJsonObjectMarshaller<Trade> jsonObjectMarshaller = new JacksonJsonObjectMarshaller<>();
+		jsonObjectMarshaller.setObjectMapper(objectMapper);
+		return jsonObjectMarshaller;
 	}
 
 	@Override
 	protected String getExpectedPrettyPrintedFile() {
-		return "expected-trades-gson-pretty-print.json";
+		return "expected-trades-jackson-pretty-print.json";
 	}
 
 }

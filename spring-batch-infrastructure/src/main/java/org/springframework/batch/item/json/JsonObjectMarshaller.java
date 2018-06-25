@@ -16,32 +16,21 @@
 
 package org.springframework.batch.item.json;
 
-import com.google.gson.Gson;
-
-import org.springframework.batch.item.file.transform.LineAggregator;
-
 /**
- * A line aggregator that uses <a href="https://github.com/google/gson">Google Gson</a>
- * to aggregate an object into a json representation.
+ * Strategy interface to marshal an object into a json representation.
+ * Implementations are required to return a valid json object.
  *
- * @param <T> type of object to serialize
+ * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
-public class GsonLineAggregator<T> implements LineAggregator<T> {
-
-	private Gson gson = new Gson();
+public interface JsonObjectMarshaller<T> {
 
 	/**
-	 * Set the {@link Gson} object to use.
-	 * @param gson object to use
+	 * Marshal an object into a json representation.
+	 * @param object to marshal
+	 * @return json representation fo the object
 	 */
-	public void setGson(Gson gson) {
-		this.gson = gson;
-	}
+	String marshal(T object);
 
-	@Override
-	public String aggregate(T item) {
-		return gson.toJson(item);
-	}
 }
