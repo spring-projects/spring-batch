@@ -655,7 +655,9 @@ replies from workers. Two examples are shown:
 their work
 * A master step that aggregates replies from workers to notify work completion
 
-The sample uses an embedded JMS broker and an embedded database for simplicity. 
+The sample uses an embedded JMS broker and an embedded database for simplicity
+but any option supported via Spring Integration for communication is technically
+acceptable. 
 
 ### [Remote Chunking Sample](id:remoteChunking)
 

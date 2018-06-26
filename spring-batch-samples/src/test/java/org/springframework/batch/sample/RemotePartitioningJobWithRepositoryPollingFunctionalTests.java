@@ -15,17 +15,9 @@
  */
 package org.springframework.batch.sample;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
 import org.springframework.batch.sample.remotepartitioning.polling.MasterConfiguration;
 import org.springframework.batch.sample.remotepartitioning.polling.WorkerConfiguration;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -37,28 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = {JobRunnerConfiguration.class, MasterConfiguration.class})
 public class RemotePartitioningJobWithRepositoryPollingFunctionalTests extends RemotePartitioningJobFunctionalTests {
 
-	private AnnotationConfigApplicationContext workerApplicationContext;
-
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		this.workerApplicationContext = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-		this.workerApplicationContext.close();
-	}
-
-	@Test
-	public void testRemotePartitioningJobWithRepositoryPolling() throws Exception {
-		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob();
-
-		// then
-		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		Assert.assertEquals(4, jobExecution.getStepExecutions().size()); // master + 3 workers
+	@Override
+	protected Class<WorkerConfiguration> getWorkerConfigurationClass() {
+		return WorkerConfiguration.class;
 	}
 
 }
