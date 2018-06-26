@@ -2659,6 +2659,45 @@ public SpringValidator validator() {
 }
 ----
 
+You can also use the `BeanValidatingItemProcessor` to validate items annotated with
+the Bean Validation API (JSR-303) annotations. For example, given the following type `Person`:
+
+[source, java]
+----
+class Person {
+
+    @NotEmpty
+    private String name;
+
+    public Person(String name) {
+     this.name = name;
+    }
+
+    public String getName() {
+     return name;
+    }
+
+    public void setName(String name) {
+     this.name = name;
+    }
+
+}
+----
+
+you can validate items by declaring a `BeanValidatingItemProcessor` bean in your
+application context and register it as a processor in your chunk-oriented step:
+
+[source, java]
+----
+@Bean
+public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws Exception {
+    BeanValidatingItemProcessor<Person> beanValidatingItemProcessor = new BeanValidatingItemProcessor<>();
+    beanValidatingItemProcessor.setFilter(true);
+
+    return beanValidatingItemProcessor;
+}
+----
+
 [[process-indicator]]
 === Preventing State Persistence
 

@@ -11,6 +11,7 @@ The Spring Batch 4.1 release adds the following features:
 * A new `@SpringBatchTest` annotation to simplify testing batch components
 * A new `@EnableBatchIntegration` annotation to simplify remote chunking configuration
 * A new `JsonItemReader` and `JsonFileItemWriter` to support the JSON format
+* Add support for validating items with the Bean Validation API
 
 [[whatsNewTesting]]
 === `@SpringBatchTest` Annotation
@@ -159,4 +160,48 @@ To add other libraries, you can implement the `JsonObjectReader` interface.
 Writing JSON data is also supported through the `JsonFileItemWriter`.
 For more details about JSON support, see the
 <<readersAndWriters.adoc#jsonReadingWriting,ItemReaders and ItemWriters>> chapter.
+
+[[whatsNewBeanValidationApi]]
+=== Bean Validation API support
+
+This release brings a new `ValidatingItemProcessor` implementation called
+`BeanValidatingItemProcessor` which allows you to validate items annotated with
+the Bean Validation API (JSR-303) annotations. For example, given the following
+type `Person`:
+
+[source, java]
+----
+class Person {
+
+    @NotEmpty
+    private String name;
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+}
+----
+
+you can validate items by declaring a `BeanValidatingItemProcessor` bean in your
+application context and register it as a processor in your chunk-oriented step:
+
+[source, java]
+----
+@Bean
+public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws Exception {
+	BeanValidatingItemProcessor<Person> beanValidatingItemProcessor = new BeanValidatingItemProcessor<>();
+	beanValidatingItemProcessor.setFilter(true);
+
+	return beanValidatingItemProcessor;
+}
+----
 

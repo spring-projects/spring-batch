@@ -72,6 +72,7 @@ allprojects {
 		h2databaseVersion = '1.4.196'
 		hibernateVersion = '5.2.12.Final'
 		hibernateValidatorVersion = '6.0.4.Final'
+		javaxElVersion = '3.0.0'
 		hsqldbVersion = '2.4.0'
 		jackson2Version = '2.9.2'
 		gsonVersion = '2.8.5'
@@ -322,7 +323,8 @@ project('spring-batch-infrastructure') {
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"
 		testRuntime "org.jruby:jruby:$jrubyVersion"
-
+		testRuntime "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
+		testRuntime "org.glassfish:javax.el:$javaxElVersion"
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
@@ -604,6 +606,8 @@ project('spring-batch-samples') {
 		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
+		testRuntime "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
+		testRuntime "org.glassfish:javax.el:$javaxElVersion"
 
 		provided "mysql:mysql-connector-java:$mysqlVersion"
 		provided "com.h2database:h2:$h2databaseVersion"
