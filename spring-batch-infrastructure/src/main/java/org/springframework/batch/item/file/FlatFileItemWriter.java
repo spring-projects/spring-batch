@@ -389,7 +389,7 @@ InitializingBean {
 	}
 
 	// Returns object representing state.
-	private OutputState getOutputState() {
+	protected OutputState getOutputState() {
 		if (state == null) {
 			File file;
 			try {
@@ -411,7 +411,7 @@ InitializingBean {
 	 * Encapsulates the runtime state of the writer. All state changing
 	 * operations on the writer go through this class.
 	 */
-	private class OutputState {
+	protected class OutputState {
 
 		private FileOutputStream os;
 
