@@ -1261,3 +1261,90 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
 
 You can find a complete example of a remote partitioning job
 link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-partitioning-sample$$[here].
+
+Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
+annotation that can be used to simplify a remote partitioning setup. This annotation provides
+two beans that can be autowired in the application context:
+
+* `RemotePartitioningMasterStepBuilderFactory`: used to configure the master step
+* `RemotePartitioningWorkerStepBuilderFactory`: used to configure the worker step
+
+These APIs will take care of configuring a number of components as described in the following diagram:
+
+.Remote Partitioning Configuration (with job repository polling)
+image::{batch-asciidoc}images/remote-partitioning-polling-config.png[Remote Partitioning Configuration (with job repository polling), scaledwidth="80%"]
+
+.Remote Partitioning Configuration (with replies aggregation)
+image::{batch-asciidoc}images/remote-partitioning-aggregation-config.png[Remote Partitioning Configuration (with replies aggregation), scaledwidth="80%"]
+
+On the master side, the `RemotePartitioningMasterStepBuilderFactory` allows you to
+configure a master step by declaring:
+
+* the `Partitioner` used to partition data
+* the output channel ("Outgoing requests") to send requests to workers
+* the input channel ("Incoming replies") to receive replies from workers (when configuring replies aggregation)
+* the poll interval and timeout parameters (when configuring job repository polling)
+
+The `MessageChannelPartitionHandler` and the `MessagingTemplate` are not needed to be explicitly configured
+(Those can still be explicitly configured if required).
+
+On the worker side, the `RemotePartitioningWorkerStepBuilderFactory` allows you to configure a worker to:
+
+* listen to requests sent by the master on the input channel ("Incoming requests")
+* call the `handle` method of `StepExecutionRequestHandler` for each request
+* send replies on the output channel ("Outgoing replies") to the master
+
+There is no need to explicitly configure the `StepExecutionRequestHandler` (which can be explicitly configured if required).
+
+The following example shows how to use these APIs:
+
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing
+@EnableBatchIntegration
+public class RemotePartitioningJobConfiguration {
+
+    @Configuration
+    public static class MasterConfiguration {
+
+        @Autowired
+        private RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
+
+        @Bean
+        public Step masterStep() {
+                 return this.masterStepBuilderFactory
+                    .get("masterStep")
+                    .partitioner("workerStep", partitioner())
+                    .gridSize(GRID_SIZE)
+                    .outputChannel(outgoingRequestsToWorkers())
+                    .inputChannel(incomingRepliesFromWorkers())
+                    .build();
+        }
+
+        // Middleware beans setup omitted
+
+    }
+
+    @Configuration
+    public static class WorkerConfiguration {
+
+        @Autowired
+        private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
+
+        @Bean
+        public Step workerStep() {
+                 return this.workerStepBuilderFactory
+                    .get("workerStep")
+                    .inputChannel(incomingRequestsFromMaster())
+                    .outputChannel(outgoingRepliesToMaster())
+                    .tasklet(tasklet()) // or chunk(CHUNK_SIZE)
+                    .build();
+        }
+
+        // Middleware beans setup omitted
+
+    }
+
+}
+----

@@ -15,18 +15,14 @@
  */
 package org.springframework.batch.sample.remotepartitioning.polling;
 
-import javax.sql.DataSource;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.partition.PartitionHandler;
-import org.springframework.batch.core.partition.support.Partitioner;
-import org.springframework.batch.integration.partition.MessageChannelPartitionHandler;
+import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
+import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
 import org.springframework.batch.sample.remotepartitioning.BasicPartitioner;
 import org.springframework.batch.sample.remotepartitioning.BrokerConfiguration;
 import org.springframework.batch.sample.remotepartitioning.DataSourceConfiguration;
@@ -34,8 +30,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
@@ -48,26 +42,22 @@ import org.springframework.integration.jms.dsl.Jms;
  */
 @Configuration
 @EnableBatchProcessing
-@EnableIntegration
+@EnableBatchIntegration
 @Import(value = {DataSourceConfiguration.class, BrokerConfiguration.class})
 public class MasterConfiguration {
 
 	private static final int GRID_SIZE = 3;
 
-	private static final long RECEIVE_TIMEOUT = 600000L;
-
-	private static final long POLL_INTERVAL = 2000L;
-
 	private final JobBuilderFactory jobBuilderFactory;
 
-	private final StepBuilderFactory stepBuilderFactory;
+	private final RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
 
 
 	public MasterConfiguration(JobBuilderFactory jobBuilderFactory,
-								StepBuilderFactory stepBuilderFactory) {
+							   RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory) {
 
 		this.jobBuilderFactory = jobBuilderFactory;
-		this.stepBuilderFactory = stepBuilderFactory;
+		this.masterStepBuilderFactory = masterStepBuilderFactory;
 	}
 
 	/*
@@ -87,36 +77,15 @@ public class MasterConfiguration {
 	}
 
 	/*
-	 * Configure master step components
+	 * Configure the master step
 	 */
 	@Bean
 	public Step masterStep() {
-		return this.stepBuilderFactory.get("masterStep")
-				.partitioner("slaveStep", partitioner())
-				.partitionHandler(partitionHandler(null))
+		return this.masterStepBuilderFactory.get("masterStep")
+				.partitioner("workerStep", new BasicPartitioner())
 				.gridSize(GRID_SIZE)
+				.outputChannel(requests())
 				.build();
-	}
-
-	@Bean
-	public Partitioner partitioner() {
-		return new BasicPartitioner();
-	}
-
-	@Bean
-	public PartitionHandler partitionHandler(DataSource dataSource) {
-		MessageChannelPartitionHandler partitionHandler = new MessageChannelPartitionHandler();
-		partitionHandler.setStepName("slaveStep");
-		partitionHandler.setGridSize(GRID_SIZE);
-		partitionHandler.setDataSource(dataSource);
-		partitionHandler.setPollInterval(POLL_INTERVAL);
-
-		MessagingTemplate template = new MessagingTemplate();
-		template.setDefaultChannel(requests());
-		template.setReceiveTimeout(RECEIVE_TIMEOUT);
-		partitionHandler.setMessagingOperations(template);
-
-		return partitionHandler;
 	}
 
 	@Bean
