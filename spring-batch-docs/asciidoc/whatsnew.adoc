@@ -9,7 +9,7 @@
 The Spring Batch 4.1 release adds the following features:
 
 * A new `@SpringBatchTest` annotation to simplify testing batch components
-* A new `@EnableBatchIntegration` annotation to simplify remote chunking configuration
+* A new `@EnableBatchIntegration` annotation to simplify remote chunking and partitioning configuration
 * A new `JsonItemReader` and `JsonFileItemWriter` to support the JSON format
 * Add support for validating items with the Bean Validation API
 
@@ -124,6 +124,55 @@ a Spring Integration flow on the worker side. You can find a remote chunking sam
 that uses these new APIs in the
 link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-chunking-sample$$[samples module]
 as well as more details in the <<spring-batch-integration.adoc#remote-chunking,Spring Batch Integration>> chapter.
+
+Just like the remote chunking configuration simplification, this version also
+introduces new APIs to simplify a remote partitioning setup:
+`RemotePartitioningMasterStepBuilder` and `RemotePartitioningWorkerStepBuilder`.
+Those can be autowired in your configuration class if the
+`@EnableBatchIntegration` is present as shown in the following example:
+
+[source, java]
+----
+@Configuration
+@EnableBatchProcessing
+@EnableBatchIntegration
+public class RemotePartitioningAppConfig {
+
+   @Autowired
+   private RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
+
+   @Autowired
+   private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
+
+   @Bean
+   public Step masterStep() {
+            return this.masterStepBuilderFactory
+               .get("masterStep")
+               .partitioner("workerStep", partitioner())
+               .gridSize(10)
+               .outputChannel(outgoingRequestsToWorkers())
+               .inputChannel(incomingRepliesFromWorkers())
+               .build();
+   }
+
+   @Bean
+   public Step workerStep() {
+            return this.workerStepBuilderFactory
+               .get("workerStep")
+               .inputChannel(incomingRequestsFromMaster())
+               .outputChannel(outgoingRepliesToMaster())
+               .chunk(100)
+               .reader(itemReader())
+               .processor(itemProcessor())
+               .writer(itemWriter())
+               .build();
+   }
+
+   // Middleware beans setup omitted
+}
+----
+
+You can find more details about these new APIs in the <<spring-batch-integration.adoc#remote-partitioning,Spring Batch Integration>> chapter.
 
 [[whatsNewJson]]
 === JSON support

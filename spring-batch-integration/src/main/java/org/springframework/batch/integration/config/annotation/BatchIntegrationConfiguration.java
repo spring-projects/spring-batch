@@ -15,9 +15,12 @@
  */
 package org.springframework.batch.integration.config.annotation;
 
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
+import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
+import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +35,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class BatchIntegrationConfiguration {
 
+	private JobExplorer jobExplorer;
+
 	private JobRepository jobRepository;
 
 	private PlatformTransactionManager transactionManager;
@@ -39,9 +44,11 @@ public class BatchIntegrationConfiguration {
 	@Autowired
 	public BatchIntegrationConfiguration(
 			JobRepository jobRepository,
+			JobExplorer jobExplorer,
 			PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
+		this.jobExplorer = jobExplorer;
 		this.transactionManager = transactionManager;
 	}
 
@@ -54,6 +61,18 @@ public class BatchIntegrationConfiguration {
 	@Bean
 	public <I,O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
 		return new RemoteChunkingWorkerBuilder<>();
+	}
+
+	@Bean
+	public RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory() {
+		return new RemotePartitioningMasterStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
+	}
+
+	@Bean
+	public RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory() {
+		return new RemotePartitioningWorkerStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
 	}
 
 }

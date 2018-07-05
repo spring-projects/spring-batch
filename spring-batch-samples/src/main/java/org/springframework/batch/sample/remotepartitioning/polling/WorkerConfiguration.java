@@ -19,24 +19,18 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.integration.partition.BeanFactoryStepLocator;
-import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
+import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
+import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.sample.remotepartitioning.BrokerConfiguration;
 import org.springframework.batch.sample.remotepartitioning.DataSourceConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.NullChannel;
-import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
@@ -49,24 +43,15 @@ import org.springframework.integration.jms.dsl.Jms;
  */
 @Configuration
 @EnableBatchProcessing
-@EnableIntegration
+@EnableBatchIntegration
 @Import(value = {DataSourceConfiguration.class, BrokerConfiguration.class})
 public class WorkerConfiguration {
 
-	private final StepBuilderFactory stepBuilderFactory;
-
-	private final ApplicationContext applicationContext;
-
-	private final JobExplorer jobExplorer;
+	private final RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
 
 
-	public WorkerConfiguration(StepBuilderFactory stepBuilderFactory,
-								JobExplorer jobExplorer,
-								ApplicationContext applicationContext) {
-
-		this.stepBuilderFactory = stepBuilderFactory;
-		this.applicationContext = applicationContext;
-		this.jobExplorer = jobExplorer;
+	public WorkerConfiguration(RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory) {
+		this.workerStepBuilderFactory = workerStepBuilderFactory;
 	}
 
 	/*
@@ -86,37 +71,19 @@ public class WorkerConfiguration {
 	}
 
 	/*
-	 * Configure outbound flow (replies going to the master)
+	 * Configure the worker step
 	 */
 	@Bean
-	public NullChannel replies() {
-		return new NullChannel(); // replies are discarded (since the master is polling the job repository)
-	}
-
-	/*
-	 * Configure worker components
-	 */
-	@Bean
-	@ServiceActivator(inputChannel = "requests", outputChannel = "replies")
-	public StepExecutionRequestHandler stepExecutionRequestHandler() {
-		StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
-		stepExecutionRequestHandler.setJobExplorer(this.jobExplorer);
-		BeanFactoryStepLocator stepLocator = new BeanFactoryStepLocator();
-		stepLocator.setBeanFactory(this.applicationContext);
-		stepExecutionRequestHandler.setStepLocator(stepLocator);
-		return stepExecutionRequestHandler;
-	}
-
-	@Bean
-	public Step slaveStep() {
-		return this.stepBuilderFactory.get("slaveStep")
-				.tasklet(getTasklet(null))
+	public Step workerStep() {
+		return this.workerStepBuilderFactory.get("workerStep")
+				.inputChannel(requests())
+				.tasklet(tasklet(null))
 				.build();
 	}
 
 	@Bean
 	@StepScope
-	public Tasklet getTasklet(@Value("#{stepExecutionContext['partition']}") String partition) {
+	public Tasklet tasklet(@Value("#{stepExecutionContext['partition']}") String partition) {
 		return (contribution, chunkContext) -> {
 			System.out.println("processing " + partition);
 			return RepeatStatus.FINISHED;
