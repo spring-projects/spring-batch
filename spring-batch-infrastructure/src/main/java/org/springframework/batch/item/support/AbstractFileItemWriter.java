@@ -57,9 +57,11 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ *
+ * @since 4.1
  */
-public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWriter<T> implements ResourceAwareItemWriterItemStream<T>,
-InitializingBean {
+public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWriter<T>
+		implements ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	public static final boolean DEFAULT_TRANSACTIONAL = true;
 
