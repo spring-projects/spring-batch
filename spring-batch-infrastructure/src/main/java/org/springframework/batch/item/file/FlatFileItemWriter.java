@@ -16,11 +16,8 @@
 
 package org.springframework.batch.item.file;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.springframework.batch.item.WriteFailedException;
-import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.Resource;
@@ -74,45 +71,13 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 		this.lineAggregator = lineAggregator;
 	}
 
-	/**
-	 * Writes out a string followed by a "new line", where the format of the new
-	 * line separator is determined by the underlying operating system. If the
-	 * input is not a String and a converter is available the converter will be
-	 * applied and then this method recursively called with the result. If the
-	 * input is an array or collection each value will be written to a separate
-	 * line (recursively calling this method for each value). If no converter is
-	 * supplied the input object's toString method will be used.<br>
-	 * 
-	 * @param items list of items to be written to output stream
-	 * @throws Exception if the transformer or file output fail,
-	 * WriterNotOpenException if the writer has not been initialized.
-	 */
 	@Override
-	public void write(List<? extends T> items) throws Exception {
-
-		if (!getOutputState().isInitialized()) {
-			throw new WriterNotOpenException("Writer must be open before it can be written to");
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Writing to flat file with " + items.size() + " items.");
-		}
-
-		OutputState state = getOutputState();
-
+	public String doWrite(List<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
-		int lineCount = 0;
 		for (T item : items) {
-			lines.append(lineAggregator.aggregate(item) + lineSeparator);
-			lineCount++;
+			lines.append(this.lineAggregator.aggregate(item)).append(this.lineSeparator);
 		}
-		try {
-			state.write(lines.toString());
-		}
-		catch (IOException e) {
-			throw new WriteFailedException("Could not write data.  The file may be corrupt.", e);
-		}
-		state.setLinesWritten(state.getLinesWritten() + lineCount);
+		return lines.toString();
 	}
 
 }

@@ -32,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.WriteFailedException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
@@ -231,7 +233,34 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * @throws Exception if an error occurs while writing items to the output stream
 	 */
 	@Override
-	public abstract void write(List<? extends T> items) throws Exception;
+	public void write(List<? extends T> items) throws Exception {
+		if (!getOutputState().isInitialized()) {
+			throw new WriterNotOpenException("Writer must be open before it can be written to");
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Writing to file with " + items.size() + " items.");
+		}
+
+		OutputState state = getOutputState();
+
+		String lines = doWrite(items);
+		try {
+			state.write(lines);
+		}
+		catch (IOException e) {
+			throw new WriteFailedException("Could not write data. The file may be corrupt.", e);
+		}
+		state.setLinesWritten(state.getLinesWritten() + items.size());
+	}
+
+	/**
+	 * Write out a string of items followed by a "new line", where the format of the new
+	 * line separator is determined by the underlying operating system.
+	 * @param items to be written
+	 * @return written lines
+	 */
+	protected abstract String doWrite(List<? extends T> items);
 
 	/**
 	 * @see ItemStream#close()

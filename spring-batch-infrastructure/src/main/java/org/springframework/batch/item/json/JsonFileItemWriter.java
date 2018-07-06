@@ -16,12 +16,9 @@
 
 package org.springframework.batch.item.json;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.batch.item.WriteFailedException;
-import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -95,22 +92,11 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	}
 
 	@Override
-	public void write(List<? extends T> items) throws Exception {
-		if (!getOutputState().isInitialized()) {
-			throw new WriterNotOpenException("Writer must be open before it can be written to");
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Writing to json file with " + items.size() + " items.");
-		}
-
-		OutputState state = getOutputState();
-
+	public String doWrite(List<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
-		int lineCount = 0;
 		Iterator<? extends T> iterator = items.iterator();
 		while (iterator.hasNext()) {
-			if (iterator.hasNext() && lineCount == 0 && state.getLinesWritten() > 0) {
+			if (iterator.hasNext() && state.getLinesWritten() > 0) {
 				lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
 			}
 			T item = iterator.next();
@@ -118,15 +104,8 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 			if (iterator.hasNext()) {
 				lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
 			}
-			lineCount++;
 		}
-		try {
-			state.write(lines.toString());
-		}
-		catch (IOException e) {
-			throw new WriteFailedException("Could not write data. The file may be corrupt.", e);
-		}
-		state.setLinesWritten(state.getLinesWritten() + lineCount);
+		return lines.toString();
 	}
 
 }
