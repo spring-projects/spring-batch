@@ -38,14 +38,14 @@ import org.springframework.integration.config.EnableIntegration;
  * <ul>
  *     <li>{@link RemoteChunkingMasterStepBuilderFactory}:
  *     used to create a master step of a remote chunking setup by automatically
- *     setting up the job repository and transaction manager.</li>
+ *     setting the job repository and transaction manager.</li>
  *     <li>{@link RemoteChunkingWorkerBuilder}: used to create the integration
  *     flow on the worker side of a remote chunking setup.</li>
  *     <li>{@link RemotePartitioningMasterStepBuilderFactory}: used to create
- *     a master step of a remote partitioning setup by automatically setting up
+ *     a master step of a remote partitioning setup by automatically setting
  *     the job repository, job explorer, bean factory and transaction manager.</li>
  *     <li>{@link RemotePartitioningWorkerStepBuilderFactory}: used to create
- *     a worker step of a remote partitioning setup by automatically setting up
+ *     a worker step of a remote partitioning setup by automatically setting
  *     the job repository, job explorer, bean factory and transaction manager.</li>
  * </ul>
  *
@@ -120,7 +120,10 @@ import org.springframework.integration.config.EnableIntegration;
  *       		.get("workerStep")
  *       		.inputChannel(incomingRequestsFromMaster())
  *       		.outputChannel(outgoingRepliesToMaster())
- *       		.tasklet(tasklet()) // or chunk(CHUNK_SIZE)
+ *       		.chunk(CHUNK_SIZE)
+ *       		.reader(itemReader())
+ *       		.processor(itemProcessor())
+ *       		.writer(itemWriter())
  *       		.build();
  * 	}
  *

@@ -16,6 +16,9 @@
 
 package org.springframework.batch.integration.partition;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
@@ -55,7 +58,8 @@ import org.springframework.util.Assert;
  *     configured with the current {@link BeanFactory} will be used
  *     <li>replies to the master on the output channel (when the master step is
  *     configured to aggregate replies from workers). If no output channel
- *     is provided, a {@link NullChannel} will be used</li>
+ *     is provided, a {@link NullChannel} will be used (assuming the master side
+ *     is configured to poll the job repository for workers status)</li>
  * </ul>
  *
  * @since 4.1
@@ -64,6 +68,7 @@ import org.springframework.util.Assert;
 public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 
 	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handle";
+	private static final Log logger = LogFactory.getLog(RemotePartitioningWorkerStepBuilder.class);
 
 	private MessageChannel inputChannel;
 	private MessageChannel outputChannel;
@@ -228,6 +233,10 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 			this.stepLocator = beanFactoryStepLocator;
 		}
 		if (this.outputChannel == null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("The output channel is set to a NullChannel. " +
+						"The master step must poll the job repository for workers status.");
+			}
 			this.outputChannel = new NullChannel();
 		}
 

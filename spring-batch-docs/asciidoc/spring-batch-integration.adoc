@@ -1262,9 +1262,8 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
 You can find a complete example of a remote partitioning job
 link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-partitioning-sample$$[here].
 
-Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
-annotation that can be used to simplify a remote partitioning setup. This annotation provides
-two beans that can be autowired in the application context:
+The `@EnableBatchIntegration` annotation that can be used to simplify a remote
+ partitioning setup. This annotation provides two beans useful for remote partitioning:
 
 * `RemotePartitioningMasterStepBuilderFactory`: used to configure the master step
 * `RemotePartitioningWorkerStepBuilderFactory`: used to configure the worker step
@@ -1338,7 +1337,10 @@ public class RemotePartitioningJobConfiguration {
                     .get("workerStep")
                     .inputChannel(incomingRequestsFromMaster())
                     .outputChannel(outgoingRepliesToMaster())
-                    .tasklet(tasklet()) // or chunk(CHUNK_SIZE)
+                    .chunk(CHUNK_SIZE)
+                    .reader(itemReader())
+                    .processor(itemProcessor())
+                    .writer(itemWriter())
                     .build();
         }
 

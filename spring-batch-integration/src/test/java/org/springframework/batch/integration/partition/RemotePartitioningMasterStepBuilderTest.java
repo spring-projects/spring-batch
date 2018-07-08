@@ -128,21 +128,6 @@ public class RemotePartitioningMasterStepBuilderTest {
 	}
 
 	@Test
-	public void timeoutMustNotBeGreaterThanZero() {
-		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The timeout must be greater than zero");
-
-		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.timeout(-1L)
-				.build();
-
-		// then
-		// expected exception
-	}
-
-	@Test
 	public void testMandatoryOutputChannel() {
 		// given
 		RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
@@ -178,7 +163,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 	}
 
 	@Test
-	public void testMasterStepCreation_whenPollingRepository() {
+	public void testMasterStepCreationWhenPollingRepository() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;

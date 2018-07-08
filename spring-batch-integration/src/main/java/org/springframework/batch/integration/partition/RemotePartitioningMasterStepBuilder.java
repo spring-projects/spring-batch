@@ -46,8 +46,8 @@ import org.springframework.util.Assert;
  * {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)},
  * this builder will create one. The <code>outputChannel</code> set with
  * {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)} will be
- * used as a default channel of the messaging template and will override any default
- * channel already set on the messaging template.
+ * used as a default channel of the messaging template and will <strong>override any default
+ * channel already set on the messaging template</strong>.
  *
  * @since 4.1
  * @author Mahmoud Ben Hassine
@@ -55,7 +55,7 @@ import org.springframework.util.Assert;
 public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 
 	private static final long DEFAULT_POLL_INTERVAL = 10000L;
-	private static final long DEFAULT_TIMEOUT = 3600000L;
+	private static final long DEFAULT_TIMEOUT = -1L;
 
 	private MessagingTemplate messagingTemplate;
 	private MessageChannel inputChannel;
@@ -128,7 +128,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the poll interval. Defaults to 10 seconds.
+	 * How often to poll the job repository for the status of the workers. Defaults to 10 seconds.
 	 * @param pollInterval the poll interval value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
@@ -139,12 +139,11 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the timeout. Defaults to 1 hour.
+	 * When using job repository polling, the time limit to wait. Defaults to -1 (no timeout).
 	 * @param timeout the timeout value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
 	public RemotePartitioningMasterStepBuilder timeout(long timeout) {
-		Assert.isTrue(timeout > 0, "The timeout must be greater than zero");
 		this.timeout = timeout;
 		return this;
 	}
@@ -196,7 +195,8 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 		try {
 			partitionHandler.afterPropertiesSet();
 			super.partitionHandler(partitionHandler);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new BeanCreationException("Unable to create a master step for remote partitioning", e);
 		}
 

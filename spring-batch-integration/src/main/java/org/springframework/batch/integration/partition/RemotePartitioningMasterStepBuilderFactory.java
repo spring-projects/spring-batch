@@ -34,9 +34,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class RemotePartitioningMasterStepBuilderFactory implements BeanFactoryAware {
 
 	private BeanFactory beanFactory;
-	private JobExplorer jobExplorer;
-	private JobRepository jobRepository;
-	private PlatformTransactionManager transactionManager;
+	final private JobExplorer jobExplorer;
+	final private JobRepository jobRepository;
+	final private PlatformTransactionManager transactionManager;
 
 
 	/**
@@ -46,8 +46,7 @@ public class RemotePartitioningMasterStepBuilderFactory implements BeanFactoryAw
 	 * @param transactionManager the transaction manager to use
 	 */
 	public RemotePartitioningMasterStepBuilderFactory(JobRepository jobRepository,
-														JobExplorer jobExplorer,
-														PlatformTransactionManager transactionManager) {
+		JobExplorer jobExplorer, PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
 		this.jobExplorer = jobExplorer;
