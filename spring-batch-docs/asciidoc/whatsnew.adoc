@@ -161,7 +161,10 @@ public class RemotePartitioningAppConfig {
                .get("workerStep")
                .inputChannel(incomingRequestsFromMaster())
                .outputChannel(outgoingRepliesToMaster())
-               .tasklet(tasklet()) // or chunk(CHUNK_SIZE)
+               .chunk(CHUNK_SIZE)
+               .reader(itemReader())
+               .processor(itemProcessor())
+               .writer(itemWriter())
                .build();
    }
 
