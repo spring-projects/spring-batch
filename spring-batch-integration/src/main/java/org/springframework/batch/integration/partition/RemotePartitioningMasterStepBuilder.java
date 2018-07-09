@@ -42,9 +42,9 @@ import org.springframework.util.Assert;
  * Builder for a master step in a remote partitioning setup. This builder creates and
  * sets a {@link MessageChannelPartitionHandler} on the master step.
  *
- * <p>If no <code>messagingTemplate</code> is provided through
+ * <p>If no {@code messagingTemplate} is provided through
  * {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)},
- * this builder will create one. The <code>outputChannel</code> set with
+ * this builder will create one. The {@code outputChannel} set with
  * {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)} will be
  * used as a default channel of the messaging template and will <strong>override any default
  * channel already set on the messaging template</strong>.
@@ -153,7 +153,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param beanFactory the bean factory to use
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder beanFactory(BeanFactory beanFactory) {
+	RemotePartitioningMasterStepBuilder beanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 		return this;
 	}

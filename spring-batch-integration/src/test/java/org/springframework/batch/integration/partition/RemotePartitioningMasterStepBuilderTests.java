@@ -43,8 +43,8 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemotePartitioningMasterStepBuilderTest.BatchConfiguration.class})
-public class RemotePartitioningMasterStepBuilderTest {
+@ContextConfiguration(classes = {RemotePartitioningMasterStepBuilderTests.BatchConfiguration.class})
+public class RemotePartitioningMasterStepBuilderTests {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();

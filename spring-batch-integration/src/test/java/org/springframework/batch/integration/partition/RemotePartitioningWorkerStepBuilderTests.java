@@ -27,7 +27,7 @@ import org.springframework.integration.channel.DirectChannel;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RemotePartitioningWorkerStepBuilderTest {
+public class RemotePartitioningWorkerStepBuilderTests {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();

@@ -945,7 +945,7 @@ two beans that can be autowired in the application context:
 * `RemoteChunkingMasterStepBuilderFactory`: used to configure the master step
 * `RemoteChunkingWorkerBuilder`: used to configure the remote worker integration flow
 
-These APIs will take care of configuring a number of components as described in the following diagram:
+These APIs take care of configuring a number of components as described in the following diagram:
 
 .Remote Chunking Configuration
 image::{batch-asciidoc}images/remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
@@ -1268,7 +1268,7 @@ The `@EnableBatchIntegration` annotation that can be used to simplify a remote
 * `RemotePartitioningMasterStepBuilderFactory`: used to configure the master step
 * `RemotePartitioningWorkerStepBuilderFactory`: used to configure the worker step
 
-These APIs will take care of configuring a number of components as described in the following diagram:
+These APIs take care of configuring a number of components as described in the following diagram:
 
 .Remote Partitioning Configuration (with job repository polling)
 image::{batch-asciidoc}images/remote-partitioning-polling-config.png[Remote Partitioning Configuration (with job repository polling), scaledwidth="80%"]
