@@ -59,9 +59,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 		this.expectedException.expectMessage("inputChannel must not be null");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.inputChannel(null)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").inputChannel(null);
 
 		// then
 		// expected exception
@@ -74,9 +72,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 		this.expectedException.expectMessage("outputChannel must not be null");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.outputChannel(null)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").outputChannel(null);
 
 		// then
 		// expected exception
@@ -89,9 +85,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 		this.expectedException.expectMessage("messagingTemplate must not be null");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.messagingTemplate(null)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").messagingTemplate(null);
 
 		// then
 		// expected exception
@@ -104,9 +98,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 		this.expectedException.expectMessage("jobExplorer must not be null");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.jobExplorer(null)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").jobExplorer(null);
 
 		// then
 		// expected exception
@@ -119,9 +111,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 		this.expectedException.expectMessage("The poll interval must be greater than zero");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.pollInterval(-1)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").pollInterval(-1);
 
 		// then
 		// expected exception
@@ -154,9 +144,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 				"not be provided in this case.");
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("step")
-				.partitionHandler(partitionHandler)
-				.build();
+		new RemotePartitioningMasterStepBuilder("step").partitionHandler(partitionHandler);
 
 		// then
 		// expected exception
@@ -208,7 +196,7 @@ public class RemotePartitioningMasterStepBuilderTest {
 	}
 
 	@Test
-	public void testMasterStepCreation_whenAggregatingReplies() {
+	public void testMasterStepCreationWhenAggregatingReplies() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;

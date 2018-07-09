@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.integration.channel.DirectChannel;
 
@@ -43,10 +42,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("inputChannel must not be null");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.inputChannel(null)
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").inputChannel(null);
 
 		// then
 		// expected exception
@@ -59,10 +55,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("outputChannel must not be null");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.outputChannel(null)
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").outputChannel(null);
 
 		// then
 		// expected exception
@@ -75,10 +68,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("jobExplorer must not be null");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.jobExplorer(null)
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").jobExplorer(null);
 
 		// then
 		// expected exception
@@ -91,10 +81,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("stepLocator must not be null");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.stepLocator(null)
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").stepLocator(null);
 
 		// then
 		// expected exception
@@ -107,10 +94,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("beanFactory must not be null");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.beanFactory(null)
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").beanFactory(null);
 
 		// then
 		// expected exception
@@ -123,9 +107,7 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("An InputChannel must be provided");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
-				.tasklet(this.tasklet)
-				.build();
+		new RemotePartitioningWorkerStepBuilder("step").tasklet(this.tasklet);
 
 		// then
 		// expected exception
@@ -139,10 +121,9 @@ public class RemotePartitioningWorkerStepBuilderTest {
 		this.expectedException.expectMessage("A JobExplorer must be provided");
 
 		// when
-		Step step = new RemotePartitioningWorkerStepBuilder("step")
+		new RemotePartitioningWorkerStepBuilder("step")
 				.inputChannel(inputChannel)
-				.tasklet(this.tasklet)
-				.build();
+				.tasklet(this.tasklet);
 
 		// then
 		// expected exception
