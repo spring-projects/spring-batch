@@ -1748,9 +1748,9 @@ staxItemWriter.write(trade);
 ----
 
 [[jsonReadingWriting]]
-=== JSON Item Readers
+=== JSON Item Readers And Writers
 
-Spring Batch provides support for reading JSON resources in the following format:
+Spring Batch provides support for reading and Writing JSON resources in the following format:
 
 [source, json]
 ----
@@ -1801,6 +1801,35 @@ public JsonItemReader<Trade> jsonItemReader() {
                  .jsonObjectReader(new JacksonJsonObjectReader<>(Trade.class))
                  .resource(new ClassPathResource("trades.json"))
                  .name("tradeJsonItemReader")
+                 .build();
+}
+----
+
+==== `JsonFileItemWriter`
+
+The `JsonFileItemWriter` delegates the marshalling of items to the
+`org.springframework.batch.item.json.JsonObjectMarshaller` interface. The contract
+of this interface is to take an object and marshall it to a JSON `String`.
+Two implementations are currently provided:
+
+* link:$$https://github.com/FasterXML/jackson$$[Jackson] through the `org.springframework.batch.item.json.JacksonJsonObjectMarshaller`
+* link:$$https://github.com/google/gson$$[Gson] through the `org.springframework.batch.item.json.GsonJsonObjectMarshaller`
+
+To be able to write JSON records, the following is needed:
+
+* `Resource`: A Spring `Resource` that represents the JSON file to write
+* `JsonObjectMarshaller`: A JSON object marshaller to marshall objects to JSON format
+
+The following example shows how to define a `JsonFileItemWriter`:
+
+[source, java]
+----
+@Bean
+public JsonFileItemWriter<Trade> jsonFileItemWriter() {
+   return new JsonFileItemWriterBuilder<Trade>()
+                 .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
+                 .resource(new ClassPathResource("trades.json"))
+                 .name("tradeJsonFileItemWriter")
                  .build();
 }
 ----
