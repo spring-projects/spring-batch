@@ -108,7 +108,7 @@ import org.springframework.integration.config.EnableIntegration;
  *       	 return this.masterStepBuilderFactory
  *       		.get("masterStep")
  *       		.partitioner("workerStep", partitioner())
- *       		.gridSize(GRID_SIZE)
+ *       		.gridSize(10)
  *       		.outputChannel(outgoingRequestsToWorkers())
  *       		.inputChannel(incomingRepliesFromWorkers())
  *       		.build();
@@ -120,7 +120,7 @@ import org.springframework.integration.config.EnableIntegration;
  *       		.get("workerStep")
  *       		.inputChannel(incomingRequestsFromMaster())
  *       		.outputChannel(outgoingRepliesToMaster())
- *       		.chunk(CHUNK_SIZE)
+ *       		.chunk(100)
  *       		.reader(itemReader())
  *       		.processor(itemProcessor())
  *       		.writer(itemWriter())

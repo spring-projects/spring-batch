@@ -134,7 +134,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	 * @param beanFactory the bean factory
 	 * @return this builder instance for fluent chaining
 	 */
-	RemotePartitioningWorkerStepBuilder beanFactory(BeanFactory beanFactory) {
+	public RemotePartitioningWorkerStepBuilder beanFactory(BeanFactory beanFactory) {
 		Assert.notNull(beanFactory, "beanFactory must not be null");
 		this.beanFactory = beanFactory;
 		return this;

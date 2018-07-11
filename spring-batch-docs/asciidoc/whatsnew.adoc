@@ -149,7 +149,7 @@ public class RemotePartitioningAppConfig {
             return this.masterStepBuilderFactory
                .get("masterStep")
                .partitioner("workerStep", partitioner())
-               .gridSize(GRID_SIZE)
+               .gridSize(10)
                .outputChannel(outgoingRequestsToWorkers())
                .inputChannel(incomingRepliesFromWorkers())
                .build();
@@ -161,7 +161,7 @@ public class RemotePartitioningAppConfig {
                .get("workerStep")
                .inputChannel(incomingRequestsFromMaster())
                .outputChannel(outgoingRepliesToMaster())
-               .chunk(CHUNK_SIZE)
+               .chunk(100)
                .reader(itemReader())
                .processor(itemProcessor())
                .writer(itemWriter())

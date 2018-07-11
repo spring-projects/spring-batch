@@ -153,7 +153,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param beanFactory the bean factory to use
 	 * @return this builder instance for fluent chaining
 	 */
-	RemotePartitioningMasterStepBuilder beanFactory(BeanFactory beanFactory) {
+	public RemotePartitioningMasterStepBuilder beanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 		return this;
 	}
