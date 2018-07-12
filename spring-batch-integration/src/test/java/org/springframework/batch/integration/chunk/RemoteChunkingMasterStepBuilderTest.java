@@ -176,13 +176,15 @@ public class RemoteChunkingMasterStepBuilderTest {
 	}
 
 	@Test
-	public void testMandatoryOutputChannel() {
+	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
 		RemoteChunkingMasterStepBuilder<String, String> builder = new RemoteChunkingMasterStepBuilder<String, String>("step")
-				.inputChannel(this.inputChannel);
+				.inputChannel(this.inputChannel)
+				.outputChannel(new DirectChannel())
+				.messagingTemplate(new MessagingTemplate());
 
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("An OutputChannel must be provided");
+		this.expectedException.expect(IllegalStateException.class);
+		this.expectedException.expectMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 
 		// when
 		TaskletStep step = builder.build();

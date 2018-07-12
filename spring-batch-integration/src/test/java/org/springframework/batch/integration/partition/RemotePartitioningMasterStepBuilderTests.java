@@ -118,12 +118,14 @@ public class RemotePartitioningMasterStepBuilderTests {
 	}
 
 	@Test
-	public void testMandatoryOutputChannel() {
+	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
-		RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
+		RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step")
+				.outputChannel(new DirectChannel())
+				.messagingTemplate(new MessagingTemplate());
 
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("An outputChannel must be provided");
+		this.expectedException.expect(IllegalStateException.class);
+		this.expectedException.expectMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 
 		// when
 		Step step = builder.build();

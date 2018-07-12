@@ -19,9 +19,9 @@ import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.util.Assert;
 
 /**
@@ -49,8 +49,8 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 
 	private ItemProcessor<I, O> itemProcessor;
 	private ItemWriter<O> itemWriter;
-	private DirectChannel inputChannel;
-	private DirectChannel outputChannel;
+	private MessageChannel inputChannel;
+	private MessageChannel outputChannel;
 
 	/**
 	 * Set the {@link ItemProcessor} to use to process items sent by the master
@@ -83,7 +83,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemoteChunkingWorkerBuilder<I, O> inputChannel(DirectChannel inputChannel) {
+	public RemoteChunkingWorkerBuilder<I, O> inputChannel(MessageChannel inputChannel) {
 		Assert.notNull(inputChannel, "inputChannel must not be null");
 		this.inputChannel = inputChannel;
 		return this;
@@ -95,7 +95,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	 * @param outputChannel the output channel
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemoteChunkingWorkerBuilder<I, O> outputChannel(DirectChannel outputChannel) {
+	public RemoteChunkingWorkerBuilder<I, O> outputChannel(MessageChannel outputChannel) {
 		Assert.notNull(outputChannel, "outputChannel must not be null");
 		this.outputChannel = outputChannel;
 		return this;

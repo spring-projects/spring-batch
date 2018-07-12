@@ -44,10 +44,12 @@ import org.springframework.util.Assert;
  *
  * <p>If no {@code messagingTemplate} is provided through
  * {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)},
- * this builder will create one. The {@code outputChannel} set with
- * {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)} will be
- * used as a default channel of the messaging template and will <strong>override any default
- * channel already set on the messaging template</strong>.
+ * this builder will create one and set its default channel to the {@code outputChannel}
+ * provided through {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)}.</p>
+ *
+ * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
+ * and that its default channel is set to an output channel on which requests to workers
+ * will be sent.</p>
  *
  * @since 4.1
  * @author Mahmoud Ben Hassine
@@ -85,14 +87,14 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the output channel on which requests to workers will be sent.
-	 * The output channel will be set as a default channel on the provided
-	 * {@link MessagingTemplate} trough
-	 * {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)}
-	 * (or the one created by this builder if no messaging template is provided).
+	 * Set the output channel on which requests to workers will be sent. By using
+	 * this setter, a default messaging template will be created and the output
+	 * channel will be set as its default channel.
+	 * <p>Use either this setter or {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)}
+	 * to provide a fully configured messaging template.</p>
+	 *
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
-	 *
 	 * @see RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)
 	 */
 	public RemotePartitioningMasterStepBuilder outputChannel(MessageChannel outputChannel) {
@@ -103,12 +105,14 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 
 	/**
 	 * Set the {@link MessagingTemplate} to use to send data to workers.
-	 * <p><strong>The default destination of the messaging template will be
-	 * overridden by the output channel provided through
-	 * {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)}</strong>.</p>
+	 * <strong>The default channel of the messaging template must be set</strong>.
+	 * <p>Use either this setter to provide a fully configured messaging template or
+	 * provide an output channel through {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)}
+	 * and a default messaging template will be created.</p>
 	 *
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
+	 * @see RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)
 	 */
 	public RemotePartitioningMasterStepBuilder messagingTemplate(MessagingTemplate messagingTemplate) {
 		Assert.notNull(messagingTemplate, "messagingTemplate must not be null");
@@ -159,13 +163,17 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	}
 
 	public Step build() {
-		Assert.notNull(this.outputChannel, "An outputChannel must be provided");
+		Assert.state(this.outputChannel == null || this.messagingTemplate == null,
+				"You must specify either an outputChannel or a messagingTemplate but not both.");
 
 		// configure messaging template
 		if (this.messagingTemplate == null) {
 			this.messagingTemplate = new MessagingTemplate();
+			this.messagingTemplate.setDefaultChannel(this.outputChannel);
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("No messagingTemplate was provided, using a default one");
+			}
 		}
-		this.messagingTemplate.setDefaultChannel(this.outputChannel);
 
 		// Configure the partition handler
 		final MessageChannelPartitionHandler partitionHandler = new MessageChannelPartitionHandler();

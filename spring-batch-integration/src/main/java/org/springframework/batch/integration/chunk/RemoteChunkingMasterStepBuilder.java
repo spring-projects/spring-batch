@@ -33,8 +33,8 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.BackOffPolicy;
@@ -47,12 +47,14 @@ import org.springframework.util.Assert;
  * Builder for a master step in a remote chunking setup. This builder creates and
  * sets a {@link ChunkMessageChannelItemWriter} on the master step.
  *
- * If no <code>messagingTemplate</code> is provided through
+ * <p>If no {@code messagingTemplate} is provided through
  * {@link RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)},
- * this builder will create one. The <code>outputChannel</code> set with
- * {@link RemoteChunkingMasterStepBuilder#outputChannel(DirectChannel)} will be
- * used as a default channel of the messaging template and will override any default
- * channel already set on the messaging template.
+ * this builder will create one and set its default channel to the {@code outputChannel}
+ * provided through {@link RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)}.</p>
+ *
+ * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
+ * and that its default channel is set to an output channel on which requests to workers
+ * will be sent.</p>
  *
  * @param <I> type of input items
  * @param <O> type of output items
@@ -64,7 +66,7 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 
 	private MessagingTemplate messagingTemplate;
 	private PollableChannel inputChannel;
-	private DirectChannel outputChannel;
+	private MessageChannel outputChannel;
 
 	private final int DEFAULT_MAX_WAIT_TIMEOUTS = 40;
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
@@ -97,17 +99,18 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	}
 
 	/**
-	 * Set the output channel on which requests to workers will be sent.
-	 * The output channel will be set as a default channel on the provided
-	 * {@link MessagingTemplate} trough {@link RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)}
-	 * (or the one created by this builder if no messaging template is provided).
+	 * Set the output channel on which requests to workers will be sent. By using
+	 * this setter, a default messaging template will be created and the output
+	 * channel will be set as its default channel.
+	 * <p>Use either this setter or {@link RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)}
+	 * to provide a fully configured messaging template.</p>
 	 *
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
 	 *
 	 * @see RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> outputChannel(DirectChannel outputChannel) {
+	public RemoteChunkingMasterStepBuilder<I, O> outputChannel(MessageChannel outputChannel) {
 		Assert.notNull(outputChannel, "outputChannel must not be null");
 		this.outputChannel = outputChannel;
 		return this;
@@ -115,13 +118,14 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 
 	/**
 	 * Set the {@link MessagingTemplate} to use to send data to workers.
-	 *
-	 * <p><strong>The default destination of the messaging template will be
-	 * overridden by the output channel provided through
-	 * {@link RemoteChunkingMasterStepBuilder#outputChannel(DirectChannel)}</strong>.</p>
+	 * <strong>The default channel of the messaging template must be set</strong>.
+	 * <p>Use either this setter to provide a fully configured messaging template or
+	 * provide an output channel through {@link RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)}
+	 * and a default messaging template will be created.</p>
 	 *
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
+	 * @see RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)
 	 */
 	public RemoteChunkingMasterStepBuilder<I, O> messagingTemplate(MessagingTemplate messagingTemplate) {
 		Assert.notNull(messagingTemplate, "messagingTemplate must not be null");
@@ -164,13 +168,17 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 */
 	public TaskletStep build() {
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");
-		Assert.notNull(this.outputChannel, "An OutputChannel must be provided");
+		Assert.state(this.outputChannel == null || this.messagingTemplate == null,
+				"You must specify either an outputChannel or a messagingTemplate but not both.");
 
 		// configure messaging template
 		if (this.messagingTemplate == null) {
 			this.messagingTemplate = new MessagingTemplate();
+			this.messagingTemplate.setDefaultChannel(this.outputChannel);
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("No messagingTemplate was provided, using a default one");
+			}
 		}
-		this.messagingTemplate.setDefaultChannel(this.outputChannel);
 
 		// configure item writer
 		ChunkMessageChannelItemWriter<O> chunkMessageChannelItemWriter = new ChunkMessageChannelItemWriter<>();
