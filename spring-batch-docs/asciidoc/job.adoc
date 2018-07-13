@@ -450,8 +450,25 @@ The `@EnableBatchProcessing` works similarly to the other
 The core interface for this configuration is the `BatchConfigurer`.
     The default implementation provides the beans mentioned above and requires a
     `DataSource` as a bean within the context to be provided.  This data
-    source will be used by the JobRepository.
+    source will be used by the JobRepository. You can customize any of these beans
+    by creating a custom implementation of the `BatchConfigurer` interface.
+    Typically, extending the `DefaultBatchConfigurer` (which is provided if a
+    `BatchConfigurer` is not found) and overriding the required getter is sufficient.
+    However, implementing your own from scratch may be required. The following
+    example shows how to provide a custom transaction manager:
 
+[source, java]
+----
+@Bean
+public BatchConfigurer batchConfigurer() {
+	return new DefaultBatchConfigurer() {
+		@Override
+		public PlatformTransactionManager getTransactionManager() {
+			return new MyTransactionManager();
+		}
+	};
+}
+----
 
 
 [NOTE]
