@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -62,6 +63,7 @@ import org.springframework.context.ApplicationContext;
  * @author Lucas Ward
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 public class JobLauncherTestUtils {
@@ -223,7 +225,7 @@ public class JobLauncherTestUtils {
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(String stepName, JobParameters jobParameters, @Nullable ExecutionContext jobExecutionContext) {
 		if (!(job instanceof StepLocator)) {
 			throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
 					+ job.getName() + " does not implement StepLocator");
