@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.lang.Nullable;
 
 /**
  * Data Access Object for job executions.
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public interface JobExecutionDao {
 
@@ -63,8 +65,10 @@ public interface JobExecutionDao {
 	 * Find the last {@link JobExecution} to have been created for a given
 	 * {@link JobInstance}.
 	 * @param jobInstance the {@link JobInstance}
-	 * @return the last {@link JobExecution} to execute for this instance
+	 * @return the last {@link JobExecution} to execute for this instance or
+	 * {@code null} if no job execution is found for the given job instance.
 	 */
+	@Nullable
 	JobExecution getLastJobExecution(JobInstance jobInstance);
 
 	/**
@@ -78,6 +82,7 @@ public interface JobExecutionDao {
 	 * @param executionId {@link Long} containing the id of the execution.
 	 * @return the {@link JobExecution} for given identifier.
 	 */
+	@Nullable
 	JobExecution getJobExecution(Long executionId);
 
 	/**

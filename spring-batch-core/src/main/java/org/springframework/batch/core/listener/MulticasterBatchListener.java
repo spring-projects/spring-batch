@@ -33,6 +33,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -130,7 +131,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	 * java.lang.Object)
 	 */
 	@Override
-	public void afterProcess(T item, S result) {
+	public void afterProcess(T item, @Nullable S result) {
 		try {
 			itemProcessListener.afterProcess(item, result);
 		}
@@ -222,7 +223,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
 	@Override
-	public void afterRead(T item) {
+	public void afterRead(@Nullable T item) {
 		try {
 			itemReadListener.afterRead(item);
 		}

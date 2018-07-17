@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should
@@ -22,7 +24,7 @@ package org.springframework.batch.core;
  * step.
  * 
  * @author Dave Syer
- * 
+ * @author Mahmoud Ben Hassine
  */
 public interface Job {
 
@@ -47,11 +49,12 @@ public interface Job {
 
 	/**
 	 * If clients need to generate new parameters for the next execution in a
-	 * sequence they can use this incrementer. The return value may be null, in
-	 * the case that this job does not have a natural sequence.
+	 * sequence they can use this incrementer. The return value may be {@code null},
+	 * in the case that this job does not have a natural sequence.
 	 * 
 	 * @return in incrementer to be used for creating new parameters
 	 */
+	@Nullable
 	JobParametersIncrementer getJobParametersIncrementer();
 
 	/**
@@ -60,7 +63,7 @@ public interface Job {
 	 * the execution.
 	 * 
 	 * @return a validator that can be used to check parameter values (never
-	 * null)
+	 * {@code null})
 	 */
 	JobParametersValidator getJobParametersValidator();
 

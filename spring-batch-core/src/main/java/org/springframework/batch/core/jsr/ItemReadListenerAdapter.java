@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.util.Assert;
  * a {@link ItemReadListener}.
  * 
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @param <T> type to be returned via a read on the associated {@link ItemReader}
  * @since 3.0
@@ -49,7 +51,7 @@ public class ItemReadListenerAdapter<T> implements ItemReadListener<T> {
 	}
 
 	@Override
-	public void afterRead(T item) {
+	public void afterRead(@Nullable T item) {
 		try {
 			delegate.afterRead(item);
 		} catch (Exception e) {

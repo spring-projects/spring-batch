@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Entry point for browsing executions of running or historical jobs and steps.
@@ -32,6 +33,7 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Dave Syer
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public interface JobExplorer {
@@ -57,7 +59,8 @@ public interface JobExplorer {
 	 * @param executionId the job execution id
 	 * @return the {@link JobExecution} with this id, or null if not found
 	 */
-	JobExecution getJobExecution(Long executionId);
+	@Nullable
+	JobExecution getJobExecution(@Nullable Long executionId);
 
 	/**
 	 * Retrieve a {@link StepExecution} by its id and parent
@@ -71,13 +74,15 @@ public interface JobExplorer {
 	 *
 	 * @see #getJobExecution(Long)
 	 */
-	StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
+	@Nullable
+	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
 
 	/**
 	 * @param instanceId {@link Long} id for the jobInstance to obtain.
 	 * @return the {@link JobInstance} with this id, or null
 	 */
-	JobInstance getJobInstance(Long instanceId);
+	@Nullable
+	JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step
@@ -99,7 +104,7 @@ public interface JobExplorer {
 	 * @param jobName the name of the job
 	 * @return the set of running executions for jobs with the specified name
 	 */
-	Set<JobExecution> findRunningJobExecutions(String jobName);
+	Set<JobExecution> findRunningJobExecutions(@Nullable String jobName);
 
 	/**
 	 * Query the repository for all unique {@link JobInstance} names (sorted
@@ -131,6 +136,6 @@ public interface JobExplorer {
 	 * @throws NoSuchJobException thrown when there is no {@link JobInstance}
 	 * for the jobName specified.
 	 */
-	int getJobInstanceCount(String jobName) throws NoSuchJobException;
+	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
 }

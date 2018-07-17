@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobKeyGenerator;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -63,12 +64,14 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return jobInstances.get(jobName + "|" + jobKeyGenerator.generateKey(jobParameters));
 	}
 
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	@Nullable
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {
 			JobInstance instance = instanceEntry.getValue();
 			if (instance.getId().equals(instanceId)) {
@@ -104,12 +107,13 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	}
 
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 		return jobExecution.getJobInstance();
 	}
 
 	@Override
-	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		int count = 0;
 
 		for (Map.Entry<String, JobInstance> instanceEntry : jobInstances.entrySet()) {

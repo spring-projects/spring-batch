@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -45,6 +46,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Stephane Nicoll
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultJobLoader implements JobLoader, InitializingBean {
 
@@ -77,9 +79,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * Creates a job loader with the job and step registries provided.
 	 *
 	 * @param jobRegistry a {@link JobRegistry}
-	 * @param stepRegistry a {@link StepRegistry}
+	 * @param stepRegistry a {@link StepRegistry} (can be {@code null})
 	 */
-	public DefaultJobLoader(JobRegistry jobRegistry, StepRegistry stepRegistry) {
+	public DefaultJobLoader(JobRegistry jobRegistry, @Nullable StepRegistry stepRegistry) {
 		this.jobRegistry = jobRegistry;
 		this.stepRegistry = stepRegistry;
 	}

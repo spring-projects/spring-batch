@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * Simple implementation of the ChunkProvider interface that does basic chunk
@@ -35,6 +36,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @see ChunkOrientedTasklet
  */
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
@@ -82,9 +84,10 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	/**
 	 * Surrounds the read call with listener callbacks.
-	 * @return item
+	 * @return the item or {@code null} if the data source is exhausted
 	 * @throws Exception is thrown if error occurs during read.
 	 */
+	@Nullable
 	protected final I doRead() throws Exception {
 		try {
 			listener.beforeRead();
@@ -146,13 +149,14 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	 *
 	 * @param contribution the current step execution contribution
 	 * @param chunk the current chunk
-	 * @return a new item for processing
+	 * @return a new item for processing or {@code null} if the data source is exhausted
 	 *
 	 * @throws SkipOverflowException if specifically the chunk is accumulating
 	 * too much data (e.g. skips) and it wants to force a commit.
 	 *
 	 * @throws Exception if there is a generic issue
 	 */
+	@Nullable
 	protected I read(StepContribution contribution, Chunk<I> chunk) throws SkipOverflowException, Exception {
 		return doRead();
 	}

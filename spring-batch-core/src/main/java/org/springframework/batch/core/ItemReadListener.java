@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ package org.springframework.batch.core;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.lang.Nullable;
 
 /**
  * Listener interface around the reading of an item.
  * 
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface ItemReadListener<T> extends StepListener {
@@ -36,7 +38,7 @@ public interface ItemReadListener<T> extends StepListener {
 	 * 
 	 * @param item returned from read()
 	 */
-	void afterRead(T item);
+	void afterRead(@Nullable T item);
 	
 	/**
 	 * Called if an error occurs while trying to read.

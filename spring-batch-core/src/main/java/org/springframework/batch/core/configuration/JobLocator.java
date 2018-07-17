@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@ package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.lang.Nullable;
 
 /**
  * A runtime service locator interface for retrieving job configurations by
  * <code>name</code>.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface JobLocator {
@@ -37,5 +39,5 @@ public interface JobLocator {
 	 * @throws NoSuchJobException if the required configuration can
 	 * not be found.
 	 */
-	Job getJob(String name) throws NoSuchJobException;
+	Job getJob(@Nullable String name) throws NoSuchJobException;
 }

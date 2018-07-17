@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import java.util.List;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  *
  * @see JobRepository
  * @see JobInstanceDao
@@ -215,6 +217,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
@@ -289,6 +292,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	@Nullable
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {

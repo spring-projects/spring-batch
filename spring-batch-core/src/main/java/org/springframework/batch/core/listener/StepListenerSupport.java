@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,14 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Basic no-op implementations of all {@link StepListener} interfaces.
  *
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
 ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListener<T, S> {
@@ -70,7 +72,7 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
 	@Override
-	public void afterRead(T item) {
+	public void afterRead(@Nullable T item) {
 	}
 
 	/* (non-Javadoc)
@@ -112,7 +114,7 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public void afterProcess(T item, S result) {
+	public void afterProcess(T item, @Nullable S result) {
 	}
 
 	/* (non-Javadoc)

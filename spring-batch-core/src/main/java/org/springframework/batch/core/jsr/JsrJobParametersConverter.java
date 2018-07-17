@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueI
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -43,6 +44,7 @@ import org.springframework.util.Assert;
  * for BATCH_JOB_INSTANCE records.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrJobParametersConverter implements JobParametersConverter, InitializingBean {
@@ -82,7 +84,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters getJobParameters(Properties properties) {
+	public JobParameters getJobParameters(@Nullable Properties properties) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		boolean runIdFound = false;
 
@@ -110,7 +112,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties getProperties(JobParameters params) {
+	public Properties getProperties(@Nullable JobParameters params) {
 		Properties properties = new Properties();
 		boolean runIdFound = false;
 
