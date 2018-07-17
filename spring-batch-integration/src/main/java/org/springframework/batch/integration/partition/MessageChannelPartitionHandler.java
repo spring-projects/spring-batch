@@ -213,7 +213,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		final Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
 
 		if(CollectionUtils.isEmpty(split)) {
-			return null;
+			return split;
 		}
 
 		int count = 0;
