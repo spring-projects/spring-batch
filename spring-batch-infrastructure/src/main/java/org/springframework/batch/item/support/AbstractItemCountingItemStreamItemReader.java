@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -49,9 +51,10 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	/**
 	 * Read next item from input.
 	 * 
-	 * @return item
+	 * @return an item or {@code null} if the data source is exhausted
 	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
+	@Nullable
 	protected abstract T doRead() throws Exception;
 
 	/**

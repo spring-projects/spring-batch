@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
+import org.springframework.lang.Nullable;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * do not rely on that data for restart (i.e. always open with a fresh context).
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  * @see ResourceArrayPropertyEditor
  * 
@@ -68,9 +70,10 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 
 	/**
 	 * Increments a counter and returns the next {@link Resource} instance from
-	 * the input, or null if none remain.
+	 * the input, or {@code null} if none remain.
 	 */
     @Override
+	@Nullable
 	public synchronized Resource read() throws Exception {
 		int index = counter.incrementAndGet() - 1;
 		if (index >= resources.length) {

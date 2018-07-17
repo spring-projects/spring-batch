@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@ package org.springframework.batch.item.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.lang.Nullable;
 import org.springframework.retry.interceptor.MethodInvocationRecoverer;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsOperations;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecoverer<T> {
@@ -42,12 +45,13 @@ public class JmsMethodInvocationRecoverer<T> implements MethodInvocationRecovere
 
 	/**
 	 * Send one message per item in the arguments list using the default destination of
-	 * the jms template. If the recovery is successful null is returned.
+	 * the jms template. If the recovery is successful {@code null} is returned.
 	 * 
 	 * @see org.springframework.retry.interceptor.MethodInvocationRecoverer#recover(Object[],
 	 * Throwable)
 	 */
     @Override
+	@Nullable
 	public T recover(Object[] items, Throwable cause) {
 		try {
 			for (Object item : items) {

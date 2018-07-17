@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -103,6 +104,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 implements InitializingBean {
@@ -492,6 +494,7 @@ implements InitializingBean {
 	 * @return the mapped object at the cursor position
 	 * @throws SQLException if interactions with the current result set fail
 	 */
+	@Nullable
 	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
 	/**

@@ -17,6 +17,7 @@
 package org.springframework.batch.item.json;
 
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 
 /**
  * Strategy interface for Json readers. Implementations are expected to use
@@ -40,9 +41,10 @@ public interface JsonObjectReader<T> {
 
 	/**
 	 * Read the next object in the Json resource if any.
-	 * @return the next object or null if the resource is exhausted
+	 * @return the next object or {@code null} if the resource is exhausted
 	 * @throws Exception if unable to read the next object
 	 */
+	@Nullable
 	T read() throws Exception;
 
 	/**

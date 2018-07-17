@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Object representing a context for an {@link ItemStream}. It is a thin wrapper
  * for a map that allows optionally for type safety on reads. It also allows for
@@ -32,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Lucas Ward
  * @author Douglas Kaminsky
+ * @author Mahmoud Ben Hassine
  */
 @SuppressWarnings("serial")
 public class ExecutionContext implements Serializable {
@@ -74,13 +77,14 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Adds a String value to the context.
+	 * Adds a String value to the context. Putting <code>null</code>
+	 * value for a given key removes the key.
 	 *
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
 
-	public void putString(String key, String value) {
+	public void putString(String key, @Nullable String value) {
 
 		put(key, value);
 	}
@@ -124,7 +128,7 @@ public class ExecutionContext implements Serializable {
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
 	 */
-	public void put(String key, Object value) {
+	public void put(String key, @Nullable Object value) {
 		if (value != null) {
 			Object result = map.put(key, value);
 			dirty = result==null || result!=null && !result.equals(value);
@@ -152,6 +156,7 @@ public class ExecutionContext implements Serializable {
 	 * @param key The key to get a value for
 	 * @return The <code>String</code> value
 	 */
+	@Nullable
 	public String getString(String key) {
 
 		return (String) readAndValidate(key, String.class);
@@ -166,6 +171,7 @@ public class ExecutionContext implements Serializable {
 	 * @return The <code>String</code> value if key is represented, specified
 	 * default otherwise
 	 */
+	@Nullable
 	public String getString(String key, String defaultString) {
 		if (!map.containsKey(key)) {
 			return defaultString;
@@ -263,6 +269,7 @@ public class ExecutionContext implements Serializable {
 	 * @param key The key to get a value for
 	 * @return The value represented by the given key
 	 */
+	@Nullable
 	public Object get(String key) {
 		return map.get(key);
 	}
@@ -333,6 +340,7 @@ public class ExecutionContext implements Serializable {
 	 *
 	 * @see java.util.Map#remove(Object)
 	 */
+	@Nullable
 	public Object remove(String key) {
 		return map.remove(key);
 	}

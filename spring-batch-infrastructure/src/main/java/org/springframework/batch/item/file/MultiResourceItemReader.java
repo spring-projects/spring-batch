@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.item.ResourceAware;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -42,6 +43,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  */
 public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -244,6 +246,12 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
 	}
 
+	/**
+	 * Getter for the current resource.
+	 * @return the current resource or {@code null} if all resources have been
+	 * processed or the first resource has not been assigned yet.
+	 */
+	@Nullable
 	public Resource getCurrentResource() {
 		if (currentResource >= resources.length || currentResource < 0) {
 			return null;

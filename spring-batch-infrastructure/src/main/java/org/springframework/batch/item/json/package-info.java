@@ -5,4 +5,7 @@
  *
  * @author Mahmoud Ben Hassine
  */
+@NonNullApi
 package org.springframework.batch.item.json;
+
+import org.springframework.lang.NonNullApi;
