@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -58,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  *
  * @see StepExecutionDao
  */
@@ -281,6 +283,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
 				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepExecutionId);

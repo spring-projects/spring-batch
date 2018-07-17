@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -58,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -241,7 +243,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public JobExecution getLastJobExecution(@Nullable JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
 
@@ -265,6 +267,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * getLastJobExecution(java.lang.String)
 	 */
 	@Override
+	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
 		try {
 			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),

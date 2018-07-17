@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.scope.context;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Central convenience class for framework use in managing the step scope
@@ -28,6 +29,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepSynchronizationManager {
@@ -55,11 +57,12 @@ public class StepSynchronizationManager {
 	};
 
 	/**
-	 * Getter for the current context if there is one, otherwise returns null.
+	 * Getter for the current context if there is one, otherwise returns {@code null}.
 	 *
-	 * @return the current {@link StepContext} or null if there is none (if one
+	 * @return the current {@link StepContext} or {@code null} if there is none (if one
 	 * has not been registered for this thread).
 	 */
+	@Nullable
 	public static StepContext getContext() {
 		return manager.getContext();
 	}

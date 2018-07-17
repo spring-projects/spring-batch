@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.lang.Nullable;
 
 
 /**
@@ -29,6 +30,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  *
  * @author Dave Syer
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public abstract class SynchronizationManagerSupport<E, C> {
@@ -61,11 +63,12 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	private final Map<E, C> contexts = new ConcurrentHashMap<E, C>();
 
 	/**
-	 * Getter for the current context if there is one, otherwise returns null.
+	 * Getter for the current context if there is one, otherwise returns {@code null}.
 	 *
-	 * @return the current context or null if there is none (if one
+	 * @return the current context or {@code null} if there is none (if one
 	 *         has not been registered for this thread).
 	 */
+	@Nullable
 	public C getContext() {
 		if (getCurrent().isEmpty()) {
 			return null;
@@ -84,7 +87,8 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @return a new context or the current one if it has the same
 	 *         execution
 	 */
-	public C register(E execution) {
+	@Nullable
+	public C register(@Nullable E execution) {
 		if (execution == null) {
 			return null;
 		}
@@ -111,7 +115,8 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @return a new context or the current one if it has the same
 	 *         execution
 	 */
-	public C register(E execution, BatchPropertyContext propertyContext) {
+	@Nullable
+	public C register(@Nullable E execution, @Nullable BatchPropertyContext propertyContext) {
 		if (execution == null) {
 			return null;
 		}
@@ -197,6 +202,6 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	protected abstract void close(C context);
 
-	protected abstract C createNewContext(E execution, BatchPropertyContext propertyContext);
+	protected abstract C createNewContext(E execution, @Nullable BatchPropertyContext propertyContext);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
 
@@ -179,6 +180,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	@Override
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
 	UnexpectedJobExecutionException {
+
+		Assert.notNull(stepExecution, "stepExecution must not be null");
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing: id=" + stepExecution.getId());

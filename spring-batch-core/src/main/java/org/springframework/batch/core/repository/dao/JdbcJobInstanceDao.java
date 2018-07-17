@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -51,6 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 JobInstanceDao, InitializingBean {
@@ -130,6 +132,7 @@ JobInstanceDao, InitializingBean {
 	 *             if any {@link JobParameters} fields are null.
 	 */
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(final String jobName,
 			final JobParameters jobParameters) {
 
@@ -166,7 +169,8 @@ JobInstanceDao, InitializingBean {
 	 * (java.lang.Long)
 	 */
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	@Nullable
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID),
@@ -241,6 +245,7 @@ JobInstanceDao, InitializingBean {
 	 * (org.springframework.batch.core.JobExecution)
 	 */
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
@@ -256,7 +261,7 @@ JobInstanceDao, InitializingBean {
 	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(java.lang.String)
 	 */
 	@Override
-	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 
 		try {
 			return getJdbcTemplate().queryForObject(

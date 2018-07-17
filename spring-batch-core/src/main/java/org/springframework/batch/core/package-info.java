@@ -4,5 +4,9 @@
  * There is a reference implementation of the core interfaces in the execution module.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
+@NonNullApi
 package org.springframework.batch.core;
+
+import org.springframework.lang.NonNullApi;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,7 @@ import java.util.Set;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  * @see JobExplorer
  * @see JobInstanceDao
@@ -157,7 +159,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * .lang.Long)
 	 */
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
 	}
 
@@ -187,7 +189,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstanceCount(java.lang.String)
 	 */
 	@Override
-	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
 	}
 

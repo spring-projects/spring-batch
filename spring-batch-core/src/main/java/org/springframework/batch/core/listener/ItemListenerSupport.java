@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.lang.Nullable;
 
 /**
  * Basic no-op implementation of the {@link ItemReadListener},
@@ -28,6 +29,7 @@ import org.springframework.batch.core.ItemWriteListener;
  * at once.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ItemListenerSupport<I, O> implements ItemReadListener<I>, ItemProcessListener<I, O>, ItemWriteListener<O> {
@@ -66,7 +68,7 @@ public class ItemListenerSupport<I, O> implements ItemReadListener<I>, ItemProce
 	 *      java.lang.Object)
 	 */
 	@Override
-	public void afterProcess(I item, O result) {
+	public void afterProcess(I item, @Nullable O result) {
 	}
 
 	/*

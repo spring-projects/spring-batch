@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -46,6 +47,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepContext extends SynchronizedAttributeAccessor {
@@ -184,6 +186,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
 	@Override
+	@Nullable
 	public Object removeAttribute(String name) {
 		unregisterDestructionCallbacks(name);
 		return super.removeAttribute(name);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -32,6 +33,7 @@ import org.springframework.util.ObjectUtils;
  * callback inside a {@link Step}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class StepContextRepeatCallback implements RepeatCallback {
@@ -60,6 +62,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */
 	@Override
+	@Nullable
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 
 		// The StepContext has to be the same for all chunks,
@@ -106,6 +109,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * @throws Exception implementations can throw an exception if anything goes
 	 * wrong
 	 */
+	@Nullable
 	public abstract RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception;
 
 }

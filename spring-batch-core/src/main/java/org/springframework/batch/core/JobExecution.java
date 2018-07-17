@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,14 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Batch domain object representing the execution of a job.
  *
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -91,7 +93,7 @@ public class JobExecution extends Entity {
 	 * @param jobConfigurationName {@link String} instance that represents the
 	 * job configuration name (used with JSR-352).
 	 */
-	public JobExecution(JobInstance job, Long id, JobParameters jobParameters, String jobConfigurationName) {
+	public JobExecution(JobInstance job, Long id, @Nullable JobParameters jobParameters, String jobConfigurationName) {
 		super(id);
 		this.jobInstance = job;
 		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;

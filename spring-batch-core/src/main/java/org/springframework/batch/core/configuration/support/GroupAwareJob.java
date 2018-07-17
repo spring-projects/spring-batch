@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -32,6 +33,7 @@ import org.springframework.util.ClassUtils;
  *
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class GroupAwareJob implements Job {
@@ -58,10 +60,10 @@ public class GroupAwareJob implements Job {
 	/**
 	 * Create a new {@link Job} with the given group name and delegate.
 	 *
-	 * @param groupName the group name to prepend
+	 * @param groupName the group name to prepend (can be {@code null})
 	 * @param delegate a delegate for the features of a regular Job
 	 */
-	public GroupAwareJob(String groupName, Job delegate) {
+	public GroupAwareJob(@Nullable String groupName, Job delegate) {
 		super();
 		this.groupName = groupName;
 		this.delegate = delegate;
@@ -89,6 +91,7 @@ public class GroupAwareJob implements Job {
 	}
 
 	@Override
+	@Nullable
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return delegate.getJobParametersIncrementer();
 	}

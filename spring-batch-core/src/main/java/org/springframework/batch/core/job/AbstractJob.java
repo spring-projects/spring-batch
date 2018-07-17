@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -54,6 +55,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 InitializingBean {
@@ -211,6 +213,7 @@ InitializingBean {
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
 	@Override
+	@Nullable
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
 	}
@@ -286,6 +289,8 @@ InitializingBean {
 	 */
 	@Override
 	public final void execute(JobExecution execution) {
+
+		Assert.notNull(execution, "jobExecution must not be null");
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Job execution starting: " + execution);

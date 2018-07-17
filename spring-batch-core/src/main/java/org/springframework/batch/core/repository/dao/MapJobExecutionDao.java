@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.SerializationUtils;
 
@@ -106,7 +107,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	}
 
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public JobExecution getLastJobExecution(@Nullable JobInstance jobInstance) {
 		JobExecution lastExec = null;
 		for (JobExecution exec : executionsById.values()) {
 			if (!exec.getJobInstance().equals(jobInstance)) {
@@ -148,6 +149,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	 * (java.lang.Long)
 	 */
 	@Override
+	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
 		return copy(executionsById.get(executionId));
 	}

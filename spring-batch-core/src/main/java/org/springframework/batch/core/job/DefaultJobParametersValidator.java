@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,14 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
  * Default implementation of {@link JobParametersValidator}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultJobParametersValidator implements JobParametersValidator, InitializingBean {
@@ -83,7 +85,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * @throws JobParametersInvalidException if the parameters are not valid
 	 */
 	@Override
-	public void validate(JobParameters parameters) throws JobParametersInvalidException {
+	public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
 
 		if (parameters == null) {
 			throw new JobParametersInvalidException("The JobParameters can not be null");
