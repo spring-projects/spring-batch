@@ -41,6 +41,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -61,7 +62,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		Long count = 0L;
 
 		@Override
-		public JobParameters getNext(JobParameters parameters) {
+		public JobParameters getNext(@Nullable JobParameters parameters) {
 			return new JobParameters(Collections.singletonMap("count", new JobParameter(count++)));
 		}
 

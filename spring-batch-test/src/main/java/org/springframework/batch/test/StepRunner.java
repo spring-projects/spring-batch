@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Utility class for executing steps outside of a {@link Job}. This is useful in
@@ -61,6 +62,7 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Dan Garrette
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see SimpleJob
  */
@@ -100,7 +102,7 @@ public class StepRunner {
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(Step step, ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(Step step, @Nullable ExecutionContext jobExecutionContext) {
 		return this.launchStep(step, this.makeUniqueJobParameters(), jobExecutionContext);
 	}
 
@@ -126,7 +128,7 @@ public class StepRunner {
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(Step step, JobParameters jobParameters, final ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(Step step, JobParameters jobParameters, @Nullable final ExecutionContext jobExecutionContext) {
 		//
 		// Create a fake job
 		//
