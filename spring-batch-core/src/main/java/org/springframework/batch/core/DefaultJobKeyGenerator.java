@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.Assert;
+
 /**
  * Default implementation of the {@link JobKeyGenerator} interface.
  * This implementation provides a single hash value based on the JobParameters
@@ -31,6 +33,7 @@ import java.util.Map;
  * are used in the calculation of the key.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
@@ -42,6 +45,7 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 	@Override
 	public String generateKey(JobParameters source) {
 
+		Assert.notNull(source, "source must not be null");
 		Map<String, JobParameter> props = source.getParameters();
 		StringBuilder stringBuffer = new StringBuilder();
 		List<String> keys = new ArrayList<String>(props.keySet());

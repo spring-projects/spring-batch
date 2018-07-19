@@ -29,6 +29,11 @@ public class DefaultJobKeyGeneratorTests {
 		jobKeyGenerator = new DefaultJobKeyGenerator();
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullParameters() {
+		jobKeyGenerator.generateKey(null);
+	}
+
 	@Test
 	public void testMixedParameters() {
 		JobParameters jobParameters1 = new JobParametersBuilder().addString(

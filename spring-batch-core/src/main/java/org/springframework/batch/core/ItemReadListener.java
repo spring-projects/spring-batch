@@ -17,7 +17,6 @@ package org.springframework.batch.core;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.lang.Nullable;
 
 /**
  * Listener interface around the reading of an item.
@@ -34,11 +33,13 @@ public interface ItemReadListener<T> extends StepListener {
 	void beforeRead();
 	
 	/**
-	 * Called after {@link ItemReader#read()}
+	 * Called after {@link ItemReader#read()}.
+	 * This method is called only for actual items (ie it is not called when the
+	 * reader returns null).
 	 * 
 	 * @param item returned from read()
 	 */
-	void afterRead(@Nullable T item);
+	void afterRead(T item);
 	
 	/**
 	 * Called if an error occurs while trying to read.
