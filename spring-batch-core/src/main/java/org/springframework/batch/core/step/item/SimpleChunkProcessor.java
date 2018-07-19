@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -42,17 +43,20 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
 
 	/**
-	 * Default constructor for ease of configuration (both itemWriter and
-	 * itemProcessor are mandatory).
+	 * Default constructor for ease of configuration.
 	 */
 	@SuppressWarnings("unused")
 	private SimpleChunkProcessor() {
 		this(null, null);
 	}
 
-	public SimpleChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
+	public SimpleChunkProcessor(@Nullable ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		this.itemProcessor = itemProcessor;
 		this.itemWriter = itemWriter;
+	}
+
+	public SimpleChunkProcessor(ItemWriter<? super O> itemWriter) {
+		this(null, itemWriter);
 	}
 
 	/**
@@ -77,7 +81,6 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(itemWriter, "ItemWriter must be set");
-		Assert.notNull(itemProcessor, "ItemProcessor must be set");
 	}
 
 	/**
