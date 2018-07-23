@@ -373,6 +373,8 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
+		// JSR-305 only used for non-required meta-annotations
+		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
 	}
 
 	if (project.hasProperty('platformVersion')) {
