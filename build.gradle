@@ -288,6 +288,9 @@ project('spring-batch-core') {
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
+		// JSR-305 only used for non-required meta-annotations
+		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
 	}
 }
 
@@ -374,6 +377,7 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 		// JSR-305 only used for non-required meta-annotations
+		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
 	}
 
