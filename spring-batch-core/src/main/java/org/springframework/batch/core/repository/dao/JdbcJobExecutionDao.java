@@ -243,7 +243,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public JobExecution getLastJobExecution(@Nullable JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
 
