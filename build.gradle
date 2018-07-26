@@ -555,6 +555,9 @@ project('spring-batch-integration') {
 		optional "org.springframework:spring-jms:$springVersion"
 
 		optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+
+		// JSR-305 only used for non-required meta-annotations
+		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 	}
 }
 

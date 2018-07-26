@@ -20,7 +20,6 @@ import org.springframework.messaging.PollableChannel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +50,7 @@ public class MessageChannelPartitionHandlerTests {
 		//execute
 		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
 		//verify
-		assertNull(executions);
+		assertTrue(executions.isEmpty());
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
