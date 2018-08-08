@@ -16,15 +16,10 @@
 
 package org.springframework.batch.core;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.util.Assert;
+
+import java.util.*;
 
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
@@ -230,9 +225,16 @@ public class JobParametersBuilder {
 	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
 		Assert.notNull(jobParameters, "jobParameters must not be null");
 
-		this.parameterMap.putAll(jobParameters.getParameters());
+		this.parameterMap.putAll(merge(jobParameters));
 
 		return this;
+	}
+
+	private Map<String, JobParameter> merge(JobParameters jobParameters) {
+		Map<String, JobParameter> merged = new LinkedHashMap<>();
+		merged.putAll(jobParameters.getParameters());
+		merged.putAll(this.parameterMap);
+		return merged;
 	}
 
 	/**
