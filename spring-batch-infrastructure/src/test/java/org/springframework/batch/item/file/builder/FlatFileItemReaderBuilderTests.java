@@ -24,6 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.FieldSetFactory;
 import org.springframework.batch.item.file.transform.Range;
@@ -73,6 +74,44 @@ public class FlatFileItemReaderBuilderTests {
 				.name("fooReader")
 				.resource(getResource("1,2,3"))
 				.delimited()
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		assertNull(reader.read());
+	}
+
+	@Test
+	public void testSimpleDelimitedWithWhitespaceCharacter() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1 2 3"))
+				.delimited()
+				.delimiter(" ")
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		assertNull(reader.read());
+	}
+
+	@Test
+	public void testSimpleDelimitedWithTabCharacter() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1\t2\t3"))
+				.delimited()
+				.delimiter(DelimitedLineTokenizer.DELIMITER_TAB)
 				.names(new String[] {"first", "second", "third"})
 				.targetType(Foo.class)
 				.build();
