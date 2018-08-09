@@ -219,6 +219,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Copy job parameters into the current state.
+	 * Current state is Supplied Job Parameter
 	 * @param jobParameters parameters to copy in
 	 * @return a reference to this object.
 	 */
@@ -230,6 +231,12 @@ public class JobParametersBuilder {
 		return this;
 	}
 
+	/**
+	 * Newly received job parameters have the same key but different values.
+	 * The previously failed job parameter is entered first, and the newly received job parameter overwrites it.
+	 * @param jobParameters
+	 * @return
+	 */
 	private Map<String, JobParameter> merge(JobParameters jobParameters) {
 		Map<String, JobParameter> merged = new LinkedHashMap<>();
 		merged.putAll(jobParameters.getParameters());

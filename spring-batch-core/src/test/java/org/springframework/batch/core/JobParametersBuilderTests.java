@@ -15,19 +15,13 @@
  */
 package org.springframework.batch.core;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -64,6 +58,10 @@ public class JobParametersBuilderTests {
 		this.parametersBuilder = new JobParametersBuilder(this.jobExplorer);
 	}
 
+	/**
+	 * Newly received job parameters have the same key but different values.
+	 * The previously failed job parameter is entered first, and the newly received job parameter overwrites it.
+	 */
 	@Test
 	public void testAddingExistingJobParameters() {
 		JobParameters params1 = new JobParametersBuilder()
@@ -81,7 +79,7 @@ public class JobParametersBuilderTests {
 				.addJobParameters(params2)
 				.toJobParameters();
 
-		assertEquals(finalParams.getString("foo"), "baz");
+		assertEquals(finalParams.getString("foo"), "bar");
 		assertEquals(finalParams.getString("bar"), "baz");
 		assertEquals(finalParams.getString("baz"), "quix");
 	}
