@@ -22,7 +22,6 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
 
 /**
  * A {@link ChannelInterceptor} that adds the current {@link StepExecution} (if
@@ -34,7 +33,7 @@ import org.springframework.messaging.support.ChannelInterceptorAdapter;
  * @author Dave Syer
  *
  */
-public class StepExecutionInterceptor extends ChannelInterceptorAdapter {
+public class StepExecutionInterceptor implements ChannelInterceptor {
 
 	/**
 	 * The name of the header

@@ -17,13 +17,13 @@ package org.springframework.batch.item.xml;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Unmarshaller;
-import org.springframework.oxm.castor.CastorMarshaller;
 
 public class CastorUnmarshallingTests extends AbstractStaxEventReaderItemReaderTests {
 
 	@Override
 	protected Unmarshaller getUnmarshaller() throws Exception {
-		CastorMarshaller unmarshaller = new CastorMarshaller();
+		@SuppressWarnings("deprecation")
+		org.springframework.oxm.castor.CastorMarshaller unmarshaller = new org.springframework.oxm.castor.CastorMarshaller();
 		unmarshaller.setMappingLocation(new ClassPathResource("mapping-castor.xml", getClass()));
 		// alternatively target class can be set
 		//unmarshaller.setTargetClass(Trade.class);

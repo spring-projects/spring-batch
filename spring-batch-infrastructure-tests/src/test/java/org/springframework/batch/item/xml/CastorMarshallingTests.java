@@ -17,14 +17,14 @@ package org.springframework.batch.item.xml;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Marshaller;
-import org.springframework.oxm.castor.CastorMarshaller;
 
 public class CastorMarshallingTests extends AbstractStaxEventWriterItemWriterTests {
 
 	@Override
 	protected Marshaller getMarshaller() throws Exception {
 
-		CastorMarshaller marshaller = new CastorMarshaller();
+		@SuppressWarnings("deprecation")
+		org.springframework.oxm.castor.CastorMarshaller marshaller = new org.springframework.oxm.castor.CastorMarshaller();
 		// marshaller.setTargetClass(Trade.class);
 		marshaller.setMappingLocation(new ClassPathResource("mapping-castor.xml", getClass()));
 		// there is no way to call

@@ -23,7 +23,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
@@ -55,6 +54,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
     @Override
 	public void afterPropertiesSet() throws Exception {
+		Assert.state(step != null, "A Step must be provided.");
 	}
 
 	/**
@@ -74,7 +74,6 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 *
 	 * @param step the {@link Step} instance to use to execute business logic
 	 */
-    @Required
 	public void setStep(Step step) {
 		this.step = step;
 	}

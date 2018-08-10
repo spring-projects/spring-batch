@@ -77,6 +77,20 @@ public class TaskExecutorPartitionHandlerTests {
 	}
 
 	@Test
+	public void testConfiguration() throws Exception {
+		handler = new TaskExecutorPartitionHandler();
+		try {
+			handler.afterPropertiesSet();
+			fail("Expected IllegalStateException when no step is set");
+		}
+		catch (IllegalStateException e) {
+			// expected
+			String message = e.getMessage();
+			assertEquals("Wrong message: " + message, "A Step must be provided.", message);
+		}
+	}
+
+	@Test
 	public void testNullStep() throws Exception {
 		handler = new TaskExecutorPartitionHandler();
 		try {

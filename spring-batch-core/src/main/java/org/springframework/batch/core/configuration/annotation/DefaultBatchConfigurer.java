@@ -51,7 +51,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	 * values are passed are ignored (to prevent {@code}@Autowired{@code} from overwriting
 	 * the value).
 	 *
-	 * @param dataSource
+	 * @param dataSource The data source to use
 	 */
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {

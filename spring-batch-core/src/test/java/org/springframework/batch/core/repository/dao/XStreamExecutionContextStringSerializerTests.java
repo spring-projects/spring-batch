@@ -28,6 +28,7 @@ public class XStreamExecutionContextStringSerializerTests extends AbstractExecut
 
 	@Before
 	public void onSetUp() throws Exception {
+		@SuppressWarnings("deprecation")
 		XStreamExecutionContextStringSerializer serializerDeserializer = new XStreamExecutionContextStringSerializer();
 		(serializerDeserializer).afterPropertiesSet();
 

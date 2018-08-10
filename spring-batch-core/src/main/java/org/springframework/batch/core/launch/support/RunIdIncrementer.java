@@ -47,7 +47,7 @@ public class RunIdIncrementer implements JobParametersIncrementer {
 
 		JobParameters params = (parameters == null) ? new JobParameters() : parameters;
 
-		long id = params.getLong(key, 0L) + 1;
+		long id = params.getLong(key, new Long(0)) + 1;
 		return new JobParametersBuilder(params).addLong(key, id).toJobParameters();
 	}
 

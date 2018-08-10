@@ -183,7 +183,7 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryProvider(HibernateQueryProvider)
 	 */
-	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider queryProvider) {
+	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider<T> queryProvider) {
 		this.queryProvider = queryProvider;
 
 		return this;

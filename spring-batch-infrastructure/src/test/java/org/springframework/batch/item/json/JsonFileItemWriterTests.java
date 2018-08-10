@@ -22,7 +22,10 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
@@ -31,16 +34,17 @@ import org.springframework.core.io.Resource;
 /**
  * @author Mahmoud Ben Hassine
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JsonFileItemWriterTests {
 
 	private Resource resource;
+	@Mock
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@Before
 	public void setUp() throws Exception {
 		File file = Files.createTempFile("test", "json").toFile();
 		this.resource = new FileSystemResource(file);
-		this.jsonObjectMarshaller = Mockito.mock(JsonObjectMarshaller.class);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -118,7 +118,7 @@ public class StepBuilderTests {
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		SimpleStepBuilder builder = new StepBuilder("step")
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
 				.repository(jobRepository)
 				.transactionManager(transactionManager)
 				.chunk(5)
@@ -137,7 +137,7 @@ public class StepBuilderTests {
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		SimpleStepBuilder builder = new StepBuilder("step")
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
 				.repository(jobRepository)
 				.transactionManager(transactionManager)
 				.chunk(5)

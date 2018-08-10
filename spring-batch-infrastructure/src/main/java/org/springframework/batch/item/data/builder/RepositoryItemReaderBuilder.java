@@ -53,7 +53,7 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private String methodName;
 
-	private RepositoryMethodReference repositoryMethodReference;
+	private RepositoryMethodReference<?> repositoryMethodReference;
 
 	private boolean saveState = true;
 
@@ -213,7 +213,7 @@ public class RepositoryItemReaderBuilder<T> {
 	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
 	 *
 	 */
-	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference repositoryMethodReference) {
+	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference<?> repositoryMethodReference) {
 		this.repositoryMethodReference = repositoryMethodReference;
 
 		return this;
@@ -275,6 +275,7 @@ public class RepositoryItemReaderBuilder<T> {
 		 * information about the method.
 		 * @return T is a proxy of the object passed in in the constructor
 		 */
+		@SuppressWarnings("unchecked")
 		public T methodIs() {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(this.repository.getClass());
