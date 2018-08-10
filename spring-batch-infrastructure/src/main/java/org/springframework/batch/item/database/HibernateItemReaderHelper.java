@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,10 @@ import org.springframework.util.StringUtils;
  * queries.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("rawtype")
+@SuppressWarnings("rawtypes")
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;

@@ -139,6 +139,7 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * slow workers time to finish, and responsiveness if there is a dead worker. Defaults to 40.
 	 *
 	 * @param maxWaitTimeouts the maximum number of wait timeouts
+	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setMaxWaitTimeouts(int)
 	 */
 	public RemoteChunkingMasterStepBuilder<I, O> maxWaitTimeouts(int maxWaitTimeouts) {
@@ -152,6 +153,7 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * overwhelming the receivers.
 	 *
 	 * @param throttleLimit the throttle limit to set
+	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setThrottleLimit(long)
 	 */
 	public RemoteChunkingMasterStepBuilder<I, O> throttleLimit(long throttleLimit) {

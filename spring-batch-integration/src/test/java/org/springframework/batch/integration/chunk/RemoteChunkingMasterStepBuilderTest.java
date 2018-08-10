@@ -235,6 +235,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 	 * The following test is to cover setters that override those from parent builders.
 	 */
 	@Test
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void testSetters() throws Exception {
 		// when
 		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute();

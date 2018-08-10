@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package org.springframework.batch.item.data.builder;
 
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -33,6 +30,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link RepositoryItemWriter}.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see RepositoryItemWriter
  */
@@ -136,6 +134,7 @@ public class RepositoryItemWriterBuilder<T> {
 		 * information about the method.
 		 * @return T is a proxy of the object passed in in the constructor
 		 */
+		@SuppressWarnings("unchecked")
 		public T methodIs() {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(this.repository.getClass());

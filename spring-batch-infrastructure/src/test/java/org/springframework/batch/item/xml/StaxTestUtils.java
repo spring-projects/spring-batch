@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import javax.xml.transform.Source;
 public final class StaxTestUtils {
 
 	public static XMLEventWriter getXmlEventWriter(Result r) throws Exception {
-	    Method m = r.getClass().getDeclaredMethod("getXMLEventWriter", new Class[]{});
+	    Method m = r.getClass().getDeclaredMethod("getXMLEventWriter");
 	    boolean accessible = m.isAccessible();
 	    m.setAccessible(true);
 	    Object result = m.invoke(r);
@@ -37,7 +37,7 @@ public final class StaxTestUtils {
 	}
 
 	public static XMLEventReader getXmlEventReader(Source s) throws Exception {
-	    Method m = s.getClass().getDeclaredMethod("getXMLEventReader", new Class[]{});
+	    Method m = s.getClass().getDeclaredMethod("getXMLEventReader");
 	    boolean accessible = m.isAccessible();
 	    m.setAccessible(true);
 	    Object result = m.invoke(s);

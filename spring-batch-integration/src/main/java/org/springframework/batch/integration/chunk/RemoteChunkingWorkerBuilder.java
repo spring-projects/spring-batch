@@ -108,6 +108,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	 *
 	 * @return the integration flow
 	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public IntegrationFlow build() {
 		Assert.notNull(this.itemWriter, "An ItemWriter must be provided");
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");

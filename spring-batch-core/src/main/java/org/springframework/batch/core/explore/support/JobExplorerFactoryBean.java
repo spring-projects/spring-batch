@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -47,6 +46,7 @@ import org.springframework.util.Assert;
  * to describe what kind of database they are using.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
@@ -71,7 +71,7 @@ implements InitializingBean {
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
-	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
+	 * The default, if not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
 	 *
 	 * @param serializer used to serialize/deserialize an {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
@@ -124,7 +124,7 @@ implements InitializingBean {
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
-			jdbcOperations = new JdbcTemplate(dataSource);	
+			jdbcOperations = new JdbcTemplate(dataSource);
 		}	
 
 		if(serializer == null) {

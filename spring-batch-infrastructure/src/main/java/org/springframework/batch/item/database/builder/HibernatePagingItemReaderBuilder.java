@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see HibernatePagingItemReader
  */
@@ -182,7 +183,7 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryProvider(HibernateQueryProvider)
 	 */
-	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider queryProvider) {
+	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider<T> queryProvider) {
 		this.queryProvider = queryProvider;
 
 		return this;
