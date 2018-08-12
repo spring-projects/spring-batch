@@ -48,7 +48,7 @@ public class ExecutionContext implements Serializable {
 	 * internal map.
 	 */
 	public ExecutionContext() {
-		map = new ConcurrentHashMap<String, Object>();
+		this.map = new ConcurrentHashMap<>();
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class ExecutionContext implements Serializable {
 	 * @param map Initial contents of context.
 	 */
 	public ExecutionContext(Map<String, Object> map) {
-		this.map = new ConcurrentHashMap<String, Object>(map);
+		this.map = new ConcurrentHashMap<>(map);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public void putLong(String key, long value) {
 
-		put(key, Long.valueOf(value));
+		put(key, value);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class ExecutionContext implements Serializable {
 	 * @param value Value to associate with key
 	 */
 	public void putInt(String key, int value) {
-		put(key, Integer.valueOf(value));
+		put(key, value);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public void putDouble(String key, double value) {
 
-		put(key, Double.valueOf(value));
+		put(key, value);
 	}
 
 	/**
@@ -130,12 +130,12 @@ public class ExecutionContext implements Serializable {
 	 */
 	public void put(String key, @Nullable Object value) {
 		if (value != null) {
-			Object result = map.put(key, value);
-			dirty = result==null || result!=null && !result.equals(value);
+			Object result = this.map.put(key, value);
+			this.dirty = result==null || result!=null && !result.equals(value);
 		}
 		else {
-			Object result = map.remove(key);
-			dirty = result!=null;
+			Object result = this.map.remove(key);
+			this.dirty = result!=null;
 		}
 	}
 
@@ -147,7 +147,7 @@ public class ExecutionContext implements Serializable {
 	 * @return True if "put" operation has occurred since flag was last cleared
 	 */
 	public boolean isDirty() {
-		return dirty;
+		return this.dirty;
 	}
 
 	/**
@@ -267,11 +267,12 @@ public class ExecutionContext implements Serializable {
 	 * Getter for the value represented by the provided key.
 	 *
 	 * @param key The key to get a value for
-	 * @return The value represented by the given key
+	 * @return The value represented by the given key or {@code null} if the key
+	 * is not present
 	 */
 	@Nullable
 	public Object get(String key) {
-		return map.get(key);
+		return this.map.get(key);
 	}
 
 	/**
@@ -301,14 +302,14 @@ public class ExecutionContext implements Serializable {
 	 * @see java.util.Map#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return map.isEmpty();
+		return this.map.isEmpty();
 	}
 
 	/**
 	 * Clears the dirty flag.
 	 */
 	public void clearDirtyFlag() {
-		dirty = false;
+		this.dirty = false;
 	}
 
 	/**
@@ -318,7 +319,7 @@ public class ExecutionContext implements Serializable {
 	 * @see java.util.Map#entrySet()
 	 */
 	public Set<Entry<String, Object>> entrySet() {
-		return map.entrySet();
+		return this.map.entrySet();
 	}
 
 	/**
@@ -329,7 +330,7 @@ public class ExecutionContext implements Serializable {
 	 * @see java.util.Map#containsKey(Object)
 	 */
 	public boolean containsKey(String key) {
-		return map.containsKey(key);
+		return this.map.containsKey(key);
 	}
 
 	/**
@@ -342,7 +343,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	@Nullable
 	public Object remove(String key) {
-		return map.remove(key);
+		return this.map.remove(key);
 	}
 
 	/**
@@ -353,7 +354,7 @@ public class ExecutionContext implements Serializable {
 	 * @see java.util.Map#containsValue(Object)
 	 */
 	public boolean containsValue(Object value) {
-		return map.containsValue(value);
+		return this.map.containsValue(value);
 	}
 
 	/*
@@ -380,7 +381,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return map.hashCode();
+		return this.map.hashCode();
 	}
 
 	/*
@@ -390,7 +391,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return map.toString();
+		return this.map.toString();
 	}
 
 	/**
@@ -400,7 +401,7 @@ public class ExecutionContext implements Serializable {
 	 * @see java.util.Map#size()
 	 */
 	public int size() {
-		return map.size();
+		return this.map.size();
 	}
 
 }
