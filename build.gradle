@@ -502,7 +502,6 @@ project('spring-batch-test') {
 		compile "org.hamcrest:hamcrest-library:$hamcrestVersion"
 		compile "org.springframework:spring-test:$springVersion"
 		compile "org.springframework:spring-jdbc:$springVersion"
-		compile "commons-io:commons-io:$commonsIoVersion"
 		compile "commons-collections:commons-collections:$commonsCollectionsVersion"
 
         testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
