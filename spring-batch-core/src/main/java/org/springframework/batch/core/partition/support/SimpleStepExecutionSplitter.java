@@ -184,7 +184,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 			StepExecution currentStepExecution = jobExecution.createStepExecution(stepName);
 
-			boolean startable = getStartable(currentStepExecution, context.getValue());
+			boolean startable = isStartable(currentStepExecution, context.getValue());
 
 			if (startable) {
 				set.add(currentStepExecution);
@@ -238,6 +238,11 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		return result;
 	}
 
+	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
+		return getStartable(stepExecution, context);
+	}
+	
+	@Deprecated
 	protected boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
 
 		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
