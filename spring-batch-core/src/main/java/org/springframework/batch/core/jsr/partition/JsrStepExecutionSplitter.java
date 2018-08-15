@@ -84,7 +84,7 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 			JobExecution curJobExecution = new JobExecution(jobExecution);
 			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
 
-			if(!restoreState || getStartable(curStepExecution, new ExecutionContext())) {
+			if(!restoreState || isStartable(curStepExecution, new ExecutionContext())) {
 				executions.add(curStepExecution);
 			}
 		}
