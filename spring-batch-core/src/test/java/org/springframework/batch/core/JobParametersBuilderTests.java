@@ -18,6 +18,7 @@ package org.springframework.batch.core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
- *
+ * @author Minhyeok Jeong
  */
 public class JobParametersBuilderTests {
 
@@ -81,9 +82,31 @@ public class JobParametersBuilderTests {
 				.addJobParameters(params2)
 				.toJobParameters();
 
-		assertEquals(finalParams.getString("foo"), "baz");
-		assertEquals(finalParams.getString("bar"), "baz");
-		assertEquals(finalParams.getString("baz"), "quix");
+		assertEquals("baz", finalParams.getString("foo"));
+		assertEquals("baz", finalParams.getString("bar"));
+		assertEquals("quix", finalParams.getString("baz"));
+	}
+
+	@Test
+	public void testAddingExistingJobParametersIfAbsent() {
+		JobParameters params1 = new JobParametersBuilder()
+				.addString("foo", "bar")
+				.addString("bar", "baz")
+				.toJobParameters();
+
+		JobParameters params2 = new JobParametersBuilder()
+				.addString("foo", "baz")
+				.toJobParameters();
+
+		JobParameters finalParams = new JobParametersBuilder()
+				.addString("baz", "quix")
+				.addJobParametersIfAbsent(params1)
+				.addJobParametersIfAbsent(params2)
+				.toJobParameters();
+
+		assertEquals("bar", finalParams.getString("foo"));
+		assertEquals("baz", finalParams.getString("bar"));
+		assertEquals("quix", finalParams.getString("baz"));
 	}
 
 	@Test
@@ -264,11 +287,16 @@ public class JobParametersBuilderTests {
 	}
 
 	private JobExecution getJobExecution(JobInstance jobInstance, BatchStatus batchStatus) {
-		JobExecution jobExecution = new JobExecution(jobInstance, 1L, null, "TestConfig");
+		Map<String, JobParameter> parameters = new LinkedHashMap<>();
+		parameters.put("STRING", new JobParameter("previous value"));
+		JobParameters jobParameters = new JobParameters(parameters);
+
+		JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters, "TestConfig");
+
 		if(batchStatus != null) {
 			jobExecution.setStatus(batchStatus);
 		}
-		return jobExecution;
 
+		return jobExecution;
 	}
 }
