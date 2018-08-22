@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -25,6 +26,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.FieldExtractor;
+import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -68,6 +70,8 @@ public class FlatFileItemWriterBuilder<T> {
 	private String name;
 
 	private DelimitedBuilder<T> delimitedBuilder;
+
+	private FormattedBuilder<T> formattedBuilder;
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -260,6 +264,140 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
+	 * Returns an instance of a {@link FormattedBuilder} for building a
+	 * {@link FormatterLineAggregator}. The {@link FormatterLineAggregator} configured by
+	 * this builder will only be used if one is not explicitly configured via
+	 * {@link FlatFileItemWriterBuilder#lineAggregator}
+	 *
+	 * @return a {@link FormattedBuilder}
+	 *
+	 */
+	public FormattedBuilder<T> formatted() {
+		this.formattedBuilder = new FormattedBuilder<>(this);
+		return this.formattedBuilder;
+	}
+
+	/**
+	 * A builder for constructing a {@link FormatterLineAggregator}.
+	 *
+	 * @param <T> the type of the parent {@link FlatFileItemWriterBuilder}
+	 */
+	public static class FormattedBuilder<T> {
+
+		private FlatFileItemWriterBuilder<T> parent;
+
+		private String format;
+
+		private Locale locale = Locale.getDefault();
+
+		private int maximumLength = 0;
+
+		private int minimumLength = 0;
+
+		private FieldExtractor<T> fieldExtractor;
+
+		private List<String> names = new ArrayList<>();
+
+		protected FormattedBuilder(FlatFileItemWriterBuilder<T> parent) {
+			this.parent = parent;
+		}
+
+		/**
+		 * Set the format string used to aggregate items
+		 * @param format used to aggregate items
+		 * @return The instance of the builder for chaining.
+		 */
+		public FormattedBuilder<T> format(String format) {
+			this.format = format;
+			return this;
+		}
+
+		/**
+		 * Set the locale.
+		 * @param locale to use
+		 * @return The instance of the builder for chaining.
+		 */
+		public FormattedBuilder<T> locale(Locale locale) {
+			this.locale = locale;
+			return this;
+		}
+
+		/**
+		 * Set the minimum length of the formatted string. If this is not set
+		 * the default is to allow any length.
+		 * @param minimumLength of the formatted string
+		 * @return The instance of the builder for chaining.
+		 */
+		public FormattedBuilder<T> minimumLength(int minimumLength) {
+			this.minimumLength = minimumLength;
+			return this;
+		}
+
+		/**
+		 * Set the maximum length of the formatted string. If this is not set
+		 * the default is to allow any length.
+		 * @param maximumLength of the formatted string
+		 * @return The instance of the builder for chaining.
+		 */
+		public FormattedBuilder<T> maximumLength(int maximumLength) {
+			this.maximumLength = maximumLength;
+			return this;
+		}
+
+		/**
+		 * Set the {@link FieldExtractor} to use to extract fields from each item.
+		 * @param fieldExtractor to use to extract fields from each item
+		 * @return The current instance of the builder
+		 */
+		public FlatFileItemWriterBuilder<T> fieldExtractor(FieldExtractor<T> fieldExtractor) {
+			this.fieldExtractor = fieldExtractor;
+			return this.parent;
+		}
+
+		/**
+		 * Names of each of the fields within the fields that are returned in the order
+		 * they occur within the formatted file. These names will be used to create
+		 * a {@link BeanWrapperFieldExtractor} only if no explicit field extractor
+		 * is set via {@link FormattedBuilder#fieldExtractor(FieldExtractor)}.
+		 *
+		 * @param names names of each field
+		 * @return The parent {@link FlatFileItemWriterBuilder}
+		 * @see BeanWrapperFieldExtractor#setNames(String[])
+		 */
+		public FlatFileItemWriterBuilder<T> names(String[] names) {
+			this.names.addAll(Arrays.asList(names));
+			return this.parent;
+		}
+
+		public FormatterLineAggregator<T> build() {
+			Assert.notNull(this.format, "A format is required");
+			Assert.isTrue((this.names != null && !this.names.isEmpty()) || this.fieldExtractor != null,
+					"A list of field names or a field extractor is required");
+
+			FormatterLineAggregator<T> formatterLineAggregator = new FormatterLineAggregator<>();
+			formatterLineAggregator.setFormat(this.format);
+			formatterLineAggregator.setLocale(this.locale);
+			formatterLineAggregator.setMinimumLength(this.minimumLength);
+			formatterLineAggregator.setMaximumLength(this.maximumLength);
+
+			if (this.fieldExtractor == null) {
+				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
+				beanWrapperFieldExtractor.setNames(this.names.toArray(new String[this.names.size()]));
+				try {
+					beanWrapperFieldExtractor.afterPropertiesSet();
+				}
+				catch (Exception e) {
+					throw new IllegalStateException("Unable to initialize FormatterLineAggregator", e);
+				}
+				this.fieldExtractor = beanWrapperFieldExtractor;
+			}
+
+			formatterLineAggregator.setFieldExtractor(this.fieldExtractor);
+			return formatterLineAggregator;
+		}
+	}
+
+	/**
 	 * A builder for constructing a {@link DelimitedLineAggregator}
 	 *
 	 * @param <T> the type of the parent {@link FlatFileItemWriterBuilder}
@@ -348,8 +486,8 @@ public class FlatFileItemWriterBuilder<T> {
 	 */
 	public FlatFileItemWriter<T> build() {
 
-		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null,
-				"A LineAggregator or a DelimitedBuilder is required");
+		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null || this.formattedBuilder != null,
+				"A LineAggregator or a DelimitedBuilder or a FormattedBuilder is required");
 		Assert.notNull(this.resource, "A Resource is required");
 
 		if(this.saveState) {
@@ -365,7 +503,14 @@ public class FlatFileItemWriterBuilder<T> {
 		writer.setForceSync(this.forceSync);
 		writer.setHeaderCallback(this.headerCallback);
 		if (this.lineAggregator == null) {
-			this.lineAggregator = this.delimitedBuilder.build();
+			Assert.state(this.delimitedBuilder == null || this.formattedBuilder == null,
+					"Either a DelimitedLineAggregator or a FormatterLineAggregator should be provided, but not both");
+			if (this.delimitedBuilder != null) {
+				this.lineAggregator = this.delimitedBuilder.build();
+			}
+			else {
+				this.lineAggregator = this.formattedBuilder.build();
+			}
 		}
 		writer.setLineAggregator(this.lineAggregator);
 		writer.setLineSeparator(this.lineSeparator);

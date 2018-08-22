@@ -49,6 +49,22 @@ public class FlatFileItemWriterBuilderTests {
 				.build();
 	}
 
+	@Test(expected = IllegalStateException.class)
+	public void testMultipleLineAggregators() throws IOException {
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		new FlatFileItemWriterBuilder<Foo>()
+				.name("itemWriter")
+				.resource(output)
+				.delimited()
+				.delimiter(";")
+				.names(new String[] {"foo", "bar"})
+				.formatted()
+				.format("%2s%2s")
+				.names(new String[] {"foo", "bar"})
+				.build();
+	}
+
 	@Test
 	public void test() throws Exception {
 
@@ -129,6 +145,62 @@ public class FlatFileItemWriterBuilderTests {
 		writer.close();
 
 		assertEquals("HEADER$1 3$4 6$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	@Test
+	public void testFormattedOutputWithDefaultFieldExtractor() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(output)
+				.lineSeparator("$")
+				.formatted()
+				.format("%2s%2s%2s")
+				.names(new String[] {"first", "second", "third"})
+				.encoding("UTF-16LE")
+				.headerCallback(writer1 -> writer1.append("HEADER"))
+				.footerCallback(writer12 -> writer12.append("FOOTER"))
+				.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$ 1 2 3$ 4 5 6$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	@Test
+	public void testFormattedOutputWithCustomFieldExtractor() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(output)
+				.lineSeparator("$")
+				.formatted()
+				.format("%3s%3s")
+				.fieldExtractor(item -> new Object[] {item.getFirst(), item.getThird()})
+				.encoding("UTF-16LE")
+				.headerCallback(writer1 -> writer1.append("HEADER"))
+				.footerCallback(writer12 -> writer12.append("FOOTER"))
+				.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$  1  3$  4  6$FOOTER", readLine("UTF-16LE", output));
 	}
 
 	@Test
