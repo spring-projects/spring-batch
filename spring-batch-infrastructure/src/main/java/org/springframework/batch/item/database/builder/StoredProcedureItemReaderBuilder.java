@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
  * A fluent builder API for the configuration of a {@link StoredProcedureItemReader}.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 4.0.0
  * @see StoredProcedureItemReader
  */
@@ -318,7 +319,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 	/**
 	 * Validates configuration and builds a new reader instance
 	 *
-	 * @return a fully constructerd {@link StoredProcedureItemReader}
+	 * @return a fully constructed {@link StoredProcedureItemReader}
 	 */
 	public StoredProcedureItemReader<T> build() {
 		if(this.saveState) {

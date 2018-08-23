@@ -70,7 +70,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	@Override
 	public void afterPropertiesSet() throws IllegalStateException {
 		for (String key : requiredKeys) {
-			Assert.state(!optionalKeys.contains(key), "Optional keys canot be required: " + key);
+			Assert.state(!optionalKeys.contains(key), "Optional keys cannot be required: " + key);
 		}
 	}
 

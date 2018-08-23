@@ -39,7 +39,7 @@ public class ItemProcessListenerAdapter<T,S> implements ItemProcessListener<T, S
 	 * @param delegate to be called within the batch lifecycle
 	 */
 	public ItemProcessListenerAdapter(javax.batch.api.chunk.listener.ItemProcessListener delegate) {
-		Assert.notNull(delegate, "An ItemProcessListener is requred");
+		Assert.notNull(delegate, "An ItemProcessListener is required");
 		this.delegate = delegate;
 	}
 

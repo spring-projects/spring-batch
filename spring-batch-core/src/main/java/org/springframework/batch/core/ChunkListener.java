@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * Listener interface for the lifecycle of a chunk.  A chunk
- * can be through of as a collection of items that will be
+ * can be thought of as a collection of items that will be
  * committed together.
  *
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface ChunkListener extends StepListener {
@@ -49,7 +50,7 @@ public interface ChunkListener extends StepListener {
 	 * after transaction rollback.  While the rollback will have occurred,
 	 * transactional resources might still be active and accessible.  Due to
 	 * this, data access code within this callback will still "participate" in
-	 * the original transaction unless it declares that it run in its own
+	 * the original transaction unless it declares that it runs in its own
 	 * transaction.  Hence: <em> Use PROPAGATION_REQUIRES_NEW for any
 	 * transactional operation that is called from here.</em>
 	 *

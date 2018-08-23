@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
  * Parser for the &lt;partition&gt; element as defined by JSR-352.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class PartitionParser {
@@ -63,7 +64,7 @@ public class PartitionParser {
 
 	/**
 	 * @param stepName the name of the step that is being partitioned
-	 * @param allowStartIfComplete  boolean to establish the allowStartIfComplete property for parition properties.
+	 * @param allowStartIfComplete  boolean to establish the allowStartIfComplete property for partition properties.
 	 */
 	public PartitionParser(String stepName, boolean allowStartIfComplete) {
 		this.name = stepName;
@@ -82,7 +83,7 @@ public class PartitionParser {
 		properties.addPropertyValue("jobRepository", new RuntimeBeanReference("jobRepository"));
 		properties.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
 
-		paserMapperElement(element, parserContext, properties);
+		parseMapperElement(element, parserContext, properties);
 		parsePartitionPlan(element, parserContext, stepName, properties);
 		parseAnalyzerElement(element, parserContext, properties);
 		parseReducerElement(element, parserContext, factoryBeanProperties);
@@ -136,7 +137,7 @@ public class PartitionParser {
 		}
 	}
 
-	private void paserMapperElement(Element element,
+	private void parseMapperElement(Element element,
 			ParserContext parserContext, MutablePropertyValues properties) {
 		Element mapperElement = DomUtils.getChildElementByTagName(element, MAPPER_ELEMENT);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.springframework.util.ReflectionUtils;
  * and the slave listeners in the Remote Chunking pattern for the Step in question.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandler<T>> {
@@ -94,7 +95,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Optimization for the bean facctory (always returns true).
+	 * Optimization for the bean factory (always returns true).
 	 * 
 	 * @see FactoryBean#isSingleton()
 	 */

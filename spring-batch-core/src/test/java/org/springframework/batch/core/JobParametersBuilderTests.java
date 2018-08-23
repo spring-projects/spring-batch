@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import static org.mockito.Mockito.when;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobParametersBuilderTests {
@@ -171,7 +172,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testPropreties() {
+	public void testProperties() {
 		Properties props = new Properties();
 		props.setProperty("SCHEDULE_DATE", "A DATE");
 		props.setProperty("LONG", "1");

@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
 public class JsrJobParametersConverter implements JobParametersConverter, InitializingBean {
 
 	public static final String JOB_RUN_ID = "jsr_batch_run_id";
-	public DataFieldMaxValueIncrementer incremeter;
+	public DataFieldMaxValueIncrementer incrementer;
 	public String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 	public DataSource dataSource;
 
@@ -77,7 +77,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 	public void afterPropertiesSet() throws Exception {
 		DataFieldMaxValueIncrementerFactory factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 
-		this.incremeter = factory.getIncrementer(DatabaseType.fromMetaData(dataSource).name(), tablePrefix + "JOB_SEQ");
+		this.incrementer = factory.getIncrementer(DatabaseType.fromMetaData(dataSource).name(), tablePrefix + "JOB_SEQ");
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +102,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 		}
 
 		if(!runIdFound) {
-			builder.addLong(JOB_RUN_ID, incremeter.nextLongValue());
+			builder.addLong(JOB_RUN_ID, incrementer.nextLongValue());
 		}
 
 		return builder.toJobParameters();
@@ -127,7 +127,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 		}
 
 		if(!runIdFound) {
-			properties.setProperty(JOB_RUN_ID, String.valueOf(incremeter.nextLongValue()));
+			properties.setProperty(JOB_RUN_ID, String.valueOf(incrementer.nextLongValue()));
 		}
 
 		return properties;

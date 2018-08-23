@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @since 1.0
  *
@@ -78,7 +79,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * @param job the job to be run.
 	 * @param jobParameters the {@link JobParameters} for this particular
 	 * execution.
-	 * @return JobExecutionAlreadyRunningException if the JobInstance already
+	 * @return the {@link JobExecution} if it returns synchronously. If the
+	 * implementation is asynchronous, the status might well be unknown.
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance already
 	 * exists and has an execution already running.
 	 * @throws JobRestartException if the execution would be a re-start, but a
 	 * re-start is either not allowed or not needed.

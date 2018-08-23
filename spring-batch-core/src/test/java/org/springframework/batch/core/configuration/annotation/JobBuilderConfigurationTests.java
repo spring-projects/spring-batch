@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobBuilderConfigurationTests {
@@ -176,7 +177,7 @@ public class JobBuilderConfigurationTests {
 		private SimpleBatchConfiguration jobs;
 
 		@Bean
-		public Job testConfigererJob() throws Exception {
+		public Job testConfigurerJob() throws Exception {
 			SimpleJobBuilder builder = jobs.jobBuilders().get("configurer").start(step1());
 			return builder.build();
 		}
