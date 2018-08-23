@@ -657,7 +657,7 @@ public class FlatFileItemReaderBuilder<T> {
 				tokenizer.afterPropertiesSet();
 			}
 			catch (Exception e) {
-				throw new IllegalStateException("Unable to intialize DelimitedLineTokenizer", e);
+				throw new IllegalStateException("Unable to initialize DelimitedLineTokenizer", e);
 			}
 
 			return tokenizer;

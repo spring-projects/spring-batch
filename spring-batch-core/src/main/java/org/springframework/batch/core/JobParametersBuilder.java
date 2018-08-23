@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  * @see JobParameters
  * @see JobParameter
@@ -201,7 +202,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Conversion method that takes the current state of this builder and
-	 * returns it as a JobruntimeParameters object.
+	 * returns it as a JobParameters object.
 	 *
 	 * @return a valid {@link JobParameters} object.
 	 */

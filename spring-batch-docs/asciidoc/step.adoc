@@ -1866,7 +1866,7 @@ Java based configuration lets you configure splits through the provided builders
 following example shows, the 'split' element contains one or more 'flow' elements, where
 entire separate flows can be defined. A 'split' element may also contain any of the
 previously discussed transition elements, such as the 'next' attribute or the 'next',
-'end', 'fail', or 'pause' elements.
+'end' or 'fail' elements.
 
 [source, java, role="javaContent"]
 ----

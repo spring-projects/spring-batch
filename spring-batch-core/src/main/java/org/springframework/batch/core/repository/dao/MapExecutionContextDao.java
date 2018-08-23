@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.util.SerializationUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 @SuppressWarnings("serial")
 public class MapExecutionContextDao implements ExecutionContextDao {
@@ -151,7 +152,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
-		Assert.notNull(stepExecutions,"Attempt to save a nulk collection of step executions");
+		Assert.notNull(stepExecutions,"Attempt to save a null collection of step executions");
 		for (StepExecution stepExecution: stepExecutions) {
 			saveExecutionContext(stepExecution);
 			saveExecutionContext(stepExecution.getJobExecution());

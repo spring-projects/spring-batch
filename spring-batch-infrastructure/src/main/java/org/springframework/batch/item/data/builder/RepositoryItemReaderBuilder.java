@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.util.StringUtils;
  * A builder implementation for the {@link RepositoryItemReader}.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see RepositoryItemReader
  */
@@ -249,13 +250,13 @@ public class RepositoryItemReaderBuilder<T> {
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
-		private RepositoryMethodIterceptor repositoryInvocationHandler;
+		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private PagingAndSortingRepository<?, ?> repository;
 
 		public RepositoryMethodReference(PagingAndSortingRepository<?, ?> repository) {
 			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryMethodIterceptor();
+			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
 		}
 
 		/**
@@ -283,7 +284,7 @@ public class RepositoryItemReaderBuilder<T> {
 		}
 	}
 
-	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 		private String methodName;
 
 		private List<Object> arguments;

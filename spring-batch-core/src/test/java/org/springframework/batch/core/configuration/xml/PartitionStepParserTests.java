@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.util.ReflectionUtils;
 /**
  * @author Dave Syer
  * @author Josh Long
+ * @author Mahmoud Ben Hassine
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -205,7 +206,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			}
 		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		// Step names not saved by this one (it geosn't have that tasklet)
+		// Step names not saved by this one (it doesn't have that tasklet)
 		assertEquals("[]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(7, stepNames.size());

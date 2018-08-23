@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 package org.springframework.batch.core.configuration;
 
 /**
- * Represents an error has occured in the configuration of base batch
+ * Represents an error has occurred in the configuration of base batch
  * infrastructure (creation of a {@link org.springframework.batch.core.repository.JobRepository}
  * for example.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2.6
  */
 public class BatchConfigurationException extends RuntimeException {

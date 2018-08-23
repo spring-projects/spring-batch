@@ -546,7 +546,7 @@ interpreted, as described in the following table:
 |===============
 |Property|Type|Description
 |comments|String[]|Specifies line prefixes that indicate comment rows.
-|encoding|String|Specifies what text encoding to use. The default is "ISO-8859-1".
+|encoding|String|Specifies what text encoding to use. The default is the value of `Charset.defaultCharset()`.
 |lineMapper|`LineMapper`|Converts a `String` to an `Object` representing the item.
 |linesToSkip|int|Number of lines to ignore at the top of the file.
 |recordSeparatorPolicy|RecordSeparatorPolicy|Used to determine where the line endings are

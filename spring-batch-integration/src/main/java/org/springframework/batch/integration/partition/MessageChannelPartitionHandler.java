@@ -61,6 +61,7 @@ import org.springframework.util.CollectionUtils;
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 @MessageEndpoint
@@ -116,7 +117,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	/**
 	 * When using job repository polling, the time limit to wait.
 	 *
-	 * @param timeout millisconds to wait, defaults to -1 (no timeout).
+	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
 	 */
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
@@ -154,7 +155,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	 * A pre-configured gateway for sending and receiving messages to the remote workers. Using this property allows a
 	 * large degree of control over the timeouts and other properties of the send. It should have channels set up
 	 * internally: <ul> <li>request channel capable of accepting {@link StepExecutionRequest} payloads</li> <li>reply
-	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the repoy should be set
+	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the reply should be set
 	 * sufficiently long that the remote steps have time to complete.
 	 *
 	 * @param messagingGateway the {@link org.springframework.integration.core.MessagingTemplate} to set

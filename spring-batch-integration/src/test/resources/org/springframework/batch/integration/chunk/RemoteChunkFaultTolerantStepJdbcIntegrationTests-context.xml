@@ -76,7 +76,7 @@
 
 	<!--
 		The chunk writer listens for results coming back, and can fail to acquire a lock. This is especially true for
-		in-memory databases (MySql and Orackle seem to deal with locks better)
+		in-memory databases (MySql and Oracle seem to deal with locks better)
 	-->
 	<aop:config proxy-target-class="true">
 		<aop:advisor advice-ref="retryAdvice" pointcut="execution(* org.springframework.integration.core.MessagingTemplate.receive(..))" />

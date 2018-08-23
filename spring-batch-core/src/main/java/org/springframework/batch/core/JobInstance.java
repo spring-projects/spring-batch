@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
  * JobInstance can be restarted multiple times in case of execution failure and
  * it's lifecycle ends with first successful execution.
  *
- * Trying to execute an existing JobIntance that has already completed
+ * Trying to execute an existing JobInstance that has already completed
  * successfully will result in error. Error will be raised also for an attempt
  * to restart a failed JobInstance if the Job is not restartable.
  *
@@ -36,6 +36,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
