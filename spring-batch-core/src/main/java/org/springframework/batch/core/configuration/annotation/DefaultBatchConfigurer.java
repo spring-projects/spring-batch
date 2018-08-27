@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 			this.dataSource = dataSource;
 		}
 
-		if(this.transactionManager == null) {
+		if(getTransactionManager() == null) {
+			logger.warn("No transaction manager was provided, using a DataSourceTransactionManager");
 			this.transactionManager = new DataSourceTransactionManager(this.dataSource);
 		}
 	}
@@ -96,11 +97,12 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 			if(dataSource == null) {
 				logger.warn("No datasource was provided...using a Map based JobRepository");
 
-				if(this.transactionManager == null) {
+				if(getTransactionManager() == null) {
+					logger.warn("No transaction manager was provided, using a ResourcelessTransactionManager");
 					this.transactionManager = new ResourcelessTransactionManager();
 				}
 
-				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
+				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(getTransactionManager());
 				jobRepositoryFactory.afterPropertiesSet();
 				this.jobRepository = jobRepositoryFactory.getObject();
 
@@ -128,7 +130,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(dataSource);
-		factory.setTransactionManager(transactionManager);
+		factory.setTransactionManager(getTransactionManager());
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}
