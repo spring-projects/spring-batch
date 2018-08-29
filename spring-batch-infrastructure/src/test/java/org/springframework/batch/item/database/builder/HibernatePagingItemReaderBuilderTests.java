@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class HibernatePagingItemReaderBuilderTests {
 
@@ -78,7 +79,7 @@ public class HibernatePagingItemReaderBuilderTests {
 				.maxItemCount(4)
 				.pageSize(5)
 				.queryName("allFoos")
-				.useSatelessSession(false)
+				.useStatelessSession(false)
 				.build();
 
 		reader.afterPropertiesSet();
