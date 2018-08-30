@@ -1,4 +1,6 @@
 <a href="https://gitter.im/spring-batch/Lobby?source=badge"><img src="https://badges.gitter.im/spring-projects/spring-batch.svg"/></a>
+<a href="https://lgtm.com/projects/g/spring-projects/spring-batch/context:java"><img src="https://img.shields.io/lgtm/grade/java/g/spring-projects/spring-batch.svg?logo=lgtm&logoWidth=18" alt="Code Quality: Java" height="18"></a>
+<a href="https://lgtm.com/projects/g/spring-projects/spring-batch/alerts"><img src="https://img.shields.io/lgtm/alerts/g/spring-projects/spring-batch.svg?logo=lgtm&logoWidth=18" alt="Total Alerts" height="18"></a>
 
 # Spring Batch [![build status](https://build.spring.io/plugins/servlet/wittified/build-status/BATCH-GRAD)](https://build.spring.io/browse/BATCH-GRAD)
 
