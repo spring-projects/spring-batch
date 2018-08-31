@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.springframework.util.Assert;
  * <code>{step1:partition0, step1:partition1, ...}</code>.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter, InitializingBean {
@@ -238,10 +239,27 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		return result;
 	}
 
+	/**
+	 * Check if a step execution is startable.
+	 * @param stepExecution the step execution to check
+	 * @param context the execution context of the step
+	 * @return true if the step execution is startable, false otherwise
+	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 */
 	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
 		return getStartable(stepExecution, context);
 	}
-	
+
+	/**
+	 * Check if a step execution is startable.
+	 * @param stepExecution the step execution to check
+	 * @param context the execution context of the step
+	 * @return true if the step execution is startable, false otherwise
+	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 * @deprecated This method is deprecated in favor of
+	 * {@link SimpleStepExecutionSplitter#isStartable} and will be removed in a
+	 * future version.
+	 */
 	@Deprecated
 	protected boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
 
