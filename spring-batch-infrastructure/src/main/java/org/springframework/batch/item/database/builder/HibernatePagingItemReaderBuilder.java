@@ -226,7 +226,7 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @see HibernatePagingItemReader#setUseStatelessSession(boolean)
 	 * @deprecated This method is deprecated in favor of
 	 * {@link HibernatePagingItemReaderBuilder#useStatelessSession} and will be
-	 * removed in version 4.2.
+	 * removed in a future version.
 	 */
 	@Deprecated
 	public HibernatePagingItemReaderBuilder<T> useSatelessSession(boolean useStatelessSession) {
