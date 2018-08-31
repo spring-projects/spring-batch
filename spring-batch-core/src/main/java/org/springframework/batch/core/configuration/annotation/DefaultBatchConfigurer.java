@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	/**
 	 * Sets the dataSource.  If the {@link DataSource} has been set once, all future
-	 * values are passed are ignored (to prevent {@code}@Autowired{@code} from overwriting
+	 * values passed in are ignored (to prevent {@code}@Autowired{@code} from overwriting
 	 * the value).
 	 *
 	 * @param dataSource
@@ -58,9 +58,19 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		if(this.dataSource == null) {
 			this.dataSource = dataSource;
 		}
+	}
 
+	/**
+	 * Sets the transactionManager. If the {@link PlatformTransactionManager} has been set
+	 * once, all future values passed in are ignored (to prevent {@code}@Autowired{@code}
+	 * from overwriting the value).
+	 *
+	 * @param transactionManager
+	 */
+	@Autowired(required = false)
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		if(this.transactionManager == null) {
-			this.transactionManager = new DataSourceTransactionManager(this.dataSource);
+			this.transactionManager = transactionManager;
 		}
 	}
 
@@ -93,12 +103,18 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	@PostConstruct
 	public void initialize() {
 		try {
+			if(this.transactionManager == null) {
+				if (dataSource == null) {
+					logger.info("No transactionManager was provided, no dataSource either... generating a ResourcelessTransactionManager");
+					this.transactionManager = new ResourcelessTransactionManager();
+				} else {
+					logger.info("No transactionManager was provided, but we have a dataSource... generating a DataSourceTransactionManager");
+					this.transactionManager = new DataSourceTransactionManager(dataSource);
+				}
+			}
+
 			if(dataSource == null) {
 				logger.warn("No datasource was provided...using a Map based JobRepository");
-
-				if(this.transactionManager == null) {
-					this.transactionManager = new ResourcelessTransactionManager();
-				}
 
 				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
 				jobRepositoryFactory.afterPropertiesSet();
