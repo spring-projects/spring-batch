@@ -92,6 +92,33 @@ public class FlatFileItemWriterBuilderTests {
 	}
 
 	@Test
+	public void testDelimitedOutputWithDefaultDelimiter() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(output)
+				.lineSeparator("$")
+				.delimited()
+				.names(new String[] {"first", "second", "third"})
+				.encoding("UTF-16LE")
+				.headerCallback(writer1 -> writer1.append("HEADER"))
+				.footerCallback(writer12 -> writer12.append("FOOTER"))
+				.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$1,2,3$4,5,6$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	@Test
 	public void testDelimitedOutputWithDefaultFieldExtractor() throws Exception {
 
 		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
