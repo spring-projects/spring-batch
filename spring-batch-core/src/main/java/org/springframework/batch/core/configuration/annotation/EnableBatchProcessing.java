@@ -111,6 +111,37 @@ import org.springframework.transaction.PlatformTransactionManager;
  * job repository and transaction manager into every step</li>
  * </ul>
  *
+ * The transaction manager provided by this annotation will be of type:
+ *
+ * <ul>
+ *     <li>{@link org.springframework.batch.support.transaction.ResourcelessTransactionManager}
+ *     if no {@link javax.sql.DataSource} is provided within the context</li>
+ *     <li>{@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
+ *     if a {@link javax.sql.DataSource} is provided within the context</li>
+ * </ul>
+ *
+ * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should be provided. For example:
+ *
+ * <pre class="code">
+ * &#064;Configuration
+ * &#064;EnableBatchProcessing
+ * public class AppConfig extends DefaultBatchConfigurer {
+ *
+ *    &#064;Bean
+ *    public Job job() {
+ *       ...
+ *    }
+ *
+ *    &#064;Override
+ *    public PlatformTransactionManager getTransactionManager() {
+ *       return new MyTransactionManager();
+ *    }
+ *
+ *  ...
+ *
+ * }
+ * </pre>
+ *
  * If the configuration is specified as <code>modular=true</code> then the context will also contain an
  * {@link AutomaticJobRegistrar}. The job registrar is useful for modularizing your configuration if there are multiple
  * jobs. It works by creating separate child application contexts containing job configurations and registering those
