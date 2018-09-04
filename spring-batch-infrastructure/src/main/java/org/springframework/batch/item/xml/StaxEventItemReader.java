@@ -83,7 +83,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	/**
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.
-	 * @param strict false by default
+	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
