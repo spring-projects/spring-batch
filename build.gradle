@@ -11,14 +11,14 @@ buildscript {
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
-		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.1"
+		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
 		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
 		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14"
 	}
 }
 
 plugins {
-	id 'org.sonarqube' version '2.1'
+	id 'org.sonarqube' version '2.6.2'
 }
 
 ext {
@@ -910,5 +910,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '3.5'
+	gradleVersion = '4.10'
 }
