@@ -49,7 +49,8 @@ public class DefaultJobParametersExtractorJobParametersTests {
 		StepExecution stepExecution = getStepExecution("foo=bar,spam=bucket");
 		extractor.setKeys(new String[] {"foo", "bar"});
 		JobParameters jobParameters = extractor.getJobParameters(null, stepExecution);
-		assertEquals("{spam=bucket, foo=bar}", jobParameters.toString());
+		assertEquals("bar", jobParameters.getString("foo"));
+		assertEquals("bucket", jobParameters.getString("spam"));
 	}
 
 	@Test

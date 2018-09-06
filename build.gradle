@@ -170,6 +170,10 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 //		testLogging {
 //			showStandardStreams = true
 //		}
+
+		if (JavaVersion.current().isJava9Compatible()) {
+			jvmArgs '--add-modules', 'java.xml.bind'
+		}
 	}
 
 	task sourcesJar(type: Jar) {
