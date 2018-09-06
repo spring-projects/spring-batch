@@ -59,6 +59,8 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	private ExecutionContext executionContext;
 	private Trade trade1 = new Trade("123", 5, new BigDecimal("10.5"), "foo");
 	private Trade trade2 = new Trade("456", 10, new BigDecimal("20.5"), "bar");
+	private Trade trade3 = new Trade("789", 15, new BigDecimal("30.5"), "foobar");
+	private Trade trade4 = new Trade("987", 20, new BigDecimal("40.5"), "barfoo");
 
 	protected abstract JsonObjectMarshaller<Trade> getJsonObjectMarshaller();
 	protected abstract JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint();
@@ -90,6 +92,20 @@ public abstract class JsonFileItemWriterFunctionalTests {
 		// then
 		assertFileEquals(
 				new File(EXPECTED_FILE_DIRECTORY + "expected-trades.json"),
+				this.resource.getFile());
+	}
+
+	@Test
+	public void testJsonWritingWithMultipleWrite() throws Exception {
+		// when
+		this.writer.open(this.executionContext);
+		this.writer.write(this.items);
+		this.writer.write(Arrays.asList(trade3, trade4));
+		this.writer.close();
+
+		// then
+		assertFileEquals(
+				new File(EXPECTED_FILE_DIRECTORY + "expected-trades-with-multiple-writes.json"),
 				this.resource.getFile());
 	}
 
