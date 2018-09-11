@@ -58,7 +58,8 @@
             Spring Data repository implementation.
 |StoredProcedureItemReader|Reads from a database cursor resulting from the
             execution of a database stored procedure. See link:readersAndWriters.html#StoredProcedureItemReader[`StoredProcedureItemReader`]
-|StaxEventItemReader|Reads via StAX. see link:readersAndWriters.html#flatFileItemReader[`FlatFileItemReader`].
+|StaxEventItemReader|Reads via StAX. see link:readersAndWriters.html#StaxEventItemReader[`StaxEventItemReader`].
+|JsonItemReader|Reads items from a Json document. see link:readersAndWriters.html#JsonItemReader[`JsonItemReader`].
 
 |===============
 
@@ -119,5 +120,7 @@
 |StaxEventItemWriter|Uses a `Marshaller` implementation to
             convert each item to XML and then writes it to an XML file using
             StAX.
+|JsonFileItemWriter|Uses a `JsonObjectMarshaller` implementation to
+            convert each item to Json and then writes it to an Json file.
 
 |===============

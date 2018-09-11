@@ -254,3 +254,69 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
 }
 ----
 
+=== JSR-305 support
+
+This release adds support for JSR-305 annotations. It leverages Spring Framework’s
+link:$$https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#null-safety$$[Null-safety]
+annotations and adds them on all public APIs of Spring Batch.
+
+These annotations will not only enforce null-safety when using Spring Batch APIs,
+but also can be used by IDEs to provide useful information related to nullability.
+For example, if a user wants to implement the `ItemReader` interface, any IDE
+supporting JSR-305 annotations will generate something like:
+
+[source, java]
+----
+public class MyItemReader implements ItemReader<String> {
+
+	@Nullable
+	public String read() throws Exception {
+		return null;
+	}
+
+}
+----
+
+The `@Nullable` annotation present on the `read` method makes it clear that the
+contract of this method says it may return `null`. This enforces what is said in its
+Javadoc, that the `read` method should return `null` when the data source is exhausted.
+
+=== `FlatFileItemWriterBuilder` enhancements
+
+Another small feature added in this release is a simplification of the configuration
+for the writing of a flat file. Specifically, these updates simplify the configuration
+of both a delimited and fixed width file. Below is an example of before and after the change.
+
+[source, java]
+----
+// Before
+@Bean
+public FlatFileItemWriter<Item> itemWriter(Resource resource) {
+	BeanWrapperFieldExtractor<Item> fieldExtractor =
+            new BeanWrapperFieldExtractor<Item>();
+	fieldExtractor.setNames(new String[] {"field1", "field2", "field3"});
+	fieldExtractor.afterPropertiesSet();
+
+	DelimitedLineAggregator aggregator = new DelimitedLineAggregator();
+	aggregator.setFieldExtractor(fieldExtractor);
+	aggregator.setDelimiter(";");
+
+	return new FlatFileItemWriterBuilder<Item>()
+			.name("itemWriter")
+			.resource(resource)
+			.lineAggregator(aggregator)
+			.build();
+}
+
+// After
+@Bean
+public FlatFileItemWriter<Item> itemWriter(Resource resource) {
+	return new FlatFileItemWriterBuilder<Item>()
+			.name("itemWriter")
+			.resource(resource)
+			.delimited()
+			.delimiter(";")
+			.names(new String[] {"field1", "field2", "field3"})
+			.build();
+}
+----
