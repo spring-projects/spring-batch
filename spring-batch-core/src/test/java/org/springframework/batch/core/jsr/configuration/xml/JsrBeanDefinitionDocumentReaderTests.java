@@ -251,7 +251,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 	}
 
 	private Document getDocument(String location) {
-		InputStream inputStream = ClassLoader.class.getResourceAsStream(location);
+		InputStream inputStream = this.getClass().getResourceAsStream(location);
 
 		try {
 			return documentLoader.loadDocument(new InputSource(inputStream),

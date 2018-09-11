@@ -137,7 +137,13 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		 * @param parent
 		 */
 		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
-			helper = new ApplicationContextHelper(parent, this, resources) {
+
+			class ResourceXmlApplicationContextHelper extends ApplicationContextHelper {
+
+				ResourceXmlApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+					super(parent, context, config);
+				}
+
 				@Override
 				protected String generateId(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
@@ -155,9 +161,10 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				@Override
 				protected void loadConfiguration(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
- 					load(resources);
+					load(resources);
 				}
-			};
+			}
+			helper = new ResourceXmlApplicationContextHelper(parent, this, resources);
 			refresh();
 		}
 
@@ -179,7 +186,13 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		private final ApplicationContextHelper helper;
 
 		public ResourceAnnotationApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
-			helper = new ApplicationContextHelper(parent, this, resources) {
+
+			class ResourceAnnotationApplicationContextHelper extends ApplicationContextHelper {
+
+				public ResourceAnnotationApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+					super(parent, context, config);
+				}
+
 				@Override
 				protected String generateId(Object... configs) {
 					if (allObjectsOfType(configs, Class.class)) {
@@ -205,7 +218,8 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 						scan(pkgs);
 					}
 				}
-			};
+			}
+			helper = new ResourceAnnotationApplicationContextHelper(parent, this, resources);
 			refresh();
 		}
 
