@@ -1348,6 +1348,25 @@ In the previous example, the `BeanWrapperFieldExtractor` described earlier in th
 chapter is used to turn the name and credit fields within `CustomerCredit` into an object
 array, which is then written out with commas between each field.
 
+It is also possible to use the `FlatFileItemWriterBuilder.DelimitedBuilder` to
+automatically create the `BeanWrapperFieldExtractor` and `DelimitedLineAggregator`
+as shown in the following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.delimited()
+				.delimiter(",")
+				.names(new String[] {"name", "credit"})
+				.build();
+}
+----
+
 [[fixedWidthFileWritingExample]]
 ===== Fixed Width File Writing Example
 
@@ -1417,6 +1436,25 @@ The underlying implementation is built using the same
 `printf` functionality of the C programming
 language. Most details on how to configure a formatter can be found in
 the Javadoc of link:$$https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html$$[Formatter].
+
+It is also possible to use the `FlatFileItemWriterBuilder.FormattedBuilder` to
+automatically create the `BeanWrapperFieldExtractor` and `FormatterLineAggregator`
+as shown in following example:
+
+.Java Configuration
+[source, java, role="javaContent"]
+----
+@Bean
+public FlatFileItemWriter<CustomerCredit> itemWriter(Resource outputResource) throws Exception {
+	return new FlatFileItemWriterBuilder<CustomerCredit>()
+				.name("customerCreditWriter")
+				.resource(outputResource)
+				.formatted()
+				.format("%-9s%-2.0f")
+				.names(new String[] {"name", "credit"})
+				.build();
+}
+----
 
 [[handlingFileCreation]]
 ===== Handling File Creation
