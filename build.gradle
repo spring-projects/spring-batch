@@ -78,6 +78,7 @@ allprojects {
 		gsonVersion = '2.8.5'
 		javaMailVersion = '1.6.0'
 		javaxBatchApiVersion = '1.0'
+		javaxAnnotationApiVersion = '1.3.2'
 		javaxInjectVersion = '1'
 		javaxTransactionVersion = '1.2'
 		jbatchTckSpi = '1.0'
@@ -86,7 +87,7 @@ allprojects {
 		junitVersion = '4.12'
 		log4jVersion = '2.9.1'
 		mysqlVersion = '5.1.44'
-		mockitoVersion = '2.11.0'
+		mockitoVersion = '2.21.0'
 		postgresqlVersion = '42.1.4'
 		quartzVersion = '2.3.0'
 		servletApiVersion = '3.1.0'
@@ -113,7 +114,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 	apply plugin: 'merge'
 
 	jacoco {
-		toolVersion = "0.7.6.201602180812"
+		toolVersion = "0.8.2"
 	}
 
     compileJava {
@@ -169,6 +170,10 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 //		testLogging {
 //			showStandardStreams = true
 //		}
+
+		if (JavaVersion.current().isJava9Compatible()) {
+			jvmArgs '--add-modules', 'java.xml.bind'
+		}
 	}
 
 	task sourcesJar(type: Jar) {
@@ -288,6 +293,7 @@ project('spring-batch-core') {
 		optional "org.springframework:spring-jdbc:$springVersion"
 		optional "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		optional "org.apache.logging.log4j:log4j-core:$log4jVersion"
+		optional "javax.annotation:javax.annotation-api:$javaxAnnotationApiVersion"
 		// JSR-305 only used for non-required meta-annotations
 		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
