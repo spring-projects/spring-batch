@@ -87,7 +87,7 @@ allprojects {
 		junitVersion = '4.12'
 		log4jVersion = '2.9.1'
 		mysqlVersion = '5.1.44'
-		mockitoVersion = '2.11.0'
+		mockitoVersion = '2.21.0'
 		postgresqlVersion = '42.1.4'
 		quartzVersion = '2.3.0'
 		servletApiVersion = '3.1.0'
