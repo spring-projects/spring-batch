@@ -23,7 +23,7 @@ Here is a list of samples with checks to indicate which features each one demons
 
 Job/Feature                                       | skip | retry | restart | automatic mapping | asynch launch | validation | delegation | write behind | non-squenetial | asynch process | filtering 
 :------------------------------------------------ | :--: | :---: | :-----: | :---------------: | :-----------: | :--------: | :--------: | :----------: | :------------: | :------------: | :-------: 
-[adhocLoop](#adhocloop)                           |      |       |         |                   |        X      |            |            |              |                |                |           
+[adhocLoop](#Adhoc Loop and JMX Demo)             |      |       |         |                   |        X      |            |            |              |                |                |           
 [AmqpJobFunctionalTests](#amqp)                   |      |       |         |                   |               |            |            |              |                |       X        |           
 [beanWrapperMapperSample](#beanWrapperMapper)     |      |       |         |       X           |               |            |            |              |                |                |           
 [compositeItemWriterSample](#compositeItemWriter) |      |       |         |                   |               |            |     X      |              |                |                |           
@@ -79,7 +79,7 @@ The samples source code has an Eclipse launch configuration to do
 this, taking the hassle out of setting up a classpath to run the
 job.
 
-### [Adhoc Loop and JMX Demo](id:adhocloop)
+### Adhoc Loop and JMX Demo
 
 This job is simply an infinite loop.  It runs forever so it is
 useful for testing features to do with stopping and starting jobs.
