@@ -21,10 +21,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -36,8 +34,8 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -47,7 +45,6 @@ import org.springframework.batch.core.launch.JobExecutionNotFailedException;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -356,10 +353,9 @@ public class CommandLineJobRunner {
 			}
 
 			if (opts.contains("-next")) {
-				JobParameters nextParameters = getNextJobParameters(job);
-				Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
-				map.putAll(jobParameters.getParameters());
-				jobParameters = new JobParameters(map);
+				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer)
+						.getNextJobParameters(job)
+						.toJobParameters();
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
@@ -470,35 +466,6 @@ public class CommandLineJobRunner {
 	}
 
 	/**
-	 * @param job the job that we need to find the next parameters for
-	 * @return the next job parameters if they can be located
-	 * @throws JobParametersNotFoundException if there is a problem
-	 */
-	private JobParameters getNextJobParameters(Job job) throws JobParametersNotFoundException {
-		String jobIdentifier = job.getName();
-		JobParameters jobParameters;
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, 0, 1);
-
-		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
-		if (incrementer == null) {
-			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobIdentifier);
-		}
-
-		if (lastInstances.isEmpty()) {
-			jobParameters = incrementer.getNext(new JobParameters());
-			if (jobParameters == null) {
-				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job="
-						+ jobIdentifier);
-			}
-		}
-		else {
-			List<JobExecution> lastExecutions = jobExplorer.getJobExecutions(lastInstances.get(0));
-			jobParameters = incrementer.getNext(lastExecutions.get(0).getJobParameters());
-		}
-		return jobParameters;
-	}
-
-	/**
 	 * Launch a batch job using a {@link CommandLineJobRunner}. Creates a new
 	 * Spring context for the job execution, and uses a common parent for all
 	 * such contexts. No exception are thrown from this method, rather
@@ -515,7 +482,7 @@ public class CommandLineJobRunner {
 	 * interpreted either as the name of the job or the id of the job execution
 	 * that failed.</li>
 	 * <li>-next: (optional) if the job has a {@link JobParametersIncrementer}
-	 * that can be used to launch the next in a sequence</li>
+	 * that can be used to launch the next instance in a sequence</li>
 	 * <li>jobPath: the xml application context containing a {@link Job}
 	 * <li>jobIdentifier: the bean id of the job or id of the failed execution
 	 * in the case of a restart.

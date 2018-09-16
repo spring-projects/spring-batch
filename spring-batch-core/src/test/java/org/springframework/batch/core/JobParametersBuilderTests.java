@@ -23,7 +23,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
@@ -55,6 +57,9 @@ public class JobParametersBuilderTests {
 	private List<JobExecution> jobExecutionList;
 
 	private Date date = new Date(System.currentTimeMillis());
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Before
 	public void initialize() {
@@ -198,9 +203,10 @@ public class JobParametersBuilderTests {
 
 	@Test
 	public void testGetNextJobParametersNoIncrementer(){
+		expectedException.expect(IllegalArgumentException.class);
+		expectedException.expectMessage("No job parameters incrementer found for job=simpleJob");
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
 	}
 
 	@Test
@@ -226,14 +232,13 @@ public class JobParametersBuilderTests {
 		initializeForNextJobParameters();
 		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", new Long(1), false);
 		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
+		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 5);
 	}
 
 	@Test
 	public void testGetNextJobParametersNoPreviousExecution(){
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		this.jobExecutionList.add(null);
 		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();

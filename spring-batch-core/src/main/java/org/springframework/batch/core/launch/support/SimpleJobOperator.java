@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -45,7 +45,6 @@ import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
@@ -79,6 +78,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
@@ -334,30 +334,15 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see JobOperator#startNextInstance(String )
 	 */
 	@Override
-	public Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
+	public Long startNextInstance(String jobName) throws NoSuchJobException,
 	UnexpectedJobExecutionException, JobParametersInvalidException {
 
 		logger.info("Locating parameters for next instance of job with name=" + jobName);
 
 		Job job = jobRegistry.getJob(jobName);
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, 0, 1);
-
-		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
-		if (incrementer == null) {
-			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobName);
-		}
-
-		JobParameters parameters;
-		if (lastInstances.isEmpty()) {
-			parameters = incrementer.getNext(new JobParameters());
-			if (parameters == null) {
-				throw new JobParametersNotFoundException("No bootstrap parameters found for job=" + jobName);
-			}
-		}
-		else {
-			List<JobExecution> lastExecutions = jobExplorer.getJobExecutions(lastInstances.get(0));
-			parameters = incrementer.getNext(lastExecutions.get(0).getJobParameters());
-		}
+		JobParameters parameters = new JobParametersBuilder(jobExplorer)
+				.getNextJobParameters(job)
+				.toJobParameters();
 
 		logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
 		try {
