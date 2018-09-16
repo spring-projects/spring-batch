@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleJobOperatorTests {
@@ -153,6 +154,7 @@ public class SimpleJobOperatorTests {
 	 */
 	@Test
 	public void testStartNextInstanceSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
