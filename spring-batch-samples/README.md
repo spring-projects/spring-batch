@@ -23,7 +23,7 @@ Here is a list of samples with checks to indicate which features each one demons
 
 Job/Feature                                       | skip | retry | restart | automatic mapping | asynch launch | validation | delegation | write behind | non-squenetial | asynch process | filtering 
 :------------------------------------------------ | :--: | :---: | :-----: | :---------------: | :-----------: | :--------: | :--------: | :----------: | :------------: | :------------: | :-------: 
-[adhocLoop](#adhoc-loop-and-jmx-demo)             |      |       |         |                   |        X      |            |            |              |                |                |           
+[Adhoc Loop and JMX Demo](#adhoc-loop-and-jmx-demo)             |      |       |         |                   |        X      |            |            |              |                |                |           
 [AmqpJobFunctionalTests](#amqp)                   |      |       |         |                   |               |            |            |              |                |       X        |           
 [beanWrapperMapperSample](#beanWrapperMapper)     |      |       |         |       X           |               |            |            |              |                |                |           
 [compositeItemWriterSample](#compositeItemWriter) |      |       |         |                   |               |            |     X      |              |                |                |           
