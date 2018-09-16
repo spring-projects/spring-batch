@@ -42,8 +42,8 @@ Job/Feature                                       | skip | retry | restart | aut
 [remoteChunking](#remoteChunking)                 |      |       |         |                   |               |            |            |              |                |         X      |           
 [quartz](#quartz)                                 |      |       |         |                   |        X      |            |            |              |                |                |           
 [restart](#restart)                               |      |       |   X     |                   |               |            |            |              |                |                |           
-[retry](#retry)                                   |      |   X   |         |                   |               |            |            |              |                |                |           
-[skip](#skip)                                     |  X   |       |         |                   |               |            |            |              |                |                |           
+[retry](#retry-sample)                            |      |   X   |         |                   |               |            |            |              |                |                |           
+[skip](#skip-sample)                              |  X   |       |         |                   |               |            |            |              |                |                |           
 [trade](#trade)                                   |      |       |         |                   |               |       X    |            |              |                |                |           
 
 The [ioSampleJob](id:ioSample) has a number of special instances that show different IO features using the same job configuration but with different readers and writers:
