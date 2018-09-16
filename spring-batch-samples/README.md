@@ -89,7 +89,7 @@ JMX using the Eclipse launch configuration "jmxLauncher".
 The JMX launcher uses an additional XML configuration file
 (adhoc-job-launcher-context.xml) to set up a `JobOperator` for
 running jobs asynchronously (i.e. in a background thread).  This
-follows the same pattern as the [Quartz sample](#quartz), so see that section
+follows the same pattern as the [Quartz sample](#quartz-sample), so see that section
  for more details of the `JobLauncher` configuration.
 
 The rest of the configuration for this demo consists of exposing
