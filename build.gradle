@@ -99,6 +99,7 @@ allprojects {
 		xstreamVersion = '1.4.10'
 		jrubyVersion = '1.7.26'
 		beanshellVersion = '2.0b5'
+		jaxbVersion = '2.3.0'
 	}
 
 	apply plugin: 'idea'
@@ -170,10 +171,6 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 //		testLogging {
 //			showStandardStreams = true
 //		}
-
-		if (JavaVersion.current().isJava9Compatible()) {
-			jvmArgs '--add-modules', 'java.xml.bind'
-		}
 	}
 
 	task sourcesJar(type: Jar) {
@@ -328,6 +325,7 @@ project('spring-batch-infrastructure') {
 		testCompile "org.aspectj:aspectjweaver:$aspectjVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
+		testCompile "javax.xml.bind:jaxb-api:$jaxbVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"
@@ -335,6 +333,8 @@ project('spring-batch-infrastructure') {
 		testRuntime "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
 		testRuntime "org.glassfish:javax.el:$javaxElVersion"
 		testRuntime "org.beanshell:bsh:$beanshellVersion"
+		testRuntime "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+		testRuntime "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
 
 		optional "javax.jms:javax.jms-api:$jmsVersion"
 		optional "com.fasterxml.jackson.core:jackson-databind:${jackson2Version}"
@@ -476,6 +476,7 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.springframework:spring-jdbc:$springVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
+		testCompile "javax.xml.bind:jaxb-api:$jaxbVersion"
 
 		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
 			optional dep
@@ -622,6 +623,9 @@ project('spring-batch-samples') {
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion"
 		testRuntime "org.glassfish:javax.el:$javaxElVersion"
+		testRuntime "javax.xml.bind:jaxb-api:$jaxbVersion"
+		testRuntime "com.sun.xml.bind:jaxb-core:$jaxbVersion"
+		testRuntime "com.sun.xml.bind:jaxb-impl:$jaxbVersion"
 
 		provided "mysql:mysql-connector-java:$mysqlVersion"
 		provided "com.h2database:h2:$h2databaseVersion"
