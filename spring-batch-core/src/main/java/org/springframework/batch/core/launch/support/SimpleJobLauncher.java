@@ -165,6 +165,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		}
 		catch (TaskRejectedException e) {
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
+			jobExecution.setStartTime(new Date(System.currentTimeMillis()));
 			jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
