@@ -19,11 +19,16 @@ package org.springframework.batch.core.launch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -46,6 +51,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Lucas Ward
@@ -263,6 +269,29 @@ public class SimpleJobLauncherTests {
 		finally {
 			assertEquals(exitStatus, jobExecution.getExitStatus());
 		}
+	}
+
+	//BATCH-2760
+	@Test
+	public void testEndTimePopulatedWhenTaskExecutorExecuteFails() throws Exception {
+		//Given
+		ThreadPoolTaskExecutor mockThreadPoolTaskExecutor = mock(ThreadPoolTaskExecutor.class);
+		doThrow(new TaskRejectedException("submit rejected")).when(mockThreadPoolTaskExecutor).execute(any(Runnable.class));
+
+		JobExecution mockJobExecution = mock(JobExecution.class);
+		when(mockJobExecution.getExitStatus()).thenReturn(ExitStatus.UNKNOWN);
+
+		when(jobRepository.createJobExecution(anyString(), any())).thenReturn(mockJobExecution);
+
+		jobLauncher.setTaskExecutor(mockThreadPoolTaskExecutor);
+
+		//When
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+
+		//Then
+		verify(jobExecution).setStartTime(any(Date.class));
+		verify(jobExecution).setEndTime(any(Date.class));
+
 	}
 
 	private boolean contains(String str, String searchStr) {
