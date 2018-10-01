@@ -37,10 +37,10 @@ import org.springframework.util.StringUtils;
  *
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0
  * @see RepositoryItemReader
  */
-
 public class RepositoryItemReaderBuilder<T> {
 
 	private PagingAndSortingRepository<?, ?> repository;
@@ -129,6 +129,17 @@ public class RepositoryItemReaderBuilder<T> {
 		this.arguments = arguments;
 
 		return this;
+	}
+
+	/**
+	 * Arguments to be passed to the data providing method.
+	 *
+	 * @param arguments the method arguments to be passed to the repository.
+	 * @return The current instance of the builder.
+	 * @see RepositoryItemReader#setArguments(List)
+	 */
+	public RepositoryItemReaderBuilder<T> arguments(Object... arguments) {
+		return arguments(Arrays.asList(arguments));
 	}
 
 	/**

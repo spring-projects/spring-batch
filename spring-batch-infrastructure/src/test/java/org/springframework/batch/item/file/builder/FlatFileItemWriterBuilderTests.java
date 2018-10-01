@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  */
 public class FlatFileItemWriterBuilderTests {
 
@@ -58,10 +59,10 @@ public class FlatFileItemWriterBuilderTests {
 				.resource(output)
 				.delimited()
 				.delimiter(";")
-				.names(new String[] {"foo", "bar"})
+				.names("foo", "bar")
 				.formatted()
 				.format("%2s%2s")
-				.names(new String[] {"foo", "bar"})
+				.names("foo", "bar")
 				.build();
 	}
 
@@ -101,7 +102,7 @@ public class FlatFileItemWriterBuilderTests {
 				.resource(output)
 				.lineSeparator("$")
 				.delimited()
-				.names(new String[] {"first", "second", "third"})
+				.names("first", "second", "third")
 				.encoding("UTF-16LE")
 				.headerCallback(writer1 -> writer1.append("HEADER"))
 				.footerCallback(writer12 -> writer12.append("FOOTER"))
@@ -129,7 +130,7 @@ public class FlatFileItemWriterBuilderTests {
 				.lineSeparator("$")
 				.delimited()
 				.delimiter(";")
-				.names(new String[] {"first", "second", "third"})
+				.names("first", "second", "third")
 				.encoding("UTF-16LE")
 				.headerCallback(writer1 -> writer1.append("HEADER"))
 				.footerCallback(writer12 -> writer12.append("FOOTER"))
@@ -185,7 +186,7 @@ public class FlatFileItemWriterBuilderTests {
 				.lineSeparator("$")
 				.formatted()
 				.format("%2s%2s%2s")
-				.names(new String[] {"first", "second", "third"})
+				.names("first", "second", "third")
 				.encoding("UTF-16LE")
 				.headerCallback(writer1 -> writer1.append("HEADER"))
 				.footerCallback(writer12 -> writer12.append("FOOTER"))

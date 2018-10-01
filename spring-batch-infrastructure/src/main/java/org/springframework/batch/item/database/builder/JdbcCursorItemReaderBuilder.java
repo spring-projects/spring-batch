@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Drummond Dawson
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -246,7 +247,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * @param args values to set on the reader query
 	 * @return this instance for method chaining
 	 */
-	public JdbcCursorItemReaderBuilder<T> queryArguments(Object[] args) {
+	public JdbcCursorItemReaderBuilder<T> queryArguments(Object... args) {
 		this.preparedStatementSetter = new ArgumentPreparedStatementSetter(args);
 
 		return this;
