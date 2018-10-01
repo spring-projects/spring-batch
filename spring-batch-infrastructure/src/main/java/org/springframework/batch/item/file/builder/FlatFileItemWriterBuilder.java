@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0
  * @see FlatFileItemWriter
  */
@@ -364,7 +365,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
 		 */
-		public FlatFileItemWriterBuilder<T> names(String[] names) {
+		public FlatFileItemWriterBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}
@@ -438,7 +439,7 @@ public class FlatFileItemWriterBuilder<T> {
 		 * @return The parent {@link FlatFileItemWriterBuilder}
 		 * @see BeanWrapperFieldExtractor#setNames(String[])
 		 */
-		public FlatFileItemWriterBuilder<T> names(String[] names) {
+		public FlatFileItemWriterBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}

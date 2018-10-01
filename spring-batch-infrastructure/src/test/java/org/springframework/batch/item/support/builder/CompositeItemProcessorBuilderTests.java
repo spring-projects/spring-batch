@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
+ * @author Drummond Dawson
  */
 public class CompositeItemProcessorBuilderTests {
 
@@ -69,8 +70,24 @@ public class CompositeItemProcessorBuilderTests {
 	}
 
 	@Test
+	public void testTransformVarargs() throws Exception {
+		Object item = new Object();
+		Object itemAfterFirstTransformation = new Object();
+		Object itemAfterSecondTransformation = new Object();
+		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
+				.delegates(this.processor1, this.processor2).build();
+
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
+		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
+
+		assertSame(itemAfterSecondTransformation, composite.process(item));
+	}
+
+	@Test
 	public void testNullOrEmptyDelegates() throws Exception {
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(new ArrayList<>()),
+				"The delegates list must have one or more delegates.");
+		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(),
 				"The delegates list must have one or more delegates.");
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>(),
 				"A list of delegates is required.");

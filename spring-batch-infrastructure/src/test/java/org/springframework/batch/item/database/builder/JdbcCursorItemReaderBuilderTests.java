@@ -46,6 +46,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
+ * @author Drummond Dawson
  */
 public class JdbcCursorItemReaderBuilderTests {
 
@@ -156,7 +157,7 @@ public class JdbcCursorItemReaderBuilderTests {
 				.dataSource(this.dataSource)
 				.name("fooReader")
 				.sql("SELECT * FROM FOO WHERE FIRST > ? ORDER BY FIRST")
-				.queryArguments(new Integer[] {3})
+				.queryArguments(3)
 				.rowMapper((rs, rowNum) -> {
 					Foo foo = new Foo();
 

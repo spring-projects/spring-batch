@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
+ * @author Drummond Dawson
  */
 public class RepositoryItemReaderBuilderTests {
 
@@ -251,6 +252,26 @@ public class RepositoryItemReaderBuilderTests {
 				.methodName("foo")
 				.name("bar")
 				.arguments(args)
+				.build();
+
+		String result = (String) reader.read();
+		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
+	}
+
+	@Test
+	public void testVarargArguments() throws Exception {
+		ArgumentCaptor<String> arg1Captor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
+		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
+				this.pageRequestContainer.capture())).thenReturn(this.page);
+
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
+				.sorts(this.sorts)
+				.maxItemCount(5)
+				.methodName("foo")
+				.name("bar")
+				.arguments(ARG1, ARG2, ARG3)
 				.build();
 
 		String result = (String) reader.read();

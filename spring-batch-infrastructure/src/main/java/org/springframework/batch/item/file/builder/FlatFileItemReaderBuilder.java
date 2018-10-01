@@ -54,6 +54,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -183,7 +184,7 @@ public class FlatFileItemReaderBuilder<T> {
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemReader#setComments(String[])
 	 */
-	public FlatFileItemReaderBuilder<T> comments(String[] comments) {
+	public FlatFileItemReaderBuilder<T> comments(String... comments) {
 		this.comments.addAll(Arrays.asList(comments));
 		return this;
 	}
@@ -610,7 +611,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The parent {@link FlatFileItemReaderBuilder}
 		 * @see DelimitedLineTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String [] names) {
+		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}
@@ -691,7 +692,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> columns(Range[] ranges) {
+		public FixedLengthBuilder<T> columns(Range... ranges) {
 			this.ranges.addAll(Arrays.asList(ranges));
 			return this;
 		}
@@ -728,7 +729,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The parent builder
 		 * @see FixedLengthTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String [] names) {
+		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}
