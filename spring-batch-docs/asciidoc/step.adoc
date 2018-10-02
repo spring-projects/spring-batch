@@ -432,7 +432,7 @@ The following example shows how to configure a job to have steps that can be res
         </tasklet>
     </step>
     <step id="playerSummarization">
-        <tasklet start-limit="3">
+        <tasklet start-limit="2">
             <chunk reader="playerSummarizationSource" writer="summaryWriter"
                    commit-interval="10"/>
         </tasklet>
@@ -475,7 +475,7 @@ public Step gameLoad() {
 @Bean
 public Step playerSummarization() {
 	return this.stepBuilderFactor.get("playerSummarization")
-			.startLimit(3)
+			.startLimit(2)
 			.<String, String>chunk(10)
 			.reader(playerSummarizationSource())
 			.writer(summaryWriter())
@@ -497,7 +497,7 @@ every time in case extra files have been added since it last ran. It has
 'allow-start-if-complete' set to 'true' in order to always be started. (It is assumed
 that the database tables games are loaded into has a process indicator on it, to ensure
 new games can be properly found by the summarization step). The summarization step,
-which is the most important in the job, is configured to have a start limit of 3. This
+which is the most important in the job, is configured to have a start limit of 2. This
 is useful because if the step continually fails, a new exit code is returned to the
 operators that control job execution, and it can not start again until manual
 intervention has taken place.
