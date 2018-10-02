@@ -434,7 +434,7 @@ project('spring-batch-core-tests') {
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 	}
 	test {
-		enabled = project.hasProperty('alltests') ? true : false
+		enabled = project.hasProperty('alltests')
 	}
 }
 
@@ -494,7 +494,7 @@ project('spring-batch-infrastructure-tests') {
 		runtime "org.postgresql:postgresql:$postgresqlVersion"
 	}
 	test {
-		enabled = project.hasProperty('alltests') ? true : false
+		enabled = project.hasProperty('alltests')
 	}
 }
 
