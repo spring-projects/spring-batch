@@ -2426,14 +2426,14 @@ cursor-based `ItemReaders` shown previously:
 [source, java, role="javaContent"]
 ----
 @Bean
-public JdbcPagingItemReader itemReader(DataSource dataSource) {
+public JdbcPagingItemReader itemReader(DataSource dataSource, PagingQueryProvider queryProvider) {
 	Map<String, Object> parameterValues = new HashMap<>();
 	parameterValues.put("status", "NEW");
 
 	return new JdbcPagingItemReaderBuilder<CustomerCredit>()
            				.name("creditReader")
            				.dataSource(dataSource)
-           				.queryProvider(queryProvider())
+           				.queryProvider(queryProvider)
            				.parameterValues(parameterValues)
            				.rowMapper(customerCreditMapper())
            				.pageSize(1000)
