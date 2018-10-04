@@ -156,7 +156,6 @@ public class ExecutionContext implements Serializable {
 	 * @param key The key to get a value for
 	 * @return The <code>String</code> value
 	 */
-	@Nullable
 	public String getString(String key) {
 
 		return (String) readAndValidate(key, String.class);
@@ -171,7 +170,6 @@ public class ExecutionContext implements Serializable {
 	 * @return The <code>String</code> value if key is represented, specified
 	 * default otherwise
 	 */
-	@Nullable
 	public String getString(String key, String defaultString) {
 		if (!containsKey(key)) {
 			return defaultString;

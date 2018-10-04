@@ -79,7 +79,7 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * Build the step from the components collected by the fluent setters. Delegates first to {@link #enhance(Step)} and
 	 * then to {@link #createTasklet()} in subclasses to create the actual tasklet.
 	 *
-	 * @return a tasklet step fully configured and read to execute
+	 * @return a tasklet step fully configured and ready to execute
 	 */
 	public TaskletStep build() {
 

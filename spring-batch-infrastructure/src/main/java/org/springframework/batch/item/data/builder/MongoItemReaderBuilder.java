@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
  * A builder implementation for the {@link MongoItemReader}
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see MongoItemReader
  */
@@ -242,7 +243,7 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Provide a Spring Data Mongo {@link Query}.  This will take precidence over a JSON
+	 * Provide a Spring Data Mongo {@link Query}.  This will take precedence over a JSON
 	 * configured query.
 	 *
 	 * @param query Query to execute

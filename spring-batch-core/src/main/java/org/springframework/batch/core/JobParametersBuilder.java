@@ -40,6 +40,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @author Minhyeok Jeong
  * @since 1.0
  * @see JobParameters
@@ -202,7 +203,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Conversion method that takes the current state of this builder and
-	 * returns it as a JobruntimeParameters object.
+	 * returns it as a JobParameters object.
 	 *
 	 * @return a valid {@link JobParameters} object.
 	 */

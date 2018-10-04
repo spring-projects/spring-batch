@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobScopeConfigurationTests {
@@ -78,9 +79,9 @@ public class JobScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlJobScopeWithInheritence() throws Exception {
+	public void testXmlJobScopeWithInheritance() throws Exception {
 		context = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsInheritence-context.xml");
+				"org/springframework/batch/core/configuration/annotation/JobScopeConfigurationTestsInheritance-context.xml");
 		JobSynchronizationManager.register(jobExecution);
 		SimpleHolder value = (SimpleHolder) context.getBean("child");
 		assertEquals("JOB", value.call());

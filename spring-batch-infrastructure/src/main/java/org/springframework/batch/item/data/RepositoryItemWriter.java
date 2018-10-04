@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -95,7 +96,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	}
 
 	/**
-	 * Performs the actual write to the repository.  This can be overriden by
+	 * Performs the actual write to the repository.  This can be overridden by
 	 * a subclass if necessary.
 	 *
 	 * @param items the list of items to be persisted.

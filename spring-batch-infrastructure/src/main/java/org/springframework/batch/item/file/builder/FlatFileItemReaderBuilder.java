@@ -628,7 +628,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 			tokenizer.setNames(this.names.toArray(new String[this.names.size()]));
 
-			if(StringUtils.hasText(this.delimiter)) {
+			if(StringUtils.hasLength(this.delimiter)) {
 				tokenizer.setDelimiter(this.delimiter);
 			}
 
@@ -657,7 +657,7 @@ public class FlatFileItemReaderBuilder<T> {
 				tokenizer.afterPropertiesSet();
 			}
 			catch (Exception e) {
-				throw new IllegalStateException("Unable to intialize DelimitedLineTokenizer", e);
+				throw new IllegalStateException("Unable to initialize DelimitedLineTokenizer", e);
 			}
 
 			return tokenizer;

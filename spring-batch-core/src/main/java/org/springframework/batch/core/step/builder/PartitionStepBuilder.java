@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.core.task.TaskExecutor;
  * multiple times with different input parameters (in the form of execution context). Useful for parallelization.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  */
@@ -133,7 +134,7 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 
 	/**
 	 * Provide an explicit {@link StepExecutionSplitter} instead of having one build from the
-	 * {@link #partitioner(String, Partitioner)}. USeful if you need more control over the splitting.
+	 * {@link #partitioner(String, Partitioner)}. Useful if you need more control over the splitting.
 	 *
 	 * @param splitter a step execution splitter
 	 * @return this for fluent chaining

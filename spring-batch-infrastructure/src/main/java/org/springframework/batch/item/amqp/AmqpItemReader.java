@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  */
 public class AmqpItemReader<T> implements ItemReader<T> {
 	private final AmqpTemplate amqpTemplate;
@@ -39,7 +40,7 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 	 * @param amqpTemplate the template to be used.  Must not be null.
 	 */
 	public AmqpItemReader(final AmqpTemplate amqpTemplate) {
-		Assert.notNull(amqpTemplate, "AmpqTemplate must not be null");
+		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
 
 		this.amqpTemplate = amqpTemplate;
 	}

@@ -63,6 +63,7 @@ import org.springframework.util.Assert;
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  */
@@ -235,7 +236,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * A {@link Function} to be delegated to as an {@link ItemProcessor}.  If this is set,
-	 * it will take precidence over any {@code ItemProcessor} configured via
+	 * it will take precedence over any {@code ItemProcessor} configured via
 	 * {@link #processor(ItemProcessor)}.
 	 *
 	 * @param function the function to delegate item processing to

@@ -95,10 +95,10 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	public String doWrite(List<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
 		Iterator<? extends T> iterator = items.iterator();
+		if (!items.isEmpty() && state.getLinesWritten() > 0) {
+			lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
+		}
 		while (iterator.hasNext()) {
-			if (iterator.hasNext() && state.getLinesWritten() > 0) {
-				lines.append(JSON_OBJECT_SEPARATOR).append(this.lineSeparator);
-			}
 			T item = iterator.next();
 			lines.append(' ').append(this.jsonObjectMarshaller.marshal(item));
 			if (iterator.hasNext()) {

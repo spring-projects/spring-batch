@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
  * of a {@link TaskletStep}.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrBatchletStepBuilder extends TaskletStepBuilder {
@@ -39,7 +40,7 @@ public class JsrBatchletStepBuilder extends TaskletStepBuilder {
 	private BatchPropertyContext batchPropertyContext;
 
 	/**
-	 * @param context used to resolve lazy binded properties
+	 * @param context used to resolve lazy bound properties
 	 */
 	public void setBatchPropertyContext(BatchPropertyContext context) {
 		this.batchPropertyContext = context;

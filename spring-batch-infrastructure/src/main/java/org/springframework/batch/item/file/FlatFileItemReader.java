@@ -122,7 +122,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * Factory for the {@link BufferedReader} that will be used to extract lines from the file. The default is fine for
-	 * plain text files, but this is a useful strategy for binary files where the standard BufferedReaader from java.io
+	 * plain text files, but this is a useful strategy for binary files where the standard BufferedReader from java.io
 	 * is limiting.
 	 * 
 	 * @param bufferedReaderFactory the bufferedReaderFactory to set

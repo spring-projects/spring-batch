@@ -97,7 +97,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 		synchronized (jobExecution) {
 			if (!persistedExecution.getVersion().equals(jobExecution.getVersion())) {
-				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + id
+				throw new OptimisticLockingFailureException("Attempt to update job execution id=" + id
 						+ " with wrong version (" + jobExecution.getVersion() + "), where current version is "
 						+ persistedExecution.getVersion());
 			}

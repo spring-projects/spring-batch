@@ -231,11 +231,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
+				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
 						new Object[] { jobExecution.getId() });
 				throw new OptimisticLockingFailureException("Attempt to update job execution id="
 						+ jobExecution.getId() + " with wrong version (" + jobExecution.getVersion()
-						+ "), where current version is " + curentVersion);
+						+ "), where current version is " + currentVersion);
 			}
 
 			jobExecution.incrementVersion();
