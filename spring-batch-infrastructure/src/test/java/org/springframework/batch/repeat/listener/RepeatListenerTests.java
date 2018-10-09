@@ -35,7 +35,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testBeforeInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void before(RepeatContext context) {
@@ -64,7 +64,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testBeforeInterceptorCanVeto() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListenerSupport() {
             @Override
 			public void before(RepeatContext context) {
@@ -86,7 +86,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testAfterInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
@@ -113,7 +113,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testOpenInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void open(RepeatContext context) {
@@ -139,7 +139,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testSingleOpenInterceptor() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListenerSupport() {
             @Override
 			public void open(RepeatContext context) {
@@ -160,7 +160,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testCloseInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void close(RepeatContext context) {
@@ -188,7 +188,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void onError(RepeatContext context, Throwable t) {
@@ -218,7 +218,7 @@ public class RepeatListenerTests extends TestCase {
 
 	public void testOnErrorInterceptorsPrecedence() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
@@ -250,8 +250,8 @@ public class RepeatListenerTests extends TestCase {
 	public void testAsynchronousOnErrorInterceptorsPrecedence() throws Exception {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
-		final List<Object> calls = new ArrayList<Object>();
-		final List<Object> fails = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
+		final List<Object> fails = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {

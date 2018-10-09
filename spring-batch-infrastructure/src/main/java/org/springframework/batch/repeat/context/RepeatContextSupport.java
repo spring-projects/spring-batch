@@ -35,7 +35,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	private volatile boolean terminateOnly;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
 	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but
@@ -128,7 +128,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -143,12 +143,12 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
     @Override
 	public void close() {
 
-		List<RuntimeException> errors = new ArrayList<RuntimeException>();
+		List<RuntimeException> errors = new ArrayList<>();
 
 		Set<Map.Entry<String, Set<Runnable>>> copy;
 
 		synchronized (callbacks) {
-			copy = new HashSet<Map.Entry<String, Set<Runnable>>>(callbacks.entrySet());
+			copy = new HashSet<>(callbacks.entrySet());
 		}
 
 		for (Map.Entry<String, Set<Runnable>> entry : copy) {

@@ -42,7 +42,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 
 	@Test
 	public void testEmptyKeyMatchesAnyLine() throws Exception {
-		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
             @Override
@@ -59,7 +59,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	@Test
 	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 
-		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", new LineTokenizer() {
             @Override
 			public FieldSet tokenize(String line) {

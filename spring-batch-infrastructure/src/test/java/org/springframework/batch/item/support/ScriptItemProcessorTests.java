@@ -38,7 +38,7 @@ import static org.junit.Assume.assumeTrue;
  * @since 3.1
  */
 public class ScriptItemProcessorTests {
-	private static List<String> availableLanguages = new ArrayList<String>();
+	private static List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeClass
 	public static void populateAvailableEngines() {
@@ -53,7 +53,7 @@ public class ScriptItemProcessorTests {
 	public void testJavascriptScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("item.toUpperCase();", "javascript");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -64,7 +64,7 @@ public class ScriptItemProcessorTests {
 	public void testJavascriptScriptSourceFunction() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", "javascript");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -75,7 +75,7 @@ public class ScriptItemProcessorTests {
 	public void testJRubyScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("jruby"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("$item.upcase", "jruby");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -86,7 +86,7 @@ public class ScriptItemProcessorTests {
 	public void testJRubyScriptSourceMethod() throws Exception {
 		assumeTrue(languageExists("jruby"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("def process(item) $item.upcase end \n process($item)", "jruby");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -97,7 +97,7 @@ public class ScriptItemProcessorTests {
 	public void testBeanShellScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("item.toUpperCase();", "bsh");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -108,7 +108,7 @@ public class ScriptItemProcessorTests {
 	public void testBeanShellScriptSourceFunction() throws Exception {
 		assumeTrue(languageExists("bsh"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);", "bsh");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -119,7 +119,7 @@ public class ScriptItemProcessorTests {
 	public void testGroovyScriptSourceSimple() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("item.toUpperCase();", "groovy");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -130,7 +130,7 @@ public class ScriptItemProcessorTests {
 	public void testGroovyScriptSourceMethod() throws Exception {
 		assumeTrue(languageExists("groovy"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)", "groovy");
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -143,7 +143,7 @@ public class ScriptItemProcessorTests {
 
 		Resource resource = new ClassPathResource("org/springframework/batch/item/support/processor-test-simple.js");
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScript(resource);
 		scriptItemProcessor.afterPropertiesSet();
 
@@ -152,7 +152,7 @@ public class ScriptItemProcessorTests {
 
 	@Test
 	public void testItemBinding() throws Exception {
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("foo.contains('World');", "javascript");
 		scriptItemProcessor.setItemBindingVariableName("foo");
 
@@ -163,13 +163,13 @@ public class ScriptItemProcessorTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testNoScriptSet() throws Exception {
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.afterPropertiesSet();
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testScriptSourceAndScriptResourceSet() throws Exception {
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("blah", "blah");
 		scriptItemProcessor.setScript(new ClassPathResource("blah"));
 		scriptItemProcessor.afterPropertiesSet();
@@ -177,13 +177,13 @@ public class ScriptItemProcessorTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testNoScriptSetWithoutInitBean() throws Exception {
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.process("blah");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testScriptSourceWithNoLanguage() throws Exception {
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", null);
 		scriptItemProcessor.afterPropertiesSet();
 	}
@@ -192,7 +192,7 @@ public class ScriptItemProcessorTests {
 	public void testItemBindingNameChange() throws Exception {
 		assumeTrue(languageExists("javascript"));
 
-		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
+		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setItemBindingVariableName("someOtherVarName");
 		scriptItemProcessor.setScriptSource("function process(param) { return param.toUpperCase(); } process(someOtherVarName);", "javascript");
 		scriptItemProcessor.afterPropertiesSet();

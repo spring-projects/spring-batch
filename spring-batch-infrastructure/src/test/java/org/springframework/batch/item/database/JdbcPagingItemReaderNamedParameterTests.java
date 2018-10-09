@@ -59,7 +59,7 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractJdbcPagingI
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setWhereClause("where VALUE >= :limit");
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));

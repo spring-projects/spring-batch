@@ -31,7 +31,7 @@ import org.springframework.batch.item.ItemStreamException;
  */
 public class CompositeItemStream implements ItemStream {
 
-	private List<ItemStream> streams = new ArrayList<ItemStream>();
+	private List<ItemStream> streams = new ArrayList<>();
 
 	/**
 	 * Public setter for the {@link ItemStream}s.

@@ -54,9 +54,9 @@ public class RepositoryItemReaderTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		sorts = new HashMap<String, Sort.Direction>();
+		sorts = new HashMap<>();
 		sorts.put("id", Direction.ASC);
-		reader = new RepositoryItemReader<Object>();
+		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);
 		reader.setPageSize(1);
 		reader.setSort(sorts);
@@ -66,13 +66,13 @@ public class RepositoryItemReaderTests {
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		try {
-			new RepositoryItemReader<Object>().afterPropertiesSet();
+            new RepositoryItemReader<>().afterPropertiesSet();
 			fail();
 		} catch (IllegalStateException e) {
 		}
 
 		try {
-			reader = new RepositoryItemReader<Object>();
+			reader = new RepositoryItemReader<>();
 			reader.setRepository(repository);
 			reader.afterPropertiesSet();
 			fail();
@@ -80,7 +80,7 @@ public class RepositoryItemReaderTests {
 		}
 
 		try {
-			reader = new RepositoryItemReader<Object>();
+			reader = new RepositoryItemReader<>();
 			reader.setRepository(repository);
 			reader.setPageSize(-1);
 			reader.afterPropertiesSet();
@@ -89,7 +89,7 @@ public class RepositoryItemReaderTests {
 		}
 
 		try {
-			reader = new RepositoryItemReader<Object>();
+			reader = new RepositoryItemReader<>();
 			reader.setRepository(repository);
 			reader.setPageSize(1);
 			reader.afterPropertiesSet();
@@ -97,7 +97,7 @@ public class RepositoryItemReaderTests {
 		} catch (IllegalStateException iae) {
 		}
 
-		reader = new RepositoryItemReader<Object>();
+		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);
 		reader.setPageSize(1);
 		reader.setSort(sorts);
@@ -108,7 +108,7 @@ public class RepositoryItemReaderTests {
 	public void testDoReadFirstReadNoResults() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>()));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
 		assertNull(reader.doRead());
 
@@ -125,7 +125,7 @@ public class RepositoryItemReaderTests {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add(result);
 		}}));
 
@@ -143,9 +143,9 @@ public class RepositoryItemReaderTests {
 	public void testDoReadFirstReadSecondPage() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add(new Object());
-		}})).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		}})).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add(result);
 		}}));
 
@@ -164,11 +164,11 @@ public class RepositoryItemReaderTests {
 	public void testDoReadFirstReadExhausted() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add(new Object());
-		}})).thenReturn(new PageImpl<Object>(new ArrayList<Object>(){{
+		}})).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add(result);
-		}})).thenReturn(new PageImpl<Object>(new ArrayList<Object>()));
+		}})).thenReturn(new PageImpl<>(new ArrayList<>()));
 
 		assertFalse(reader.doRead() == result);
 		assertEquals(result, reader.doRead());
@@ -186,7 +186,7 @@ public class RepositoryItemReaderTests {
 	public void testJumpToItem() throws Exception {
 		reader.setPageSize(100);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<Object>(new ArrayList<Object>() {{
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add(new Object());
 		}}));
 
@@ -214,7 +214,7 @@ public class RepositoryItemReaderTests {
 	@Test
 	public void testDifferentTypes() throws Exception {
 		TestRepository differentRepository = mock(TestRepository.class);
-		RepositoryItemReader<String> reader = new RepositoryItemReader<String>();
+		RepositoryItemReader<String> reader = new RepositoryItemReader<>();
 		sorts = new HashMap<>();
 		sorts.put("id", Direction.ASC);
 		reader.setRepository(differentRepository);
@@ -223,7 +223,7 @@ public class RepositoryItemReaderTests {
 		reader.setMethodName("findFirstNames");
 
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(differentRepository.findFirstNames(pageRequestContainer.capture())).thenReturn(new PageImpl<String>(new ArrayList<String>(){{
+		when(differentRepository.findFirstNames(pageRequestContainer.capture())).thenReturn(new PageImpl<>(new ArrayList<String>(){{
 			add("result");
 		}}));
 

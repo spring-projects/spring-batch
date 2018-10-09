@@ -134,7 +134,7 @@ final class PropertyMatches {
 	 * @param maxDistance the maximum distance to accept
 	 */
 	private String[] calculateMatches(PropertyDescriptor[] propertyDescriptors, int maxDistance) {
-		List<String> candidates = new ArrayList<String>();
+		List<String> candidates = new ArrayList<>();
 		for (int i = 0; i < propertyDescriptors.length; i++) {
 			if (propertyDescriptors[i].getWriteMethod() != null) {
 				String possibleAlternative = propertyDescriptors[i].getName();

@@ -44,7 +44,7 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 
 	public UnopenedElementClosingEventWriter(XMLEventWriter wrappedEventWriter, Writer ioWriter, List<QName> unopenedElements) {
 		super(wrappedEventWriter);
-		this.unopenedElements = new LinkedList<QName>(unopenedElements);
+		this.unopenedElements = new LinkedList<>(unopenedElements);
 		this.ioWriter = ioWriter;
 	}
 

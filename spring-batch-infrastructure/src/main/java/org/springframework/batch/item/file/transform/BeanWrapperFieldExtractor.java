@@ -50,7 +50,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	 */
     @Override
 	public Object[] extract(T item) {
-		List<Object> values = new ArrayList<Object>();
+		List<Object> values = new ArrayList<>();
 
 		BeanWrapper bw = new BeanWrapperImpl(item);
 		for (String propertyName : this.names) {

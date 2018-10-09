@@ -992,7 +992,7 @@ public class StaxEventItemWriterTests {
 	 * @return new instance of fully configured writer
 	 */
 	private StaxEventItemWriter<Object> createItemWriter() throws Exception {
-		StaxEventItemWriter<Object> source = new StaxEventItemWriter<Object>();
+		StaxEventItemWriter<Object> source = new StaxEventItemWriter<>();
 		source.setResource(resource);
 
 		marshaller = new SimpleMarshaller();

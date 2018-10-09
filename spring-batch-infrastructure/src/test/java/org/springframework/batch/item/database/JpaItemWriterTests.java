@@ -49,14 +49,14 @@ public class JpaItemWriterTests {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
-		writer = new JpaItemWriter<Object>();
+		writer = new JpaItemWriter<>();
 		emf = mock(EntityManagerFactory.class,"emf");
 		writer.setEntityManagerFactory(emf);
 	}
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new JpaItemWriter<Object>();
+		writer = new JpaItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");

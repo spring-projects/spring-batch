@@ -290,8 +290,8 @@ public class SqlPagingQueryUtils {
 	 */
 	public static void buildSortConditions(
 			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
-		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeys().entrySet());
-		List<String> clauses = new ArrayList<String>();
+		List<Map.Entry<String, Order>> keys = new ArrayList<>(provider.getSortKeys().entrySet());
+		List<String> clauses = new ArrayList<>();
 		
 		for(int i = 0; i < keys.size(); i++) {
 			StringBuilder clause = new StringBuilder();

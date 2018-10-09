@@ -57,7 +57,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 		if (limit <= 0) {
 			return;
 		}
-		Map<Class<? extends Throwable>, Integer> thresholds = new HashMap<Class<? extends Throwable>, Integer>();
+		Map<Class<? extends Throwable>, Integer> thresholds = new HashMap<>();
 		for (Class<? extends Throwable> type : exceptionClasses) {
 			thresholds.put(type, limit);
 		}

@@ -31,9 +31,9 @@ public class FooService {
 	public static final int GENERATION_LIMIT = 10;
 	
 	private int counter = 0;
-	private List<Foo> generatedFoos = new ArrayList<Foo>(GENERATION_LIMIT);
-	private List<Foo> processedFoos = new ArrayList<Foo>(GENERATION_LIMIT);
-	private List<Foo> processedFooNameValuePairs = new ArrayList<Foo>(GENERATION_LIMIT);
+	private List<Foo> generatedFoos = new ArrayList<>(GENERATION_LIMIT);
+	private List<Foo> processedFoos = new ArrayList<>(GENERATION_LIMIT);
+	private List<Foo> processedFooNameValuePairs = new ArrayList<>(GENERATION_LIMIT);
 	
 	public Foo generateFoo() {
 		if (counter++ >= GENERATION_LIMIT) return null;

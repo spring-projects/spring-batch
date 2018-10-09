@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  */
 public abstract class ExtractorLineAggregator<T> implements LineAggregator<T> {
 
-	private FieldExtractor<T> fieldExtractor = new PassThroughFieldExtractor<T>();
+	private FieldExtractor<T> fieldExtractor = new PassThroughFieldExtractor<>();
 
 	/**
 	 * Public setter for the field extractor responsible for splitting an input

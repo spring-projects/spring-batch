@@ -39,7 +39,7 @@ public class ListItemReader<T> implements ItemReader<T> {
 			this.list = list;
 		}
 		else {
-			this.list = new ArrayList<T>(list);
+			this.list = new ArrayList<>(list);
 		}
 	}
 

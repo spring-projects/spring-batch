@@ -42,14 +42,14 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		ps = mock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
 		
-		key = new LinkedHashMap<String, Object>(2);
+		key = new LinkedHashMap<>(2);
 		key.put("1", Integer.valueOf(1));
 		key.put("2", Integer.valueOf(2));
 	}
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
-		mapper.setValues(new HashMap<String, Object>(), ps);
+		mapper.setValues(new HashMap<>(), ps);
 	}
 	
 	public void testCreateSetter() throws Exception {

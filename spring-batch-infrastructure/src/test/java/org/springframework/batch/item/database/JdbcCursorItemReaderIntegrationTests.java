@@ -30,7 +30,7 @@ public class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSou
 
     @Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
-		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<Foo>();
+		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>();
 		result.setDataSource(dataSource);
 		result.setSql("select ID, NAME, VALUE from T_FOOS");
 		result.setIgnoreWarnings(true);

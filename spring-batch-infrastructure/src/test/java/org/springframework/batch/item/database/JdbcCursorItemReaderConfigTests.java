@@ -58,7 +58,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
 		reader.setUseSharedExtendedConnection(true);
 		reader.setSql("select foo from bar");
@@ -90,7 +90,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
@@ -118,7 +118,7 @@ public class JdbcCursorItemReaderConfigTests {
 				ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		reader.setConnectionAutoCommit(neededAutoCommit);

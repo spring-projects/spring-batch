@@ -126,7 +126,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			line = "";
 		}
 
-		List<String> tokens = new ArrayList<String>(doTokenize(line));
+		List<String> tokens = new ArrayList<>(doTokenize(line));
 		
 		// if names are set and strict flag is false
 		if ( ( names.length != 0 ) && ( ! strict ) ) {

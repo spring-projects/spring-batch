@@ -30,7 +30,7 @@ import org.springframework.validation.Validator;
  */
 public class SpringValidatorTests {
 
-	private SpringValidator<Object> validator = new SpringValidator<Object>();
+	private SpringValidator<Object> validator = new SpringValidator<>();
 
 	private Validator mockValidator;
 

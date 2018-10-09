@@ -123,7 +123,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	private Map<String, Order> getSortKeysReplaced(Object qualifierReplacement) {
 		final String newQualifier = "" + qualifierReplacement;
-		final Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		final Map<String, Order> sortKeys = new LinkedHashMap<>();
 		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
 			sortKeys.put(sortKey.getKey().replaceFirst("^.*\\.", newQualifier), sortKey.getValue());
 		}

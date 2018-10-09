@@ -80,6 +80,6 @@ public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, Ini
 
 	public void setFieldSetMappers(Map<String, FieldSetMapper<T>> fieldSetMappers) {
 		Assert.isTrue(!fieldSetMappers.isEmpty(), "The 'fieldSetMappers' property must be non-empty");
-		this.patternMatcher = new PatternMatcher<FieldSetMapper<T>>(fieldSetMappers);
+		this.patternMatcher = new PatternMatcher<>(fieldSetMappers);
 	}
 }

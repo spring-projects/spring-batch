@@ -67,7 +67,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testSetTemplate() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
             @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
@@ -87,7 +87,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testCallbackNotExecuted() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
             @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
@@ -160,7 +160,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List<Object> list = new ArrayList<Object>();
+		final List<Object> list = new ArrayList<>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
             @Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {

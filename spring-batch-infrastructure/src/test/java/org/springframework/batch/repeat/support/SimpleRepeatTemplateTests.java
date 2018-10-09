@@ -58,7 +58,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	@Test
 	public void testExecute() throws Exception {
-		template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
+		template.iterate(new ItemReaderRepeatCallback<>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 	}
 
@@ -72,7 +72,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
-		template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
+		template.iterate(new ItemReaderRepeatCallback<>(provider, processor));
 
 		assertEquals(2, processor.count);
 
@@ -113,7 +113,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	public void testContextClosedOnNormalCompletion() throws Exception {
 
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
             @Override
@@ -149,7 +149,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	public void testContextClosedOnAbnormalCompletion() throws Exception {
 
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
             @Override
@@ -191,7 +191,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	@Test
 	public void testExceptionHandlerCalledOnAbnormalCompletion() throws Exception {
 
-		final List<Throwable> list = new ArrayList<Throwable>();
+		final List<Throwable> list = new ArrayList<>();
 
 		template.setExceptionHandler(new ExceptionHandler() {
             @Override
@@ -358,7 +358,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	@Test
 	public void testResult() throws Exception {
-		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
+		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// We are complete - do not expect to be called again
 		assertFalse(result.isContinuable());

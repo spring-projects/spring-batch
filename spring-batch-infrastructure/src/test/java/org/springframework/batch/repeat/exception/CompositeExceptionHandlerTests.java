@@ -39,7 +39,7 @@ public class CompositeExceptionHandlerTests extends TestCase {
 	}
 
 	public void testDelegation() throws Throwable {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		handler.setHandlers(new ExceptionHandler[] {
 			new ExceptionHandler() {
                 @Override

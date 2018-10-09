@@ -70,7 +70,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<Throwable, Level>(Level.RETHROW);
+	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<>(Level.RETHROW);
 
 	/**
 	 * Setter for the {@link Classifier} used by this handler. The default is to

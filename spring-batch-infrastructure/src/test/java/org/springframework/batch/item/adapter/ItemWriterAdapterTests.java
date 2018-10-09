@@ -52,7 +52,7 @@ public class ItemWriterAdapterTests {
 	@Test
 	public void testProcess() throws Exception {
 		Foo foo;
-		List<Foo> foos = new ArrayList<Foo>();
+		List<Foo> foos = new ArrayList<>();
 		while ((foo = fooService.generateFoo()) != null) {
 			foos.add(foo);
 		}

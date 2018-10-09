@@ -36,7 +36,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class HibernateItemReaderHelperTests {
 	
-	private HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<String>();
+	private HibernateItemReaderHelper<String> helper = new HibernateItemReaderHelper<>();
 	
 	private SessionFactory sessionFactory = mock(SessionFactory.class);
 	

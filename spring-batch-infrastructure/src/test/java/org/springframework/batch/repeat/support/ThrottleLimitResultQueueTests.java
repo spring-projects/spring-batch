@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public class ThrottleLimitResultQueueTests {
 	
-	private ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<String>(1);
+	private ThrottleLimitResultQueue<String> queue = new ThrottleLimitResultQueue<>(1);
 	
 	@Test
 	public void testPutTake() throws Exception {

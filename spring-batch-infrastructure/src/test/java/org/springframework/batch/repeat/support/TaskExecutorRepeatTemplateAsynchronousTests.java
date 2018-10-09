@@ -149,7 +149,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	public void testMultiThreadAsynchronousExecution() throws Exception {
 
 		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<String>();
+		final Set<String> threadNames = new HashSet<>();
 
 		final RepeatCallback callback = new RepeatCallback() {
             @Override
@@ -184,8 +184,8 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		template.setThrottleLimit(throttleLimit);
 
 		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<String>();
-		final List<String> items = new ArrayList<String>();
+		final Set<String> threadNames = new HashSet<>();
+		final List<String> items = new ArrayList<>();
 
 		final RepeatCallback callback = new RepeatCallback() {
             @Override
@@ -234,7 +234,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		jobTemplate.setTaskExecutor(taskExecutor);
 
 		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<String>();
+		final Set<String> threadNames = new HashSet<>();
 
 		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
             @Override

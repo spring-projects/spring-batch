@@ -46,7 +46,7 @@ public class AmqpItemReaderTests {
         final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
         when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
+        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
         assertEquals("foo", amqpItemReader.read());
     }
 
@@ -55,7 +55,7 @@ public class AmqpItemReaderTests {
         final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
         when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
+        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
         amqpItemReader.setItemType(String.class);
 
         assertEquals("foo", amqpItemReader.read());
@@ -69,7 +69,7 @@ public class AmqpItemReaderTests {
 
         when(amqpTemplate.receive()).thenReturn(message);
 
-        final AmqpItemReader<Message> amqpItemReader = new AmqpItemReader<Message>(amqpTemplate);
+        final AmqpItemReader<Message> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
         amqpItemReader.setItemType(Message.class);
 
         assertEquals(message, amqpItemReader.read());
@@ -82,7 +82,7 @@ public class AmqpItemReaderTests {
 
         when(amqpTemplate.receiveAndConvert()).thenReturn("foo");
 
-        final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<Integer>(amqpTemplate);
+        final AmqpItemReader<Integer> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
         amqpItemReader.setItemType(Integer.class);
 
         try {
@@ -98,7 +98,7 @@ public class AmqpItemReaderTests {
     public void testNullItemType() {
         final AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<String>(amqpTemplate);
+        final AmqpItemReader<String> amqpItemReader = new AmqpItemReader<>(amqpTemplate);
         amqpItemReader.setItemType(null);
     }
 }

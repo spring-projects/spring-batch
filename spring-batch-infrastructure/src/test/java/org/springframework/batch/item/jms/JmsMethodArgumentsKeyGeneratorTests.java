@@ -38,7 +38,7 @@ public class JmsMethodArgumentsKeyGeneratorTests {
 		Message message = mock(Message.class);
 		when(message.getJMSMessageID()).thenReturn("foo");
 
-		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		JmsItemReader<Message> itemReader = new JmsItemReader<>();
 		itemReader.setItemType(Message.class);
 		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[]{message}));
 

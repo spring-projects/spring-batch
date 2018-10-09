@@ -102,7 +102,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private BeanFactory beanFactory;
 
-	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<DistanceHolder, ConcurrentMap<String, String>>();
+	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<>();
 
 	private int distanceLimit = 5;
 

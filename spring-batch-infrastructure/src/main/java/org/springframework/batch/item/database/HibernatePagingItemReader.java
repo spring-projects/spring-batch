@@ -159,7 +159,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	protected void doReadPage() {
 
 		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
+			results = new CopyOnWriteArrayList<>();
 		}
 		else {
 			results.clear();

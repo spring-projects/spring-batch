@@ -37,7 +37,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
     @Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
+		reader = new ListItemReader<>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
 	}
 
 	public void testNext() throws Exception {
@@ -49,7 +49,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	public void testCommit() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List<Object> taken = new ArrayList<Object>();
+		final List<Object> taken = new ArrayList<>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
                 @Override
@@ -77,7 +77,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	public void testTransactionalExhausted() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List<Object> taken = new ArrayList<Object>();
+		final List<Object> taken = new ArrayList<>();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
             @Override
 			public Void doInTransaction(TransactionStatus status) {
@@ -95,7 +95,7 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	public void testRollback() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List<Object> taken = new ArrayList<Object>();
+		final List<Object> taken = new ArrayList<>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
                 @Override

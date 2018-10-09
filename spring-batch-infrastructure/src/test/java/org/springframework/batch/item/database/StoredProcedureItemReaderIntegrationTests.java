@@ -28,7 +28,7 @@ public class StoredProcedureItemReaderIntegrationTests
 
 	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReader<Foo>();
+		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(dataSource);
 		reader.setProcedureName("read_foos");
 		reader.setRowMapper(new FooRowMapper());

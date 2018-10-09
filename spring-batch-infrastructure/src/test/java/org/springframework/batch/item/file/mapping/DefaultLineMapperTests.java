@@ -30,7 +30,7 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
  */
 public class DefaultLineMapperTests {
 
-	private DefaultLineMapper<String> tested = new DefaultLineMapper<String>();
+	private DefaultLineMapper<String> tested = new DefaultLineMapper<>();
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMandatoryTokenizer() throws Exception {

@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  */
 public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 
-	private Classifier<T, ItemWriter<? super T>> classifier = new ClassifierSupport<T, ItemWriter<? super T>>(null);
+	private Classifier<T, ItemWriter<? super T>> classifier = new ClassifierSupport<>(null);
 
 	/**
 	 * @param classifier the classifier to set
@@ -55,12 +55,12 @@ public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
     @Override
 	public void write(List<? extends T> items) throws Exception {
 
-		Map<ItemWriter<? super T>, List<T>> map = new LinkedHashMap<ItemWriter<? super T>, List<T>>();
+		Map<ItemWriter<? super T>, List<T>> map = new LinkedHashMap<>();
 
 		for (T item : items) {
 			ItemWriter<? super T> key = classifier.classify(item);
 			if (!map.containsKey(key)) {
-				map.put(key, new ArrayList<T>());
+				map.put(key, new ArrayList<>());
 			}
 			map.get(key).add(item);
 		}

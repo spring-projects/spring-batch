@@ -36,7 +36,7 @@ import org.springframework.batch.item.file.transform.Name;
  */
 public class PatternMatchingCompositeLineMapperTests {
 
-	private PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<Name>();
+	private PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<>();
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoMappers() throws Exception {
@@ -48,7 +48,7 @@ public class PatternMatchingCompositeLineMapperTests {
 
 	@Test
 	public void testKeyFound() throws Exception {
-		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
             @Override
 			public FieldSet tokenize(String line) {
@@ -63,7 +63,7 @@ public class PatternMatchingCompositeLineMapperTests {
 		});
 		mapper.setTokenizers(tokenizers);
 
-		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
+		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
             @Override
 			public Name mapFieldSet(FieldSet fs) {
@@ -84,7 +84,7 @@ public class PatternMatchingCompositeLineMapperTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testMapperKeyNotFound() throws Exception {
-		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
             @Override
 			public FieldSet tokenize(String line) {
@@ -99,7 +99,7 @@ public class PatternMatchingCompositeLineMapperTests {
 		});
 		mapper.setTokenizers(tokenizers);
 
-		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
+		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
             @Override
 			public Name mapFieldSet(FieldSet fs) {

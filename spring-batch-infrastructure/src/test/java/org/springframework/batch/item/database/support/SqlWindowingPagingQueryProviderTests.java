@@ -107,7 +107,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 		pagingQueryProvider.setFromClause("foo_e E, foo_i I");
 		pagingQueryProvider.setWhereClause("E.id=I.id");
 		
-		Map<String, Order> sortKeys = new HashMap<String, Order>();
+		Map<String, Order> sortKeys = new HashMap<>();
 		sortKeys.put("E.id", Order.DESCENDING);		
 		pagingQueryProvider.setSortKeys(sortKeys);
 		

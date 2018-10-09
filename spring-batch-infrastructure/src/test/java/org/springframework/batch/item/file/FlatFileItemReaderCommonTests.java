@@ -31,7 +31,7 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 	
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		FlatFileItemReader<Foo> tested = new FlatFileItemReader<Foo>();
+		FlatFileItemReader<Foo> tested = new FlatFileItemReader<>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
 		tested.setLineMapper(new LineMapper<Foo>() {

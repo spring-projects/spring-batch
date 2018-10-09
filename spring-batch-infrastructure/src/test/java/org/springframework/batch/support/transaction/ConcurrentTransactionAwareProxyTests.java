@@ -66,7 +66,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	@Before
 	public void init() {
 		executor = Executors.newFixedThreadPool(outerMax);
-		completionService = new ExecutorCompletionService<List<String>>(executor);
+		completionService = new ExecutorCompletionService<>(executor);
 	}
 
 	@After
@@ -142,7 +142,7 @@ public class ConcurrentTransactionAwareProxyTests {
 			completionService.submit(new Callable<List<String>>() {
                 @Override
 				public List<String> call() throws Exception {
-					List<String> list = new ArrayList<String>();
+					List<String> list = new ArrayList<>();
 					for (int i = 0; i < innerMax; i++) {
 						String value = count + "bar" + i;
 						saveInSetAndAssert(set, value);
@@ -170,7 +170,7 @@ public class ConcurrentTransactionAwareProxyTests {
 			completionService.submit(new Callable<List<String>>() {
                 @Override
 				public List<String> call() throws Exception {
-					List<String> result = new ArrayList<String>();
+					List<String> result = new ArrayList<>();
 					for (int i = 0; i < innerMax; i++) {
 						String value = "bar" + i;
 						saveInListAndAssert(list, value);
@@ -210,7 +210,7 @@ public class ConcurrentTransactionAwareProxyTests {
 				completionService.submit(new Callable<List<String>>() {
                     @Override
 					public List<String> call() throws Exception {
-						List<String> list = new ArrayList<String>();
+						List<String> list = new ArrayList<>();
 						for (int i = 0; i < innerMax; i++) {
 							String value = "bar" + i;
 							list.add(saveInMapAndAssert(map, id, value).get("foo"));
@@ -267,7 +267,7 @@ public class ConcurrentTransactionAwareProxyTests {
             @Override
 			public Void doInTransaction(TransactionStatus status) {
 				if (!map.containsKey(id)) {
-					map.put(id, new HashMap<String, String>());
+					map.put(id, new HashMap<>());
 				}
 				map.get(id).put("foo", value);
 				return null;

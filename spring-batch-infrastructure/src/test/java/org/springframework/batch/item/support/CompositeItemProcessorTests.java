@@ -36,7 +36,7 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class CompositeItemProcessorTests {
 
-	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<Object, Object>();
+	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<>();
 
 	private ItemProcessor<Object, Object> processor1;
 	private ItemProcessor<Object, Object> processor2;
@@ -78,7 +78,7 @@ public class CompositeItemProcessorTests {
 	@Test
 	@SuppressWarnings({"unchecked", "serial"})
 	public void testItemProcessorGenerics() throws Exception {
-		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<String, String>();
+		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<>();
 		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
 		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
 		composite.setDelegates(new ArrayList<ItemProcessor<?,?>>() {{

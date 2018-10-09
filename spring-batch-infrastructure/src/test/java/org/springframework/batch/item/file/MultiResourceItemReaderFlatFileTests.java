@@ -33,8 +33,8 @@ public class MultiResourceItemReaderFlatFileTests extends
     @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
-		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<Foo>();
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<>();
 
 		fileReader.setLineMapper(new LineMapper<Foo>() {
 

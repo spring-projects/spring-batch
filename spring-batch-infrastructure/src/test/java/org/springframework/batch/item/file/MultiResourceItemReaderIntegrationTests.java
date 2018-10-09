@@ -45,9 +45,9 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class MultiResourceItemReaderIntegrationTests {
 
-	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<String>();
+	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<>();
 
-	private FlatFileItemReader<String> itemReader = new FlatFileItemReader<String>();
+	private FlatFileItemReader<String> itemReader = new FlatFileItemReader<>();
 
 	private ExecutionContext ctx = new ExecutionContext();
 
