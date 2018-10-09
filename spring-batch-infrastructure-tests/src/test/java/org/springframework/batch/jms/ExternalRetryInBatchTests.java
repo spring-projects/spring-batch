@@ -102,9 +102,9 @@ public class ExternalRetryInBatchTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
-	private List<String> recovered = new ArrayList<String>();
+	private List<String> recovered = new ArrayList<>();
 
 	@Test
 	public void testExternalRetryRecoveryInBatch() throws Exception {
@@ -204,7 +204,7 @@ public class ExternalRetryInBatchTests {
 
 	private List<String> getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

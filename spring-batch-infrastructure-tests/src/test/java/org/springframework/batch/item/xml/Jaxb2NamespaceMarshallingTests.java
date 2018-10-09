@@ -53,7 +53,7 @@ public class Jaxb2NamespaceMarshallingTests {
 
 	private static final int MAX_WRITE = 100;
 
-	private StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<QualifiedTrade>();
+	private StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
 
 	private Resource resource;
 

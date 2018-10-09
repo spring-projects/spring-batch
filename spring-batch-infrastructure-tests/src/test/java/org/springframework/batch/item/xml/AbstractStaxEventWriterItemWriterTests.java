@@ -49,7 +49,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	private static final int MAX_WRITE = 100;
 
-	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<Trade>();
+	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<>();
 
 	private Resource resource;
 

@@ -89,7 +89,7 @@ public class JpaPagingItemReaderAsyncTests {
 
 	@Test
 	public void testAsyncReader() throws Throwable {
-		List<Throwable> throwables = new ArrayList<Throwable>();
+		List<Throwable> throwables = new ArrayList<>();
 		int max = 10;
 		for (int i = 0; i < max; i++) {
 			try {
@@ -112,13 +112,13 @@ public class JpaPagingItemReaderAsyncTests {
 	 */
 	private void doTest() throws Exception, InterruptedException, ExecutionException {
 		final JpaPagingItemReader<Foo> reader = getItemReader();
-		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<List<Foo>>(Executors
+		CompletionService<List<Foo>> completionService = new ExecutorCompletionService<>(Executors
 				.newFixedThreadPool(THREAD_COUNT));
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			completionService.submit(new Callable<List<Foo>>() {
 				@Override
 				public List<Foo> call() throws Exception {
-					List<Foo> list = new ArrayList<Foo>();
+					List<Foo> list = new ArrayList<>();
 					Foo next = null;
 					do {
 						next = reader.read();
@@ -133,7 +133,7 @@ public class JpaPagingItemReaderAsyncTests {
 			});
 		}
 		int count = 0;
-		Set<Foo> results = new HashSet<Foo>();
+		Set<Foo> results = new HashSet<>();
 		for (int i = 0; i < THREAD_COUNT; i++) {
 			List<Foo> items = completionService.take().get();
 			count += items.size();
@@ -151,7 +151,7 @@ public class JpaPagingItemReaderAsyncTests {
 
 		String jpqlQuery = "select f from Foo f";
 
-		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<Foo>();
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
 		reader.setQueryString(jpqlQuery);
 		reader.setEntityManagerFactory(entityManagerFactory);
 		reader.setPageSize(PAGE_SIZE);

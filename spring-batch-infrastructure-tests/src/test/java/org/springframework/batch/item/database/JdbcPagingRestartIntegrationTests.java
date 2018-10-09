@@ -131,7 +131,7 @@ public class JdbcPagingRestartIntegrationTests {
 		logger.debug("Ids: "+ids);
 		int startAfterValue = (new Long(ids.get(count - 1).get("ID").toString())).intValue();
 		logger.debug("Start after: " + startAfterValue);
-		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
+		Map<String, Object> startAfterValues = new LinkedHashMap<>();
 		startAfterValues.put("ID", startAfterValue);
 		executionContext.put("JdbcPagingItemReader.start.after", startAfterValues);
 		((ItemStream) reader).open(executionContext);
@@ -150,13 +150,13 @@ public class JdbcPagingRestartIntegrationTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
+		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<>();
 		reader.setDataSource(dataSource);
 		SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		reader.setQueryProvider(factory.getObject());

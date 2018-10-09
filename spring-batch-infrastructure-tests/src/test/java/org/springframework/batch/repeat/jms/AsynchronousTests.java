@@ -99,7 +99,7 @@ public class AsynchronousTests {
 		}
 	}
 
-	private volatile List<String> list = new ArrayList<String>();
+	private volatile List<String> list = new ArrayList<>();
 
 	private void assertInitialState() {
 		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
@@ -175,7 +175,7 @@ public class AsynchronousTests {
 		assertTrue(list.size() >= 1);
 
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
