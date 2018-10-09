@@ -32,9 +32,9 @@ import org.springframework.validation.Validator;
 
 public class OrderValidator implements Validator {
 
-	private static final List<String> CARD_TYPES = new ArrayList<String>();
-	private static final List<String> SHIPPER_IDS = new ArrayList<String>();
-	private static final List<String> SHIPPER_TYPES = new ArrayList<String>();
+	private static final List<String> CARD_TYPES = new ArrayList<>();
+	private static final List<String> SHIPPER_IDS = new ArrayList<>();
+	private static final List<String> SHIPPER_TYPES = new ArrayList<>();
 	private static final long MAX_ID = 9999999999L;
 	private static final BigDecimal BD_MIN = new BigDecimal("0.0");
 	private static final BigDecimal BD_MAX = new BigDecimal("99999999.99");

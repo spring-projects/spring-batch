@@ -34,7 +34,7 @@ public class HibernateCreditDao implements
 		CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;
-	private List<Throwable> errors = new ArrayList<Throwable>();
+	private List<Throwable> errors = new ArrayList<>();
 	private SessionFactory sessionFactory;
 
 	public void setSessionFactory(SessionFactory sessionFactory) {

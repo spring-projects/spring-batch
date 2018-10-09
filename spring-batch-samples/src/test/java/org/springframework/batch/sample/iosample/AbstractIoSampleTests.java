@@ -103,7 +103,7 @@ public abstract class AbstractIoSampleTests {
 	 */
 	private List<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
 		CustomerCredit credit;
-		List<CustomerCredit> result = new ArrayList<CustomerCredit>();
+		List<CustomerCredit> result = new ArrayList<>();
 		while ((credit = reader.read()) != null) {
 			result.add(credit);
 		}

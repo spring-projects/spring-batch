@@ -43,12 +43,12 @@ public class CustomItemReaderTests {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 		items.add("1");
 		items.add("2");
 		items.add("3");
 		
-		itemReader = new CustomItemReader<String>(items);
+		itemReader = new CustomItemReader<>(items);
 	}
 	
 	@Test
@@ -65,11 +65,11 @@ public class CustomItemReaderTests {
 		((ItemStream)itemReader).open(executionContext);
 		assertEquals("1", itemReader.read());
 		((ItemStream)itemReader).update(executionContext);
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 		items.add("1");
 		items.add("2");
 		items.add("3");
-		itemReader = new CustomItemReader<String>(items);
+		itemReader = new CustomItemReader<>(items);
 		
 		((ItemStream)itemReader).open(executionContext);
 		assertEquals("2", itemReader.read());

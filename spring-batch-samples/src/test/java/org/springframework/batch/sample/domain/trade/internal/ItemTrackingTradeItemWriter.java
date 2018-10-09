@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
-	private List<Trade> items = new ArrayList<Trade>();
+	private List<Trade> items = new ArrayList<>();
 	private String writeFailureISIN;
 	private JdbcOperations jdbcTemplate;
 
@@ -45,7 +45,7 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 
 	@Override
 	public void write(List<? extends Trade> items) throws Exception {
-		List<Trade> newItems = new ArrayList<Trade>();
+		List<Trade> newItems = new ArrayList<>();
 
 		for (Trade t : items) {
 			if (t.getIsin().equals(this.writeFailureISIN)) {

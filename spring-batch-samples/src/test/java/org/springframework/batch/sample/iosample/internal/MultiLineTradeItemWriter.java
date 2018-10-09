@@ -35,7 +35,7 @@ public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
 
 	@Override
 	public void write(List<? extends Trade> items) throws Exception {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 
 		for (Trade t : items) {
 			lines.add("BEGIN");

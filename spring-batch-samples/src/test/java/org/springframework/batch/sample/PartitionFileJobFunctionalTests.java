@@ -69,7 +69,7 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 				.containsBeanDefinition("outputTestReader"));
 
 		open(inputReader);
-		List<CustomerCredit> inputs = new ArrayList<CustomerCredit>(getCredits(inputReader));
+		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
 		close(inputReader);
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -79,7 +79,7 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) applicationContext
 				.getBean("outputTestReader");
 		open(outputReader);
-		List<CustomerCredit> outputs = new ArrayList<CustomerCredit>(getCredits(outputReader));
+		List<CustomerCredit> outputs = new ArrayList<>(getCredits(outputReader));
 		close(outputReader);
 
 		assertEquals(inputs.size(), outputs.size());
@@ -98,7 +98,7 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 	 */
 	private Set<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
 		CustomerCredit credit;
-		Set<CustomerCredit> result = new LinkedHashSet<CustomerCredit>();
+		Set<CustomerCredit> result = new LinkedHashSet<>();
 
 		while ((credit = reader.read()) != null) {
 			result.add(credit);

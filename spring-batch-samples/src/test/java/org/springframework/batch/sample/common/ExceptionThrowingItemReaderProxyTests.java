@@ -43,8 +43,8 @@ public class ExceptionThrowingItemReaderProxyTests {
 	public void testProcess() throws Exception {
 				
 		//create module and set item processor and iteration count
-		ExceptionThrowingItemReaderProxy<String> itemReader = new ExceptionThrowingItemReaderProxy<String>();
-		itemReader.setDelegate(new ListItemReader<String>(new ArrayList<String>() {{
+		ExceptionThrowingItemReaderProxy<String> itemReader = new ExceptionThrowingItemReaderProxy<>();
+		itemReader.setDelegate(new ListItemReader<>(new ArrayList<String>() {{
 			add("a");
 			add("b");
 			add("c");

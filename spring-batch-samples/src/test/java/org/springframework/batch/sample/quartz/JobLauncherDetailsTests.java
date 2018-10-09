@@ -50,7 +50,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 public class JobLauncherDetailsTests {
 	private JobLauncherDetails details = new JobLauncherDetails();
 	private TriggerFiredBundle firedBundle;
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List<Serializable> list = new ArrayList<>();
 	
 	@Before
 	public void setUp() throws Exception {
