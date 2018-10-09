@@ -35,7 +35,7 @@ import org.springframework.batch.repeat.RepeatOperations;
  */
 public final class RepeatSynchronizationManager {
 
-	private static final ThreadLocal<RepeatContext> contextHolder = new ThreadLocal<RepeatContext>();
+	private static final ThreadLocal<RepeatContext> contextHolder = new ThreadLocal<>();
 
 	private RepeatSynchronizationManager() {
 	}

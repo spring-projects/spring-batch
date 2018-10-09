@@ -30,7 +30,7 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	private RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<String>();
+	private RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<>();
 
 	public void testSetDelegateAndPassInString() throws Exception {
 		aggregator.setDelegate(new LineAggregator<String>() {

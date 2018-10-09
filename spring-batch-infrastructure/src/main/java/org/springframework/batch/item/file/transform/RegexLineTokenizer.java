@@ -58,7 +58,7 @@ public class RegexLineTokenizer extends AbstractLineTokenizer {
 		boolean matchFound = matcher.find();
 
 		if (matchFound) {
-			List<String> tokens = new ArrayList<String>(matcher.groupCount());
+			List<String> tokens = new ArrayList<>(matcher.groupCount());
 			for (int i = 1; i <= matcher.groupCount(); i++) {
 				tokens.add(matcher.group(i));
 			}

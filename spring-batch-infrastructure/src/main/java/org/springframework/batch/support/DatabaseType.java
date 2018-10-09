@@ -52,7 +52,7 @@ public enum DatabaseType {
 	private static final Map<String, DatabaseType> nameMap;
 
 	static{
-		nameMap = new HashMap<String, DatabaseType>();
+		nameMap = new HashMap<>();
 		for(DatabaseType type: values()){
 			nameMap.put(type.getProductName(), type);
 		}

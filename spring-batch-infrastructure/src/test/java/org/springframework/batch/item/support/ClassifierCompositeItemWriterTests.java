@@ -36,13 +36,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class ClassifierCompositeItemWriterTests {
 	
-	private ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<String>();
-	private List<String> defaults = new ArrayList<String>();
-	private List<String> foos = new ArrayList<String>();
+	private ClassifierCompositeItemWriter<String> writer = new ClassifierCompositeItemWriter<>();
+	private List<String> defaults = new ArrayList<>();
+	private List<String> foos = new ArrayList<>();
 
 	@Test
 	public void testWrite() throws Exception {
-		Map<String, ItemWriter<? super String>> map = new HashMap<String, ItemWriter<? super String>>();
+		Map<String, ItemWriter<? super String>> map = new HashMap<>();
 		ItemWriter<String> fooWriter = new ItemWriter<String>() {
             @Override
 			public void write(List<? extends String> items) throws Exception {
@@ -57,7 +57,7 @@ public class ClassifierCompositeItemWriterTests {
 		};
 		map.put("foo", fooWriter );
 		map.put("*", defaultWriter);
-		writer.setClassifier(new PatternMatchingClassifier<ItemWriter<? super String>>(map));
+		writer.setClassifier(new PatternMatchingClassifier<>(map));
 		writer.write(Arrays.asList("foo", "foo", "one", "two", "three"));
 		assertEquals("[foo, foo]", foos.toString());
 		assertEquals("[one, two, three]", defaults.toString());

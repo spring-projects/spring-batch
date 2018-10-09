@@ -51,7 +51,7 @@ public class UnopenedElementClosingEventWriterTests {
 
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 	
-	private List<QName> unopenedElements = new LinkedList<QName>();
+	private List<QName> unopenedElements = new LinkedList<>();
 	
 	private QName unopenedA = new QName("http://test", "unopened-a", "t");
 	

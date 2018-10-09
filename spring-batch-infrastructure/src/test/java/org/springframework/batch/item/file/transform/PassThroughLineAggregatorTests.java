@@ -22,7 +22,7 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 
 public class PassThroughLineAggregatorTests extends TestCase {
 	
-	private LineAggregator<Object> mapper = new PassThroughLineAggregator<Object>();
+	private LineAggregator<Object> mapper = new PassThroughLineAggregator<>();
 
 	public void testUnmapItemAsFieldSet() throws Exception {
 		Object item = new Object();

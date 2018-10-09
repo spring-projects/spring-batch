@@ -45,7 +45,7 @@ public class AmqpItemWriterTests {
 
         amqpTemplate.convertAndSend("bar");
 
-        AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<String>(amqpTemplate);
+        AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<>(amqpTemplate);
         amqpItemWriter.write(Arrays.asList("foo", "bar"));
 
     }

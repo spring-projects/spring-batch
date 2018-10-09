@@ -49,7 +49,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemReaderRepeatCallback<Trade>(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback<>(provider, processor);
 
 		final RepeatTemplate chunkTemplate = new RepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -83,7 +83,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemReaderRepeatCallback<Trade>(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback<>(provider, processor);
 
 		final TaskExecutorRepeatTemplate chunkTemplate = new TaskExecutorRepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency

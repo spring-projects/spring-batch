@@ -53,7 +53,7 @@ public class JdbcParameterUtilsTests {
 		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, &sameparameter, &sameparameter bad wolf", null));
 		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, :sameparameter, :sameparameter bad wolf", null));
 		assertEquals(0, JdbcParameterUtils.countParameterPlaceholders("xxx & yyy", null));
-		List<String> l = new ArrayList<String>();
+		List<String> l = new ArrayList<>();
 		assertEquals(3, JdbcParameterUtils.countParameterPlaceholders("select :par1, :par2 :par3", l));
 		assertEquals(3, l.size());
 	}

@@ -34,7 +34,7 @@ import org.springframework.batch.item.ItemWriter;
 public class CompositeItemWriterTests {
 
 	// object under test
-	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<Object>();
+	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<>();
 
 	/**
 	 * Regular usage scenario. All injected processors should be called.
@@ -45,7 +45,7 @@ public class CompositeItemWriterTests {
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public class CompositeItemWriterTests {
 		}
 		writer.write(data);
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 		writers.add(writer);
 
 		itemWriter.setDelegates(writers);

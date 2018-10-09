@@ -52,9 +52,9 @@ public class FlatFileItemReaderTests {
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 
-	private FlatFileItemReader<String> reader = new FlatFileItemReader<String>();
+	private FlatFileItemReader<String> reader = new FlatFileItemReader<>();
 
-	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<Item>();
+	private FlatFileItemReader<Item> itemReader = new FlatFileItemReader<>();
 
 	private ExecutionContext executionContext = new ExecutionContext();
 

@@ -73,7 +73,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * @param thresholds the threshold value map.
 	 */
 	public void setThresholds(Map<Class<? extends Throwable>, Integer> thresholds) {
-		Map<Class<? extends Throwable>, IntegerHolder> typeMap = new HashMap<Class<? extends Throwable>, IntegerHolder>();
+		Map<Class<? extends Throwable>, IntegerHolder> typeMap = new HashMap<>();
 		for (Entry<Class<? extends Throwable>, Integer> entry : thresholds.entrySet()) {
 			typeMap.put(entry.getKey(), new IntegerHolder(entry.getValue()));
 		}

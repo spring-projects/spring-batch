@@ -26,7 +26,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 public class JmsItemWriterTests {
 
-	JmsItemWriter<String> itemWriter = new JmsItemWriter<String>();
+	JmsItemWriter<String> itemWriter = new JmsItemWriter<>();
 
 	@Test
 	public void testNoItemTypeSunnyDay() throws Exception {

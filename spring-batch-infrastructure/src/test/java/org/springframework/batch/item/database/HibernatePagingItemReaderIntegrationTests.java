@@ -43,7 +43,7 @@ AbstractGenericDataSourceItemReaderIntegrationTests {
 
 		SessionFactory sessionFactory = factoryBean.getObject();
 
-		HibernatePagingItemReader<Foo> hibernateReader = new HibernatePagingItemReader<Foo>();
+		HibernatePagingItemReader<Foo> hibernateReader = new HibernatePagingItemReader<>();
 		setQuery(hibernateReader);
 		hibernateReader.setPageSize(2);
 		hibernateReader.setSessionFactory(sessionFactory);

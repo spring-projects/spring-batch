@@ -63,6 +63,6 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
 		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
-		this.tokenizers = new PatternMatcher<LineTokenizer>(tokenizers);
+		this.tokenizers = new PatternMatcher<>(tokenizers);
 	}
 }

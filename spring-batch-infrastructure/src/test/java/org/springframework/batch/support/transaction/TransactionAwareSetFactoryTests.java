@@ -39,7 +39,7 @@ public class TransactionAwareSetFactoryTests {
 
 	@Before
 	public void setUp() throws Exception {
-		set = TransactionAwareProxyFactory.createTransactionalSet(new HashSet<String>(Arrays.asList("foo", "bar", "spam")));
+		set = TransactionAwareProxyFactory.createTransactionalSet(new HashSet<>(Arrays.asList("foo", "bar", "spam")));
 	}
 
 	@Test

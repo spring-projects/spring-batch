@@ -33,7 +33,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 public class JmsItemReaderTests {
 
-	JmsItemReader<String> itemReader = new JmsItemReader<String>();
+	JmsItemReader<String> itemReader = new JmsItemReader<>();
 
 	@Test
 	public void testNoItemTypeSunnyDay() {
@@ -61,7 +61,7 @@ public class JmsItemReaderTests {
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		JmsItemReader<Date> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		assertEquals(date, itemReader.read());
@@ -73,7 +73,7 @@ public class JmsItemReaderTests {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		JmsItemReader<Date> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		try {
@@ -92,7 +92,7 @@ public class JmsItemReaderTests {
 		Message message = mock(Message.class);
 		when(jmsTemplate.receive()).thenReturn(message);
 
-		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		JmsItemReader<Message> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Message.class);
 		assertEquals(message, itemReader.read());

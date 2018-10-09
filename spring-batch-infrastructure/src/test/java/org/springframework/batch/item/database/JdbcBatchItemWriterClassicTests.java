@@ -41,11 +41,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  */
 public class JdbcBatchItemWriterClassicTests {
 
-	private JdbcBatchItemWriter<String> writer = new JdbcBatchItemWriter<String>();
+	private JdbcBatchItemWriter<String> writer = new JdbcBatchItemWriter<>();
 
 	private JdbcTemplate jdbcTemplate;
 
-	protected List<Object> list = new ArrayList<Object>();
+	protected List<Object> list = new ArrayList<>();
 
 	private PreparedStatement ps;
 
@@ -83,7 +83,7 @@ public class JdbcBatchItemWriterClassicTests {
 	 */
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new JdbcBatchItemWriter<String>();
+		writer = new JdbcBatchItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");

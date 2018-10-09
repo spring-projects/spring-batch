@@ -43,9 +43,9 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
     @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
 
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
 
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {

@@ -41,7 +41,7 @@ public class SingleItemPeekableItemReaderBuilderTests {
 	public void testPeek() throws Exception {
 		SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReaderBuilder<String>()
 				.delegate(
-						new ListItemReader<String>(Arrays.asList("a", "b")))
+						new ListItemReader<>(Arrays.asList("a", "b")))
 				.build();
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());

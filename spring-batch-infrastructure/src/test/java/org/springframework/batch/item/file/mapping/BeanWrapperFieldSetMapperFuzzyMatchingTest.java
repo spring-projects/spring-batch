@@ -26,7 +26,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTest {
 
 	@Test(expected = NotWritablePropertyException.class)
 	public void testFuzzyMatchingWithKeyCandidateCollision() throws BindException {
-		BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<GreenBean>();
+		BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(true);
 		mapper.setTargetType(GreenBean.class);
 		DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
@@ -38,7 +38,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTest {
 
 	@Test
 	public void testFuzzyMatchingWithLowerLimit() throws BindException {
-		BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<GreenBean>();
+		BeanWrapperFieldSetMapper<GreenBean> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setDistanceLimit(0);
 		mapper.setStrict(false);
 		mapper.setTargetType(GreenBean.class);
@@ -51,7 +51,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTest {
 
 	@Test
 	public void testFuzzyMatchingWithPropertyCollision() throws BindException {
-		BeanWrapperFieldSetMapper<BlueBean> mapper = new BeanWrapperFieldSetMapper<BlueBean>();
+		BeanWrapperFieldSetMapper<BlueBean> mapper = new BeanWrapperFieldSetMapper<>();
 		mapper.setStrict(true);
 		mapper.setTargetType(BlueBean.class);
 		DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();

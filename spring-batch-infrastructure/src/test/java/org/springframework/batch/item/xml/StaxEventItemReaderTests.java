@@ -599,7 +599,7 @@ public class StaxEventItemReaderTests {
 	private StaxEventItemReader<List<XMLEvent>> createNewInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<List<XMLEvent>>();
+		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<>();
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
@@ -612,7 +612,7 @@ public class StaxEventItemReaderTests {
 	private StaxEventItemReader<ItemCountAwareFragment> createNewItemCountAwareInputSource() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<ItemCountAwareFragment>();
+		StaxEventItemReader<ItemCountAwareFragment> newSource = new StaxEventItemReader<>();
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
@@ -633,7 +633,7 @@ public class StaxEventItemReaderTests {
 		 */
 		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader, QName fragmentName) throws XMLStreamException {
 			XMLEvent eventInsideFragment;
-			List<XMLEvent> events = new ArrayList<XMLEvent>();
+			List<XMLEvent> events = new ArrayList<>();
 			do {
 				eventInsideFragment = eventReader.peek();
 				if (eventInsideFragment instanceof EndElement

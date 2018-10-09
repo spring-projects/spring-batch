@@ -30,14 +30,14 @@ import org.junit.Test;
  */
 public class PatternMatcherTests {
 
-	private static Map<String, Integer> map = new HashMap<String, Integer>();
+	private static Map<String, Integer> map = new HashMap<>();
 	static {
 		map.put("an*", 3);
 		map.put("a*", 2);
 		map.put("big*", 4);
 	}
 
-	private static Map<String, Integer> defaultMap = new HashMap<String, Integer>();
+	private static Map<String, Integer> defaultMap = new HashMap<>();
 	static {
 		defaultMap.put("an", 3);
 		defaultMap.put("a", 2);
@@ -103,36 +103,36 @@ public class PatternMatcherTests {
 
 	@Test
 	public void testMatchPrefixSubsumed() {
-		assertEquals(2, new PatternMatcher<Integer>(map).match("apple").intValue());
+		assertEquals(2, new PatternMatcher<>(map).match("apple").intValue());
 	}
 
 	@Test
 	public void testMatchPrefixSubsuming() {
-		assertEquals(3, new PatternMatcher<Integer>(map).match("animal").intValue());
+		assertEquals(3, new PatternMatcher<>(map).match("animal").intValue());
 	}
 
 	@Test
 	public void testMatchPrefixUnrelated() {
-		assertEquals(4, new PatternMatcher<Integer>(map).match("biggest").intValue());
+		assertEquals(4, new PatternMatcher<>(map).match("biggest").intValue());
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testMatchPrefixNoMatch() {
-		new PatternMatcher<Integer>(map).match("bat");
+		new PatternMatcher<>(map).match("bat");
 	}
 
 	@Test
 	public void testMatchPrefixDefaultValueUnrelated() {
-		assertEquals(5, new PatternMatcher<Integer>(defaultMap).match("biggest").intValue());
+		assertEquals(5, new PatternMatcher<>(defaultMap).match("biggest").intValue());
 	}
 
 	@Test
 	public void testMatchPrefixDefaultValueEmptyString() {
-		assertEquals(1, new PatternMatcher<Integer>(defaultMap).match("").intValue());
+		assertEquals(1, new PatternMatcher<>(defaultMap).match("").intValue());
 	}
 
 	@Test
 	public void testMatchPrefixDefaultValueNoMatch() {
-		assertEquals(1, new PatternMatcher<Integer>(defaultMap).match("bat").intValue());
+		assertEquals(1, new PatternMatcher<>(defaultMap).match("bat").intValue());
 	}
 }

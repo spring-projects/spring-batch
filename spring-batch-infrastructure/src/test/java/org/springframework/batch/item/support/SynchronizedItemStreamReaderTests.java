@@ -90,7 +90,7 @@ public class SynchronizedItemStreamReaderTests {
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		final TestItemReader testItemReader = new TestItemReader();
-		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReader<Integer>();
+		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReader<>();
 		synchronizedItemStreamReader.setDelegate(testItemReader);
 
 		// Open the ItemReader and make sure it's initialized properly.
@@ -101,7 +101,7 @@ public class SynchronizedItemStreamReaderTests {
 		/* Set up SIZE threads that read from the reader and updates the execution 
 		 * context.
 		 */
-		final Set<Integer> ecSet = new HashSet<Integer>();
+		final Set<Integer> ecSet = new HashSet<>();
 		final int SIZE = 20;
 		Thread[] threads = new Thread[SIZE];
 		for (int i = 0; i < SIZE; i++) {

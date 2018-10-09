@@ -32,36 +32,36 @@ public class PassThroughFieldExtractorTests {
 
 	@Test
 	public void testExtractString() {
-		PassThroughFieldExtractor<String> extractor = new PassThroughFieldExtractor<String>();
+		PassThroughFieldExtractor<String> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract("abc");
 		assertTrue(Arrays.equals(new Object[] { "abc" }, result));
 	}
 
 	@Test
 	public void testExtractArray() {
-		PassThroughFieldExtractor<String[]> extractor = new PassThroughFieldExtractor<String[]>();
+		PassThroughFieldExtractor<String[]> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(new String[] { "a", "b", null, "d" });
 		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
 	}
 
 	@Test
 	public void testExtractFieldSet() {
-		PassThroughFieldExtractor<FieldSet> extractor = new PassThroughFieldExtractor<FieldSet>();
+		PassThroughFieldExtractor<FieldSet> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(new DefaultFieldSet(new String[] { "a", "b", "", "d" }));
 		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
 	}
 
 	@Test
 	public void testExtractCollection() {
-		PassThroughFieldExtractor<List<String>> extractor = new PassThroughFieldExtractor<List<String>>();
+		PassThroughFieldExtractor<List<String>> extractor = new PassThroughFieldExtractor<>();
 		Object[] result = extractor.extract(Arrays.asList("a", "b", null, "d"));
 		assertTrue(Arrays.equals(new Object[] { "a", "b", null, "d" }, result));
 	}
 
 	@Test
 	public void testExtractMap() {
-		PassThroughFieldExtractor<Map<String, String>> extractor = new PassThroughFieldExtractor<Map<String, String>>();
-		Map<String, String> map = new LinkedHashMap<String, String>();
+		PassThroughFieldExtractor<Map<String, String>> extractor = new PassThroughFieldExtractor<>();
+		Map<String, String> map = new LinkedHashMap<>();
 		map.put("A", "a");
 		map.put("B", "b");
 		map.put("C", null);

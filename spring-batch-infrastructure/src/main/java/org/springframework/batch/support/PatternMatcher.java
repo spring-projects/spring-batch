@@ -30,8 +30,8 @@ import org.springframework.util.Assert;
  */
 public class PatternMatcher<S> {
 
-	private Map<String, S> map = new HashMap<String, S>();
-	private List<String> sorted = new ArrayList<String>();
+	private Map<String, S> map = new HashMap<>();
+	private List<String> sorted = new ArrayList<>();
 
 	/**
 	 * Initialize a new {@link PatternMatcher} with a map of patterns to values
@@ -41,7 +41,7 @@ public class PatternMatcher<S> {
 		super();
 		this.map = map;
 		// Sort keys to start with the most specific
-		sorted = new ArrayList<String>(map.keySet());
+		sorted = new ArrayList<>(map.keySet());
 		Collections.sort(sorted, new Comparator<String>() {
             @Override
 			public int compare(String o1, String o2) {

@@ -39,7 +39,7 @@ public class SqlPagingQueryUtilsTests {
 	
 	@Before
 	public void setUp() {
-		sortKeys = new LinkedHashMap<String, Order>();
+		sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 	}
 

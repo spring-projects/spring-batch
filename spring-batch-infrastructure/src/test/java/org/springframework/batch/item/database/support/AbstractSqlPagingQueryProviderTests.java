@@ -44,7 +44,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 		pagingQueryProvider.setFromClause("foo");
 		pagingQueryProvider.setWhereClause("bar = 1");
 		
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("id", Order.ASCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
 		pageSize = 100;
@@ -66,7 +66,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testGenerateFirstPageQueryWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
@@ -76,7 +76,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testGenerateRemainingPagesQueryWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
@@ -86,7 +86,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testGenerateJumpToItemQueryWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);
@@ -96,7 +96,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testGenerateJumpToItemQueryForFirstPageWithMultipleSortKeys() {
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("name", Order.ASCENDING);
 		sortKeys.put("id", Order.DESCENDING);
 		pagingQueryProvider.setSortKeys(sortKeys);

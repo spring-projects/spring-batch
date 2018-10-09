@@ -287,7 +287,7 @@ public class AbstractDelegatorTests {
 
 	private static class FooService {
 
-		private List<Foo> processedFooNameValuePairs = new ArrayList<Foo>();
+		private List<Foo> processedFooNameValuePairs = new ArrayList<>();
 
 		@SuppressWarnings("unused")
 		public void processNameValuePair(String name, int value) {

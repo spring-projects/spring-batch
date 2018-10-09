@@ -56,7 +56,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
-		Map<String, Object> arguments = new HashMap<String, Object>();
+		Map<String, Object> arguments = new HashMap<>();
 		arguments.put(itemBindingVariableName, item);
 
 		return (O) scriptEvaluator.evaluate(getScriptSource(), arguments);

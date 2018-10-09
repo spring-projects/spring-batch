@@ -159,39 +159,39 @@ public class TransactionAwareProxyFactory<T> {
 	}
 
 	public static <K, V> Map<K, V> createTransactionalMap() {
-		return new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>()).createInstance();
+		return new TransactionAwareProxyFactory<>(new ConcurrentHashMap<K, V>()).createInstance();
 	}
 
 	public static <K, V> Map<K, V> createTransactionalMap(Map<K, V> map) {
-		return new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(map)).createInstance();
+		return new TransactionAwareProxyFactory<>(new ConcurrentHashMap<>(map)).createInstance();
 	}
 
 	public static <K, V> ConcurrentMap<K, V> createAppendOnlyTransactionalMap() {
-		return new TransactionAwareProxyFactory<ConcurrentHashMap<K, V>>(new ConcurrentHashMap<K, V>(), true).createInstance();
+		return new TransactionAwareProxyFactory<>(new ConcurrentHashMap<K, V>(), true).createInstance();
 	}
 
 	public static <T> Set<T> createAppendOnlyTransactionalSet() {
-		return new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>(), true).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArraySet<T>(), true).createInstance();
 	}
 
 	public static <T> Set<T> createTransactionalSet() {
-		return new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>()).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArraySet<T>()).createInstance();
 	}
 
 	public static <T> Set<T> createTransactionalSet(Set<T> set) {
-		return new TransactionAwareProxyFactory<CopyOnWriteArraySet<T>>(new CopyOnWriteArraySet<T>(set)).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArraySet<>(set)).createInstance();
 	}
 
 	public static <T> List<T> createAppendOnlyTransactionalList() {
-		return new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>(), true).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArrayList<T>(), true).createInstance();
 	}
 
 	public static <T> List<T> createTransactionalList() {
-		return new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>()).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArrayList<T>()).createInstance();
 	}
 
 	public static <T> List<T> createTransactionalList(List<T> list) {
-		return new TransactionAwareProxyFactory<CopyOnWriteArrayList<T>>(new CopyOnWriteArrayList<T>(list)).createInstance();
+		return new TransactionAwareProxyFactory<>(new CopyOnWriteArrayList<>(list)).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {
@@ -252,7 +252,7 @@ public class TransactionAwareProxyFactory<T> {
 					return invocation.proceed();
 				}
 				if (result instanceof Collection<?>) {
-					HashSet<Object> set = new HashSet<Object>((Collection<?>) result);
+					HashSet<Object> set = new HashSet<>((Collection<?>) result);
 					set.addAll((Collection<?>) invocation.proceed());
 					result = set;
 				}

@@ -47,7 +47,7 @@ public class ResultHolderResultQueue implements ResultQueue<ResultHolder> {
 	 * at any given time.
 	 */
 	public ResultHolderResultQueue(int throttleLimit) {
-		results = new PriorityBlockingQueue<ResultHolder>(throttleLimit, new ResultHolderComparator());
+		results = new PriorityBlockingQueue<>(throttleLimit, new ResultHolderComparator());
 		waits = new Semaphore(throttleLimit);
 	}
 

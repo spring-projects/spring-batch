@@ -47,7 +47,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 	private JpaNativeQueryProvider<Foo> jpaQueryProvider;
 
 	public JpaNativeQueryProviderIntegrationTests() {
-		jpaQueryProvider = new JpaNativeQueryProvider<Foo>();
+		jpaQueryProvider = new JpaNativeQueryProvider<>();
 		jpaQueryProvider.setEntityClass(Foo.class);
 	}
 
@@ -62,7 +62,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 
 		Query query = jpaQueryProvider.createQuery();
 
-		List<Foo> expectedFoos = new ArrayList<Foo>();
+		List<Foo> expectedFoos = new ArrayList<>();
 
 		expectedFoos.add(new Foo(1, "bar1", 1));
 		expectedFoos.add(new Foo(2, "bar2", 2));
@@ -89,7 +89,7 @@ public class JpaNativeQueryProviderIntegrationTests {
 		Query query = jpaQueryProvider.createQuery();
 		query.setParameter("limit", 3);
 
-		List<Foo> expectedFoos = new ArrayList<Foo>();
+		List<Foo> expectedFoos = new ArrayList<>();
 
 		expectedFoos.add(new Foo(3, "bar3", 3));
 		expectedFoos.add(new Foo(4, "bar4", 4));

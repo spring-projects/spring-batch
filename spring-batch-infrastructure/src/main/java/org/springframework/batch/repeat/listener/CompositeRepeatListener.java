@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.RepeatListener;
  */
 public class CompositeRepeatListener implements RepeatListener {
 
-	private List<RepeatListener> listeners = new ArrayList<RepeatListener>();
+	private List<RepeatListener> listeners = new ArrayList<>();
 
 	/**
 	 * Public setter for the listeners.

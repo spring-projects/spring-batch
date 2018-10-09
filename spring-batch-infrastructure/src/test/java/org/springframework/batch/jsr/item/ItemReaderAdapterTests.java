@@ -112,7 +112,7 @@ public class ItemReaderAdapterTests {
 	@Test
 	@SuppressWarnings("serial")
 	public void testCheckpointChange() throws Exception {
-		ItemReaderAdapter<String> adapter = new ItemReaderAdapter<String>(new ItemReader() {
+		ItemReaderAdapter<String> adapter = new ItemReaderAdapter<>(new ItemReader() {
 
 			private CheckpointContainer container = null;
 			private List<String> items = new ArrayList<String>() {{

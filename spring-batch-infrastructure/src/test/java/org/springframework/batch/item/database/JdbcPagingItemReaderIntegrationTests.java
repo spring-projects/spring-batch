@@ -36,12 +36,12 @@ public class JdbcPagingItemReaderIntegrationTests extends AbstractGenericDataSou
     @Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
-		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<Foo>();
+		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<>();
 		inputSource.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");
 		queryProvider.setFromClause("from T_FOOS");
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("ID", Order.ASCENDING);
 		queryProvider.setSortKeys(sortKeys);
 		inputSource.setQueryProvider(queryProvider);

@@ -63,7 +63,7 @@ public class StoredprocedureItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
+		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
 		reader.setUseSharedExtendedConnection(true);
 		reader.setProcedureName("foo_bar");
@@ -99,7 +99,7 @@ public class StoredprocedureItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
+		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(ds);
 		reader.setProcedureName("foo_bar");
 		final ExecutionContext ec = new ExecutionContext();
@@ -134,7 +134,7 @@ public class StoredprocedureItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<String>();
+		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(ds);
 		reader.setProcedureName("foo_bar");
 		reader.setParameters(new SqlParameter[] {

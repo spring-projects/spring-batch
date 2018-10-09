@@ -35,7 +35,7 @@ public class ValidatingItemProcessorTests {
 	@Test
 	public void testSuccessfulValidation() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
 		validator.validate(ITEM);
 
@@ -45,7 +45,7 @@ public class ValidatingItemProcessorTests {
 	@Test(expected = ValidationException.class)
 	public void testFailedValidation() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
 		processFailedValidation(tested);
 	}
@@ -53,7 +53,7 @@ public class ValidatingItemProcessorTests {
 	@Test
 	public void testFailedValidation_Filter() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 		tested.setFilter(true);
 
 		assertNull(processFailedValidation(tested));

@@ -37,7 +37,7 @@ public class DelimitedLineAggregatorTests {
 
 	@Before
 	public void setup() {
-		aggregator = new DelimitedLineAggregator<String[]>();
+		aggregator = new DelimitedLineAggregator<>();
 		aggregator.setFieldExtractor(defaultFieldExtractor);
 	}
 
