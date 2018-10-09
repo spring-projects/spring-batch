@@ -40,7 +40,7 @@ import org.springframework.util.ClassUtils;
  */
 public class JobSupport implements BeanNameAware, Job {
 
-	private List<Step> steps = new ArrayList<Step>();
+	private List<Step> steps = new ArrayList<>();
 
 	private String name;
 

@@ -91,7 +91,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 		writer = new SkipWriterStub(dataSource);
 		processor = new SkipProcessorStub(dataSource);
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(transactionManager);
@@ -152,10 +152,10 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-				List<String> committed = new ArrayList<String>(writer.getCommitted());
+				List<String> committed = new ArrayList<>(writer.getCommitted());
 				Collections.sort(committed);
 				assertEquals("[1, 2, 3, 4, 5]", committed.toString());
-				List<String> processed = new ArrayList<String>(processor.getCommitted());
+				List<String> processed = new ArrayList<>(processor.getCommitted());
 				Collections.sort(processed);
 				assertEquals("[1, 2, 3, 4, 5]", processed.toString());
 				assertEquals(0, stepExecution.getSkipCount());
@@ -202,7 +202,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private List<String> written = new ArrayList<String>();
+		private List<String> written = new ArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -247,7 +247,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new ArrayList<String>();
+		private List<String> processed = new ArrayList<>();
 
 		private JdbcTemplate jdbcTemplate;
 

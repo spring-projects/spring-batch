@@ -55,7 +55,7 @@ public class StepExecutionSerializationUtilsTests {
 		int threads = 10;
 
 		Executor executor = Executors.newFixedThreadPool(threads);
-		CompletionService<StepExecution> completionService = new ExecutorCompletionService<StepExecution>(executor);
+		CompletionService<StepExecution> completionService = new ExecutorCompletionService<>(executor);
 
 		for (int i = 0; i < repeats; i++) {
 			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters(), null);

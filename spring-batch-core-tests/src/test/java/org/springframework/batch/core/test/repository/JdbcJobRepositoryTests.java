@@ -51,11 +51,11 @@ public class JdbcJobRepositoryTests {
 
 	private JobSupport job;
 
-	private Set<Long> jobExecutionIds = new HashSet<Long>();
+	private Set<Long> jobExecutionIds = new HashSet<>();
 
-	private Set<Long> jobIds = new HashSet<Long>();
+	private Set<Long> jobIds = new HashSet<>();
 
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List<Serializable> list = new ArrayList<>();
 
 	private JdbcTemplate jdbcTemplate;
 

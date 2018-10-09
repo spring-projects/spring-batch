@@ -190,7 +190,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> written = new CopyOnWriteArrayList<String>();
+		private List<String> written = new CopyOnWriteArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -226,7 +226,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new CopyOnWriteArrayList<String>();
+		private List<String> processed = new CopyOnWriteArrayList<>();
 		
 		public List<String> getProcessed() {
 			return processed;

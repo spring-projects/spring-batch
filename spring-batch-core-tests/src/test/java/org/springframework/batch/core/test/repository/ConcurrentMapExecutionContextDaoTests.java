@@ -77,7 +77,7 @@ public class ConcurrentMapExecutionContextDaoTests {
 	public void testConcurrentTransactionalSaveUpdate() throws Exception {
 
 		ExecutorService executor = Executors.newFixedThreadPool(3);
-		CompletionService<StepExecution> completionService = new ExecutorCompletionService<StepExecution>(executor);
+		CompletionService<StepExecution> completionService = new ExecutorCompletionService<>(executor);
 
 		final int outerMax = 10;
 		final int innerMax = 100;
