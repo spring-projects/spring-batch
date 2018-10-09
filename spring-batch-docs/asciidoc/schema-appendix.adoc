@@ -35,6 +35,16 @@ modified with additional indexes and constraints as desired. The file names are 
 form `schema-\*.sql`, where "*" is the short name of the target database platform.
 The scripts are in the package `org.springframework.batch.core`.
 
+[[migrationDDLScripts]]
+==== Migration DDL Scripts
+
+Spring Batch provides migration DDL scripts that you need to execute when you upgrade versions.
+These scripts can be found in the Core Jar file under `org/springframework/batch/core/migration`.
+Migration scripts are organized into folders corresponding to version numbers in which they were introduced:
+
+* `2.2`: contains scripts needed if you are migrating from a version before `2.2` to version `2.2`
+* `4.1`: contains scripts needed if you are migrating from a version before `4.1` to version `4.1`
+
 [[metaDataVersion]]
 ==== Version
 
