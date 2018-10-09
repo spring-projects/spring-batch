@@ -30,13 +30,13 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private static List<String> processed = new ArrayList<String>();
+	private static List<String> processed = new ArrayList<>();
 
-	private static List<String> handled = new ArrayList<String>();
+	private static List<String> handled = new ArrayList<>();
 
-	private static List<String> expected = new ArrayList<String>();
+	private static List<String> expected = new ArrayList<>();
 
-	private static List<String> list = new ArrayList<String>();
+	private static List<String> list = new ArrayList<>();
 
 	private Lifecycle bus;
 

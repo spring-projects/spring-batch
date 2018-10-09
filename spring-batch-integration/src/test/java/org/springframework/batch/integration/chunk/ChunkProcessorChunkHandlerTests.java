@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 
 public class ChunkProcessorChunkHandlerTests {
 
-	private ChunkProcessorChunkHandler<Object> handler = new ChunkProcessorChunkHandler<Object>();
+	private ChunkProcessorChunkHandler<Object> handler = new ChunkProcessorChunkHandler<>();
 
 	protected int count = 0;
 
@@ -24,7 +24,7 @@ public class ChunkProcessorChunkHandlerTests {
 			}
 		});
 		StepContribution stepContribution = MetaDataInstanceFactory.createStepExecution().createStepContribution();
-		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(0, StringUtils
+		ChunkResponse response = handler.handleChunk(new ChunkRequest<>(0, StringUtils
 						.commaDelimitedListToSet("foo,bar"), 12L, stepContribution));
 		assertEquals(stepContribution, response.getStepContribution());
 		assertEquals(12, response.getJobId().longValue());

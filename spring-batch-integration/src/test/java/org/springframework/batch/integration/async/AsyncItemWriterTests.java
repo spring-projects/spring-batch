@@ -50,23 +50,23 @@ public class AsyncItemWriterTests {
 	@Before
 	public void setup() {
 		taskExecutor = new SimpleAsyncTaskExecutor();
-		writtenItems = new ArrayList<String>();
-		writer = new AsyncItemWriter<String>();
+		writtenItems = new ArrayList<>();
+		writer = new AsyncItemWriter<>();
 	}
 
 	@Test
 	public void testRoseyScenario() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> processedItems = new ArrayList<>();
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				return "bar";
@@ -87,16 +87,16 @@ public class AsyncItemWriterTests {
 	@Test
 	public void testFilteredItem() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> processedItems = new ArrayList<>();
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				return null;
@@ -116,16 +116,16 @@ public class AsyncItemWriterTests {
 	@Test
 	public void testException() throws Exception {
 		writer.setDelegate(new ListItemWriter(writtenItems));
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> processedItems = new ArrayList<>();
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				return "foo";
 			}
 		}));
 
-		processedItems.add(new FutureTask<String>(new Callable<String>() {
+		processedItems.add(new FutureTask<>(new Callable<String>() {
 			@Override
 			public String call() throws Exception {
 				throw new RuntimeException("This was expected");
@@ -149,7 +149,7 @@ public class AsyncItemWriterTests {
 	public void testExecutionException() {
 		ListItemWriter delegate = new ListItemWriter(writtenItems);
 		writer.setDelegate(delegate);
-		List<Future<String>> processedItems = new ArrayList<Future<String>>();
+		List<Future<String>> processedItems = new ArrayList<>();
 
 		processedItems.add(new Future<String>() {
 
@@ -194,7 +194,7 @@ public class AsyncItemWriterTests {
 		ListItemStreamWriter itemWriter = new ListItemStreamWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> processedItems = new ArrayList<>();
 
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.open(executionContext);
@@ -212,7 +212,7 @@ public class AsyncItemWriterTests {
 		ListItemWriter itemWriter = new ListItemWriter(writtenItems);
 		writer.setDelegate(itemWriter);
 
-		List<FutureTask<String>> processedItems = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> processedItems = new ArrayList<>();
 
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.open(executionContext);

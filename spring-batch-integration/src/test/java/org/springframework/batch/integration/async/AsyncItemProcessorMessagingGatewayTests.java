@@ -46,7 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class AsyncItemProcessorMessagingGatewayTests {
 
-	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<String, String>();
+	private final AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
 	private final StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(new JobParametersBuilder().addLong("factor", 2L).toJobParameters());;
 
@@ -82,7 +82,7 @@ public class AsyncItemProcessorMessagingGatewayTests {
 	public void testMultiExecution() throws Exception {
 		processor.setDelegate(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
-		List<Future<String>> list = new ArrayList<Future<String>>();
+		List<Future<String>> list = new ArrayList<>();
 		for (int count = 0; count < 10; count++) {
 			list.add(processor.process("foo" + count));
 		}

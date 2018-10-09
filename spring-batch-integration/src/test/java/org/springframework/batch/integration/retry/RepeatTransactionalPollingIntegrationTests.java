@@ -29,13 +29,13 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private static List<String> processed = new ArrayList<String>();
+	private static List<String> processed = new ArrayList<>();
 	
 	private static List<String> expected;
 
-	private static List<String> handled = new ArrayList<String>();
+	private static List<String> handled = new ArrayList<>();
 	
-	private static List<String> list = new ArrayList<String>();
+	private static List<String> list = new ArrayList<>();
 
 	private Lifecycle bus;
 

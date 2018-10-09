@@ -101,7 +101,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 */
 	private Throwable process(ChunkRequest<S> chunkRequest, StepContribution stepContribution) throws Exception {
 
-		Chunk<S> chunk = new Chunk<S>(chunkRequest.getItems());
+		Chunk<S> chunk = new Chunk<>(chunkRequest.getItems());
 		Throwable failure = null;
 		try {
 			chunkProcessor.process(stepContribution, chunk);

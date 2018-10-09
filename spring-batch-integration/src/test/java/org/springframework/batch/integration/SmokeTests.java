@@ -33,7 +33,7 @@ public class SmokeTests {
 
 	@Test
 	public void testVanillaSendAndReceive() throws Exception {
-		smokein.send(new GenericMessage<String>("foo"));
+		smokein.send(new GenericMessage<>("foo"));
 		@SuppressWarnings("unchecked")
 		Message<String> message = (Message<String>) smokeout.receive(100);
 		String result = message == null ? null : message.getPayload();

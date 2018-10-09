@@ -14,9 +14,9 @@ public class SimpleService implements Service {
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private List<String> processed = new CopyOnWriteArrayList<String>();
+	private List<String> processed = new CopyOnWriteArrayList<>();
 
-	private List<String> expected = new ArrayList<String>();
+	private List<String> expected = new ArrayList<>();
 
 	private int count = 0;
 

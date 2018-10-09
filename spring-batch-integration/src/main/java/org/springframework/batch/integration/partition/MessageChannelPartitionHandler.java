@@ -237,7 +237,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	private Collection<StepExecution> pollReplies(final StepExecution masterStepExecution, final Set<StepExecution> split) throws Exception {
-		final Collection<StepExecution> result = new ArrayList<StepExecution>(split.size());
+		final Collection<StepExecution> result = new ArrayList<>(split.size());
 
 		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
 			@Override
@@ -269,7 +269,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			}
 		};
 
-		Poller<Collection<StepExecution>> poller = new DirectPoller<Collection<StepExecution>>(pollInterval);
+		Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
 		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
 
 		if(timeout >= 0) {

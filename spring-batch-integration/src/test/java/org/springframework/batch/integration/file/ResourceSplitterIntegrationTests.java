@@ -70,7 +70,7 @@ public class ResourceSplitterIntegrationTests {
 	@Ignore //FIXME
 	// This broke with Integration 2.0 in a milestone, so watch out when upgrading...
 	public void testVanillaConversion() throws Exception {
-		resources.send(new GenericMessage<String>("classpath:*-context.xml"));
+		resources.send(new GenericMessage<>("classpath:*-context.xml"));
 		Message<Resource> message = (Message<Resource>) requests.receive(200L);
 		assertNotNull(message);
 		message = (Message<Resource>) requests.receive(100L);
