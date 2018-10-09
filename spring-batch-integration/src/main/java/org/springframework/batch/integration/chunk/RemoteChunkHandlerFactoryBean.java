@@ -138,7 +138,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 			step.registerStepExecutionListener((StepExecutionListener) chunkWriter);
 		}
 
-		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<T>();
+		ChunkProcessorChunkHandler<T> handler = new ChunkProcessorChunkHandler<>();
 		setNonBuffering(chunkProcessor);
 		handler.setChunkProcessor(chunkProcessor);
 		// TODO: create step context for the processor in case it has
@@ -169,7 +169,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	 */
 	private void replaceChunkProcessor(ChunkOrientedTasklet<?> tasklet, ItemWriter<T> chunkWriter,
 			final StepContributionSource stepContributionSource) {
-		setField(tasklet, "chunkProcessor", new SimpleChunkProcessor<T, T>(new PassThroughItemProcessor<T>(),
+		setField(tasklet, "chunkProcessor", new SimpleChunkProcessor<T, T>(new PassThroughItemProcessor<>(),
 				chunkWriter) {
 			@Override
 			protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs) throws Exception {

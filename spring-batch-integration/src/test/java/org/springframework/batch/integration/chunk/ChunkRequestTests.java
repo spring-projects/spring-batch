@@ -30,7 +30,7 @@ import org.springframework.util.SerializationUtils;
  */
 public class ChunkRequestTests {
 
-	private ChunkRequest<String> request = new ChunkRequest<String>(0, Arrays.asList("foo", "bar"),
+	private ChunkRequest<String> request = new ChunkRequest<>(0, Arrays.asList("foo", "bar"),
 			111L, MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test

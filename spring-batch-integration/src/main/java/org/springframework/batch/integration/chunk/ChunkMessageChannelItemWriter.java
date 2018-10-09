@@ -104,7 +104,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			if (logger.isDebugEnabled()) {
 				logger.debug("Dispatching chunk: " + request);
 			}
-			messagingGateway.send(new GenericMessage<ChunkRequest<T>>(request));
+			messagingGateway.send(new GenericMessage<>(request));
 			localState.incrementExpected();
 
 		}
@@ -171,7 +171,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	public Collection<StepContribution> getStepContributions() {
-		List<StepContribution> contributions = new ArrayList<StepContribution>();
+		List<StepContribution> contributions = new ArrayList<>();
 		for (ChunkResponse response : localState.pollChunkResponses()) {
 			StepContribution contribution = response.getStepContribution();
 			if (logger.isDebugEnabled()) {
@@ -274,14 +274,14 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 		private StepExecution stepExecution;
 
-		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
+		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<>();
 
 		public int getExpecting() {
 			return expected.get() - actual.get();
 		}
 
 		public <T> ChunkRequest<T> getRequest(List<? extends T> items) {
-			return new ChunkRequest<T>(current.incrementAndGet(), items, getJobId(), createStepContribution());
+			return new ChunkRequest<>(current.incrementAndGet(), items, getJobId(), createStepContribution());
 		}
 
 		public void open(int expectedValue, int actualValue) {
@@ -290,7 +290,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 
 		public Collection<ChunkResponse> pollChunkResponses() {
-			Collection<ChunkResponse> set = new ArrayList<ChunkResponse>();
+			Collection<ChunkResponse> set = new ArrayList<>();
 			synchronized (contributions) {
 				ChunkResponse item = contributions.poll();
 				while (item != null) {

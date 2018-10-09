@@ -93,7 +93,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 */
 	public Future<O> process(final I item) throws Exception {
 		final StepExecution stepExecution = getStepExecution();
-		FutureTask<O> task = new FutureTask<O>(new Callable<O>() {
+		FutureTask<O> task = new FutureTask<>(new Callable<O>() {
 			public O call() throws Exception {
 				if (stepExecution != null) {
 					StepSynchronizationManager.register(stepExecution);

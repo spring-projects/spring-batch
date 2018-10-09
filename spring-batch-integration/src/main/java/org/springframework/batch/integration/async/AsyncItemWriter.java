@@ -59,7 +59,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
 	public void write(List<? extends Future<T>> items) throws Exception {
-		List<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<>();
 		for (Future<T> future : items) {
 			try {
 				T item = future.get();

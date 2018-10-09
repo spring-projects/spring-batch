@@ -28,7 +28,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private static List<String> list = new ArrayList<String>();
+	private static List<String> list = new ArrayList<>();
 
 	@Autowired
 	private SimpleRecoverer recoverer;
