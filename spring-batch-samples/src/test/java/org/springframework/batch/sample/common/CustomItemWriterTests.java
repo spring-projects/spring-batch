@@ -36,7 +36,7 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 public class CustomItemWriterTests {
 	@Test
 	public void testFlush() throws Exception {
-		CustomItemWriter<String> itemWriter = new CustomItemWriter<String>();
+		CustomItemWriter<String> itemWriter = new CustomItemWriter<>();
 		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(1, itemWriter.getOutput().size());
 		itemWriter.write(Arrays.asList("2","3"));

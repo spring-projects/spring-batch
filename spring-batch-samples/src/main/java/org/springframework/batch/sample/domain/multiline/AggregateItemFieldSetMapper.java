@@ -96,7 +96,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 			return AggregateItem.getFooter();
 		}
 
-		return new AggregateItem<T>(delegate.mapFieldSet(fieldSet));
+		return new AggregateItem<>(delegate.mapFieldSet(fieldSet));
 
 	}
 

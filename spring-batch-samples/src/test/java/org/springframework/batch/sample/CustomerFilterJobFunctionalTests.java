@@ -47,7 +47,7 @@ public class CustomerFilterJobFunctionalTests {
 	private List<Customer> customers;
 	private int activeRow = 0;
 	private JdbcOperations jdbcTemplate;
-	private Map<String, Double> credits = new HashMap<String, Double>();
+	private Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;

@@ -37,7 +37,7 @@ import org.springframework.mail.MailMessage;
 public class TestMailErrorHandler implements MailErrorHandler {
 	private static final Log LOGGER = LogFactory.getLog(TestMailErrorHandler.class);
 
-	private List<MailMessage> failedMessages = new ArrayList<MailMessage>();
+	private List<MailMessage> failedMessages = new ArrayList<>();
 
 	@Override
 	public void handle(MailMessage failedMessage, Exception ex) {

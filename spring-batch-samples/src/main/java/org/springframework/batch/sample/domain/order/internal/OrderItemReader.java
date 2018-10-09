@@ -137,7 +137,7 @@ public class OrderItemReader implements ItemReader<Order> {
 		else if (LineItem.LINE_ID_ITEM.equals(lineId)) {
 			log.debug("MAPPING LINE ITEM");
 			if (order.getLineItems() == null) {
-				order.setLineItems(new ArrayList<LineItem>());
+				order.setLineItems(new ArrayList<>());
 			}
 			order.getLineItems().add(itemMapper.mapFieldSet(fieldSet));
 		}

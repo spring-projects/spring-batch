@@ -70,7 +70,7 @@ public class OrderValidatorTests {
 		order.setOrderId(-5);
 		order.setOrderDate(new Date(new Date().getTime() + 1000000000L));
 		order.setTotalLines(10);
-		order.setLineItems(new ArrayList<LineItem>());
+		order.setLineItems(new ArrayList<>());
 
 		Errors errors = new BeanPropertyBindingResult(order, "validOrder");
 
@@ -85,7 +85,7 @@ public class OrderValidatorTests {
 		order.setOrderId(Long.MAX_VALUE);
 		order.setOrderDate(new Date(new Date().getTime() - 1000));
 		order.setTotalLines(0);
-		List<LineItem> items = new ArrayList<LineItem>();
+		List<LineItem> items = new ArrayList<>();
 		items.add(new LineItem());
 		order.setLineItems(items);
 
@@ -101,7 +101,7 @@ public class OrderValidatorTests {
 		order.setOrderId(5L);
 		order.setOrderDate(new Date(new Date().getTime() - 1000));
 		order.setTotalLines(1);
-		items = new ArrayList<LineItem>();
+		items = new ArrayList<>();
 		items.add(new LineItem());
 		order.setLineItems(items);
 
@@ -307,7 +307,7 @@ public class OrderValidatorTests {
 	@Test
 	public void testValidLineItems() {
 		Order order = new Order();
-		List<LineItem> lineItems = new ArrayList<LineItem>();
+		List<LineItem> lineItems = new ArrayList<>();
 		lineItems.add(buildLineItem(-5, 5.00, 0, 0, 2, 3, 3, 30));
 		lineItems.add(buildLineItem(Long.MAX_VALUE, 5.00, 0, 0, 2, 3, 3, 30));
 		lineItems.add(buildLineItem(6, -5.00, 0, 0, 2, 3, 3, 0));

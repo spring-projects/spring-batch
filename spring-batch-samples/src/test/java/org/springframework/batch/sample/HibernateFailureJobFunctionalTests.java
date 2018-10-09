@@ -154,7 +154,7 @@ public class HibernateFailureJobFunctionalTests {
 	 * Credit was increased by CREDIT_INCREASE
 	 */
 	protected void validatePostConditions() throws Exception {
-		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
+		final List<BigDecimal> matches = new ArrayList<>();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override

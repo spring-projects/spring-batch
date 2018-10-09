@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class RetrySampleItemWriterTests {
 
-	private RetrySampleItemWriter<Object> processor = new RetrySampleItemWriter<Object>();
+	private RetrySampleItemWriter<Object> processor = new RetrySampleItemWriter<>();
 
 	/*
 	 * Processing throws exception on 2nd and 3rd call.

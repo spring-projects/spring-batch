@@ -39,7 +39,7 @@ public class AggregateItemReaderTests {
 				case 1:
 				case 2:
 				case 3:
-					return new AggregateItem<String>("line");
+					return new AggregateItem<>("line");
 				case 4:
 					return AggregateItem.getFooter();
 				default:
@@ -49,7 +49,7 @@ public class AggregateItemReaderTests {
 
 		};
 
-		provider = new AggregateItemReader<String>();
+		provider = new AggregateItemReader<>();
 		provider.setItemReader(input);
 	}
 

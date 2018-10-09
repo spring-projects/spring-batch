@@ -44,7 +44,7 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  */
 public class RemoteLauncherTests {
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
-	private static List<Exception> errors = new ArrayList<Exception>();
+	private static List<Exception> errors = new ArrayList<>();
 	private static JobOperator launcher;
 	private static JobLoader loader;
 	static private Thread thread;
