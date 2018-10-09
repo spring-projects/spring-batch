@@ -36,6 +36,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
+import java.util.Date;
+
 /**
  * Simple implementation of the {@link JobLauncher} interface. The Spring Core
  * {@link TaskExecutor} interface is used to launch a {@link Job}. This means
@@ -166,6 +168,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		}
 		catch (TaskRejectedException e) {
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
+			jobExecution.setStartTime(new Date(System.currentTimeMillis()));
+			jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
 				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
 			}
