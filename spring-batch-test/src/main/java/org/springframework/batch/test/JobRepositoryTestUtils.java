@@ -135,7 +135,7 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 	 */
 	public List<JobExecution> createJobExecutions(String jobName, String[] stepNames, int count)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-		List<JobExecution> list = new ArrayList<JobExecution>();
+		List<JobExecution> list = new ArrayList<>();
 		JobParameters jobParameters = new JobParameters();
 		for (int i = 0; i < count; i++) {
 			JobExecution jobExecution = jobRepository.createJobExecution(jobName, jobParametersIncrementer

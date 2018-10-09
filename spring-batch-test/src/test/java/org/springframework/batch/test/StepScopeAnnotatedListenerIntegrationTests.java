@@ -66,7 +66,7 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 
 		@BeforeStep
 		public void initializeState(StepExecution stepExecution) {
-			this.list = new ArrayList<String>();
+			this.list = new ArrayList<>();
 		}
 
 		@AfterStep
