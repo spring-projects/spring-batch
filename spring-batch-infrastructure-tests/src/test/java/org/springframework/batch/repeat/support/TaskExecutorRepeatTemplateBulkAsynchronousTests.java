@@ -82,7 +82,7 @@ public class TaskExecutorRepeatTemplateBulkAsynchronousTests {
 		template.setTaskExecutor(taskExecutor);
 		template.setThrottleLimit(throttleLimit);
 
-		items = Collections.synchronizedList(new ArrayList<String>());
+		items = Collections.synchronizedList(new ArrayList<>());
 
 		callback = new RepeatCallback() {
 

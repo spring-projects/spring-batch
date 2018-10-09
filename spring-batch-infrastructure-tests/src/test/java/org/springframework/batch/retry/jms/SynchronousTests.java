@@ -101,7 +101,7 @@ public class SynchronousTests {
 		assertEquals(0, count);
 	}
 
-	List<Object> list = new ArrayList<Object>();
+	List<Object> list = new ArrayList<>();
 
 	/*
 	 * Message processing is successful on the second attempt without having to
@@ -168,7 +168,7 @@ public class SynchronousTests {
 
 		assertInitialState();
 
-		JmsItemReader<Object> provider = new JmsItemReader<Object>();
+		JmsItemReader<Object> provider = new JmsItemReader<>();
 		// provider.setItemType(Message.class);
 		jmsTemplate.setDefaultDestinationName("queue");
 		provider.setJmsTemplate(jmsTemplate);
@@ -396,7 +396,7 @@ public class SynchronousTests {
 
 	private List<String> getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

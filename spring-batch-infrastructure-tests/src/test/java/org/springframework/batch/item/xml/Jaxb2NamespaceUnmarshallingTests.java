@@ -39,7 +39,7 @@ import org.springframework.util.ClassUtils;
 
 public class Jaxb2NamespaceUnmarshallingTests {
 
-	private StaxEventItemReader<QualifiedTrade> reader = new StaxEventItemReader<QualifiedTrade>();
+	private StaxEventItemReader<QualifiedTrade> reader = new StaxEventItemReader<>();
 
 	private Resource resource = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
 			"domain/trades.xml"));
@@ -66,7 +66,7 @@ public class Jaxb2NamespaceUnmarshallingTests {
 	@Test
 	public void testRead() throws Exception {
 		QualifiedTrade result;
-		List<QualifiedTrade> results = new ArrayList<QualifiedTrade>();
+		List<QualifiedTrade> results = new ArrayList<>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}

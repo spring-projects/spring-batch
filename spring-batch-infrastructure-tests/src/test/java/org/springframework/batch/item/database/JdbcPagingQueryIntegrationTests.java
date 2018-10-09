@@ -125,7 +125,7 @@ public class JdbcPagingQueryIntegrationTests {
 	@Test
 	public void testQueryFromStartWithGroupBy() throws Exception {
 		AbstractSqlPagingQueryProvider queryProvider = (AbstractSqlPagingQueryProvider) getPagingQueryProvider();
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("NAME", Order.ASCENDING);
 		sortKeys.put("CODE", Order.DESCENDING);
 		queryProvider.setSortKeys(sortKeys);
@@ -162,7 +162,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 	private Map<String, Object> getStartAfterValues(
 			PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
-		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
+		Map<String, Object> startAfterValues = new LinkedHashMap<>();
 		for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 			startAfterValues.put(sortKey.getKey(), list.get(list.size() - 1).get(sortKey.getKey()));
 		}
@@ -196,7 +196,7 @@ public class JdbcPagingQueryIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		return factory.getObject();
@@ -204,14 +204,14 @@ public class JdbcPagingQueryIntegrationTests {
 	}
 	
 	private List<Object> getParameterList(Map<String, Object> values, Map<String, Object> sortKeyValue) {
-		SortedMap<String, Object> sm = new TreeMap<String, Object>();
+		SortedMap<String, Object> sm = new TreeMap<>();
 		if (values != null) {
 			sm.putAll(values);
 		}
-		List<Object> parameterList = new ArrayList<Object>();
+		List<Object> parameterList = new ArrayList<>();
 		parameterList.addAll(sm.values());
 		if (sortKeyValue != null && sortKeyValue.size() > 0) {
-			List<Map.Entry<String, Object>> keys = new ArrayList<Map.Entry<String,Object>>(sortKeyValue.entrySet());
+			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
 			for(int i = 0; i < keys.size(); i++) {
 				for(int j = 0; j < i; j++) {

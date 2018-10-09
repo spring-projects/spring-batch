@@ -28,7 +28,7 @@ public class XStreamUnmarshallingTests extends AbstractStaxEventReaderItemReader
 	@Override
 	protected Unmarshaller getUnmarshaller() throws Exception {
 		XStreamMarshaller unmarshaller = new XStreamMarshaller();
-		Map<String,Class<?>> aliasesMap = new HashMap<String,Class<?>>();
+		Map<String,Class<?>> aliasesMap = new HashMap<>();
 		aliasesMap.put("trade", Trade.class);
 		aliasesMap.put("isin", String.class);
 		aliasesMap.put("customer", String.class);

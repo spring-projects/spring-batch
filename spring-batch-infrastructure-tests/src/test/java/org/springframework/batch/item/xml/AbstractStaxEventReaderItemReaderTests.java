@@ -32,7 +32,7 @@ import org.springframework.util.ClassUtils;
 
 public abstract class AbstractStaxEventReaderItemReaderTests {
 
-	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<Trade>();
+	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<>();
 
 	@Before
 	public void setUp() throws Exception {
@@ -46,7 +46,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 		reader.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "input.xml")));
 		reader.open(new ExecutionContext());
 		Trade result;
-		List<Trade> results = new ArrayList<Trade>();
+		List<Trade> results = new ArrayList<>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}
@@ -59,7 +59,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 				.addResourcePathToPackagePath(getClass(), "input-nested.xml")));
 		reader.open(new ExecutionContext());
 		Trade result;
-		List<Trade> results = new ArrayList<Trade>();
+		List<Trade> results = new ArrayList<>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}

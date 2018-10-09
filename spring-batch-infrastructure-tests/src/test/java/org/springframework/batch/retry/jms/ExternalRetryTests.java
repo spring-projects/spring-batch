@@ -86,9 +86,9 @@ public class ExternalRetryTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
-	private List<Object> recovered = new ArrayList<Object>();
+	private List<Object> recovered = new ArrayList<>();
 
 	/*
 	 * Message processing is successful on the second attempt but must receive
@@ -248,7 +248,7 @@ public class ExternalRetryTests {
 
 	private List<String> getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)
