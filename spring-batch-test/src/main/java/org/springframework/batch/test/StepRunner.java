@@ -136,7 +136,7 @@ public class StepRunner {
 		job.setName("TestJob");
 		job.setJobRepository(this.jobRepository);
 
-		List<Step> stepsToExecute = new ArrayList<Step>();
+		List<Step> stepsToExecute = new ArrayList<>();
 		stepsToExecute.add(step);
 		job.setSteps(stepsToExecute);
 
@@ -190,7 +190,7 @@ public class StepRunner {
 	 * current timestamp, to ensure that the job instance will be unique
 	 */
 	private JobParameters makeUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
 	}

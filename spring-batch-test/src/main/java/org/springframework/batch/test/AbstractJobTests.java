@@ -150,7 +150,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * current timestamp, to ensure that the job instance will be unique.
 	 */
 	protected JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
 	}
