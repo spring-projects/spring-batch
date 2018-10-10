@@ -43,7 +43,7 @@ public class JsrJobListenerFactoryBean extends org.springframework.batch.core.li
 
 	@Override
 	protected ListenerMetaData[] getMetaDataValues() {
-		List<ListenerMetaData> values = new ArrayList<ListenerMetaData>();
+		List<ListenerMetaData> values = new ArrayList<>();
 		Collections.addAll(values, JobListenerMetaData.values());
 		Collections.addAll(values, JsrJobListenerMetaData.values());
 

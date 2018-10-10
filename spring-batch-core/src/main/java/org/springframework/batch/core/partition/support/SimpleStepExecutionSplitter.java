@@ -176,7 +176,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		JobExecution jobExecution = stepExecution.getJobExecution();
 
 		Map<String, ExecutionContext> contexts = getContexts(stepExecution, gridSize);
-		Set<StepExecution> set = new HashSet<StepExecution>(contexts.size());
+		Set<StepExecution> set = new HashSet<>(contexts.size());
 
 		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
 
@@ -194,7 +194,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		jobRepository.addAll(set);
 
-		Set<StepExecution> executions = new HashSet<StepExecution>(set.size());
+		Set<StepExecution> executions = new HashSet<>(set.size());
 		executions.addAll(set);
 
 		return executions;
@@ -219,7 +219,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		}
 		else {
 			if (partitioner instanceof PartitionNameProvider) {
-				result = new HashMap<String, ExecutionContext>();
+				result = new HashMap<>();
 				Collection<String> names = ((PartitionNameProvider) partitioner).getPartitionNames(splitSize);
 				for (String name : names) {
 					/*

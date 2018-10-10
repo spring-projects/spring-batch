@@ -41,7 +41,7 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class StepContextTests {
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null, null), 1L);
 

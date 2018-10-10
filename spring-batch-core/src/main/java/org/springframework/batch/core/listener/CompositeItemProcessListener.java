@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
  */
 public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T, S> {
 
-	private OrderedComposite<ItemProcessListener<? super T, ? super S>> listeners = new OrderedComposite<ItemProcessListener<? super T, ? super S>>();
+	private OrderedComposite<ItemProcessListener<? super T, ? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

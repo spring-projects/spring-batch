@@ -125,7 +125,7 @@ public class PropertyParser {
 	}
 
 	private Map<String, Properties> getProperties(String keyName, Properties properties) {
-		ManagedMap<String, Properties> stepProperties = new ManagedMap<String, Properties>();
+		ManagedMap<String, Properties> stepProperties = new ManagedMap<>();
 		stepProperties.setMergeEnabled(true);
 		stepProperties.put(keyName, properties);
 
@@ -138,13 +138,13 @@ public class PropertyParser {
 
 	@SuppressWarnings("unchecked")
 	private Map<String, Map<String, Properties>> getStepArtifactProperties(BeanDefinition beanDefinition, Properties properties) {
-		ManagedMap<String, Map<String, Properties>> stepArtifacts = new ManagedMap<String, Map<String, Properties>>();
+		ManagedMap<String, Map<String, Properties>> stepArtifacts = new ManagedMap<>();
 		stepArtifacts.setMergeEnabled(true);
 
 		Map<String, Map<String, Properties>> existingArtifacts
 				= (Map<String, Map<String, Properties>>) beanDefinition.getPropertyValues().get(getPropertyName(batchArtifactType));
 
-		ManagedMap<String, Properties> artifactProperties = new ManagedMap<String, Properties>();
+		ManagedMap<String, Properties> artifactProperties = new ManagedMap<>();
 		artifactProperties.setMergeEnabled(true);
 
 		if(existingArtifacts != null && existingArtifacts.containsKey(stepName)) {
@@ -163,7 +163,7 @@ public class PropertyParser {
 
 	private void setJobPropertiesBean(Properties properties) {
 		if (batchArtifactType.equals(BatchArtifactType.JOB)) {
-			Map<String, String> jobProperties = new HashMap<String, String>();
+			Map<String, String> jobProperties = new HashMap<>();
 
 			if (properties != null && !properties.isEmpty()) {
 				for (String param : properties.stringPropertyNames()) {

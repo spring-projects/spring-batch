@@ -58,7 +58,7 @@ public class JobSynchronizationManagerTests {
 
 	@Test
 	public void testClose() throws Exception {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
@@ -75,7 +75,7 @@ public class JobSynchronizationManagerTests {
 	public void testMultithreaded() throws Exception {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<JobContext> task = new FutureTask<JobContext>(new Callable<JobContext>() {
+		FutureTask<JobContext> task = new FutureTask<>(new Callable<JobContext>() {
 			@Override
 			public JobContext call() throws Exception {
 				try {
@@ -99,7 +99,7 @@ public class JobSynchronizationManagerTests {
 	@Test
 	public void testRelease() {
 		JobContext context = JobSynchronizationManager.register(jobExecution);
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
 			public void run() {

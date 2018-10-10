@@ -133,7 +133,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList<BeanDefinition> listeners = new ManagedList<BeanDefinition>();
+			ManagedList<BeanDefinition> listeners = new ManagedList<>();
 			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");

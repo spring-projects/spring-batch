@@ -35,7 +35,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 	JdbcJobExecutionDao jobExecutionDao;
 
-	List<String> list = new ArrayList<String>();
+	List<String> list = new ArrayList<>();
 
 	/*
 	 * (non-Javadoc)

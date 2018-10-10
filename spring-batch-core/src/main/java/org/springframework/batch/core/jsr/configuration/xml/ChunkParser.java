@@ -153,7 +153,7 @@ public class ChunkParser {
 				}
 			} else if(name.equals(NO_ROLLBACK_EXCEPTION_CLASSES_ELEMENT)) {
 				//TODO: Update to support excludes
-				ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
+				ManagedList<TypedStringValue> list = new ManagedList<>();
 
 				for (Element child : DomUtils.getChildElementsByTagName(nestedElement, INCLUDE_ELEMENT)) {
 					String className = child.getAttribute(CLASS_ATTRIBUTE);

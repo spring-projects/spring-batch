@@ -59,7 +59,7 @@ public class JsrSplitParser {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
 
-		Collection<Object> flows = new ManagedList<Object>();
+		Collection<Object> flows = new ManagedList<>();
 		int i = 0;
 		for (Element nextElement : flowElements) {
 			FlowParser flowParser = new FlowParser(idAttribute + "." + i, jobFactoryRef);

@@ -41,7 +41,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	@Before
 	public void setUp() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(FlatFileParseException.class, true);
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
@@ -67,7 +67,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getSkippableSubsetSkipPolicy() {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, true);
 		skippableExceptions.put(ItemWriterException.class, false);
 		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);
@@ -104,7 +104,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getFatalSubsetSkipPolicy() {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, false);
 		skippableExceptions.put(ItemWriterException.class, true);
 		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);

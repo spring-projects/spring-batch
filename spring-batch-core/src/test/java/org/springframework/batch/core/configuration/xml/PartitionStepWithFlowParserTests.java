@@ -61,7 +61,7 @@ public class PartitionStepWithFlowParserTests {
 	@Autowired
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 
-	private List<String> savedStepNames = new ArrayList<String>();
+	private List<String> savedStepNames = new ArrayList<>();
 
 	@Before
 	public void setUp() {
@@ -84,7 +84,7 @@ public class PartitionStepWithFlowParserTests {
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			list.add(stepExecution.getStepName());
 		}

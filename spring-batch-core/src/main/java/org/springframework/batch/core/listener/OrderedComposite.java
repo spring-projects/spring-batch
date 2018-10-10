@@ -32,13 +32,13 @@ import org.springframework.core.annotation.Order;
  */
 class OrderedComposite<S> {
 
-	private List<S> unordered = new ArrayList<S>();
+	private List<S> unordered = new ArrayList<>();
 
-	private List<S> ordered = new ArrayList<S>();
+	private List<S> ordered = new ArrayList<>();
 	
 	private Comparator<? super S> comparator = new AnnotationAwareOrderComparator();
 
-	private List<S> list = new ArrayList<S>();
+	private List<S> list = new ArrayList<>();
 
 	/**
 	 * Public setter for the listeners.
@@ -84,7 +84,7 @@ class OrderedComposite<S> {
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> iterator() {
-		return new ArrayList<S>(list).iterator();
+		return new ArrayList<>(list).iterator();
 	}
 
 	/**
@@ -93,7 +93,7 @@ class OrderedComposite<S> {
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> reverse() {
-		ArrayList<S> result = new ArrayList<S>(list);
+		ArrayList<S> result = new ArrayList<>(list);
 		Collections.reverse(result);
 		return result.iterator();
 	}

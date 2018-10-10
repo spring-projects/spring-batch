@@ -34,11 +34,11 @@ import java.util.List;
  */
 public class Chunk<W> implements Iterable<W> {
 
-	private List<W> items = new ArrayList<W>();
+	private List<W> items = new ArrayList<>();
 
-	private List<SkipWrapper<W>> skips = new ArrayList<SkipWrapper<W>>();
+	private List<SkipWrapper<W>> skips = new ArrayList<>();
 
-	private List<Exception> errors = new ArrayList<Exception>();
+	private List<Exception> errors = new ArrayList<>();
 
 	private Object userData;
 
@@ -57,10 +57,10 @@ public class Chunk<W> implements Iterable<W> {
 	public Chunk(Collection<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items != null) {
-			this.items = new ArrayList<W>(items);
+			this.items = new ArrayList<>(items);
 		}
 		if (skips != null) {
-			this.skips = new ArrayList<SkipWrapper<W>>(skips);
+			this.skips = new ArrayList<>(skips);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Chunk<W> implements Iterable<W> {
 	 * @return a copy of the items to be processed as an unmodifiable list
 	 */
 	public List<W> getItems() {
-		return Collections.unmodifiableList(new ArrayList<W>(items));
+		return Collections.unmodifiableList(new ArrayList<>(items));
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class Chunk<W> implements Iterable<W> {
 
 		public void remove(Throwable e) {
 			remove();
-			skips.add(new SkipWrapper<W>(next, e));
+			skips.add(new SkipWrapper<>(next, e));
 		}
 
 		@Override

@@ -51,7 +51,7 @@ public class NonAbstractStepTests {
 	/**
 	 * Sequence of events encountered during step execution.
 	 */
-	final List<String> events = new ArrayList<String>();
+	final List<String> events = new ArrayList<>();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(1L,
 			"jobName"), new JobParameters()));

@@ -73,7 +73,7 @@ public class StepListenerParser extends AbstractListenerParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(stepElement));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList<BeanDefinition> listenerBeans = new ManagedList<BeanDefinition>();
+			ManagedList<BeanDefinition> listenerBeans = new ManagedList<>();
 			if (propertyValues.contains("listeners")) {
 				listenerBeans = (ManagedList<BeanDefinition>) propertyValues.getPropertyValue("listeners").getValue();
 			}

@@ -42,7 +42,7 @@ public class DefaultExecutionContextSerializerTests extends AbstractExecutionCon
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testSerializeNonSerializable() throws Exception {
-		Map<String, Object> m1 = new HashMap<String, Object>();
+		Map<String, Object> m1 = new HashMap<>();
 		m1.put("object1", new Object());
 
 		serializer.serialize(m1, new ByteArrayOutputStream());

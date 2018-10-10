@@ -206,7 +206,7 @@ public class ItemListenerErrorTests {
 
 		private boolean goingToFail = false;
 
-		private ItemReader<String> delegate = new ListItemReader<String>(Collections.singletonList("1"));
+		private ItemReader<String> delegate = new ListItemReader<>(Collections.singletonList("1"));
 
 		private int count = 0;
 

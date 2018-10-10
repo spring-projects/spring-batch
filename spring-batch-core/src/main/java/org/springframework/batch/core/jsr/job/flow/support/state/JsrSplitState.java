@@ -53,7 +53,7 @@ public class JsrSplitState extends org.springframework.batch.core.job.flow.suppo
 	 */
 	@Override
 	protected FlowExecutionStatus doAggregation(Collection<FlowExecution> results, FlowExecutor executor) {
-		List<String> stepNames = new ArrayList<String>();
+		List<String> stepNames = new ArrayList<>();
 
 		for (Flow curFlow : getFlows()) {
 			JsrFlow flow = (JsrFlow) curFlow;

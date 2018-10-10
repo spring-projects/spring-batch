@@ -109,7 +109,7 @@ public class JobScopeTests {
 
 	@Test
 	public void testRegisterDestructionCallback() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
 			@Override
@@ -126,7 +126,7 @@ public class JobScopeTests {
 
 	@Test
 	public void testRegisterAnotherDestructionCallback() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		context.setAttribute("foo", "bar");
 		scope.registerDestructionCallback("foo", new Runnable() {
 			@Override

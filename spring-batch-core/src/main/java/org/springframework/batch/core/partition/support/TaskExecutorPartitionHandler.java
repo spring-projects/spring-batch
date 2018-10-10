@@ -94,8 +94,8 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
     protected Set<StepExecution> doHandle(StepExecution masterStepExecution,
                                           Set<StepExecution> partitionStepExecutions) throws Exception {
         Assert.notNull(step, "A Step must be provided.");
-        final Set<Future<StepExecution>> tasks = new HashSet<Future<StepExecution>>(getGridSize());
-        final Set<StepExecution> result = new HashSet<StepExecution>();
+        final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
+        final Set<StepExecution> result = new HashSet<>();
 
         for (final StepExecution stepExecution : partitionStepExecutions) {
             final FutureTask<StepExecution> task = createTask(step, stepExecution);
@@ -133,7 +133,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
      */
     protected FutureTask<StepExecution> createTask(final Step step,
                                                    final StepExecution stepExecution) {
-        return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+        return new FutureTask<>(new Callable<StepExecution>() {
             @Override
             public StepExecution call() throws Exception {
                 step.execute(stepExecution);

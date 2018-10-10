@@ -28,7 +28,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
-	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<ItemWriteListener<? super S>>();
+	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

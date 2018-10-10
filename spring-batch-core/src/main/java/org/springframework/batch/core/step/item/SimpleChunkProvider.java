@@ -45,7 +45,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	protected final ItemReader<? extends I> itemReader;
 
-	private final MulticasterBatchListener<I, ?> listener = new MulticasterBatchListener<I, Object>();
+	private final MulticasterBatchListener<I, ?> listener = new MulticasterBatchListener<>();
 
 	private final RepeatOperations repeatOperations;
 
@@ -109,7 +109,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	@Override
 	public Chunk<I> provide(final StepContribution contribution) throws Exception {
 
-		final Chunk<I> inputs = new Chunk<I>();
+		final Chunk<I> inputs = new Chunk<>();
 		repeatOperations.iterate(new RepeatCallback() {
 
 			@Override

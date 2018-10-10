@@ -59,8 +59,8 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 	@Ignore //FIXME
 	public void testTransactionException() throws Exception {
 
-		final SkipWriterStub<String> writer = new SkipWriterStub<String>();
-		FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
+		final SkipWriterStub<String> writer = new SkipWriterStub<>();
+		FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();
 		factory.setItemWriter(writer);
 
 		@SuppressWarnings("serial")
@@ -83,7 +83,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		factory.setTransactionManager(transactionManager);
 		factory.setCommitInterval(2);
 
-		ItemReader<String> reader = new ListItemReader<String>(Arrays.asList("1", "2"));
+		ItemReader<String> reader = new ListItemReader<>(Arrays.asList("1", "2"));
 		factory.setItemReader(reader);
 
 		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();

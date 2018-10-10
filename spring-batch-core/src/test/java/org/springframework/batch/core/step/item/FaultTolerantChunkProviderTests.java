@@ -43,7 +43,7 @@ public class FaultTolerantChunkProviderTests {
 
 	@Test
 	public void testProvide() throws Exception {
-		provider = new FaultTolerantChunkProvider<String>(new ListItemReader<String>(Arrays.asList("foo", "bar")),
+		provider = new FaultTolerantChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")),
 				new RepeatTemplate());
 		Chunk<String> chunk = provider.provide(contribution);
 		assertNotNull(chunk);
@@ -52,7 +52,7 @@ public class FaultTolerantChunkProviderTests {
 
 	@Test
 	public void testProvideWithOverflow() throws Exception {
-		provider = new FaultTolerantChunkProvider<String>(new ItemReader<String>() {
+		provider = new FaultTolerantChunkProvider<>(new ItemReader<String>() {
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new RuntimeException("Planned");

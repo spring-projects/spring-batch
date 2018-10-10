@@ -105,7 +105,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Test
 	public void testSaveAndFindExecutionContexts() {
 
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			JobInstance ji = jobInstanceDao.createJobInstance("testJob" + i, new JobParameters());
 			JobExecution je = new JobExecution(ji, new JobParameters());
@@ -141,7 +141,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Transactional
 	@Test
 	public void testSaveEmptyExecutionContexts() {
-		contextDao.saveExecutionContexts(new ArrayList<StepExecution>());
+		contextDao.saveExecutionContexts(new ArrayList<>());
 	}
 
 	@Transactional

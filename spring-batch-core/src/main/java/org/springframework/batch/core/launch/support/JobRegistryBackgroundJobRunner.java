@@ -81,7 +81,7 @@ public class JobRegistryBackgroundJobRunner {
 
 	private JobRegistry jobRegistry;
 
-	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<Exception>());
+	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<>());
 
 	/**
 	 * @param parentContextPath the parentContextPath to be used by the JobRegistryBackgroundJobRunner.
@@ -116,7 +116,7 @@ public class JobRegistryBackgroundJobRunner {
 	 */
 	public static List<Exception> getErrors() {
 		synchronized (errors) {
-			return new ArrayList<Exception>(errors);
+			return new ArrayList<>(errors);
 		}
 	}
 

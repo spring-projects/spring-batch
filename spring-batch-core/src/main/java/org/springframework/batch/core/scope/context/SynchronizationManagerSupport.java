@@ -49,18 +49,18 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * to cover the single threaded case, so that the API is the same as
 	 * multi-threaded.
 	 */
-	private final ThreadLocal<Stack<E>> executionHolder = new ThreadLocal<Stack<E>>();
+	private final ThreadLocal<Stack<E>> executionHolder = new ThreadLocal<>();
 
 	/**
 	 * Reference counter for each execution: how many threads are using the
 	 * same one?
 	 */
-	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<E, AtomicInteger>();
+	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<>();
 
 	/**
 	 * Simple map from a running execution to the associated context.
 	 */
-	private final Map<E, C> contexts = new ConcurrentHashMap<E, C>();
+	private final Map<E, C> contexts = new ConcurrentHashMap<>();
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns {@code null}.
@@ -179,7 +179,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	public Stack<E> getCurrent() {
 		if (executionHolder.get() == null) {
-			executionHolder.set(new Stack<E>());
+			executionHolder.set(new Stack<>());
 		}
 		return executionHolder.get();
 	}

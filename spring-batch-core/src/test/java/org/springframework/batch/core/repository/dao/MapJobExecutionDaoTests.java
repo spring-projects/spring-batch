@@ -78,8 +78,8 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 		// Support objects for this testing
 		final CountDownLatch latch = new CountDownLatch(1);
-		final SortedSet<Long> ids = Collections.synchronizedSortedSet(new TreeSet<Long>()); // TODO Change to SkipList w/JDK6
-		final AtomicReference<Exception> exception = new AtomicReference<Exception>(null);
+		final SortedSet<Long> ids = Collections.synchronizedSortedSet(new TreeSet<>()); // TODO Change to SkipList w/JDK6
+		final AtomicReference<Exception> exception = new AtomicReference<>(null);
 
 		// Implementation of the high-concurrency code
 		final Runnable codeUnderTest = new Runnable() {

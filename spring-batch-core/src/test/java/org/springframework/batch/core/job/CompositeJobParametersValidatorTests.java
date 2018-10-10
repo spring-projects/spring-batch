@@ -44,7 +44,7 @@ public class CompositeJobParametersValidatorTests {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testValidatorsCanNotBeEmpty() throws Exception{
-		compositeJobParametersValidator.setValidators(new ArrayList<JobParametersValidator>());
+		compositeJobParametersValidator.setValidators(new ArrayList<>());
 		compositeJobParametersValidator.afterPropertiesSet();
 	}
 	

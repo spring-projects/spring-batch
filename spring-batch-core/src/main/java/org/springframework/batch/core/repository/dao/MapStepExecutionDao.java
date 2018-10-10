@@ -39,9 +39,9 @@ import org.springframework.util.SerializationUtils;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<Long, Map<Long,StepExecution>>();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<>();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<Long, StepExecution>();
+	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<>();
 
 	private AtomicLong currentId = new AtomicLong();
 
@@ -75,7 +75,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = new ConcurrentHashMap<Long, StepExecution>();
+			executions = new ConcurrentHashMap<>();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 
@@ -125,7 +125,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		if (executions == null || executions.isEmpty()) {
 			return;
 		}
-		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
+		List<StepExecution> result = new ArrayList<>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
 
 			@Override
@@ -134,7 +134,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 		});
 
-		List<StepExecution> copy = new ArrayList<StepExecution>(result.size());
+		List<StepExecution> copy = new ArrayList<>(result.size());
 		for (StepExecution exec : result) {
 			copy.add(copy(exec));
 		}

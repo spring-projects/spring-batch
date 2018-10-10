@@ -72,7 +72,7 @@ public class ListenerParser {
 	private ManagedList<AbstractBeanDefinition> parseListeners(Element element, ParserContext parserContext, String stepName) {
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, LISTENERS_ELEMENT);
 
-		ManagedList<AbstractBeanDefinition> listeners = new ManagedList<AbstractBeanDefinition>();
+		ManagedList<AbstractBeanDefinition> listeners = new ManagedList<>();
 
 		if (listenersElements.size() == 1) {
 			Element listenersElement = listenersElements.get(0);

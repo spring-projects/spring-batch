@@ -36,7 +36,7 @@ public class FlowBuilderTests {
 
 	@Test
 	public void test() throws Exception {
-		FlowBuilder<Flow> builder = new FlowBuilder<Flow>("flow");
+		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
 		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
 		builder.start(new StepSupport("step") {

@@ -122,8 +122,8 @@ public class ItemSkipParsingTests extends AbstractJsrTestCase {
 
 	public static class SkipErrorGeneratingWriter implements ItemWriter<String> {
 		private static int count = 0;
-		protected List<String> writtenItems = new ArrayList<String>();
-		private List<String> skippedItems = new ArrayList<String>();
+		protected List<String> writtenItems = new ArrayList<>();
+		private List<String> skippedItems = new ArrayList<>();
 
 		@Override
 		public void write(List<? extends String> items) throws Exception {
@@ -135,7 +135,7 @@ public class ItemSkipParsingTests extends AbstractJsrTestCase {
 				skippedItems.addAll(items);
 				throw new Exception("write skip me");
 			} else if(count == 9) {
-				skippedItems = new ArrayList<String>();
+				skippedItems = new ArrayList<>();
 				throw new RuntimeException("write fail because of me");
 			} else {
 				writtenItems.addAll(items);

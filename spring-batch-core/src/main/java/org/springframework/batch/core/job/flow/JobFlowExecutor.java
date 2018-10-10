@@ -39,7 +39,7 @@ import org.springframework.lang.Nullable;
  */
 public class JobFlowExecutor implements FlowExecutor {
 
-	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
+	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
 
 	private final JobExecution execution;
 

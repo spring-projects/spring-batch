@@ -48,7 +48,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 
 	private final Log logger = LogFactory.getLog(getClass());
 	private ItemReader<? extends I> itemReader;
-	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
+	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<>();
 	private RepeatOperations repeatTemplate;
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
 	private ItemWriter<? super O> itemWriter;
@@ -83,7 +83,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 			throws Exception {
 
 		final AtomicInteger filterCount = new AtomicInteger(0);
-		final Chunk<O> output = new Chunk<O>();
+		final Chunk<O> output = new Chunk<>();
 
 		repeatTemplate.iterate(new RepeatCallback() {
 

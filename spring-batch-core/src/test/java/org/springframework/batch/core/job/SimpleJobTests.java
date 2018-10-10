@@ -78,7 +78,7 @@ public class SimpleJobTests {
 
 	private ExecutionContextDao ecDao;
 
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List<Serializable> list = new ArrayList<>();
 
 	private JobInstance jobInstance;
 
@@ -122,7 +122,7 @@ public class SimpleJobTests {
 			}
 		});
 
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(step1);
 		steps.add(step2);
 		job.setName("testJob");
@@ -194,7 +194,7 @@ public class SimpleJobTests {
 				return false;
 			}
 		};
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(testStep);
 		job.setSteps(steps);
 		job.execute(jobExecution);
@@ -355,7 +355,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testStepAlreadyCompleteInSameExecution() throws Exception {
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(step1);
 		steps.add(step2);
 		// Two steps with the same name should both be executed, since
@@ -372,7 +372,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testNoSteps() throws Exception {
-		job.setSteps(new ArrayList<Step>());
+		job.setSteps(new ArrayList<>());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();

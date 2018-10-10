@@ -68,7 +68,7 @@ public class ChunkOrientedStepIntegrationTests {
 	private RepeatTemplate chunkOperations;
 
 	private ItemReader<String> getReader(String[] args) {
-		return new ListItemReader<String>(Arrays.asList(args));
+		return new ListItemReader<>(Arrays.asList(args));
 	}
 
 	@Before
@@ -93,7 +93,7 @@ public class ChunkOrientedStepIntegrationTests {
 	@Ignore
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
 			@Override
 			public void write(List<? extends String> data) throws Exception {

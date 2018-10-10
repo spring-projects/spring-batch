@@ -52,7 +52,7 @@ DisposableBean {
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobRegistry = null;
 
-	private Collection<String> jobNames = new HashSet<String>();
+	private Collection<String> jobNames = new HashSet<>();
 
 	private String groupName = null;
 

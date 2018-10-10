@@ -97,7 +97,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 		// group, or in the required group.
 		if (!optionalKeys.isEmpty()) {
 
-			Collection<String> missingKeys = new HashSet<String>();
+			Collection<String> missingKeys = new HashSet<>();
 			for (String key : keys) {
 				if (!optionalKeys.contains(key) && !requiredKeys.contains(key)) {
 					missingKeys.add(key);
@@ -110,7 +110,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 
 		}
 
-		Collection<String> missingKeys = new HashSet<String>();
+		Collection<String> missingKeys = new HashSet<>();
 		for (String key : requiredKeys) {
 			if (!keys.contains(key)) {
 				missingKeys.add(key);
@@ -132,7 +132,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * @see #setOptionalKeys(String[])
 	 */
 	public final void setRequiredKeys(String[] requiredKeys) {
-		this.requiredKeys = new HashSet<String>(Arrays.asList(requiredKeys));
+		this.requiredKeys = new HashSet<>(Arrays.asList(requiredKeys));
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class DefaultJobParametersValidator implements JobParametersValidator, In
 	 * @see #setRequiredKeys(String[])
 	 */
 	public final void setOptionalKeys(String[] optionalKeys) {
-		this.optionalKeys = new HashSet<String>(Arrays.asList(optionalKeys));
+		this.optionalKeys = new HashSet<>(Arrays.asList(optionalKeys));
 	}
 
 }

@@ -43,7 +43,7 @@ public class SplitStateTests {
 	@Test
 	public void testBasicHandling() throws Exception {
 
-		Collection<Flow> flows  = new ArrayList<Flow>();
+		Collection<Flow> flows  = new ArrayList<>();
 		Flow flow1 = mock(Flow.class);
 		Flow flow2 = mock(Flow.class);
 		flows.add(flow1);

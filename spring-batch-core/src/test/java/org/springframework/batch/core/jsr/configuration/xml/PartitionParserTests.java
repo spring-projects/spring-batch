@@ -54,9 +54,9 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	@Before
 	public void before() {
 		MyBatchlet.processed = 0;
-		MyBatchlet.threadNames = Collections.synchronizedSet(new HashSet<String>());
-		MyBatchlet.artifactNames = Collections.synchronizedSet(new HashSet<String>());
-		PartitionCollector.artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		MyBatchlet.threadNames = Collections.synchronizedSet(new HashSet<>());
+		MyBatchlet.artifactNames = Collections.synchronizedSet(new HashSet<>());
+		PartitionCollector.artifactNames = Collections.synchronizedSet(new HashSet<>());
 	}
 
 	@Test
@@ -236,7 +236,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 
 	public static class PartitionCollector implements javax.batch.api.partition.PartitionCollector {
 
-		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Inject
 		@BatchProperty
@@ -293,8 +293,8 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	public static class MyBatchlet implements Batchlet {
 
 		protected static int processed = 0;
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
-		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
+		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Inject
 		@BatchProperty
@@ -326,12 +326,12 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	public static class ItemReader extends AbstractItemReader {
 
 		private List<Integer> items;
-		protected static Vector<Integer> processedItems = new Vector<Integer>();
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Vector<Integer> processedItems = new Vector<>();
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Override
 		public void open(Serializable checkpoint) throws Exception {
-			items = new ArrayList<Integer>();
+			items = new ArrayList<>();
 			items.add(1);
 			items.add(2);
 			items.add(3);
@@ -352,8 +352,8 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 
 	public static class ItemWriter extends AbstractItemWriter {
 
-		protected static Vector<Integer> processedItems = new Vector<Integer>();
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Vector<Integer> processedItems = new Vector<>();
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Override
 		public void writeItems(List<Object> items) throws Exception {

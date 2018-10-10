@@ -225,7 +225,7 @@ public class StepParserTests {
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
 		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils
 				.getField(composite, "list");
-		List<StepExecutionListener> unwrappedList = new ArrayList<StepExecutionListener>();
+		List<StepExecutionListener> unwrappedList = new ArrayList<>();
 		for (StepExecutionListener listener : list) {
 			while (listener instanceof Advised) {
 				listener = (StepExecutionListener) ((Advised) listener).getTargetSource().getTarget();
@@ -427,13 +427,13 @@ public class StepParserTests {
 	public void testStepWithListsMerge() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<>();
 		skippable.put(SkippableRuntimeException.class, true);
 		skippable.put(SkippableException.class, true);
 		skippable.put(FatalRuntimeException.class, false);
 		skippable.put(FatalSkippableException.class, false);
 		skippable.put(ForceRollbackForWriteSkipException.class, true);
-		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<>();
 		retryable.put(DeadlockLoserDataAccessException.class, true);
 		retryable.put(FatalSkippableException.class, true);
 		retryable.put(ForceRollbackForWriteSkipException.class, true);
@@ -467,11 +467,11 @@ public class StepParserTests {
 	public void testStepWithListsNoMerge() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippable = new HashMap<>();
 		skippable.put(SkippableException.class, true);
 		skippable.put(FatalSkippableException.class, false);
 		skippable.put(ForceRollbackForWriteSkipException.class, true);
-		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> retryable = new HashMap<>();
 		retryable.put(FatalSkippableException.class, true);
 		retryable.put(ForceRollbackForWriteSkipException.class, true);
 		List<Class<CompositeItemStream>> streams = Arrays.asList(CompositeItemStream.class);
@@ -543,7 +543,7 @@ public class StepParserTests {
 
 	@SuppressWarnings("unchecked")
 	private <T> Collection<Class<? extends T>> toClassCollection(Collection<T> in) throws Exception {
-		Collection<Class<? extends T>> out = new ArrayList<Class<? extends T>>();
+		Collection<Class<? extends T>> out = new ArrayList<>();
 		for (T item : in) {
 			while (item instanceof Advised) {
 				item = (T) ((Advised) item).getTargetSource().getTarget();

@@ -46,7 +46,7 @@ public class BatchRetryTemplateTests {
 
 	private int count = 0;
 
-	private List<String> outputs = new ArrayList<String>();
+	private List<String> outputs = new ArrayList<>();
 
 	@Test
 	public void testSuccessfulAttempt() throws Exception {
@@ -201,7 +201,7 @@ public class BatchRetryTemplateTests {
 		RecoveryCallback<String[]> recoveryCallback = new RecoveryCallback<String[]>() {
 			@Override
 			public String[] recover(RetryContext context) throws Exception {
-				List<String> recovered = new ArrayList<String>();
+				List<String> recovered = new ArrayList<>();
 				for (String item : outputs) {
 					recovered.add("r:" + item);
 				}

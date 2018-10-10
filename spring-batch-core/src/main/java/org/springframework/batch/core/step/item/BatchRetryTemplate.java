@@ -63,7 +63,7 @@ public class BatchRetryTemplate implements RetryOperations {
 
 		public BatchRetryState(Collection<RetryState> keys) {
 			super(keys);
-			this.keys = new ArrayList<RetryState>(keys);
+			this.keys = new ArrayList<>(keys);
 		}
 
 	}
@@ -114,7 +114,7 @@ public class BatchRetryTemplate implements RetryOperations {
 
 			BatchRetryState batchState = (BatchRetryState) state;
 
-			Collection<RetryContext> contexts = new ArrayList<RetryContext>();
+			Collection<RetryContext> contexts = new ArrayList<>();
 			for (RetryState retryState : batchState.keys) {
 				contexts.add(super.open(retryPolicy, retryState));
 			}
@@ -234,7 +234,7 @@ public class BatchRetryTemplate implements RetryOperations {
 	}
 
 	public static List<RetryState> createState(List<?> keys) {
-		List<RetryState> states = new ArrayList<RetryState>();
+		List<RetryState> states = new ArrayList<>();
 		for (Object key : keys) {
 			states.add(new DefaultRetryState(key));
 		}
@@ -242,7 +242,7 @@ public class BatchRetryTemplate implements RetryOperations {
 	}
 
 	public static List<RetryState> createState(List<?> keys, Classifier<? super Throwable, Boolean> classifier) {
-		List<RetryState> states = new ArrayList<RetryState>();
+		List<RetryState> states = new ArrayList<>();
 		for (Object key : keys) {
 			states.add(new DefaultRetryState(key, classifier));
 		}

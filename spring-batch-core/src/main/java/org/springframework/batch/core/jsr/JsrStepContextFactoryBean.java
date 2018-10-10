@@ -39,7 +39,7 @@ public class JsrStepContextFactoryBean implements FactoryBean<StepContext>, Init
 	@Autowired
 	private BatchPropertyContext batchPropertyContext;
 
-	private static final ThreadLocal<javax.batch.runtime.context.StepContext> contextHolder = new ThreadLocal<javax.batch.runtime.context.StepContext>();
+	private static final ThreadLocal<javax.batch.runtime.context.StepContext> contextHolder = new ThreadLocal<>();
 
 	protected void setBatchPropertyContext(BatchPropertyContext batchPropertyContext) {
 		this.batchPropertyContext = batchPropertyContext;

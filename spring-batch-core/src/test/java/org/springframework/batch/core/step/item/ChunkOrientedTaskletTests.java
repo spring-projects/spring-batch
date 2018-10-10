@@ -37,11 +37,11 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testHandle() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
-				Chunk<String> chunk = new Chunk<String>();
+				Chunk<String> chunk = new Chunk<>();
 				chunk.add("foo");
 				return chunk;
 			}
@@ -63,7 +63,7 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testFail() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				throw new RuntimeException("Foo!");
@@ -90,11 +90,11 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testExitCode() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
-				Chunk<String> chunk = new Chunk<String>();
+				Chunk<String> chunk = new Chunk<>();
 				chunk.add("foo");
 				chunk.setEnd();
 				return chunk;

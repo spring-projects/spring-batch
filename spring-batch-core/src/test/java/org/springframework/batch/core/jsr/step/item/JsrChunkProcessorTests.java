@@ -57,7 +57,7 @@ public class JsrChunkProcessorTests {
 	@Before
 	public void setUp() throws Exception {
 
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 
 		for (int i = 0; i < 25; i++) {
 			items.add("item " + i);
@@ -68,7 +68,7 @@ public class JsrChunkProcessorTests {
 		writer = new StoringItemWriter();
 		readListener = new CountingListener();
 
-		builder = new JsrSimpleStepBuilder<String, String>(new StepBuilder("step1"));
+		builder = new JsrSimpleStepBuilder<>(new StepBuilder("step1"));
 		builder.setBatchPropertyContext(new BatchPropertyContext());
 		repository = new MapJobRepositoryFactoryBean().getObject();
 		builder.repository(repository);
@@ -78,7 +78,7 @@ public class JsrChunkProcessorTests {
 
 	@Test
 	public void testNoInputNoListeners() throws Exception{
-		reader = new FailingListItemReader(new ArrayList<String>());
+		reader = new FailingListItemReader(new ArrayList<>());
 		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) readListener).build();
 
 		runStep(step);
@@ -346,7 +346,7 @@ public class JsrChunkProcessorTests {
 
 	public static class StoringItemWriter implements ItemWriter<String>{
 
-		protected List<String> results = new ArrayList<String>();
+		protected List<String> results = new ArrayList<>();
 		protected boolean fail = false;
 
 		@Override

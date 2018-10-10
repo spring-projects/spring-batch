@@ -33,7 +33,7 @@ public class SkipWrapperTests {
 	 */
 	@Test
 	public void testItemWrapperT() {
-		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo");
+		SkipWrapper<String> wrapper = new SkipWrapper<>("foo");
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(null, wrapper.getException());
 	}
@@ -43,7 +43,7 @@ public class SkipWrapperTests {
 	 */
 	@Test
 	public void testItemWrapperTException() {
-		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo",exception);
+		SkipWrapper<String> wrapper = new SkipWrapper<>("foo", exception);
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(exception, wrapper.getException());
 	}
@@ -53,7 +53,7 @@ public class SkipWrapperTests {
 	 */
 	@Test
 	public void testToString() {
-		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo");
+		SkipWrapper<String> wrapper = new SkipWrapper<>("foo");
 		assertTrue("foo", wrapper.toString().contains("foo"));
 	}
 

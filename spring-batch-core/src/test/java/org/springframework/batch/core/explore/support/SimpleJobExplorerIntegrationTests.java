@@ -100,7 +100,7 @@ public class SimpleJobExplorerIntegrationTests {
 		@Bean
 		public SimpleFlow simpleFlow() {
 			SimpleFlow simpleFlow = new SimpleFlow("simpleFlow");
-			List<StateTransition> transitions = new ArrayList<StateTransition>();
+			List<StateTransition> transitions = new ArrayList<>();
 			transitions.add(StateTransition.createStateTransition(new StepState(dummyStep()), "end0"));
 			transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 			simpleFlow.setStateTransitions(transitions);

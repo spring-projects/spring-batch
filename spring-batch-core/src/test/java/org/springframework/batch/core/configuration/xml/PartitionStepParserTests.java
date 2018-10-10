@@ -91,7 +91,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private List<String> savedStepNames = new ArrayList<String>();
+	private List<String> savedStepNames = new ArrayList<>();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -225,7 +225,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			list.add(stepExecution.getStepName());
 		}

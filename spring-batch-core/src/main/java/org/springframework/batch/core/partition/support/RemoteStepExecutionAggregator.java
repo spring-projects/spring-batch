@@ -90,7 +90,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 		if (executions == null) {
 			return;
 		}
-		Collection<StepExecution> updates = new ArrayList<StepExecution>();
+		Collection<StepExecution> updates = new ArrayList<>();
 		for (StepExecution stepExecution : executions) {
 			Long id = stepExecution.getId();
 			Assert.state(id != null, "StepExecution has null id. It must be saved first: " + stepExecution);

@@ -87,7 +87,7 @@ public class SplitParser {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
 
-		Collection<BeanDefinition> flows = new ManagedList<BeanDefinition>();
+		Collection<BeanDefinition> flows = new ManagedList<>();
 		int i = 0;
 		String prefix = idAttribute;
 		for (Element nextElement : flowElements) {

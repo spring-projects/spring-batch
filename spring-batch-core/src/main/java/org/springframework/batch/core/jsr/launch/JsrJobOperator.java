@@ -290,7 +290,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 			throw new NoSuchJobInstanceException("Unable to find JobInstance " + jobInstance.getInstanceId());
 		}
 
-		List<JobExecution> results = new ArrayList<JobExecution>(batchExecutions.size());
+		List<JobExecution> results = new ArrayList<>(batchExecutions.size());
 		for (org.springframework.batch.core.JobExecution jobExecution : batchExecutions) {
 			results.add(new JsrJobExecution(jobExecution, jobParametersConverter));
 		}
@@ -344,7 +344,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 			throw new NoSuchJobException("The job was not found");
 		}
 
-		return new ArrayList<JobInstance>(jobInstances);
+		return new ArrayList<>(jobInstances);
 	}
 
 	/* (non-Javadoc)
@@ -352,7 +352,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 */
 	@Override
 	public Set<String> getJobNames() throws JobSecurityException {
-		return new HashSet<String>(jobExplorer.getJobNames());
+		return new HashSet<>(jobExplorer.getJobNames());
 	}
 
 	/* (non-Javadoc)
@@ -385,7 +385,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 			throw new NoSuchJobException("Job name: " + name + " not found.");
 		}
 
-		List<Long> results = new ArrayList<Long>(findRunningJobExecutions.size());
+		List<Long> results = new ArrayList<>(findRunningJobExecutions.size());
 
 		for (org.springframework.batch.core.JobExecution jobExecution : findRunningJobExecutions) {
 			results.add(jobExecution.getId());
@@ -408,7 +408,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 
 		Collection<org.springframework.batch.core.StepExecution> executions = execution.getStepExecutions();
 
-		List<StepExecution> batchExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> batchExecutions = new ArrayList<>();
 
 		if(executions != null) {
 			for (org.springframework.batch.core.StepExecution stepExecution : executions) {
@@ -502,7 +502,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 
 		try {
 			final Semaphore semaphore = new Semaphore(1);
-			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<Exception>());
+			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<>());
 			semaphore.acquire();
 
 			taskExecutor.execute(new Runnable() {
@@ -655,7 +655,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 
 		try {
 			final Semaphore semaphore = new Semaphore(1);
-			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<Exception>());
+			final List<Exception> exceptionHolder = Collections.synchronizedList(new ArrayList<>());
 			semaphore.acquire();
 
 			taskExecutor.execute(new Runnable() {
@@ -772,7 +772,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 
 	private static class ExecutingJobRegistry {
 
-		private Map<Long, Job> registry = new ConcurrentHashMap<Long, Job>();
+		private Map<Long, Job> registry = new ConcurrentHashMap<>();
 
 		public void register(Job job, org.springframework.batch.core.JobExecution jobExecution) throws DuplicateJobException {
 

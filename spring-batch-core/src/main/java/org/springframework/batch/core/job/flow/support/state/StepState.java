@@ -85,7 +85,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	 */
 	@Override
 	public Collection<String> getStepNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		names.add(step.getName());
 

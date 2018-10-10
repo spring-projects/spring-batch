@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
 public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, ApplicationContextAware,
 		InitializingBean {
 
-	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
+	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
 
 	private JobLoader jobLoader;
 

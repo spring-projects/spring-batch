@@ -68,12 +68,12 @@ public class SimpleStepFactoryBeanTests {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
-	private List<Exception> listened = new ArrayList<Exception>();
+	private List<Exception> listened = new ArrayList<>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao(), new MapExecutionContextDao());
 
-	private List<String> written = new ArrayList<String>();
+	private List<String> written = new ArrayList<>();
 
 	private ItemWriter<String> writer = new ItemWriter<String>() {
 		@Override
@@ -122,7 +122,7 @@ public class SimpleStepFactoryBeanTests {
 	@Test
 	public void testSimpleJob() throws Exception {
 
-		job.setSteps(new ArrayList<Step>());
+		job.setSteps(new ArrayList<>());
 		AbstractStep step = (AbstractStep) getStepFactory("foo", "bar").getObject();
 		step.setName("step1");
 		job.addStep(step);
@@ -373,7 +373,7 @@ public class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		final List<String> listenerCalls = new ArrayList<String>();
+		final List<String> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemProcessor<String, String>,
 		ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
@@ -463,7 +463,7 @@ public class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		final List<String> listenerCalls = new ArrayList<String>();
+		final List<String> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
 			@Override
@@ -503,11 +503,11 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {
-		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<String, String>();
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 		items.addAll(Arrays.asList(args));
-		reader = new ListItemReader<String>(items);
+		reader = new ListItemReader<>(items);
 
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);

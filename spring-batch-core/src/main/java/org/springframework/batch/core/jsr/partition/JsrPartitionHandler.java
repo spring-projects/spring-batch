@@ -74,7 +74,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	private BatchPropertyContext propertyContext;
 	private JobRepository jobRepository;
 	private boolean allowStartIfComplete = false;
-	private Set<String> partitionStepNames = new HashSet<String>();
+	private Set<String> partitionStepNames = new HashSet<>();
 	private int pollingInterval = DEFAULT_POLLING_INTERVAL;
 
 	/**
@@ -174,8 +174,8 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	@Override
 	public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter,
 			StepExecution stepExecution) throws Exception {
-		final List<Future<StepExecution>> tasks = new ArrayList<Future<StepExecution>>();
-		final Set<StepExecution> result = new HashSet<StepExecution>();
+		final List<Future<StepExecution>> tasks = new ArrayList<>();
+		final Set<StepExecution> result = new HashSet<>();
 		final ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 
 		int stepExecutionCount = jobRepository.getStepExecutionCount(stepExecution.getJobExecution().getJobInstance(), stepExecution.getStepName());
@@ -268,7 +268,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	 */
 	private Set<StepExecution> splitStepExecution(StepExecution stepExecution,
 			boolean isRestart) throws Exception, JobExecutionException {
-		Set<StepExecution> partitionStepExecutions = new HashSet<StepExecution>();
+		Set<StepExecution> partitionStepExecutions = new HashSet<>();
 		if(isRestart) {
 			if(mapper != null) {
 				PartitionPlan plan = mapper.mapPartitions();
@@ -381,7 +381,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	 */
 	protected FutureTask<StepExecution> createTask(final Step step,
 			final StepExecution stepExecution) {
-		return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+		return new FutureTask<>(new Callable<StepExecution>() {
 			@Override
 			public StepExecution call() throws Exception {
 				step.execute(stepExecution);
@@ -401,7 +401,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		Assert.isTrue(pollingInterval >= 0, "The polling interval must be positive");
 
 		if(partitionDataQueue == null) {
-			partitionDataQueue = new LinkedBlockingQueue<Serializable>();
+			partitionDataQueue = new LinkedBlockingQueue<>();
 		}
 
 		if(lock == null) {

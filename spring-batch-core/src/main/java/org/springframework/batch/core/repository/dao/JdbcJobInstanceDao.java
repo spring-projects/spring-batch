@@ -212,7 +212,7 @@ JobInstanceDao, InitializingBean {
 
 		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<List<JobInstance>>() {
 
-			private List<JobInstance> list = new ArrayList<JobInstance>();
+			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public List<JobInstance> extractData(ResultSet rs) throws SQLException,
@@ -312,7 +312,7 @@ JobInstanceDao, InitializingBean {
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
 		@SuppressWarnings("rawtypes")
 		ResultSetExtractor extractor = new ResultSetExtractor() {
-			private List<JobInstance> list = new ArrayList<JobInstance>();
+			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public Object extractData(ResultSet rs) throws SQLException,

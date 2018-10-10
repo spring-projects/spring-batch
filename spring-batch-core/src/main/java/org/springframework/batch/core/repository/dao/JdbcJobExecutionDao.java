@@ -289,7 +289,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
-		final Set<JobExecution> result = new HashSet<JobExecution>();
+		final Set<JobExecution> result = new HashSet<>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
@@ -364,7 +364,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @return job parameters for the requested execution id
 	 */
 	protected JobParameters getJobParameters(Long executionId) {
-		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		final Map<String, JobParameter> map = new HashMap<>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {

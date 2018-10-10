@@ -121,7 +121,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Test
 	public void testSaveAndGetExecutions() {
 
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			StepExecution se = new StepExecution("step" + i, jobExecution);
 			se.setStatus(BatchStatus.STARTED);
@@ -161,7 +161,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	public void testSaveEmptyCollection() {
-		dao.saveStepExecutions(new ArrayList<StepExecution>());
+		dao.saveStepExecutions(new ArrayList<>());
 	}
 
 	@Transactional

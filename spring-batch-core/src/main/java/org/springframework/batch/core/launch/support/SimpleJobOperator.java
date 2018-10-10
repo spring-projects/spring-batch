@@ -158,7 +158,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		if (jobInstance == null) {
 			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
 		}
-		List<Long> list = new ArrayList<Long>();
+		List<Long> list = new ArrayList<>();
 		for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
 			list.add(jobExecution.getId());
 		}
@@ -172,7 +172,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public Set<String> getJobNames() {
-		return new TreeSet<String>(jobRegistry.getJobNames());
+		return new TreeSet<>(jobRegistry.getJobNames());
 	}
 
 	/*
@@ -182,7 +182,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
-		List<Long> list = new ArrayList<Long>();
+		List<Long> list = new ArrayList<>();
 		List<JobInstance> jobInstances = jobExplorer.getJobInstances(jobName, start, count);
 		for (JobInstance jobInstance : jobInstances) {
 			list.add(jobInstance.getId());
@@ -217,7 +217,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-		Set<Long> set = new LinkedHashSet<Long>();
+		Set<Long> set = new LinkedHashSet<>();
 		for (JobExecution jobExecution : jobExplorer.findRunningJobExecutions(jobName)) {
 			set.add(jobExecution.getId());
 		}
@@ -238,7 +238,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
 
-		Map<Long, String> map = new LinkedHashMap<Long, String>();
+		Map<Long, String> map = new LinkedHashMap<>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			map.put(stepExecution.getId(), stepExecution.toString());
 		}
