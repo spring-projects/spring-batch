@@ -32,7 +32,7 @@ Job/Feature                                       | skip | retry | restart | aut
 [Football Job](#football-job)                         |      |       |         |                   |               |            |            |              |                |                |           
 [Header Footer Sample](#header-footer-sample)                     |      |       |         |                   |               |            |            |              |                |                |           
 [Hibernate Sample](#hibernate-sample)                           |      |   X   |         |                   |               |            |            |      X       |                |                |           
-[IO Sample Job](#io-sample-job)                             |      |       |         |                   |               |     X      |            |      X       |                |                |           
+IO Sample Job                             |      |       |         |                   |               |     X      |            |      X       |                |                |           
 [Infinite Loop Sample](#infinite-loop-sample)                     |      |       |         |                   |               |     X      |            |              |        X       |                |           
 [Loop Flow Sample](#loop-flow-sample)                             |      |       |         |                   |               |            |            |              |                |                |           
 [Multiline](#multiline)                           |      |       |         |                   |               |            |     X      |              |                |                |           
@@ -118,9 +118,7 @@ which is used to configure the query for the writer.
 ### Amqp Job Sample
 
 This sample shows the use of Spring Batch to write to an `AmqpItemWriter`.
-The `AmqpItemReader` and Writer were contributed by Chris Schaefer and
-a blog entry can be found at 
-[http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html](http://blog.dtzq.com/2012/08/spring-batch-amqp-itemreader-itemwriter.html).
+The `AmqpItemReader` and Writer were contributed by Chris Schaefer.
 It is modeled after the `JmsItemReader` / Writer implementations, which
 are popular models for remote chunking. It leverages the `AmqpTemplate`.
 
@@ -589,7 +587,7 @@ custom aggregator transformer.
 The purpose of this sample is to show multi-threaded step execution
 using the Process Indicator pattern.
 
-The job reads data from the same file as the [Fixed Length Import sample](#fixedLength), but instead of
+The job reads data from the same file as the [Fixed Length Import sample](#fixed-length-import-job), but instead of
 writing it out directly it goes through a staging table, and the
 staging table is read in a multi-threaded step.  Note that for such
 a simple example where the item processing was not expensive, there
@@ -790,8 +788,8 @@ based on object reference, not on field content.
 The purpose of this sample is to show how to use the skip features
 of Spring Batch.  Since skip is really just a special case of retry
 (with limit 0), the details are quite similar to the [Retry
-Sample](#retry), but the use case is less artificial, since it
-is based on the [Trade Sample](#trade).
+Sample](#retry-sample), but the use case is less artificial, since it
+is based on the [Trade Sample](#trade-job).
 
 The failure condition is still artificial, since it is triggered by
 a special `ItemWriter` wrapper (`ItemTrackingItemWriter`).
@@ -812,7 +810,7 @@ transaction attribute:
 
 The format for the transaction attribute specification is given in
 the Spring Core documentation (e.g. see the Javadocs for
-[TransactionAttributeEditor](http://docs.spring.io/spring/docs/3.2.0.RELEASE/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
+[TransactionAttributeEditor](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
 
 ### Tasklet Job
 
@@ -889,4 +887,4 @@ The job has a single step that copies `Trade` data from one XML
 file to another.  It uses XStream for the object XML conversion,
 because this is simple to configure for basic use cases like this
 one.  See
-[Spring OXM documentation](http://docs.spring.io/spring-ws/sites/2.0/reference/html/oxm.html) for details of other options.
+[Spring OXM documentation](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm) for details of other options.
