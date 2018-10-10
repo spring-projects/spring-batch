@@ -28,7 +28,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeChunkListener implements ChunkListener {
 
-	private OrderedComposite<ChunkListener> listeners = new OrderedComposite<ChunkListener>();
+	private OrderedComposite<ChunkListener> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

@@ -59,7 +59,7 @@ public class StepListenerMethodAttributeParserTests {
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
 		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(
 				composite, "list");
-		List<Object> r = new ArrayList<Object>();
+		List<Object> r = new ArrayList<>();
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {
 				listener = ((Advised) listener).getTargetSource().getTarget();

@@ -220,7 +220,7 @@ public class SimpleJobRepository implements JobRepository {
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
+		List<StepExecution> stepExecutions = new ArrayList<>(jobExecutions.size());
 
 		for (JobExecution jobExecution : jobExecutions) {
 			stepExecutionDao.addStepExecutions(jobExecution);

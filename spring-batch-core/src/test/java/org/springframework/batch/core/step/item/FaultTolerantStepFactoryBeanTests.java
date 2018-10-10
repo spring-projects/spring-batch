@@ -314,7 +314,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setFailures("2");
 		reader.setExceptionType(ItemStreamException.class);
 
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		map.put(ItemStreamException.class, true);
 		factory.setSkippableExceptionClasses(map);
 
@@ -374,7 +374,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testProcessFilter() throws Exception {
 		processor.setFailures("4");
 		processor.setFilter(true);
-		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
+		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<>();
 		factory.setListeners(new StepListener[] { listenerStub });
 		Step step = factory.getObject();
 
@@ -437,7 +437,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testFatalException() throws Exception {
 		reader.setFailures("2");
 
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		map.put(SkippableException.class, true);
 		map.put(SkippableRuntimeException.class, true);
 		map.put(FatalRuntimeException.class, false);
@@ -528,7 +528,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setFailures("1", "3", "5");
 		writer.setFailures();
 
-		final List<Throwable> listenerCalls = new ArrayList<Throwable>();
+		final List<Throwable> listenerCalls = new ArrayList<>();
 
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
@@ -753,7 +753,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testAutoRegisterItemListeners() throws Exception {
 		reader.setFailures("2");
 
-		final List<Integer> listenerCalls = new ArrayList<Integer>();
+		final List<Integer> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
 		ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
@@ -1098,7 +1098,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	private SkipPolicy getSkippableSubsetSkipPolicy() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, true);
 		skippableExceptions.put(ItemWriterException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);
@@ -1106,7 +1106,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	private SkipPolicy getFatalSubsetSkipPolicy() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(ItemWriterException.class, true);
 		skippableExceptions.put(WriteFailedException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);

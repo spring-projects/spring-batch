@@ -357,7 +357,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testNextFirstInSequence() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName };
-		StubJobExplorer.jobInstances = new ArrayList<JobInstance>();
+		StubJobExplorer.jobInstances = new ArrayList<>();
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "spam").toJobParameters();
@@ -447,7 +447,7 @@ public class CommandLineJobRunnerTests {
 
 	public static class StubJobExplorer implements JobExplorer {
 
-		static List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+		static List<JobInstance> jobInstances = new ArrayList<>();
 
 		static JobExecution jobExecution;
 
@@ -508,7 +508,7 @@ public class CommandLineJobRunnerTests {
 		@Override
 		public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 			if (jobInstances == null) {
-				return new ArrayList<JobInstance>();
+				return new ArrayList<>();
 			}
 			List<JobInstance> result = jobInstances;
 			jobInstances = null;

@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 
-	private List<Step> steps = new ArrayList<Step>();
+	private List<Step> steps = new ArrayList<>();
 
 	private JobFlowBuilder builder;
 

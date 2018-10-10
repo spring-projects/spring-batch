@@ -128,7 +128,7 @@ public class ChunkElementParser {
 				new ExceptionElementParser().parse(element, parserContext, "skippable-exception-classes");
 		if (StringUtils.hasText(skipLimit)) {
 			if (skippableExceptions == null) {
-				skippableExceptions = new ManagedMap<TypedStringValue, Boolean>();
+				skippableExceptions = new ManagedMap<>();
 				skippableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
@@ -153,7 +153,7 @@ public class ChunkElementParser {
 				new ExceptionElementParser().parse(element, parserContext, "retryable-exception-classes");
 		if (StringUtils.hasText(retryLimit)) {
 			if (retryableExceptions == null) {
-				retryableExceptions = new ManagedMap<TypedStringValue, Boolean>();
+				retryableExceptions = new ManagedMap<>();
 				retryableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
@@ -287,7 +287,7 @@ public class ChunkElementParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<BeanMetadataElement>();
+			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<>();
 			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans, enclosing);
@@ -309,7 +309,7 @@ public class ChunkElementParser {
 	private void handleStreamsElement(Element element, MutablePropertyValues propertyValues, ParserContext parserContext) {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
-			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<RuntimeBeanReference>();
+			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<>();
 			streamBeans.setMergeEnabled(streamsElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");

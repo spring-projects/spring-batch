@@ -123,10 +123,10 @@ public class JsrSimpleStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		Assert.state(getReader() != null, "ItemReader must be provided");
 		Assert.state(getProcessor() != null || getWriter() != null, "ItemWriter or ItemProcessor must be provided");
 		RepeatOperations repeatOperations = createRepeatOperations();
-		ChunkProvider<I> chunkProvider = new JsrChunkProvider<I>();
-		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor<I, O>(getReader(), getProcessor(), getWriter(), repeatOperations);
-		chunkProcessor.setListeners(new ArrayList<StepListener>(getItemListeners()));
-		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
+		ChunkProvider<I> chunkProvider = new JsrChunkProvider<>();
+		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor<>(getReader(), getProcessor(), getWriter(), repeatOperations);
+		chunkProcessor.setListeners(new ArrayList<>(getItemListeners()));
+		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
 		return tasklet;
 	}

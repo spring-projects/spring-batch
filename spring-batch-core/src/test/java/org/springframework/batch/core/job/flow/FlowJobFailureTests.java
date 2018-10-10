@@ -60,7 +60,7 @@ public class FlowJobFailureTests {
 	@Test
 	public void testStepFailure() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
-		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		List<StateTransition> transitions = new ArrayList<>();
 		StepState step = new StepState(new StepSupport("step"));
 		transitions.add(StateTransition.createStateTransition(step, ExitStatus.FAILED.getExitCode(), "end0"));
 		transitions.add(StateTransition.createStateTransition(step, ExitStatus.COMPLETED.getExitCode(), "end1"));
@@ -76,7 +76,7 @@ public class FlowJobFailureTests {
 	@Test
 	public void testStepStatusUnknown() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
-		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		List<StateTransition> transitions = new ArrayList<>();
 		StepState step = new StepState(new StepSupport("step") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,

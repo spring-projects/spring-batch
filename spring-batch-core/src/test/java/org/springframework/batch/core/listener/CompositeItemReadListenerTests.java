@@ -37,7 +37,7 @@ public class CompositeItemReadListenerTests {
 	@Before
 	public void setUp() throws Exception {
 		listener = mock(ItemReadListener.class);
-		compositeListener = new CompositeItemReadListener<Object>();
+		compositeListener = new CompositeItemReadListener<>();
 		compositeListener.register(listener);
 	}
 	

@@ -48,13 +48,13 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
-	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<T>();
+	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<>();
 
-	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<T, S>();
+	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<>();
 
-	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
+	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<>();
 
-	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<T, S>();
+	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<>();
 
 	private CompositeRetryReadListener retryReadListener = new CompositeRetryReadListener();
 

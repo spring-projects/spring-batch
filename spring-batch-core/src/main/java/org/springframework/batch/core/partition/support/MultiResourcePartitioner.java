@@ -70,7 +70,7 @@ public class MultiResourcePartitioner implements Partitioner {
 	 */
 	@Override
 	public Map<String, ExecutionContext> partition(int gridSize) {
-		Map<String, ExecutionContext> map = new HashMap<String, ExecutionContext>(gridSize);
+		Map<String, ExecutionContext> map = new HashMap<>(gridSize);
 		int i = 0;
 		for (Resource resource : resources) {
 			ExecutionContext context = new ExecutionContext();

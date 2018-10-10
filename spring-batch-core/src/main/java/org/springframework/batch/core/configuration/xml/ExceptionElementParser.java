@@ -29,7 +29,7 @@ public class ExceptionElementParser {
 	public ManagedMap<TypedStringValue, Boolean> parse(Element element, ParserContext parserContext, String exceptionListName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
-			ManagedMap<TypedStringValue, Boolean> map = new ManagedMap<TypedStringValue, Boolean>();
+			ManagedMap<TypedStringValue, Boolean> map = new ManagedMap<>();
 			Element exceptionClassesElement = children.get(0);
 			addExceptionClasses("include", true, exceptionClassesElement, map, parserContext);
 			addExceptionClasses("exclude", false, exceptionClassesElement, map, parserContext);

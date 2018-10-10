@@ -55,9 +55,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	private JobRegistry jobRegistry;
 	private StepRegistry stepRegistry;
 
-	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<ApplicationContextFactory, ConfigurableApplicationContext>();
+	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<>();
 
-	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<ConfigurableApplicationContext, Collection<String>>();
+	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<>();
 
 	/**
 	 * Default constructor useful for declarative configuration.
@@ -162,7 +162,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		// Try to detect auto-registration (e.g. through a bean post processor)
 		boolean autoRegistrationDetected = jobNamesAfter.size() > jobNamesBefore.size();
 
-		Collection<String> jobsRegistered = new HashSet<String>();
+		Collection<String> jobsRegistered = new HashSet<>();
 		if (autoRegistrationDetected) {
 			for (String name : jobNamesAfter) {
 				if (!jobNamesBefore.contains(name)) {
@@ -198,7 +198,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 		}
 
-		Collection<Job> result = new ArrayList<Job>();
+		Collection<Job> result = new ArrayList<>();
 		for (String name : jobsRegistered) {
 			try {
 				result.add(jobRegistry.getJob(name));
@@ -229,7 +229,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 */
 	private Collection<Step> getSteps(final StepLocator stepLocator, final ApplicationContext jobApplicationContext) {
 		final Collection<String> stepNames = stepLocator.getStepNames();
-		final Collection<Step> result = new ArrayList<Step>();
+		final Collection<Step> result = new ArrayList<>();
 		for (String stepName : stepNames) {
 			result.add(stepLocator.getStep(stepName));
 		}

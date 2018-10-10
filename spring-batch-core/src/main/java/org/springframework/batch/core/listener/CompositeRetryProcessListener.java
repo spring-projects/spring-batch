@@ -28,7 +28,7 @@ import javax.batch.api.chunk.listener.RetryProcessListener;
  * @since 3.0
  */
 public class CompositeRetryProcessListener implements RetryProcessListener {
-	private OrderedComposite<RetryProcessListener> listeners = new OrderedComposite<RetryProcessListener>();
+	private OrderedComposite<RetryProcessListener> listeners = new OrderedComposite<>();
 
 	/**
 	 * <p>

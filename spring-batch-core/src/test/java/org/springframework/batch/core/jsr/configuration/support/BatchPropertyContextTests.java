@@ -33,10 +33,10 @@ import org.junit.Test;
  */
 public class BatchPropertyContextTests {
 	private Properties jobProperties = new Properties();
-	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
-	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
-	private Map<String, Map<String, Properties>> partitionProperties = new HashMap<String, Map<String, Properties>>();
-	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<String, Map<String, Properties>>();
+	private Map<String, Properties> stepProperties = new HashMap<>();
+	private Map<String, Properties> artifactProperties = new HashMap<>();
+	private Map<String, Map<String, Properties>> partitionProperties = new HashMap<>();
+	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<>();
 
 	@SuppressWarnings("serial")
 	@Before

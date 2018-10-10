@@ -35,7 +35,7 @@ public class JsrChunkProvider<T> implements ChunkProvider<T> {
 	 */
 	@Override
 	public Chunk<T> provide(StepContribution contribution) throws Exception {
-		return new Chunk<T>();
+		return new Chunk<>();
 	}
 
 	/* (non-Javadoc)

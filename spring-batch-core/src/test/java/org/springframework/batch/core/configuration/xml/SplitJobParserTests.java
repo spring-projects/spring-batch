@@ -57,7 +57,7 @@ public class SplitJobParserTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(4, jobExecution.getStepExecutions().size());
-		ArrayList<String> names = new ArrayList<String>(((StepLocator)job).getStepNames());
+		ArrayList<String> names = new ArrayList<>(((StepLocator) job).getStepNames());
 		Collections.sort(names);
 		assertEquals("[s1, s2, s3, s4]", names.toString());
 	}

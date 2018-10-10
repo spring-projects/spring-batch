@@ -52,7 +52,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	private JobExecution jobExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	public JobContext(JobExecution jobExecution) {
 		super();
@@ -85,7 +85,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : jobExecution.getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -96,7 +96,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the {@link JobParameters}
 	 */
 	public Map<String, Object> getJobParameters() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, JobParameter> entry : jobExecution.getJobParameters().getParameters()
 				.entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
@@ -116,7 +116,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -149,7 +149,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 */
 	public void close() {
 
-		List<Exception> errors = new ArrayList<Exception>();
+		List<Exception> errors = new ArrayList<>();
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 

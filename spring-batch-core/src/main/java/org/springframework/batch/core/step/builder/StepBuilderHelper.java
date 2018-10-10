@@ -91,7 +91,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 * @return this for fluent chaining
 	 */
 	public B listener(Object listener) {
-		Set<Method> stepExecutionListenerMethods = new HashSet<Method>();
+		Set<Method> stepExecutionListenerMethods = new HashSet<>();
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
 
@@ -166,7 +166,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public static class CommonStepProperties {
 
-		private List<StepExecutionListener> stepExecutionListeners = new ArrayList<StepExecutionListener>();
+		private List<StepExecutionListener> stepExecutionListeners = new ArrayList<>();
 
 		private int startLimit = Integer.MAX_VALUE;
 
@@ -185,7 +185,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.allowStartIfComplete = properties.allowStartIfComplete;
 			this.jobRepository = properties.jobRepository;
 			this.transactionManager = properties.transactionManager;
-			this.stepExecutionListeners = new ArrayList<StepExecutionListener>(properties.stepExecutionListeners);
+			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
 		public JobRepository getJobRepository() {

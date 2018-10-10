@@ -28,7 +28,7 @@ public class JsrChunkProviderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		provider = new JsrChunkProvider<String>();
+		provider = new JsrChunkProvider<>();
 	}
 
 	@Test

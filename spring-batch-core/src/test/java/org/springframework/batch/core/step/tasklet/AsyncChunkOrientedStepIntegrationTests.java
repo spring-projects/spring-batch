@@ -83,7 +83,7 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	private int maxIdle;
 
 	private ItemReader<String> getReader(String[] args) {
-		return new ListItemReader<String>(Arrays.asList(args));
+		return new ListItemReader<>(Arrays.asList(args));
 	}
 
 	@After

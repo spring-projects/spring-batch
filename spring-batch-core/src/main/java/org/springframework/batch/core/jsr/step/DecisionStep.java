@@ -52,7 +52,7 @@ public class DecisionStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-		List<javax.batch.runtime.StepExecution> stepExecutions = new ArrayList<javax.batch.runtime.StepExecution>();
+		List<javax.batch.runtime.StepExecution> stepExecutions = new ArrayList<>();
 
 		if(executionContext.containsKey("batch.lastSteps")) {
 			List<String> stepNames = (List<String>) executionContext.get("batch.lastSteps");

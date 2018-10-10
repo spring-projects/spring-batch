@@ -29,7 +29,7 @@ import org.springframework.batch.core.StepListener;
 abstract class BatchListenerFactoryHelper {
 
 	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {
-		List<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<>();
 		for (StepListener stepListener : listeners) {
 			if (cls.isAssignableFrom(stepListener.getClass())) {
 				@SuppressWarnings("unchecked")

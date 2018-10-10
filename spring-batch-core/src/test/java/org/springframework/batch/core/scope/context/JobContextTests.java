@@ -50,7 +50,7 @@ public class JobContextTests {
 		JobInstance jobInstance = new JobInstance(2L, "job");
 		jobExecution.setJobInstance(jobInstance);
 		context = new JobContext(jobExecution);
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 	}
 
 	@Test

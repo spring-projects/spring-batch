@@ -90,27 +90,26 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testGetMultipleInMultipleThreads() throws Exception {
 
-		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
-			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
-				@Override
-				public String call() throws Exception {
-					StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
-					ExecutionContext executionContext = stepExecution.getExecutionContext();
-					executionContext.put("foo", value);
-					StepContext context = StepSynchronizationManager.register(stepExecution);
-					logger.debug("Registered: " + context.getStepExecutionContext());
-					try {
-						return simple.getName();
-					}
-					finally {
-						StepSynchronizationManager.close();
-					}
-				}
-			});
+			FutureTask<String> task = new FutureTask<>(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
+                    ExecutionContext executionContext = stepExecution.getExecutionContext();
+                    executionContext.put("foo", value);
+                    StepContext context = StepSynchronizationManager.register(stepExecution);
+                    logger.debug("Registered: " + context.getStepExecutionContext());
+                    try {
+                        return simple.getName();
+                    } finally {
+                        StepSynchronizationManager.close();
+                    }
+                }
+            });
 			tasks.add(task);
 			taskExecutor.execute(task);
 		}
@@ -126,7 +125,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testGetSameInMultipleThreads() throws Exception {
 
-		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> tasks = new ArrayList<>();
 		final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
@@ -135,7 +134,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
-			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+			FutureTask<String> task = new FutureTask<>(new Callable<String>() {
 				@Override
 				public String call() throws Exception {
 					ExecutionContext executionContext = stepExecution.getExecutionContext();

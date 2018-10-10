@@ -43,7 +43,7 @@ public class TaskExecutorPartitionHandlerTests {
 
 	private int count = 0;
 
-	private Collection<String> stepExecutions = new TreeSet<String>();
+	private Collection<String> stepExecutions = new TreeSet<>();
 
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
 
@@ -56,7 +56,7 @@ public class TaskExecutorPartitionHandlerTests {
 
 		@Override
 		public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
-			HashSet<StepExecution> result = new HashSet<StepExecution>();
+			HashSet<StepExecution> result = new HashSet<>();
 			for (int i = gridSize; i-- > 0;) {
 				result.add(stepExecution.getJobExecution().createStepExecution("foo" + i));
 			}

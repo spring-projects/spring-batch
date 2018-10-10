@@ -164,7 +164,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	public static class CommonJobProperties {
 
-		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<JobExecutionListener>();
+		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<>();
 
 		private boolean restartable = true;
 
@@ -181,7 +181,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
 			this.jobRepository = properties.jobRepository;
-			this.jobExecutionListeners = new LinkedHashSet<JobExecutionListener>(properties.jobExecutionListeners);
+			this.jobExecutionListeners = new LinkedHashSet<>(properties.jobExecutionListeners);
 			this.jobParametersIncrementer = properties.jobParametersIncrementer;
 			this.jobParametersValidator = properties.jobParametersValidator;
 		}
@@ -219,7 +219,7 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		}
 
 		public List<JobExecutionListener> getJobExecutionListeners() {
-			return new ArrayList<JobExecutionListener>(jobExecutionListeners);
+			return new ArrayList<>(jobExecutionListeners);
 		}
 
 		public void addStepExecutionListeners(List<JobExecutionListener> jobExecutionListeners) {

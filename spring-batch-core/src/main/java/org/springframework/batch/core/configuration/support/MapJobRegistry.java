@@ -40,7 +40,7 @@ public class MapJobRegistry implements JobRegistry {
 	 * The map holding the registered job factories.
 	 */
 	// The "final" ensures that it is visible and initialized when the constructor resolves.
-	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<String, JobFactory>();
+	private final ConcurrentMap<String, JobFactory> map = new ConcurrentHashMap<>();
 
 	@Override
 	public void register(JobFactory jobFactory) throws DuplicateJobException {

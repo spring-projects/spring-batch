@@ -43,7 +43,7 @@ import org.springframework.util.ClassUtils;
  */
 public class JobSupport implements BeanNameAware, Job, StepLocator {
 
-	private Map<String, Step> steps = new HashMap<String, Step>();
+	private Map<String, Step> steps = new HashMap<>();
 
 	private String name;
 

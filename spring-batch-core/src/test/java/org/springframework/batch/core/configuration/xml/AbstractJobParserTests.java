@@ -48,7 +48,7 @@ public abstract class AbstractJobParserTests {
 	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
 
 	@Autowired
-	protected ArrayList<String> stepNamesList = new ArrayList<String>();
+	protected ArrayList<String> stepNamesList = new ArrayList<>();
 
 	@Before
 	public void setUp() {

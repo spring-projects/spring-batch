@@ -56,9 +56,9 @@ public class FlowBuilder<Q> {
 
 	private String prefix;
 
-	private List<StateTransition> transitions = new ArrayList<StateTransition>();
+	private List<StateTransition> transitions = new ArrayList<>();
 
-	private Map<String, State> tos = new HashMap<String, State>();
+	private Map<String, State> tos = new HashMap<>();
 
 	private State currentState;
 
@@ -74,7 +74,7 @@ public class FlowBuilder<Q> {
 
 	private int endCounter = 0;
 
-	private Map<Object, State> states = new HashMap<Object, State>();
+	private Map<Object, State> states = new HashMap<>();
 
 	private SimpleFlow flow;
 
@@ -144,7 +144,7 @@ public class FlowBuilder<Q> {
 	 */
 	public UnterminatedFlowBuilder<Q> next(JobExecutionDecider decider) {
 		doNext(decider);
-		return new UnterminatedFlowBuilder<Q>(this);
+		return new UnterminatedFlowBuilder<>(this);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class FlowBuilder<Q> {
 	 */
 	public UnterminatedFlowBuilder<Q> start(JobExecutionDecider decider) {
 		doStart(decider);
-		return new UnterminatedFlowBuilder<Q>(this);
+		return new UnterminatedFlowBuilder<>(this);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class FlowBuilder<Q> {
 	 */
 	public UnterminatedFlowBuilder<Q> from(JobExecutionDecider decider) {
 		doFrom(decider);
-		return new UnterminatedFlowBuilder<Q>(this);
+		return new UnterminatedFlowBuilder<>(this);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class FlowBuilder<Q> {
 	 * @return a builder to enable fluent chaining
 	 */
 	public SplitBuilder<Q> split(TaskExecutor executor) {
-		return new SplitBuilder<Q>(this, executor);
+		return new SplitBuilder<>(this, executor);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class FlowBuilder<Q> {
 	 * @return a builder to enable fluent chaining
 	 */
 	public TransitionBuilder<Q> on(String pattern) {
-		return new TransitionBuilder<Q>(this, pattern);
+		return new TransitionBuilder<>(this, pattern);
 	}
 
 	/**
@@ -316,14 +316,14 @@ public class FlowBuilder<Q> {
 	}
 
 	private void addDanglingEndStates() {
-		Set<String> froms = new HashSet<String>();
+		Set<String> froms = new HashSet<>();
 		for (StateTransition transition : transitions) {
 			froms.add(transition.getState().getName());
 		}
 		if (tos.isEmpty() && currentState != null) {
 			tos.put(currentState.getName(), currentState);
 		}
-		Map<String, State> copy = new HashMap<String, State>(tos);
+		Map<String, State> copy = new HashMap<>(tos);
 		// Find all the states that are really end states but not explicitly declared as such
 		for (String to : copy.keySet()) {
 			if (!froms.contains(to)) {
@@ -334,7 +334,7 @@ public class FlowBuilder<Q> {
 				}
 			}
 		}
-		copy = new HashMap<String, State>(tos);
+		copy = new HashMap<>(tos);
 		// Then find the states that do not have a default transition
 		for (String from : copy.keySet()) {
 			currentState = copy.get(from);
@@ -427,7 +427,7 @@ public class FlowBuilder<Q> {
 		 * @return a TransitionBuilder
 		 */
 		public TransitionBuilder<Q> on(String pattern) {
-			return new TransitionBuilder<Q>(parent, pattern);
+			return new TransitionBuilder<>(parent, pattern);
 		}
 
 	}
@@ -636,13 +636,13 @@ public class FlowBuilder<Q> {
 		 * @return the parent builder
 		 */
 		public FlowBuilder<Q> add(Flow... flows) {
-			Collection<Flow> list = new ArrayList<Flow>(Arrays.asList(flows));
+			Collection<Flow> list = new ArrayList<>(Arrays.asList(flows));
 			String name = "split" + (parent.splitCounter++);
 			int counter = 0;
 			State one = parent.currentState;
 			Flow flow = null;
 			if (!(one == null || one instanceof FlowState)) {
-				FlowBuilder<Flow> stateBuilder = new FlowBuilder<Flow>(name + "_" + (counter++));
+				FlowBuilder<Flow> stateBuilder = new FlowBuilder<>(name + "_" + (counter++));
 				stateBuilder.currentState = one;
 				flow = stateBuilder.build();
 			} else if (one instanceof FlowState && parent.states.size() == 1) {

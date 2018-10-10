@@ -48,7 +48,7 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 		Assert.notNull(source, "source must not be null");
 		Map<String, JobParameter> props = source.getParameters();
 		StringBuilder stringBuffer = new StringBuilder();
-		List<String> keys = new ArrayList<String>(props.keySet());
+		List<String> keys = new ArrayList<>(props.keySet());
 		Collections.sort(keys);
 		for (String key : keys) {
 			JobParameter jobParameter = props.get(key);

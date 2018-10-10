@@ -61,7 +61,7 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 	@Override
 	public Set<StepExecution> split(StepExecution stepExecution, int gridSize)
 			throws JobExecutionException {
-		Set<StepExecution> executions = new TreeSet<StepExecution>(new Comparator<StepExecution>() {
+		Set<StepExecution> executions = new TreeSet<>(new Comparator<StepExecution>() {
 
 			@Override
 			public int compare(StepExecution arg0, StepExecution arg1) {

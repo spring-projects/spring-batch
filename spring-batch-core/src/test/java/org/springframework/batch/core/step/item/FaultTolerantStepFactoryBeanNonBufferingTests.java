@@ -53,7 +53,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
-	private ListItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory
+	private ListItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory
 			.createTransactionalList(items));
 
 	private SkipWriterStub writer = new SkipWriterStub();
@@ -72,7 +72,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(SkippableException.class, true);
 		skippableExceptions.put(SkippableRuntimeException.class, true);
 		factory.setSkippableExceptionClasses(skippableExceptions);

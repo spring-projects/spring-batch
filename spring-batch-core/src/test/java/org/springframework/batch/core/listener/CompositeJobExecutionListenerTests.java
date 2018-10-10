@@ -32,7 +32,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 
 	private CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
 	/**
 	 * Test method for

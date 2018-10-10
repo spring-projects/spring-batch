@@ -135,7 +135,7 @@ public class StepListenerFactoryBeanTests {
 		// method name, that all three will be called
 		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
@@ -147,7 +147,7 @@ public class StepListenerFactoryBeanTests {
 	public void testAnnotatingInterfaceResultsInOneCall() throws Exception {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "afterStep");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
@@ -329,7 +329,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		@SuppressWarnings("unchecked")
@@ -349,7 +349,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		@SuppressWarnings("unchecked")
@@ -367,7 +367,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		factoryBean.getObject();

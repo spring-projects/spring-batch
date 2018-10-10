@@ -75,7 +75,7 @@ public class ListPreparedStatementSetterTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		List<Long> parameters = new ArrayList<Long>();
+		List<Long> parameters = new ArrayList<>();
 		parameters.add(1L);
 		parameters.add(4L);
 		pss = new ListPreparedStatementSetter(parameters);
@@ -85,7 +85,7 @@ public class ListPreparedStatementSetterTests {
 	@Test
 	public void testSetValues() {
 
-		final List<String> results = new ArrayList<String>();
+		final List<String> results = new ArrayList<>();
 		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
 				new RowCallbackHandler() {
 			@Override

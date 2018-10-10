@@ -43,11 +43,11 @@ public class JobParameters implements Serializable {
 	private final Map<String,JobParameter> parameters;
 
 	public JobParameters() {
-		this.parameters = new LinkedHashMap<String, JobParameter>();
+		this.parameters = new LinkedHashMap<>();
 	}
 
 	public JobParameters(Map<String,JobParameter> parameters) {
-		this.parameters = new LinkedHashMap<String,JobParameter>(parameters);
+		this.parameters = new LinkedHashMap<>(parameters);
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class JobParameters implements Serializable {
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map<String, JobParameter> getParameters(){
-		return new LinkedHashMap<String, JobParameter>(parameters);
+		return new LinkedHashMap<>(parameters);
 	}
 
 	/**

@@ -28,7 +28,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
-	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<ItemReadListener<? super T>>();
+	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.

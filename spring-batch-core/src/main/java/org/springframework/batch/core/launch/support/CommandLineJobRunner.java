@@ -357,7 +357,7 @@ public class CommandLineJobRunner {
 
 			if (opts.contains("-next")) {
 				JobParameters nextParameters = getNextJobParameters(job);
-				Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
+				Map<String, JobParameter> map = new HashMap<>(nextParameters.getParameters());
 				map.putAll(jobParameters.getParameters());
 				jobParameters = new JobParameters(map);
 			}
@@ -397,7 +397,7 @@ public class CommandLineJobRunner {
 
 		int start = 0;
 		int count = 100;
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
 
 		while (!lastInstances.isEmpty()) {
@@ -436,7 +436,7 @@ public class CommandLineJobRunner {
 		if (jobExecutions.isEmpty()) {
 			return null;
 		}
-		List<JobExecution> result = new ArrayList<JobExecution>();
+		List<JobExecution> result = new ArrayList<>();
 		for (JobExecution jobExecution : jobExecutions) {
 			if (jobExecution.getStatus() != BatchStatus.ABANDONED) {
 				result.add(jobExecution);
@@ -450,7 +450,7 @@ public class CommandLineJobRunner {
 		if (jobExecutions.isEmpty()) {
 			return null;
 		}
-		List<JobExecution> result = new ArrayList<JobExecution>();
+		List<JobExecution> result = new ArrayList<>();
 		for (JobExecution jobExecution : jobExecutions) {
 			if (jobExecution.isRunning()) {
 				result.add(jobExecution);
@@ -533,7 +533,7 @@ public class CommandLineJobRunner {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
-		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
+		List<String> newargs = new ArrayList<>(Arrays.asList(args));
 
 		try {
 			if (System.in.available() > 0) {
@@ -557,8 +557,8 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		Set<String> opts = new LinkedHashSet<String>();
-		List<String> params = new ArrayList<String>();
+		Set<String> opts = new LinkedHashSet<>();
+		List<String> params = new ArrayList<>();
 
 		int count = 0;
 		String jobPath = null;

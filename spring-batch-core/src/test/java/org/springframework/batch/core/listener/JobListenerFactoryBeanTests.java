@@ -95,7 +95,7 @@ public class JobListenerFactoryBeanTests {
 		Object listener = JobListenerFactoryBean.getListener(delegate);
 		Object other = JobListenerFactoryBean.getListener(delegate);
 		assertTrue(listener instanceof JobExecutionListener);
-		Set<JobExecutionListener> listeners = new HashSet<JobExecutionListener>();
+		Set<JobExecutionListener> listeners = new HashSet<>();
 		listeners.add((JobExecutionListener) listener);
 		listeners.add((JobExecutionListener) other);
 		assertTrue(listeners.contains(listener));
@@ -191,7 +191,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -209,7 +209,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -226,7 +226,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		factoryBean.getObject();

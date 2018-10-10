@@ -94,7 +94,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
+		FutureTask<Integer> systemCommandTask = new FutureTask<>(new Callable<Integer>() {
 
 			@Override
 			public Integer call() throws Exception {

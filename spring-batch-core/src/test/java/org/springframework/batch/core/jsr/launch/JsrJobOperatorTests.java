@@ -230,7 +230,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetJobExecutionsRoseyScenario() {
 		org.springframework.batch.core.JobInstance jobInstance = new org.springframework.batch.core.JobInstance(5L, "my job");
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 		executions.add(new JobExecution(2L));
 
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(executions);
@@ -255,7 +255,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test(expected=NoSuchJobInstanceException.class)
 	public void testGetJobExecutionsNoneReturned() {
 		org.springframework.batch.core.JobInstance jobInstance = new org.springframework.batch.core.JobInstance(5L, "my job");
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(executions);
 
@@ -309,7 +309,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetJobInstancesRoseyScenario() {
-		List<JobInstance> instances = new ArrayList<JobInstance>();
+		List<JobInstance> instances = new ArrayList<>();
 		instances.add(new JobInstance(1L, "myJob"));
 		instances.add(new JobInstance(2L, "myJob"));
 		instances.add(new JobInstance(3L, "myJob"));
@@ -331,7 +331,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test(expected=NoSuchJobException.class)
 	public void testGetJobInstancesZeroInstancesReturned() {
-		List<JobInstance> instances = new ArrayList<JobInstance>();
+		List<JobInstance> instances = new ArrayList<>();
 
 		when(jobExplorer.getJobInstances("myJob", 0, 3)).thenReturn(instances);
 
@@ -340,7 +340,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetJobNames() {
-		List<String> jobNames = new ArrayList<String>();
+		List<String> jobNames = new ArrayList<>();
 		jobNames.add("job1");
 		jobNames.add("job2");
 
@@ -372,7 +372,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test(expected=NoSuchJobException.class)
 	public void testGetNoRunningExecutions() {
-		Set<JobExecution> executions = new HashSet<JobExecution>();
+		Set<JobExecution> executions = new HashSet<>();
 
 		when(jobExplorer.findRunningJobExecutions("myJob")).thenReturn(executions);
 
@@ -381,7 +381,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetRunningExecutions() {
-		Set<JobExecution> executions = new HashSet<JobExecution>();
+		Set<JobExecution> executions = new HashSet<>();
 		executions.add(new JobExecution(5L));
 
 		when(jobExplorer.findRunningJobExecutions("myJob")).thenReturn(executions);
@@ -392,7 +392,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetStepExecutionsRoseyScenario() {
 		JobExecution jobExecution = new JobExecution(5L);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		stepExecutions.add(new StepExecution("step1", jobExecution, 1L));
 		stepExecutions.add(new StepExecution("step2", jobExecution, 2L));
 		jobExecution.addStepExecutions(stepExecutions);
@@ -415,7 +415,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetStepExecutionsPartitionedStepScenario() {
 		JobExecution jobExecution = new JobExecution(5L);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		stepExecutions.add(new StepExecution("step1", jobExecution, 1L));
 		stepExecutions.add(new StepExecution("step2", jobExecution, 2L));
 		stepExecutions.add(new StepExecution("step2:partition0", jobExecution, 2L));

@@ -27,7 +27,7 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
  */
 public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerStub<T> implements ItemProcessor<T, T> {
 
-	private List<T> processed = new ArrayList<T>();
+	private List<T> processed = new ArrayList<>();
 
 	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
 

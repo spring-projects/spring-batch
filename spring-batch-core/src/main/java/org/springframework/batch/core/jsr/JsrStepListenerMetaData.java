@@ -80,7 +80,7 @@ public enum JsrStepListenerMetaData implements ListenerMetaData {
 	}
 
 	static{
-		propertyMap = new HashMap<String, JsrStepListenerMetaData>();
+		propertyMap = new HashMap<>();
 		for(JsrStepListenerMetaData metaData : values()){
 			propertyMap.put(metaData.getPropertyName(), metaData);
 		}

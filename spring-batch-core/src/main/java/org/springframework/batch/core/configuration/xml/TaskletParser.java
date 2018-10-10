@@ -210,7 +210,7 @@ public class TaskletParser {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
 			Element exceptionClassesElement = children.get(0);
-			ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
+			ManagedList<TypedStringValue> list = new ManagedList<>();
 			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", exceptionClassesElement, list, parserContext);

@@ -50,7 +50,7 @@ public class AsyncTaskletStepTests {
 
 	private static Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
 
-	private List<String> processed = new CopyOnWriteArrayList<String>();
+	private List<String> processed = new CopyOnWriteArrayList<>();
 
 	private TaskletStep step;
 
@@ -74,7 +74,7 @@ public class AsyncTaskletStepTests {
 
 	private int concurrencyLimit = 300;
 
-	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<String>();
+	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
 
 	private void setUp() throws Exception {
 
@@ -85,7 +85,7 @@ public class AsyncTaskletStepTests {
 
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemProcessor, itemWriter,
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ListItemReader<>(items), itemProcessor, itemWriter,
 				chunkTemplate));
 
 		jobRepository = new JobRepositorySupport();
@@ -116,7 +116,7 @@ public class AsyncTaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
-		items = new ArrayList<String>(Arrays.asList(StringUtils
+		items = new ArrayList<>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25")));
 
 		setUp();

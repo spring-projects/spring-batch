@@ -41,7 +41,7 @@ import org.springframework.util.ClassUtils;
 @RunWith(Parameterized.class)
 public class StepNameTests {
 
-	private Map<String, StepLocator> stepLocators = new HashMap<String, StepLocator>();
+	private Map<String, StepLocator> stepLocators = new HashMap<>();
 
 	private ApplicationContext context;
 
@@ -77,7 +77,7 @@ public class StepNameTests {
 
 	@Parameters
 	public static List<Object[]> data() throws Exception {
-		List<Object[]> list = new ArrayList<Object[]>();
+		List<Object[]> list = new ArrayList<>();
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
 		editor.setAsText("classpath*:" + ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
 		Resource[] resources = (Resource[]) editor.getValue();

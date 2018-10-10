@@ -39,7 +39,7 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
-	private Set<String> keys = new HashSet<String>();
+	private Set<String> keys = new HashSet<>();
 
 	private boolean useAllParentParameters = true;
 
@@ -57,7 +57,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * @param keys the keys to set
 	 */
 	public void setKeys(String[] keys) {
-		this.keys = new HashSet<String>(Arrays.asList(keys));
+		this.keys = new HashSet<>(Arrays.asList(keys));
 	}
 
 	/**

@@ -38,7 +38,7 @@ import org.springframework.core.io.Resource;
  */
 public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<ApplicationContextFactory[]>, ApplicationContextAware {
 
-	private List<Resource> resources = new ArrayList<Resource>();
+	private List<Resource> resources = new ArrayList<>();
 
 	private boolean copyConfiguration = true;
 

@@ -56,7 +56,7 @@ import org.springframework.util.StringUtils;
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 	private static final String SCOPED_TARGET_BEAN_PREFIX = "scopedTarget.";
 	private static final Log LOGGER = LogFactory.getLog(BatchPropertyBeanPostProcessor.class);
-	private static final Set<Class<? extends Annotation>> REQUIRED_ANNOTATIONS = new HashSet<Class<? extends Annotation>>();
+	private static final Set<Class<? extends Annotation>> REQUIRED_ANNOTATIONS = new HashSet<>();
 
 	private JsrExpressionParser jsrExpressionParser;
 	private BatchPropertyContext batchPropertyContext;

@@ -29,7 +29,7 @@ public class ExampleItemWriter implements ItemWriter<String> {
 
 	private static final Log log = LogFactory.getLog(ExampleItemWriter.class);
 
-	private static List<String> items = new ArrayList<String>();
+	private static List<String> items = new ArrayList<>();
 
 	public static void clear() {
 		items.clear();

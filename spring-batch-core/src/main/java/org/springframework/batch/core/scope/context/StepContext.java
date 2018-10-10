@@ -54,7 +54,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	private StepExecution stepExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	private BatchPropertyContext propertyContext = null;
 
@@ -115,7 +115,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the step {@link ExecutionContext}
 	 */
 	public Map<String, Object> getStepExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : stepExecution.getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -126,7 +126,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : stepExecution.getJobExecution().getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -137,7 +137,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the {@link JobParameters}
 	 */
 	public Map<String, Object> getJobParameters() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, JobParameter> entry : stepExecution.getJobParameters().getParameters().entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
 		}
@@ -146,7 +146,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Map<String, Object> getPartitionPlan() {
-		Map<String, Object> partitionPlanProperties = new HashMap<String, Object>();
+		Map<String, Object> partitionPlanProperties = new HashMap<>();
 
 		if(propertyContext != null) {
 			Map partitionProperties = propertyContext.getStepProperties(getStepName());
@@ -166,7 +166,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -199,7 +199,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public void close() {
 
-		List<Exception> errors = new ArrayList<Exception>();
+		List<Exception> errors = new ArrayList<>();
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 

@@ -190,7 +190,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save an null collection of step executions");
-		Map<Long, String> serializedContexts = new HashMap<Long, String>(stepExecutions.size());
+		Map<Long, String> serializedContexts = new HashMap<>(stepExecutions.size());
 		for (StepExecution stepExecution : stepExecutions) {
 			Long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -287,7 +287,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
     }
 
 	private String serializeContext(ExecutionContext ctx) {
-		Map<String, Object> m = new HashMap<String, Object>();
+		Map<String, Object> m = new HashMap<>();
 		for (Entry<String, Object> me : ctx.entrySet()) {
 			m.put(me.getKey(), me.getValue());
 		}

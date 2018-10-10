@@ -51,7 +51,7 @@ public class JobParametersTests {
 
 	private JobParameters getNewParameters() {
 
-		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameterMap = new HashMap<>();
 		parameterMap.put("string.key1", new JobParameter("value1", true));
 		parameterMap.put("string.key2", new JobParameter("value2", true));
 		parameterMap.put("long.key1", new JobParameter(1L, true));
@@ -164,7 +164,7 @@ public class JobParametersTests {
 
 		String string1 = stringBuilder.toString();
 
-		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameterMap = new HashMap<>();
 		parameterMap.put("string.key2", new JobParameter("value2", true));
 		parameterMap.put("string.key1", new JobParameter("value1", true));
 		parameterMap.put("long.key2", new JobParameter(2L, true));

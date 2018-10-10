@@ -66,7 +66,7 @@ public class StepSynchronizationManagerTests {
 
 	@Test
 	public void testClose() throws Exception {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
@@ -83,7 +83,7 @@ public class StepSynchronizationManagerTests {
 	public void testMultithreaded() throws Exception {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
 		ExecutorService executorService = Executors.newFixedThreadPool(2);
-		FutureTask<StepContext> task = new FutureTask<StepContext>(new Callable<StepContext>() {
+		FutureTask<StepContext> task = new FutureTask<>(new Callable<StepContext>() {
 			@Override
 			public StepContext call() throws Exception {
 				try {
@@ -107,7 +107,7 @@ public class StepSynchronizationManagerTests {
 	@Test
 	public void testRelease() {
 		StepContext context = StepSynchronizationManager.register(stepExecution);
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		context.registerDestructionCallback("foo", new Runnable() {
 			@Override
 			public void run() {
