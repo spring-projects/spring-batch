@@ -41,6 +41,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Minhyeok Jeong
  * @since 1.0
  * @see JobParameters
  * @see JobParameter
@@ -224,15 +225,29 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Copy job parameters into the current state.
-	 * @param jobParameters parameters to copy in
+	 * Add job parameters into the current parameter map. If the map previously
+	 * contained a mapping for the key, the old value is replaced.
+	 *
+	 * @param jobParameters parameters to add to
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
 		Assert.notNull(jobParameters, "jobParameters must not be null");
-
 		this.parameterMap.putAll(jobParameters.getParameters());
+		return this;
+	}
 
+	/**
+	 * Add job parameters into the current parameter map. If the map previously
+	 * contained a mapping for the key, the new value is ignored.
+	 *
+	 * @param jobParameters parameters to add to
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addJobParametersIfAbsent(JobParameters jobParameters) {
+		Assert.notNull(jobParameters, "jobParameters must not be null");
+		jobParameters.getParameters().forEach(
+				(key, value) -> this.parameterMap.putIfAbsent(key, value));
 		return this;
 	}
 
@@ -282,7 +297,7 @@ public class JobParametersBuilder {
 			}
 		}
 
-		this.parameterMap = addJobParameters(nextParameters)
+		this.parameterMap = addJobParametersIfAbsent(nextParameters)
 								.toJobParameters()
 								.getParameters();
 		return this;
