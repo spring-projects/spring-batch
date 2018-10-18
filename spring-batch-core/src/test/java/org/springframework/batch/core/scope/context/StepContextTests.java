@@ -165,6 +165,11 @@ public class StepContextTests {
 	}
 
 	@Test
+	public void testJobId() throws Exception {
+		assertEquals(2L, (long)context.getJobId());
+	}
+
+	@Test
 	public void testStepExecutionContext() throws Exception {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
