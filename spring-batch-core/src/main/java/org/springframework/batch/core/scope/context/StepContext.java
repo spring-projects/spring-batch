@@ -48,6 +48,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Nicolas Widart
  *
  */
 public class StepContext extends SynchronizedAttributeAccessor {
@@ -99,6 +100,19 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
 				"StepExecution does not have a JobInstance");
 		return stepExecution.getJobExecution().getJobInstance().getJobName();
+	}
+
+	/**
+	 * Convenient accessor for current job identifier.
+	 *
+	 * @return the job identifier of the enclosing {@link JobInstance}
+	 * associated with the current {@link StepExecution}
+	 */
+	public Long getJobId() {
+		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
+		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
+				"StepExecution does not have a JobInstance");
+		return stepExecution.getJobExecution().getJobInstance().getId();
 	}
 
 	/**
