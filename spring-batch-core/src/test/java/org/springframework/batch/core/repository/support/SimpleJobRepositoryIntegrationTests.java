@@ -180,7 +180,11 @@ public class SimpleJobRepositoryIntegrationTests {
 	@Test
 	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
-		jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+
+		//simulating a running job execution
+		jobExecution.setStartTime(new Date());
+		jobRepository.update(jobExecution);
 
 		try {
 			jobRepository.createJobExecution(job.getName(), jobParameters);

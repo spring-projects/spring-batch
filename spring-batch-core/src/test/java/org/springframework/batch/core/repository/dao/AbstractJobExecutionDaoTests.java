@@ -194,14 +194,23 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testFindRunningExecutions() {
-
+		//Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.setEndTime(new Date(1L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
+		//BATCH-2675
+		//Abnormal JobExecution as both StartTime and EndTime are null
+		//This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setLastUpdated(new Date(5L));
+		dao.saveJobExecution(exec);
+
+		//Running JobExecution as StartTime is populated but EndTime is null
+		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setStartTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);

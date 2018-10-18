@@ -73,6 +73,8 @@ public class OptimisticLockingFailureTests {
 				.addLong("test", 1L)
 				.toJobParameters());
 
+		Thread.sleep(1000);
+
 		while(restartJobExecution.isRunning()) {
 			// wait for async launched job to complete execution
 		}

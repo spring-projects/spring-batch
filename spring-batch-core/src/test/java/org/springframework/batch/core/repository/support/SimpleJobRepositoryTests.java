@@ -240,6 +240,7 @@ public class SimpleJobRepositoryTests {
 	@Test(expected = JobExecutionAlreadyRunningException.class)
 	public void testCreateJobExecutionAlreadyRunning() throws Exception {
 		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setStartTime(new Date());
 		jobExecution.setEndTime(null);
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);

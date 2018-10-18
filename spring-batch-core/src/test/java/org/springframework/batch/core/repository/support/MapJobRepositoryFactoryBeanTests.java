@@ -17,10 +17,13 @@ package org.springframework.batch.core.repository.support;
 
 import org.junit.Test;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
+
+import java.util.Date;
 
 import static org.junit.Assert.fail;
 
@@ -42,7 +45,11 @@ public class MapJobRepositoryFactoryBeanTests {
 		Job job = new JobSupport("jobName");
 		JobParameters jobParameters = new JobParameters();
 
-		repository.createJobExecution(job.getName(), jobParameters);
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), jobParameters);
+
+		// simulate a running execution
+		jobExecution.setStartTime(new Date());
+		repository.update(jobExecution);
 
 		try {
 			repository.createJobExecution(job.getName(), jobParameters);

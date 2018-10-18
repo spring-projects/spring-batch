@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.SerializationUtils;
 
@@ -34,8 +35,13 @@ import org.springframework.util.SerializationUtils;
  */
 public class JobExecutionTests {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), "foo"),
-			new Long(12), new JobParameters(), null);
+	private JobExecution execution;
+
+	@Before
+	public void initExecution() {
+		execution = new JobExecution(new JobInstance(new Long(11), "foo"),
+				new Long(12), new JobParameters(), null);
+	}
 
 	@Test
 	public void testJobExecution() {
@@ -65,6 +71,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunning() {
+		simulatingARunningExecution();
 		assertTrue(execution.isRunning());
 		execution.setEndTime(new Date(100L));
 		assertFalse(execution.isRunning());
@@ -76,6 +83,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunningWithStoppedExecution() {
+		simulatingARunningExecution();
 		assertTrue(execution.isRunning());
 		execution.stop();
 		assertTrue(execution.isRunning());
@@ -250,4 +258,9 @@ public class JobExecutionTests {
 		assertTrue(allExceptions.contains(exception));
 		assertTrue(allExceptions.contains(stepException1));
 	}
+
+	private void simulatingARunningExecution() {
+		execution.setStartTime(new Date());
+	}
+
 }

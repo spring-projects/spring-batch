@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.repository;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,6 +205,11 @@ public class JdbcJobRepositoryTests {
 
 				try {
 					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+
+					//simulate running execution
+					execution.setStartTime(new Date());
+					repository.update(execution);
+
 					cacheJobIds(execution);
 					list.add(execution);
 					Thread.sleep(1000);

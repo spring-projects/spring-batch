@@ -209,7 +209,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test(expected=JobExecutionIsRunningException.class)
 	public void testAbandonJobRunning() throws Exception {
-		JobExecution jobExecution = new JobExecution(5L);
+		JobExecution jobExecution = simulatingARunningJobExecution();
 		when(jobExplorer.getJobExecution(5L)).thenReturn(jobExecution);
 
 		jsrJobOperator.abandon(5L);
@@ -676,5 +676,11 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 			jobParametersConverter.afterPropertiesSet();
 			return new JsrJobOperator(jobExplorer, jobrepository, jobParametersConverter, transactionManager);
 		}
+	}
+
+	private JobExecution simulatingARunningJobExecution() {
+		JobExecution jobExecution = new JobExecution(5L);
+		jobExecution.setStartTime(new Date(1L));
+		return jobExecution;
 	}
 }

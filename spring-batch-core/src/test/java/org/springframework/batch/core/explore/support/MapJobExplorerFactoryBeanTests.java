@@ -18,10 +18,13 @@ package org.springframework.batch.core.explore.support;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+
+import java.util.Date;
 
 /**
  * Tests for {@link MapJobExplorerFactoryBean}.
@@ -36,8 +39,12 @@ public class MapJobExplorerFactoryBeanTests {
 	public void testCreateExplorer() throws Exception {
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.getObject().createJobExecution("foo", new JobParameters());
-		
+		JobExecution jobExecution = repositoryFactory.getObject().createJobExecution("foo", new JobParameters());
+
+		//simulating a running job execution
+		jobExecution.setStartTime(new Date());
+		repositoryFactory.getObject().update(jobExecution);
+
 		MapJobExplorerFactoryBean tested = new MapJobExplorerFactoryBean(repositoryFactory);
 		tested.afterPropertiesSet();
 
