@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import static org.junit.Assert.fail;
  * Repository tests using JDBC DAOs (rather than mocks).
  *
  * @author Robert Kasanicky
+ * @author Dimitrios Liapis
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -180,7 +181,11 @@ public class SimpleJobRepositoryIntegrationTests {
 	@Test
 	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
-		jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+
+		//simulating a running job execution
+		jobExecution.setStartTime(new Date());
+		jobRepository.update(jobExecution);
 
 		try {
 			jobRepository.createJobExecution(job.getName(), jobParameters);

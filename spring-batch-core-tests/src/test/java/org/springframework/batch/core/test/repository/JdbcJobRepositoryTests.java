@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.repository;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,6 +205,11 @@ public class JdbcJobRepositoryTests {
 
 				try {
 					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+
+					//simulate running execution
+					execution.setStartTime(new Date());
+					repository.update(execution);
+
 					cacheJobIds(execution);
 					list.add(execution);
 					Thread.sleep(1000);
