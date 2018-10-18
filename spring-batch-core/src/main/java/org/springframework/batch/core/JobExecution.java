@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Dimitrios Liapis
  *
  */
 @SuppressWarnings("serial")
@@ -232,10 +234,10 @@ public class JobExecution extends Entity {
 	 * be noted that this does not necessarily mean that it has been persisted
 	 * as such yet.
 	 *
-	 * @return true if the end time is null
+	 * @return true if the end time is null and the start time is not null
 	 */
 	public boolean isRunning() {
-		return endTime == null;
+		return startTime != null && endTime == null;
 	}
 
 	/**
