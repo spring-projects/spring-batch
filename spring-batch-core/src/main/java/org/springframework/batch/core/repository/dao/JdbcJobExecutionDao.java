@@ -60,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Dimitrios Liapis
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 

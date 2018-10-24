@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+/**
+ * Parent Test Class for {@link JdbcJobExecutionDao} and {@link MapJobExecutionDao}.
+ *
+ * @author Dimitrios Liapis
+ */
 public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao dao;
@@ -197,7 +202,8 @@ public abstract class AbstractJobExecutionDaoTests {
 		//Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
-		exec.setEndTime(new Date(1L));
+		exec.setStartTime(new Date(1L));
+		exec.setEndTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 

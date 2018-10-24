@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,23 +25,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
+ * @author Dimitrios Liapis
  *
  */
 public class JobExecutionTests {
 
-	private JobExecution execution;
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), "foo"),
+			new Long(12), new JobParameters(), null);
 
-	@Before
-	public void initExecution() {
-		execution = new JobExecution(new JobInstance(new Long(11), "foo"),
-				new Long(12), new JobParameters(), null);
-	}
 
 	@Test
 	public void testJobExecution() {
@@ -71,7 +67,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunning() {
-		simulatingARunningExecution();
+		execution.setStartTime(new Date());
 		assertTrue(execution.isRunning());
 		execution.setEndTime(new Date(100L));
 		assertFalse(execution.isRunning());
@@ -83,7 +79,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunningWithStoppedExecution() {
-		simulatingARunningExecution();
+		execution.setStartTime(new Date());
 		assertTrue(execution.isRunning());
 		execution.stop();
 		assertTrue(execution.isRunning());
@@ -257,10 +253,6 @@ public class JobExecutionTests {
 		assertEquals(1, execution.getFailureExceptions().size());
 		assertTrue(allExceptions.contains(exception));
 		assertTrue(allExceptions.contains(stepException1));
-	}
-
-	private void simulatingARunningExecution() {
-		execution.setStartTime(new Date());
 	}
 
 }
