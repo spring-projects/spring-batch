@@ -72,7 +72,7 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
 	@Override
-	public void afterRead(@Nullable T item) {
+	public void afterRead(T item) {
 	}
 
 	/* (non-Javadoc)

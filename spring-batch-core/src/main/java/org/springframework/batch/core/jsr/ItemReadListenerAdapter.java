@@ -19,7 +19,6 @@ import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -51,7 +50,7 @@ public class ItemReadListenerAdapter<T> implements ItemReadListener<T> {
 	}
 
 	@Override
-	public void afterRead(@Nullable T item) {
+	public void afterRead(T item) {
 		try {
 			delegate.afterRead(item);
 		} catch (Exception e) {
