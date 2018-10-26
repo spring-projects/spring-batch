@@ -3054,6 +3054,7 @@ Spring Batch offers the following readers and writers for commonly used messagin
 * <<amqpItemWriter>>
 * <<jmsItemReader>>
 * <<jmsItemWriter>>
+* <<kafkaItemWriter>>
 
 [[amqpItemReader]]
 ===== `AmqpItemReader`
@@ -3080,6 +3081,12 @@ method. Spring Batch provides a `JmsItemReaderBuilder` to construct an instance 
 The `JmsItemWriter` is an `ItemWriter` for JMS that uses a `JmsTemplate`. The template
 should have a default destination, which is used to send items in `write(List)`. Spring
 Batch provides a `JmsItemWriterBuilder` to construct an instance of the `JmsItemWriter`.
+
+[[kafkaItemWriter]]
+===== `KafkaItemWriter`
+The `KafkaItemWriter` is an `ItemWriter` for Apache Kafka that uses a `KafkaTemplate` to
+send events to a default topic. Spring Batch provides a `KafkaItemWriterBuilder` to
+construct an instance of the `KafkaItemWriter`.
 
 [[databaseReaders]]
 ==== Database Readers
