@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
+ * @author Dimitrios Liapis
  *
  */
 public class JobExecutionTests {
@@ -65,6 +66,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunning() {
+		execution.setStartTime(new Date());
 		assertTrue(execution.isRunning());
 		execution.setEndTime(new Date(100L));
 		assertFalse(execution.isRunning());
@@ -76,6 +78,7 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testIsRunningWithStoppedExecution() {
+		execution.setStartTime(new Date());
 		assertTrue(execution.isRunning());
 		execution.stop();
 		assertTrue(execution.isRunning());

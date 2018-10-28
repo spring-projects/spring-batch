@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+/**
+ * Parent Test Class for {@link JdbcJobExecutionDao} and {@link MapJobExecutionDao}.
+ */
 public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao dao;
@@ -193,14 +196,24 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testFindRunningExecutions() {
-
+		//Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
-		exec.setEndTime(new Date(1L));
+		exec.setStartTime(new Date(1L));
+		exec.setEndTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
+		//BATCH-2675
+		//Abnormal JobExecution as both StartTime and EndTime are null
+		//This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setLastUpdated(new Date(5L));
+		dao.saveJobExecution(exec);
+
+		//Running JobExecution as StartTime is populated but EndTime is null
+		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setStartTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
