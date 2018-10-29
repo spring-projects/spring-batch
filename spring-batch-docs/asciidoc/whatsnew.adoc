@@ -12,6 +12,8 @@ The Spring Batch 4.1 release adds the following features:
 * A new `@EnableBatchIntegration` annotation to simplify remote chunking and partitioning configuration
 * A new `JsonItemReader` and `JsonFileItemWriter` to support the JSON format
 * Add support for validating items with the Bean Validation API
+* Add support for JSR-305 annotations
+* Enhancements to the `FlatFileItemWriterBuilder` API
 
 [[whatsNewTesting]]
 === `@SpringBatchTest` Annotation
@@ -254,6 +256,7 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
 }
 ----
 
+[[whatsNewJSR305Api]]
 === JSR-305 support
 
 This release adds support for JSR-305 annotations. It leverages Spring Framework’s
@@ -281,6 +284,7 @@ The `@Nullable` annotation present on the `read` method makes it clear that the
 contract of this method says it may return `null`. This enforces what is said in its
 Javadoc, that the `read` method should return `null` when the data source is exhausted.
 
+[[whatsNewFlatFileItemWriterBuilder]]
 === `FlatFileItemWriterBuilder` enhancements
 
 Another small feature added in this release is a simplification of the configuration
