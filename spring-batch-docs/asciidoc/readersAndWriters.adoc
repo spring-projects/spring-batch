@@ -3000,6 +3000,7 @@ Spring Batch includes the following decorators:
 
 * <<synchronizedItemStreamReader>>
 * <<singleItemPeekableItemReader>>
+* <<synchronizedItemStreamWriter>>
 * <<multiResourceItemWriter>>
 * <<classifierCompositeItemWriter>>
 * <<classifierCompositeItemProcessor>>
@@ -3022,6 +3023,13 @@ item, and this is the next item returned from the `read` method. Spring Batch pr
 NOTE: SingleItemPeekableItemReader's peek method is not thread-safe, because it would not
 be possible to honor the peek in multiple threads. Only one of the threads that peeked
 would get that item in the next call to read.
+
+[[synchronizedItemStreamWriter]]
+===== `SynchronizedItemStreamWriter`
+When using an `ItemWriter` that is not thread safe, Spring Batch offers the
+`SynchronizedItemStreamWriter` decorator, which can be used to make the `ItemWriter`
+thread safe. Spring Batch provides a `SynchronizedItemStreamWriterBuilder` to construct
+an instance of the `SynchronizedItemStreamWriter`.
 
 [[multiResourceItemWriter]]
 ===== `MultiResourceItemWriter`
