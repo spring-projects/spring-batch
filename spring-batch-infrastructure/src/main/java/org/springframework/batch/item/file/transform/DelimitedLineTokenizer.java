@@ -194,7 +194,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	}
 
     /**
-     * Trim and leading or trailing quotes (and any leading or trailing
+     * Trim any leading or trailing quotes (and any leading or trailing
      * whitespace before or after the quotes) from within the specified character
      * array beginning at the specified offset index for the specified count.
      * <p/>
