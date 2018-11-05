@@ -122,7 +122,7 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	/**
 	 * A hint to the {@link #splitter(StepExecutionSplitter)} about how many step executions are required. If running
 	 * locally or remotely through a {@link #taskExecutor(TaskExecutor)} determines precisely the number of step
-	 * execution sin the first attempt at a partition step execution.
+	 * executions in the first attempt at a partition step execution.
 	 *
 	 * @param gridSize the grid size
 	 * @return this for fluent chaining
