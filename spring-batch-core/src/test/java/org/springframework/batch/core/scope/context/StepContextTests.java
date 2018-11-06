@@ -37,6 +37,7 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
+ * @author Nicolas Widart
  *
  */
 public class StepContextTests {

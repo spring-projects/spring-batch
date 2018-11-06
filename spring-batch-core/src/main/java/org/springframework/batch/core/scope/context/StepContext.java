@@ -48,6 +48,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Nicolas Widart
  *
  */
 public class StepContext extends SynchronizedAttributeAccessor {
