@@ -758,10 +758,8 @@ There are scenarios in which you may not want to persist your
 // This would reside in your BatchConfigurer implementation
 @Override
 protected JobRepository createJobRepository() throws Exception {
-    JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-    factory.setDataSource(dataSource);
+    MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
     factory.setTransactionManager(transactionManager);
-    factory.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
     return factory.getObject();
 }
 
