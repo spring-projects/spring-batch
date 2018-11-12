@@ -55,6 +55,7 @@ import org.springframework.util.ClassUtils;
  * </p>
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  */
 public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
@@ -239,9 +240,23 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Close the cursor and database connection.
+	 * @deprecated This method is deprecated in favor of
+	 * {@link StoredProcedureItemReader#cleanupOnClose(java.sql.Connection)} and
+	 * will be removed in a future release
 	 */
 	@Override
+	@Deprecated
 	protected void cleanupOnClose() throws Exception {
+		JdbcUtils.closeStatement(this.callableStatement);
+	}
+
+	/**
+	 * Close the cursor and database connection.
+	 * @param connection to the database
+	 */
+	@Override
+	protected void cleanupOnClose(Connection connection) throws Exception {
+		JdbcUtils.closeConnection(connection);
 		JdbcUtils.closeStatement(this.callableStatement);
 	}
 
