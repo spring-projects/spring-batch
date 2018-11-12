@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,20 @@ import junit.framework.TestCase;
 
 import static org.mockito.Mockito.mock;
 
-import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.Db2LuwMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.Db2MainframeMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
  * @author Will Schipp
- *
+ * @author Drummond Dawson
  */
 public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
@@ -89,11 +89,11 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	}
 	
 	public void testDb2(){
-		assertTrue(factory.getIncrementer("db2", "NAME") instanceof DB2SequenceMaxValueIncrementer);
+		assertTrue(factory.getIncrementer("db2", "NAME") instanceof Db2LuwMaxValueIncrementer);
 	}
 	
 	public void testDb2zos(){
-		assertTrue(factory.getIncrementer("db2zos", "NAME") instanceof DB2MainframeSequenceMaxValueIncrementer);
+		assertTrue(factory.getIncrementer("db2zos", "NAME") instanceof Db2MainframeMaxValueIncrementer);
 	}
 
 	public void testMysql(){
@@ -114,7 +114,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	}
 	
 	public void testPostgres(){
-		assertTrue(factory.getIncrementer("postgres", "NAME") instanceof PostgreSQLSequenceMaxValueIncrementer);
+		assertTrue(factory.getIncrementer("postgres", "NAME") instanceof PostgresSequenceMaxValueIncrementer);
 	}
 
 	public void testMsSqlServer(){
