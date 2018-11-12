@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ import org.springframework.util.ClassUtils;
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
@@ -143,10 +144,24 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Close the cursor and database connection.
+	 * @deprecated This method is deprecated in favor of
+	 * {@link JdbcCursorItemReader#cleanupOnClose(java.sql.Connection)} and will
+	 * be removed in a future release
 	 */
 	@Override
+	@Deprecated
 	protected void cleanupOnClose() throws Exception {
 		JdbcUtils.closeStatement(this.preparedStatement);
+	}
+
+	/**
+	 * Close the cursor and database connection.
+	 * @param connection to the database
+	 */
+	@Override
+	protected void cleanupOnClose(Connection connection) throws Exception {
+		JdbcUtils.closeStatement(this.preparedStatement);
+		JdbcUtils.closeConnection(connection);
 	}
 
 	@Override

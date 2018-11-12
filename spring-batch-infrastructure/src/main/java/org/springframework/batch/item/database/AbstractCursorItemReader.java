@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -396,7 +396,7 @@ implements InitializingBean {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
 		rs = null;
-		cleanupOnClose();
+		cleanupOnClose(con);
 
 		if(this.con != null && !this.con.isClosed()) {
 			this.con.setAutoCommit(this.initialConnectionAutoCommit);
@@ -413,7 +413,22 @@ implements InitializingBean {
 		}
 	}
 
+	/**
+	 * Clean up resources.
+	 * @throws Exception If unable to clean up resources
+	 * @deprecated This method is deprecated in favor of
+	 * {@link AbstractCursorItemReader#cleanupOnClose(java.sql.Connection)} and
+	 * will be removed in a future release
+	 */
+	@Deprecated
 	protected abstract void cleanupOnClose()  throws Exception;
+
+	/**
+	 * Clean up resources.
+	 * @param connection to the database
+	 * @throws Exception If unable to clean up resources
+	 */
+	protected abstract void cleanupOnClose(Connection connection)  throws Exception;
 
 	/**
 	 * Execute the statement to open the cursor.
