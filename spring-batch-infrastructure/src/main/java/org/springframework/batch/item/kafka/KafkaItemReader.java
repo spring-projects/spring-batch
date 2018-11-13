@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -40,8 +42,7 @@ import org.springframework.util.Assert;
  * An {@link ItemReader} implementation for Apache Kafka.
  * </p>
  *
- * Single-thread consumer with manually assigned list of partitions and
- * offsets store outside of Kafka. Supports:
+ * Single-thread consumer with manually assigned list of partitions and offsets store outside of Kafka. Supports:
  * <ul>
  * <li>Retry/restart, topic-partition offsets saved in ExecutionContext.
  * <li>Uses 'max.poll.records' for chunking/paging.
@@ -59,7 +60,16 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 
 	private static final long DEFAULT_POLL_TIMEOUT = 50L;
 
+	private static final long MIN_ASSIGN_TIMEOUT = 2000L;
+
+	private final Supplier<Duration> minTimeoutProvider = () -> Duration
+			.ofMillis(Math.max(this.pollTimeout.toMillis() * 20, MIN_ASSIGN_TIMEOUT));
+
 	private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
+
+	private AtomicBoolean assigned = new AtomicBoolean(false);
+
+	private Duration assignTimeout = this.minTimeoutProvider.get();
 
 	private List<TopicPartition> topicPartitions;
 
@@ -78,7 +88,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	private List<ConsumerRecord<K, V>> results;
 
 	public void setPollTimeout(long pollTimeout) {
-		Assert.isTrue(pollTimeout > 0, "'pollTimeout' must be greater than zero");
+		Assert.isTrue(pollTimeout >= 0, "'pollTimeout' must no be negative.");
 		this.pollTimeout = Duration.ofMillis(pollTimeout);
 	}
 
@@ -138,30 +148,22 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
 		try {
-			this.consumer = consumerFactory.createConsumer();
+			consumer = consumerFactory.createConsumer();
 			consumer.assign(topicPartitions);
+
+			if (isSaveState() && executionContext.containsKey(TOPIC_PARTITION_OFFSET)) {
+				offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSET);
+			}
+			else {
+				offsets = consumer.beginningOffsets(topicPartitions);
+			}
+
+			if (offsets != null && !offsets.isEmpty()) {
+				offsets.forEach(consumer::seek);
+			}
 		}
 		catch (Exception e) {
 			throw new ItemStreamException("Failed to initialize the reader", e);
-		}
-		// TODO seekToBeginning vs. seekToEnd vs. provided offsets (saveState or not)
-		if (!isSaveState()) {
-			consumer.seekToBeginning(topicPartitions);
-			return;
-		}
-
-		if (executionContext.containsKey(TOPIC_PARTITION_OFFSET)) {
-			offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSET);
-			if (offsets != null && !offsets.isEmpty()) {
-				for (Map.Entry<TopicPartition, Long> topicPartitionOffset : offsets.entrySet()) {
-					try {
-						consumer.seek(topicPartitionOffset.getKey(), topicPartitionOffset.getValue() + 1);
-					}
-					catch (Exception e) {
-						throw new ItemStreamException("Could not seek to stored offset on restart", e);
-					}
-				}
-			}
 		}
 	}
 
@@ -207,8 +209,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 		else {
 			results.clear();
 		}
-		ConsumerRecords<K, V> records = consumer.poll(pollTimeout.toMillis());
-		if (records != null) {
+		 ConsumerRecords<K, V> records = this.consumer.poll(this.assigned.getAndSet(true) ? this.pollTimeout : this.assignTimeout);
+		if (records != null && !records.isEmpty()) {
 			records.iterator().forEachRemaining(results::add);
 		}
 	}

@@ -92,7 +92,7 @@ public class KafkaItemReaderBuilder<K, V> {
 	public KafkaItemReader<K, V> build() {
 		Assert.notNull(this.consumerFactory, "consumerFactory is required.");
 		Assert.notNull(this.topicPartitions, "topicPartitions is required.");
-		Assert.isTrue(this.pollTimeout > 0, "pollTimeout must be greater than zero");
+		Assert.isTrue(this.pollTimeout >= 0, "pollTimeout must not be negative.");
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(this.consumerFactory);
