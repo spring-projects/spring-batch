@@ -413,7 +413,7 @@ copying large numbers of files or replicating filesystems into content managemen
 systems. It can also be used for remote execution by providing a `Step` implementation
 that is a proxy for a remote invocation (such as using Spring Remoting).
 
-[[stepExecutionSplitter]]
+[[partitioner]]
 
 ==== Partitioner
 
