@@ -19,6 +19,7 @@ package org.springframework.batch.item.kafka.builder;
 import java.util.List;
 
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.kafka.KafkaItemReader;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -29,6 +30,7 @@ import org.springframework.util.Assert;
  *
  * @author Mathieu Ouellet
  * @since 4.2
+ * @see KafkaItemReader
  */
 public class KafkaItemReaderBuilder<K, V> {
 
@@ -36,9 +38,15 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	private List<TopicPartition> topicPartitions;
 
+	private List<String> topics;
+
 	private long pollTimeout = 50L;
 
 	private boolean saveState = true;
+
+	private String name;
+
+	private int maxItemCount = Integer.MAX_VALUE;
 
 	/**
 	 * The {@link ConsumerFactory} implementation to produce a new {@link Consumer} instance for the reader.
@@ -61,6 +69,11 @@ public class KafkaItemReaderBuilder<K, V> {
 	 */
 	public KafkaItemReaderBuilder<K, V> topicPartitions(List<TopicPartition> topicPartitions) {
 		this.topicPartitions = topicPartitions;
+		return this;
+	}
+
+	public KafkaItemReaderBuilder<K, V> topics(List<String> topics) {
+		this.topics = topics;
 		return this;
 	}
 
@@ -89,16 +102,64 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	/**
+	 * The name used to calculate the key within the {@link org.springframework.batch.item.ExecutionContext}. Required
+	 * if {@link #saveState(boolean)} is set to true.
+	 *
+	 * @param name name of the reader instance
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
+	 */
+	public KafkaItemReaderBuilder<K, V> name(String name) {
+		this.name = name;
+		return this;
+	}
+
+	/**
+	 * Configure the max number of items to be read.
+	 *
+	 * @param maxItemCount the max items to be read
+	 * @return The current instance of the builder.
+	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
+	 */
+	public KafkaItemReaderBuilder<K, V> maxItemCount(int maxItemCount) {
+		this.maxItemCount = maxItemCount;
+		return this;
+	}
+
 	public KafkaItemReader<K, V> build() {
-		Assert.notNull(this.consumerFactory, "consumerFactory is required.");
-		Assert.notNull(this.topicPartitions, "topicPartitions is required.");
-		Assert.isTrue(this.pollTimeout >= 0, "pollTimeout must not be negative.");
+		Assert.state(topicPartitions != null || topics != null,
+				"Either 'topicPartitions' or 'topics' must be provided.");
+		Assert.state(topicPartitions == null || topics == null,
+				"Both 'topicPartitions' and 'topics' cannot be specified together.");
+
+		Assert.isTrue(pollTimeout >= 0, "pollTimeout must not be negative.");
+
+		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
+
+		Object maxPoll = consumerFactory.getConfigurationProperties().get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG);
+		Assert.notNull(maxPoll, "Consumer configuration for 'max.poll.records' must not be null.");
+		Assert.state(
+				(maxPoll instanceof Number && ((Number) maxPoll).intValue() > 0)
+						|| (maxPoll instanceof String && Integer.parseInt((String) maxPoll) > 0),
+				"Consumer configuration for 'max.poll.records' must be greater than zero.");
+
+		Object enableAutoCommit = consumerFactory.getConfigurationProperties()
+				.get(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
+		Assert.notNull(enableAutoCommit, "Consumer configuration for 'enable.auto.commit' must not be null.");
+		Assert.state(
+				(enableAutoCommit instanceof Boolean && !((Boolean) enableAutoCommit))
+						|| (enableAutoCommit instanceof String && !Boolean.valueOf((String) enableAutoCommit)),
+				"'enable.auto.commit' must be false.");
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(this.consumerFactory);
 		reader.setTopicPartitions(this.topicPartitions);
+		reader.setTopics(this.topics);
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
+//		reader.setName(this.name);
+		reader.setMaxItemCount(this.maxItemCount);
 		return reader;
 	}
 }

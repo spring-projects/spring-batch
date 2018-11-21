@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.util.*;
 
 import org.apache.kafka.clients.consumer.Consumer;
@@ -14,6 +15,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.ExecutionContext;
@@ -40,6 +42,7 @@ public class KafkaItemReaderTests {
 		MockitoAnnotations.initMocks(this);
 		Map<String, Object> config = new HashMap<>();
 		config.put("max.poll.records", 2);
+		config.put("enable.auto.commit", false);
 		when(consumerFactory.getConfigurationProperties()).thenReturn(config);
 		when(consumerFactory.createConsumer()).thenReturn(consumer);
 		topicPartition = new TopicPartition("topic", 0);
@@ -114,6 +117,7 @@ public class KafkaItemReaderTests {
 
 		config = new HashMap<>();
 		config.put("max.poll.records", 10);
+		config.put("enable.auto.commit", false);
 		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
 		reader.afterPropertiesSet();
 	}
@@ -125,13 +129,6 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void shouldSeekToBeginning() {
-		reader.setSaveState(false);
-		reader.open(new ExecutionContext());
-		verify(consumer).seekToBeginning(Collections.singletonList(topicPartition));
-	}
-
-	@Test
 	public void shouldSeekOnSavedState() {
 		long offset = 100L;
 		Map<TopicPartition, Long> offsets = new HashMap<>();
@@ -139,7 +136,7 @@ public class KafkaItemReaderTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("topic.partition.offset", offsets);
 		reader.open(executionContext);
-		verify(consumer).seek(topicPartition, offset + 1);
+		verify(consumer).seek(topicPartition, offset);
 	}
 
 	@Test
@@ -147,7 +144,7 @@ public class KafkaItemReaderTests {
 		Map<TopicPartition, List<ConsumerRecord<String, String>>> records = new HashMap<>();
 		records.put(topicPartition, Collections.singletonList(
 				new ConsumerRecord<>(topicPartition.topic(), topicPartition.partition(), 0L, "key0", "val0")));
-		when(consumer.poll(50L)).thenReturn(new ConsumerRecords<>(records));
+		when(consumer.poll(ArgumentMatchers.any())).thenReturn(new ConsumerRecords<>(records));
 
 		reader.open(new ExecutionContext());
 		String read = reader.read();
@@ -157,15 +154,13 @@ public class KafkaItemReaderTests {
 	@Test
 	public void testPollRecords() throws Exception {
 		Map<TopicPartition, List<ConsumerRecord<String, String>>> firstPoll = new HashMap<>();
-		firstPoll.put(topicPartition,
-				Arrays.asList(
-						new ConsumerRecord<>(topicPartition.topic(), topicPartition.partition(), 0L, "key0", "val0"),
-						new ConsumerRecord<>(topicPartition.topic(), topicPartition.partition(), 1L, "key1", "val1")));
+		firstPoll.put(topicPartition, Arrays.asList(new ConsumerRecord<>("topic", 0, 0L, "key0", "val0"),
+				new ConsumerRecord<>("topic", 0, 1L, "key1", "val1")));
+		when(consumer.poll(Duration.ofMillis(2000L))).thenReturn(new ConsumerRecords<>(firstPoll));
 
 		Map<TopicPartition, List<ConsumerRecord<String, String>>> secondPoll = new HashMap<>();
-		secondPoll.put(topicPartition, Collections.singletonList(
-				new ConsumerRecord<>(topicPartition.topic(), topicPartition.partition(), 2L, "key2", "val2")));
-		when(consumer.poll(50L)).thenReturn(new ConsumerRecords<>(firstPoll), new ConsumerRecords<>(secondPoll));
+		secondPoll.put(topicPartition, Collections.singletonList(new ConsumerRecord<>("topic", 0, 2L, "key2", "val2")));
+		when(consumer.poll(Duration.ofMillis(50L))).thenReturn(new ConsumerRecords<>(secondPoll));
 
 		reader.open(new ExecutionContext());
 

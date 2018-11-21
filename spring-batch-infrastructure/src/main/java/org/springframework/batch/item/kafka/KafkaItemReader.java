@@ -18,24 +18,25 @@ package org.springframework.batch.item.kafka;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemStreamItemReader;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * <p>
@@ -54,7 +55,7 @@ import org.springframework.util.Assert;
  * @since 4.2
  *
  */
-public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> implements InitializingBean {
+public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemReader<V> implements InitializingBean {
 
 	private static final String TOPIC_PARTITION_OFFSET = "topic.partition.offset";
 
@@ -73,19 +74,24 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 
 	private List<TopicPartition> topicPartitions;
 
+	private List<String> topics;
+
 	private ConsumerFactory<K, V> consumerFactory;
 
 	private boolean saveState = true;
 
-	private int maxPollRecords;
+	private int maxRecordsPerPoll;
 
 	private Consumer<K, V> consumer;
 
 	private Map<TopicPartition, Long> offsets = new HashMap<>();
 
-	private int current = 0;
+	private Iterator<ConsumerRecord<K, V>> records;
 
-	private List<ConsumerRecord<K, V>> results;
+	public KafkaItemReader() {
+		super();
+		setName(ClassUtils.getShortName(KafkaItemReader.class));
+	}
 
 	public void setPollTimeout(long pollTimeout) {
 		Assert.isTrue(pollTimeout >= 0, "'pollTimeout' must no be negative.");
@@ -96,6 +102,10 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 		this.topicPartitions = topicPartitions;
 	}
 
+	public void setTopics(List<String> topics) {
+		this.topics = topics;
+	}
+
 	public void setConsumerFactory(ConsumerFactory<K, V> consumerFactory) {
 		this.consumerFactory = consumerFactory;
 	}
@@ -104,6 +114,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	 * The flag that determines whether to save internal state for restarts.
 	 * @return true if the flag was set
 	 */
+	@Override
 	public boolean isSaveState() {
 		return saveState;
 	}
@@ -115,32 +126,36 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	 *
 	 * @param saveState flag value (default true).
 	 */
+	@Override
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(topicPartitions != null && !topicPartitions.isEmpty(),
-				"'topicPartitions' must no be null or empty.");
+		Assert.state(topicPartitions != null || topics != null,
+				"Either 'topicPartitions' or 'topics' must be provided.");
+		Assert.state(topicPartitions == null || topics == null,
+				"Both 'topicPartitions' and 'topics' cannot be specified together.");
 		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
 		Object maxPoll = consumerFactory.getConfigurationProperties().get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG);
 		Assert.notNull(maxPoll, "Consumer configuration for 'max.poll.records' must not be null.");
 		if (maxPoll instanceof Number) {
-			this.maxPollRecords = ((Number) maxPoll).intValue();
+			this.maxRecordsPerPoll = ((Number) maxPoll).intValue();
 		}
 		else if (maxPoll instanceof String) {
-			this.maxPollRecords = Integer.parseInt((String) maxPoll);
+			this.maxRecordsPerPoll = Integer.parseInt((String) maxPoll);
 		}
-		Assert.isTrue(maxPollRecords > 0, "Consumer configuration for 'max.poll.records' must be greater than zero.");
+		Assert.isTrue(maxRecordsPerPoll > 0,
+				"Consumer configuration for 'max.poll.records' must be greater than zero.");
+
 		Object enableAutoCommit = consumerFactory.getConfigurationProperties()
 				.get(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
-		if (enableAutoCommit != null) {
-			Assert.state(
-					(enableAutoCommit instanceof Boolean && !((Boolean) enableAutoCommit))
-							|| (enableAutoCommit instanceof String && !Boolean.valueOf((String) enableAutoCommit)),
-					"'enable.auto.commit' must be false.");
-		}
+		Assert.notNull(enableAutoCommit, "Consumer configuration for 'enable.auto.commit' must not be null.");
+		Assert.state(
+				(enableAutoCommit instanceof Boolean && !((Boolean) enableAutoCommit))
+						|| (enableAutoCommit instanceof String && !Boolean.valueOf((String) enableAutoCommit)),
+				"Consumer configuration for 'enable.auto.commit' must be false.");
 	}
 
 	@Override
@@ -148,9 +163,6 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
 		try {
-			consumer = consumerFactory.createConsumer();
-			consumer.assign(topicPartitions);
-
 			if (isSaveState() && executionContext.containsKey(TOPIC_PARTITION_OFFSET)) {
 				offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSET);
 			}
@@ -168,51 +180,35 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 	}
 
 	@Override
-	public void close() {
-		super.close();
-		current = 0;
-		try {
-			if (this.consumer != null) {
-				this.consumer.close();
-				this.consumer = null;
-			}
+	protected void doOpen() throws Exception {
+		consumer = consumerFactory.createConsumer();
+		if (topics != null) {
+			topicPartitions = topics.stream().flatMap(topic -> consumer.partitionsFor(topic).stream())
+					.map(partitionInfo -> new TopicPartition(partitionInfo.topic(), partitionInfo.partition()))
+					.collect(Collectors.toList());
 		}
-		catch (Exception e) {
-			throw new ItemStreamException("Error while closing item reader", e);
-		}
+		consumer.assign(topicPartitions);
 	}
 
 	@Override
-	public V read() throws Exception {
-		if (results == null || current >= maxPollRecords) {
-			doPollRecords();
-			if (current >= maxPollRecords) {
-				current = 0;
-			}
-		}
+	protected void jumpToItem(int itemIndex) throws Exception {
+	}
 
-		int next = current++;
-		if (next < results.size()) {
-			ConsumerRecord<K, V> record = results.get(next);
+	@Override
+	protected V doRead() throws Exception {
+		if (records == null || !records.hasNext()) {
+			records = doPoll();
+		}
+		if (records.hasNext()) {
+			ConsumerRecord<K, V> record = records.next();
 			offsets.put(new TopicPartition(record.topic(), record.partition()), record.offset());
 			return record.value();
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 
-	protected void doPollRecords() {
-		if (results == null) {
-			results = new CopyOnWriteArrayList<>();
-		}
-		else {
-			results.clear();
-		}
-		 ConsumerRecords<K, V> records = this.consumer.poll(this.assigned.getAndSet(true) ? this.pollTimeout : this.assignTimeout);
-		if (records != null && !records.isEmpty()) {
-			records.iterator().forEachRemaining(results::add);
-		}
+	protected Iterator<ConsumerRecord<K, V>> doPoll() {
+		return this.consumer.poll(this.assigned.getAndSet(true) ? this.pollTimeout : this.assignTimeout).iterator();
 	}
 
 	@Override
@@ -224,4 +220,13 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> imple
 		}
 	}
 
+	@Override
+	protected void doClose() throws Exception {
+		records = null;
+		if (this.consumer != null) {
+			this.consumer.close();
+			this.consumer = null;
+			this.assigned.set(false);
+		}
+	}
 }

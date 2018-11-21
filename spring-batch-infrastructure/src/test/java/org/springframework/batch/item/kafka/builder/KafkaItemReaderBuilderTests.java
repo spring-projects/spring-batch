@@ -2,10 +2,13 @@ package org.springframework.batch.item.kafka.builder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Before;
@@ -34,30 +37,37 @@ public class KafkaItemReaderBuilderTests {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
+		Map<String, Object> config = new HashMap<>();
+		config.put("max.poll.records", 2);
+		config.put("enable.auto.commit", false);
+		when(consumerFactory.getConfigurationProperties()).thenReturn(config);
 	}
 
 	@Test
 	public void testNullConsumerFactory() {
 		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("consumerFactory is required.");
+		this.thrown.expectMessage("'consumerFactory' must not be null.");
 
 		new KafkaItemReaderBuilder<>().topicPartitions(topicPartitions).build();
 	}
 
 	@Test
-	public void testNullTopicPartitions() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("topicPartitions is required.");
+	public void testNullTopicsAndTopicPartitions() {
+		this.thrown.expect(IllegalStateException.class);
+		this.thrown.expectMessage("Either 'topicPartitions' or 'topics' must be provided.");
 
 		new KafkaItemReaderBuilder<>().consumerFactory(consumerFactory).build();
 	}
 
 	@Test
-	public void testPollTimeoutNotGreaterThanZero() {
+	public void testPollTimeoutNegative() {
 		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("pollTimeout must be greater than zero");
+		this.thrown.expectMessage("pollTimeout must not be negative.");
 
-		new KafkaItemReaderBuilder<>().consumerFactory(consumerFactory).topicPartitions(topicPartitions).pollTimeout(0)
+		new KafkaItemReaderBuilder<>()
+				.consumerFactory(consumerFactory)
+				.topicPartitions(topicPartitions)
+				.pollTimeout(-1)
 				.build();
 	}
 
@@ -68,8 +78,12 @@ public class KafkaItemReaderBuilderTests {
 		long pollTimeout = 100;
 
 		// when
-		KafkaItemReader<Object, Object> reader = new KafkaItemReaderBuilder<>().consumerFactory(consumerFactory)
-				.topicPartitions(topicPartitions).pollTimeout(pollTimeout).saveState(saveState).build();
+		KafkaItemReader<Object, Object> reader = new KafkaItemReaderBuilder<>()
+				.consumerFactory(consumerFactory)
+				.topicPartitions(topicPartitions)
+				.pollTimeout(pollTimeout)
+				.saveState(saveState)
+				.build();
 
 		// then
 		assertFalse((Boolean) ReflectionTestUtils.getField(reader, "saveState"));
