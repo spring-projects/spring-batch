@@ -48,7 +48,10 @@ public class KafkaItemReaderBuilderTests {
 		this.thrown.expect(IllegalArgumentException.class);
 		this.thrown.expectMessage("'consumerFactory' must not be null.");
 
-		new KafkaItemReaderBuilder<>().topicPartitions(topicPartitions).build();
+		new KafkaItemReaderBuilder<>()
+				.name("kafkaItemReader")
+				.topicPartitions(topicPartitions)
+				.build();
 	}
 
 	@Test
@@ -56,7 +59,10 @@ public class KafkaItemReaderBuilderTests {
 		this.thrown.expect(IllegalStateException.class);
 		this.thrown.expectMessage("Either 'topicPartitions' or 'topics' must be provided.");
 
-		new KafkaItemReaderBuilder<>().consumerFactory(consumerFactory).build();
+		new KafkaItemReaderBuilder<>()
+				.name("kafkaItemReader")
+				.consumerFactory(consumerFactory)
+				.build();
 	}
 
 	@Test
@@ -65,6 +71,7 @@ public class KafkaItemReaderBuilderTests {
 		this.thrown.expectMessage("pollTimeout must not be negative.");
 
 		new KafkaItemReaderBuilder<>()
+				.name("kafkaItemReader")
 				.consumerFactory(consumerFactory)
 				.topicPartitions(topicPartitions)
 				.pollTimeout(-1)
@@ -76,6 +83,8 @@ public class KafkaItemReaderBuilderTests {
 		// given
 		boolean saveState = false;
 		long pollTimeout = 100;
+		int maxItemCount = 100;
+		String name = "kafkaItemReader";
 
 		// when
 		KafkaItemReader<Object, Object> reader = new KafkaItemReaderBuilder<>()
@@ -83,12 +92,16 @@ public class KafkaItemReaderBuilderTests {
 				.topicPartitions(topicPartitions)
 				.pollTimeout(pollTimeout)
 				.saveState(saveState)
+				.name(name)
+				.maxItemCount(maxItemCount)
 				.build();
 
 		// then
-		assertFalse((Boolean) ReflectionTestUtils.getField(reader, "saveState"));
 		assertEquals(consumerFactory, ReflectionTestUtils.getField(reader, "consumerFactory"));
 		assertEquals(topicPartitions, ReflectionTestUtils.getField(reader, "topicPartitions"));
 		assertEquals(Duration.ofMillis(pollTimeout), ReflectionTestUtils.getField(reader, "pollTimeout"));
+		assertEquals(saveState, ReflectionTestUtils.getField(reader, "saveState"));
+		assertEquals(maxItemCount, ReflectionTestUtils.getField(reader, "maxItemCount"));
+		assertEquals(name, ReflectionTestUtils.getField(reader, "name"));
 	}
 }

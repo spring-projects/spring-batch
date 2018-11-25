@@ -17,7 +17,6 @@
 package org.springframework.batch.item.kafka;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.ExecutionContext;
@@ -63,14 +61,10 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 
 	private static final long MIN_ASSIGN_TIMEOUT = 2000L;
 
-	private final Supplier<Duration> minTimeoutProvider = () -> Duration
+	private final Supplier<Duration> assignTimeoutProvider = () -> Duration
 			.ofMillis(Math.max(this.pollTimeout.toMillis() * 20, MIN_ASSIGN_TIMEOUT));
 
 	private Duration pollTimeout = Duration.ofMillis(DEFAULT_POLL_TIMEOUT);
-
-	private AtomicBoolean assigned = new AtomicBoolean(false);
-
-	private Duration assignTimeout = this.minTimeoutProvider.get();
 
 	private List<TopicPartition> topicPartitions;
 
@@ -78,13 +72,11 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 
 	private ConsumerFactory<K, V> consumerFactory;
 
-	private boolean saveState = true;
-
-	private int maxRecordsPerPoll;
-
 	private Consumer<K, V> consumer;
 
-	private Map<TopicPartition, Long> offsets = new HashMap<>();
+	private AtomicBoolean assigned = new AtomicBoolean(false);
+
+	private Map<TopicPartition, Long> offsets;
 
 	private Iterator<ConsumerRecord<K, V>> records;
 
@@ -110,52 +102,11 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 		this.consumerFactory = consumerFactory;
 	}
 
-	/**
-	 * The flag that determines whether to save internal state for restarts.
-	 * @return true if the flag was set
-	 */
-	@Override
-	public boolean isSaveState() {
-		return saveState;
-	}
-
-	/**
-	 * Set the flag that determines whether to save internal data for {@link ExecutionContext}. Only switch this to
-	 * false if you don't want to save any state from this stream, and you don't need it to be restartable. Always set
-	 * it to false if the reader is being used in a concurrent environment.
-	 *
-	 * @param saveState flag value (default true).
-	 */
-	@Override
-	public void setSaveState(boolean saveState) {
-		this.saveState = saveState;
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(topicPartitions != null || topics != null,
-				"Either 'topicPartitions' or 'topics' must be provided.");
-		Assert.state(topicPartitions == null || topics == null,
-				"Both 'topicPartitions' and 'topics' cannot be specified together.");
+		Assert.state(topicPartitions != null || topics != null, "Either 'topicPartitions' or 'topics' must be provided.");
+		Assert.state(topicPartitions == null || topics == null, "Both 'topicPartitions' and 'topics' cannot be specified together.");
 		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
-		Object maxPoll = consumerFactory.getConfigurationProperties().get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG);
-		Assert.notNull(maxPoll, "Consumer configuration for 'max.poll.records' must not be null.");
-		if (maxPoll instanceof Number) {
-			this.maxRecordsPerPoll = ((Number) maxPoll).intValue();
-		}
-		else if (maxPoll instanceof String) {
-			this.maxRecordsPerPoll = Integer.parseInt((String) maxPoll);
-		}
-		Assert.isTrue(maxRecordsPerPoll > 0,
-				"Consumer configuration for 'max.poll.records' must be greater than zero.");
-
-		Object enableAutoCommit = consumerFactory.getConfigurationProperties()
-				.get(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
-		Assert.notNull(enableAutoCommit, "Consumer configuration for 'enable.auto.commit' must not be null.");
-		Assert.state(
-				(enableAutoCommit instanceof Boolean && !((Boolean) enableAutoCommit))
-						|| (enableAutoCommit instanceof String && !Boolean.valueOf((String) enableAutoCommit)),
-				"Consumer configuration for 'enable.auto.commit' must be false.");
 	}
 
 	@Override
@@ -183,7 +134,8 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 	protected void doOpen() throws Exception {
 		consumer = consumerFactory.createConsumer();
 		if (topics != null) {
-			topicPartitions = topics.stream().flatMap(topic -> consumer.partitionsFor(topic).stream())
+			topicPartitions = topics.stream()
+					.flatMap(topic -> consumer.partitionsFor(topic).stream())
 					.map(partitionInfo -> new TopicPartition(partitionInfo.topic(), partitionInfo.partition()))
 					.collect(Collectors.toList());
 		}
@@ -208,13 +160,13 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	protected Iterator<ConsumerRecord<K, V>> doPoll() {
-		return this.consumer.poll(this.assigned.getAndSet(true) ? this.pollTimeout : this.assignTimeout).iterator();
+		return consumer.poll(assigned.getAndSet(true) ? pollTimeout : assignTimeoutProvider.get()).iterator();
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
-		if (saveState) {
+		if (isSaveState()) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.put(TOPIC_PARTITION_OFFSET, offsets);
 		}
@@ -223,10 +175,10 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 	@Override
 	protected void doClose() throws Exception {
 		records = null;
-		if (this.consumer != null) {
-			this.consumer.close();
-			this.consumer = null;
-			this.assigned.set(false);
+		offsets = null;
+		assigned.set(false);
+		if (consumer != null) {
+			consumer.close();
 		}
 	}
 }

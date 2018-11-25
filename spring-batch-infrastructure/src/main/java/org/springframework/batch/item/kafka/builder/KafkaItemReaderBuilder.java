@@ -49,53 +49,11 @@ public class KafkaItemReaderBuilder<K, V> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	/**
-	 * The {@link ConsumerFactory} implementation to produce a new {@link Consumer} instance for the reader.
-	 *
-	 * @param consumerFactory
-	 * @return The current instance of the builder.
-	 * @see KafkaItemReader#setConsumerFactory(ConsumerFactory)
-	 */
-	public KafkaItemReaderBuilder<K, V> consumerFactory(ConsumerFactory<K, V> consumerFactory) {
-		this.consumerFactory = consumerFactory;
-		return this;
-	}
-
-	/**
-	 * A list of {@link TopicPartition}s to manually assign to the consumer.
-	 * 
-	 * @param topicPartitions list of partitions to assign to the consumer
-	 * @return The current instance of the builder.
-	 * @see KafkaItemReader#setTopicPartitions(List)
-	 */
-	public KafkaItemReaderBuilder<K, V> topicPartitions(List<TopicPartition> topicPartitions) {
-		this.topicPartitions = topicPartitions;
-		return this;
-	}
-
-	public KafkaItemReaderBuilder<K, V> topics(List<String> topics) {
-		this.topics = topics;
-		return this;
-	}
-
-	/**
-	 * Set the pollTimeout for the poll() operations.
-	 *
-	 * @param pollTimeout default to 50ms
-	 * @return The current instance of the builder.
-	 * @see KafkaItemReader#setPollTimeout(long)
-	 */
-	public KafkaItemReaderBuilder<K, V> pollTimeout(long pollTimeout) {
-		this.pollTimeout = pollTimeout;
-		return this;
-	}
-
-	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
 	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 *
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
-	 * @see KafkaItemReader#setSaveState(boolean)
 	 */
 	public KafkaItemReaderBuilder<K, V> saveState(boolean saveState) {
 		this.saveState = saveState;
@@ -127,30 +85,62 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	/**
+	 * The {@link ConsumerFactory} implementation to produce a new {@link Consumer} instance for the reader.
+	 *
+	 * @param consumerFactory
+	 * @return The current instance of the builder.
+	 * @see KafkaItemReader#setConsumerFactory(ConsumerFactory)
+	 */
+	public KafkaItemReaderBuilder<K, V> consumerFactory(ConsumerFactory<K, V> consumerFactory) {
+		this.consumerFactory = consumerFactory;
+		return this;
+	}
+
+	/**
+	 * A list of {@link TopicPartition}s to manually assign the consumer.
+	 *
+	 * @param topicPartitions list of partitions to assign the consumer
+	 * @return The current instance of the builder.
+	 * @see KafkaItemReader#setTopicPartitions(List)
+	 */
+	public KafkaItemReaderBuilder<K, V> topicPartitions(List<TopicPartition> topicPartitions) {
+		this.topicPartitions = topicPartitions;
+		return this;
+	}
+
+	/**
+	 * A list of topics to manually assign the consumer.
+	 *
+	 * @param topics list of topics to assign the consumer
+	 * @return The current instance of the builder.
+	 * @see KafkaItemReader#setTopics(List)
+	 */
+	public KafkaItemReaderBuilder<K, V> topics(List<String> topics) {
+		this.topics = topics;
+		return this;
+	}
+
+	/**
+	 * Set the pollTimeout for the poll() operations.
+	 *
+	 * @param pollTimeout default to 50ms
+	 * @return The current instance of the builder.
+	 * @see KafkaItemReader#setPollTimeout(long)
+	 */
+	public KafkaItemReaderBuilder<K, V> pollTimeout(long pollTimeout) {
+		this.pollTimeout = pollTimeout;
+		return this;
+	}
+
 	public KafkaItemReader<K, V> build() {
-		Assert.state(topicPartitions != null || topics != null,
-				"Either 'topicPartitions' or 'topics' must be provided.");
-		Assert.state(topicPartitions == null || topics == null,
-				"Both 'topicPartitions' and 'topics' cannot be specified together.");
-
-		Assert.isTrue(pollTimeout >= 0, "pollTimeout must not be negative.");
-
-		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
-
-		Object maxPoll = consumerFactory.getConfigurationProperties().get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG);
-		Assert.notNull(maxPoll, "Consumer configuration for 'max.poll.records' must not be null.");
-		Assert.state(
-				(maxPoll instanceof Number && ((Number) maxPoll).intValue() > 0)
-						|| (maxPoll instanceof String && Integer.parseInt((String) maxPoll) > 0),
-				"Consumer configuration for 'max.poll.records' must be greater than zero.");
-
-		Object enableAutoCommit = consumerFactory.getConfigurationProperties()
-				.get(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
-		Assert.notNull(enableAutoCommit, "Consumer configuration for 'enable.auto.commit' must not be null.");
-		Assert.state(
-				(enableAutoCommit instanceof Boolean && !((Boolean) enableAutoCommit))
-						|| (enableAutoCommit instanceof String && !Boolean.valueOf((String) enableAutoCommit)),
-				"'enable.auto.commit' must be false.");
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
+		}
+		Assert.state(this.topicPartitions != null || this.topics != null, "Either 'topicPartitions' or 'topics' must be provided.");
+		Assert.state(this.topicPartitions == null || this.topics == null, "Both 'topicPartitions' and 'topics' cannot be specified together.");
+		Assert.isTrue(this.pollTimeout >= 0, "pollTimeout must not be negative.");
+		Assert.notNull(this.consumerFactory, "'consumerFactory' must not be null.");
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(this.consumerFactory);
@@ -158,7 +148,7 @@ public class KafkaItemReaderBuilder<K, V> {
 		reader.setTopics(this.topics);
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
-//		reader.setName(this.name);
+		reader.setName(this.name);
 		reader.setMaxItemCount(this.maxItemCount);
 		return reader;
 	}

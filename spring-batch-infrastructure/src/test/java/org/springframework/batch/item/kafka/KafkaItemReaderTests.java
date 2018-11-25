@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
 /**
  * @author Mathieu Ouellet
@@ -66,6 +65,15 @@ public class KafkaItemReaderTests {
 		}
 
 		reader.setTopicPartitions(Collections.singletonList(new TopicPartition("topic", 0)));
+		reader.setTopics(Collections.singletonList("topic"));
+		try {
+			reader.afterPropertiesSet();
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalStateException ignore) {
+		}
+
+		reader.setTopics(null);
 		try {
 			reader.afterPropertiesSet();
 			fail("Expected exception was not thrown");
@@ -73,52 +81,7 @@ public class KafkaItemReaderTests {
 		catch (IllegalArgumentException ignore) {
 		}
 
-		Map<String, Object> config = new HashMap<>();
-		config.put("max.poll.records", 0);
-		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
-		try {
-			reader.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalStateException | IllegalArgumentException ignore) {
-		}
-
-		config = new HashMap<>();
-		config.put("max.poll.records", "0");
-		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
-		try {
-			reader.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalStateException | IllegalArgumentException ignore) {
-		}
-
-		config = new HashMap<>();
-		config.put("max.poll.records", 10);
-		config.put("enable.auto.commit", true);
-		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
-		try {
-			reader.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalStateException | IllegalArgumentException ignore) {
-		}
-
-		config = new HashMap<>();
-		config.put("max.poll.records", 10);
-		config.put("enable.auto.commit", "true");
-		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
-		try {
-			reader.afterPropertiesSet();
-			fail("Expected exception was not thrown");
-		}
-		catch (IllegalStateException | IllegalArgumentException ignore) {
-		}
-
-		config = new HashMap<>();
-		config.put("max.poll.records", 10);
-		config.put("enable.auto.commit", false);
-		reader.setConsumerFactory(new DefaultKafkaConsumerFactory<>(config));
+		reader.setConsumerFactory(consumerFactory);
 		reader.afterPropertiesSet();
 	}
 
