@@ -572,7 +572,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> includedFields(Integer[] fields) {
+		public DelimitedBuilder<T> includedFields(Integer... fields) {
 			this.includedFields.addAll(Arrays.asList(fields));
 			return this;
 		}
