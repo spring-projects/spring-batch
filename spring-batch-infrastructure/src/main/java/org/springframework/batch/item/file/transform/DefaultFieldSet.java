@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  * 
  * @author Rob Harrop
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultFieldSet implements FieldSet {
 
@@ -154,7 +155,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public String readString(int index) {
-		return readAndTrim(index);
+		return read(index);
 	}
 
 	/*
@@ -226,7 +227,7 @@ public class DefaultFieldSet implements FieldSet {
 	public boolean readBoolean(int index, String trueValue) {
 		Assert.notNull(trueValue, "'trueValue' cannot be null.");
 
-		String value = readAndTrim(index);
+		String value = read(index);
 
 		return trueValue.equals(value);
 	}
@@ -250,7 +251,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public char readChar(int index) {
-		String value = readAndTrim(index);
+		String value = read(index);
 
 		Assert.isTrue(value.length() == 1, "Cannot convert field value '" + value + "' to char.");
 
@@ -276,7 +277,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public byte readByte(int index) {
-		return Byte.parseByte(readAndTrim(index));
+		return Byte.parseByte(read(index));
 	}
 
 	/*
@@ -298,7 +299,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public short readShort(int index) {
-		return Short.parseShort(readAndTrim(index));
+		return Short.parseShort(read(index));
 	}
 
 	/*
@@ -320,7 +321,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public int readInt(int index) {
-		return parseNumber(readAndTrim(index)).intValue();
+		return parseNumber(read(index)).intValue();
 	}
 
 	/*
@@ -343,7 +344,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public int readInt(int index, int defaultValue) {
-		String value = readAndTrim(index);
+		String value = read(index);
 
 		return StringUtils.hasLength(value) ? Integer.parseInt(value) : defaultValue;
 	}
@@ -367,7 +368,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public long readLong(int index) {
-		return parseNumber(readAndTrim(index)).longValue();
+		return parseNumber(read(index)).longValue();
 	}
 
 	/*
@@ -390,7 +391,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public long readLong(int index, long defaultValue) {
-		String value = readAndTrim(index);
+		String value = read(index);
 
 		return StringUtils.hasLength(value) ? Long.parseLong(value) : defaultValue;
 	}
@@ -414,7 +415,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public float readFloat(int index) {
-		return parseNumber(readAndTrim(index)).floatValue();
+		return parseNumber(read(index)).floatValue();
 	}
 
 	/*
@@ -437,7 +438,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public double readDouble(int index) {
-		return parseNumber(readAndTrim(index)).doubleValue();
+		return parseNumber(read(index)).doubleValue();
 	}
 
 	/*
@@ -484,7 +485,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
-		String candidate = readAndTrim(index);
+		String candidate = read(index);
 
 		if (!StringUtils.hasText(candidate)) {
 			return defaultValue;
@@ -530,7 +531,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public Date readDate(int index) {
-		return parseDate(readAndTrim(index), dateFormat);
+		return parseDate(read(index), dateFormat);
 	}
 
 	/*
@@ -541,7 +542,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public Date readDate(int index, Date defaultValue) {
-		String candidate = readAndTrim(index);
+		String candidate = read(index);
 		return StringUtils.hasText(candidate) ? parseDate(candidate, dateFormat) : defaultValue;
 	}
 
@@ -588,7 +589,7 @@ public class DefaultFieldSet implements FieldSet {
 	public Date readDate(int index, String pattern) {
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 		sdf.setLenient(false);
-		return parseDate(readAndTrim(index), sdf);
+		return parseDate(read(index), sdf);
 	}
 
 	/*
@@ -599,7 +600,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
     @Override
 	public Date readDate(int index, String pattern, Date defaultValue) {
-		String candidate = readAndTrim(index);
+		String candidate = read(index);
 		return StringUtils.hasText(candidate) ? readDate(index, pattern) : defaultValue;
 	}
 
@@ -649,11 +650,27 @@ public class DefaultFieldSet implements FieldSet {
 
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
+	 * This method can be overridden to not trim values, for example by calling
+	 * {@link DefaultFieldSet#readRawString(int)}.
+	 *
+	 * @param index the offset in the token array to obtain the value to be trimmed.
+	 *
+	 * @return null if the field value is <code>null</code>.
+	 */
+	protected String read(int index) {
+		return readAndTrim(index);
+	}
+
+	/**
+	 * Read and trim the {@link String} value at '<code>index</code>'.
 	 *
 	 * @param index the offset in the token array to obtain the value to be trimmed.
 	 * 
 	 * @return null if the field value is <code>null</code>.
+	 * @deprecated Use {@link DefaultFieldSet#read(int)} instead. This method will
+	 * be removed in a future version
 	 */
+	@Deprecated
 	protected String readAndTrim(int index) {
 		String value = tokens[index];
 
@@ -743,7 +760,7 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		Properties props = new Properties();
 		for (int i = 0; i < tokens.length; i++) {
-			String value = readAndTrim(i);
+			String value = read(i);
 			if (value != null) {
 				props.setProperty(names.get(i), value);
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -648,5 +648,20 @@ public class DefaultFieldSetTests {
 
 		assertEquals(value, fs.readRawString(0));
 		assertEquals(value, fs.readRawString(name));
+	}
+
+	@Test
+	public void testReadStringWhenOverridingReadMethodToReturnRawStrings() {
+		String name = "fieldName";
+		String value = " string with trailing whitespace   ";
+		FieldSet fs = new DefaultFieldSet(new String[] { value }, new String[] { name }) {
+			@Override
+			protected String read(int index) {
+				return super.readRawString(index);
+			}
+		};
+
+		assertEquals(value, fs.readString(0));
+		assertEquals(value, fs.readString(name));
 	}
 }
