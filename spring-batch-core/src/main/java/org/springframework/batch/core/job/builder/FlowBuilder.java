@@ -70,6 +70,10 @@ public class FlowBuilder<Q> {
 
 	private EndState stoppedState;
 
+	private int stepCounter = 0;
+
+	private int flowCounter = 0;
+
 	private int decisionCounter = 0;
 
 	private int splitCounter = 0;
@@ -282,7 +286,7 @@ public class FlowBuilder<Q> {
 		if (input instanceof Step) {
 			if (!states.containsKey(input)) {
 				Step step = (Step) input;
-				states.put(input, new StepState(prefix + step.getName(), step));
+				states.put(input, new StepState(prefix + "step" + (stepCounter++), step));
 			}
 			result = states.get(input);
 		}
@@ -295,7 +299,7 @@ public class FlowBuilder<Q> {
 		}
 		else if (input instanceof Flow) {
 			if (!states.containsKey(input)) {
-				states.put(input, new FlowState((Flow) input, prefix + ((Flow) input).getName()));
+				states.put(input, new FlowState((Flow) input, prefix + "flow" + (flowCounter++)));
 			}
 			result = states.get(input);
 		}
