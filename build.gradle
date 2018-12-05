@@ -12,8 +12,8 @@ buildscript {
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
-		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
-		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14"
+		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.6"
+		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16"
 	}
 }
 
@@ -80,7 +80,7 @@ allprojects {
 		javaxInjectVersion = '1'
 		javaxTransactionVersion = '1.3'
 		jbatchTckSpi = '1.0'
-		jettisonVersion = '1.2' //? => upgrade to 1.4 and the build fails (deprecated anyway via xstream) 
+		jettisonVersion = '1.2' //? => upgrade to 1.4 and the build fails (deprecated anyway via xstream)
 		jmsVersion = '2.0.1'
 		junitVersion = '4.12'
 		log4jVersion = '2.11.1'
@@ -98,6 +98,7 @@ allprojects {
 		beanshellVersion = '2.0b5'
 		jaxbApiVersion = '2.3.1'
 		jaxbImplVersion = '2.3.0.1'
+		docResourcesVersion = '0.1.1.RELEASE'
 	}
 
 	apply plugin: 'idea'
@@ -636,35 +637,77 @@ project('spring-batch-samples') {
 }
 
 apply plugin: "org.asciidoctor.convert"
-asciidoctor {
-	sourceDir = file('spring-batch-docs/asciidoc')
-	sources {
-		include '*.adoc'
+
+asciidoctorj {
+	version = '1.5.5'
+}
+
+configurations {
+	docs
+}
+
+dependencies {
+	docs "io.spring.docresources:spring-doc-resources:${docResourcesVersion}@zip"
+}
+
+task prepareAsciidocBuild(type: Sync) {
+	dependsOn configurations.docs
+	// copy doc resources
+	from {
+		configurations.docs.collect { zipTree(it) }
 	}
+	// and doc sources
+	from "spring-batch-docs/asciidoc/"
+	// to a build directory of your choice
+	into "$buildDir/asciidoc/assemble"
+}
+
+task('makePDF', type: org.asciidoctor.gradle.AsciidoctorTask){
+	dependsOn prepareAsciidocBuild
+	backends 'pdf'
+	sourceDir "$buildDir/asciidoc/assemble"
+	sources {
+		include 'index-single.adoc'
+	}
+	options doctype: 'book', eruby: 'erubis'
+	logDocuments = true
+	attributes 'icons': 'font',
+		'sectanchors': '',
+		'sectnums': '',
+		'toc': '',
+		'source-highlighter' : 'coderay',
+		revnumber: project.version
+}
+
+asciidoctor {
+	dependsOn makePDF
+	backends 'html5'
+	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
-			include 'images/**'
-			include 'jsfiles/**'
-			include 'tocbot-3.0.2/**'
+			include 'images/*', 'css/**', 'js/**'
 		}
 	}
-	logDocuments = true
-	backends = ["html", "pdf"]
 	options doctype: 'book', eruby: 'erubis'
-	attributes  'icons': 'font',
-			'idprefix': '',
-			'idseparator': '-',
-			docinfo: 'shared',
-			revnumber: project.version,
-			sectanchors: '',
-			sectnums: '',
-			'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend
-			stylesdir: 'stylesheets/',
-			stylesheet: 'spring.css',
-			'spring-version': project.version,
-			'allow-uri-read': ''
-
+	logDocuments = true
+	attributes 'docinfo': 'shared',
+		// use provided stylesheet
+		stylesdir: "css/",
+		stylesheet: 'spring.css',
+		'linkcss': true,
+		'icons': 'font',
+    'sectanchors': '',
+		// use provided highlighter
+		'source-highlighter=highlight.js',
+		'highlightjsdir=js/highlight',
+		'highlightjs-theme=atom-one-dark-reasonable',
+		'idprefix': '',
+		'idseparator': '-',
+		'spring-version': project.version,
+		'allow-uri-read': '',
+		revnumber: project.version
 }
+
 
 apply plugin: 'org.sonarqube'
 
@@ -745,39 +788,18 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (asciidoctor) {
-			exclude '*.pdf'
-			exclude '*.html'
-			exclude 'images'
-			exclude 'jsfiles'
-			exclude 'tocbot-3.0.2'
-			exclude  'html/index-pdf.html'
-			exclude 'pdf/images'
-			exclude 'pdf/jsfiles'
-			exclude 'pdf/tocbot-3.0.2'
-			exclude 'pdf/appendix.pdf'
-			exclude 'pdf/common-patterns.pdf'
-			exclude 'pdf/domain.pdf'
-			exclude 'pdf/index.pdf'
-			exclude 'pdf/toggle.pdf'
-			exclude 'pdf/job.pdf'
-			exclude 'pdf/jsr-352.pdf'
-			exclude 'pdf/readersAndWriters.pdf'
-			exclude 'pdf/repeat.pdf'
-			exclude 'pdf/retry.pdf'
-			exclude 'pdf/scalability.pdf'
-			exclude 'pdf/schema-appendix.pdf'
-			exclude 'pdf/spring-batch-integration.pdf'
-			exclude 'pdf/spring-batch-intro.pdf'
-			exclude 'pdf/step.pdf'
-			exclude 'pdf/testing.pdf'
-			exclude 'pdf/transaction-appendix.pdf'
-			exclude 'pdf/whatsnew.pdf'
-			exclude 'pdf/glossary.pdf'
-
+		from (makePDF) {
+			include "index-single.pdf"
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
+			into 'reference/pdf'
+		}
 
-			into 'reference'
+		from (asciidoctor) {
+			include "*.html"
+			include "css/**"
+			include "js/**"
+			include "images/**"
+			into 'reference/html'
 		}
 }
 
