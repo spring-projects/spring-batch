@@ -36,6 +36,8 @@ allprojects {
 	group = 'org.springframework.batch'
 
 	repositories {
+    // temporary for docs resources
+    mavenLocal()
 		maven { url 'https://repo.spring.io/libs-snapshot' }
 		maven { url 'https://repo.spring.io/libs-milestone' }
 		maven { url 'https://repo.spring.io/plugins-release' }
@@ -636,16 +638,34 @@ project('spring-batch-samples') {
 }
 
 apply plugin: "org.asciidoctor.convert"
+configurations {
+	docs
+}
+
+dependencies {
+	docs "io.spring.docresources:spring-doc-resources:0.1.1-BUILD-SNAPSHOT@zip"
+}
+
+task prepareAsciidocBuild(type: Sync) {
+	dependsOn configurations.docs
+	// copy doc resources
+	from {
+		configurations.docs.collect { zipTree(it) }
+	}
+	// and doc sources
+	from "spring-batch-docs/asciidoc/"
+	// to a build directory of your choice
+	into "$buildDir/asciidoc/build"
+}
+
 asciidoctor {
-	sourceDir = file('spring-batch-docs/asciidoc')
+  sourceDir "$buildDir/asciidoc/build"
 	sources {
 		include '*.adoc'
 	}
 	resources {
 		from(sourceDir) {
-			include 'images/**'
-			include 'jsfiles/**'
-			include 'tocbot-3.0.2/**'
+			include 'images/*', 'css/**', 'js/**'
 		}
 	}
 	logDocuments = true
@@ -658,13 +678,17 @@ asciidoctor {
 			revnumber: project.version,
 			sectanchors: '',
 			sectnums: '',
-			'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend
-			stylesdir: 'stylesheets/',
-			stylesheet: 'spring.css',
+	  	stylesdir: "css/",
+		  stylesheet: 'spring.css',
+		  'linkcss': true,
+		  'source-highlighter=highlight.js',
+		  'highlightjsdir=js/highlight',
+		  'highlightjs-theme=atom-one-dark-reasonable',
 			'spring-version': project.version,
 			'allow-uri-read': ''
 
 }
+asciidoctor.dependsOn prepareAsciidocBuild
 
 apply plugin: 'org.sonarqube'
 
