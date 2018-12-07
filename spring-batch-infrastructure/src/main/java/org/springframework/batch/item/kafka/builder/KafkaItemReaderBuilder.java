@@ -17,11 +17,12 @@
 package org.springframework.batch.item.kafka.builder;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.kafka.KafkaItemReader;
+import org.springframework.batch.item.kafka.support.OffsetsProvider;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.util.Assert;
 
@@ -39,6 +40,8 @@ public class KafkaItemReaderBuilder<K, V> {
 	private List<TopicPartition> topicPartitions;
 
 	private List<String> topics;
+
+	private OffsetsProvider offsetsProvider;
 
 	private long pollTimeout = 50L;
 
@@ -121,6 +124,11 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	public KafkaItemReaderBuilder<K,V> offsetsProvider(OffsetsProvider offsetsProvider)  {
+		this.offsetsProvider = offsetsProvider;
+		return this;
+	}
+
 	/**
 	 * Set the pollTimeout for the poll() operations.
 	 *
@@ -141,11 +149,13 @@ public class KafkaItemReaderBuilder<K, V> {
 		Assert.state(this.topicPartitions == null || this.topics == null, "Both 'topicPartitions' and 'topics' cannot be specified together.");
 		Assert.isTrue(this.pollTimeout >= 0, "pollTimeout must not be negative.");
 		Assert.notNull(this.consumerFactory, "'consumerFactory' must not be null.");
+		Assert.notNull(this.offsetsProvider, "'offsetsProvider' must not be null.");
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(this.consumerFactory);
 		reader.setTopicPartitions(this.topicPartitions);
 		reader.setTopics(this.topics);
+		reader.setOffsetsProvider(this.offsetsProvider);
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);

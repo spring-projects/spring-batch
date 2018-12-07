@@ -30,6 +30,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.kafka.support.OffsetsProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -74,6 +75,8 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 
 	private Consumer<K, V> consumer;
 
+	private OffsetsProvider offsetsProvider;
+
 	private AtomicBoolean assigned = new AtomicBoolean(false);
 
 	private Map<TopicPartition, Long> offsets;
@@ -102,11 +105,16 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 		this.consumerFactory = consumerFactory;
 	}
 
+	public void setOffsetsProvider(OffsetsProvider offsetsProvider) {
+		this.offsetsProvider = offsetsProvider;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(topicPartitions != null || topics != null, "Either 'topicPartitions' or 'topics' must be provided.");
 		Assert.state(topicPartitions == null || topics == null, "Both 'topicPartitions' and 'topics' cannot be specified together.");
 		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
+		Assert.notNull(offsetsProvider, "'offsetsProvider' must not be null.");
 	}
 
 	@Override
@@ -118,7 +126,7 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 				offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSET);
 			}
 			else {
-				offsets = consumer.beginningOffsets(topicPartitions);
+				offsets = offsetsProvider.get();
 			}
 
 			if (offsets != null && !offsets.isEmpty()) {
@@ -140,6 +148,7 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 					.collect(Collectors.toList());
 		}
 		consumer.assign(topicPartitions);
+		offsetsProvider.setConsumer(consumer);
 	}
 
 	@Override

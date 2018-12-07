@@ -18,6 +18,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.kafka.KafkaItemReader;
+import org.springframework.batch.item.kafka.support.OffsetsProvider;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -31,6 +32,8 @@ public class KafkaItemReaderBuilderTests {
 
 	@Mock
 	private ConsumerFactory<Object, Object> consumerFactory;
+	@Mock
+	private OffsetsProvider offsetsProvider;
 
 	private List<TopicPartition> topicPartitions = Collections.singletonList(new TopicPartition("topic", 0));
 
@@ -51,6 +54,7 @@ public class KafkaItemReaderBuilderTests {
 		new KafkaItemReaderBuilder<>()
 				.name("kafkaItemReader")
 				.topicPartitions(topicPartitions)
+				.offsetsProvider(offsetsProvider)
 				.build();
 	}
 
@@ -62,6 +66,7 @@ public class KafkaItemReaderBuilderTests {
 		new KafkaItemReaderBuilder<>()
 				.name("kafkaItemReader")
 				.consumerFactory(consumerFactory)
+				.offsetsProvider(offsetsProvider)
 				.build();
 	}
 
@@ -74,7 +79,20 @@ public class KafkaItemReaderBuilderTests {
 				.name("kafkaItemReader")
 				.consumerFactory(consumerFactory)
 				.topicPartitions(topicPartitions)
+				.offsetsProvider(offsetsProvider)
 				.pollTimeout(-1)
+				.build();
+	}
+
+	@Test
+	public void testNullOffsetsProvider() {
+		this.thrown.expect(IllegalArgumentException.class);
+		this.thrown.expectMessage("'offsetsProvider' must not be null.");
+
+		new KafkaItemReaderBuilder<>()
+				.name("kafkaItemReader")
+				.consumerFactory(consumerFactory)
+				.topicPartitions(topicPartitions)
 				.build();
 	}
 
@@ -84,15 +102,15 @@ public class KafkaItemReaderBuilderTests {
 		boolean saveState = false;
 		long pollTimeout = 100;
 		int maxItemCount = 100;
-		String name = "kafkaItemReader";
 
 		// when
 		KafkaItemReader<Object, Object> reader = new KafkaItemReaderBuilder<>()
 				.consumerFactory(consumerFactory)
 				.topicPartitions(topicPartitions)
+				.offsetsProvider(offsetsProvider)
 				.pollTimeout(pollTimeout)
 				.saveState(saveState)
-				.name(name)
+				.name("kafkaItemReader")
 				.maxItemCount(maxItemCount)
 				.build();
 
@@ -102,6 +120,5 @@ public class KafkaItemReaderBuilderTests {
 		assertEquals(Duration.ofMillis(pollTimeout), ReflectionTestUtils.getField(reader, "pollTimeout"));
 		assertEquals(saveState, ReflectionTestUtils.getField(reader, "saveState"));
 		assertEquals(maxItemCount, ReflectionTestUtils.getField(reader, "maxItemCount"));
-		assertEquals(name, ReflectionTestUtils.getField(reader, "name"));
 	}
 }

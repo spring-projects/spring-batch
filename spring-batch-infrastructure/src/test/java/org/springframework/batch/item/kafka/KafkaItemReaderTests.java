@@ -3,6 +3,7 @@ package org.springframework.batch.item.kafka;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +20,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.kafka.support.OffsetsProvider;
 import org.springframework.kafka.core.ConsumerFactory;
 
 /**
@@ -31,6 +33,9 @@ public class KafkaItemReaderTests {
 
 	@Mock
 	private Consumer<String, String> consumer;
+
+	@Mock
+	private OffsetsProvider offsetsProvider;
 
 	private TopicPartition topicPartition;
 
@@ -47,6 +52,7 @@ public class KafkaItemReaderTests {
 		topicPartition = new TopicPartition("topic", 0);
 		reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(consumerFactory);
+		reader.setOffsetsProvider(offsetsProvider);
 		reader.setTopicPartitions(Collections.singletonList(topicPartition));
 		reader.setSaveState(true);
 		reader.setPollTimeout(50L);
@@ -82,24 +88,21 @@ public class KafkaItemReaderTests {
 		}
 
 		reader.setConsumerFactory(consumerFactory);
+		try {
+			reader.afterPropertiesSet();
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException ignore) {
+		}
+
+		reader.setOffsetsProvider(offsetsProvider);
 		reader.afterPropertiesSet();
 	}
 
 	@Test
-	public void shouldAssignTopicPartitions() {
+	public void testAssignTopicPartitions() {
 		reader.open(new ExecutionContext());
 		verify(consumer).assign(Collections.singletonList(topicPartition));
-	}
-
-	@Test
-	public void shouldSeekOnSavedState() {
-		long offset = 100L;
-		Map<TopicPartition, Long> offsets = new HashMap<>();
-		offsets.put(topicPartition, offset);
-		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.put("topic.partition.offset", offsets);
-		reader.open(executionContext);
-		verify(consumer).seek(topicPartition, offset);
 	}
 
 	@Test
@@ -135,6 +138,27 @@ public class KafkaItemReaderTests {
 
 		read = reader.read();
 		assertThat(read, is("val2"));
+	}
+
+	@Test
+	public void testSeekOnSavedState() {
+		long offset = 100L;
+		Map<TopicPartition, Long> offsets = new HashMap<>();
+		offsets.put(topicPartition, offset);
+		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.put("topic.partition.offset", offsets);
+		reader.open(executionContext);
+		verify(consumer).seek(topicPartition, offset);
+	}
+
+	@Test
+	public void testSeekToProvidedOffsets() {
+		long offset = 100L;
+		Map<TopicPartition, Long> offsets = new HashMap<>();
+		offsets.put(topicPartition, offset);
+		given(offsetsProvider.get()).willReturn(offsets);
+		reader.open(new ExecutionContext());
+		verify(consumer).seek(topicPartition, offset);
 	}
 
 }
