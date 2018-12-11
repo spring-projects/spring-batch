@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -87,6 +88,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param serializer {@link ExecutionContextSerializer} instance to use.
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
+		Assert.notNull(serializer, "Serializer must not be null");
 		this.serializer = serializer;
 	}
 
@@ -208,6 +210,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		Assert.state(serializer != null, "ExecutionContextSerializer is required");
 	}
 
 	/**
