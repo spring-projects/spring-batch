@@ -36,8 +36,6 @@ allprojects {
 	group = 'org.springframework.batch'
 
 	repositories {
-    // temporary for docs resources
-    mavenLocal()
 		maven { url 'https://repo.spring.io/libs-snapshot' }
 		maven { url 'https://repo.spring.io/libs-milestone' }
 		maven { url 'https://repo.spring.io/plugins-release' }
@@ -643,7 +641,7 @@ configurations {
 }
 
 dependencies {
-	docs "io.spring.docresources:spring-doc-resources:0.1.1-BUILD-SNAPSHOT@zip"
+	docs "io.spring.docresources:spring-doc-resources:0.1.0.RELEASE@zip"
 }
 
 task prepareAsciidocBuild(type: Sync) {
