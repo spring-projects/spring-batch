@@ -663,7 +663,7 @@ asciidoctor {
 	}
 	resources {
 		from(sourceDir) {
-			include 'images/*', 'css/**', 'js/**'
+			include 'images/*', 'css/**', 'js/**', 'jsfiles/**'
 		}
 	}
 	logDocuments = true
@@ -768,34 +768,13 @@ task docsZip(type: Zip) {
 		}
 
 		from (asciidoctor) {
-			exclude '*.pdf'
-			exclude '*.html'
-			exclude 'images'
-			exclude 'jsfiles'
-			exclude 'tocbot-3.0.2'
-			exclude  'html/index-pdf.html'
-			exclude 'pdf/images'
-			exclude 'pdf/jsfiles'
-			exclude 'pdf/tocbot-3.0.2'
-			exclude 'pdf/appendix.pdf'
-			exclude 'pdf/common-patterns.pdf'
-			exclude 'pdf/domain.pdf'
-			exclude 'pdf/index.pdf'
-			exclude 'pdf/toggle.pdf'
-			exclude 'pdf/job.pdf'
-			exclude 'pdf/jsr-352.pdf'
-			exclude 'pdf/readersAndWriters.pdf'
-			exclude 'pdf/repeat.pdf'
-			exclude 'pdf/retry.pdf'
-			exclude 'pdf/scalability.pdf'
-			exclude 'pdf/schema-appendix.pdf'
-			exclude 'pdf/spring-batch-integration.pdf'
-			exclude 'pdf/spring-batch-intro.pdf'
-			exclude 'pdf/step.pdf'
-			exclude 'pdf/testing.pdf'
-			exclude 'pdf/transaction-appendix.pdf'
-			exclude 'pdf/whatsnew.pdf'
-			exclude 'pdf/glossary.pdf'
+
+			include '*.html'
+			include 'index-single.pdf'
+			include 'css/*'
+			include 'js/**'
+			include 'jsfiles/*'
+			include 'images/*'
 
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
 
