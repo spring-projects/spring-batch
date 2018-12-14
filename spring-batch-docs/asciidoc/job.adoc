@@ -30,7 +30,7 @@ options and runtime concerns of a `Job`.
 
 ifdef::backend-html5[]
 [role="javaContent"]
-There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however
+There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface. However,
 builders abstract away the difference in configuration.
 
 [source, java, role="javaContent"]
@@ -56,10 +56,9 @@ builders can also contain other elements that help with parallelisation (`Split`
 declarative flow control (`Decision`) and externalization of flow definitions (`Flow`).
 
 [role="xmlContent"]
-There are multiple implementations of the <<job.adoc#configureJob,`Job`>> interface, however, the namespace
-abstracts away the differences in configuration. It has only three
-required dependencies: a name, a `JobRepository` , and
-a list of `Step` instances.
+Whether you use Java or XML, there are multiple implementations of the <<job.adoc#configureJob,`Job`>>
+interface. However, the namespace abstracts away the differences in configuration. It has
+only three required dependencies: a name, `JobRepository` , and a list of `Step` instances.
 
 [source, xml, role="xmlContent"]
 ----
@@ -719,8 +718,8 @@ The following example shows the inclusion of `MapJobRepositoryFactoryBean` in XM
 </bean>
 ----
 
-[role="xmlContent"]
-The following example shows the inclusion of `MapJobRepositoryFactoryBean` in XML:
+[role="javaContent"]
+The following example shows the inclusion of `MapJobRepositoryFactoryBean` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
