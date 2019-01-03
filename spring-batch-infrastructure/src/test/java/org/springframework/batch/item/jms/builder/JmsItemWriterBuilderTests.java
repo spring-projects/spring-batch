@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2019 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.batch.item.jms.JmsItemWriter;
 import org.springframework.jms.core.JmsOperations;
-import org.springframework.jms.core.JmsTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -33,6 +32,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 public class JmsItemWriterBuilderTests {
 

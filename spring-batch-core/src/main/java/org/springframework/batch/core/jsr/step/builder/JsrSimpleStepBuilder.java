@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.step.BatchletStep;
 import org.springframework.batch.core.jsr.step.item.JsrChunkProcessor;
@@ -45,6 +44,7 @@ import org.springframework.util.Assert;
  * pattern defined by the spec.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @param <I> The input type for the step
  * @param <O> The output type for the step
