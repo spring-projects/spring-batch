@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.xml;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -31,6 +32,7 @@ import javax.xml.transform.stax.StAXSource;
  * This class is thread-safe.
  *
  * @author Josh Long
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class StaxUtils {
@@ -41,5 +43,12 @@ public abstract class StaxUtils {
 
 	public static Result getResult(XMLEventWriter w) {
 		return new StAXResult(w);
+	}
+
+	public static XMLInputFactory createXmlInputFactory() {
+		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+		xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+		xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+		return xmlInputFactory;
 	}
 }
