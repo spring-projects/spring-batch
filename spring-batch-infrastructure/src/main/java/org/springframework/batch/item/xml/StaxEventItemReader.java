@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  * The implementation is <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -74,6 +75,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	private boolean noInput;
 
 	private boolean strict = true;
+
+	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
 
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
@@ -115,6 +118,15 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		for (String fragmentRootElementName : fragmentRootElementNames) {
 			this.fragmentRootElementNames.add(parseFragmentRootElementName(fragmentRootElementName));
 		}
+	}
+
+	/**
+	 * Set the {@link XMLInputFactory}.
+	 * @param xmlInputFactory to use
+	 */
+	public void setXmlInputFactory(XMLInputFactory xmlInputFactory) {
+		Assert.notNull(xmlInputFactory, "XMLInputFactory must not be null");
+		this.xmlInputFactory = xmlInputFactory;
 	}
 
 	/**
@@ -205,7 +217,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 
 		inputStream = resource.getInputStream();
-		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
+		eventReader = xmlInputFactory.createXMLEventReader(inputStream);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 		noInput = false;
 

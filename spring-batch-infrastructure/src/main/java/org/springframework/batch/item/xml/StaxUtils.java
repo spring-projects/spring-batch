@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.util.ClassUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import java.lang.reflect.Constructor;
@@ -38,6 +39,7 @@ import java.lang.reflect.Method;
  * As the only class state maintained is to cache java reflection metadata, which is thread-safe, this class is thread-safe.
  *
  * @author Josh Long
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class StaxUtils {
@@ -142,4 +144,11 @@ public abstract class StaxUtils {
         m.setAccessible(accessible);
         return (XMLEventReader) result;
     }
+
+    public static XMLInputFactory createXmlInputFactory() {
+		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+		xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+		xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+		return xmlInputFactory;
+	}
 }

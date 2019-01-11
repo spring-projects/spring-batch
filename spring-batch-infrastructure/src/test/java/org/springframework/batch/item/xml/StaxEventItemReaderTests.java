@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.xml;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -33,12 +35,12 @@ import org.springframework.util.ClassUtils;
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ import static org.junit.Assert.fail;
  * Tests for {@link StaxEventItemReader}.
  * 
  * @author Robert Kasanicky
+ * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemReaderTests {
 
@@ -329,7 +333,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragment() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(xml.getBytes());
-		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
 
 		final int EXPECTED_NUMBER_OF_FRAGMENTS = 2;
 		for (int i = 0; i < EXPECTED_NUMBER_OF_FRAGMENTS; i++) {
@@ -346,7 +350,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragmentOnEmpty() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(emptyXml.getBytes());
-		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
 
 		assertFalse(source.moveCursorToNextFragment(reader));
 	}
@@ -357,7 +361,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragmentOnMissing() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(missingXml.getBytes());
-		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
 		assertFalse(source.moveCursorToNextFragment(reader));
 	}
 
@@ -575,6 +579,39 @@ public class StaxEventItemReaderTests {
 			assert expected.getMessage() == TroublemakerUnmarshaller.MESSAGE;
 		}
 		assertNull(source.read());
+	}
+
+	@Test
+	public void testDtdXml() {
+		String xmlWithDtd = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE rohit [\n<!ENTITY entityex SYSTEM \"file://" +
+				new File("src/test/resources/org/springframework/batch/support/existing.txt").getAbsolutePath() +
+				"\">\n]>\n<abc>&entityex;</abc>";
+		StaxEventItemReader<String> reader = new StaxEventItemReader<>();
+		reader.setName("foo");
+		reader.setResource(new ByteArrayResource(xmlWithDtd.getBytes()));
+		reader.setUnmarshaller(new MockFragmentUnmarshaller() {
+			@Override
+			public Object unmarshal(Source source) throws XmlMappingException {
+				try {
+					XMLEventReader xmlEventReader = StaxUtils.getXmlEventReader(source);
+					xmlEventReader.nextEvent();
+					xmlEventReader.nextEvent();
+					return xmlEventReader.getElementText();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		reader.setFragmentRootElementName("abc");
+
+		reader.open(new ExecutionContext());
+
+		try {
+			reader.read();
+			fail("Should fail when XML contains DTD");
+		} catch (Exception e) {
+			Assert.assertThat(e.getMessage(), Matchers.containsString("Undeclared general entity"));
+		}
 	}
 
 	/**
