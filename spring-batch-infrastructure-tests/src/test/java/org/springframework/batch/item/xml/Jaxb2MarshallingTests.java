@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -48,7 +49,10 @@ public class Jaxb2MarshallingTests extends AbstractStaxEventWriterItemWriterTest
 
 	public static String getTextFromSource(Source source) {
 		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			StreamResult stream = new StreamResult(new StringWriter());
 			transformer.transform(source, stream);
