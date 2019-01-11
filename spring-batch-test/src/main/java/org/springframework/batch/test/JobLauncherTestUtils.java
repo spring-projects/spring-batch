@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -155,12 +156,12 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * @return a new JobParameters object containing only a parameter for the
-	 * current timestamp, to ensure that the job instance will be unique.
+	 * @return a new JobParameters object containing only a UUID parameter,
+	 * to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("random", new JobParameter((long) (Math.random() * JOB_PARAMETER_MAXIMUM)));
+		parameters.put("random", new JobParameter(UUID.randomUUID().toString()));
 		return new JobParameters(parameters);
 	}
 
