@@ -58,7 +58,7 @@ allprojects {
 		springIntegrationVersion = '5.1.0.RELEASE'
 		springLdapVersion = '2.3.2.RELEASE'
 
-		activemqVersion = '5.15.7'
+		activemqVersion = '5.15.8'
 		aspectjVersion = '1.9.2'
 		castorVersion = '1.4.1'
 		commonsCollectionsVersion = '3.2.2'
