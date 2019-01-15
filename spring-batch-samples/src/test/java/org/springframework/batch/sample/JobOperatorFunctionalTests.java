@@ -130,6 +130,9 @@ public class JobOperatorFunctionalTests {
 		assertTrue(exec1 != exec2);
 		assertTrue(!operator.getParameters(exec1).equals(operator.getParameters(exec2)));
 
+		// Give the asynchronous task executor a chance to start executions
+		Thread.sleep(1000);
+
 		Set<Long> executions = operator.getRunningExecutions(jobName);
 		assertTrue(executions.contains(exec1));
 		assertTrue(executions.contains(exec2));
