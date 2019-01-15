@@ -181,7 +181,7 @@ public class CustomItemWriter extends ItemListenerSupport implements StepListene
 
     public void afterRead(Object item) {
         if (isPoisonPill(item)) {
-            stepExecution.setTerminateOnly(true);
+            stepExecution.setTerminateOnly();
        }
     }
 
