@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.item.database.support.SqlServerPagingQueryProvi
 import org.springframework.batch.item.database.support.SqlitePagingQueryProvider;
 import org.springframework.batch.item.database.support.SybasePagingQueryProvider;
 import org.springframework.batch.support.DatabaseType;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.Assert;
@@ -46,6 +47,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Drummond Dawson
  * @since 4.0
  * @see JdbcPagingItemReader
  */
@@ -171,6 +173,20 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 */
 	public JdbcPagingItemReaderBuilder<T> rowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
+
+		return this;
+	}
+
+	/**
+	 * Creates a {@link BeanPropertyRowMapper} to be used as your
+	 * {@link RowMapper}.
+	 *
+	 * @param mappedClass the class for the row mapper
+	 * @return this instance for method chaining
+	 * @see BeanPropertyRowMapper
+	 */
+	public JdbcPagingItemReaderBuilder<T> beanRowMapper(Class<T> mappedClass) {
+		this.rowMapper = new BeanPropertyRowMapper<>(mappedClass);
 
 		return this;
 	}
