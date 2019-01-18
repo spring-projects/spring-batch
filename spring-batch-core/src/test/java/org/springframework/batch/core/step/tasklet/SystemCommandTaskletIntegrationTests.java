@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ public class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testExecuteTimeout() throws Exception {
 		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 3000" :
+				"ping 127.0.0.1" :
 					"sleep 3";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
@@ -159,7 +159,7 @@ public class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testInterruption() throws Exception {
 		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 5000" :
+				"ping 127.0.0.1" :
 					"sleep 5";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
@@ -270,7 +270,7 @@ public class SystemCommandTaskletIntegrationTests {
 		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(), stepExecution.getJobExecution(), stoppedJobExecution);
 
 		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 5000" :
+				"ping 127.0.0.1 -n 5" :
 					"sleep 15";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
