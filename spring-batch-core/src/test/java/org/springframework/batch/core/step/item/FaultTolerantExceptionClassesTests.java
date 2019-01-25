@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2016 the original author or authors.
+ * Copyright 2009-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -45,6 +46,7 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0.2
  */
 @ContextConfiguration
@@ -78,6 +80,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	public void setup() {
 		reader.clear();
 		writer.clear();
+		tasklet.clear();
 	}
 
 	@Test
@@ -317,6 +320,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
+	@DirtiesContext
 	public void testNoRollbackTaskletRollbackException() throws Exception {
 		tasklet.setExceptionType(RuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
@@ -325,6 +329,7 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	}
 
 	@Test
+	@DirtiesContext
 	public void testNoRollbackTaskletNoRollbackException() throws Exception {
 		tasklet.setExceptionType(SkippableRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackTasklet");
