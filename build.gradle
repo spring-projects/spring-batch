@@ -922,5 +922,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 wrapper {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '4.10'
+	gradleVersion = '4.10.3'
 }
