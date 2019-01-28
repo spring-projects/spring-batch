@@ -147,7 +147,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 
 	// enable all compiler warnings; individual projects may customize further
 	ext.xLintArg = '-Xlint:all'
-	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg]
+	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg] + '-proc:none'
 
 	tasks.withType(Test).all {
 		// suppress all console output during testing unless running `gradle -i`
@@ -184,21 +184,23 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 		from javadoc
 	}
 
-	task checkTestConfigs << {
-		def configFiles = []
-		sourceSets.test.java.srcDirs.each {
-			fileTree(it).include('**/*.xml').exclude('**/log4j.xml').each { configFile ->
-				def configXml = new XmlParser(false, false).parse(configFile)
+	task checkTestConfigs {
+		doLast {
+			def configFiles = []
+			sourceSets.test.java.srcDirs.each {
+				fileTree(it).include('**/*.xml').exclude('**/log4j.xml').each { configFile ->
+					def configXml = new XmlParser(false, false).parse(configFile)
 
-				if (configXml.@'xsi:schemaLocation' ==~ /.*spring-[a-z-]*\d\.\d\.xsd.*/) {
-					configFiles << configFile
+					if (configXml.@'xsi:schemaLocation' ==~ /.*spring-[a-z-]*\d\.\d\.xsd.*/) {
+						configFiles << configFile
+					}
 				}
 			}
-		}
-		if (configFiles) {
-			throw new InvalidUserDataException('Hardcoded XSD version in the config files:\n' +
-												configFiles.collect {relativePath(it)}.join('\n') +
-			'\nPlease, use versionless schemaLocations for Spring XSDs to avoid issues with builds on different versions of dependencies.')
+			if (configFiles) {
+				throw new InvalidUserDataException('Hardcoded XSD version in the config files:\n' +
+						configFiles.collect { relativePath(it) }.join('\n') +
+						'\nPlease, use versionless schemaLocations for Spring XSDs to avoid issues with builds on different versions of dependencies.')
+			}
 		}
 	}
 
@@ -918,7 +920,7 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 	}
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
 	description = 'Generates gradlew[.bat] scripts'
 	gradleVersion = '4.10'
 }
