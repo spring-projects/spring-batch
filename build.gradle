@@ -60,8 +60,6 @@ allprojects {
 
 		activemqVersion = '5.15.8'
 		aspectjVersion = '1.9.2'
-		castorVersion = '1.4.1'
-		commonsCollectionsVersion = '3.2.2'
 		commonsDdbcpVersion = '2.5.0'
 		commonsIoVersion = '2.6'
 		commonsLangVersion = '3.8.1'
@@ -455,10 +453,6 @@ project('spring-batch-infrastructure-tests') {
 		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
 		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
 		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
-		testCompile ("org.codehaus.castor:castor-xml:$castorVersion") {
-			exclude group: 'stax', module: 'stax'
-			exclude group: 'commons-lang', module: 'commons-lang'
-		}
 		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "xerces:xercesImpl:$xercesVersion"
