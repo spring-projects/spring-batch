@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrJobOperator implements JobOperator, ApplicationContextAware, InitializingBean {
@@ -177,7 +178,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	 * @param jobExplorer an instance of Spring Batch's {@link JobExplorer}.
 	 * @param jobRepository an instance of Spring Batch's {@link JobOperator}.
 	 * @param jobParametersConverter an instance of Spring Batch's {@link JobParametersConverter}.
-	 * @param transactionManager a {@link javax.transaction.TransactionManager}.
+	 * @param transactionManager a {@link PlatformTransactionManager}.
 	 */
 	public JsrJobOperator(JobExplorer jobExplorer, JobRepository jobRepository, JobParametersConverter jobParametersConverter, PlatformTransactionManager transactionManager) {
 		Assert.notNull(jobExplorer, "A JobExplorer is required");
