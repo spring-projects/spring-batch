@@ -358,7 +358,7 @@ InitializingBean {
 				try {
 					listener.afterJob(execution);
 				} catch (Exception e) {
-					logger.error("Exception encountered in afterStep callback", e);
+					logger.error("Exception encountered in afterJob callback", e);
 				}
 
 				jobRepository.update(execution);
