@@ -303,12 +303,6 @@ project('spring-batch-core') {
 project('spring-batch-infrastructure') {
     description = 'Spring Batch Infrastructure'
 
-	test {
-		if (JavaVersion.current().isJava7Compatible()) {
-			jvmArgs '-XX:MaxPermSize=256m'
-		}
-	}
-
 	dependencies {
 
 		compile "org.springframework:spring-core:$springVersion"
