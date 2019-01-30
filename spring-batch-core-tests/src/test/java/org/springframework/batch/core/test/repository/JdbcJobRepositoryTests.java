@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.test.AbstractIntegrationTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,7 +48,7 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
-public class JdbcJobRepositoryTests {
+public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 	private JobSupport job;
 
@@ -68,37 +68,15 @@ public class JdbcJobRepositoryTests {
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {
+		super.setUp();
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
-	}
-
-	@After
-	public void onTearDownAfterTransaction() throws Exception {
-
-		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
-		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
-		jdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
-		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_PARAMS");
-		jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
-		jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE");
-
-//		for (Long id : jobExecutionIds) {
-//			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
-//			jdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
-//		}
-//		for (Long id : jobIds) {
-//			jdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
-//		}
-//		for (Long id : jobIds) {
-//			int count = jdbcTemplate.queryForObject(
-//					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", Integer.class, id);
-//			assertEquals(0, count);
-//		}
 	}
 
 	@Test
