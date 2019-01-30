@@ -91,7 +91,6 @@ allprojects {
 		sqlfireclientVersion = '1.0.3'
 		sqliteVersion = '3.21.0.1'
 		woodstoxVersion = '5.0.3'
-		xercesVersion = '2.11.0' //?
 		xmlunitVersion = '2.5.1'
 		xstreamVersion = '1.4.11.1'
 		jrubyVersion = '1.7.26'
@@ -448,7 +447,6 @@ project('spring-batch-infrastructure-tests') {
 		}
 		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
-		testCompile "xerces:xercesImpl:$xercesVersion"
 		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		testCompile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
 			exclude group: 'stax', module: 'stax-api'
