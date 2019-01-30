@@ -22,7 +22,7 @@ import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * RowMapper used to map a ResultSet to a {@link org.springframework.batch.core.test.football.PlayerSummary}
+ * RowMapper used to map a ResultSet to a {@link org.springframework.batch.sample.domain.football.PlayerSummary}
  * 
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
