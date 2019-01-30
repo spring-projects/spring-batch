@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class Jaxb2NamespaceMarshallingTests {
 
 		assertThat(
 				Input.from(expected.getFile()),
-				CompareMatcher.isSimilarTo(Input.from(resource.getFile())));
+				CompareMatcher.isSimilarTo(Input.from(resource.getFile())).normalizeWhitespace());
 	}
 
 	@Before
