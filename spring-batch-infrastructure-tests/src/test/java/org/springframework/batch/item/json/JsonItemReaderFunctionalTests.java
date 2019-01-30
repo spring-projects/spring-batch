@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,20 @@ public abstract class JsonItemReaderFunctionalTests {
 		Assert.assertEquals("bar", trade.getCustomer());
 		Assert.assertEquals(new BigDecimal("1.4"), trade.getPrice());
 		Assert.assertEquals(2, trade.getQuantity());
+
+		trade = itemReader.read();
+		Assert.assertNotNull(trade);
+		Assert.assertEquals("789", trade.getIsin());
+		Assert.assertEquals("foobar", trade.getCustomer());
+		Assert.assertEquals(new BigDecimal("1.6"), trade.getPrice());
+		Assert.assertEquals(3, trade.getQuantity());
+
+		trade = itemReader.read();
+		Assert.assertNotNull(trade);
+		Assert.assertEquals("100", trade.getIsin());
+		Assert.assertEquals("barfoo", trade.getCustomer());
+		Assert.assertEquals(new BigDecimal("1.8"), trade.getPrice());
+		Assert.assertEquals(4, trade.getQuantity());
 
 		trade = itemReader.read();
 		Assert.assertNull(trade);

@@ -23,8 +23,8 @@ dn: cn=Gern Jensen,ou=Product Testing,dc=airius,dc=com
 telephonenumber: +1 408 555 1212
 uid: gernj
 description:: V2hhdCBhIGNhcmVmdWwgcmVhZGVyIHlvdSBhcmUhICBUaGlzIHZhbHVlIGlzIGJhc2UtNjQtZW5j
-b2RlZCBiZWNhdXNlIGl0IGhhcyBhIGNvbnRyb2wgY2hhcmFjdGVyIGluIGl0IChhIENSKS4NICBC
-eSB0aGUgd2F5LCB5b3Ugc2hvdWxkIHJlYWxseSBnZXQgb3V0IG1vcmUu
+ b2RlZCBiZWNhdXNlIGl0IGhhcyBhIGNvbnRyb2wgY2hhcmFjdGVyIGluIGl0IChhIENSKS4NICBC
+ eSB0aGUgd2F5LCB5b3Ugc2hvdWxkIHJlYWxseSBnZXQgb3V0IG1vcmUu
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
