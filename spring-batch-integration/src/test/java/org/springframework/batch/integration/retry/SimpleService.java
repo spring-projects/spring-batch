@@ -3,6 +3,7 @@ package org.springframework.batch.integration.retry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +19,7 @@ public class SimpleService implements Service {
 
 	private List<String> expected = new ArrayList<String>();
 
-	private int count = 0;
+	private AtomicInteger count = new AtomicInteger(0);
 
 	public void setExpected(List<String> expected) {
 		this.expected = expected;
@@ -34,9 +35,9 @@ public class SimpleService implements Service {
 
 	@ServiceActivator(inputChannel = "requests", outputChannel = "replies")
 	public String process(String message) {
-		String result = message + ": " + (count++);
+		String result = message + ": " + count.incrementAndGet();
 		logger.debug("Handling: " + message);
-		if (count <= expected.size()) {
+		if (count.get() <= expected.size()) {
 			processed.add(message);
 		}
 		if ("fail".equals(message)) {
