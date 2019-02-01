@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,12 +43,12 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		bus = (Lifecycle) applicationContext;
 	}
 
-	private static volatile int count = 0;
+	private static AtomicInteger count = new AtomicInteger(0);
 
 	@Before
 	public void clearLists() {
 		list.clear();
-		count = 0;
+		count.set(0);
 	}
 
 	public String input() {
@@ -61,7 +62,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	}
 
 	public void output(String message) {
-		count++;
+		count.incrementAndGet();
 		logger.debug("Handled: " + message);
 	}
 
