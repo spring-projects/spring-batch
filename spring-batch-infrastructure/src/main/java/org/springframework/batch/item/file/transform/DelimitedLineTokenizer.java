@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
         String value;
 
-        if ((line.length() >= 2) && (line.charAt(start) == quoteCharacter) && (line.charAt(start + len - 1) == quoteCharacter)) {
+        if ((line.length() >= 2) && isQuoteCharacter(line.charAt(start)) && isQuoteCharacter(line.charAt(start + len - 1))) {
 			int beginIndex = start + 1;
 			int endIndex = len - 2;
 			value = line.substring(beginIndex, beginIndex + endIndex);
