@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,16 +103,16 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
-	 * Convenient accessor for current job identifier.
+	 * Convenient accessor for current {@link JobInstance} identifier.
 	 *
-	 * @return the job identifier of the enclosing {@link JobInstance}
+	 * @return the identifier of the enclosing {@link JobInstance}
 	 * associated with the current {@link StepExecution}
 	 */
-	public Long getJobId() {
+	public Long getJobInstanceId() {
 		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
 		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
 				"StepExecution does not have a JobInstance");
-		return stepExecution.getJobExecution().getJobInstance().getId();
+		return stepExecution.getJobExecution().getJobInstance().getInstanceId();
 	}
 
 	/**

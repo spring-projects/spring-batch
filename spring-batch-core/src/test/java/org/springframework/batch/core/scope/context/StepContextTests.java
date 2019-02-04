@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.batch.item.ExecutionContext;
 /**
  * @author Dave Syer
  * @author Nicolas Widart
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepContextTests {
@@ -166,8 +167,8 @@ public class StepContextTests {
 	}
 
 	@Test
-	public void testJobId() throws Exception {
-		assertEquals(2L, (long)context.getJobId());
+	public void testJobInstanceId() throws Exception {
+		assertEquals(2L, (long)context.getJobInstanceId());
 	}
 
 	@Test
