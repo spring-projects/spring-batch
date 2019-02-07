@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,14 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
+
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -283,6 +288,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 * @throws Exception if there is a problem
 	 */
 	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
+		Timer.Sample sample = BatchMetrics.createTimerSample();
+		String status = BatchMetrics.STATUS_SUCCESS;
 		try {
 			doWrite(outputs.getItems());
 		}
@@ -292,7 +299,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			 * here, so prevent any more processing of these inputs.
 			 */
 			inputs.clear();
+			status = BatchMetrics.STATUS_FAILURE;
 			throw e;
+		}
+		finally {
+			stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 		}
 		contribution.incrementWriteCount(outputs.size());
 	}
@@ -302,6 +313,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 			final I item = iterator.next();
 			O output;
+			Timer.Sample sample = BatchMetrics.createTimerSample();
+			String status = BatchMetrics.STATUS_SUCCESS;
 			try {
 				output = doProcess(item);
 			}
@@ -311,7 +324,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 				 * here, so prevent any more processing of these inputs.
 				 */
 				inputs.clear();
+				status = BatchMetrics.STATUS_FAILURE;
 				throw e;
+			}
+			finally {
+				stopTimer(sample, contribution.getStepExecution(), "item.process", status, "Item processing");
 			}
 			if (output != null) {
 				outputs.add(output);
@@ -321,6 +338,14 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			}
 		}
 		return outputs;
+	}
+
+	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status, String description) {
+		sample.stop(BatchMetrics.createTimer(metricName, description + " duration",
+				Tag.of("job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+				Tag.of("step.name", stepExecution.getStepName()),
+				Tag.of("status", status)
+		));
 	}
 
 }

@@ -19,6 +19,9 @@ package org.springframework.batch.core.job;
 import java.util.Collection;
 import java.util.Date;
 
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -36,6 +39,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -297,7 +301,9 @@ InitializingBean {
 		}
 
 		JobSynchronizationManager.register(execution);
-
+		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs");
+		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
+		Timer.Sample timerSample = BatchMetrics.createTimerSample();
 		try {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -353,6 +359,11 @@ InitializingBean {
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
+				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
+						Tag.of("name", execution.getJobInstance().getJobName()),
+						Tag.of("status", execution.getExitStatus().getExitCode())
+				));
+				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
 				try {

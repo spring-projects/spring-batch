@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,16 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -115,13 +120,19 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 			@Override
 			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = null;
+				Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+				String status = BatchMetrics.STATUS_SUCCESS;
 				try {
 					item = read(contribution, inputs);
 				}
 				catch (SkipOverflowException e) {
 					// read() tells us about an excess of skips by throwing an
 					// exception
+					status = BatchMetrics.STATUS_FAILURE;
 					return RepeatStatus.FINISHED;
+				}
+				finally {
+					stopTimer(sample, contribution.getStepExecution(), status);
 				}
 				if (item == null) {
 					inputs.setEnd();
@@ -136,6 +147,14 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 		return inputs;
 
+	}
+
+	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
+		sample.stop(BatchMetrics.createTimer("item.read", "Item reading duration",
+				Tag.of("job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+				Tag.of("step.name", stepExecution.getStepName()),
+				Tag.of("status", status)
+		));
 	}
 
 	@Override

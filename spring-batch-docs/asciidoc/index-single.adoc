@@ -34,6 +34,8 @@ include::jsr-352.adoc[]
 
 include::spring-batch-integration.adoc[]
 
+include::monitoring-and-metrics.adoc[]
+
 include::appendix.adoc[]
 
 include::schema-appendix.adoc[]

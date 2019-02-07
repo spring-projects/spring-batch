@@ -98,6 +98,7 @@ allprojects {
 		beanshellVersion = '2.0b5'
 		jaxbApiVersion = '2.3.1'
 		jaxbImplVersion = '2.3.0.1'
+		micrometerVersion = '1.1.4'
 		docResourcesVersion = '0.1.1.RELEASE'
 	}
 
@@ -274,6 +275,7 @@ project('spring-batch-core') {
 		compile "org.springframework:spring-core:$springVersion"
 		compile "org.springframework:spring-tx:$springVersion"
 		compile "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+		compile "io.micrometer:micrometer-core:$micrometerVersion"
 
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
