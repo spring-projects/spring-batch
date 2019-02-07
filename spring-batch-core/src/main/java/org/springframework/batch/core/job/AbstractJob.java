@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package org.springframework.batch.core.job;
 import java.util.Collection;
 import java.util.Date;
 
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -59,6 +62,8 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 InitializingBean {
+
+	private static final String METRICS_PREFIX = "spring.batch.";
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -297,7 +302,11 @@ InitializingBean {
 		}
 
 		JobSynchronizationManager.register(execution);
-
+		LongTaskTimer longTaskTimer = LongTaskTimer.builder(METRICS_PREFIX + "jobs.active")
+				.description("Active jobs")
+				.register(Metrics.globalRegistry);
+		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
+		Timer.Sample timerSample = Timer.start(Metrics.globalRegistry);
 		try {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -353,6 +362,13 @@ InitializingBean {
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
+				timerSample.stop(Timer.builder(METRICS_PREFIX + "job")
+						.description("Job duration in seconds")
+						.tag("name", execution.getJobInstance().getJobName())
+						.tag("status", execution.getExitStatus().getExitCode())
+						.register(Metrics.globalRegistry)
+				);
+				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
 				try {

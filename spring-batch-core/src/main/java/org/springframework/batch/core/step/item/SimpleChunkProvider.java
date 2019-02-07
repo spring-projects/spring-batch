@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,12 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.item.ItemReader;
@@ -40,6 +43,12 @@ import org.springframework.lang.Nullable;
  * @see ChunkOrientedTasklet
  */
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
+
+	private static final String METRICS_PREFIX = "spring.batch.";
+
+	private static final String STATUS_SUCCESS = "SUCCESS";
+
+	private static final String STATUS_FAILURE = "FAILURE";
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -115,13 +124,19 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 			@Override
 			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = null;
+				Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+				String status = STATUS_SUCCESS;
 				try {
 					item = read(contribution, inputs);
 				}
 				catch (SkipOverflowException e) {
 					// read() tells us about an excess of skips by throwing an
 					// exception
+					status = STATUS_FAILURE;
 					return RepeatStatus.FINISHED;
+				}
+				finally {
+					stopTimer(sample, contribution.getStepExecution(), status);
 				}
 				if (item == null) {
 					inputs.setEnd();
@@ -136,6 +151,16 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 		return inputs;
 
+	}
+
+	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
+		sample.stop(Timer.builder(METRICS_PREFIX + "item.read")
+				.description("Item reading duration in seconds")
+				.tag("job.name", stepExecution.getJobExecution().getJobInstance().getJobName())
+				.tag("step.name", stepExecution.getStepName())
+				.tag("status", status)
+				.register(Metrics.globalRegistry)
+		);
 	}
 
 	@Override

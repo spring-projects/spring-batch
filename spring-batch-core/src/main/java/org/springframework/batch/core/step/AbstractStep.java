@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.springframework.batch.core.step;
 
 import java.util.Date;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -51,6 +53,8 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
+
+	private static final String METRICS_PREFIX = "spring.batch.";
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -188,6 +192,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
+		Timer.Sample sample = Timer.start(Metrics.globalRegistry);
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -256,6 +261,13 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
+			sample.stop(Timer.builder(METRICS_PREFIX + "step")
+							.description("Step duration in seconds")
+							.tag("job.name", stepExecution.getJobExecution().getJobInstance().getJobName())
+							.tag("name", stepExecution.getStepName())
+							.tag("status", stepExecution.getExitStatus().getExitCode())
+							.register(Metrics.globalRegistry)
+			);
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.io.Serializable;
  * they can be applied at a chunk boundary.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -43,11 +44,14 @@ public class StepContribution implements Serializable {
 
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
+	private volatile StepExecution stepExecution;
+
 	/**
 	 * @param execution {@link StepExecution} the stepExecution used to initialize
 	 * {@code skipCount}.
 	 */
 	public StepContribution(StepExecution execution) {
+		this.stepExecution = execution;
 		this.parentSkipCount = execution.getSkipCount();
 	}
 
@@ -189,6 +193,14 @@ public class StepContribution implements Serializable {
 	 */
 	public int getProcessSkipCount() {
 		return processSkipCount;
+	}
+
+	/**
+	 * Public getter for the parent step execution of this contribution.
+	 * @return parent step execution of this contribution
+	 */
+	public StepExecution getStepExecution() {
+		return stepExecution;
 	}
 
 	/*
