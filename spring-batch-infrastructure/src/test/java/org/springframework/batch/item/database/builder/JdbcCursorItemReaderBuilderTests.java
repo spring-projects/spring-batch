@@ -317,7 +317,7 @@ public class JdbcCursorItemReaderBuilderTests {
 			new JdbcCursorItemReaderBuilder<Foo>().saveState(true).build();
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveSate is set to true", iae.getMessage());
+			assertEquals("A name is required when saveState is set to true", iae.getMessage());
 		}
 		catch (Exception e) {
 			fail();

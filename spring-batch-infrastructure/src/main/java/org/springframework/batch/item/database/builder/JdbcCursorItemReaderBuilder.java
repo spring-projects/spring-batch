@@ -334,7 +334,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 	public JdbcCursorItemReader<T> build() {
 		if(this.saveState) {
 			Assert.hasText(this.name,
-					"A name is required when saveSate is set to true");
+					"A name is required when saveState is set to true");
 		}
 
 		Assert.hasText(this.sql, "A query is required");
