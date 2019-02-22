@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,37 @@ import org.springframework.batch.repeat.RepeatListener;
 public class CompositeRepeatListener implements RepeatListener {
 
 	private List<RepeatListener> listeners = new ArrayList<>();
+
+	public CompositeRepeatListener() {
+
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link RepeatListener}s.
+	 *
+	 * @param listeners {@link List} of RepeatListeners to be used by the CompositeRepeatListener.
+	 */
+	public CompositeRepeatListener(List<RepeatListener> listeners) {
+		setListeners(listeners);
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link RepeatListener}s.
+	 *
+	 * @param listeners array of RepeatListeners to be used by the CompositeRepeatListener.
+	 */
+	public CompositeRepeatListener(RepeatListener... listeners) {
+		setListeners(listeners);
+	}
+
+	/**
+	 * Public setter for the listeners.
+	 *
+	 * @param listeners {@link List} of RepeatListeners to be used by the CompositeRepeatListener.
+	 */
+	public void setListeners(List<RepeatListener> listeners) {
+		this.listeners = listeners;
+	}
 
 	/**
 	 * Public setter for the listeners.

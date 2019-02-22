@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,6 +41,28 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 	private List<ItemWriter<? super T>> delegates;
 
 	private boolean ignoreItemStream = false;
+
+	public CompositeItemWriter() {
+
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 *
+	 * @param delegates the list of delegates to use.
+	 */
+	public CompositeItemWriter(List<ItemWriter<? super T>> delegates) {
+		setDelegates(delegates);
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 *
+	 * @param delegates the array of delegates to use.
+	 */
+	public CompositeItemWriter(ItemWriter<? super T>... delegates) {
+		this(Arrays.asList(delegates));
+	}
 
 	/**
 	 * Establishes the policy whether to call the open, close, or update methods for the

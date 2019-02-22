@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,15 @@ public class CompositeItemStream implements ItemStream {
 
 	/**
 	 * Public setter for the {@link ItemStream}s.
+	 *
+	 * @param streams {@link List} of {@link ItemStream}.
+	 */
+	public void setStreams(List<ItemStream> streams) {
+		this.streams = streams;
+	}
+
+	/**
+	 * Public setter for the {@link ItemStream}s.
 	 * 
 	 * @param streams array of {@link ItemStream}.
 	 */
@@ -61,6 +70,24 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	public CompositeItemStream() {
 		super();
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link ItemStream}s.
+	 *
+	 * @param streams {@link List} of {@link ItemStream}.
+	 */
+	public CompositeItemStream(List<ItemStream> streams) {
+		setStreams(streams);
+	}
+
+	/**
+	 * Convenience constructor for setting the {@link ItemStream}s.
+	 *
+	 * @param streams array of {@link ItemStream}.
+	 */
+	public CompositeItemStream(ItemStream... streams) {
+		setStreams(streams);
 	}
 
 	/**
