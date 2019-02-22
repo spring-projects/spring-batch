@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,6 +38,33 @@ import java.util.List;
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
 	private List<? extends ItemProcessor<?, ?>> delegates;
+
+	/**
+	 * Default constrcutor
+	 */
+	public CompositeItemProcessor() {
+
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 *
+	 * @param delegates array of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
+	public CompositeItemProcessor(ItemProcessor<?, ?>... delegates) {
+		this(Arrays.asList(delegates));
+	}
+
+	/**
+	 * Convenience constructor for setting the delegates.
+	 *
+	 * @param delegates list of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
+	public CompositeItemProcessor(List<? extends ItemProcessor<?, ?>> delegates) {
+		setDelegates(delegates);
+	}
 
 	@Nullable
 	@Override
