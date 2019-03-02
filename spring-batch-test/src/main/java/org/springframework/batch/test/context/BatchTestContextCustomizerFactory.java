@@ -32,8 +32,7 @@ public class BatchTestContextCustomizerFactory implements ContextCustomizerFacto
 
 	@Override
 	public ContextCustomizer createContextCustomizer(Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
-		SpringBatchTest springBatchTest = AnnotatedElementUtils.findMergedAnnotation(testClass, SpringBatchTest.class);
-		if (springBatchTest != null) {
+		if (AnnotatedElementUtils.hasAnnotation(testClass, SpringBatchTest.class)) {
 			return new BatchTestContextCustomizer();
 		}
 		return null;
