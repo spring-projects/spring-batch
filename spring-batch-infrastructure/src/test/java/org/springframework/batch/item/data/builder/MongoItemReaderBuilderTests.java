@@ -69,8 +69,8 @@ public class MongoItemReaderBuilderTests {
 		Query query = this.queryContainer.getValue();
 		assertEquals(50, query.getLimit());
 		assertEquals(0, query.getSkip());
-		assertEquals("{ }", query.getQueryObject().toJson());
-		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
 
 	@Test
@@ -119,8 +119,8 @@ public class MongoItemReaderBuilderTests {
 		assertNull("reader should not return result", reader.read());
 
 		Query query = this.queryContainer.getValue();
-		assertEquals("{ \"name\" : \"foo\" }", query.getQueryObject().toJson());
-		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 		assertEquals("collection", collectionContainer.getValue());
 	}
 
@@ -140,8 +140,8 @@ public class MongoItemReaderBuilderTests {
 		assertNull("reader should not return result", reader.read());
 
 		Query query = this.queryContainer.getValue();
-		assertEquals("{ \"name\" : \"foo\" }", query.getQueryObject().toJson());
-		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 		assertEquals("collection", collectionContainer.getValue());
 	}
 
