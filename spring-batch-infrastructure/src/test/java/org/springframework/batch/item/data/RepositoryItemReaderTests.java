@@ -241,13 +241,13 @@ public class RepositoryItemReaderTests {
 		reader.setCurrentItemCount(3);
 		reader.setPageSize(2);
 
-		PageRequest request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		PageRequest request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("3");
 			add("4");
 		}}));
 
-		request = PageRequest.of(2, 2, new Sort(Direction.ASC, "id"));
+		request = PageRequest.of(2, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("5");
 			add("6");
@@ -268,13 +268,13 @@ public class RepositoryItemReaderTests {
 		reader.setCurrentItemCount(3);
 		reader.setPageSize(2);
 
-		PageRequest request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		PageRequest request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("3");
 			add("4");
 		}}));
 
-		request = PageRequest.of(2, 2, new Sort(Direction.ASC, "id"));
+		request = PageRequest.of(2, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("5");
 			add("6");
@@ -299,13 +299,13 @@ public class RepositoryItemReaderTests {
 	public void testResetOfPage() throws Exception {
 		reader.setPageSize(2);
 
-		PageRequest request = PageRequest.of(0, 2, new Sort(Direction.ASC, "id"));
+		PageRequest request = PageRequest.of(0, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>(){{
 			add("1");
 			add("2");
 		}}));
 
-		request = PageRequest.of(1, 2, new Sort(Direction.ASC, "id"));
+		request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
 		when(repository.findAll(request)).thenReturn(new PageImpl<>(new ArrayList<Object>() {{
 			add("3");
 			add("4");
