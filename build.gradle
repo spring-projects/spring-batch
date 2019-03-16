@@ -22,7 +22,7 @@ plugins {
 }
 
 ext {
-	linkHomepage = 'http://projects.spring.io/spring-batch/'
+	linkHomepage = 'https://projects.spring.io/spring-batch/'
 	linkCi       = 'https://build.spring.io/browse/BATCH'
 	linkIssue    = 'https://jira.spring.io/browse/BATCH'
 	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
