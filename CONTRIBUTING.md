@@ -22,7 +22,7 @@ submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
 
 1. Go to [https://github.com/spring-projects/spring-batch](https://github.com/spring-projects/spring-batch)
 2. Hit the "fork" button and choose your own github account as the target
-3. For more details see [http://help.github.com/fork-a-repo/](http://help.github.com/fork-a-repo/)
+3. For more details see [https://help.github.com/fork-a-repo/](https://help.github.com/fork-a-repo/)
 
 ## Setup your Local Development Environment
 
@@ -47,7 +47,7 @@ _you should see branches on origin as well as upstream, including 'master'_
 * When ready to resolve an issue or to collaborate with others, you can push your branch to origin (your fork), e.g.: `git push origin BATCH-123`
 * If you want to collaborate with another contributor, have them fork your repository (add it as a remote) and `git fetch <your-username>` to grab your branch. Alternatively, they can use `git fetch --all` to sync their local state with all of their remotes.
 * If you grant that collaborator push access to your repository, they can even apply their changes to your branch.
-* When ready for your contribution to be reviewed for potential inclusion in the master branch of the canonical *spring-batch* repository (what you know as 'upstream'), issue a pull request to the *spring-projects* repository (for more detail, see [http://help.github.com/send-pull-requests/](http://help.github.com/send-pull-requests/)).
+* When ready for your contribution to be reviewed for potential inclusion in the master branch of the canonical *spring-batch* repository (what you know as 'upstream'), issue a pull request to the *spring-projects* repository (for more detail, see [https://help.github.com/send-pull-requests/](https://help.github.com/send-pull-requests/)).
 * The project lead may merge your changes into the upstream master branch as-is, he may keep the pull request open yet add a comment about something that should be modified, or he might reject the pull request by closing it.
 * A prerequisite for any pull request is that it will be cleanly merge-able with the upstream master's current state. **This is the responsibility of any contributor.** If your pull request cannot be applied cleanly, the project lead will most likely add a comment requesting that you make it merge-able. For a full explanation, see the Pro Git section on rebasing: [https://git-scm.com/book/en/v2/Git-Branching-Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing). As stated there: "> Often, you’ll do this to make sure your commits apply cleanly on a remote branch — perhaps in a project to which you’re trying to contribute but that you don’t maintain."
 
@@ -63,7 +63,7 @@ _you should see branches on origin as well as upstream, including 'master'_
     - Switch back to the topic branch: `git checkout BATCH-123` (no -b needed since the branch already exists)
     - Rebase the topic branch to minimize the distance between it and your recently synched master branch: `git rebase master`
 (Again, for more detail see the Pro Git section on rebasing: [https://git-scm.com/book/en/v2/Git-Branching-Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing))
-* **Note** You cannot rebase if you have already pushed your branch to your remote because you'd be rewriting history (see **'The Perils of Rebasing'** in the article). If you rebase by mistake, you can undo it as discussed [in this stackoverflow discussion](http://stackoverflow.com/questions/134882/undoing-a-git-rebase). Once you have published your branch, you need to merge in the master rather than rebasing.
+* **Note** You cannot rebase if you have already pushed your branch to your remote because you'd be rewriting history (see **'The Perils of Rebasing'** in the article). If you rebase by mistake, you can undo it as discussed [in this stackoverflow discussion](https://stackoverflow.com/questions/134882/undoing-a-git-rebase). Once you have published your branch, you need to merge in the master rather than rebasing.
 * Now, if you issue a pull request, it is much more likely to be merged without conflicts. Most likely, any pull request that would produce conflicts will be deferred until the issuer of that pull request makes these adjustments.
 * Assuming your pull request is merged into the 'upstream' master, you will actually end up pulling that change into your own master eventually, and at that time, you may decide to delete the topic branch from your local repository and your fork (origin) if you pushed it there.
     - to delete the local branch: `git branch -d BATCH-123`
@@ -188,6 +188,6 @@ See the [checking out and building][] section of the README for instructions. Ma
 
 Add a comment to the associated JIRA issue(s) linking to your new pull request.
 
-[help documentation]: http://help.github.com/send-pull-requests
+[help documentation]: https://help.github.com/send-pull-requests
 [JIRA issue tracker]: https://jira.spring.io/browse/BATCH
 [checking out and building]: https://github.com/spring-projects/spring-batch#building-from-source

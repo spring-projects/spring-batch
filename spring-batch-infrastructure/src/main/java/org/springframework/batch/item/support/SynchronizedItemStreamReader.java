@@ -32,8 +32,8 @@ import org.springframework.util.Assert;
  * restartable.
  * 
  * Here are some links about the motivation behind this class:
- * - http://projects.spring.io/spring-batch/faq.html#threading-reader}
- * - http://stackoverflow.com/a/20002493/2910265}
+ * - https://projects.spring.io/spring-batch/faq.html#threading-reader}
+ * - https://stackoverflow.com/a/20002493/2910265}
  * 
  * @author Matthew Ouyang
  * @since 3.0.4

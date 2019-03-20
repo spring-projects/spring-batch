@@ -221,13 +221,13 @@ public class DefaultJobLoaderTests {
     private static final String BASIC_JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     private static final String JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     public static class BasicStubJob implements Job {

@@ -79,7 +79,7 @@ file:
   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
   xsi:schemaLocation="
     http://www.springframework.org/schema/batch-integration
-    http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
 
     ...
 
@@ -98,13 +98,13 @@ Batch Integration may look like the following:
   xmlns:batch-int="http://www.springframework.org/schema/batch-integration"
   xsi:schemaLocation="
     http://www.springframework.org/schema/batch-integration
-    http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
     http://www.springframework.org/schema/batch
-    http://www.springframework.org/schema/batch/spring-batch.xsd
+    https://www.springframework.org/schema/batch/spring-batch.xsd
     http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
+    https://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/integration
-    http://www.springframework.org/schema/integration/spring-integration.xsd">
+    https://www.springframework.org/schema/integration/spring-integration.xsd">
 
     ...
 
@@ -174,7 +174,7 @@ necessary to launch the Batch job.
 
 The following image illustrates the typical Spring Integration
 message flow in order to start a Batch job. The
-link:$$http://www.eaipatterns.com/toc.html$$[EIP (Enterprise Integration Patterns) website]
+link:$$https://www.enterpriseintegrationpatterns.com/toc.html$$[EIP (Enterprise Integration Patterns) website]
 provides a full overview of messaging icons and their descriptions.
 
 .Launch Batch Job
@@ -936,7 +936,7 @@ configured `SimpleChunkProcessor`, which is where you would provide a reference 
 when it receives chunks from the master.
 
 For more information, see the section of the "Scalability" chapter on
-link:$$http://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
+link:$$https://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
 
 Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
 annotation that can be used to simplify a remote chunking setup. This annotation provides
