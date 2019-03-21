@@ -72,7 +72,7 @@ public class RemoteChunkingParserTests {
 
 		FactoryBean serviceActivatorFactoryBean = applicationContext.getBean(ServiceActivatorFactoryBean.class);
 		assertNotNull("ServiceActivatorFactoryBean must not be null", serviceActivatorFactoryBean);
-		assertNotNull("Output channel must not be null", TestUtils.getPropertyValue(serviceActivatorFactoryBean, "outputChannel"));
+		assertNotNull("Output channel name must not be null", TestUtils.getPropertyValue(serviceActivatorFactoryBean, "outputChannelName"));
 
 		MessageChannel inputChannel = applicationContext.getBean("requests", MessageChannel.class);
 		assertNotNull("Input channel must not be null", inputChannel);
