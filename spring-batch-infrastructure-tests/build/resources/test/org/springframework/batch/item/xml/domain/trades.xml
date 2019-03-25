@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<trades xmlns="urn:org.springframework.batch.io.oxm.domain" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<trades xmlns="urn:org.springframework.batch.io.oxm.domain" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:org.springframework.batch.io.oxm.domain trade.xsd">
 	<trade>
 		<customer>Customer1</customer>

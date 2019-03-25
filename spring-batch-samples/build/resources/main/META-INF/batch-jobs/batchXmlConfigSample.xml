@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job id="batchXmlConfigSample" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="batchXmlConfigSample" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
 	<step id="step1" next="step2">
 		<chunk>
 			<reader ref="reader"/>

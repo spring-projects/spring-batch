@@ -26,7 +26,7 @@
 
 [info 2017/03/23 10:06:04.154 CDT <Test worker> tid=0xc] HHH000021: Bytecode provider name : javassist
 
-[warn 2017/03/23 10:06:04.602 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:06:04.602 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:06:06.086 CDT <Test worker> tid=0xc] HCANN000001: Hibernate Commons Annotations {5.0.1.Final}
 

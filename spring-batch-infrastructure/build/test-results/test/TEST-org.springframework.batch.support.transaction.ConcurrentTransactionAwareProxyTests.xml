@@ -15,13 +15,13 @@
 log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
 log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
 log4j:WARN Please initialize the log4j system properly.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See https://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 log4j:WARN No appenders could be found for logger (org.springframework.batch.support.transaction.ConcurrentTransactionAwareProxyTests).
 log4j:WARN Please initialize the log4j system properly.
 log4j:WARN Please initialize the log4j system properly.
 log4j:WARN Please initialize the log4j system properly.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See https://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See https://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+log4j:WARN See https://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 ]]></system-err>
 </testsuite>

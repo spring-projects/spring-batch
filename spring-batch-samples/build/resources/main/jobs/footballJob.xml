@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:aop="https://www.springframework.org/schema/aop"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
+		https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<job id="footballJob" xmlns="http://www.springframework.org/schema/batch">
+	<job id="footballJob" xmlns="https://www.springframework.org/schema/batch">
 		<step id="playerload" next="gameLoad">
 			<tasklet>
 				<chunk reader="playerFileItemReader" writer="playerWriter"
@@ -22,7 +22,7 @@
 		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
 
-	<step id="summarizationStep" xmlns="http://www.springframework.org/schema/batch">
+	<step id="summarizationStep" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="playerSummarizationSource" writer="summaryWriter"
                    commit-interval="${job.commit.interval}" />

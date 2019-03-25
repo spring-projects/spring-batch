@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
-	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans" xmlns:integration="https://www.springframework.org/schema/integration"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xmlns:batch="https://www.springframework.org/schema/batch"
+	xsi:schemaLocation="https://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
 
 	<import resource="classpath:/simple-job-launcher-context.xml" />
 
 	<integration:channel id="requests" />
 
-	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+	<job id="job" xmlns="https://www.springframework.org/schema/batch">
 		<step id="step">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="3"/>

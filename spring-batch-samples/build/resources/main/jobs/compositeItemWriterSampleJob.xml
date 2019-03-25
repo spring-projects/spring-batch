@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<description>
 	<![CDATA[Sample showing usage of CompositeItemWriter.
@@ -12,7 +12,7 @@
 		(see the two FlatFileItemWriters used in this example).]]>
 	</description>
 
-	<job id="compositeItemWriterJob" xmlns="http://www.springframework.org/schema/batch" >
+	<job id="compositeItemWriterJob" xmlns="https://www.springframework.org/schema/batch" >
 		<step id="step1">
 			<tasklet>
 				<chunk reader="fileItemReader" processor="processor" writer="compositeWriter"

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
-	xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
-	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+	xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+	https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-	<step id="nonSkippableStep" xmlns="http://www.springframework.org/schema/batch">
+	<step id="nonSkippableStep" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4"/>
 		</tasklet>
 	</step>
 
-	<step id="skippableStep" xmlns="http://www.springframework.org/schema/batch">
+	<step id="skippableStep" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -22,7 +22,7 @@
 		</tasklet>
 	</step>
 
-	<step id="skippableFatalStep" xmlns="http://www.springframework.org/schema/batch">
+	<step id="skippableFatalStep" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -35,7 +35,7 @@
 		</tasklet>
 	</step>
 
-	<step id="retryable" xmlns="http://www.springframework.org/schema/batch">
+	<step id="retryable" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="5" retry-limit="2">
 				<skippable-exception-classes>
@@ -51,7 +51,7 @@
 		</tasklet>
 	</step>
 
-	<step id="noRollbackDefault" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackDefault" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -65,7 +65,7 @@
 		</tasklet>
 	</step>
 
-	<step id="noRollbackPathology" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackPathology" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -78,7 +78,7 @@
 		</tasklet>
 	</step>
 
-	<step id="noRollbackSkippable" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackSkippable" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -94,7 +94,7 @@
 		</tasklet>
 	</step>
 
-	<step id="noRollbackFatal" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackFatal" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="4" skip-limit="1">
 				<skippable-exception-classes>
@@ -111,7 +111,7 @@
 		</tasklet>
 	</step>
 
-	<step id="noRollbackTasklet" xmlns="http://www.springframework.org/schema/batch">
+	<step id="noRollbackTasklet" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet ref="tasklet">
 			<no-rollback-exception-classes>
 				<include class="org.springframework.batch.core.step.item.SkippableRuntimeException"/>

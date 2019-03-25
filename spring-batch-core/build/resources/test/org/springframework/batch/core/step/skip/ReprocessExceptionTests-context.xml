@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	   			http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	   xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+	   			https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
 
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository"/>
@@ -30,12 +30,12 @@
 
 	<bean id="writer" class="org.springframework.batch.core.step.skip.ReprocessExceptionTests$PersonItemWriter"/>
 
-	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+	<job id="job" xmlns="https://www.springframework.org/schema/batch">
 		<step id="step1">
 			<tasklet>
 				<chunk reader="reader" processor="processor" writer="writer" commit-interval="1">
 					<skip-policy>
-						<bean class="org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy" xmlns="http://www.springframework.org/schema/beans"/>
+						<bean class="org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy" xmlns="https://www.springframework.org/schema/beans"/>
 					</skip-policy>
 				</chunk>
 			</tasklet>
