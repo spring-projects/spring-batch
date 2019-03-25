@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<job id="jsrJobOperatorTestBeanCreationException" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="jsrJobOperatorTestBeanCreationException" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
     <step id="step1" >
         <batchlet ref="org.springframework.batch.core.jsr.step.batchlet.NonExistent" />
     </step>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd
-						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-	<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	xmlns:util="https://www.springframework.org/schema/util" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+						https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/jobXML_1_0.xsd
+						https://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+	<job id="job1" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
 		<step id="step1" next="step2">
 			<chunk checkpoint-policy="item" item-count="3">
 				<reader ref="generatingItemReader1" />

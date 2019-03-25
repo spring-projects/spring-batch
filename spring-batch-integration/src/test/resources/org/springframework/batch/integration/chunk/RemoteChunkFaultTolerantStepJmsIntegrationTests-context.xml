@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:integration="http://www.springframework.org/schema/integration"
-	   xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
-	   xmlns:jms="http://www.springframework.org/schema/jms"
-	   xsi:schemaLocation="http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+	   xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:integration="https://www.springframework.org/schema/integration"
+	   xmlns:int-jms="https://www.springframework.org/schema/integration/jms"
+	   xmlns:jms="https://www.springframework.org/schema/jms"
+	   xsi:schemaLocation="https://www.springframework.org/schema/jms https://www.springframework.org/schema/jms/spring-jms.xsd
+		https://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+		https://www.springframework.org/schema/integration/jms https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
 
 	<import resource="classpath:/jms-context.xml" />
 
-	<job id="job" xmlns="http://www.springframework.org/schema/batch">
+	<job id="job" xmlns="https://www.springframework.org/schema/batch">
 		<step id="step">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="2" skip-limit="2">

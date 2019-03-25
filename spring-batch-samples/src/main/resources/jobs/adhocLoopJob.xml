@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
-	xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-       	http://www.springframework.org/schema/beans/spring-beans.xsd
-      	http://www.springframework.org/schema/batch
-      	http://www.springframework.org/schema/batch/spring-batch.xsd
-       	http://www.springframework.org/schema/aop
- 		http://www.springframework.org/schema/aop/spring-aop.xsd">
+	xmlns="https://www.springframework.org/schema/beans"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="https://www.springframework.org/schema/aop"
+	xsi:schemaLocation="https://www.springframework.org/schema/beans
+       	https://www.springframework.org/schema/beans/spring-beans.xsd
+      	https://www.springframework.org/schema/batch
+      	https://www.springframework.org/schema/batch/spring-batch.xsd
+       	https://www.springframework.org/schema/aop
+ 		https://www.springframework.org/schema/aop/spring-aop.xsd">
 
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<job id="loopJob" incrementer="jobParametersIncrementer" xmlns="http://www.springframework.org/schema/batch">
+	<job id="loopJob" incrementer="jobParametersIncrementer" xmlns="https://www.springframework.org/schema/batch">
 		<step id="step1">
 			<tasklet>
 				<chunk reader="reader" writer="writer" commit-interval="3"/>
