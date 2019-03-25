@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="https://www.springframework.org/schema/util"
+	xsi:schemaLocation="https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		https://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
-	<job id="skipJob" incrementer="incrementer" xmlns="http://www.springframework.org/schema/batch">
+	<job id="skipJob" incrementer="incrementer" xmlns="https://www.springframework.org/schema/batch">
 
 		<step id="step1" parent="baseStep">
 			<tasklet>
@@ -52,14 +52,14 @@
 		</step>
 	</job>
 
-	<step id="baseStep" abstract="true" xmlns="http://www.springframework.org/schema/batch">
+	<step id="baseStep" abstract="true" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<listeners>
 				<listener>
-					<bean class="org.springframework.batch.sample.common.SkipCheckingListener" xmlns="http://www.springframework.org/schema/beans" />
+					<bean class="org.springframework.batch.sample.common.SkipCheckingListener" xmlns="https://www.springframework.org/schema/beans" />
 				</listener>
 				<listener>
-					<bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener" xmlns="http://www.springframework.org/schema/beans">
+					<bean class="org.springframework.batch.core.listener.ExecutionContextPromotionListener" xmlns="https://www.springframework.org/schema/beans">
 						<property name="keys">
 							<list>
 								<value>stepName</value>

@@ -1,4 +1,4 @@
-<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+<batch-artifacts xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html">
 	<ref id="testBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport" />
     <ref id="restartBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.RestartBatchlet" />
     <ref id="failingBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.FailingBatchlet" />

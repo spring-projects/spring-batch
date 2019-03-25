@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="testing">
   <title>Unit Testing</title>
 
@@ -273,6 +273,6 @@ public void testAfterStep() {
     <classname>StepExecution</classname> is just one convenience method
     available within the factory. A full method listing can be found in its
     <ulink
-    url="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
+    url="https://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
   </section>
 </chapter>

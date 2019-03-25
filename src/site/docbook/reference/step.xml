@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="configureStep">
   <title>Configuring a Step</title>
 
@@ -1688,9 +1688,9 @@ itemWriter.write(items);</programlisting>
       scope must be added explicitly, either by using the
       <literal>batch</literal> namespace:</para>
 
-      <programlisting language="xml">&lt;beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:batch="http://www.springframework.org/schema/batch"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      <programlisting language="xml">&lt;beans xmlns="https://www.springframework.org/schema/beans"
+       xmlns:batch="https://www.springframework.org/schema/batch"
+       xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="..."&gt;
 &lt;batch:job .../&gt;
 ...
@@ -1724,9 +1724,9 @@ itemWriter.write(items);</programlisting>
 		<para>Because it is not part of the Spring container by default, the scope
 		must be added explicitly, either by using the <literal>batch</literal> namespace:</para>
 
-	    <programlisting language="xml">&lt;beans xmlns="http://www.springframework.org/schema/beans"
-		  xmlns:batch="http://www.springframework.org/schema/batch"
-		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	    <programlisting language="xml">&lt;beans xmlns="https://www.springframework.org/schema/beans"
+		  xmlns:batch="https://www.springframework.org/schema/batch"
+		  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
 		  xsi:schemaLocation="..."&gt;
 
 		  &lt;batch:job .../&gt;

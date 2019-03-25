@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="domain"
-    xmlns:xlink="http://www.w3.org/1999/xlink" xreflabel="Batch Domain Language">
+<chapter xmlns="https://docbook.org/ns/docbook" version="5.0" xml:id="domain"
+    xmlns:xlink="https://www.w3.org/1999/xlink" xreflabel="Batch Domain Language">
   <title>The Domain Language of Batch</title>
 
   <para>To any experienced batch architect, the overall concepts of batch
@@ -1040,14 +1040,14 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     bean definition, a namespace has been provided for ease of
     configuration:</para>
 
-    <programlisting language="xml">&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>"
-     xmlns:beans="http://www.springframework.org/schema/beans"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    <programlisting language="xml">&lt;beans:beans xmlns="<emphasis role="bold">https://www.springframework.org/schema/batch</emphasis>"
+     xmlns:beans="https://www.springframework.org/schema/beans"
+     xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
-           <emphasis role="bold">http://www.springframework.org/schema/batch
-           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
+           https://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+           <emphasis role="bold">https://www.springframework.org/schema/batch
+           https://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;
         &lt;step id="step1"&gt;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-		"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+		"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="whatsNew">
   <title>What's New in Spring Batch 3.0</title>
 
@@ -38,7 +38,7 @@
 	</para>
 
 	  <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;job id="myJob3" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0"&gt;
+&lt;job id="myJob3" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0"&gt;
     &lt;step id="step1" &gt;
         &lt;batchlet ref="testBatchlet" /&gt;
     &lt;/step&gt;

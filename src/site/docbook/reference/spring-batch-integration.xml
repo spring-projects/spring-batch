@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-		"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+		"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="springBatchIntegration" xreflabel="Spring Batch Integration">
 	<title>Spring Batch Integration</title>
 
@@ -77,12 +77,12 @@
 				namespace declarations to your Spring XML Application Context
 				file:
 			</para>
-			<programlisting language="xml">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-  xmlns:batch-int=&quot;http://www.springframework.org/schema/batch-integration&quot;
+			<programlisting language="xml">&lt;beans xmlns=&quot;https://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;https://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:batch-int=&quot;https://www.springframework.org/schema/batch-integration&quot;
   xsi:schemaLocation=&quot;
-    http://www.springframework.org/schema/batch-integration
-    http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd&quot;&gt;
+    https://www.springframework.org/schema/batch-integration
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd&quot;&gt;
 
     ...
 
@@ -91,20 +91,20 @@
 				A fully configured Spring XML Application Context file for Spring
 				Batch Integration may look like the following:
 			</para>
-			<programlisting language="xml">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-  xmlns:int=&quot;http://www.springframework.org/schema/integration&quot;
-  xmlns:batch=&quot;http://www.springframework.org/schema/batch&quot;
-  xmlns:batch-int=&quot;http://www.springframework.org/schema/batch-integration&quot;
+			<programlisting language="xml">&lt;beans xmlns=&quot;https://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;https://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:int=&quot;https://www.springframework.org/schema/integration&quot;
+  xmlns:batch=&quot;https://www.springframework.org/schema/batch&quot;
+  xmlns:batch-int=&quot;https://www.springframework.org/schema/batch-integration&quot;
   xsi:schemaLocation=&quot;
-    http://www.springframework.org/schema/batch-integration
-    http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
-    http://www.springframework.org/schema/batch
-    http://www.springframework.org/schema/batch/spring-batch.xsd
-    http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/integration
-    http://www.springframework.org/schema/integration/spring-integration.xsd&quot;&gt;
+    https://www.springframework.org/schema/batch-integration
+    https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
+    https://www.springframework.org/schema/batch
+    https://www.springframework.org/schema/batch/spring-batch.xsd
+    https://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    https://www.springframework.org/schema/integration
+    https://www.springframework.org/schema/integration/spring-integration.xsd&quot;&gt;
 
     ...
 
@@ -178,7 +178,7 @@
 			<para>
 				The following image illustrates the typical Spring Integration
 				message flow in order to start a Batch job. The
-				<ulink url="http://www.eaipatterns.com/toc.html">EIP (Enterprise IntegrationPatterns) website</ulink>
+				<ulink url="https://www.enterpriseintegrationpatterns.com/toc.html">EIP (Enterprise IntegrationPatterns) website</ulink>
 				provides a full overview of messaging icons and their descriptions.
 			</para>
 
@@ -259,7 +259,7 @@ public class FileMessageToJobRequest {
 					using the <classname>JobExplorer</classname>. For more
 					information, please refer to the <classname>Spring
 					Batch</classname> reference documentation on
-					<ulink url="http://docs.spring.io/spring-batch/reference/html/configureJob.html#queryingRepository">Querying
+					<ulink url="https://docs.spring.io/spring-batch/reference/html/configureJob.html#queryingRepository">Querying
 						the Repository</ulink>.
 				</para>
 				<para>
@@ -770,7 +770,7 @@ public class FileMessageToJobRequest {
 				<para>
 					For more information, please also consult the Spring Batch
 					manual, specifically the chapter on
-					<ulink url="http://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking">Remote
+					<ulink url="https://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking">Remote
 						Chunking</ulink>.
 				</para>
 			</sect3>
@@ -809,7 +809,7 @@ public class FileMessageToJobRequest {
 				</para>
 				<para>
 					The reference manual section
-					<ulink url="http://docs.spring.io/spring-batch/reference/html/scalability.html#partitioning">Remote
+					<ulink url="https://docs.spring.io/spring-batch/reference/html/scalability.html#partitioning">Remote
 						Partitioning</ulink> provides an overview of the concepts and
 					components needed to configure Remote Partitioning and shows an
 					example of using the default

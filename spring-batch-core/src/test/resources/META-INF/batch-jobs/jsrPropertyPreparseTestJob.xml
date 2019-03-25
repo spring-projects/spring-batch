@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job id="jsrPropertyPreparseTestJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="jsrPropertyPreparseTestJob" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
     <properties>
         <property name="jobProperty1" value="jobProperty1Value"/>
         <property name="jobProperty2" value="#{jobProperties['jobProperty1']}"/>

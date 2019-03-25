@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+<job id="job1" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
 	<!-- JSR Section 8.1.3 -->
 	<properties>
 		<property name="jobPropertyName1" value="jobPropertyValue1"/>
