@@ -1,4 +1,4 @@
-<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+<batch-artifacts xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html">
 	<ref id="reader" class="org.springframework.batch.sample.jsr352.JsrSampleItemReader"/>
 	<ref id="processor" class="org.springframework.batch.sample.jsr352.JsrSampleItemProcessor"/>
 	<ref id="writer" class="org.springframework.batch.sample.jsr352.JsrSampleItemWriter"/>

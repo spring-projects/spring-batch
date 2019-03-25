@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
+<beans xmlns="https://www.springframework.org/schema/beans"
+       xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+						https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/jobXML_1_0.xsd">
 
     <!-- Not implemented (partition relatated): JSR 8.2.6.2, 8.2.6.3.1, 8.2.6.4.1, 8.2.6.5.1, 8.2.6.6.1 -->
 
-    <job id="job1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="1.0">
+    <job id="job1" xmlns="https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html" version="1.0">
         <properties>
             <property name="jobPropertyName1" value="jobPropertyValue1"/>
         </properties>

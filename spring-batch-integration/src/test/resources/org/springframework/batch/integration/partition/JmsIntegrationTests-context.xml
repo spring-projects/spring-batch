@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:p="http://www.springframework.org/schema/p"
-	   xmlns:integration="http://www.springframework.org/schema/integration"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
-	   xmlns:task="http://www.springframework.org/schema/task"
-	   xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+<beans xmlns="https://www.springframework.org/schema/beans"
+	   xmlns:p="https://www.springframework.org/schema/p"
+	   xmlns:integration="https://www.springframework.org/schema/integration"
+	   xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:int-jms="https://www.springframework.org/schema/integration/jms"
+	   xmlns:task="https://www.springframework.org/schema/task"
+	   xsi:schemaLocation="https://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+		https://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+		https://www.springframework.org/schema/task https://www.springframework.org/schema/task/spring-task-3.0.xsd
+		https://www.springframework.org/schema/integration/jms https://www.springframework.org/schema/integration/jms/spring-integration-jms-2.0.xsd
+		https://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:/simple-job-launcher-context.xml" />
 
@@ -23,18 +23,18 @@
 
 	<task:executor id="taskExecutor" pool-size="2" />
 
-	<channel id="requests" xmlns="http://www.springframework.org/schema/integration">
+	<channel id="requests" xmlns="https://www.springframework.org/schema/integration">
 		<queue />
 	</channel>
 
-	<channel id="staging" xmlns="http://www.springframework.org/schema/integration" />
+	<channel id="staging" xmlns="https://www.springframework.org/schema/integration" />
 
 	<int-jms:inbound-gateway request-channel="worker" request-destination-name="requests"
 		concurrent-consumers="2" />
 
 	<service-activator ref="stepExecutionRequestHandler" input-channel="worker"
-		xmlns="http://www.springframework.org/schema/integration" />
-	<aggregator ref="partitionHandler" input-channel="staging" xmlns="http://www.springframework.org/schema/integration" />
+		xmlns="https://www.springframework.org/schema/integration" />
+	<aggregator ref="partitionHandler" input-channel="staging" xmlns="https://www.springframework.org/schema/integration" />
 
 	<!-- This is the "remote" worker (which in this case is local) -->
 	<bean id="stepExecutionRequestHandler" class="org.springframework.batch.integration.partition.StepExecutionRequestHandler"
@@ -57,7 +57,7 @@
 		<property name="gridSize" value="2" />
 	</bean>
 
-	<job id="job1" xmlns="http://www.springframework.org/schema/batch">
+	<job id="job1" xmlns="https://www.springframework.org/schema/batch">
 		<step id="step1-master">
 			<partition handler="partitionHandler" partitioner="partitioner" />
 		</step>
@@ -65,15 +65,15 @@
 
 	<bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 
-	<step id="step1" xmlns="http://www.springframework.org/schema/batch">
+	<step id="step1" xmlns="https://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk commit-interval="10">
 				<reader>
 					<bean class="org.springframework.batch.integration.partition.ExampleItemReader" scope="step"
-						xmlns="http://www.springframework.org/schema/beans" />
+						xmlns="https://www.springframework.org/schema/beans" />
 				</reader>
 				<writer>
-					<bean class="org.springframework.batch.integration.partition.ExampleItemWriter" xmlns="http://www.springframework.org/schema/beans" />
+					<bean class="org.springframework.batch.integration.partition.ExampleItemWriter" xmlns="https://www.springframework.org/schema/beans" />
 				</writer>
 			</chunk>
 		</tasklet>
