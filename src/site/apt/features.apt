@@ -111,7 +111,7 @@ Spring Batch Features and Roadmap
   case, but each chunk is passed on to the remote processes.  The
   remote execution is an asynchronous listener of some sort
   (e.g. message-driven component or web service).  Implemented using
-  {{{http://projects.spring.io/spring-integration/}Spring
+  {{{https://projects.spring.io/spring-integration/}Spring
   Integration}} in a Batch sub-project (spring-batch-integration).
 
   * Partitioning - steps execute concurrently and optionally in
@@ -148,7 +148,7 @@ Spring Batch Features and Roadmap
 
 * SpringSource Enterprise Batch
 
-  * The plan is for {{{http://www.sping.io}Spring}} to
+  * The plan is for {{{https://www.sping.io}Spring}} to
   provide an enterprise product that deals with runtime concerns, as
   opposed to programming and configuration.
 

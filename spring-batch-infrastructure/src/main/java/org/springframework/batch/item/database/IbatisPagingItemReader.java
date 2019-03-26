@@ -86,7 +86,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Michael Minella
  * @since 2.0
  * @deprecated as of Spring Batch 3.0, in favor of the native Spring Batch support
- * in the MyBatis follow-up project (http://mybatis.github.io/spring/)
+ * in the MyBatis follow-up project (https://mybatis.github.io/spring/)
  */
 @Deprecated
 public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
