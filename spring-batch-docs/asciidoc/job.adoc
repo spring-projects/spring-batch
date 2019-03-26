@@ -1614,7 +1614,7 @@ If you set the table prefix on the job repository, don't forget to set it on the
 
 Most of the methods on `JobOperator` are
       self-explanatory, and more detailed explanations can be found on the
-      link:$$http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html$$[javadoc of the interface]. However, the
+      link:$$https://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html$$[javadoc of the interface]. However, the
       `startNextInstance` method is worth noting. This
       method will always start a new instance of a Job.
       This can be extremely useful if there are serious issues in a

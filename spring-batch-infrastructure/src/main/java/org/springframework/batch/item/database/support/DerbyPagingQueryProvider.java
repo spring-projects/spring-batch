@@ -47,7 +47,7 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		}
 	}
 	
-	// derby version numbering is M.m.f.p [ {alpha|beta} ] see http://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
+	// derby version numbering is M.m.f.p [ {alpha|beta} ] see https://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
 	private boolean isDerbyVersionSupported(String version) {
 		String[] minimalVersionParts = MINIMAL_DERBY_VERSION.split("\\.");
 		String[] versionParts = version.split("[\\. ]");

@@ -810,7 +810,7 @@ transaction attribute:
 
 The format for the transaction attribute specification is given in
 the Spring Core documentation (e.g. see the Javadocs for
-[TransactionAttributeEditor](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
+[TransactionAttributeEditor](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
 
 ### Tasklet Job
 
@@ -831,7 +831,7 @@ method.
 command line.
 
 You can visualise the Spring configuration of a job through
-Spring-IDE.  See [Spring IDE](http://spring.io/tools).  The
+Spring-IDE.  See [Spring IDE](https://spring.io/tools).  The
 source view of the configuration is as follows:
 
     <bean id="taskletJob" parent="simpleJob">
