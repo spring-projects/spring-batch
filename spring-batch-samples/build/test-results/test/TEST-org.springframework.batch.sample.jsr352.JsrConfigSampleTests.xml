@@ -284,7 +284,7 @@ org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: e
 10:06:23,919  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: MARK
 10:06:23,919  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: JANE
 10:06:23,928  INFO SimpleAsyncTaskExecutor-1 SimpleStepHandler:146 - Executing step: [step2]
-10:06:23,940  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:42 - Calling remote service at: http://api.example.com
+10:06:23,940  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:42 - Calling remote service at: https://api.example.com
 10:06:25,942  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:46 - Remote service call complete
 10:06:25,959  INFO SimpleAsyncTaskExecutor-1 JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@10a33437: startup date [Thu Mar 23 10:06:23 CDT 2017]; parent: org.springframework.context.support.GenericXmlApplicationContext@88d233d
 10:06:25,970  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [META-INF/batch.xml]
@@ -315,7 +315,7 @@ org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: e
 10:06:26,063  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: MARK
 10:06:26,064  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: JANE
 10:06:26,069  INFO SimpleAsyncTaskExecutor-1 SimpleStepHandler:146 - Executing step: [step2]
-10:06:26,075  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:42 - Calling remote service at: http://api.example.com
+10:06:26,075  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:42 - Calling remote service at: https://api.example.com
 10:06:28,079  INFO SimpleAsyncTaskExecutor-1 JsrSampleBatchlet:46 - Remote service call complete
 10:06:28,083  INFO SimpleAsyncTaskExecutor-1 JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@60bf8e3f: startup date [Thu Mar 23 10:06:25 CDT 2017]; parent: org.springframework.context.support.GenericXmlApplicationContext@88d233d
 10:06:28,089  INFO Test worker XmlBeanDefinitionReader:317 - Loading XML bean definitions from class path resource [META-INF/batch.xml]
@@ -343,7 +343,7 @@ org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: e
 10:06:28,204  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: MARK
 10:06:28,204  INFO SimpleAsyncTaskExecutor-1 JsrSampleItemWriter:38 - Writing person: JANE
 10:06:28,208  INFO SimpleAsyncTaskExecutor-1 SimpleStepHandler:146 - Executing step: [step2]
-10:06:28,214  INFO SimpleAsyncTaskExecutor-1 JsrSampleTasklet:45 - Calling remote service at: http://api.example.com
+10:06:28,214  INFO SimpleAsyncTaskExecutor-1 JsrSampleTasklet:45 - Calling remote service at: https://api.example.com
 10:06:30,218  INFO SimpleAsyncTaskExecutor-1 JsrSampleTasklet:49 - Remote service call complete
 10:06:30,221  INFO SimpleAsyncTaskExecutor-1 JsrXmlApplicationContext:985 - Closing org.springframework.batch.core.jsr.configuration.xml.JsrXmlApplicationContext@eefc61b: startup date [Thu Mar 23 10:06:28 CDT 2017]; parent: org.springframework.context.support.GenericXmlApplicationContext@88d233d
 ]]></system-out>
