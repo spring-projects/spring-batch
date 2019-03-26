@@ -9,7 +9,7 @@
 	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
 	<xsd:import namespace="http://www.springframework.org/schema/tool"/>
 	<xsd:import namespace="http://www.springframework.org/schema/integration"
-				schemaLocation="http://www.springframework.org/schema/integration/spring-integration.xsd"/>
+				schemaLocation="https://www.springframework.org/schema/integration/spring-integration.xsd"/>
 
 	<xsd:annotation>
 		<xsd:documentation><![CDATA[

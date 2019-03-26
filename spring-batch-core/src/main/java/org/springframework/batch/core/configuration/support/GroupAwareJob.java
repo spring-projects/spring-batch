@@ -28,7 +28,7 @@ import org.springframework.util.ClassUtils;
  * <code>financeDepartment</code>, which would result in a {@link Job} with
  * identical functionality but named <code>financeDepartment.overnightJob</code>
  * . The use of a "." separator for elements is deliberate, since it is a "safe"
- * character in a <a href="http://www.w3.org/Addressing/URL">URL</a>.
+ * character in a <a href="https://www.w3.org/Addressing/URL">URL</a>.
  *
  *
  * @author Dave Syer
