@@ -535,7 +535,7 @@ are beyond the scope of the Spring Batch architecture, but it is not unusual for
 job streams to include file moving utilities as steps in the job stream. The batch
 architecture only needs to know how to locate the files to be processed. Spring Batch
 begins the process of feeding the data into the pipe from this starting point. However,
-link:$$http://projects.spring.io/spring-integration/$$[Spring Integration] provides many
+link:$$https://projects.spring.io/spring-integration/$$[Spring Integration] provides many
 of these types of services.
 
 The other properties in `FlatFileItemReader` let you further specify how your data is
@@ -1484,19 +1484,19 @@ the `StaxEventItemReader` can process:
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <records>
-    <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
         <isin>XYZ0001</isin>
         <quantity>5</quantity>
         <price>11.39</price>
         <customer>Customer1</customer>
     </trade>
-    <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
         <isin>XYZ0002</isin>
         <quantity>2</quantity>
         <price>72.99</price>
         <customer>Customer2c</customer>
     </trade>
-    <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <trade xmlns="https://springframework.org/batch/sample/io/oxm/domain">
         <isin>XYZ0003</isin>
         <quantity>9</quantity>
         <price>99.99</price>

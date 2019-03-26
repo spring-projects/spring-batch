@@ -53,7 +53,7 @@ public class ClassifierCompositeItemProcessor<I,O> implements ItemProcessor<I, O
 	}
 	
     /* 
-     * Helper method to work around wildcard capture compiler error: see http://docs.oracle.com/javase/tutorial/java/generics/capture.html
+     * Helper method to work around wildcard capture compiler error: see https://docs.oracle.com/javase/tutorial/java/generics/capture.html
      * The method process(capture#4-of ?) in the type ItemProcessor<capture#4-of ?,capture#5-of ? extends O> is not applicable for the arguments (I)
      */
     @SuppressWarnings("unchecked")

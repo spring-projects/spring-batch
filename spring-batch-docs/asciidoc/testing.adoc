@@ -354,4 +354,4 @@ public void testAfterStep() {
 The preceding method for creating a simple
     `StepExecution` is just one convenience method
     available within the factory. A full method listing can be found in its
-    link:$$http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html$$[Javadoc].
+    link:$$https://docs.spring.io/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html$$[Javadoc].
