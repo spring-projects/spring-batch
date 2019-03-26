@@ -18,13 +18,13 @@
 2017-03-23 10:03:36,812 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:36,850 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:36,913 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@701408ba, testMethod = testRollbackOnFirstChunkAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@21093928]; rollback [true]>
-[warn 2017/03/23 10:03:36.915 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:36.915 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:37.212 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:37.237 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:37.263 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:37.263 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:37.535 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -38,13 +38,13 @@
 2017-03-23 10:03:37,574 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:37,607 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:37,627 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@170025e5, testMethod = testRestartOnSecondPage@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@8f30356]; rollback [true]>
-[warn 2017/03/23 10:03:37.630 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:37.630 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:37.937 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:37.953 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:37.962 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:37.962 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:38.321 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -58,13 +58,13 @@
 2017-03-23 10:03:38,361 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:38,395 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:38,415 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@46e0c16c, testMethod = testInvalidRestore@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@4e6210eb]; rollback [true]>
-[warn 2017/03/23 10:03:38.417 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:38.417 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:38.657 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:38.673 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:38.680 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:38.680 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:38.932 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -78,19 +78,19 @@
 2017-03-23 10:03:38,983 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:39,021 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:39,052 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@4ffe20d8, testMethod = testMultipleRestarts@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@3b99a42e]; rollback [true]>
-[warn 2017/03/23 10:03:39.055 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:39.055 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:39.353 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:39.386 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:39.397 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:39.397 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:39.676 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:39.695 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:39.703 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:39.703 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:39.971 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -104,7 +104,7 @@
 2017-03-23 10:03:40,019 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:40,055 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:40,086 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@5cca0a99, testMethod = testNormalProcessing@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@4eca2c5d]; rollback [true]>
-[warn 2017/03/23 10:03:40.090 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:40.090 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:40.395 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -118,7 +118,7 @@
 2017-03-23 10:03:40,447 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:40,490 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:40,516 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@7d4c8ff, testMethod = testRestoreFromEmptyData@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@458d27cb]; rollback [true]>
-[warn 2017/03/23 10:03:40.518 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:40.518 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:40.777 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -132,13 +132,13 @@
 2017-03-23 10:03:40,818 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:40,848 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:40,866 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@62461f84, testMethod = testRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@5a8c0d3c]; rollback [true]>
-[warn 2017/03/23 10:03:40.868 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:40.868 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:41.099 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:41.116 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:41.123 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:41.123 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:41.355 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -152,13 +152,13 @@
 2017-03-23 10:03:41,399 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:41,429 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
 2017-03-23 10:03:41,452 INFO Test worker [org.springframework.test.context.transaction.TransactionContext] - <Began transaction (1) for test context [DefaultTestContext@736cd992 testClass = HibernateCursorItemReaderParametersIntegrationTests, testInstance = org.springframework.batch.item.database.HibernateCursorItemReaderParametersIntegrationTests@5439b2e8, testMethod = testRollbackAndRestart@AbstractDataSourceItemReaderIntegrationTests, testException = [null], mergedContextConfiguration = [MergedContextConfiguration@3ee162be testClass = HibernateCursorItemReaderParametersIntegrationTests, locations = '{classpath:/org/springframework/batch/item/database/data-source-context.xml}', classes = '{}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{}', contextCustomizers = set[[empty]], contextLoader = 'org.springframework.test.context.support.DelegatingSmartContextLoader', parent = [null]], attributes = map[[empty]]]; transaction manager [org.springframework.jdbc.datasource.DataSourceTransactionManager@7ed75663]; rollback [true]>
-[warn 2017/03/23 10:03:41.454 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:41.454 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:41.684 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
 [info 2017/03/23 10:03:41.698 CDT <Test worker> tid=0xc] HHH000397: Using ASTQueryTranslatorFactory
 
-[warn 2017/03/23 10:03:41.705 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:41.705 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:41.938 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -171,7 +171,7 @@
 2017-03-23 10:03:41,970 INFO Test worker [org.springframework.context.support.GenericApplicationContext] - <Refreshing org.springframework.context.support.GenericApplicationContext@16445ed0: startup date [Thu Mar 23 10:03:41 CDT 2017]; root of context hierarchy>
 2017-03-23 10:03:41,973 INFO Test worker [org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor] - <JSR-330 'javax.inject.Inject' annotation found and supported for autowiring>
 2017-03-23 10:03:42,002 INFO Test worker [org.springframework.jdbc.datasource.DriverManagerDataSource] - <Loaded JDBC driver: org.hsqldb.jdbcDriver>
-[warn 2017/03/23 10:03:42.020 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:03:42.020 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:03:42.241 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 

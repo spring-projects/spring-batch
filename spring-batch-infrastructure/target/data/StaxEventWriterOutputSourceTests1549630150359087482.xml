@@ -1,1 +1,1 @@
-<?xml version='1.0' encoding='UTF-8'?><ns:root xmlns:ns="http://www.springframework.org/test" xmlns:foo="urn:org.test.foo"><foo:StaxEventItemWriter-testString/></ns:root>
+<?xml version='1.0' encoding='UTF-8'?><ns:root xmlns:ns="https://www.springframework.org/test" xmlns:foo="urn:org.test.foo"><foo:StaxEventItemWriter-testString/></ns:root>

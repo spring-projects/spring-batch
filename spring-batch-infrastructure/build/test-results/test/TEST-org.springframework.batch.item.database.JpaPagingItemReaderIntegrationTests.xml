@@ -23,7 +23,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:00.623 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:00.623 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:00.885 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -35,7 +35,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:00.930 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:00.930 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:01.194 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -55,7 +55,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:01.299 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:01.299 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:01.545 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -67,7 +67,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:01.577 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:01.577 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:01.815 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -87,7 +87,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:01.895 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:01.895 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:02.111 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -99,7 +99,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:02.134 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:02.134 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:02.350 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -119,7 +119,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:02.424 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:02.424 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:02.630 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -131,7 +131,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:02.651 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:02.651 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:02.845 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -143,7 +143,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:02.868 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:02.868 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:03.062 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -163,7 +163,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:03.134 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:03.134 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:03.316 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -183,7 +183,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:03.386 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:03.386 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:03.577 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -203,7 +203,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:03.641 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:03.641 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:03.816 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -215,7 +215,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:03.836 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:03.836 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:04.016 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -235,7 +235,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:04.077 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:04.077 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:04.259 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -247,7 +247,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:04.375 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:04.375 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:04.554 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
@@ -266,7 +266,7 @@
 	name: bar
 	...]
 
-[warn 2017/03/23 10:04:04.612 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace http://www.hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
+[warn 2017/03/23 10:04:04.612 CDT <Test worker> tid=0xc] HHH90000012: Recognized obsolete hibernate namespace http://hibernate.sourceforge.net/hibernate-mapping. Use namespace https://hibernate.org/dtd/hibernate-mapping instead.  Support for obsolete DTD/XSD namespaces may be removed at any time.
 
 [info 2017/03/23 10:04:04.783 CDT <Test worker> tid=0xc] HHH000400: Using dialect: org.hibernate.dialect.HSQLDialect
 
