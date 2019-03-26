@@ -6,14 +6,14 @@ layout: documentation_page
 <span id="books"></span>
 ## Books
 
-* **Michael T. Minella**: [Pro Spring Batch](http://www.amazon.com/dp/1430234520)
-* **Arnaud Cogoluegnes, Thierry Templier, Gary Gregory, Olivier Bazoud**: [Spring Batch in Action](http://www.amazon.com/dp/1935182951)
+* **Michael T. Minella**: [Pro Spring Batch](https://www.amazon.com/dp/1430234520)
+* **Arnaud Cogoluegnes, Thierry Templier, Gary Gregory, Olivier Bazoud**: [Spring Batch in Action](https://www.amazon.com/dp/1935182951)
 
 <span id="video_training"></span>
 
 ## Video Training
 
-* **Michael T. Minella**: [Learning Spring Batch](http://shop.oreilly.com/product/0636920044673.do) O'Reilly Publishing
+* **Michael T. Minella**: [Learning Spring Batch](https://shop.oreilly.com/product/0636920044673.do) O'Reilly Publishing
 
 <span id="videos"></span>
 
