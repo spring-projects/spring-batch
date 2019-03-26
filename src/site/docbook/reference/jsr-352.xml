@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="jsr-352" xreflabel="JSR-352 Support">
 	<title>JSR-352 Support</title>
 
@@ -233,9 +233,9 @@
 &lt;beans xmlns="http://www.springframework.org/schema/beans"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.springframework.org/schema/beans
-                              http://www.springframework.org/schema/beans/spring-beans.xsd
+                              https://www.springframework.org/schema/beans/spring-beans.xsd
                               http://xmlns.jcp.org/xml/ns/javaee
-                              http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"&gt;
+                              https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/jobXML_1_0.xsd"&gt;
 
     &lt;!-- javax.batch.api.Batchlet implementation --&gt;
     &lt;bean id="fooBatchlet" class="io.spring.FooBatchlet"&gt;

@@ -1045,9 +1045,9 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
            http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
+           https://www.springframework.org/schema/beans/spring-beans.xsd
            <emphasis role="bold">http://www.springframework.org/schema/batch
-           http://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
+           https://www.springframework.org/schema/batch/spring-batch-2.2.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;
         &lt;step id="step1"&gt;
