@@ -39,7 +39,7 @@ public class JsrConfigSampleTests {
 
 	@Before
 	public void setup() {
-		properties.setProperty("remoteServiceURL", "http://api.example.com");
+		properties.setProperty("remoteServiceURL", "https://api.example.com");
 	}
 
 	/**
