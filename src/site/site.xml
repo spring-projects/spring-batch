@@ -3,7 +3,7 @@
 
 	<bannerLeft>
 		<name>${project.name}</name>
-		<href>http://projects.spring.io/spring-batch/
+		<href>https://projects.spring.io/spring-batch/
 		</href>
 	</bannerLeft>
 
@@ -28,7 +28,7 @@
 
 		<links>
 			<item name="Home"
-				href="http://projects.spring.io/spring-batch/index.html" />
+				href="https://projects.spring.io/spring-batch/index.html" />
 		</links>
 
 		<menu name="Documentation" inherit="none">
@@ -49,16 +49,16 @@
 		<menu name="Support" inherit="none">
 			<item name="Building" href="building.html" />
 			<item name="Forums"
-				href="http://forum.spring.io/forum/spring-projects/batch" />
-			<item name="JIRA" href="http://jira.spring.io/browse/BATCH" />
+				href="https://forum.spring.io/forum/spring-projects/batch" />
+			<item name="JIRA" href="https://jira.spring.io/browse/BATCH" />
 			<item name="1.0.x"
-				href="http://docs.spring.io/spring-batch/1.0.x/index.html" />
+				href="https://docs.spring.io/spring-batch/1.0.x/index.html" />
 			<item name="1.1.x"
-				href="http://docs.spring.io/spring-batch/1.1.x/index.html" />
+				href="https://docs.spring.io/spring-batch/1.1.x/index.html" />
 			<item name="2.0.x"
-				href="http://docs.spring.io/spring-batch/2.0.x/index.html" />
+				href="https://docs.spring.io/spring-batch/2.0.x/index.html" />
 			<item name="2.1.x"
-				href="http://docs.spring.io/spring-batch/2.1.x/index.html" />
+				href="https://docs.spring.io/spring-batch/2.1.x/index.html" />
 		</menu>
 
 		<menu name="Modules" inherit="none">

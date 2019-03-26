@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="configureJob">
   <title>Configuring and Running a Job</title>
 
@@ -760,7 +760,7 @@ public class AppConfig {
 
       <para>The controller in this case is a Spring MVC controller. More
       information on Spring MVC can be found here: <ulink
-      url="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html">http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html</ulink>.
+      url="https://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html">https://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/mvc.html</ulink>.
       The controller launches a <classname>Job</classname> using a
       <classname>JobLauncher</classname> that has been configured to launch
       <link linkend="configureJobLauncher">asynchronously</link>, which
@@ -1043,7 +1043,7 @@ public class JobLauncherController {
       <para>Most of the methods on <classname>JobOperator</classname> are
       self-explanatory, and more detailed explanations can be found on the
       <ulink
-      url="http://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html">javadoc
+      url="https://docs.spring.io/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html">javadoc
       of the interface</ulink>. However, the
       <methodname>startNextInstance</methodname> method is worth noting. This
       method will always start a new instance of a <classname>Job</classname>.

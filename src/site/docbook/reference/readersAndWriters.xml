@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+"https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="readersAndWriters">
   <title>ItemReaders and ItemWriters</title>
 
@@ -457,7 +457,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       explored more in the next sections. The resource property represents a
       Spring Core <classname>Resource</classname>. Documentation explaining
       how to create beans of this type can be found in <ulink
-      url="http://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/resources.html"><citetitle>Spring
+      url="https://docs.spring.io/spring/docs/3.2.x/spring-framework-reference/html/resources.html"><citetitle>Spring
       Framework, Chapter 5.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
@@ -475,7 +475,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
       how to locate the files to be processed. Spring Batch begins the process
       of feeding the data into the pipe from this starting point. However,
       <ulink
-      url="http://projects.spring.io/spring-integration/"><citetitle>Spring
+      url="https://projects.spring.io/spring-integration/"><citetitle>Spring
       Integration</citetitle></ulink> provides many of these types of
       services.</para>
 
@@ -1404,7 +1404,7 @@ assertEquals(born, values[2]);</programlisting>
         <methodname>printf</methodname> functionality of the C programming
         language. Most details on how to configure a formatter can be found in
         the javadoc of <ulink
-        url="http://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html"><citetitle>Formatter</citetitle></ulink>.</para>
+        url="https://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html"><citetitle>Formatter</citetitle></ulink>.</para>
       </section>
 
       <section id="handlingFileCreation">
@@ -1473,7 +1473,7 @@ assertEquals(born, values[2]);</programlisting>
     considered one 'fragment'. Spring Batch uses Object/XML Mapping (OXM) to
     bind fragments to objects. However, Spring Batch is not tied to any
     particular XML binding technology. Typical use is to delegate to <ulink
-    url="http://docs.spring.io/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
+    url="https://docs.spring.io/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
     OXM</citetitle></ulink>, which provides uniform abstraction for the most
     popular OXM technologies. The dependency on Spring OXM is optional and you
     can choose to implement Spring Batch specific interfaces if desired. The
@@ -1507,19 +1507,19 @@ assertEquals(born, values[2]);</programlisting>
 
       <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;records&gt;
-    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+    &lt;trade xmlns="https://springframework.org/batch/sample/io/oxm/domain"&gt;
         &lt;isin&gt;XYZ0001&lt;/isin&gt;
         &lt;quantity&gt;5&lt;/quantity&gt;
         &lt;price&gt;11.39&lt;/price&gt;
         &lt;customer&gt;Customer1&lt;/customer&gt;
     &lt;/trade&gt;
-    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+    &lt;trade xmlns="https://springframework.org/batch/sample/io/oxm/domain"&gt;
         &lt;isin&gt;XYZ0002&lt;/isin&gt;
         &lt;quantity&gt;2&lt;/quantity&gt;
         &lt;price&gt;72.99&lt;/price&gt;
         &lt;customer&gt;Customer2c&lt;/customer&gt;
     &lt;/trade&gt;
-    &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
+    &lt;trade xmlns="https://springframework.org/batch/sample/io/oxm/domain"&gt;
         &lt;isin&gt;XYZ0003&lt;/isin&gt;
         &lt;quantity&gt;9&lt;/quantity&gt;
         &lt;price&gt;99.99&lt;/price&gt;
