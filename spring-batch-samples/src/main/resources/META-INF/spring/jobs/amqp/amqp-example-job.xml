@@ -5,8 +5,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:batch="http://www.springframework.org/schema/batch"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <beans:import resource="classpath:/META-INF/spring/config-beans.xml"/>
     <beans:import resource="classpath:/META-INF/spring/jobs/messaging/rabbitmq-beans.xml"/>
