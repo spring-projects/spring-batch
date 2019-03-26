@@ -82,7 +82,7 @@ $ mvn test -DforkMode=never -Dtest=FootballJobFunctionalTests -Dplayer.file.name
   Our policy is to commit Eclipse (and only Eclipse) meta data to
   source control.  This will work out of the box for you if you use
   the (excellent) Q4E Eclipse-plugin
-  (http://q4e.googlecode.com/svn/trunk/updatesite).  With this plugin,
+  (https://q4e.googlecode.com/svn/trunk/updatesite).  With this plugin,
   each of the reactor modules at the top level builds independently
   and feeds changes into other projects in your workspace.  It is not
   recommended to use the Maven Eclipse plugin (<<<mvn
@@ -134,7 +134,7 @@ $ mvn -P snapshots dependency:tree
   building web content.  For Spring Batch we prefer the "almost plain
   text" version.  See files under <<<src/site/apt>>> in all the projects
   for examples, and also refer to the
-  {{{http://maven.apache.org/guides/mini/guide-apt-format.html}Apt
+  {{{https://maven.apache.org/guides/mini/guide-apt-format.html}Apt
   Format Guide}} on the Maven website.
 
   N.B. you put .apt source files in a subdirectory called <<<apt>>>,
@@ -196,7 +196,7 @@ $ mvn -P snapshots dependency:tree
 +---
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+                 "https://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="chapter-id">
 	<title>Chapter Title</title>
 	<section>

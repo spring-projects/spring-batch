@@ -2,27 +2,27 @@ Spring Batch 2.2.1 Release Notes
 
 * Bug
 
-  * {{{http://jira.spring.io/browse/BATCH-1849}[BATCH-1849]}} - Item was not picked up after restarting a failed job!!!
+  * {{{https://jira.spring.io/browse/BATCH-1849}[BATCH-1849]}} - Item was not picked up after restarting a failed job!!!
 
-  * {{{http://jira.spring.io/browse/BATCH-1973}[BATCH-1973]}} - processor-transactional="false" in chunk definition does not have stable behavior
+  * {{{https://jira.spring.io/browse/BATCH-1973}[BATCH-1973]}} - processor-transactional="false" in chunk definition does not have stable behavior
 
-  * {{{http://jira.spring.io/browse/BATCH-2036}[BATCH-2036]}} - Output incorrect when using processor-transactional="false" and skips.
+  * {{{https://jira.spring.io/browse/BATCH-2036}[BATCH-2036]}} - Output incorrect when using processor-transactional="false" and skips.
 
-  * {{{http://jira.spring.io/browse/BATCH-2038}[BATCH-2038]}} - DerbyPagingQueryProvider does not work with Derby 10.10.1.1
+  * {{{https://jira.spring.io/browse/BATCH-2038}[BATCH-2038]}} - DerbyPagingQueryProvider does not work with Derby 10.10.1.1
 
-  * {{{http://jira.spring.io/browse/BATCH-2050}[BATCH-2050]}} - AbstractItemCountingItemStreamItemReader.read() shouldn't be final
+  * {{{https://jira.spring.io/browse/BATCH-2050}[BATCH-2050]}} - AbstractItemCountingItemStreamItemReader.read() shouldn't be final
 
-  * {{{http://jira.spring.io/browse/BATCH-2054}[BATCH-2054]}} - StaxEventItemWriter fails on a NullPointerException with Spring OXM 3.2.x.
+  * {{{https://jira.spring.io/browse/BATCH-2054}[BATCH-2054]}} - StaxEventItemWriter fails on a NullPointerException with Spring OXM 3.2.x.
 
 * Improvement
 
-  * {{{http://jira.spring.io/browse/BATCH-1984}[BATCH-1984]}} - CompositeItemProcessor.setDelegates argument has limiting generic type
+  * {{{https://jira.spring.io/browse/BATCH-1984}[BATCH-1984]}} - CompositeItemProcessor.setDelegates argument has limiting generic type
 
-  * {{{http://jira.spring.io/browse/BATCH-2052}[BATCH-2052]}} - StaxEventItemWriter should only force sync once per chunk
+  * {{{https://jira.spring.io/browse/BATCH-2052}[BATCH-2052]}} - StaxEventItemWriter should only force sync once per chunk
 
-  * {{{http://jira.spring.io/browse/BATCH-2069}[BATCH-2069]}} - Relax OSGI dependencies on nosql jars
+  * {{{https://jira.spring.io/browse/BATCH-2069}[BATCH-2069]}} - Relax OSGI dependencies on nosql jars
 
 * Task
 
-  * {{{http://jira.spring.io/browse/BATCH-2056}[BATCH-2056]}} - Update 'What's New' in Reference Document
+  * {{{https://jira.spring.io/browse/BATCH-2056}[BATCH-2056]}} - Update 'What's New' in Reference Document
 

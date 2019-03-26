@@ -615,14 +615,14 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteRootTagWithNamespace() throws Exception {
-		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.setRootTagName("{https://www.springframework.org/test}root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(items);
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content
-				.contains(("<root xmlns=\"http://www.springframework.org/test\">")));
+				.contains(("<root xmlns=\"https://www.springframework.org/test\">")));
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 		assertTrue("Wrong content: " + content, content.contains(("</root>")));
 	}
@@ -632,7 +632,7 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteRootTagWithNamespaceAndPrefix() throws Exception {
-		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
 		marshaller.setNamespace(writer.getRootTagNamespace());
 		marshaller.setNamespacePrefix(writer.getRootTagNamespacePrefix());
@@ -641,7 +641,7 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content
-				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\">")));
+				.contains(("<ns:root xmlns:ns=\"https://www.springframework.org/test\">")));
 		assertTrue("Wrong content: " + content, content.contains(NS_TEST_STRING));
 		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
 		assertTrue("Wrong content: " + content, content.contains(("<ns:root")));
@@ -652,7 +652,7 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteRootTagWithAdditionalNamespace() throws Exception {
-		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		marshaller.setNamespace("urn:org.test.foo");
 		marshaller.setNamespacePrefix("foo");
 		writer.setRootElementAttributes(Collections.singletonMap("xmlns:foo", "urn:org.test.foo"));
@@ -662,7 +662,7 @@ public class StaxEventItemWriterTests {
 		writer.close();
 		String content = getOutputFileContent();
 		assertTrue("Wrong content: " + content, content
-				.contains(("<ns:root xmlns:ns=\"http://www.springframework.org/test\" "
+				.contains(("<ns:root xmlns:ns=\"https://www.springframework.org/test\" "
 						+ "xmlns:foo=\"urn:org.test.foo\">")));
 		assertTrue("Wrong content: " + content, content.contains(FOO_TEST_STRING));
 		assertTrue("Wrong content: " + content, content.contains(("</ns:root>")));
@@ -675,7 +675,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testRootTagWithNamespaceRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
-		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.setRootTagName("{https://www.springframework.org/test}root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -684,7 +684,7 @@ public class StaxEventItemWriterTests {
 
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
-		writer.setRootTagName("{http://www.springframework.org/test}root");
+		writer.setRootTagName("{https://www.springframework.org/test}root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -693,7 +693,7 @@ public class StaxEventItemWriterTests {
 
 		String content = getOutputFileContent();
 		assertEquals("Wrong content: " + content,
-				"<root xmlns=\"http://www.springframework.org/test\"><item/><item/></root>", content);
+				"<root xmlns=\"https://www.springframework.org/test\"><item/><item/></root>", content);
 	}
 
 	/**
@@ -702,7 +702,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testRootTagWithNamespaceAndPrefixRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
-		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -711,7 +711,7 @@ public class StaxEventItemWriterTests {
 
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
-		writer.setRootTagName("{http://www.springframework.org/test}ns:root");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:root");
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -720,7 +720,7 @@ public class StaxEventItemWriterTests {
 
 		String content = getOutputFileContent();
 		assertEquals("Wrong content: " + content,
-				"<ns:root xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></ns:root>", content);
+				"<ns:root xmlns:ns=\"https://www.springframework.org/test\"><ns:item/><ns:item/></ns:root>", content);
 	}
 
 	/**
@@ -730,7 +730,7 @@ public class StaxEventItemWriterTests {
 	public void testRootTagWithAdditionalNamespaceRestart() throws Exception {
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{urn:org.test.foo}foo:root");
-		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "http://www.springframework.org/test"));
+		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "https://www.springframework.org/test"));
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -740,7 +740,7 @@ public class StaxEventItemWriterTests {
 		writer = createItemWriter();
 		writer.setMarshaller(jaxbMarshaller);
 		writer.setRootTagName("{urn:org.test.foo}foo:root");
-		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "http://www.springframework.org/test"));
+		writer.setRootElementAttributes(Collections.singletonMap("xmlns:ns", "https://www.springframework.org/test"));
 		writer.afterPropertiesSet();
 		writer.open(executionContext);
 		writer.write(jaxbItems);
@@ -749,7 +749,7 @@ public class StaxEventItemWriterTests {
 
 		String content = getOutputFileContent();
 		assertEquals("Wrong content: " + content,
-				"<foo:root xmlns:foo=\"urn:org.test.foo\" xmlns:ns=\"http://www.springframework.org/test\"><ns:item/><ns:item/></foo:root>", content);
+				"<foo:root xmlns:foo=\"urn:org.test.foo\" xmlns:ns=\"https://www.springframework.org/test\"><ns:item/><ns:item/></foo:root>", content);
 	}
 	
 	/**
@@ -790,7 +790,7 @@ public class StaxEventItemWriterTests {
 		String content = getOutputFileContent();
 
 		assertEquals("Wrong content: " + content,
-				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\"><ns:group><StaxEventItemWriter-testString/></ns:group></ns:testroot>", content);
+				"<ns:testroot xmlns:ns=\"https://www.springframework.org/test\"><ns:group><StaxEventItemWriter-testString/></ns:group></ns:testroot>", content);
 	}
 	
 	/**
@@ -811,7 +811,7 @@ public class StaxEventItemWriterTests {
 		String content = getOutputFileContent();
 
 		assertEquals("Wrong content: " + content,
-				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
+				"<ns:testroot xmlns:ns=\"https://www.springframework.org/test\">" +
 				"<ns:group><StaxEventItemWriter-testString/><StaxEventItemWriter-testString/></ns:group></ns:testroot>", content);
 	}
 
@@ -833,7 +833,7 @@ public class StaxEventItemWriterTests {
 		String content = getOutputFileContent();
 
 		assertEquals("Wrong content: " + content,
-				"<ns:testroot xmlns:ns=\"http://www.springframework.org/test\">" +
+				"<ns:testroot xmlns:ns=\"https://www.springframework.org/test\">" +
 				"<preHeader>PRE-HEADER</preHeader><ns:group><subGroup><postHeader>POST-HEADER</postHeader>" +
 				"<StaxEventItemWriter-testString/><StaxEventItemWriter-testString/>" +
 				"<preFooter>PRE-FOOTER</preFooter></subGroup></ns:group><postFooter>POST-FOOTER</postFooter>" +
@@ -848,7 +848,7 @@ public class StaxEventItemWriterTests {
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
-					writer.add(factory.createStartElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
 				}
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
@@ -862,7 +862,7 @@ public class StaxEventItemWriterTests {
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
-					writer.add(factory.createEndElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
 				}
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
@@ -871,7 +871,7 @@ public class StaxEventItemWriterTests {
 			}
 
 		});
-		writer.setRootTagName("{http://www.springframework.org/test}ns:testroot");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:testroot");
 		writer.afterPropertiesSet();
 	}
 
@@ -887,7 +887,7 @@ public class StaxEventItemWriterTests {
 					writer.add(factory.createStartElement("", "", "preHeader"));
 					writer.add(factory.createCharacters("PRE-HEADER"));
 					writer.add(factory.createEndElement("", "", "preHeader"));
-					writer.add(factory.createStartElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createStartElement("ns", "https://www.springframework.org/test", "group"));
 					writer.add(factory.createStartElement("", "", "subGroup"));
 					writer.add(factory.createStartElement("", "", "postHeader"));
 					writer.add(factory.createCharacters("POST-HEADER"));
@@ -909,7 +909,7 @@ public class StaxEventItemWriterTests {
 					writer.add(factory.createCharacters("PRE-FOOTER"));
 					writer.add(factory.createEndElement("", "", "preFooter"));
 					writer.add(factory.createEndElement("", "", "subGroup"));
-					writer.add(factory.createEndElement("ns", "http://www.springframework.org/test", "group"));
+					writer.add(factory.createEndElement("ns", "https://www.springframework.org/test", "group"));
 					writer.add(factory.createStartElement("", "", "postFooter"));
 					writer.add(factory.createCharacters("POST-FOOTER"));
 					writer.add(factory.createEndElement("", "", "postFooter"));
@@ -921,7 +921,7 @@ public class StaxEventItemWriterTests {
 			}
 
 		});
-		writer.setRootTagName("{http://www.springframework.org/test}ns:testroot");
+		writer.setRootTagName("{https://www.springframework.org/test}ns:testroot");
 		writer.afterPropertiesSet();
 	}
 
@@ -1000,7 +1000,7 @@ public class StaxEventItemWriterTests {
 		return source;
 	}
 
-	@XmlRootElement(name="item", namespace="http://www.springframework.org/test")
+	@XmlRootElement(name="item", namespace="https://www.springframework.org/test")
 	private static class JAXBItem {
 	}
 

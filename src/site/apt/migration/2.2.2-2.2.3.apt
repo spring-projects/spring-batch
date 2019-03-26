@@ -2,10 +2,10 @@ Spring Batch 2.2.3 Release Notes
 
 * Bug
 
-  * {{{http://jira.spring.io/browse/BATCH-2122}[BATCH-2122]}} - Offset not reset when skip limit is hit a chunk boundary
+  * {{{https://jira.spring.io/browse/BATCH-2122}[BATCH-2122]}} - Offset not reset when skip limit is hit a chunk boundary
 
-  * {{{http://jira.spring.io/browse/BATCH-2124}[BATCH-2124]}} - Running batch create scripts multiple times can lead to multiple rows being inserted in sequence tables
+  * {{{https://jira.spring.io/browse/BATCH-2124}[BATCH-2124]}} - Running batch create scripts multiple times can lead to multiple rows being inserted in sequence tables
 
-  * {{{http://jira.spring.io/browse/BATCH-2141}[BATCH-2141]}} - RepositoryItemReader reads the first page twice when used with partitions.
+  * {{{https://jira.spring.io/browse/BATCH-2141}[BATCH-2141]}} - RepositoryItemReader reads the first page twice when used with partitions.
 
-  * {{{http://jira.spring.io/browse/BATCH-2077}[BATCH-2077]}} - Java Config: Register listeners just once.
+  * {{{https://jira.spring.io/browse/BATCH-2077}[BATCH-2077]}} - Java Config: Register listeners just once.

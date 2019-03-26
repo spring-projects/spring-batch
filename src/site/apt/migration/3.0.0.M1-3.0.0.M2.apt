@@ -2,10 +2,10 @@ Spring Batch 3.0.0.M2 Release Notes
 
 * Bug
 
-  * {{{http://jira.spring.io/browse/BATCH-2049}[BATCH-2049]}} - Support multiple fragmentRootElementNames in StaxEventItemReader
+  * {{{https://jira.spring.io/browse/BATCH-2049}[BATCH-2049]}} - Support multiple fragmentRootElementNames in StaxEventItemReader
 
 * Improvement
 
-  * {{{http://jira.spring.io/browse/BATCH-2077}[BATCH-2077]}} - Java Config: Register listeners just once
+  * {{{https://jira.spring.io/browse/BATCH-2077}[BATCH-2077]}} - Java Config: Register listeners just once
 
-  * {{{http://jira.spring.io/browse/BATCH-2089}[BATCH-2089]}} - Add ability to remap exit status on transitions
+  * {{{https://jira.spring.io/browse/BATCH-2089}[BATCH-2089]}} - Add ability to remap exit status on transitions

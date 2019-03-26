@@ -27,7 +27,7 @@ Spring Batch 2.0 Highlights
 
 * Java 5
 
-  As you may know, Spring 3.0 is going to be the first major release of Spring to target Java 5 exclusively (I'll leave it to Juergen and Arjen to clarify that in more detail).  Now that Sun has put an "{{{http://java.dzone.com/articles/rip%E2%80%A6jdk-14}End of Service Life}}" stamp on the JDK 1.4 it seems appropriate, and there are some great new features on Spring 3.0 that we want to take advantage of.
+  As you may know, Spring 3.0 is going to be the first major release of Spring to target Java 5 exclusively (I'll leave it to Juergen and Arjen to clarify that in more detail).  Now that Sun has put an "{{{https://dzone.com/articles/rip%25E2%2580%25A6jdk-14}End of Service Life}}" stamp on the JDK 1.4 it seems appropriate, and there are some great new features on Spring 3.0 that we want to take advantage of.
 
   Since Spring 3.0 took a little longer to release than we had initially hoped we did some work in 2.0.0 to provide the late binding features independent of Spring 3.0.  The 2.0.0 and 2.0.1 releases of Spring Batch actually do not work with Spring 3.0, but 2.0.2 should.  The expressions in step scoped beans will use the weaker, but very similar, expression language from Spring Batch instead of the full Spring EL.  In a future release of Spring Batch we will be able to fully support Spring EL in late binding expressions.
 
@@ -126,7 +126,7 @@ public interface Tasklet {
 
 ** Remote Chunking
 
-  Remote chunking is a technique for dividing up the work of a step without any explicit knowledge of the structure of the data.  Any input source can be split up dynamically by reading it in a single process (as per normal in 1.x) and sending the items as a chunk to a remote worker process.  The remote process implements a listener pattern, responding to the request, processing the data and sending an asynchronous reply.  The transport for the request and reply has to be durable with guaranteed delivery and a single consumer, and those features are readily available with any JMS implementation.  But Spring Batch is building the remote chunking feature on top of {{{http://projects.spring.io/spring-integration/}Spring Integration}}, so actually it is agnostic to the actual implementation of the message middleware.
+  Remote chunking is a technique for dividing up the work of a step without any explicit knowledge of the structure of the data.  Any input source can be split up dynamically by reading it in a single process (as per normal in 1.x) and sending the items as a chunk to a remote worker process.  The remote process implements a listener pattern, responding to the request, processing the data and sending an asynchronous reply.  The transport for the request and reply has to be durable with guaranteed delivery and a single consumer, and those features are readily available with any JMS implementation.  But Spring Batch is building the remote chunking feature on top of {{{https://projects.spring.io/spring-integration/}Spring Integration}}, so actually it is agnostic to the actual implementation of the message middleware.
 
 ** Partitioning
 

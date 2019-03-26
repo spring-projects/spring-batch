@@ -2,41 +2,41 @@ Spring Batch 2.2.6 Release Notes
 
 * Improvement
 
-  * {{{http://jira.springsource.org/browse/BATCH-1786}[BATCH-1786]}} - Add convenience method to AbstractJobExplorerFactoryBean
+  * {{{https://jira.springsource.org/browse/BATCH-1786}[BATCH-1786]}} - Add convenience method to AbstractJobExplorerFactoryBean
 
-  * {{{http://jira.springsource.org/browse/BATCH-2042}[BATCH-2042]}} - Update docs and expand on role of ItemProcessor especially during a retry
+  * {{{https://jira.springsource.org/browse/BATCH-2042}[BATCH-2042]}} - Update docs and expand on role of ItemProcessor especially during a retry
 
-  * {{{http://jira.springsource.org/browse/BATCH-2083}[BATCH-2083]}} - AbstractStep needs to give better exception message
+  * {{{https://jira.springsource.org/browse/BATCH-2083}[BATCH-2083]}} - AbstractStep needs to give better exception message
 
-  * {{{http://jira.springsource.org/browse/BATCH-2092}[BATCH-2092]}} - Get input line when by FlatFileFormatException
+  * {{{https://jira.springsource.org/browse/BATCH-2092}[BATCH-2092]}} - Get input line when by FlatFileFormatException
 
-  * {{{http://jira.springsource.org/browse/BATCH-2185}[BATCH-2185]}} - Provide a way to register listeners in javaconfig that do not implement a listener interface
+  * {{{https://jira.springsource.org/browse/BATCH-2185}[BATCH-2185]}} - Provide a way to register listeners in javaconfig that do not implement a listener interface
 
 * Bug
 
-  * {{{http://jira.springsource.org/browse/BATCH-2011}[BATCH-2011]}} - ExitStatus.compareTo() delivers result out of given range [-1,1]
+  * {{{https://jira.springsource.org/browse/BATCH-2011}[BATCH-2011]}} - ExitStatus.compareTo() delivers result out of given range [-1,1]
 
-  * {{{http://jira.springsource.org/browse/BATCH-2059}[BATCH-2059]}} - OrderedComposite.add fails if one of the items is step scope
+  * {{{https://jira.springsource.org/browse/BATCH-2059}[BATCH-2059]}} - OrderedComposite.add fails if one of the items is step scope
 
-  * {{{http://jira.springsource.org/browse/BATCH-2060}[BATCH-2060]}} - Wrong Link to Source-Repository on Project Website
+  * {{{https://jira.springsource.org/browse/BATCH-2060}[BATCH-2060]}} - Wrong Link to Source-Repository on Project Website
 
-  * {{{http://jira.springsource.org/browse/BATCH-2061}[BATCH-2061]}} - State transition causes infinite loop
+  * {{{https://jira.springsource.org/browse/BATCH-2061}[BATCH-2061]}} - State transition causes infinite loop
 
-  * {{{http://jira.springsource.org/browse/BATCH-2085}[BATCH-2085]}} - Attribute 'flow' is not allowed to appear in element 'batch:step'
+  * {{{https://jira.springsource.org/browse/BATCH-2085}[BATCH-2085]}} - Attribute 'flow' is not allowed to appear in element 'batch:step'
 
-  * {{{http://jira.springsource.org/browse/BATCH-2106}[BATCH-2106]}} - batch_job_execution_params migration script incorrect value for 'identifying' column
+  * {{{https://jira.springsource.org/browse/BATCH-2106}[BATCH-2106]}} - batch_job_execution_params migration script incorrect value for 'identifying' column
 
-  * {{{http://jira.springsource.org/browse/BATCH-2172}[BATCH-2172]}} - Spring batch fails to autodetect database type DB2ZOS
+  * {{{https://jira.springsource.org/browse/BATCH-2172}[BATCH-2172]}} - Spring batch fails to autodetect database type DB2ZOS
 
-  * {{{http://jira.springsource.org/browse/BATCH-2186}[BATCH-2186]}} - Backport BATCH-2045 to 2.2.x  branch
+  * {{{https://jira.springsource.org/browse/BATCH-2186}[BATCH-2186]}} - Backport BATCH-2045 to 2.2.x  branch
 
-  * {{{http://jira.springsource.org/browse/BATCH-2189}[BATCH-2189]}} - DefaultBatchConfigurer violates PostConstruct rules
+  * {{{https://jira.springsource.org/browse/BATCH-2189}[BATCH-2189]}} - DefaultBatchConfigurer violates PostConstruct rules
 
-  * {{{http://jira.springsource.org/browse/BATCH-2204}[BATCH-2204]}} - transactional reader does not work since 2.2
+  * {{{https://jira.springsource.org/browse/BATCH-2204}[BATCH-2204]}} - transactional reader does not work since 2.2
 
 * Task
 
-  * {{{http://jira.springsource.org/browse/BATCH-2090}[BATCH-2090]}} - HibernateItemWriter: doWrite should not be deprecated
+  * {{{https://jira.springsource.org/browse/BATCH-2090}[BATCH-2090]}} - HibernateItemWriter: doWrite should not be deprecated
 
 
 

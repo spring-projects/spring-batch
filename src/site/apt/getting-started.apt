@@ -13,7 +13,7 @@ Spring Batch Getting Started
 
   This is the quickest way to get started.  It requires an internet connection for download, and access to a Maven repository (remote or local).
 
-    * Download STS version 3.4.* (or better) from the {{{http://spring.io/tools/sts/}Spring website}}.  STS is a free Eclipse bundle with many features useful for Spring developers.
+    * Download STS version 3.4.* (or better) from the {{{https://spring.io/tools/sts/}Spring website}}.  STS is a free Eclipse bundle with many features useful for Spring developers.
 
     * Go to <<<New->Other...>>> and select <<<SpringSource Tool Suite->Template Project>>> from the wizard chooser.
 
@@ -27,10 +27,10 @@ Spring Batch Getting Started
 
   * Download the "no-dependencies" version of the distribution and unzip to create a directory <<<org.springframework.batch-<versionId>>>>.
 
-  * Get the m2eclipse plugin (http://m2eclipse.sonatype.org/update)
+  * Get the m2eclipse plugin (https://m2eclipse.sonatype.org/update)
   (installed in STS out of the box).  If you can't or don't want to
   install this plugin, you can use the
-  {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven
+  {{{https://maven.apache.org/plugins/maven-eclipse-plugin/}Maven
   Eclipse Plugin}} to create the classpath entries you need.
 
   * Open Eclipse and create a workspace as for the non-Mavenized version.
@@ -81,7 +81,7 @@ $ mvn test
 
 * Using Gradle (for Groovy programmers)
 
-  * There is a Groovy project template with instructions available {{{http://robokaso.github.com/Groovy-Spring-Batch-Template/}here}}
+  * There is a Groovy project template with instructions available {{{https://robokaso.github.com/Groovy-Spring-Batch-Template/}here}}
 
 * Migrating to 2.2.x
 

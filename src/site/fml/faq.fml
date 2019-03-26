@@ -9,7 +9,7 @@
 			<answer>
 				You can track the progress and planning in
 				JIRA
-				(http://opensource.atlassian.com/projects/spring/browse/BATCH).
+				(https://opensource.atlassian.com/projects/spring/browse/BATCH).
 			</answer>
 		</faq>
 		<faq id="threading">

@@ -788,7 +788,7 @@ transaction attribute:
 
 The format for the transaction attribute specification is given in
 the Spring Core documentation (e.g. see the Javadocs for
-[TransactionAttributeEditor](http://docs.spring.io/spring/docs/3.2.0.RELEASE/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
+[TransactionAttributeEditor](https://docs.spring.io/spring/docs/3.2.0.RELEASE/javadoc-api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html)).
 
 ### [Tasklet Job](id:tasklet)
 
@@ -809,7 +809,7 @@ method.
 command line.
 
 You can visualise the Spring configuration of a job through
-Spring-IDE.  See [Spring IDE](http://spring.io/tools).  The
+Spring-IDE.  See [Spring IDE](https://spring.io/tools).  The
 source view of the configuration is as follows:
 
     <bean id="taskletJob" parent="simpleJob">
@@ -865,4 +865,4 @@ The job has a single step that copies `Trade` data from one XML
 file to another.  It uses XStream for the object XML conversion,
 because this is simple to configure for basic use cases like this
 one.  See
-[Spring OXM documentation](http://docs.spring.io/spring-ws/sites/2.0/reference/html/oxm.html) for details of other options.
+[Spring OXM documentation](https://docs.spring.io/spring-ws/sites/2.0/reference/html/oxm.html) for details of other options.
