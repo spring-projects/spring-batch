@@ -195,7 +195,7 @@ To use Spring dependency injection within a JSR-352 based batch job consists of 
           xsi:schemaLocation="http://www.springframework.org/schema/beans
                               https://www.springframework.org/schema/beans/spring-beans.xsd
                               http://xmlns.jcp.org/xml/ns/javaee
-                              https://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/jobXML_1_0.xsd">
+                              https://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
 
     <!-- javax.batch.api.Batchlet implementation -->
     <bean id="fooBatchlet" class="io.spring.FooBatchlet">
