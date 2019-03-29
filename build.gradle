@@ -98,7 +98,7 @@ allprojects {
 		beanshellVersion = '2.0b5'
 		jaxbApiVersion = '2.3.1'
 		jaxbImplVersion = '2.3.0.1'
-		micrometerVersion = '1.1.1'
+		micrometerVersion = '1.1.3'
 	}
 
 	apply plugin: 'idea'
