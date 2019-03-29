@@ -155,7 +155,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
 		sample.stop(Timer.builder(METRICS_PREFIX + "item.read")
-				.description("Item reading duration in seconds")
+				.description("Item reading duration")
 				.tag("job.name", stepExecution.getJobExecution().getJobInstance().getJobName())
 				.tag("step.name", stepExecution.getStepName())
 				.tag("status", status)

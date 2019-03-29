@@ -262,7 +262,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			sample.stop(Timer.builder(METRICS_PREFIX + "step")
-							.description("Step duration in seconds")
+							.description("Step duration")
 							.tag("job.name", stepExecution.getJobExecution().getJobInstance().getJobName())
 							.tag("name", stepExecution.getStepName())
 							.tag("status", stepExecution.getExitStatus().getExitCode())

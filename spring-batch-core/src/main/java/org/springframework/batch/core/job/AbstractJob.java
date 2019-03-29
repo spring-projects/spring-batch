@@ -302,7 +302,7 @@ InitializingBean {
 		}
 
 		JobSynchronizationManager.register(execution);
-		LongTaskTimer longTaskTimer = LongTaskTimer.builder(METRICS_PREFIX + "jobs.active")
+		LongTaskTimer longTaskTimer = LongTaskTimer.builder(METRICS_PREFIX + "job.active")
 				.description("Active jobs")
 				.register(Metrics.globalRegistry);
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
@@ -363,7 +363,7 @@ InitializingBean {
 				}
 
 				timerSample.stop(Timer.builder(METRICS_PREFIX + "job")
-						.description("Job duration in seconds")
+						.description("Job duration")
 						.tag("name", execution.getJobInstance().getJobName())
 						.tag("status", execution.getExitStatus().getExitCode())
 						.register(Metrics.globalRegistry)

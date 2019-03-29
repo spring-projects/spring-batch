@@ -43,6 +43,7 @@ import org.springframework.context.annotation.Configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class BatchMetricsTests {
 
@@ -52,67 +53,87 @@ public class BatchMetricsTests {
 		ApplicationContext context = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
-		
+
 		// when
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-		
+
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		List<Meter> meters = Metrics.globalRegistry.getMeters();
 		assertThat(meters, Matchers.hasSize(7));
 
-		Meter.Id itemReadMeter = meters.get(0).getId();
-		assertEquals(itemReadMeter.getName(), "spring.batch.item.read");
-		assertEquals(itemReadMeter.getDescription(), "Item reading duration in seconds");
-		assertEquals(itemReadMeter.getTag("job.name"), "job");
-		assertEquals(itemReadMeter.getTag("step.name"), "step2");
-		assertEquals(itemReadMeter.getTag("status"), "SUCCESS");
-		assertEquals(itemReadMeter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.job")
+					.tag("name", "job")
+					.tag("status", "COMPLETED")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.job " +
+					"registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id step1Meter = meters.get(1).getId();
-		assertEquals(step1Meter.getName(), "spring.batch.step");
-		assertEquals(step1Meter.getDescription(), "Step duration in seconds");
-		assertEquals(step1Meter.getTag("name"), "step1");
-		assertEquals(step1Meter.getTag("job.name"), "job");
-		assertEquals(step1Meter.getTag("status"), "COMPLETED");
-		assertEquals(step1Meter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.job.active")
+					.longTaskTimer();
+		} catch (Exception e) {
+			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active" +
+					" registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id step2Meter = meters.get(2).getId();
-		assertEquals(step2Meter.getName(), "spring.batch.step");
-		assertEquals(step2Meter.getDescription(), "Step duration in seconds");
-		assertEquals(step2Meter.getTag("name"), "step2");
-		assertEquals(step2Meter.getTag("job.name"), "job");
-		assertEquals(step2Meter.getTag("status"), "COMPLETED");
-		assertEquals(step2Meter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.step")
+					.tag("name", "step1")
+					.tag("job.name", "job")
+					.tag("status", "COMPLETED")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step" +
+					" registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id activeJobsMeter = meters.get(3).getId();
-		assertEquals(activeJobsMeter.getName(), "spring.batch.jobs.active");
-		assertEquals(activeJobsMeter.getDescription(), "Active jobs");
-		assertEquals(activeJobsMeter.getTags().size(), 0);
-		assertEquals(activeJobsMeter.getType(), Meter.Type.LONG_TASK_TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.step")
+					.tag("name", "step2")
+					.tag("job.name", "job")
+					.tag("status", "COMPLETED")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step" +
+					" registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id chunkWriteMeter = meters.get(4).getId();
-		assertEquals(chunkWriteMeter.getName(), "spring.batch.chunk.write");
-		assertEquals(chunkWriteMeter.getDescription(), "Chunk writing duration in seconds");
-		assertEquals(chunkWriteMeter.getTag("job.name"), "job");
-		assertEquals(chunkWriteMeter.getTag("step.name"), "step2");
-		assertEquals(chunkWriteMeter.getTag("status"), "SUCCESS");
-		assertEquals(chunkWriteMeter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.item.read")
+					.tag("job.name", "job")
+					.tag("step.name", "step2")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.read" +
+					" registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id itemProcessMeter = meters.get(5).getId();
-		assertEquals(itemProcessMeter.getName(), "spring.batch.item.process");
-		assertEquals(itemProcessMeter.getDescription(), "Item processing duration in seconds");
-		assertEquals(itemProcessMeter.getTag("job.name"), "job");
-		assertEquals(itemProcessMeter.getTag("step.name"), "step2");
-		assertEquals(itemProcessMeter.getTag("status"), "SUCCESS");
-		assertEquals(itemProcessMeter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.item.process")
+					.tag("job.name", "job")
+					.tag("step.name", "step2")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.process" +
+					" registered in the global registry: " + e.getMessage());
+		}
 
-		Meter.Id jobMeter = meters.get(6).getId();
-		assertEquals(jobMeter.getName(), "spring.batch.job");
-		assertEquals(jobMeter.getDescription(), "Job duration in seconds");
-		assertEquals(jobMeter.getTag("name"), "job");
-		assertEquals(jobMeter.getTag("status"), "COMPLETED");
-		assertEquals(jobMeter.getType(), Meter.Type.TIMER);
+		try {
+			Metrics.globalRegistry.get("spring.batch.chunk.write")
+					.tag("job.name", "job")
+					.tag("step.name", "step2")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
+					" registered in the global registry: " + e.getMessage());
+		}
 	}
 
 	@Configuration
