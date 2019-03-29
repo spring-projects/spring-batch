@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import io.micrometer.core.instrument.LongTaskTimer;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +39,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -62,8 +63,6 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 InitializingBean {
-
-	private static final String METRICS_PREFIX = "spring.batch.";
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -302,11 +301,9 @@ InitializingBean {
 		}
 
 		JobSynchronizationManager.register(execution);
-		LongTaskTimer longTaskTimer = LongTaskTimer.builder(METRICS_PREFIX + "job.active")
-				.description("Active jobs")
-				.register(Metrics.globalRegistry);
+		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs");
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
-		Timer.Sample timerSample = Timer.start(Metrics.globalRegistry);
+		Timer.Sample timerSample = BatchMetrics.createTimerSample();
 		try {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -362,12 +359,10 @@ InitializingBean {
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
-				timerSample.stop(Timer.builder(METRICS_PREFIX + "job")
-						.description("Job duration")
-						.tag("name", execution.getJobInstance().getJobName())
-						.tag("status", execution.getExitStatus().getExitCode())
-						.register(Metrics.globalRegistry)
-				);
+				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
+						Tag.of("name", execution.getJobInstance().getJobName()),
+						Tag.of("status", execution.getExitStatus().getExitCode())
+				));
 				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 

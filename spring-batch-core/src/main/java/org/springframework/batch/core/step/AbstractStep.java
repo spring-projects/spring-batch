@@ -17,7 +17,7 @@ package org.springframework.batch.core.step;
 
 import java.util.Date;
 
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +32,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
@@ -53,8 +54,6 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
-
-	private static final String METRICS_PREFIX = "spring.batch.";
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -192,7 +191,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+		Timer.Sample sample = BatchMetrics.createTimerSample();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -261,13 +260,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
-			sample.stop(Timer.builder(METRICS_PREFIX + "step")
-							.description("Step duration")
-							.tag("job.name", stepExecution.getJobExecution().getJobInstance().getJobName())
-							.tag("name", stepExecution.getStepName())
-							.tag("status", stepExecution.getExitStatus().getExitCode())
-							.register(Metrics.globalRegistry)
-			);
+			sample.stop(BatchMetrics.createTimer("step", "Step duration",
+					Tag.of("job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+					Tag.of("name", stepExecution.getStepName()),
+					Tag.of("status", stepExecution.getExitStatus().getExitCode())
+			));
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
 
