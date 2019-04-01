@@ -29,15 +29,19 @@ import io.micrometer.core.instrument.Timer;
  * Main entry point to interact with Micrometer's {@link Metrics#globalRegistry}.
  * Provides common metrics such as {@link Timer}, {@link Counter} and {@link Gauge}.
  *
+ * Only intended for internal use.
+ *
  * @author Mahmoud Ben Hassine
  */
-public class BatchMetrics {
+public final class BatchMetrics {
 
-	public static final String METRICS_PREFIX = "spring.batch.";
+	private static final String METRICS_PREFIX = "spring.batch.";
 
 	public static final String STATUS_SUCCESS = "SUCCESS";
 
 	public static final String STATUS_FAILURE = "FAILURE";
+
+	private BatchMetrics() {}
 
 	/**
 	 * Create a {@link Timer}.
