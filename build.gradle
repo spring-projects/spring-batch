@@ -12,8 +12,8 @@ buildscript {
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
-		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.3"
-		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.14"
+		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.6"
+		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16"
 	}
 }
 
@@ -28,6 +28,7 @@ ext {
 	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
 	linkScmConnection    = 'git://github.com/spring-projects/spring-batch.git'
 	linkScmDevConnection = 'git@github.com:spring-projects/spring-batch.git'
+	docResourcesVersion = '0.1.1.RELEASE'
 
 	mainProjects = subprojects.findAll { !it.name.endsWith('tests') && !it.name.endsWith('samples') && it.name.startsWith('spring-batch-')}
 }
@@ -636,12 +637,17 @@ project('spring-batch-samples') {
 }
 
 apply plugin: "org.asciidoctor.convert"
+
+asciidoctorj {
+	version = '1.5.5'
+}
+
 configurations {
 	docs
 }
 
 dependencies {
-	docs "io.spring.docresources:spring-doc-resources:0.1.0.RELEASE@zip"
+	docs "io.spring.docresources:spring-doc-resources:${docResourcesVersion}@zip"
 }
 
 task prepareAsciidocBuild(type: Sync) {
@@ -653,40 +659,53 @@ task prepareAsciidocBuild(type: Sync) {
 	// and doc sources
 	from "spring-batch-docs/asciidoc/"
 	// to a build directory of your choice
-	into "$buildDir/asciidoc/build"
+	into "$buildDir/asciidoc/assemble"
+}
+
+task('makePDF', type: org.asciidoctor.gradle.AsciidoctorTask){
+	dependsOn prepareAsciidocBuild
+	backends 'pdf'
+	sourceDir "$buildDir/asciidoc/assemble"
+	sources {
+		include 'index-single.adoc'
+	}
+	options doctype: 'book', eruby: 'erubis'
+	logDocuments = true
+	attributes 'icons': 'font',
+		'sectanchors': '',
+		'toc': '',
+		'source-highlighter' : 'coderay'
 }
 
 asciidoctor {
-  sourceDir "$buildDir/asciidoc/build"
-	sources {
-		include '*.adoc'
-	}
+	dependsOn makePDF
+	backends 'html5'
+	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
-			include 'images/*', 'css/**', 'js/**', 'jsfiles/**'
+			include 'images/*', 'css/**', 'js/**'
 		}
 	}
-	logDocuments = true
-	backends = ["html", "pdf"]
 	options doctype: 'book', eruby: 'erubis'
-	attributes  'icons': 'font',
-			'idprefix': '',
-			'idseparator': '-',
-			docinfo: 'shared',
-			revnumber: project.version,
-			sectanchors: '',
-			sectnums: '',
-	  	stylesdir: "css/",
-		  stylesheet: 'spring.css',
-		  'linkcss': true,
-		  'source-highlighter=highlight.js',
-		  'highlightjsdir=js/highlight',
-		  'highlightjs-theme=atom-one-dark-reasonable',
-			'spring-version': project.version,
-			'allow-uri-read': ''
-
+	logDocuments = true
+	attributes 'docinfo': 'shared',
+		// use provided stylesheet
+		stylesdir: "css/",
+		stylesheet: 'spring.css',
+		'linkcss': true,
+		'icons': 'font',
+    'sectanchors': '',
+		// use provided highlighter
+		'source-highlighter=highlight.js',
+		'highlightjsdir=js/highlight',
+		'highlightjs-theme=atom-one-dark-reasonable',
+		'idprefix': '',
+		'idseparator': '-',
+		'spring-version': project.version,
+		'allow-uri-read': '',
+		revnumber: project.version
 }
-asciidoctor.dependsOn prepareAsciidocBuild
+
 
 apply plugin: 'org.sonarqube'
 
@@ -767,17 +786,17 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (asciidoctor) {
-
-			include '*.html'
-			include 'index-single.pdf'
-			include 'css/*'
-			include 'js/**'
-			include 'jsfiles/*'
-			include 'images/*'
-
+		from (makePDF) {
+			include "index-single.pdf"
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
+			into 'reference'
+		}
 
+		from (asciidoctor) {
+			include "*.html"
+			include "css/**"
+			include "js/**"
+			include "images/**"
 			into 'reference'
 		}
 }
