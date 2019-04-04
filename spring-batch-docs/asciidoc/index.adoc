@@ -30,6 +30,8 @@ and guidelines.
 with Spring Batch.
 <<spring-batch-integration.adoc#springBatchIntegration,Spring Batch Integration>> :: Integration
 between Spring Batch and Spring Integration projects.
+<<monitoring-and-metrics.adoc#monitoring-and-metrics,Monitoring and metrics>> :: Batch jobs
+monitoring and metrics
 
 The following appendices are available:
 
