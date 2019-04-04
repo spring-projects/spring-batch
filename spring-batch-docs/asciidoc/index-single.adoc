@@ -1,6 +1,7 @@
 :doctype: book
 :toc: left
 :toclevels: 4
+:sectnums:
 :onlyonetoggle: true
 
 include::header/index-header.adoc[]

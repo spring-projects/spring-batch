@@ -81,7 +81,7 @@ allprojects {
 		javaxInjectVersion = '1'
 		javaxTransactionVersion = '1.3'
 		jbatchTckSpi = '1.0'
-		jettisonVersion = '1.2' //? => upgrade to 1.4 and the build fails (deprecated anyway via xstream) 
+		jettisonVersion = '1.2' //? => upgrade to 1.4 and the build fails (deprecated anyway via xstream)
 		jmsVersion = '2.0.1'
 		junitVersion = '4.12'
 		log4jVersion = '2.11.1'
@@ -673,8 +673,10 @@ task('makePDF', type: org.asciidoctor.gradle.AsciidoctorTask){
 	logDocuments = true
 	attributes 'icons': 'font',
 		'sectanchors': '',
+		'sectnums': '',
 		'toc': '',
-		'source-highlighter' : 'coderay'
+		'source-highlighter' : 'coderay',
+		revnumber: project.version
 }
 
 asciidoctor {
@@ -683,7 +685,7 @@ asciidoctor {
 	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
-			include 'images/*', 'css/**', 'js/**', 'jsfiles/**'
+			include 'images/*', 'css/**', 'js/**'
 		}
 	}
 	options doctype: 'book', eruby: 'erubis'
@@ -789,16 +791,15 @@ task docsZip(type: Zip) {
 		from (makePDF) {
 			include "index-single.pdf"
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
-			into 'reference'
+			into 'reference/pdf'
 		}
 
 		from (asciidoctor) {
 			include "*.html"
 			include "css/**"
 			include "js/**"
-			include "jsfiles/**"
 			include "images/**"
-			into 'reference'
+			into 'reference/html'
 		}
 }
 
