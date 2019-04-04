@@ -683,7 +683,7 @@ asciidoctor {
 	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
-			include 'images/*', 'css/**', 'js/**'
+			include 'images/*', 'css/**', 'js/**', 'jsfiles/**'
 		}
 	}
 	options doctype: 'book', eruby: 'erubis'
@@ -796,6 +796,7 @@ task docsZip(type: Zip) {
 			include "*.html"
 			include "css/**"
 			include "js/**"
+			include "jsfiles/**"
 			include "images/**"
 			into 'reference'
 		}
