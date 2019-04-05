@@ -21,19 +21,19 @@ under the `spring.batch.` prefix. The following table explains all metrics in de
 
 |===============
 |__Metric Name__|__Type__|__Description__
-|spring.batch.job|TIMER|Duration of job execution
-|spring.batch.job.active|LONG_TASK_TIMER|Currently active jobs
-|spring.batch.step|TIMER|Duration of step execution
-|spring.batch.item.read|TIMER|Duration of item reading
-|spring.batch.item.process|TIMER|Duration of item processing
-|spring.batch.chunk.write|TIMER|Duration of chunk writing
+|`spring.batch.job`|`TIMER`|Duration of job execution
+|`spring.batch.job.active`|`LONG_TASK_TIMER`|Currently active jobs
+|`spring.batch.step`|`TIMER`|Duration of step execution
+|`spring.batch.item.read`|`TIMER`|Duration of item reading
+|`spring.batch.item.process`|`TIMER`|Duration of item processing
+|`spring.batch.chunk.write`|`TIMER`|Duration of chunk writing
 |===============
 
 [[custom-metrics]]
 
 === Custom metrics
 
-If you want to use your own metrics in your custom components, we recommend to use
+If you want to use your own metrics in your custom components, we recommend using
 Micrometer APIs directly. The following is an example of how to time a `Tasklet`:
 
 [source, java]
