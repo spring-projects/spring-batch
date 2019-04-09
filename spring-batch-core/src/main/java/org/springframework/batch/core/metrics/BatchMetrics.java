@@ -32,6 +32,7 @@ import io.micrometer.core.instrument.Timer;
  * Only intended for internal use.
  *
  * @author Mahmoud Ben Hassine
+ * @since 4.2
  */
 public final class BatchMetrics {
 
@@ -46,9 +47,9 @@ public final class BatchMetrics {
 	/**
 	 * Create a {@link Timer}.
 	 *
-	 * @param name        of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the timer
-	 * @param tags        of the timer
+	 * @param tags of the timer
 	 * @return a new timer instance
 	 */
 	public static Timer createTimer(String name, String description, Tag... tags) {
@@ -70,9 +71,9 @@ public final class BatchMetrics {
 	/**
 	 * Create a new {@link LongTaskTimer}.
 	 *
-	 * @param name        of the long task timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the long task timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the long task timer.
-	 * @param tags        of the timer
+	 * @param tags of the timer
 	 * @return a new long task timer instance
 	 */
 	public static LongTaskTimer createLongTaskTimer(String name, String description, Tag... tags) {
@@ -85,9 +86,9 @@ public final class BatchMetrics {
 	/**
 	 * Create a new {@link Counter}.
 	 *
-	 * @param name        of the counter. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the counter. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the counter
-	 * @param tags        of the counter
+	 * @param tags of the counter
 	 * @return a new counter instance
 	 */
 	public static Counter createCounter(String name, String description, Tag... tags) {
@@ -100,10 +101,10 @@ public final class BatchMetrics {
 	/**
 	 * Create a new {@link Gauge}.
 	 *
-	 * @param name        of the gauge. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the gauge. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the gauge
-	 * @param supplier    A supplier that yields a value for the gauge.
-	 * @param tags        of the gauge
+	 * @param supplier A supplier that yields a value for the gauge.
+	 * @param tags of the gauge
 	 * @return a new gauge instance
 	 */
 	public static Gauge createGauge(String name, String description, Supplier<Number> supplier, Tag... tags) {
