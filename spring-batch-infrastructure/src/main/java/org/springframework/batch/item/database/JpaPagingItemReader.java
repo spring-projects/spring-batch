@@ -81,6 +81,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Will Schipp
+ * @author jojoldu
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
@@ -185,14 +186,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
-
-		EntityTransaction tx = null;
-		
 		if (transacted) {
-			tx = entityManager.getTransaction();
-			tx.begin();
-			
-			entityManager.flush();
 			entityManager.clear();
 		}//end if
 
@@ -219,7 +213,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 			}//end if
 		} else {
 			results.addAll(query.getResultList());
-			tx.commit();
 		}//end if
 	}
 
