@@ -17,7 +17,7 @@
 
     <beans:bean id="inboundAmqpTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate"
                 p:connectionFactory-ref="rabbitConnectionFactory" p:routingKey="${rabbitmq.inbound.queue}"
-                p:queue="${rabbitmq.inbound.queue}"/>
+                p:defaultReceiveQueue="${rabbitmq.inbound.queue}"/>
 
     <beans:bean id="outboundAmqpTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate"
                 p:connectionFactory-ref="rabbitConnectionFactory" p:routingKey="${rabbitmq.outbound.queue}"/>
