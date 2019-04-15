@@ -20,7 +20,6 @@ import java.util.List;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -42,10 +41,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BatchMetricsTests {
+
+	private static final int EXPECTED_SPRING_BATCH_METRICS = 6;
 
 	@Test
 	public void testBatchMetrics() throws Exception {
@@ -60,7 +61,7 @@ public class BatchMetricsTests {
 		// then
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 		List<Meter> meters = Metrics.globalRegistry.getMeters();
-		assertThat(meters, Matchers.hasSize(7));
+		assertTrue(meters.size() >= EXPECTED_SPRING_BATCH_METRICS);
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.job")
