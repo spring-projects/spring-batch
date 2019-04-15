@@ -888,3 +888,16 @@ file to another.  It uses XStream for the object XML conversion,
 because this is simple to configure for basic use cases like this
 one.  See
 [Spring OXM documentation](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm) for details of other options.
+
+### Batch metrics with Micrometer
+
+This sample shows how to use [Micrometer](https://micrometer.io) to collect batch metrics in Spring Batch.
+It uses [Prometheus](https://prometheus.io) as metrics backend and [Grafana](https://grafana.com) as frontend. 
+The sample consists of two jobs:
+
+* `job1` : composed of two tasklets that print `hello` and `world`
+* `job2` : composed of single chunk-oriented step that reads and writes a random number of items
+
+These two jobs are run repeatedly at regular intervals and might fail randomly for demonstration purpose.
+
+Please refer to the [README.md](src/main/java/org/springframework/batch/sample/metrics/README.md) for more details about how to run this sample.

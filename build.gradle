@@ -99,6 +99,7 @@ allprojects {
 		jaxbApiVersion = '2.3.1'
 		jaxbImplVersion = '2.3.0.1'
 		micrometerVersion = '1.1.4'
+		prometheusPushgatewayVersion = '0.6.0'
 		docResourcesVersion = '0.1.1.RELEASE'
 	}
 
@@ -596,6 +597,8 @@ project('spring-batch-samples') {
 		compile "javax.mail:javax.mail-api:$javaMailVersion"
 		compile "org.apache.activemq:activemq-client:$activemqVersion"
 		compile "org.apache.activemq:activemq-broker:$activemqVersion"
+		compile "io.micrometer:micrometer-registry-prometheus:$micrometerVersion"
+		compile "io.prometheus:simpleclient_pushgateway:$prometheusPushgatewayVersion"
 
 		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
 		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"

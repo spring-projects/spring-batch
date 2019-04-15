@@ -17,7 +17,7 @@ which metrics are provided out-of-the-box and how to contribute custom metrics.
 Metrics collection does not require any specific configuration. All metrics provided
 by the framework are registered in
 link:$$https://micrometer.io/docs/concepts#_global_registry$$[Micrometer's global registry]
-under the `spring.batch.` prefix. The following table explains all metrics in details:
+under the `spring.batch` prefix. The following table explains all metrics in details:
 
 |===============
 |__Metric Name__|__Type__|__Description__
