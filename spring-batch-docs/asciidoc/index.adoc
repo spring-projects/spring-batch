@@ -10,7 +10,7 @@ The reference documentation is divided into several sections:
 [horizontal]
 <<spring-batch-intro.adoc#spring-batch-intro,Spring Batch Introduction>> :: Background, usage
  scenarios and general guidelines.
-<<whatsnew.adoc#whatsNew,What's new in Spring Batch 4.1>> :: New features introduced in version 4.1.
+<<whatsnew.adoc#whatsNew,What's new in Spring Batch 4.2>> :: New features introduced in version 4.2.
 <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>> :: Core concepts and abstractions
 of the Batch domain language.
 <<job.adoc#configureJob,Configuring and Running a Job>> :: Job configuration, execution and

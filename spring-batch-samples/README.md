@@ -888,3 +888,34 @@ file to another.  It uses XStream for the object XML conversion,
 because this is simple to configure for basic use cases like this
 one.  See
 [Spring OXM documentation](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#oxm) for details of other options.
+
+### Batch metrics with Micrometer
+
+This sample shows how to use [Micrometer](https://micrometer.io) to collect batch metrics in Spring Batch.
+It uses [Prometheus](https://prometheus.io) as the metrics back end and [Grafana](https://grafana.com) as the front end. 
+The sample consists of two jobs:
+
+* `job1` : Composed of two tasklets that print `hello` and `world`
+* `job2` : Composed of single chunk-oriented step that reads and writes a random number of items
+
+These two jobs are run repeatedly at regular intervals and might fail randomly for demonstration purposes.
+
+This sample requires [docker compose](https://docs.docker.com/compose/) to start the monitoring stack.
+To run the sample, please follow these steps:
+
+```
+$>cd spring-batch-samples/src/grafana
+$>docker-compose up -d
+```
+
+This should start the required monitoring stack:
+
+* Prometheus server on port `9090`
+* Prometheus push gateway on port `9091`
+* Grafana on port `3000`
+
+Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/features/datasources/prometheus/)
+and import the ready-to-use dashboard in `spring-batch-samples/src/grafana/spring-batch-dashboard.json`.
+
+Finally, run the `org.springframework.batch.sample.metrics.BatchMetricsApplication`
+class without any argument to start the sample.
