@@ -892,12 +892,12 @@ one.  See
 ### Batch metrics with Micrometer
 
 This sample shows how to use [Micrometer](https://micrometer.io) to collect batch metrics in Spring Batch.
-It uses [Prometheus](https://prometheus.io) as metrics backend and [Grafana](https://grafana.com) as frontend. 
+It uses [Prometheus](https://prometheus.io) as the metrics back end and [Grafana](https://grafana.com) as the front end. 
 The sample consists of two jobs:
 
-* `job1` : composed of two tasklets that print `hello` and `world`
-* `job2` : composed of single chunk-oriented step that reads and writes a random number of items
+* `job1` : Composed of two tasklets that print `hello` and `world`
+* `job2` : Composed of single chunk-oriented step that reads and writes a random number of items
 
-These two jobs are run repeatedly at regular intervals and might fail randomly for demonstration purpose.
+These two jobs are run repeatedly at regular intervals and might fail randomly for demonstration purposes.
 
 Please refer to the [README.md](src/main/java/org/springframework/batch/sample/metrics/README.md) for more details about how to run this sample.

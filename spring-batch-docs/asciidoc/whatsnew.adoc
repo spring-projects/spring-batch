@@ -14,9 +14,9 @@ Spring Batch 4.2 adds the following features:
 [[whatsNewMetrics]]
 === Batch metrics with Micrometer
 
-This release introduces a new feature that allows you to monitor your batch jobs
-using Micrometer. By default, Spring Batch will collect metrics like job duration,
-step duration, item read/write throughput, etc and register them in Micrometer's
+This release introduces a new feature that lets you monitor your batch jobs
+by using Micrometer. By default, Spring Batch collects metrics (such as job duration,
+step duration, item read and write throughput, and others) and registers them in Micrometer's
 global metrics registry under the `spring.batch` prefix.
 These metrics can be sent to any https://micrometer.io/docs/concepts#_supported_monitoring_systems[monitoring system]
 supported by Micrometer.
