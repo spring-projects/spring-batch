@@ -900,4 +900,22 @@ The sample consists of two jobs:
 
 These two jobs are run repeatedly at regular intervals and might fail randomly for demonstration purposes.
 
-Please refer to the [README.md](src/main/java/org/springframework/batch/sample/metrics/README.md) for more details about how to run this sample.
+This sample requires [docker compose](https://docs.docker.com/compose/) to start the monitoring stack.
+To run the sample, please follow these steps:
+
+```
+$>cd spring-batch-samples/src/grafana
+$>docker-compose up -d
+```
+
+This should start the required monitoring stack:
+
+* Prometheus server on port `9090`
+* Prometheus push gateway on port `9091`
+* Grafana on port `3000`
+
+Once started, you need to [configure Prometheus as data source in Grafana](https://grafana.com/docs/features/datasources/prometheus/)
+and import the ready-to-use dashboard in `spring-batch-samples/src/grafana/spring-batch-dashboard.json`.
+
+Finally, run the `org.springframework.batch.sample.metrics.BatchMetricsApplication`
+class without any argument to start the sample.
