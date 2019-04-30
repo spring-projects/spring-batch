@@ -17,12 +17,12 @@
 package org.springframework.batch.item.kafka.builder;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.kafka.KafkaItemReader;
-import org.springframework.batch.item.kafka.support.OffsetsProvider;
+import org.springframework.batch.item.kafka.OffsetsProvider;
+import org.springframework.batch.item.kafka.support.AutoCommitOffsetsProvider;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.util.Assert;
 
@@ -41,7 +41,7 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	private List<String> topics;
 
-	private OffsetsProvider offsetsProvider;
+	private OffsetsProvider offsetsProvider = new AutoCommitOffsetsProvider();
 
 	private long pollTimeout = 50L;
 
@@ -124,6 +124,13 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	/**
+	 * The {@link OffsetsProvider} implementation to provide initial offsets.
+	 *
+	 * @param offsetsProvider
+	 * @return The current instance of the builder.
+	 * @see KafkaItemReader#setOffsetsProvider(OffsetsProvider)
+	 */
 	public KafkaItemReaderBuilder<K,V> offsetsProvider(OffsetsProvider offsetsProvider)  {
 		this.offsetsProvider = offsetsProvider;
 		return this;
@@ -150,6 +157,9 @@ public class KafkaItemReaderBuilder<K, V> {
 		Assert.isTrue(this.pollTimeout >= 0, "pollTimeout must not be negative.");
 		Assert.notNull(this.consumerFactory, "'consumerFactory' must not be null.");
 		Assert.notNull(this.offsetsProvider, "'offsetsProvider' must not be null.");
+		if  (this.consumerFactory.isAutoCommit()) {
+			Assert.state(this.offsetsProvider instanceof AutoCommitOffsetsProvider, "'AutoCommitOffsetsProvider' must be used if 'consumerFactory' is set to auto commit.");
+		}
 
 		KafkaItemReader<K, V> reader = new KafkaItemReader<>();
 		reader.setConsumerFactory(this.consumerFactory);

@@ -18,7 +18,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.item.kafka.KafkaItemReader;
-import org.springframework.batch.item.kafka.support.OffsetsProvider;
+import org.springframework.batch.item.kafka.OffsetsProvider;
+import org.springframework.batch.item.kafka.support.BeginningOffsetsProvider;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -54,6 +55,7 @@ public class KafkaItemReaderBuilderTests {
 		new KafkaItemReaderBuilder<>()
 				.name("kafkaItemReader")
 				.topicPartitions(topicPartitions)
+				.consumerFactory(null)
 				.offsetsProvider(offsetsProvider)
 				.build();
 	}
@@ -65,6 +67,7 @@ public class KafkaItemReaderBuilderTests {
 
 		new KafkaItemReaderBuilder<>()
 				.name("kafkaItemReader")
+				.topicPartitions(null)
 				.consumerFactory(consumerFactory)
 				.offsetsProvider(offsetsProvider)
 				.build();
@@ -93,6 +96,22 @@ public class KafkaItemReaderBuilderTests {
 				.name("kafkaItemReader")
 				.consumerFactory(consumerFactory)
 				.topicPartitions(topicPartitions)
+				.offsetsProvider(null)
+				.build();
+	}
+
+	@Test
+	public void testOffsetsProviderWithAutoCommitConsumerFactory() {
+		this.thrown.expect(IllegalStateException.class);
+		this.thrown.expectMessage("'AutoCommitOffsetsProvider' must be used if 'consumerFactory' is set to auto commit.");
+
+		when(consumerFactory.isAutoCommit()).thenReturn(true);
+
+		new KafkaItemReaderBuilder<>()
+				.name("kafkaItemReader")
+				.consumerFactory(consumerFactory)
+				.topicPartitions(topicPartitions)
+				.offsetsProvider(new BeginningOffsetsProvider())
 				.build();
 	}
 

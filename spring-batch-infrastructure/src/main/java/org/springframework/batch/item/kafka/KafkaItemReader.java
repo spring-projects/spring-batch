@@ -30,7 +30,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.kafka.support.OffsetsProvider;
+import org.springframework.batch.item.kafka.support.AutoCommitOffsetsProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -41,14 +41,6 @@ import org.springframework.util.ClassUtils;
  * <p>
  * An {@link ItemReader} implementation for Apache Kafka.
  * </p>
- *
- * Single-thread consumer with manually assigned list of partitions and offsets store outside of Kafka. Supports:
- * <ul>
- * <li>Retry/restart, topic-partition offsets saved in ExecutionContext.
- * <li>Uses 'max.poll.records' for chunking/paging.
- * <li>Remote chunking, manual topic-partition assignment.
- * <li>...
- * </ul>
  *
  * @author Mathieu Ouellet
  * @since 4.2
@@ -115,6 +107,9 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 		Assert.state(topicPartitions == null || topics == null, "Both 'topicPartitions' and 'topics' cannot be specified together.");
 		Assert.notNull(consumerFactory, "'consumerFactory' must not be null.");
 		Assert.notNull(offsetsProvider, "'offsetsProvider' must not be null.");
+		if  (consumerFactory.isAutoCommit()) {
+			Assert.state(offsetsProvider instanceof AutoCommitOffsetsProvider, "'AutoCommitOffsetsProvider' must be used if 'consumerFactory' is set to auto commit.");
+		}
 	}
 
 	@Override
@@ -126,7 +121,7 @@ public class KafkaItemReader<K, V> extends AbstractItemCountingItemStreamItemRea
 				offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSET);
 			}
 			else {
-				offsets = offsetsProvider.get();
+				offsets = offsetsProvider.get(topicPartitions);
 			}
 
 			if (offsets != null && !offsets.isEmpty()) {
