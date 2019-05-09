@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.file.builder;
 
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,6 +176,8 @@ public class FlatFileItemReaderBuilderTests {
 				.names("first", "second", "third")
 				.targetType(Foo.class)
 				.recordSeparatorPolicy(new DefaultRecordSeparatorPolicy("\"", "%"))
+				.bufferedReaderFactory((resource, encoding) ->
+						new LineNumberReader(new InputStreamReader(resource.getInputStream(), encoding)))
 				.maxItemCount(2)
 				.saveState(false)
 				.build();
