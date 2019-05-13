@@ -102,6 +102,7 @@ allprojects {
 		micrometerVersion = '1.1.4'
 		prometheusPushgatewayVersion = '0.6.0'
 		docResourcesVersion = '0.1.1.RELEASE'
+		assertjVersion='3.12.2'
 	}
 
 	apply plugin: 'idea'
@@ -325,6 +326,8 @@ project('spring-batch-infrastructure') {
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 		testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
 		testCompile "javax.xml.bind:jaxb-api:$jaxbApiVersion"
+		testCompile "org.springframework.kafka:spring-kafka-test:$springKafkaVersion"
+		testCompile "org.assertj:assertj-core:$assertjVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"

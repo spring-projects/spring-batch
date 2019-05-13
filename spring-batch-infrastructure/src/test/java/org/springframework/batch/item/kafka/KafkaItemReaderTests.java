@@ -1,167 +1,312 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *          https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package org.springframework.batch.item.kafka;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Mathieu Ouellet
+ * @author Mahmoud Ben Hassine
  */
 public class KafkaItemReaderTests {
 
-	private static final TopicPartition TOPIC_PARTITION = new TopicPartition("topic", 0);
-
-	@Mock
-	private ConsumerFactory<String, String> consumerFactory;
-
-	@Mock
-	private Consumer<String, String> consumer;
-
-	@Mock
-	private OffsetsProvider offsetsProvider;
+	@ClassRule
+	public static EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1);
 
 	private KafkaItemReader<String, String> reader;
+	private KafkaTemplate<String, String> template;
+	private Properties consumerProperties;
+
+	@BeforeClass
+	public static void setUpTopics() {
+		embeddedKafka.getEmbeddedKafka().addTopics(
+				new NewTopic("topic1", 1, (short) 1),
+				new NewTopic("topic2", 2, (short) 1),
+				new NewTopic("topic3", 1, (short) 1),
+				new NewTopic("topic4", 2, (short) 1)
+		);
+	}
 
 	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-		Map<String, Object> config = new HashMap<>();
-		config.put("max.poll.records", 2);
-		config.put("enable.auto.commit", false);
-		when(consumerFactory.getConfigurationProperties()).thenReturn(config);
-		when(consumerFactory.createConsumer()).thenReturn(consumer);
-		reader = new KafkaItemReader<>();
-		reader.setConsumerFactory(consumerFactory);
-		reader.setOffsetsProvider(offsetsProvider);
-		reader.setTopicPartitions(singletonList(TOPIC_PARTITION));
-		reader.setSaveState(true);
-		reader.setPollTimeout(50L);
-		reader.afterPropertiesSet();
+	public void setUp() {
+		Map<String, Object> producerProperties = KafkaTestUtils.producerProps(embeddedKafka.getEmbeddedKafka());
+		ProducerFactory<String, String> producerFactory = new DefaultKafkaProducerFactory<>(producerProperties);
+		this.template = new KafkaTemplate<>(producerFactory);
+
+		this.consumerProperties = new Properties();
+		this.consumerProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+				embeddedKafka.getEmbeddedKafka().getBrokersAsString());
+		this.consumerProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "1");
+		this.consumerProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+				StringDeserializer.class.getName());
+		this.consumerProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+				StringDeserializer.class.getName());
 	}
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception {
-		reader = new KafkaItemReader<>();
-
+	public void testValidation() {
 		try {
-			reader.afterPropertiesSet();
+			new KafkaItemReader<>(null, "topic", 0);
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalStateException ignore) {
+		catch (IllegalArgumentException exception) {
+			assertEquals("Consumer properties must not be null", exception.getMessage());
 		}
 
-		reader.setTopicPartitions(singletonList(new TopicPartition("topic", 0)));
-		reader.setTopics(singletonList("topic"));
 		try {
-			reader.afterPropertiesSet();
+			new KafkaItemReader<>(new Properties(), "topic", 0);
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalStateException ignore) {
+		catch (IllegalArgumentException exception) {
+			assertEquals("bootstrap.servers property must be provided", exception.getMessage());
 		}
 
-		reader.setTopics(null);
+		Properties consumerProperties = new Properties();
+		consumerProperties.put("bootstrap.servers", embeddedKafka.getEmbeddedKafka());
 		try {
-			reader.afterPropertiesSet();
+			new KafkaItemReader<>(consumerProperties, "topic", 0);
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalArgumentException ignore) {
+		catch (IllegalArgumentException exception) {
+			assertEquals("group.id property must be provided", exception.getMessage());
 		}
 
-		reader.setConsumerFactory(consumerFactory);
+		consumerProperties.put("group.id", "1");
 		try {
-			reader.afterPropertiesSet();
+			new KafkaItemReader<>(consumerProperties, "topic", 0);
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalArgumentException ignore) {
+		catch (IllegalArgumentException exception) {
+			assertEquals("key.deserializer property must be provided", exception.getMessage());
 		}
 
-		reader.setOffsetsProvider(offsetsProvider);
-		reader.afterPropertiesSet();
+		consumerProperties.put("key.deserializer", StringDeserializer.class.getName());
+		try {
+			new KafkaItemReader<>(consumerProperties, "topic", 0);
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException exception) {
+			assertEquals("value.deserializer property must be provided", exception.getMessage());
+		}
+
+		consumerProperties.put("value.deserializer", StringDeserializer.class.getName());
+		try {
+			new KafkaItemReader<>(consumerProperties, "", 0);
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException exception) {
+			assertEquals("Topic name must not be null or empty", exception.getMessage());
+		}
+
+		try {
+			this.reader = new KafkaItemReader<>(consumerProperties, "topic");
+			fail("Expected exception was not thrown");
+		}
+		catch (Exception exception) {
+			assertEquals("At least one partition must be provided", exception.getMessage());
+		}
+
+		try {
+			this.reader = new KafkaItemReader<>(consumerProperties, "topic", 0);
+		}
+		catch (Exception exception) {
+			fail("Must not throw an exception when configuration is valid");
+		}
+
+		try {
+			this.reader.setPollTimeout(null);
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException exception) {
+			assertEquals("pollTimeout must not be null", exception.getMessage());
+		}
+
+		try {
+			this.reader.setPollTimeout(Duration.ZERO);
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException exception) {
+			assertEquals("pollTimeout must not be zero", exception.getMessage());
+		}
+
+		try {
+			this.reader.setPollTimeout(Duration.ofSeconds(-1));
+			fail("Expected exception was not thrown");
+		}
+		catch (IllegalArgumentException exception) {
+			assertEquals("pollTimeout must not be negative", exception.getMessage());
+		}
 	}
 
 	@Test
-	public void testAssignTopicPartitions() {
-		reader.open(new ExecutionContext());
-		verify(consumer).assign(singletonList(TOPIC_PARTITION));
+	public void testReadFromSinglePartition() {
+		this.template.setDefaultTopic("topic1");
+		this.template.sendDefault("val0");
+		this.template.sendDefault("val1");
+		this.template.sendDefault("val2");
+		this.template.sendDefault("val3");
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic1", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+
+		String item = this.reader.read();
+		assertThat(item, is("val0"));
+
+		item = this.reader.read();
+		assertThat(item, is("val1"));
+
+		item = this.reader.read();
+		assertThat(item, is("val2"));
+
+		item = this.reader.read();
+		assertThat(item, is("val3"));
+
+		item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
 	}
 
 	@Test
-	public void testRead() throws Exception {
-		Map<TopicPartition, List<ConsumerRecord<String, String>>> records = new HashMap<>();
-		records.put(TOPIC_PARTITION, singletonList(
-				new ConsumerRecord<>(TOPIC_PARTITION.topic(), TOPIC_PARTITION.partition(), 0L, "key0", "val0")));
-		when(consumer.poll(any())).thenReturn(new ConsumerRecords<>(records));
+	public void testReadFromMultiplePartitions() {
+		this.template.setDefaultTopic("topic2");
+		this.template.sendDefault("val0");
+		this.template.sendDefault("val1");
+		this.template.sendDefault("val2");
+		this.template.sendDefault("val3");
 
-		reader.open(new ExecutionContext());
-		String read = reader.read();
-		assertThat(read, is("val0"));
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic2", 0, 1);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+
+		List<String> items = new ArrayList<>();
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		assertThat(items, containsInAnyOrder("val0", "val1", "val2", "val3"));
+		String item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
 	}
 
 	@Test
-	public void testPollRecords() throws Exception {
-		Map<TopicPartition, List<ConsumerRecord<String, String>>> firstPoll = new HashMap<>();
-		firstPoll.put(TOPIC_PARTITION, asList(new ConsumerRecord<>("topic", 0, 0L, "key0", "val0"),
-				new ConsumerRecord<>("topic", 0, 1L, "key1", "val1")));
-		when(consumer.poll(Duration.ofMillis(2000L))).thenReturn(new ConsumerRecords<>(firstPoll));
+	public void testReadFromSinglePartitionAfterRestart() {
+		this.template.setDefaultTopic("topic3");
+		this.template.sendDefault("val0");
+		this.template.sendDefault("val1");
+		this.template.sendDefault("val2");
+		this.template.sendDefault("val3");
+		this.template.sendDefault("val4");
 
-		Map<TopicPartition, List<ConsumerRecord<String, String>>> secondPoll = new HashMap<>();
-		secondPoll.put(TOPIC_PARTITION, singletonList(new ConsumerRecord<>("topic", 0, 2L, "key2", "val2")));
-		when(consumer.poll(Duration.ofMillis(50L))).thenReturn(new ConsumerRecords<>(secondPoll));
-
-		reader.open(new ExecutionContext());
-
-		String read = reader.read();
-		assertThat(read, is("val0"));
-
-		read = reader.read();
-		assertThat(read, is("val1"));
-
-		read = reader.read();
-		assertThat(read, is("val2"));
-	}
-
-	@Test
-	public void testSeekOnSavedState() {
-		long offset = 100L;
-		Map<TopicPartition, Long> offsets = new HashMap<>();
-		offsets.put(TOPIC_PARTITION, offset);
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.put("topic.partition.offset", offsets);
-		reader.open(executionContext);
-		verify(consumer).seek(TOPIC_PARTITION, offset);
+		Map<TopicPartition, Long> offsets = new HashMap<>();
+		offsets.put(new TopicPartition("topic3", 0), 1L);
+		executionContext.put("topic.partition.offsets", offsets);
+
+		// topic3-0: val0, val1, val2, val3, val4
+		//                  ^
+		//                  |
+		//   last committed offset = 1  (should restart from offset = 2)
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic3", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(executionContext);
+
+		List<String> items = new ArrayList<>();
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		assertThat(items, containsInAnyOrder("val2", "val3", "val4"));
+		String item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
 	}
 
 	@Test
-	public void testSeekToProvidedOffsets() {
-		long offset = 100L;
+	public void testReadFromMultiplePartitionsAfterRestart() {
+		this.template.send("topic4", 0, null, "val0");
+		this.template.send("topic4", 0, null, "val2");
+		this.template.send("topic4", 0, null, "val4");
+		this.template.send("topic4", 0, null, "val6");
+		this.template.send("topic4", 1, null, "val1");
+		this.template.send("topic4", 1, null, "val3");
+		this.template.send("topic4", 1, null, "val5");
+		this.template.send("topic4", 1, null, "val7");
+
+		ExecutionContext executionContext = new ExecutionContext();
 		Map<TopicPartition, Long> offsets = new HashMap<>();
-		offsets.put(TOPIC_PARTITION, offset);
-		given(offsetsProvider.get(singletonList(TOPIC_PARTITION))).willReturn(offsets);
-		reader.open(new ExecutionContext());
-		verify(consumer).seek(TOPIC_PARTITION, offset);
+		offsets.put(new TopicPartition("topic4", 0), 1L);
+		offsets.put(new TopicPartition("topic4", 1), 2L);
+		executionContext.put("topic.partition.offsets", offsets);
+
+		// topic4-0: val0, val2, val4, val6
+		//                   ^
+		//                   |
+		//   last committed  offset = 1  (should restart from offset = 2)
+		// topic4-1: val1, val3, val5, val7
+		//                         ^
+		//                         |
+		//         last committed  offset = 2  (should restart from offset = 3)
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic4", 0, 1);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(executionContext);
+
+		List<String> items = new ArrayList<>();
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		items.add(this.reader.read());
+		assertThat(items, containsInAnyOrder("val4", "val6", "val7"));
+		String item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
 	}
 
 }
