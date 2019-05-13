@@ -54,7 +54,7 @@ public abstract class TransactionManagerConfigurationTests {
 		for (Advisor advisor : advisors) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor) {
 				TransactionInterceptor transactionInterceptor = (TransactionInterceptor) advisor.getAdvice();
-				return transactionInterceptor.getTransactionManager();
+				return (PlatformTransactionManager) transactionInterceptor.getTransactionManager();
 			}
 		}
 		return null;

@@ -46,7 +46,7 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '5.2.0.M1'
+		springVersionDefault = '5.2.0.M2'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.4.RELEASE'
 		springAmqpVersion = '2.2.0.M1'
