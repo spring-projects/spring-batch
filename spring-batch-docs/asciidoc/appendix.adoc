@@ -27,6 +27,9 @@
 |AmqpItemReader|Given a Spring `AmqpTemplate`, it provides
             synchronous receive methods. The `receiveAndConvert()` method
             lets you receive POJO objects.
+|KafkaItemReader|An `ItemReader` that reads messages from an Apache Kafka topic.
+It can be configured to read messages from multiple partitions of the same topic.
+This reader stores message offsets in the execution context to support restart capabilities.
 |FlatFileItemReader|Reads from a flat file. Includes `ItemStream`
             and `Skippable` functionality. See link:readersAndWriters.html#flatFileItemReader[`FlatFileItemReader`].
 |HibernateCursorItemReader|Reads from a cursor based on an HQL query. See

@@ -9,6 +9,7 @@
 Spring Batch 4.2 adds the following features:
 
 * Support for batch metrics with https://micrometer.io[Micrometer]
+* Support for reading/writing data from/to https://kafka.apache.org[Apache Kafka] topics
 * Improved documentation
 
 [[whatsNewMetrics]]
@@ -23,6 +24,13 @@ supported by Micrometer.
 
 For more details about this feature, please refer to the
 <<monitoring-and-metrics.adoc#monitoring-and-metrics,Monitoring and metrics>> chapter.
+
+[[whatsNewKafka]]
+=== Apache Kafka item reader/writer
+
+This release adds a new `KafkaItemReader` and `KafkaItemWriter` to read data from and
+write it to Kafka topics. For more details about these new components, please refer
+to the https://docs.spring.io/spring-batch/4.2.x/api/index.html[Javadoc].
 
 [[whatsNewDocs]]
 === Documentation updates
