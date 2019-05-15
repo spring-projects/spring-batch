@@ -47,6 +47,11 @@ public class JobRepositorySupport implements JobRepository {
 		return null;
 	}
 
+	@Override
+	public StepExecution getLastStepExecution(Collection<StepExecution> stepExecutions, String stepName) {
+		return null;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#getStepExecutionCount(org.springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
 	 */
@@ -73,6 +78,11 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public void updateExecutionContext(JobExecution jobExecution) {
+	}
+
+	@Override
+	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
+		return null;
 	}
 
 	public void add(StepExecution stepExecution) {

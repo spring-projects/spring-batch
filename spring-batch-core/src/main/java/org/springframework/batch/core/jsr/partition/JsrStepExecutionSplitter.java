@@ -17,12 +17,14 @@ package org.springframework.batch.core.jsr.partition;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.launch.JsrJobOperator;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -78,13 +80,15 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 			}
 		});
 		JobExecution jobExecution = stepExecution.getJobExecution();
+		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
+		Collection<StepExecution> allPriorStepExecutions = jobRepository.getStepExecutions(jobInstance);
 
 		for(int i = 0; i < gridSize; i++) {
 			String stepName = this.stepName + ":partition" + i;
 			JobExecution curJobExecution = new JobExecution(jobExecution);
 			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
 
-			if(!restoreState || isStartable(curStepExecution, new ExecutionContext())) {
+			if(!restoreState || isStartable(curStepExecution, new ExecutionContext(), allPriorStepExecutions)) {
 				executions.add(curStepExecution);
 			}
 		}
