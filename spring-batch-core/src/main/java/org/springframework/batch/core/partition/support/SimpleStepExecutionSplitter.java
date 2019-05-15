@@ -178,6 +178,9 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		Map<String, ExecutionContext> contexts = getContexts(stepExecution, gridSize);
 		Set<StepExecution> set = new HashSet<>(contexts.size());
 
+		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
+		Collection<StepExecution> allPriorStepExecutions = jobRepository.getStepExecutions(jobInstance);
+
 		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
 
 			// Make the step execution name unique and repeatable
@@ -185,7 +188,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 			StepExecution currentStepExecution = jobExecution.createStepExecution(stepName);
 
-			boolean startable = isStartable(currentStepExecution, context.getValue());
+			boolean startable = isStartable(currentStepExecution, context.getValue(), allPriorStepExecutions);
 
 			if (startable) {
 				set.add(currentStepExecution);
@@ -245,9 +248,29 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 * @param context the execution context of the step
 	 * @return true if the step execution is startable, false otherwise
 	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 * @deprecated This method is less performant than and deprecated in favor of
+	 * {@link SimpleStepExecutionSplitter#isStartable(StepExecution, ExecutionContext, Collection)}
 	 */
+	@Deprecated
 	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
-		return getStartable(stepExecution, context);
+		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
+		String stepName = stepExecution.getStepName();
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
+		return isStartable(stepExecution, context, lastStepExecution);
+	}
+
+	/**
+	 * Check if a step execution is startable.
+	 * @param stepExecution the step execution to check
+	 * @param context the execution context of the step
+	 * @param allPriorStepExecutions all the step executions in the job repository at this moment to compare against
+	 * @return true if the step execution is startable, false otherwise
+	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 */
+	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context, Collection<StepExecution> allPriorStepExecutions) throws JobExecutionException {
+		String stepName = stepExecution.getStepName();
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(allPriorStepExecutions, stepName);
+		return isStartable(stepExecution, context, lastStepExecution);
 	}
 
 	/**
@@ -262,11 +285,10 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 */
 	@Deprecated
 	protected boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
+		return isStartable(stepExecution, context);
+	}
 
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		String stepName = stepExecution.getStepName();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
-
+	private boolean isStartable(StepExecution stepExecution, ExecutionContext context, StepExecution lastStepExecution) throws JobExecutionException {
 		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED);
 
 		if (isRestart) {
@@ -277,7 +299,6 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		}
 
 		return shouldStart(allowStartIfComplete, stepExecution, lastStepExecution) || isRestart;
-
 	}
 
 	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution, StepExecution lastStepExecution)

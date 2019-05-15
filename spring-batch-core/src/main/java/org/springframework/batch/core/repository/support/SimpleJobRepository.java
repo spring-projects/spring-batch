@@ -217,17 +217,31 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
-	@Nullable
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<>(jobExecutions.size());
 
 		for (JobExecution jobExecution : jobExecutions) {
 			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					stepExecutions.add(stepExecution);
-				}
+			stepExecutions.addAll(jobExecution.getStepExecutions());
+		}
+		return stepExecutions;
+	}
+
+	@Override
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		Collection<StepExecution> stepExecutions = getStepExecutions(jobInstance);
+		return getLastStepExecution(stepExecutions, stepName);
+	}
+
+	@Override
+	public StepExecution getLastStepExecution(Collection<StepExecution> allStepExecutions, String stepName) {
+
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+
+		for (StepExecution stepExecution : allStepExecutions) {
+			if (stepName.equals(stepExecution.getStepName())) {
+				stepExecutions.add(stepExecution);
 			}
 		}
 
