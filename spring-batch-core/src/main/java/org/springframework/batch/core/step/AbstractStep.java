@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step;
 
+import java.time.Duration;
 import java.util.Date;
 
 import io.micrometer.core.instrument.Tag;
@@ -267,6 +268,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			));
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
+			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(), stepExecution.getEndTime());
+			logger.info("Step: [" + stepExecution.getStepName() + "] executed in " + BatchMetrics.formatDuration(stepExecutionDuration));
 
 			try {
 				getJobRepository().update(stepExecution);
