@@ -15,7 +15,12 @@
  */
 package org.springframework.batch.sample.metrics;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import io.micrometer.core.instrument.Meter;
@@ -31,6 +36,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
@@ -41,12 +47,90 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BatchMetricsTests {
 
 	private static final int EXPECTED_SPRING_BATCH_METRICS = 6;
+
+	@Test
+	public void testCalculateDuration() {
+		LocalDateTime startTime = LocalDateTime.now();
+		LocalDateTime endTime = startTime
+				.plus(2, ChronoUnit.HOURS)
+				.plus(31, ChronoUnit.MINUTES)
+				.plus(12, ChronoUnit.SECONDS)
+				.plus(42, ChronoUnit.MILLIS);
+
+		Duration duration = BatchMetrics.calculateDuration(toDate(startTime), toDate(endTime));
+		Duration expectedDuration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31).plusHours(2);
+		assertEquals(expectedDuration, duration);
+	}
+
+	@Test
+	public void testCalculateDurationWhenNoStartTime() {
+		Duration duration = BatchMetrics.calculateDuration(null, toDate(LocalDateTime.now()));
+		assertNull(duration);
+	}
+
+	@Test
+	public void testCalculateDurationWhenNoEndTime() {
+		Duration duration = BatchMetrics.calculateDuration(toDate(LocalDateTime.now()), null);
+		assertNull(duration);
+	}
+
+	private Date toDate(LocalDateTime localDateTime) {
+		return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+	}
+
+	@Test
+	public void testFormatValidDuration() {
+		Duration duration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31).plusHours(2);
+		String formattedDuration = BatchMetrics.formatDuration(duration);
+		assertEquals("2h31m12s42ms", formattedDuration);
+	}
+
+	@Test
+	public void testFormatValidDurationWithoutHours() {
+		Duration duration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31);
+		String formattedDuration = BatchMetrics.formatDuration(duration);
+		assertEquals("31m12s42ms", formattedDuration);
+	}
+
+	@Test
+	public void testFormatValidDurationWithoutMinutes() {
+		Duration duration = Duration.ofMillis(42).plusSeconds(12);
+		String formattedDuration = BatchMetrics.formatDuration(duration);
+		assertEquals("12s42ms", formattedDuration);
+	}
+
+	@Test
+	public void testFormatValidDurationWithoutSeconds() {
+		Duration duration = Duration.ofMillis(42);
+		String formattedDuration = BatchMetrics.formatDuration(duration);
+		assertEquals("42ms", formattedDuration);
+	}
+
+	@Test
+	public void testFormatNegativeDuration() {
+		Duration duration = Duration.ofMillis(-1);
+		String formattedDuration = BatchMetrics.formatDuration(duration);
+		assertTrue(formattedDuration.isEmpty());
+	}
+
+	@Test
+	public void testFormatZeroDuration() {
+		String formattedDuration = BatchMetrics.formatDuration(Duration.ZERO);
+		assertTrue(formattedDuration.isEmpty());
+	}
+
+	@Test
+	public void testFormatNullDuration() {
+		String formattedDuration = BatchMetrics.formatDuration(null);
+		assertTrue(formattedDuration.isEmpty());
+	}
 
 	@Test
 	public void testBatchMetrics() throws Exception {

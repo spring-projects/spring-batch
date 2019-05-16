@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.metrics;
 
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.Counter;
@@ -25,9 +28,17 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 
+import org.springframework.lang.Nullable;
+
 /**
- * Main entry point to interact with Micrometer's {@link Metrics#globalRegistry}.
- * Provides common metrics such as {@link Timer}, {@link Counter} and {@link Gauge}.
+ * Central class for batch metrics. It provides:
+ *
+ * <ul>
+ *     <li>the main entry point to interact with Micrometer's {@link Metrics#globalRegistry}
+ *     with common metrics such as {@link Timer}, {@link Counter} and {@link Gauge}.</li>
+ *     <li>Some utility methods like calculating durations and formatting them in
+ *     a human readable format.</li>
+ * </ul>
  *
  * Only intended for internal use.
  *
@@ -46,7 +57,6 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a {@link Timer}.
-	 *
 	 * @param name of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the timer
 	 * @param tags of the timer
@@ -61,7 +71,6 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link Timer.Sample}.
-	 *
 	 * @return a new timer sample instance
 	 */
 	public static Timer.Sample createTimerSample() {
@@ -70,7 +79,6 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link LongTaskTimer}.
-	 *
 	 * @param name of the long task timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the long task timer.
 	 * @param tags of the timer
@@ -85,7 +93,6 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link Counter}.
-	 *
 	 * @param name of the counter. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the counter
 	 * @param tags of the counter
@@ -100,7 +107,6 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link Gauge}.
-	 *
 	 * @param name of the gauge. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the gauge
 	 * @param supplier A supplier that yields a value for the gauge.
@@ -112,6 +118,49 @@ public final class BatchMetrics {
 				.description(description)
 				.tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
+	}
+
+	/**
+	 * Calculate the duration between two dates.
+	 * @param startTime the start time
+	 * @param endTime the end time
+	 * @return the duration between start time and end time
+	 */
+	@Nullable
+	public static Duration calculateDuration(@Nullable Date startTime, @Nullable Date endTime) {
+		if (startTime == null || endTime == null) {
+			return null;
+		}
+		return Duration.between(startTime.toInstant(), endTime.toInstant());
+	}
+
+	/**
+	 * Format a duration in a human readable format like: 2h32m15s10ms.
+	 * @param duration to format
+	 * @return A human readable duration
+	 */
+	public static String formatDuration(@Nullable Duration duration) {
+		if (duration == null || duration.isZero() || duration.isNegative()) {
+			return "";
+		}
+		StringBuilder formattedDuration = new StringBuilder();
+		long hours = duration.toHours();
+		long minutes = duration.toMinutes();
+		long seconds = duration.getSeconds();
+		long millis = duration.toMillis();
+		if (hours != 0) {
+			formattedDuration.append(hours).append("h");
+		}
+		if (minutes != 0) {
+			formattedDuration.append(minutes - TimeUnit.HOURS.toMinutes(hours)).append("m");
+		}
+		if (seconds != 0) {
+			formattedDuration.append(seconds - TimeUnit.MINUTES.toSeconds(minutes)).append("s");
+		}
+		if (millis != 0) {
+			formattedDuration.append(millis - TimeUnit.SECONDS.toMillis(seconds)).append("ms");
+		}
+		return formattedDuration.toString();
 	}
 
 }
