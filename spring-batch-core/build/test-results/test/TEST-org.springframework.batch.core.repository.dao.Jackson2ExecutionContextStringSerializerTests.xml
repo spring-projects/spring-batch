@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializerTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:34" hostname="Michaels-MacBook-Pro-3.local" time="0.04">
-  <properties/>
-  <testcase name="testSerializeAMap" classname="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializerTests" time="0.018"/>
-  <testcase name="testNullSerialization" classname="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializerTests" time="0.0"/>
-  <testcase name="testComplexObject" classname="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializerTests" time="0.022"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:pls="http://www.w3.org/2005/01/pronunciation-lexicon" xmlns:ssml="http://www.w3.org/2001/10/synthesis" xmlns:svg="http://www.w3.org/2000/svg"><head><title>Testing Individual Steps</title><link rel="stylesheet" type="text/css" href="docbook-epub.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/><link rel="prev" href="ch10s02.xhtml" title="End-To-End Testing of Batch Jobs"/><link rel="next" href="ch10s04.xhtml" title="Testing Step-Scoped Components"/></head><body><header/><section class="section" title="Testing Individual Steps" epub:type="subchapter" id="testingIndividualSteps"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Testing Individual Steps</h2></div></div></div><p>For complex batch jobs, test cases in the end-to-end testing
-    approach may become unmanageable. It these cases, it may be more useful to
-    have test cases to test individual steps on their own. The
-    <code class="classname">AbstractJobTests</code> class contains a method
-    <code class="methodname">launchStep</code> that takes a step name and runs just
-    that particular <code class="classname">Step</code>. This approach allows for more
-    targeted tests by allowing the test to set up data for just that step and
-    to validate its results directly.</p><pre class="programlisting">JobExecution jobExecution = jobLauncherTestUtils.launchStep("loadFileStep");</pre></section><footer/></body></html>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.job.flow.support.state.SplitStateTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.03">
-  <properties/>
-  <testcase name="testConcurrentHandling" classname="org.springframework.batch.core.job.flow.support.state.SplitStateTests" time="0.029"/>
-  <testcase name="testBasicHandling" classname="org.springframework.batch.core.job.flow.support.state.SplitStateTests" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: spring-batch-infrastructure-tests
-Implementation-Version: 4.0.0.BUILD-SNAPSHOT
-Created-By: 1.8.0_31 (Oracle Corporation)
-

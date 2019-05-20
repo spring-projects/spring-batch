@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.job.builder.FlowBuilderTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:11" hostname="Michaels-MacBook-Pro-3.local" time="0.008">
-  <properties/>
-  <testcase name="test" classname="org.springframework.batch.core.job.builder.FlowBuilderTests" time="0.008"/>
-  <system-out><![CDATA[10:02:11,546  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step]
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

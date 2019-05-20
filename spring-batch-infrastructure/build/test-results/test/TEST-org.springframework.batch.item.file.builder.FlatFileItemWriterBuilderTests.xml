@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.item.file.builder.FlatFileItemWriterBuilderTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:12" hostname="Michaels-MacBook-Pro-3.local" time="0.043">
-  <properties/>
-  <testcase name="testFlags" classname="org.springframework.batch.item.file.builder.FlatFileItemWriterBuilderTests" time="0.02"/>
-  <testcase name="testMissingLineAggregator" classname="org.springframework.batch.item.file.builder.FlatFileItemWriterBuilderTests" time="0.0"/>
-  <testcase name="test" classname="org.springframework.batch.item.file.builder.FlatFileItemWriterBuilderTests" time="0.023"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

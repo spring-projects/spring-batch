@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.support.DatabaseTypeIntegrationTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:25" hostname="Michaels-MacBook-Pro-3.local" time="0.732">
-  <properties/>
-  <testcase name="testDerby" classname="org.springframework.batch.support.DatabaseTypeIntegrationTests" time="0.294"/>
-  <testcase name="testH2" classname="org.springframework.batch.support.DatabaseTypeIntegrationTests" time="0.438"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

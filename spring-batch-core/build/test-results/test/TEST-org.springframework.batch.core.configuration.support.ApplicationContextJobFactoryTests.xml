@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.configuration.support.ApplicationContextJobFactoryTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:01:51" hostname="Michaels-MacBook-Pro-3.local" time="0.013">
-  <properties/>
-  <testcase name="testFactoryContext" classname="org.springframework.batch.core.configuration.support.ApplicationContextJobFactoryTests" time="0.009"/>
-  <testcase name="testPostProcessing" classname="org.springframework.batch.core.configuration.support.ApplicationContextJobFactoryTests" time="0.004"/>
-  <system-out><![CDATA[10:01:51,636  INFO Test worker support.StaticApplicationContext:581 - Refreshing org.springframework.context.support.StaticApplicationContext@6523e183: startup date [Thu Mar 23 10:01:51 CDT 2017]; root of context hierarchy
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

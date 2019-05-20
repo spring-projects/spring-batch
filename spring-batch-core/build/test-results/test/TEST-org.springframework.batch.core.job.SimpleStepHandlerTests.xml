@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.job.SimpleStepHandlerTests" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:12" hostname="Michaels-MacBook-Pro-3.local" time="0.005">
-  <properties/>
-  <testcase name="testHandleStep" classname="org.springframework.batch.core.job.SimpleStepHandlerTests" time="0.004"/>
-  <testcase name="testAfterPropertiesSet" classname="org.springframework.batch.core.job.SimpleStepHandlerTests" time="0.001"/>
-  <system-out><![CDATA[10:02:12,247  INFO Test worker job.SimpleStepHandler:146 - Executing step: [step]
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

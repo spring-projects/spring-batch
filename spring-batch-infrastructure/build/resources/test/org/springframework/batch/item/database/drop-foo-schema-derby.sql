@@ -1,3 +1,0 @@
-DROP PROCEDURE read_foos;
-DROP PROCEDURE read_some_foos;
-DROP TABLE T_FOOS;

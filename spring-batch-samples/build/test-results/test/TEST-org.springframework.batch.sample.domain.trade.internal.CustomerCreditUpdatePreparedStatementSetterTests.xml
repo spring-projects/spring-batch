@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetterTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:56" hostname="Michaels-MacBook-Pro-3.local" time="0.201">
-  <properties/>
-  <testcase name="testSetValues" classname="org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetterTests" time="0.201"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

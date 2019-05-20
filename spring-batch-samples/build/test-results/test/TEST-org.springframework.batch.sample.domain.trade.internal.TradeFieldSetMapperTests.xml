@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapperTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:05:57" hostname="Michaels-MacBook-Pro-3.local" time="0.001">
-  <properties/>
-  <testcase name="testRegularUse" classname="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapperTests" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

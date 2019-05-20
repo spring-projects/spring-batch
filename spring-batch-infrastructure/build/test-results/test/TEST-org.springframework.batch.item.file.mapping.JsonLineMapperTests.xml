@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.item.file.mapping.JsonLineMapperTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:12" hostname="Michaels-MacBook-Pro-3.local" time="0.134">
-  <properties/>
-  <testcase name="testMappingError" classname="org.springframework.batch.item.file.mapping.JsonLineMapperTests" time="0.126"/>
-  <testcase name="testMapLine" classname="org.springframework.batch.item.file.mapping.JsonLineMapperTests" time="0.004"/>
-  <testcase name="testMapNested" classname="org.springframework.batch.item.file.mapping.JsonLineMapperTests" time="0.002"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.step.item.SkipWrapperTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:45" hostname="Michaels-MacBook-Pro-3.local" time="0.0">
-  <properties/>
-  <testcase name="testToString" classname="org.springframework.batch.core.step.item.SkipWrapperTests" time="0.0"/>
-  <testcase name="testItemWrapperT" classname="org.springframework.batch.core.step.item.SkipWrapperTests" time="0.0"/>
-  <testcase name="testItemWrapperTException" classname="org.springframework.batch.core.step.item.SkipWrapperTests" time="0.0"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

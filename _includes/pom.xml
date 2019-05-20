@@ -1,7 +1,0 @@
-<dependencies>
-    <dependency>
-        <groupId>{@= groupId @}</groupId>
-        <artifactId>spring-batch-core</artifactId>
-        <version>{@= version @}</version>
-    </dependency>
-</dependencies>

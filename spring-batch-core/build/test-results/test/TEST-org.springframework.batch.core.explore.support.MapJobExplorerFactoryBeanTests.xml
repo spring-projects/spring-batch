@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBeanTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:02:10" hostname="Michaels-MacBook-Pro-3.local" time="0.003">
-  <properties/>
-  <testcase name="testCreateExplorer" classname="org.springframework.batch.core.explore.support.MapJobExplorerFactoryBeanTests" time="0.003"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

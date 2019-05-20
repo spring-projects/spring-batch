@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.springframework.batch.item.xml.stax.DefaultFragmentEventReaderTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-03-23T15:04:22" hostname="Michaels-MacBook-Pro-3.local" time="0.006">
-  <properties/>
-  <testcase name="testMarkFragmentProcessed" classname="org.springframework.batch.item.xml.stax.DefaultFragmentEventReaderTests" time="0.004"/>
-  <testcase name="testFragmentWrapping" classname="org.springframework.batch.item.xml.stax.DefaultFragmentEventReaderTests" time="0.001"/>
-  <testcase name="testMarkFragmentProcessedImmediatelyAfterMarkFragmentStart" classname="org.springframework.batch.item.xml.stax.DefaultFragmentEventReaderTests" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
