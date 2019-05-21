@@ -718,12 +718,12 @@ public Job chunkJob() {
 ----
 
 The `ItemReader` reference points to the bean you want
-to use for reading data on the master. The `ItemWriter` reference
+to use for reading data on the manager. The `ItemWriter` reference
 points to a special `ItemWriter`
 (called `ChunkMessageChannelItemWriter`),
 as described above. The processor (if any) is left off the
-master configuration, as it is configured on the worker. The
-following configuration provides a basic master setup. You
+manager configuration, as it is configured on the worker. The
+following configuration provides a basic manager setup. You
 should check any additional component properties, such as
 throttle limits and so on, when implementing your use case.
 
@@ -878,7 +878,7 @@ public org.apache.activemq.ActiveMQConnectionFactory connectionFactory() {
 }
 
 /*
- * Configure inbound flow (requests coming from the master)
+ * Configure inbound flow (requests coming from the manager)
  */
 @Bean
 public DirectChannel requests() {
@@ -894,7 +894,7 @@ public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) 
 }
 
 /*
- * Configure outbound flow (replies going to the master)
+ * Configure outbound flow (replies going to the manager)
  */
 @Bean
 public DirectChannel replies() {
@@ -925,7 +925,7 @@ public ChunkProcessorChunkHandler<Integer> chunkProcessorChunkHandler() {
 ----
 
 Most of these configuration items should look familiar from the
-master configuration. Workers do not need access to
+manager configuration. Workers do not need access to
 the Spring Batch `JobRepository` nor
 to the actual job configuration file. The main bean of interest
 is the `chunkProcessorChunkHandler`. The
@@ -933,7 +933,7 @@ is the `chunkProcessorChunkHandler`. The
 configured `SimpleChunkProcessor`, which is where you would provide a reference to your
 `ItemWriter` (and, optionally, your
 `ItemProcessor`) that will run on the worker
-when it receives chunks from the master.
+when it receives chunks from the manager.
 
 For more information, see the section of the "Scalability" chapter on
 link:$$https://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
@@ -942,7 +942,7 @@ Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatch
 annotation that can be used to simplify a remote chunking setup. This annotation provides
 two beans that can be autowired in the application context:
 
-* `RemoteChunkingMasterStepBuilderFactory`: used to configure the master step
+* `RemoteChunkingMasterStepBuilderFactory`: used to configure the manager step
 * `RemoteChunkingWorkerBuilder`: used to configure the remote worker integration flow
 
 These APIs take care of configuring a number of components as described in the following diagram:
@@ -950,8 +950,8 @@ These APIs take care of configuring a number of components as described in the f
 .Remote Chunking Configuration
 image::{batch-asciidoc}images/remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
 
-On the master side, the `RemoteChunkingMasterStepBuilderFactory` allows you to
-configure a master step by declaring:
+On the manager side, the `RemoteChunkingMasterStepBuilderFactory` lets you
+configure a manager step by declaring:
 
 * the item reader to read items and send them to workers
 * the output channel ("Outgoing requests") to send requests to workers
@@ -962,10 +962,10 @@ A `ChunkMessageChannelItemWriter` and the `MessagingTemplate` are not needed to 
 
 On the worker side, the `RemoteChunkingWorkerBuilder` allows you to configure a worker to:
 
-* listen to requests sent by the master on the input channel ("Incoming requests")
+* listen to requests sent by the manager on the input channel ("Incoming requests")
 * call the `handleChunk` method of `ChunkProcessorChunkHandler` for each request
 with the configured `ItemProcessor` and `ItemWriter`
-* send replies on the output channel ("Outgoing replies") to the master
+* send replies on the output channel ("Outgoing replies") to the manager
 
 There is no need to explicitly configure the `SimpleChunkProcessor`
 and the `ChunkProcessorChunkHandler` (Those can be explicitly configured if required).
@@ -979,14 +979,14 @@ The following example shows how to use these APIs:
 public class RemoteChunkingJobConfiguration {
 
     @Configuration
-    public static class MasterConfiguration {
+    public static class ManagerConfiguration {
 
         @Autowired
-        private RemoteChunkingMasterStepBuilderFactory masterStepBuilderFactory;
+        private RemoteChunkingMasterStepBuilderFactory managerStepBuilderFactory;
 
         @Bean
-        public TaskletStep masterStep() {
-            return this.masterStepBuilderFactory.get("masterStep")
+        public TaskletStep managerStep() {
+            return this.managerStepBuilderFactory.get("managerStep")
                        .chunk(100)
                        .reader(itemReader())
                        .outputChannel(requests()) // requests sent to workers
@@ -1009,8 +1009,8 @@ public class RemoteChunkingJobConfiguration {
             return this.workerBuilder
                        .itemProcessor(itemProcessor())
                        .itemWriter(itemWriter())
-                       .inputChannel(requests()) // requests received from the master
-                       .outputChannel(replies()) // replies sent to the master
+                       .inputChannel(requests()) // requests received from the manager
+                       .outputChannel(replies()) // replies sent to the manager
                        .build();
         }
 
@@ -1130,7 +1130,7 @@ configuration:
 ----
 
 /*
- * Configuration of the master side
+ * Configuration of the manager side
  */
 @Bean
 public PartitionHandler partitionHandler() {
@@ -1239,7 +1239,7 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
 [source, xml, role="xmlContent"]
 ----
 <job id="personJob">
-  <step id="step1.master">
+  <step id="step1.manager">
     <partition partitioner="partitioner" handler="partitionHandler"/>
     ...
   </step>
@@ -1251,7 +1251,7 @@ You must also ensure that the partition `handler` attribute maps to the `partiti
 ----
 	public Job personJob() {
 		return jobBuilderFactory.get("personJob")
-				.start(stepBuilderFactory.get("step1.master")
+				.start(stepBuilderFactory.get("step1.manager")
 						.partitioner("step1.worker", partitioner())
 						.partitionHandler(partitionHandler())
 						.build())
@@ -1265,7 +1265,7 @@ link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-
 The `@EnableBatchIntegration` annotation that can be used to simplify a remote
  partitioning setup. This annotation provides two beans useful for remote partitioning:
 
-* `RemotePartitioningMasterStepBuilderFactory`: used to configure the master step
+* `RemotePartitioningMasterStepBuilderFactory`: used to configure the manager step
 * `RemotePartitioningWorkerStepBuilderFactory`: used to configure the worker step
 
 These APIs take care of configuring a number of components as described in the following diagram:
@@ -1276,8 +1276,8 @@ image::{batch-asciidoc}images/remote-partitioning-polling-config.png[Remote Part
 .Remote Partitioning Configuration (with replies aggregation)
 image::{batch-asciidoc}images/remote-partitioning-aggregation-config.png[Remote Partitioning Configuration (with replies aggregation), scaledwidth="80%"]
 
-On the master side, the `RemotePartitioningMasterStepBuilderFactory` allows you to
-configure a master step by declaring:
+On the manager side, the `RemotePartitioningMasterStepBuilderFactory` allows you to
+configure a manager step by declaring:
 
 * the `Partitioner` used to partition data
 * the output channel ("Outgoing requests") to send requests to workers
@@ -1289,9 +1289,9 @@ The `MessageChannelPartitionHandler` and the `MessagingTemplate` are not needed 
 
 On the worker side, the `RemotePartitioningWorkerStepBuilderFactory` allows you to configure a worker to:
 
-* listen to requests sent by the master on the input channel ("Incoming requests")
+* listen to requests sent by the manager on the input channel ("Incoming requests")
 * call the `handle` method of `StepExecutionRequestHandler` for each request
-* send replies on the output channel ("Outgoing replies") to the master
+* send replies on the output channel ("Outgoing replies") to the manager
 
 There is no need to explicitly configure the `StepExecutionRequestHandler` (which can be explicitly configured if required).
 
@@ -1305,15 +1305,15 @@ The following example shows how to use these APIs:
 public class RemotePartitioningJobConfiguration {
 
     @Configuration
-    public static class MasterConfiguration {
+    public static class ManagerConfiguration {
 
         @Autowired
-        private RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
+        private RemotePartitioningMasterStepBuilderFactory managerStepBuilderFactory;
 
         @Bean
-        public Step masterStep() {
-                 return this.masterStepBuilderFactory
-                    .get("masterStep")
+        public Step managerStep() {
+                 return this.managerStepBuilderFactory
+                    .get("managerStep")
                     .partitioner("workerStep", partitioner())
                     .gridSize(10)
                     .outputChannel(outgoingRequestsToWorkers())
@@ -1335,8 +1335,8 @@ public class RemotePartitioningJobConfiguration {
         public Step workerStep() {
                  return this.workerStepBuilderFactory
                     .get("workerStep")
-                    .inputChannel(incomingRequestsFromMaster())
-                    .outputChannel(outgoingRepliesToMaster())
+                    .inputChannel(incomingRequestsFromManager())
+                    .outputChannel(outgoingRepliesToManager())
                     .chunk(100)
                     .reader(itemReader())
                     .processor(itemProcessor())
