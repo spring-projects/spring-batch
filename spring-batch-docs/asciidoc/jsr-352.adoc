@@ -559,7 +559,7 @@ Traditional Spring Batch jobs have four ways of scaling (the last two capable of
 * Multiple threads - Executing a single step via multiple threads.
 
 
-* Partitioning - Dividing the data up for parallel processing (master/slave).
+* Partitioning - Dividing the data up for parallel processing (manager/worker).
 
 
 * Remote Chunking - Executing the processor piece of logic remotely.
@@ -584,7 +584,7 @@ JSR-352 provides two options for scaling batch jobs.  Both options support only 
 ==== Partitioning
 
 Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Meta-data is provided
-                to each slave to identify the input to be processed with the slaves reporting back to the master the
+                to each worker to identify the input to be processed with the worker reporting back to the manager the
                 results upon completion.  However, there are some important differences:
 
 * Partitioned `Batchlet` - This will run multiple instances of the
@@ -610,10 +610,10 @@ Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Met
 
 
 * `StepExecutions` - In Spring Batch, partitioned steps are run as
-                            master/slave. Within JSR-352, the same configuration occurs.  However, the slave steps do
+                            manager/worker. Within JSR-352, the same configuration occurs.  However, the worker steps do
                             not get official `StepExecutions`.  Because of that, calls to
                             `JsrJobOperator#getStepExecutions(long jobExecutionId)` will only
-                            return the `StepExecution` for the master.
+                            return the `StepExecution` for the manager.
 
 [NOTE]
 ====
@@ -623,16 +623,16 @@ via the `JobExplorer` and Spring Batch Admin.
 ====
 
 
-* Compensating logic - Since Spring Batch implements the master/slave logic of
+* Compensating logic - Since Spring Batch implements the manager/worker logic of
                             partitioning using steps, `StepExecutionListeners` can be used to
-                            handle compensating logic if something goes wrong.  However, since the slaves JSR-352
+                            handle compensating logic if something goes wrong.  However, since the workers JSR-352
                             provides a collection of other components for the ability to provide compensating logic when
                             errors occur and to dynamically set the exit status.  These components include the following:
 
 |===============
 |__Artifact Interface__|__Description__
-|`javax.batch.api.partition.PartitionCollector`|Provides a way for slave steps to send information back to the
-                                                master.  There is one instance per slave thread.
+|`javax.batch.api.partition.PartitionCollector`|Provides a way for worker steps to send information back to the
+                                                manager.  There is one instance per worker thread.
 |`javax.batch.api.partition.PartitionAnalyzer`|End point that receives the information collected by the
                                                 `PartitionCollector` as well as the resulting
                                                 statuses from a completed partition.
