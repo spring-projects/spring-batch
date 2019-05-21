@@ -584,8 +584,8 @@ JSR-352 provides two options for scaling batch jobs.  Both options support only 
 ==== Partitioning
 
 Conceptually, partitioning in JSR-352 is the same as it is in Spring Batch.  Meta-data is provided
-                to each worker to identify the input to be processed with the worker reporting back to the manager the
-                results upon completion.  However, there are some important differences:
+                to each worker to identify the input to be processed, with the workers reporting back to the manager the
+                results upon completion. However, there are some important differences:
 
 * Partitioned `Batchlet` - This will run multiple instances of the
                             configured `Batchlet` on multiple threads.  Each instance will have
