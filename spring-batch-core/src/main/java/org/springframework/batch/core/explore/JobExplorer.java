@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,16 @@ public interface JobExplorer {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
+	 * Find the last job instance for the given job.
+	 * @param jobName name of the job
+	 * @return the last job instance if any or null otherwise
+	 */
+	@Nullable
+	default JobInstance getLastJobInstance(String jobName) {
+		return null;
+	}
+
+	/**
 	 * Retrieve a {@link JobExecution} by its id. The complete object graph for
 	 * this execution should be returned (unless otherwise indicated) including
 	 * the parent {@link JobInstance} and associated {@link ExecutionContext}
@@ -94,6 +104,18 @@ public interface JobExplorer {
 	 * @return the set of all executions for the specified {@link JobInstance}
 	 */
 	List<JobExecution> getJobExecutions(JobInstance jobInstance);
+
+	/**
+	 * Find the last {@link JobExecution} to have been created for a given
+	 * {@link JobInstance}.
+	 * @param jobInstance the {@link JobInstance}
+	 * @return the last {@link JobExecution} to execute for this instance or
+	 * {@code null} if no job execution is found for the given job instance.
+	 */
+	@Nullable
+	default JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return null;
+	}
 
 	/**
 	 * Retrieve running job executions. The corresponding step executions may

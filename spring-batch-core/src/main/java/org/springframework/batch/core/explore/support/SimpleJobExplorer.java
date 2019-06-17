@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,18 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * (non-Javadoc)
 	 *
 	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getLastJobExecution(
+	 * org.springframework.batch.core.JobInstance)
+	 */
+	@Nullable
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return jobExecutionDao.getLastJobExecution(jobInstance);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions
 	 * (java.lang.String)
 	 */
@@ -161,6 +173,18 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstance(java
+	 * .lang.String)
+	 */
+	@Override
+	public JobInstance getLastJobInstance(String jobName) {
+		return jobInstanceDao.getLastJobInstance(jobName);
 	}
 
 	/*
