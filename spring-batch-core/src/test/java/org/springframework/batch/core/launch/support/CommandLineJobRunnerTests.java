@@ -506,6 +506,16 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
+		public JobInstance getLastJobInstance(String jobName) {
+			return null;
+		}
+
+		@Override
+		public JobExecution getLastJobExecution(JobInstance jobInstance) {
+			return null;
+		}
+
+		@Override
 		public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 			if (jobInstances == null) {
 				return new ArrayList<>();

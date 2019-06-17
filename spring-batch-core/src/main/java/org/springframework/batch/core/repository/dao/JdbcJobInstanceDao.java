@@ -81,7 +81,10 @@ JobInstanceDao, InitializingBean {
 	private static final String FIND_JOB_NAMES = "SELECT distinct JOB_NAME from %PREFIX%JOB_INSTANCE order by JOB_NAME";
 
 	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
-	
+
+	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where" +
+			" I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
+
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
@@ -235,6 +238,25 @@ JobInstanceDao, InitializingBean {
 				new Object[] { jobName }, extractor);
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#
+	 * getLastJobInstance(java.lang.String)
+	 */
+	@Override
+	@Nullable
+	public JobInstance getLastJobInstance(String jobName) {
+		try {
+			return getJdbcTemplate().queryForObject(
+					getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
+					new Object[] { jobName, jobName },
+					new JobInstanceRowMapper());
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	/*

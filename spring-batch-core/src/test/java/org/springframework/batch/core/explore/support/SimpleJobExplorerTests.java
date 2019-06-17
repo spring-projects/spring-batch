@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleJobExplorerTests {
@@ -80,6 +81,13 @@ public class SimpleJobExplorerTests {
 				jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
 		jobExplorer.getJobExecution(123L);
+	}
+
+	@Test
+	public void testGetLastJobExecution() {
+		when(jobExecutionDao.getLastJobExecution(jobInstance)).thenReturn(jobExecution);
+		JobExecution lastJobExecution = jobExplorer.getLastJobExecution(jobInstance);
+		assertEquals(jobExecution, lastJobExecution);
 	}
 
 	@Test
@@ -154,6 +162,13 @@ public class SimpleJobExplorerTests {
 	public void testGetLastJobInstances() throws Exception {
 		jobInstanceDao.getJobInstances("foo", 0, 1);
 		jobExplorer.getJobInstances("foo", 0, 1);
+	}
+
+	@Test
+	public void testGetLastJobInstance() {
+		when(jobInstanceDao.getLastJobInstance("foo")).thenReturn(jobInstance);
+		JobInstance lastJobInstance = jobExplorer.getLastJobInstance("foo");
+		assertEquals(jobInstance, lastJobInstance);
 	}
 
 	@Test
