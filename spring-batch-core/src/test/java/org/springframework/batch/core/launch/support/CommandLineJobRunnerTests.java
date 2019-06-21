@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -52,6 +53,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CommandLineJobRunnerTests {
@@ -242,7 +244,7 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -258,7 +260,7 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobName));
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -267,7 +269,7 @@ public class CommandLineJobRunnerTests {
 		JobInstance jobInstance = new JobInstance(3L, jobName);
 		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -455,7 +457,7 @@ public class CommandLineJobRunnerTests {
 
 		@Override
 		public Set<JobExecution> findRunningJobExecutions(String jobName) {
-			throw new UnsupportedOperationException();
+			return new HashSet<>();
 		}
 
 		@Override
