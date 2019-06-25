@@ -123,7 +123,7 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, @Nullable Object value) {
 		if (value != null) {
 			Object result = this.map.put(key, value);
-			this.dirty = result == null || result != null && !result.equals(value);
+			this.dirty = result == null || !result.equals(value);
 		}
 		else {
 			Object result = this.map.remove(key);
@@ -148,7 +148,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public String getString(String key) {
 
-		return (String) readAndValidate(key, String.class);
+		return readAndValidate(key, String.class);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public long getLong(String key) {
 
-		return (Long) readAndValidate(key, Long.class);
+		return readAndValidate(key, Long.class);
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public int getInt(String key) {
 
-		return (Integer) readAndValidate(key, Integer.class);
+		return readAndValidate(key, Integer.class);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class ExecutionContext implements Serializable {
 	 * @return The <code>Double</code> value
 	 */
 	public double getDouble(String key) {
-		return (Double) readAndValidate(key, Double.class);
+		return readAndValidate(key, Double.class);
 	}
 
 	/**
@@ -256,13 +256,50 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
+	 * Typesafe getter for the value represented by the provided key, with cast to given class.
+	 *
+	 * @param key The key to get a value for
+	 * @param clazz The class of return type
+	 * @param <V> Type of returned value
+	 * @return The value of given type represented by the given key or {@code null} if the key
+	 * is not present
+	 */
+	@Nullable
+	public <V> V get(String key, Class<V> clazz) {
+		Object value = this.map.get(key);
+		if (value == null) {
+			return null;
+		}
+		return get(key, clazz, null);
+	}
+
+	/**
+	 * Typesafe getter for the value represented by the provided key, with cast to given class.
+	 *
+	 * @param key The key to get a value for
+	 * @param type The class of return type
+	 * @param defaultValue Default value in case element is not present
+	 * @param <V> Type of returned value
+	 * @return The value of given type represented by the given key or {@code null} if the key
+	 * is not present
+	 */
+	@Nullable
+	public <V> V get(String key, Class<V> clazz, @Nullable V defaultValue) {
+		Object value = this.map.get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return clazz.cast(value);
+	}
+
+	/**
 	 * Utility method that attempts to take a value represented by a given key and
 	 * validate it as a member of the specified type.
 	 * @param key The key to validate a value for
 	 * @param type Class against which value should be validated
 	 * @return Value typed to the specified <code>Class</code>
 	 */
-	private Object readAndValidate(String key, Class<?> type) {
+	private <V> V readAndValidate(String key, Class<V> type) {
 
 		Object value = get(key);
 
@@ -271,7 +308,7 @@ public class ExecutionContext implements Serializable {
 					+ (value == null ? null : "(" + value.getClass() + ")" + value) + "]");
 		}
 
-		return value;
+		return type.cast(value);
 	}
 
 	/**
