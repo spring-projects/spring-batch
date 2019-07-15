@@ -3201,6 +3201,7 @@ Spring Batch offers the following specialized readers:
 
 * <<ldifReader>>
 * <<mappingLdifReader>>
+* <<avroItemReader>>
 
 [[ldifReader]]
 ===== `LdifReader`
@@ -3216,11 +3217,19 @@ The `MappingLdifReader` reads LDIF (LDAP Data Interchange Format) records from a
 Each read returns a POJO. Spring Batch provides a `MappingLdifReaderBuilder` to construct
 an instance of the `MappingLdifReader`.
 
+[[avroItemReader]]
+===== `AvroItemReader`
+The `AvroItemReader` reads serialized Avro data from a Resource.
+Each read returns an instance of the type specified by a Java class or Avro Schema.
+The reader may be optionnally configured  for input that embeds an Avro schema or not.
+Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the `AvroItemReader`.
+
 [[specializedWriters]]
 ==== Specialized Writers
 Spring Batch offers the following specialized writers:
 
 * <<simpleMailMessageItemWriter>>
+* <<avroItemWriter>>
 
 [[simpleMailMessageItemWriter]]
 ===== `SimpleMailMessageItemWriter`
@@ -3228,6 +3237,13 @@ The `SimpleMailMessageItemWriter` is an `ItemWriter` that can send mail messages
 delegates the actual sending of messages to an instance of `MailSender`. Spring Batch
 provides a `SimpleMailMessageItemWriterBuilder` to construct an instance of the
 `SimpleMailMessageItemWriter`.
+
+[[avroItemWriter]]
+===== `AvroItemWriter`
+The `AvroItemWrite` serializes Java objects to a WriteableResource according to the given type or Schema.
+The writer may be optionally configured to embed an Avro schema in the output or not.
+Spring Batch provides an `AvroItemWriterBuilder` to construct an instance of the `AvroItemWriter`.
+
 
 [[specializedProcessors]]
 ==== Specialized Processors
