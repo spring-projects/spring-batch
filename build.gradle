@@ -60,6 +60,7 @@ allprojects {
 		springLdapVersion = '2.3.2.RELEASE'
 
 		activemqVersion = '5.15.9'
+		apacheAvroVersion ='1.9.0'
 		aspectjVersion = '1.9.3'
 		commonsDdbcpVersion = '2.6.0'
 		commonsIoVersion = '2.6'
@@ -385,6 +386,8 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 		optional "org.springframework.kafka:spring-kafka:$springKafkaVersion"
+		optional "org.apache.avro:avro:$apacheAvroVersion"
+
 		// JSR-305 only used for non-required meta-annotations
 		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
