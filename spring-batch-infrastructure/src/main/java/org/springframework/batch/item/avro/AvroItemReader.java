@@ -166,13 +166,32 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	/**
 	 *
 	 * @param data the {@link Resource} containing the data to be read.
+	 * @param schema the schema used to serialize the data.
+	 */
+	public AvroItemReader(Resource data, Schema schema) {
+		Assert.notNull(data, "'data' is required");
+		Assert.state(data.exists(), "'data' " + data.getFilename() +" does not exist");
+		Assert.notNull(schema, "'schema' is required");
+		try {
+			this.inputStream = data.getInputStream();
+		}
+		catch (IOException e) {
+			throw new IllegalArgumentException(e.getMessage(), e);
+		}
+		this.datumReader = new GenericDatumReader<>(schema);
+	}
+
+
+	/**
+	 *
+	 * @param data the {@link Resource} containing the data to be read.
 	 * @param schema the {@link Resource} containing the
 	 */
 	public AvroItemReader(Resource data, Resource schema) {
 		Assert.notNull(data, "'data' is required");
 		Assert.state(data.exists(), "'data' " + data.getFilename() +" does not exist");
-		Assert.notNull(data, "'schema' is required");
-		Assert.state(data.exists(), "'schema' " + schema.getFilename() +" does not exist");
+		Assert.notNull(schema, "'schema' is required");
+		Assert.state(schema.exists(), "'schema' " + schema.getFilename() +" does not exist");
 		try {
 			this.inputStream = data.getInputStream();
 			Schema avroSchema = new Schema.Parser().parse(schema.getInputStream());

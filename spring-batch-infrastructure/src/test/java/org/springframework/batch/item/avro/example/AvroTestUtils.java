@@ -32,7 +32,6 @@ import org.springframework.core.io.Resource;
  *
  * @author David Turanski
  */
-
 class AvroTestUtils {
 
      static void createTestDataWithNoEmbeddedSchema() throws Exception {
@@ -40,9 +39,9 @@ class AvroTestUtils {
         Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
 
         DatumWriter<User> userDatumWriter = new SpecificDatumWriter<User>(User.class);
-        new File("users-no-schema.avro");
+        new File("users-no-SCHEMA.avro");
 
-        FileOutputStream fileOutputStream =  new FileOutputStream("user-data-no-schema.avro");
+        FileOutputStream fileOutputStream =  new FileOutputStream("user-data-no-SCHEMA.avro");
 
         Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream,null);
         userDatumWriter.setSchema(new Schema.Parser().parse(schemaResource.getInputStream()));

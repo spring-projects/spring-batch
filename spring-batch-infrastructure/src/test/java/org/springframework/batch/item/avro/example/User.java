@@ -93,7 +93,7 @@ public class User extends org.apache.avro.specific.SpecificRecordBase implements
 
   /**
    * Default constructor.  Note that this does not initialize fields
-   * to their default values from the schema.  If that is desired then
+   * to their default values from the SCHEMA.  If that is desired then
    * one should use <code>newBuilder()</code>.
    */
   public User() {}

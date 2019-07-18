@@ -164,7 +164,7 @@ public class AvroItemWriterBuilder<T> {
 	/**
 	 *
 	 * @param embedHeader set to true to embed an Avro schema header in the serialized output.
-	 * * @return The current instance of the builder.
+	 * @return The current instance of the builder.
 	 */
 	public AvroItemWriterBuilder<T> embedHeader(boolean embedHeader) {
 		this.embedHeader = embedHeader;
