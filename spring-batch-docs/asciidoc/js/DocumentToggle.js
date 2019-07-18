@@ -37,6 +37,7 @@ $(document).ready(function(){
         $("*.javaContent > *").addClass("js-toc-ignore");
         $("*.xmlContent > *").removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
+        tocbot.refresh();
         Cookies.set('docToggle', 'xml', { expires: 3652 });
     };
 
@@ -46,6 +47,7 @@ $(document).ready(function(){
         $("*.xmlContent > *").addClass("js-toc-ignore");
         $("*.javaContent > *").removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
+        tocbot.refresh();
         Cookies.set('docToggle', 'java', { expires: 3652 });
     };
 
@@ -55,6 +57,7 @@ $(document).ready(function(){
         $("*.javaContent > *").removeClass("js-toc-ignore");
         $("*.xmlContent > *").removeClass("js-toc-ignore");
         window.dispatchEvent(new Event("tocRefresh"));
+        tocbot.refresh();
         Cookies.set('docToggle', 'both', { expires: 3652 });
     };
 
