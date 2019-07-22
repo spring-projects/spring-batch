@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,14 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Convenient factory for a {@link RemotePartitioningMasterStepBuilder} which sets
+ * Convenient factory for a {@link RemotePartitioningManagerStepBuilder} which sets
  * the {@link JobRepository}, {@link JobExplorer}, {@link BeanFactory} and
  * {@link PlatformTransactionManager} automatically.
  *
- * @deprecated Use {@link RemotePartitioningManagerStepBuilderFactory} instead
- *
- * @since 4.1
+ * @since 4.2
  * @author Mahmoud Ben Hassine
  */
-@Deprecated
-public class RemotePartitioningMasterStepBuilderFactory implements BeanFactoryAware {
+public class RemotePartitioningManagerStepBuilderFactory implements BeanFactoryAware {
 
 	private BeanFactory beanFactory;
 	final private JobExplorer jobExplorer;
@@ -43,13 +40,13 @@ public class RemotePartitioningMasterStepBuilderFactory implements BeanFactoryAw
 
 
 	/**
-	 * Create a new {@link RemotePartitioningMasterStepBuilderFactory}.
+	 * Create a new {@link RemotePartitioningManagerStepBuilderFactory}.
 	 * @param jobRepository the job repository to use
 	 * @param jobExplorer the job explorer to use
 	 * @param transactionManager the transaction manager to use
 	 */
-	public RemotePartitioningMasterStepBuilderFactory(JobRepository jobRepository,
-		JobExplorer jobExplorer, PlatformTransactionManager transactionManager) {
+	public RemotePartitioningManagerStepBuilderFactory(JobRepository jobRepository,
+													   JobExplorer jobExplorer, PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
 		this.jobExplorer = jobExplorer;
@@ -62,13 +59,13 @@ public class RemotePartitioningMasterStepBuilderFactory implements BeanFactoryAw
 	}
 
 	/**
-	 * Creates a {@link RemotePartitioningMasterStepBuilder} and initializes its job
+	 * Creates a {@link RemotePartitioningManagerStepBuilder} and initializes its job
 	 * repository, job explorer, bean factory and transaction manager.
 	 * @param name the name of the step
-	 * @return a {@link RemotePartitioningMasterStepBuilder}
+	 * @return a {@link RemotePartitioningManagerStepBuilder}
 	 */
-	public RemotePartitioningMasterStepBuilder get(String name) {
-		return new RemotePartitioningMasterStepBuilder(name)
+	public RemotePartitioningManagerStepBuilder get(String name) {
+		return new RemotePartitioningManagerStepBuilder(name)
 				.repository(this.jobRepository)
 				.jobExplorer(this.jobExplorer)
 				.beanFactory(this.beanFactory)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,13 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * Builder for a master step in a remote chunking setup. This builder creates and
- * sets a {@link ChunkMessageChannelItemWriter} on the master step.
+ * Builder for a manager step in a remote chunking setup. This builder creates and
+ * sets a {@link ChunkMessageChannelItemWriter} on the manager step.
  *
  * <p>If no {@code messagingTemplate} is provided through
- * {@link RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)},
+ * {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)},
  * this builder will create one and set its default channel to the {@code outputChannel}
- * provided through {@link RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)}.</p>
+ * provided through {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)}.</p>
  *
  * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
  * and that its default channel is set to an output channel on which requests to workers
@@ -59,13 +59,10 @@ import org.springframework.util.Assert;
  * @param <I> type of input items
  * @param <O> type of output items
  *
- * @deprecated Use {@link RemoteChunkingManagerStepBuilder} instead.
- *
- * @since 4.1
+ * @since 4.2
  * @author Mahmoud Ben Hassine
  */
-@Deprecated
-public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
+public class RemoteChunkingManagerStepBuilder<I, O> extends FaultTolerantStepBuilder<I, O> {
 
 	private MessagingTemplate messagingTemplate;
 	private PollableChannel inputChannel;
@@ -77,11 +74,11 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
 	/**
-	 * Create a new {@link RemoteChunkingMasterStepBuilder}.
+	 * Create a new {@link RemoteChunkingManagerStepBuilder}.
 	 *
-	 * @param stepName name of the master step
+	 * @param stepName name of the manager step
 	 */
-	public RemoteChunkingMasterStepBuilder(String stepName) {
+	public RemoteChunkingManagerStepBuilder(String stepName) {
 		super(new StepBuilder(stepName));
 	}
 
@@ -95,7 +92,7 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 *
 	 * @see ChunkMessageChannelItemWriter#setReplyChannel
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> inputChannel(PollableChannel inputChannel) {
+	public RemoteChunkingManagerStepBuilder<I, O> inputChannel(PollableChannel inputChannel) {
 		Assert.notNull(inputChannel, "inputChannel must not be null");
 		this.inputChannel = inputChannel;
 		return this;
@@ -105,15 +102,15 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * Set the output channel on which requests to workers will be sent. By using
 	 * this setter, a default messaging template will be created and the output
 	 * channel will be set as its default channel.
-	 * <p>Use either this setter or {@link RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)}
+	 * <p>Use either this setter or {@link RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)}
 	 * to provide a fully configured messaging template.</p>
 	 *
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
 	 *
-	 * @see RemoteChunkingMasterStepBuilder#messagingTemplate(MessagingTemplate)
+	 * @see RemoteChunkingManagerStepBuilder#messagingTemplate(MessagingTemplate)
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> outputChannel(MessageChannel outputChannel) {
+	public RemoteChunkingManagerStepBuilder<I, O> outputChannel(MessageChannel outputChannel) {
 		Assert.notNull(outputChannel, "outputChannel must not be null");
 		this.outputChannel = outputChannel;
 		return this;
@@ -123,14 +120,14 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * Set the {@link MessagingTemplate} to use to send data to workers.
 	 * <strong>The default channel of the messaging template must be set</strong>.
 	 * <p>Use either this setter to provide a fully configured messaging template or
-	 * provide an output channel through {@link RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)}
+	 * provide an output channel through {@link RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)}
 	 * and a default messaging template will be created.</p>
 	 *
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
-	 * @see RemoteChunkingMasterStepBuilder#outputChannel(MessageChannel)
+	 * @see RemoteChunkingManagerStepBuilder#outputChannel(MessageChannel)
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> messagingTemplate(MessagingTemplate messagingTemplate) {
+	public RemoteChunkingManagerStepBuilder<I, O> messagingTemplate(MessagingTemplate messagingTemplate) {
 		Assert.notNull(messagingTemplate, "messagingTemplate must not be null");
 		this.messagingTemplate = messagingTemplate;
 		return this;
@@ -145,7 +142,7 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setMaxWaitTimeouts(int)
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> maxWaitTimeouts(int maxWaitTimeouts) {
+	public RemoteChunkingManagerStepBuilder<I, O> maxWaitTimeouts(int maxWaitTimeouts) {
 		Assert.isTrue(maxWaitTimeouts > 0, "maxWaitTimeouts must be greater than zero");
 		this.maxWaitTimeouts = maxWaitTimeouts;
 		return this;
@@ -159,16 +156,16 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * @return this builder instance for fluent chaining
 	 * @see ChunkMessageChannelItemWriter#setThrottleLimit(long)
 	 */
-	public RemoteChunkingMasterStepBuilder<I, O> throttleLimit(long throttleLimit) {
+	public RemoteChunkingManagerStepBuilder<I, O> throttleLimit(long throttleLimit) {
 		Assert.isTrue(throttleLimit > 0, "throttleLimit must be greater than zero");
 		this.throttleLimit = throttleLimit;
 		return this;
 	}
 
 	/**
-	 * Build a master {@link TaskletStep}.
+	 * Build a manager {@link TaskletStep}.
 	 *
-	 * @return the configured master step
+	 * @return the configured manager step
 	 * @see RemoteChunkHandlerFactoryBean
 	 */
 	public TaskletStep build() {
@@ -204,149 +201,149 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 */
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> reader(ItemReader<? extends I> reader) {
+	public RemoteChunkingManagerStepBuilder<I, O> reader(ItemReader<? extends I> reader) {
 		super.reader(reader);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O>  repository(JobRepository jobRepository) {
+	public RemoteChunkingManagerStepBuilder<I, O> repository(JobRepository jobRepository) {
 		super.repository(jobRepository);
 		return this;
 	}
 
 	@Override
-	public  RemoteChunkingMasterStepBuilder<I, O>  transactionManager(PlatformTransactionManager transactionManager) {
+	public RemoteChunkingManagerStepBuilder<I, O> transactionManager(PlatformTransactionManager transactionManager) {
 		super.transactionManager(transactionManager);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(Object listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(SkipListener<? super I, ? super O> listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(SkipListener<? super I, ? super O> listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(ChunkListener listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(ChunkListener listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> transactionAttribute(TransactionAttribute transactionAttribute) {
+	public RemoteChunkingManagerStepBuilder<I, O> transactionAttribute(TransactionAttribute transactionAttribute) {
 		super.transactionAttribute(transactionAttribute);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(org.springframework.retry.RetryListener listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(org.springframework.retry.RetryListener listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> keyGenerator(KeyGenerator keyGenerator) {
+	public RemoteChunkingManagerStepBuilder<I, O> keyGenerator(KeyGenerator keyGenerator) {
 		super.keyGenerator(keyGenerator);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> retryLimit(int retryLimit) {
+	public RemoteChunkingManagerStepBuilder<I, O> retryLimit(int retryLimit) {
 		super.retryLimit(retryLimit);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> retryPolicy(RetryPolicy retryPolicy) {
+	public RemoteChunkingManagerStepBuilder<I, O> retryPolicy(RetryPolicy retryPolicy) {
 		super.retryPolicy(retryPolicy);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> backOffPolicy(BackOffPolicy backOffPolicy) {
+	public RemoteChunkingManagerStepBuilder<I, O> backOffPolicy(BackOffPolicy backOffPolicy) {
 		super.backOffPolicy(backOffPolicy);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> retryContextCache(RetryContextCache retryContextCache) {
+	public RemoteChunkingManagerStepBuilder<I, O> retryContextCache(RetryContextCache retryContextCache) {
 		super.retryContextCache(retryContextCache);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> skipLimit(int skipLimit) {
+	public RemoteChunkingManagerStepBuilder<I, O> skipLimit(int skipLimit) {
 		super.skipLimit(skipLimit);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> noSkip(Class<? extends Throwable> type) {
+	public RemoteChunkingManagerStepBuilder<I, O> noSkip(Class<? extends Throwable> type) {
 		super.noSkip(type);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> skip(Class<? extends Throwable> type) {
+	public RemoteChunkingManagerStepBuilder<I, O> skip(Class<? extends Throwable> type) {
 		super.skip(type);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> skipPolicy(SkipPolicy skipPolicy) {
+	public RemoteChunkingManagerStepBuilder<I, O> skipPolicy(SkipPolicy skipPolicy) {
 		super.skipPolicy(skipPolicy);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> noRollback(Class<? extends Throwable> type) {
+	public RemoteChunkingManagerStepBuilder<I, O> noRollback(Class<? extends Throwable> type) {
 		super.noRollback(type);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> noRetry(Class<? extends Throwable> type) {
+	public RemoteChunkingManagerStepBuilder<I, O> noRetry(Class<? extends Throwable> type) {
 		super.noRetry(type);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> retry(Class<? extends Throwable> type) {
+	public RemoteChunkingManagerStepBuilder<I, O> retry(Class<? extends Throwable> type) {
 		super.retry(type);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> stream(ItemStream stream) {
+	public RemoteChunkingManagerStepBuilder<I, O> stream(ItemStream stream) {
 		super.stream(stream);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> chunk(int chunkSize) {
+	public RemoteChunkingManagerStepBuilder<I, O> chunk(int chunkSize) {
 		super.chunk(chunkSize);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
+	public RemoteChunkingManagerStepBuilder<I, O> chunk(CompletionPolicy completionPolicy) {
 		super.chunk(completionPolicy);
 		return this;
 	}
 
 	/**
 	 * This method will throw a {@link UnsupportedOperationException} since
-	 * the item writer of the master step in a remote chunking setup will be
+	 * the item writer of the manager step in a remote chunking setup will be
 	 * automatically set to an instance of {@link ChunkMessageChannelItemWriter}.
 	 *
-	 * When building a master step for remote chunking, no item writer must be
+	 * When building a manager step for remote chunking, no item writer must be
 	 * provided.
 	 *
 	 * @throws UnsupportedOperationException if an item writer is provided
@@ -354,69 +351,69 @@ public class RemoteChunkingMasterStepBuilder<I, O> extends FaultTolerantStepBuil
 	 * @see RemoteChunkHandlerFactoryBean#setChunkWriter(ItemWriter)
 	 */
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> writer(ItemWriter<? super O> writer) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("When configuring a master step " +
+	public RemoteChunkingManagerStepBuilder<I, O> writer(ItemWriter<? super O> writer) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("When configuring a manager step " +
 				"for remote chunking, the item writer will be automatically set " +
 				"to an instance of ChunkMessageChannelItemWriter. The item writer " +
 				"must not be provided in this case.");
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> readerIsTransactionalQueue() {
+	public RemoteChunkingManagerStepBuilder<I, O> readerIsTransactionalQueue() {
 		super.readerIsTransactionalQueue();
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(ItemReadListener<? super I> listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(ItemReadListener<? super I> listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(ItemWriteListener<? super O> listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(ItemWriteListener<? super O> listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> chunkOperations(RepeatOperations repeatTemplate) {
+	public RemoteChunkingManagerStepBuilder<I, O> chunkOperations(RepeatOperations repeatTemplate) {
 		super.chunkOperations(repeatTemplate);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> exceptionHandler(ExceptionHandler exceptionHandler) {
+	public RemoteChunkingManagerStepBuilder<I, O> exceptionHandler(ExceptionHandler exceptionHandler) {
 		super.exceptionHandler(exceptionHandler);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> stepOperations(RepeatOperations repeatTemplate) {
+	public RemoteChunkingManagerStepBuilder<I, O> stepOperations(RepeatOperations repeatTemplate) {
 		super.stepOperations(repeatTemplate);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> startLimit(int startLimit) {
+	public RemoteChunkingManagerStepBuilder<I, O> startLimit(int startLimit) {
 		super.startLimit(startLimit);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> listener(StepExecutionListener listener) {
+	public RemoteChunkingManagerStepBuilder<I, O> listener(StepExecutionListener listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> allowStartIfComplete(boolean allowStartIfComplete) {
+	public RemoteChunkingManagerStepBuilder<I, O> allowStartIfComplete(boolean allowStartIfComplete) {
 		super.allowStartIfComplete(allowStartIfComplete);
 		return this;
 	}
 
 	@Override
-	public RemoteChunkingMasterStepBuilder<I, O> processor(ItemProcessor<? super I, ? extends O> itemProcessor) {
+	public RemoteChunkingManagerStepBuilder<I, O> processor(ItemProcessor<? super I, ? extends O> itemProcessor) {
 		super.processor(itemProcessor);
 		return this;
 	}

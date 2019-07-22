@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
-import org.springframework.batch.sample.remotechunking.MasterConfiguration;
+import org.springframework.batch.sample.remotechunking.ManagerConfiguration;
 import org.springframework.batch.sample.remotechunking.WorkerConfiguration;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +36,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * The master step of the job under test will read data and send chunks to the worker
+ * The manager step of the job under test will read data and send chunks to the worker
  * (started in {@link RemoteChunkingJobFunctionalTests#setUp()}) for processing and writing.
  *
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {JobRunnerConfiguration.class, MasterConfiguration.class})
+@ContextConfiguration(classes = {JobRunnerConfiguration.class, ManagerConfiguration.class})
 @PropertySource("classpath:remote-chunking.properties")
 public class RemoteChunkingJobFunctionalTests {
 
@@ -81,7 +81,7 @@ public class RemoteChunkingJobFunctionalTests {
 		// then
 		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 		Assert.assertEquals(
-				"Waited for 2 results.", // the master sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers
+				"Waited for 2 results.", // the manager sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers
 				jobExecution.getExitStatus().getExitDescription());
 	}
 

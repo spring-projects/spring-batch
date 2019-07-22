@@ -132,13 +132,11 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:element name="remote-chunking-master">
+	<xsd:element name="remote-chunking-manager">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
-						The remote chunking master is used as the writer in batch jobs
+						The remote chunking manager is used as the writer in batch jobs
 						to communicate with the middleware used to send chunks remotely.
-						This element is deprecated in favor of "remote-chunking-manager"
-						defined in "spring-batch-integration-4.2.xsd" and above.
 					]]></xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -170,7 +168,7 @@
 			<xsd:attribute name="reply-channel" type="xsd:string" use="required">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-								The channel to use for reply messages from slaves.
+								The channel to use for reply messages from workers.
 							]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
@@ -182,14 +180,12 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="remote-chunking-slave">
+	<xsd:element name="remote-chunking-worker">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
-						The remote chunking slave receives chunks sent by the master and
+						The remote chunking worker receives chunks sent by the manager and
 						provides the processor and writer to handle the chunks, returning
-						status back to the master.
-						This element is deprecated in favor of "remote-chunking-worker"
-						defined in "spring-batch-integration-4.2.xsd" and above.
+						status back to the manager.
 					]]></xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -197,7 +193,7 @@
 			<xsd:attribute name="input-channel" type="xsd:string" use="required">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-								The channel to use for receiving messages from the master.
+								The channel to use for receiving messages from the manager.
 							]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">
@@ -209,7 +205,7 @@
 			<xsd:attribute name="output-channel" type="xsd:string" use="required">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-								The channel to use for sending messages to the master.
+								The channel to use for sending messages to the manager.
 							]]></xsd:documentation>
 					<xsd:appinfo>
 						<tool:annotation kind="ref">

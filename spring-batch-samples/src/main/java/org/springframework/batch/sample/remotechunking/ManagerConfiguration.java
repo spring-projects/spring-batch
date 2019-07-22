@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the master side of the remote chunking sample.
- * The master step reads numbers from 1 to 6 and sends 2 chunks {1, 2, 3} and
+ * This configuration class is for the manager side of the remote chunking sample.
+ * The manager step reads numbers from 1 to 6 and sends 2 chunks {1, 2, 3} and
  * {4, 5, 6} to workers for processing and writing.
  *
  * @author Mahmoud Ben Hassine
@@ -50,7 +50,7 @@ import org.springframework.integration.jms.dsl.Jms;
 @EnableBatchIntegration
 @EnableIntegration
 @PropertySource("classpath:remote-chunking.properties")
-public class MasterConfiguration {
+public class ManagerConfiguration {
 
 	@Value("${broker.url}")
 	private String brokerUrl;
@@ -59,7 +59,7 @@ public class MasterConfiguration {
 	private JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
-	private RemoteChunkingMasterStepBuilderFactory masterStepBuilderFactory;
+	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
 
 	@Bean
 	public ActiveMQConnectionFactory connectionFactory() {
@@ -110,8 +110,8 @@ public class MasterConfiguration {
 	}
 
 	@Bean
-	public TaskletStep masterStep() {
-		return this.masterStepBuilderFactory.get("masterStep")
+	public TaskletStep managerStep() {
+		return this.managerStepBuilderFactory.get("managerStep")
 				.<Integer, Integer>chunk(3)
 				.reader(itemReader())
 				.outputChannel(requests())
@@ -122,7 +122,7 @@ public class MasterConfiguration {
 	@Bean
 	public Job remoteChunkingJob() {
 		return this.jobBuilderFactory.get("remoteChunkingJob")
-				.start(masterStep())
+				.start(managerStep())
 				.build();
 	}
 

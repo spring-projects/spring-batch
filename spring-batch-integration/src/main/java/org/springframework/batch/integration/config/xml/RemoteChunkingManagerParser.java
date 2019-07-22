@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,14 @@ import org.w3c.dom.Element;
 
 /**
  * <p>
- * Parser for the remote-chunking-master namespace element.
+ * Parser for the remote-chunking-manager namespace element.
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.1
  */
-public class RemoteChunkingMasterParser extends AbstractBeanDefinitionParser {
+public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
 	private static final String MESSAGE_TEMPLATE_ATTRIBUTE = "message-template";
 	private static final String STEP_ATTRIBUTE = "step";
 	private static final String REPLY_CHANNEL_ATTRIBUTE = "reply-channel";

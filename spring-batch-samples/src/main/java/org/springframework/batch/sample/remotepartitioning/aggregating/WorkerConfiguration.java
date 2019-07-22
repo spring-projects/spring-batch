@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.integration.jms.dsl.Jms;
 
 /**
  * This configuration class is for the worker side of the remote partitioning sample.
- * Each worker will process a partition sent by the master step.
+ * Each worker will process a partition sent by the manager step.
  *
  * @author Mahmoud Ben Hassine
  */
@@ -55,7 +55,7 @@ public class WorkerConfiguration {
 	}
 
 	/*
-	 * Configure inbound flow (requests coming from the master)
+	 * Configure inbound flow (requests coming from the manager)
 	 */
 	@Bean
 	public DirectChannel requests() {
@@ -71,7 +71,7 @@ public class WorkerConfiguration {
 	}
 
 	/*
-	 * Configure outbound flow (replies going to the master)
+	 * Configure outbound flow (replies going to the manager)
 	 */
 	@Bean
 	public DirectChannel replies() {

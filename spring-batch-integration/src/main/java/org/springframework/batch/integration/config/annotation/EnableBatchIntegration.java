@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
-import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
-import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
+import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.config.EnableIntegration;
@@ -36,13 +36,13 @@ import org.springframework.integration.config.EnableIntegration;
  * class, it will be possible to autowire the following beans:
  *
  * <ul>
- *     <li>{@link RemoteChunkingMasterStepBuilderFactory}:
- *     used to create a master step of a remote chunking setup by automatically
+ *     <li>{@link RemoteChunkingManagerStepBuilderFactory}:
+ *     used to create a manager step of a remote chunking setup by automatically
  *     setting the job repository and transaction manager.</li>
  *     <li>{@link RemoteChunkingWorkerBuilder}: used to create the integration
  *     flow on the worker side of a remote chunking setup.</li>
- *     <li>{@link RemotePartitioningMasterStepBuilderFactory}: used to create
- *     a master step of a remote partitioning setup by automatically setting
+ *     <li>{@link RemotePartitioningManagerStepBuilderFactory}: used to create
+ *     a manager step of a remote partitioning setup by automatically setting
  *     the job repository, job explorer, bean factory and transaction manager.</li>
  *     <li>{@link RemotePartitioningWorkerStepBuilderFactory}: used to create
  *     a worker step of a remote partitioning setup by automatically setting
@@ -58,14 +58,14 @@ import org.springframework.integration.config.EnableIntegration;
  * public class RemoteChunkingAppConfig {
  *
  * 	&#064;Autowired
- * 	private RemoteChunkingMasterStepBuilderFactory masterStepBuilderFactory;
+ * 	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
  *
  * 	&#064;Autowired
  * 	private RemoteChunkingWorkerBuilder workerBuilder;
  *
  * 	&#064;Bean
- * 	public TaskletStep masterStep() {
- *       	 return this.masterStepBuilderFactory
+ * 	public TaskletStep managerStep() {
+ *       	 return this.managerStepBuilderFactory
  *       		.get("masterStep")
  *       		.chunk(100)
  *       		.reader(itemReader())
@@ -79,8 +79,8 @@ import org.springframework.integration.config.EnableIntegration;
  *       	 return this.workerBuilder
  *       		.itemProcessor(itemProcessor())
  *       		.itemWriter(itemWriter())
- *       		.inputChannel(incomingRequestsFromMaster())
- *       		.outputChannel(outgoingRepliesToMaster())
+ *       		.inputChannel(incomingRequestsFromManager())
+ *       		.outputChannel(outgoingRepliesToManager())
  *       		.build();
  * 	}
  *
@@ -98,15 +98,15 @@ import org.springframework.integration.config.EnableIntegration;
  * public class RemotePartitioningAppConfig {
  *
  * 	&#064;Autowired
- * 	private RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
+ * 	private RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
  *
  * 	&#064;Autowired
  * 	private RemotePartitioningWorkerStepBuilderFactory workerStepBuilderFactory;
  *
  * 	&#064;Bean
- * 	public Step masterStep() {
- *       	 return this.masterStepBuilderFactory
- *       		.get("masterStep")
+ * 	public Step managerStep() {
+ *       	 return this.managerStepBuilderFactory
+ *       		.get("managerStep")
  *       		.partitioner("workerStep", partitioner())
  *       		.gridSize(10)
  *       		.outputChannel(outgoingRequestsToWorkers())
@@ -118,8 +118,8 @@ import org.springframework.integration.config.EnableIntegration;
  * 	public Step workerStep() {
  *       	 return this.workerStepBuilderFactory
  *       		.get("workerStep")
- *       		.inputChannel(incomingRequestsFromMaster())
- *       		.outputChannel(outgoingRepliesToMaster())
+ *       		.inputChannel(incomingRequestsFromManager())
+ *       		.outputChannel(outgoingRepliesToManager())
  *       		.chunk(100)
  *       		.reader(itemReader())
  *       		.processor(itemProcessor())
