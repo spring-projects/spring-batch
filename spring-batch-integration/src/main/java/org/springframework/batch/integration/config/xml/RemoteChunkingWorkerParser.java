@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,16 +34,17 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Parser for the remote-chunking-slave namespace element. If an
+ * Parser for the remote-chunking-worker namespace element. If an
  * {@link org.springframework.batch.item.ItemProcessor} is not provided, an
  * {@link org.springframework.batch.item.support.PassThroughItemProcessor} will be
  * configured.
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.1
  */
-public class RemoteChunkingSlaveParser extends AbstractBeanDefinitionParser {
+public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 	private static final String INPUT_CHANNEL_ATTRIBUTE = "input-channel";
 	private static final String OUTPUT_CHANNEL_ATTRIBUTE = "output-channel";
 	private static final String ITEM_PROCESSOR_ATTRIBUTE = "item-processor";

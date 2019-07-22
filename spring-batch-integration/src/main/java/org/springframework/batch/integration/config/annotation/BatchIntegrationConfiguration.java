@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.springframework.batch.integration.config.annotation;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
+import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
 import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
+import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -52,9 +54,16 @@ public class BatchIntegrationConfiguration {
 		this.transactionManager = transactionManager;
 	}
 
+	@Deprecated
 	@Bean
 	public RemoteChunkingMasterStepBuilderFactory remoteChunkingMasterStepBuilderFactory() {
 		return new RemoteChunkingMasterStepBuilderFactory(this.jobRepository,
+				this.transactionManager);
+	}
+
+	@Bean
+	public RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory() {
+		return new RemoteChunkingManagerStepBuilderFactory(this.jobRepository,
 				this.transactionManager);
 	}
 
@@ -63,9 +72,16 @@ public class BatchIntegrationConfiguration {
 		return new RemoteChunkingWorkerBuilder<>();
 	}
 
+	@Deprecated
 	@Bean
 	public RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory() {
 		return new RemotePartitioningMasterStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
+	}
+
+	@Bean
+	public RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory() {
+		return new RemotePartitioningManagerStepBuilderFactory(this.jobRepository,
 				this.jobExplorer, this.transactionManager);
 	}
 

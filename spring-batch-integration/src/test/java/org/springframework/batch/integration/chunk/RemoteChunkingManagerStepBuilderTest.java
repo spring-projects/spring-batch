@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,12 +66,13 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 /**
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemoteChunkingMasterStepBuilderTest.BatchConfiguration.class})
-public class RemoteChunkingMasterStepBuilderTest {
+@ContextConfiguration(classes = {RemoteChunkingManagerStepBuilderTest.BatchConfiguration.class})
+public class RemoteChunkingManagerStepBuilderTest {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -92,7 +93,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 		this.expectedException.expectMessage("inputChannel must not be null");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.inputChannel(null)
 				.build();
 
@@ -107,7 +108,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 		this.expectedException.expectMessage("outputChannel must not be null");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.outputChannel(null)
 				.build();
 
@@ -122,7 +123,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 		this.expectedException.expectMessage("messagingTemplate must not be null");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.messagingTemplate(null)
 				.build();
 
@@ -137,7 +138,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 		this.expectedException.expectMessage("maxWaitTimeouts must be greater than zero");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.maxWaitTimeouts(-1)
 				.build();
 
@@ -152,7 +153,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 		this.expectedException.expectMessage("throttleLimit must be greater than zero");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.throttleLimit(-1L)
 				.build();
 
@@ -163,7 +164,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 	@Test
 	public void testMandatoryInputChannel() {
 		// given
-		RemoteChunkingMasterStepBuilder<String, String> builder = new RemoteChunkingMasterStepBuilder<>("step");
+		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<>("step");
 
 		this.expectedException.expect(IllegalArgumentException.class);
 		this.expectedException.expectMessage("An InputChannel must be provided");
@@ -178,7 +179,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 	@Test
 	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
-		RemoteChunkingMasterStepBuilder<String, String> builder = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.inputChannel(this.inputChannel)
 				.outputChannel(new DirectChannel())
 				.messagingTemplate(new MessagingTemplate());
@@ -197,13 +198,13 @@ public class RemoteChunkingMasterStepBuilderTest {
 	public void testUnsupportedOperationExceptionWhenSpecifyingAnItemWriter() {
 		// given
 		this.expectedException.expect(UnsupportedOperationException.class);
-		this.expectedException.expectMessage("When configuring a master " +
+		this.expectedException.expectMessage("When configuring a manager " +
 				"step for remote chunking, the item writer will be automatically " +
 				"set to an instance of ChunkMessageChannelItemWriter. " +
 				"The item writer must not be provided in this case.");
 
 		// when
-		TaskletStep step = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep step = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.reader(this.itemReader)
 				.writer(items -> { })
 				.repository(this.jobRepository)
@@ -217,9 +218,9 @@ public class RemoteChunkingMasterStepBuilderTest {
 	}
 
 	@Test
-	public void testMasterStepCreation() {
+	public void testManagerStepCreation() {
 		// when
-		TaskletStep taskletStep = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.reader(this.itemReader)
 				.repository(this.jobRepository)
 				.transactionManager(this.transactionManager)
@@ -292,7 +293,7 @@ public class RemoteChunkingMasterStepBuilderTest {
 			}
 		};
 
-		TaskletStep taskletStep = new RemoteChunkingMasterStepBuilder<String, String>("step")
+		TaskletStep taskletStep = new RemoteChunkingManagerStepBuilder<String, String>("step")
 				.reader(itemReader)
 				.readerIsTransactionalQueue()
 				.processor(itemProcessor)

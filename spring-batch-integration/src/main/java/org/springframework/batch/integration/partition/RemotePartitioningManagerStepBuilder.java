@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,25 +39,22 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Builder for a master step in a remote partitioning setup. This builder creates and
- * sets a {@link MessageChannelPartitionHandler} on the master step.
+ * Builder for a manager step in a remote partitioning setup. This builder creates and
+ * sets a {@link MessageChannelPartitionHandler} on the manager step.
  *
  * <p>If no {@code messagingTemplate} is provided through
- * {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)},
+ * {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)},
  * this builder will create one and set its default channel to the {@code outputChannel}
- * provided through {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)}.</p>
+ * provided through {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)}.</p>
  *
  * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
  * and that its default channel is set to an output channel on which requests to workers
  * will be sent.</p>
  *
- * @deprecated Use {@link RemotePartitioningManagerStepBuilder} instead.
- *
- * @since 4.1
+ * @since 4.2
  * @author Mahmoud Ben Hassine
  */
-@Deprecated
-public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
+public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 
 	private static final long DEFAULT_POLL_INTERVAL = 10000L;
 	private static final long DEFAULT_TIMEOUT = -1L;
@@ -71,10 +68,10 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	private long timeout = DEFAULT_TIMEOUT;
 
 	/**
-	 * Create a new {@link RemotePartitioningMasterStepBuilder}.
-	 * @param stepName name of the master step
+	 * Create a new {@link RemotePartitioningManagerStepBuilder}.
+	 * @param stepName name of the manager step
 	 */
-	public RemotePartitioningMasterStepBuilder(String stepName) {
+	public RemotePartitioningManagerStepBuilder(String stepName) {
 		super(new StepBuilder(stepName));
 	}
 
@@ -83,7 +80,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder inputChannel(MessageChannel inputChannel) {
+	public RemotePartitioningManagerStepBuilder inputChannel(MessageChannel inputChannel) {
 		Assert.notNull(inputChannel, "inputChannel must not be null");
 		this.inputChannel = inputChannel;
 		return this;
@@ -93,14 +90,14 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * Set the output channel on which requests to workers will be sent. By using
 	 * this setter, a default messaging template will be created and the output
 	 * channel will be set as its default channel.
-	 * <p>Use either this setter or {@link RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)}
+	 * <p>Use either this setter or {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)}
 	 * to provide a fully configured messaging template.</p>
 	 *
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
-	 * @see RemotePartitioningMasterStepBuilder#messagingTemplate(MessagingTemplate)
+	 * @see RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)
 	 */
-	public RemotePartitioningMasterStepBuilder outputChannel(MessageChannel outputChannel) {
+	public RemotePartitioningManagerStepBuilder outputChannel(MessageChannel outputChannel) {
 		Assert.notNull(outputChannel, "outputChannel must not be null");
 		this.outputChannel = outputChannel;
 		return this;
@@ -110,14 +107,14 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * Set the {@link MessagingTemplate} to use to send data to workers.
 	 * <strong>The default channel of the messaging template must be set</strong>.
 	 * <p>Use either this setter to provide a fully configured messaging template or
-	 * provide an output channel through {@link RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)}
+	 * provide an output channel through {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)}
 	 * and a default messaging template will be created.</p>
 	 *
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
-	 * @see RemotePartitioningMasterStepBuilder#outputChannel(MessageChannel)
+	 * @see RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)
 	 */
-	public RemotePartitioningMasterStepBuilder messagingTemplate(MessagingTemplate messagingTemplate) {
+	public RemotePartitioningManagerStepBuilder messagingTemplate(MessagingTemplate messagingTemplate) {
 		Assert.notNull(messagingTemplate, "messagingTemplate must not be null");
 		this.messagingTemplate = messagingTemplate;
 		return this;
@@ -128,7 +125,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param jobExplorer the job explorer to use.
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder jobExplorer(JobExplorer jobExplorer) {
+	public RemotePartitioningManagerStepBuilder jobExplorer(JobExplorer jobExplorer) {
 		Assert.notNull(jobExplorer, "jobExplorer must not be null");
 		this.jobExplorer = jobExplorer;
 		return this;
@@ -139,7 +136,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param pollInterval the poll interval value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder pollInterval(long pollInterval) {
+	public RemotePartitioningManagerStepBuilder pollInterval(long pollInterval) {
 		Assert.isTrue(pollInterval > 0, "The poll interval must be greater than zero");
 		this.pollInterval = pollInterval;
 		return this;
@@ -150,7 +147,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param timeout the timeout value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder timeout(long timeout) {
+	public RemotePartitioningManagerStepBuilder timeout(long timeout) {
 		this.timeout = timeout;
 		return this;
 	}
@@ -160,7 +157,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @param beanFactory the bean factory to use
 	 * @return this builder instance for fluent chaining
 	 */
-	public RemotePartitioningMasterStepBuilder beanFactory(BeanFactory beanFactory) {
+	public RemotePartitioningManagerStepBuilder beanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 		return this;
 	}
@@ -208,7 +205,7 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 			super.partitionHandler(partitionHandler);
 		}
 		catch (Exception e) {
-			throw new BeanCreationException("Unable to create a master step for remote partitioning", e);
+			throw new BeanCreationException("Unable to create a manager step for remote partitioning", e);
 		}
 
 		return super.build();
@@ -219,77 +216,77 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder repository(JobRepository jobRepository) {
+	public RemotePartitioningManagerStepBuilder repository(JobRepository jobRepository) {
 		super.repository(jobRepository);
 		return this;
 	}
 
 	@Override
-	public  RemotePartitioningMasterStepBuilder transactionManager(PlatformTransactionManager transactionManager) {
+	public RemotePartitioningManagerStepBuilder transactionManager(PlatformTransactionManager transactionManager) {
 		super.transactionManager(transactionManager);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder partitioner(String slaveStepName, Partitioner partitioner) {
+	public RemotePartitioningManagerStepBuilder partitioner(String slaveStepName, Partitioner partitioner) {
 		super.partitioner(slaveStepName, partitioner);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder gridSize(int gridSize) {
+	public RemotePartitioningManagerStepBuilder gridSize(int gridSize) {
 		super.gridSize(gridSize);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder step(Step step) {
+	public RemotePartitioningManagerStepBuilder step(Step step) {
 		super.step(step);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder splitter(StepExecutionSplitter splitter) {
+	public RemotePartitioningManagerStepBuilder splitter(StepExecutionSplitter splitter) {
 		super.splitter(splitter);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder aggregator(StepExecutionAggregator aggregator) {
+	public RemotePartitioningManagerStepBuilder aggregator(StepExecutionAggregator aggregator) {
 		super.aggregator(aggregator);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder startLimit(int startLimit) {
+	public RemotePartitioningManagerStepBuilder startLimit(int startLimit) {
 		super.startLimit(startLimit);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder listener(Object listener) {
+	public RemotePartitioningManagerStepBuilder listener(Object listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder listener(StepExecutionListener listener) {
+	public RemotePartitioningManagerStepBuilder listener(StepExecutionListener listener) {
 		super.listener(listener);
 		return this;
 	}
 
 	@Override
-	public RemotePartitioningMasterStepBuilder allowStartIfComplete(boolean allowStartIfComplete) {
+	public RemotePartitioningManagerStepBuilder allowStartIfComplete(boolean allowStartIfComplete) {
 		super.allowStartIfComplete(allowStartIfComplete);
 		return this;
 	}
 
 	/**
 	 * This method will throw a {@link UnsupportedOperationException} since
-	 * the partition handler of the master step will be automatically set to an
+	 * the partition handler of the manager step will be automatically set to an
 	 * instance of {@link MessageChannelPartitionHandler}.
 	 *
-	 * When building a master step for remote partitioning using this builder,
+	 * When building a manager step for remote partitioning using this builder,
 	 * no partition handler must be provided.
 	 *
 	 * @param partitionHandler a partition handler
@@ -297,9 +294,9 @@ public class RemotePartitioningMasterStepBuilder extends PartitionStepBuilder {
 	 * @throws UnsupportedOperationException if a partition handler is provided
 	 */
 	@Override
-	public RemotePartitioningMasterStepBuilder partitionHandler(PartitionHandler partitionHandler) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("When configuring a master step " +
-				"for remote partitioning using the RemotePartitioningMasterStepBuilder, " +
+	public RemotePartitioningManagerStepBuilder partitionHandler(PartitionHandler partitionHandler) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("When configuring a manager step " +
+				"for remote partitioning using the RemotePartitioningManagerStepBuilder, " +
 				"the partition handler will be automatically set to an instance " +
 				"of MessageChannelPartitionHandler. The partition handler must " +
 				"not be provided in this case.");

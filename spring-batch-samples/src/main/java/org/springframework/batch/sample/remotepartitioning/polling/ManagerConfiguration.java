@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.remotepartitioning.aggregating;
+package org.springframework.batch.sample.remotepartitioning.polling;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -22,7 +22,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.integration.config.annotation.EnableBatchIntegration;
-import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
+import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.sample.remotepartitioning.BasicPartitioner;
 import org.springframework.batch.sample.remotepartitioning.BrokerConfiguration;
 import org.springframework.batch.sample.remotepartitioning.DataSourceConfiguration;
@@ -35,8 +35,8 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the master side of the remote partitioning sample.
- * The master step will create 3 partitions for workers to process.
+ * This configuration class is for the manager side of the remote partitioning sample.
+ * The manager step will create 3 partitions for workers to process.
  *
  * @author Mahmoud Ben Hassine
  */
@@ -44,20 +44,20 @@ import org.springframework.integration.jms.dsl.Jms;
 @EnableBatchProcessing
 @EnableBatchIntegration
 @Import(value = {DataSourceConfiguration.class, BrokerConfiguration.class})
-public class MasterConfiguration {
+public class ManagerConfiguration {
 
 	private static final int GRID_SIZE = 3;
 
 	private final JobBuilderFactory jobBuilderFactory;
 
-	private final RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory;
+	private final RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
 
 
-	public MasterConfiguration(JobBuilderFactory jobBuilderFactory,
-							   RemotePartitioningMasterStepBuilderFactory masterStepBuilderFactory) {
+	public ManagerConfiguration(JobBuilderFactory jobBuilderFactory,
+								RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory) {
 
 		this.jobBuilderFactory = jobBuilderFactory;
-		this.masterStepBuilderFactory = masterStepBuilderFactory;
+		this.managerStepBuilderFactory = managerStepBuilderFactory;
 	}
 
 	/*
@@ -77,38 +77,21 @@ public class MasterConfiguration {
 	}
 
 	/*
-	 * Configure inbound flow (replies coming from workers)
+	 * Configure the manager step
 	 */
 	@Bean
-	public DirectChannel replies() {
-		return new DirectChannel();
-	}
-
-	@Bean
-	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
-				.channel(replies())
-				.get();
-	}
-
-	/*
-	 * Configure the master step
-	 */
-	@Bean
-	public Step masterStep() {
-		return this.masterStepBuilderFactory.get("masterStep")
+	public Step managerStep() {
+		return this.managerStepBuilderFactory.get("managerStep")
 				.partitioner("workerStep", new BasicPartitioner())
 				.gridSize(GRID_SIZE)
 				.outputChannel(requests())
-				.inputChannel(replies())
 				.build();
 	}
 
 	@Bean
 	public Job remotePartitioningJob() {
 		return this.jobBuilderFactory.get("remotePartitioningJob")
-				.start(masterStep())
+				.start(managerStep())
 				.build();
 	}
 

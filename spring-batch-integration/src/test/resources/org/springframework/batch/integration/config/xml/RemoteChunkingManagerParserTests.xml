@@ -11,7 +11,7 @@
 		 http://www.springframework.org/schema/batch
 		 https://www.springframework.org/schema/batch/spring-batch.xsd
 		 http://www.springframework.org/schema/batch-integration
-		 https://www.springframework.org/schema/batch-integration/spring-batch-integration-3.1.xsd
+		 https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
 		 http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd">
 
 	<batch:job id="processingJob">
@@ -37,7 +37,7 @@
 		</constructor-arg>
 	</bean>
 
-	<batch-int:remote-chunking-master id="itemWriter" message-template="messagingTemplate" step="process" reply-channel="replies"/>
+	<batch-int:remote-chunking-manager id="itemWriter" message-template="messagingTemplate" step="process" reply-channel="replies"/>
 
 	<bean id="messagingTemplate" class="org.springframework.integration.core.MessagingTemplate"/>
 

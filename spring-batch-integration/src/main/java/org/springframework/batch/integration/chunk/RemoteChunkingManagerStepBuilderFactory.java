@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Convenient factory for a {@link RemoteChunkingMasterStepBuilder} which sets
+ * Convenient factory for a {@link RemoteChunkingManagerStepBuilder} which sets
  * the {@link JobRepository} and {@link PlatformTransactionManager} automatically.
  *
- * @deprecated Use {@link RemoteChunkingManagerStepBuilderFactory} instead.
- *
- * @since 4.1
+ * @since 4.2
  * @author Mahmoud Ben Hassine
  */
-@Deprecated
-public class RemoteChunkingMasterStepBuilderFactory {
+public class RemoteChunkingManagerStepBuilderFactory {
 
 	private JobRepository jobRepository;
 
 	private PlatformTransactionManager transactionManager;
 
 	/**
-	 * Create a new {@link RemoteChunkingMasterStepBuilderFactory}.
+	 * Create a new {@link RemoteChunkingManagerStepBuilderFactory}.
 	 *
 	 * @param jobRepository the job repository to use
 	 * @param transactionManager the transaction manager to use
 	 */
-	public RemoteChunkingMasterStepBuilderFactory(
+	public RemoteChunkingManagerStepBuilderFactory(
 			JobRepository jobRepository,
 			PlatformTransactionManager transactionManager) {
 
@@ -49,16 +46,16 @@ public class RemoteChunkingMasterStepBuilderFactory {
 	}
 
 	/**
-	 * Creates a {@link RemoteChunkingMasterStepBuilder} and initializes its job
+	 * Creates a {@link RemoteChunkingManagerStepBuilder} and initializes its job
 	 * repository and transaction manager.
 	 * 
 	 * @param name the name of the step
 	 * @param <I> type of input items
 	 * @param <O> type of output items
-	 * @return a {@link RemoteChunkingMasterStepBuilder}
+	 * @return a {@link RemoteChunkingManagerStepBuilder}
 	 */
-	public <I, O> RemoteChunkingMasterStepBuilder<I, O> get(String name) {
-		return new RemoteChunkingMasterStepBuilder<I, O>(name)
+	public <I, O> RemoteChunkingManagerStepBuilder<I, O> get(String name) {
+		return new RemoteChunkingManagerStepBuilder<I, O>(name)
 				.repository(this.jobRepository)
 				.transactionManager(this.transactionManager);
 	}

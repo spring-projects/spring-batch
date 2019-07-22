@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 package org.springframework.batch.sample;
 
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
-import org.springframework.batch.sample.remotepartitioning.polling.MasterConfiguration;
+import org.springframework.batch.sample.remotepartitioning.polling.ManagerConfiguration;
 import org.springframework.batch.sample.remotepartitioning.polling.WorkerConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * The master step of the job under test will create 3 partitions for workers
+ * The manager step of the job under test will create 3 partitions for workers
  * to process.
  *
  * @author Mahmoud Ben Hassine
  */
-@ContextConfiguration(classes = {JobRunnerConfiguration.class, MasterConfiguration.class})
+@ContextConfiguration(classes = {JobRunnerConfiguration.class, ManagerConfiguration.class})
 public class RemotePartitioningJobWithRepositoryPollingFunctionalTests extends RemotePartitioningJobFunctionalTests {
 
 	@Override
