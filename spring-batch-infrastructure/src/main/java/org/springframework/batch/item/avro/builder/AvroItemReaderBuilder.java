@@ -16,18 +16,10 @@
 
 package org.springframework.batch.item.avro.builder;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileReader;
-import org.apache.avro.file.DataFileStream;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.io.DatumReader;
 
 import org.springframework.batch.item.avro.AvroItemReader;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -48,33 +40,14 @@ public class AvroItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
-	private DatumReader<T> datumReader;
-
-	private Schema schema;
-
-	private File inputFile;
-
-	private InputStream inputStream;
+	private Resource schema;
 
 	private Resource resource;
 
 	private Class<T> type;
 
-	private boolean embeddedHeader;
+	private boolean embeddedHeader =true;
 
-	private DataFileStream<T> dataFileReader;
-
-	/**
-	 * Configure a {@link File} containing Avro serialized objects.
-	 * @param inputFile an existing File.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemReaderBuilder<T> inputFile(File inputFile) {
-		Assert.notNull(inputFile, "An File is required.");
-		Assert.state(inputFile.exists(), "File " + inputFile.getName() + " does not exist.");
-		this.inputFile=inputFile;
-		return this;
-	}
 
 	/**
 	 * Configure a {@link Resource} containing Avro serialized objects.
@@ -88,38 +61,17 @@ public class AvroItemReaderBuilder<T> {
 		return this;
 	}
 
-	/**
-	 * Configure an {@link InputStream} containing Avro serialized objects.
-	 * @param inputStream an existing InputStream.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemReaderBuilder<T> inputStream(InputStream inputStream) {
-		Assert.notNull(inputStream, "An 'inputStream' is required.");
-		this.inputStream = inputStream;
-		return this;
-	}
-
-	public AvroItemReaderBuilder<T> schema(Schema schema) {
-		Assert.notNull(schema, "A 'schema' is required.");
-		this.schema = schema;
-		return this;
-	}
-
 
 	/**
 	 * Configure an Avro {@link Schema} from a {@link Resource}.
-	 * @param schemaResource an existing schema Resource.
+	 * @param schema an existing schema Resource.
 	 * @return The current instance of the builder.
 	 */
-	public AvroItemReaderBuilder<T> schema(Resource schemaResource) {
-		Assert.notNull(schemaResource, "A 'schemaResource' is required.");
-		Assert.state(schemaResource.exists(), "Resource " + schemaResource.getFilename() + " does not exist.");
-		try {
-			return schema(schemaResource.getFile());
-		}
-		catch (IOException e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
+	public AvroItemReaderBuilder<T> schema(Resource schema) {
+		Assert.notNull(schema, "A 'schema' Resource is required.");
+		Assert.state(schema.exists(), "Resource " + schema.getFilename() + " does not exist.");
+		this.schema = schema;
+		return this;
 	}
 
 	/**
@@ -129,29 +81,7 @@ public class AvroItemReaderBuilder<T> {
 	 */
 	public AvroItemReaderBuilder<T> schema(String schemaString) {
 		Assert.hasText(schemaString, "A 'schema' is required.");
-		try {
-			this.schema = new Schema.Parser().parse(schemaString);
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
-		return this;
-	}
-
-	/**
-	 * Configure an Avro {@link Schema} from a File.
-	 * @param schemaFile an existing schema File.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemReaderBuilder<T> schema(File schemaFile) {
-		Assert.notNull(schemaFile, "A 'schemaFile' is required.");
-		Assert.state(schemaFile.exists(), "File " + schemaFile.getAbsolutePath() + "does not exist.");
-		try {
-			this.schema = new Schema.Parser().parse(schemaFile);
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
+		this.schema = new ByteArrayResource(schemaString.getBytes());
 		return this;
 	}
 
@@ -167,37 +97,11 @@ public class AvroItemReaderBuilder<T> {
 	}
 
 	/**
-	 *
-	 * @param embeddedHeader set to true if input contains an embedded Schema header.
-	 * This is the case if it was created by a {@link org.apache.avro.file.DataFileWriter}
-	 * @return The current instance of the builder.
+	 * Disable or enable reading an embedded Avro schema header. True by default.
+	 * @param embeddedHeader set to false to if the input resource does not contain an Avro schema header.
 	 */
 	public AvroItemReaderBuilder<T> embeddedHeader(boolean embeddedHeader) {
 		this.embeddedHeader = embeddedHeader;
-		return this;
-	}
-
-	/**
-	 * Configure a {@link DatumReader}.
-	 *
-	 * @param datumReader the DatumReader.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemReaderBuilder<T> datumReader(DatumReader<T> datumReader) {
-		Assert.notNull(datumReader, "A 'datumReader' is required.");
-		this.datumReader = datumReader;
-		return this;
-	}
-
-	/**
-	 * Configure a {@link DataFileStream}, normally a {@link DataFileReader}. No other properties are required.
-	 *
-	 * @param dataFileReader the DataFileReader.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemReaderBuilder<T> dataFileReader(DataFileStream<T> dataFileReader) {
-		Assert.notNull(dataFileReader, "A 'dataFileReader' is required.");
-		this.dataFileReader = dataFileReader;
 		return this;
 	}
 
@@ -260,29 +164,13 @@ public class AvroItemReaderBuilder<T> {
 	public AvroItemReader<T> build() {
 		AvroItemReader<T> avroItemReader;
 
-		if (this.dataFileReader != null) {
-			avroItemReader = buildWithDataFileReader();
+		Assert.notNull(this.resource, "A 'resource' is required.");
+
+		if (this.type != null) {
+			avroItemReader = buildForType();
 		}
-
 		else {
-			Assert.state(onlyOneOf(this.inputStream, this.inputFile, this.resource),
-					"You cannot specify more than one of 'inputStream', 'resource', and 'inputFile'.");
-
-			Assert.state(exactlyOneOf(this.inputStream, this.inputFile, this.resource),
-					"One of 'inputStream', 'resource', or 'inputFile' is required.");
-
-
-			if (this.type != null) {
-				avroItemReader = buildForType();
-
-			}
-			else if (this.datumReader != null) {
-				Assert.isNull(this.schema, "You cannot specify a Schema and a DatumReader.");
-				avroItemReader = buildForDatumReader(this.datumReader);
-			}
-			else {
-				avroItemReader = buildForGenericDatumReader();
-			}
+			avroItemReader = buildForSchema();
 		}
 
 		avroItemReader.setSaveState(this.saveState);
@@ -301,69 +189,15 @@ public class AvroItemReaderBuilder<T> {
 	}
 
 
-
-	private AvroItemReader<T> buildWithDataFileReader() {
-		Assert.isNull(this.schema, "You cannot specify a Schema and a DataFileReader.");
-		Assert.isNull(this.type, "You cannot specify a type and a DataFileReader.");
-		Assert.isNull(this.datumReader, "You cannot specify a DatumReader and a DataFileReader.");
-		Assert.isNull(this.inputStream, "You cannot specify an InputStream and a DataFileReader.");
-		Assert.isNull(this.inputFile, "You cannot specify a File and a DataFileReader.");
-		Assert.isNull(this.resource, "You cannot specify a Resource and a DataFileReader.");
-		return new AvroItemReader<T>(dataFileReader);
-	}
-
 	private AvroItemReader<T> buildForType() {
-		Assert.isNull(this.datumReader,
-				"You cannot specify a DatumReader and a 'type'");
 		Assert.isNull(this.schema, "You cannot specify a schema and 'type'.");
-
-		if (this.inputFile != null) {
-			return new AvroItemReader<>(this.inputFile, this.type);
-		} else if (this.resource != null) {
-			return new AvroItemReader<>(this.resource, this.type);
-		}
-		return new AvroItemReader<>(this.inputStream, this.type);
+		return new AvroItemReader<>(this.resource, this.type);
 	}
 
-	private AvroItemReader<T> buildForGenericDatumReader() {
+	private AvroItemReader<T> buildForSchema() {
 		Assert.notNull(this.schema, "'schema' is required.");
-		return buildForDatumReader(new GenericDatumReader<>(schema));
+		return new AvroItemReader<>(resource, schema);
 	}
 
-	private AvroItemReader<T> buildForDatumReader(DatumReader<T> datumReader) {
-		if (this.inputStream == null) {
-			try {
-				if (this.inputFile != null) {
-					this.inputStream = new FileInputStream(this.inputFile);
-				} else {
-					this.inputStream = this.resource.getInputStream();
-				}
-			} catch (Exception e) {
-				throw new IllegalArgumentException(e.getMessage(), e);
-			}
-		}
-		return new AvroItemReader<>(this.inputStream, datumReader);
-	}
-
-
-	private boolean onlyOneOf(Object ... objects) {
-		int count = 0;
-		for (Object obj: objects) {
-			if (obj != null) {
-				count++;
-			}
-		}
-		return count <= 1;
-	}
-
-	private boolean exactlyOneOf(Object ... objects) {
-		int count = 0;
-		for (Object obj: objects) {
-			if (obj != null) {
-				count++;
-			}
-		}
-		return count == 1;
-	}
 
 }

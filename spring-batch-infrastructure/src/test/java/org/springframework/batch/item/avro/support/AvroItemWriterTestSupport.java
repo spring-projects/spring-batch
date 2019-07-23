@@ -16,12 +16,20 @@
 
 package org.springframework.batch.item.avro.support;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.avro.Schema;
+
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.batch.item.avro.builder.AvroItemReaderBuilder;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +53,7 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
     private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedHeader) throws Exception {
         AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>()
                 .type(clazz)
-                .inputStream(new ByteArrayInputStream(bytes))
+                .resource(new ByteArrayResource(bytes))
                 .embeddedHeader(embeddedHeader)
                 .build();
 
@@ -60,25 +68,69 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
         assertThat(records).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
     }
 
-    /*
-     * This item reader configured for no embedded SCHEMA header.
-     */
-    protected  <T> void verifyPojos(byte[] bytes, List<T> actual, Schema schema) throws Exception {
-        AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>()
-                .inputStream(new ByteArrayInputStream(bytes))
-                .schema(schema)
-                .build();
-        avroItemReader.afterPropertiesSet();
 
+    protected static class OutputStreamResource implements WritableResource {
 
-        List<T> records = new ArrayList<>();
-        T record;
-        while ((record = avroItemReader.read()) != null) {
-            records.add(record);
+        final private  OutputStream outputStream;
+
+        public OutputStreamResource(OutputStream outputStream) {
+            this.outputStream = outputStream;
         }
-        assertThat(records).hasSize(4);
-        assertThat(records).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
 
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            return this.outputStream;
+        }
+
+        @Override
+        public boolean exists() {
+            return true;
+        }
+
+        @Override
+        public URL getURL() throws IOException {
+            return null;
+        }
+
+        @Override
+        public URI getURI() throws IOException {
+            return null;
+        }
+
+        @Override
+        public File getFile() throws IOException {
+            return null;
+        }
+
+        @Override
+        public long contentLength() throws IOException {
+            return 0;
+        }
+
+        @Override
+        public long lastModified() throws IOException {
+            return 0;
+        }
+
+        @Override
+        public Resource createRelative(String relativePath) throws IOException {
+            return null;
+        }
+
+        @Override
+        public String getFilename() {
+            return null;
+        }
+
+        @Override
+        public String getDescription() {
+            return "Output stream resource";
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return null;
+        }
     }
 
 }

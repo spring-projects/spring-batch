@@ -29,6 +29,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.reflect.ReflectData;
 import org.springframework.batch.item.avro.example.User;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -54,6 +55,9 @@ public abstract class AvroTestFixtures {
 
 
 	protected Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
+
+
+	protected Resource plainOldUserSchemaResource = new ByteArrayResource(PlainOldUser.SCHEMA.toString().getBytes());
 
 	// Serialized data only
 	protected Resource dataResource = new ClassPathResource(

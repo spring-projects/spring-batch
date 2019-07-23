@@ -16,18 +16,12 @@
 
 package org.springframework.batch.item.avro.builder;
 
-import java.io.IOException;
-
-import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
-import org.apache.avro.specific.SpecificDatumReader;
 import org.junit.Test;
 
-import org.springframework.batch.item.avro.support.AvroItemReaderTestSupport;
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.batch.item.avro.example.User;
+import org.springframework.batch.item.avro.support.AvroItemReaderTestSupport;
 
 /**
  * @author David Turanski
@@ -35,94 +29,57 @@ import org.springframework.batch.item.avro.example.User;
 public class AvroItemReaderBuilderTests extends AvroItemReaderTestSupport {
 
 	@Test
-	public void itemReaderWithSpecificDatumReader() throws Exception {
-
-		AvroItemReader<User> avroItemReader = new AvroItemReaderBuilder<User>()
-				.datumReader(new SpecificDatumReader<>(User.class)).resource(dataResource).build();
-		verify(avroItemReader, avroGeneratedUsers());
-	}
-
-	@Test
 	public void itemReaderWithSchemaResource() throws Exception {
 
 		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>().resource(dataResource)
-				.schema(schemaResource).build();
+				.embeddedHeader(false).schema(schemaResource).build();
 
 		verify(avroItemReader, genericAvroGeneratedUsers());
 	}
 
 	@Test
-	public void itemReaderWithInputStream() throws Exception {
+	public void itemReaderWithGeneratedData() throws Exception {
 		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>()
-				.inputStream(dataResource.getInputStream()).schema(schemaResource).build();
-
-		verify(avroItemReader, genericAvroGeneratedUsers());
-	}
-
-	@Test
-	public void itemReaderWithSchema() throws Exception {
-		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>()
-				.inputStream(dataResource.getInputStream())
-				.schema(new Schema.Parser().parse(schemaResource.getInputStream())).build();
+				.resource(dataResourceWithSchema).schema(schemaResource).build();
 		verify(avroItemReader, genericAvroGeneratedUsers());
 	}
 
 	@Test
 	public void itemReaderWithSchemaString() throws Exception {
 		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>()
-				.schema(schemaString(schemaResource)).resource(dataResource).build();
+				.schema(schemaString(schemaResource)).resource(dataResourceWithSchema).build();
 
-		verify(avroItemReader, genericAvroGeneratedUsers());
-	}
-
-	@Test
-	public void itemReaderWithFile() throws Exception {
-		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>()
-				.schema(schemaResource.getFile()).inputFile(dataResource.getFile()).build();
 		verify(avroItemReader, genericAvroGeneratedUsers());
 	}
 
 	@Test
 	public void itemReaderWithEmbeddedHeader() throws Exception {
-		AvroItemReader<User> avroItemReader = new AvroItemReaderBuilder<User>()
-				.inputFile(dataResourceWithSchema.getFile()).type(User.class).embeddedHeader(true).build();
+		AvroItemReader<User> avroItemReader = new AvroItemReaderBuilder<User>().resource(dataResourceWithSchema)
+				.type(User.class).build();
 		verify(avroItemReader, avroGeneratedUsers());
 	}
 
 	@Test
 	public void itemReaderForSpecificType() throws Exception {
-		AvroItemReader<User> avroItemReader = new AvroItemReaderBuilder<User>().type(User.class).embeddedHeader(true)
+		AvroItemReader<User> avroItemReader = new AvroItemReaderBuilder<User>().type(User.class)
 				.resource(dataResourceWithSchema).build();
 		verify(avroItemReader, avroGeneratedUsers());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithNoSchemaStringShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).build();
+		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).embeddedHeader(false).build();
 
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithPartialConfigurationShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).build();
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void itemReaderWithNoInputsShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).build();
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void itemReaderWithMultipleInputsShouldFail() throws IOException {
-		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).resource(dataResource)
-				.inputFile(dataResource.getFile()).build();
+		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).embeddedHeader(false).build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void itemReaderWithDataFileWriterAndTypeShouldFail() throws IOException {
-		DatumReader<User> userDatumReader = new SpecificDatumReader<>(User.class);
-		DataFileReader<User> dataFileReader = new DataFileReader<>(dataResourceWithSchema.getFile(), userDatumReader);
-
-		new AvroItemReaderBuilder<User>().type(User.class).embeddedHeader(true).dataFileReader(dataFileReader).build();
+	public void itemReaderWithNoInputsShouldFail() {
+		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).embeddedHeader(false).build();
 	}
+
 }

@@ -17,19 +17,15 @@
 package org.springframework.batch.item.avro.builder;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
-import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.reflect.ReflectDatumWriter;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.avro.support.AvroItemWriterTestSupport;
 import org.springframework.batch.item.avro.AvroItemWriter;
 import org.springframework.batch.item.avro.example.User;
+import org.springframework.batch.item.avro.support.AvroItemWriterTestSupport;
+import org.springframework.core.io.WritableResource;
 
 /**
  * @author David Turanski
@@ -37,15 +33,17 @@ import org.springframework.batch.item.avro.example.User;
 public class AvroItemWriterBuilderTests extends AvroItemWriterTestSupport {
 
 	private ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+	private WritableResource output = new OutputStreamResource(outputStream);
 
     @Test
     public void itemWriterForAvroGeneratedClass() throws Exception {
 
         AvroItemWriter<User> avroItemWriter = new AvroItemWriterBuilder<User>()
-                .schema(schemaResource)
-                .outputStream(outputStream)
+                .resource(output)
+				.schema(schemaResource)
                 .type(User.class)
                 .build();
+		avroItemWriter.afterPropertiesSet();
 
         avroItemWriter.open(new ExecutionContext());
         avroItemWriter.write(this.avroGeneratedUsers());
@@ -58,119 +56,85 @@ public class AvroItemWriterBuilderTests extends AvroItemWriterTestSupport {
 	@Test
 	public void itemWriterForGenericRecords() throws Exception {
 
-		DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(PlainOldUser.SCHEMA);
-		DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter);
-
 		AvroItemWriter<GenericRecord> avroItemWriter = new AvroItemWriterBuilder<GenericRecord>()
-				.dataFileWriter(dataFileWriter).outputStream(outputStream).schema(PlainOldUser.SCHEMA).build();
+				.type(GenericRecord.class)
+				.schema(plainOldUserSchemaResource)
+				.resource(output)
+				.build();
+		avroItemWriter.afterPropertiesSet();
+
 
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.genericPlainOldUsers());
 		avroItemWriter.close();
 
-		byte[] bytes = outputStream.toByteArray();
-        verifyRecordsWithEmbeddedHeader(bytes, this.genericPlainOldUsers(), GenericRecord.class);
+        verifyRecordsWithEmbeddedHeader(outputStream.toByteArray(), this.genericPlainOldUsers(), GenericRecord.class);
 
 	}
 
 	@Test
 	public void itemWriterForPojos() throws Exception {
 
-		final DatumWriter<PlainOldUser> writer = new ReflectDatumWriter<>(PlainOldUser.class);
-
-		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriterBuilder<PlainOldUser>()
-                .outputStream(outputStream)
-                .datumWriter(writer)
+		AvroItemWriter avroItemWriter = new AvroItemWriterBuilder()
+                .resource(output)
+				.schema(plainOldUserSchemaResource)
+                .type(PlainOldUser.class)
                 .build();
-
+		avroItemWriter.afterPropertiesSet();
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.plainOldUsers());
 		avroItemWriter.close();
 
-		byte[] bytes = outputStream.toByteArray();
-
-		verifyRecords(bytes, this.plainOldUsers(), PlainOldUser.class, false);
+		verifyRecordsWithEmbeddedHeader(outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class);
 
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithMultipleOutputs() {
+	@Test
+	public void itemWriterWithNoEmbeddedHeaders() throws Exception {
 
-    	new AvroItemWriterBuilder<GenericRecord>()
-				.outputStream(outputStream)
-				.outputFile(new File("output"))
-				.schema(schemaResource)
+		AvroItemWriter avroItemWriter = new AvroItemWriterBuilder()
+				.resource(output)
+				.schema(plainOldUserSchemaResource)
+				.type(PlainOldUser.class)
+				.embedHeader(false)
 				.build();
+		avroItemWriter.afterPropertiesSet();
+		avroItemWriter.open(new ExecutionContext());
+		avroItemWriter.write(this.plainOldUsers());
+		avroItemWriter.close();
+
+		verifyRecords(outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class, false);
 
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWitNoOutputs() {
 
-		new AvroItemWriterBuilder<GenericRecord>()
-				.schema(schemaResource)
-				.build();
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFailWitNoOutput() {
 
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithMultipleWriters() {
-
-		new AvroItemWriterBuilder<GenericRecord>()
-				.outputStream(outputStream)
-				.schema(schemaResource)
-				.datumWriter(new GenericDatumWriter<>())
-				.dataFileWriter(new DataFileWriter<>(new GenericDatumWriter<>()))
-				.build();
-
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithNoWriters() {
-
-		new AvroItemWriterBuilder<GenericRecord>()
-				.outputStream(outputStream)
-				.schema(schemaResource)
-				.build();
-
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithWriterAndType() {
-
-		new AvroItemWriterBuilder<GenericRecord>()
-				.outputStream(outputStream)
-				.schema(schemaResource)
+		new AvroItemWriterBuilder()
 				.type(GenericRecord.class)
-				.dataFileWriter(new DataFileWriter<>(new GenericDatumWriter<>()))
 				.build();
 
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithDatumWriterAndSchema() {
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFailWitNoSchema() {
 
-		new AvroItemWriterBuilder<GenericRecord>()
-				.outputStream(outputStream)
-				.schema(schemaResource)
+		new AvroItemWriterBuilder()
+				.resource(output)
 				.type(GenericRecord.class)
-				.datumWriter(new GenericDatumWriter<>())
 				.build();
 
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void shouldFailWithDataFileWriterAndSchema() {
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldFailWitNoType() {
 
-		DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(PlainOldUser.SCHEMA);
-		DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter);
-
-		new AvroItemWriterBuilder<GenericRecord>()
+		new AvroItemWriterBuilder()
+				.resource(output)
 				.schema(schemaResource)
-				.dataFileWriter(dataFileWriter)
 				.build();
 
 	}
-
 
 }

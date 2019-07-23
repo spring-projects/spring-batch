@@ -16,17 +16,11 @@
 
 package org.springframework.batch.item.avro.builder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.io.DatumWriter;
 import org.springframework.batch.item.avro.AvroItemWriter;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * @author David Turanski
@@ -35,88 +29,37 @@ import org.springframework.util.StringUtils;
 public class AvroItemWriterBuilder<T> {
 	private Class<T> type;
 
-	private DataFileWriter<T> dataFileWriter;
+	private WritableResource resource;
 
-	private OutputStream outputStream;
+	private Resource schema;
 
-	private DatumWriter<T> datumWriter;
-
-	private File file;
-
-	private Schema schema;
-
-	private boolean embedHeader;
+	private boolean embedHeader = true;
 
 	private String name  = AvroItemWriter.class.getSimpleName();
 
-
 	/**
 	 *
-	 * @param outputStream the OutputStream used to write the serialized data.
+	 * @param resource the {@link WritableResource} used to write the serialized data.
 	 * @return The current instance of the builder.
 	 */
-	public AvroItemWriterBuilder<T> outputStream(OutputStream outputStream) {
-		Assert.notNull(outputStream, "An OutputStream is required.");
-		this.outputStream = outputStream;
-		return this;
-
-	}
-
-	/**
-	 *
-	 * @param file the File used to write the serialized data.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> outputFile(File file) {
-		Assert.notNull(file, "A File is required.");
-		this.file = file;
+	public AvroItemWriterBuilder<T> resource(WritableResource resource) {
+		Assert.notNull(resource, "A 'resource' is required.");
+		this.resource = resource;
 		return this;
 	}
 
 	/**
 	 *
-	 * @param schema the {@link Schema} used to serialize the output.
+	 * @param schema the Resource containing the schema JSON used to serialize the output.
 	 * @return The current instance of the builder.
 	 */
-	public AvroItemWriterBuilder<T> schema(Schema schema) {
-		Assert.notNull(schema, "A Schema is required.");
+	public AvroItemWriterBuilder<T> schema(Resource schema) {
+		Assert.notNull(schema, "A 'schema' is required.");
+		Assert.state(schema.exists(), "Resource " + schema.getFilename() + "does not exist.");
 		this.schema = schema;
 		return this;
 	}
 
-	/**
-	 *
-	 * @param schemaResource the Resource containing the schema JSON used to serialize the output.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> schema(Resource schemaResource) {
-		Assert.notNull(schemaResource, "A 'schemaResource' is required.");
-		Assert.state(schemaResource.exists(), "Resource " + schemaResource.getFilename() + "does not exist");
-		try {
-			this.schema = new Schema.Parser().parse(schemaResource.getInputStream());
-		}
-		catch (IOException e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
-		return this;
-	}
-
-	/**
-	 *
-	 * @param schemaFile the File containing the schema JSON used to serialize the output.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> schema(File schemaFile) {
-		Assert.notNull(schemaFile, "A 'schemaFile' is required.");
-		Assert.state(schemaFile.exists(), "File " + schemaFile.getAbsolutePath() + "does not exist");
-		try {
-			this.schema = new Schema.Parser().parse(schemaFile);
-		}
-		catch (IOException e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
-		return this;
-	}
 
 	/**
 	 *
@@ -125,19 +68,10 @@ public class AvroItemWriterBuilder<T> {
 	 */
 	public AvroItemWriterBuilder<T> schema(String schemaString) {
 		Assert.hasText(schemaString, "A 'schemaString' is required.");
-		this.schema = new Schema.Parser().parse(schemaString);
+		this.schema = new ByteArrayResource(schemaString.getBytes());
 		return this;
 	}
 
-	/**
-	 *
-	 * @param dataFileWriter the {@link DataFileWriter} used to serialize the output.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> dataFileWriter(DataFileWriter<T> dataFileWriter) {
-		this.dataFileWriter = dataFileWriter;
-		return this;
-	}
 
 	/**
 	 *
@@ -151,19 +85,9 @@ public class AvroItemWriterBuilder<T> {
 	}
 
 	/**
+	 * Disable or enable embedding an Avro schema header in the output. True by default.
 	 *
-	 * @param datumWriter the {@link DatumWriter} to use to serialize the output.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> datumWriter(DatumWriter<T> datumWriter) {
-		Assert.notNull(datumWriter, "A 'datumWriter' is required.");
-		this.datumWriter = datumWriter;
-		return this;
-	}
-
-	/**
-	 *
-	 * @param embedHeader set to true to embed an Avro schema header in the serialized output.
+	 * @param embedHeader set to false to disable embedding an Avro schema header.
 	 * @return The current instance of the builder.
 	 */
 	public AvroItemWriterBuilder<T> embedHeader(boolean embedHeader) {
@@ -192,76 +116,14 @@ public class AvroItemWriterBuilder<T> {
 	 */
 	public AvroItemWriter<T> build() {
 
-		AvroItemWriter<T> avroItemWriter;
+		Assert.notNull(this.resource, "A 'resource' is required.");
+		Assert.notNull(this.resource, "A 'schema' is required.");
+		Assert.notNull(this.type, "A 'type' is required.");
 
-		Assert.state(onlyOneOf(this.outputStream, this.file), "You cannot specify both 'outputStream' and 'fie'.");
-
-		Assert.state(exactlyOneOf(this.outputStream, this.file), "One of 'outputStream' or 'file' is required.");
-
-		Assert.state(onlyOneOf(this.dataFileWriter, this.type, this.datumWriter),
-				"You cannot specify more than one of 'dataFileWriter', 'type', or 'datumWriter'.");
-
-		Assert.state(exactlyOneOf(this.dataFileWriter, this.type, this.datumWriter),
-				"One of dataFileWriter','type', or 'datumWriter' is required.");
-
-		if (this.dataFileWriter != null) {
-			avroItemWriter = buildWithDataFileWriter();
-		}
-		else if (this.datumWriter != null) {
-			try {
-				avroItemWriter = buildWithDatumWriter();
-			} catch (Exception e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-		}
-
-		else {
-			avroItemWriter = buildWithType();
-		}
-
-		if (StringUtils.hasText(this.name)) {
-			avroItemWriter.setName(this.name);
-		}
-
+		AvroItemWriter<T> avroItemWriter = new AvroItemWriter<>(this.resource, this.schema, this.type);
+		avroItemWriter.setName(name);
+		avroItemWriter.setEmbedHeader(embedHeader);
 		return avroItemWriter;
-	}
-
-	private AvroItemWriter<T> buildWithDatumWriter() throws IOException {
-		Assert.isNull(this.schema, "You cannot specify both 'datumWriter' and 'schema'.");
-		return this.file != null ? new AvroItemWriter<>(new FileOutputStream(file), this.datumWriter)
-				: new AvroItemWriter<>(this.outputStream, this.datumWriter);
-
-	}
-
-	private AvroItemWriter<T> buildWithType() {
-		return this.file != null ? new AvroItemWriter<>(this.file, this.type, this.schema)
-				: new AvroItemWriter<>(this.outputStream, this.type, this.schema);
-	}
-
-	private AvroItemWriter<T> buildWithDataFileWriter() {
-		Assert.notNull(this.schema, " A Schema is required.");
-		return this.file != null ? new AvroItemWriter<>(this.file, this.dataFileWriter, this.schema)
-				: new AvroItemWriter<>(this.outputStream, this.dataFileWriter, this.schema);
-	}
-
-	private boolean onlyOneOf(Object... objects) {
-		int count = 0;
-		for (Object obj : objects) {
-			if (obj != null) {
-				count++;
-			}
-		}
-		return count <= 1;
-	}
-
-	private boolean exactlyOneOf(Object... objects) {
-		int count = 0;
-		for (Object obj : objects) {
-			if (obj != null) {
-				count++;
-			}
-		}
-		return count == 1;
 	}
 
 }
