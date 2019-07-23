@@ -50,13 +50,15 @@ public interface JobExplorer {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
-	 * Find the last job instance for the given job.
+	 * Find the last job instance by Id for the given job.
 	 * @param jobName name of the job
-	 * @return the last job instance if any or null otherwise
+	 * @return the last job instance by Id if any or null otherwise
+	 *
+	 * @since 4.2
 	 */
 	@Nullable
 	default JobInstance getLastJobInstance(String jobName) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -106,15 +108,17 @@ public interface JobExplorer {
 	List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
 	/**
-	 * Find the last {@link JobExecution} to have been created for a given
+	 * Find the last {@link JobExecution} that has been created for a given
 	 * {@link JobInstance}.
 	 * @param jobInstance the {@link JobInstance}
-	 * @return the last {@link JobExecution} to execute for this instance or
+	 * @return the last {@link JobExecution} that has been created for this instance or
 	 * {@code null} if no job execution is found for the given job instance.
+	 *
+	 * @since 4.2
 	 */
 	@Nullable
 	default JobExecution getLastJobExecution(JobInstance jobInstance) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**

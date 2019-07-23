@@ -97,13 +97,15 @@ public interface JobInstanceDao {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
-	 * Fetch the last job instance for the given job.
+	 * Fetch the last job instance by Id for the given job.
 	 * @param jobName name of the job
-	 * @return the last job instance if any or null otherwise
+	 * @return the last job instance by Id if any or null otherwise
+	 *
+	 * @since 4.2
 	 */
 	@Nullable
 	default JobInstance getLastJobInstance(String jobName) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
