@@ -16,17 +16,12 @@
 
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -36,13 +31,19 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -51,6 +52,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JdbcPagingQueryIntegrationTests {
 
 	private static Log logger = LogFactory.getLog(JdbcPagingQueryIntegrationTests.class);
@@ -71,7 +73,8 @@ public class JdbcPagingQueryIntegrationTests {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
 		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
-		jdbcTemplate.update("DELETE from T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+//		jdbcTemplate.update("DELETE from T_FOOS");
 		for(int i = 0; i < names.length; i++) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
 			maxId++;
@@ -81,7 +84,8 @@ public class JdbcPagingQueryIntegrationTests {
 
 	@After
 	public void destroy() {
-		jdbcTemplate.update("DELETE from T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+//		jdbcTemplate.update("DELETE from T_FOOS");
 	}
 
 	@Test
@@ -187,7 +191,6 @@ public class JdbcPagingQueryIntegrationTests {
 		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
 		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);
 		assertEquals(pageSize, list.size());
-		expected = "[{id=" + (minId + pageSize);
 	}
 
 	protected PagingQueryProvider getPagingQueryProvider() throws Exception {
