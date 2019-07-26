@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,19 +63,19 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	protected NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
-	private ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
+	protected ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
-	private ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
+	protected ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
 
-	private String sql;
+	protected String sql;
 
-	private boolean assertUpdates = true;
+	protected boolean assertUpdates = true;
 
-	private int parameterCount;
+	protected int parameterCount;
 
-	private boolean usingNamedParameters;
+	protected boolean usingNamedParameters;
 
 	/**
 	 * Public setter for the flag that determines whether an assertion is made
