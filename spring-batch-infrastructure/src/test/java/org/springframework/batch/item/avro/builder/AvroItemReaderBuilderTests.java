@@ -32,7 +32,7 @@ public class AvroItemReaderBuilderTests extends AvroItemReaderTestSupport {
 	public void itemReaderWithSchemaResource() throws Exception {
 
 		AvroItemReader<GenericRecord> avroItemReader = new AvroItemReaderBuilder<GenericRecord>().resource(dataResource)
-				.embeddedHeader(false).schema(schemaResource).build();
+				.embeddedSchema(false).schema(schemaResource).build();
 
 		verify(avroItemReader, genericAvroGeneratedUsers());
 	}
@@ -68,18 +68,18 @@ public class AvroItemReaderBuilderTests extends AvroItemReaderTestSupport {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithNoSchemaStringShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).embeddedHeader(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).embeddedSchema(false).build();
 
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithPartialConfigurationShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).embeddedHeader(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).embeddedSchema(false).build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithNoInputsShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).embeddedHeader(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).embeddedSchema(false).build();
 	}
 
 }

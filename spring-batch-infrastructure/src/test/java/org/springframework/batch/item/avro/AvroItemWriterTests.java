@@ -81,7 +81,7 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	public void itemWriterWithNoEmbeddedHeaders() throws Exception {
 
 		AvroItemWriter avroItemWriter = new AvroItemWriter(output, plainOldUserSchemaResource,PlainOldUser.class);
-		avroItemWriter.setEmbedHeader(false);
+		avroItemWriter.setEmbedSchema(false);
 		avroItemWriter.afterPropertiesSet();
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.plainOldUsers());

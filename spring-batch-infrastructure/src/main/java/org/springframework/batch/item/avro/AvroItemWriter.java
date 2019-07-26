@@ -60,7 +60,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 
 	private Class<T> clazz;
 
-	private boolean embedHeader = true;
+	private boolean embedSchema = true;
 
 	/**
 	 *
@@ -132,11 +132,11 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 	}
 
 	/**
-	 * Disable or enable embedding an Avro schema header in the output. True by default.
-	 * @param embedHeader set to false to disable embedding an Avro schema header.
+	 * Disable or enable embedding an Avro schema in the output. True by default.
+	 * @param embedSchema set to false to disable embedding an Avro schema.
 	 */
-	public void setEmbedHeader(boolean embedHeader) {
-		this.embedHeader = embedHeader;
+	public void setEmbedSchema(boolean embedSchema) {
+		this.embedSchema = embedSchema;
 	}
 
 
@@ -149,7 +149,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 		if (this.dataFileWriter != null) {
 			return;
 		}
-		if (this.embedHeader) {
+		if (this.embedSchema) {
 			this.dataFileWriter = new DataFileWriter<>(datumWriterForClass(this.clazz));
 		} else {
 			this.outputStreamWriter = createOutputStreamWriter(resource.getOutputStream(),datumWriterForClass(this.clazz));

@@ -96,7 +96,7 @@ public class AvroItemWriterBuilderTests extends AvroItemWriterTestSupport {
 				.resource(output)
 				.schema(plainOldUserSchemaResource)
 				.type(PlainOldUser.class)
-				.embedHeader(false)
+				.embedSchema(false)
 				.build();
 		avroItemWriter.afterPropertiesSet();
 		avroItemWriter.open(new ExecutionContext());

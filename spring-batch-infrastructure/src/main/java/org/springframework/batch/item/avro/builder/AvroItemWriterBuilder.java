@@ -33,7 +33,7 @@ public class AvroItemWriterBuilder<T> {
 
 	private Resource schema;
 
-	private boolean embedHeader = true;
+	private boolean embedSchema = true;
 
 	private String name  = AvroItemWriter.class.getSimpleName();
 
@@ -85,13 +85,13 @@ public class AvroItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Disable or enable embedding an Avro schema header in the output. True by default.
+	 * Disable or enable embedding an Avro schema in the output. True by default.
 	 *
-	 * @param embedHeader set to false to disable embedding an Avro schema header.
+	 * @param embedSchema set to false to disable embedding an Avro schema.
 	 * @return The current instance of the builder.
 	 */
-	public AvroItemWriterBuilder<T> embedHeader(boolean embedHeader) {
-		this.embedHeader = embedHeader;
+	public AvroItemWriterBuilder<T> embedSchema(boolean embedSchema) {
+		this.embedSchema = embedSchema;
 		return this;
 	}
 
@@ -122,7 +122,7 @@ public class AvroItemWriterBuilder<T> {
 
 		AvroItemWriter<T> avroItemWriter = new AvroItemWriter<>(this.resource, this.schema, this.type);
 		avroItemWriter.setName(name);
-		avroItemWriter.setEmbedHeader(embedHeader);
+		avroItemWriter.setEmbedSchema(embedSchema);
 		return avroItemWriter;
 	}
 

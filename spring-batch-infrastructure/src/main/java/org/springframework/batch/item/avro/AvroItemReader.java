@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  */
 public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
-	private boolean embeddedHeader = true;
+	private boolean embeddedSchema = true;
 
 	private InputStreamReader<T> inputStreamReader;
 
@@ -93,11 +93,11 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	/**
-	 * Disable or enable reading an embedded Avro schema header. True by default.
-	 * @param embeddedHeader set to false to if the input resource does not contain an Avro schema header.
+	 * Disable or enable reading an embedded Avro schema. True by default.
+	 * @param embeddedSchema set to false to if the input Resource does not embed an Avro schema.
 	 */
-	public void setEmbeddedHeader(boolean embeddedHeader) {
-		this.embeddedHeader = embeddedHeader;
+	public void setEmbeddedSchema(boolean embeddedSchema) {
+		this.embeddedSchema = embeddedSchema;
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		if (this.dataFileReader != null) {
 			return;
 		}
-		if (this.embeddedHeader) {
+		if (this.embeddedSchema) {
 			this.dataFileReader = new DataFileStream<>(this.inputStream, this.datumReader);
 		} else {
 			this.inputStreamReader = createInputStreamReader(this.inputStream, this.datumReader);

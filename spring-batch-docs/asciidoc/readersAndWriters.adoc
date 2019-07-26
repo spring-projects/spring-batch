@@ -3219,10 +3219,9 @@ an instance of the `MappingLdifReader`.
 
 [[avroItemReader]]
 ===== `AvroItemReader`
-The `AvroItemReader` reads serialized Avro data from a File or InputStream.
+The `AvroItemReader` reads serialized Avro data from a Resource.
 Each read returns an instance of the type specified by a Java class or Avro Schema.
-The reader may be optionnally configured with an Avro `DataFileReader` or `DatumReader` and
-may be configured for input that embeds an Avro schema header or not.
+The reader may be optionnally configured  for input that embeds an Avro schema or not.
 Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the `AvroItemReader`.
 
 [[specializedWriters]]
@@ -3241,9 +3240,8 @@ provides a `SimpleMailMessageItemWriterBuilder` to construct an instance of the
 
 [[avroItemWriter]]
 ===== `AvroItemWriter`
-The `AvroItemWrite` serializes Java objects to a File or OutputStream according to the given type or Schema.
-The writer may be optionally configured with a `DataFileWriter` or `DatumWriter` to embed an
-Avro schema header in the output or not.
+The `AvroItemWrite` serializes Java objects to a WriteableResource according to the given type or Schema.
+The writer may be optionally configured to embed an Avro schema in the output or not.
 Spring Batch provides an `AvroItemWriterBuilder` to construct an instance of the `AvroItemWriter`.
 
 

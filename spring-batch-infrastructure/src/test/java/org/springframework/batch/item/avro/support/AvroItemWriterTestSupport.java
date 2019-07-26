@@ -54,7 +54,7 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
         AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>()
                 .type(clazz)
                 .resource(new ByteArrayResource(bytes))
-                .embeddedHeader(embeddedHeader)
+                .embeddedSchema(embeddedHeader)
                 .build();
 
         avroItemReader.afterPropertiesSet();

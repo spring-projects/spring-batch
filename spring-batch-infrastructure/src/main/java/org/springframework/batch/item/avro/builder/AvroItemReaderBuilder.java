@@ -46,7 +46,7 @@ public class AvroItemReaderBuilder<T> {
 
 	private Class<T> type;
 
-	private boolean embeddedHeader =true;
+	private boolean embeddedSchema =true;
 
 
 	/**
@@ -97,11 +97,11 @@ public class AvroItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Disable or enable reading an embedded Avro schema header. True by default.
-	 * @param embeddedHeader set to false to if the input resource does not contain an Avro schema header.
+	 * Disable or enable reading an embedded Avro schema. True by default.
+	 * @param embeddedSchema set to false to if the input resource does not contain an Avro schema.
 	 */
-	public AvroItemReaderBuilder<T> embeddedHeader(boolean embeddedHeader) {
-		this.embeddedHeader = embeddedHeader;
+	public AvroItemReaderBuilder<T> embeddedSchema(boolean embeddedSchema) {
+		this.embeddedSchema = embeddedSchema;
 		return this;
 	}
 
@@ -183,7 +183,7 @@ public class AvroItemReaderBuilder<T> {
 		avroItemReader.setName(this.name);
 		avroItemReader.setCurrentItemCount(this.currentItemCount);
 		avroItemReader.setMaxItemCount(this.maxItemCount);
-		avroItemReader.setEmbeddedHeader(this.embeddedHeader);
+		avroItemReader.setEmbeddedSchema(this.embeddedSchema);
 
 		return avroItemReader;
 	}

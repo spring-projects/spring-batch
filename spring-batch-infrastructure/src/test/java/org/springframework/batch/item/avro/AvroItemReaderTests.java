@@ -33,7 +33,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 
 		AvroItemReader<GenericRecord> itemReader = new AvroItemReader<>(dataResource, schemaResource);
 		itemReader.setName(itemReader.getClass().getSimpleName());
-		itemReader.setEmbeddedHeader(false);
+		itemReader.setEmbeddedSchema(false);
 
 		verify(itemReader, genericAvroGeneratedUsers());
 	}
@@ -43,7 +43,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	public void readSpecificUsers() throws Exception {
 
 		AvroItemReader<User> itemReader = new AvroItemReader<>(dataResource, User.class);
-		itemReader.setEmbeddedHeader(false);
+		itemReader.setEmbeddedSchema(false);
 		itemReader.setName(itemReader.getClass().getSimpleName());
 
 		verify(itemReader, avroGeneratedUsers());
@@ -53,7 +53,7 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 	public void readSpecificUsersWithEmbeddedSchema() throws Exception {
 
 		AvroItemReader<User> itemReader = new AvroItemReader<>(dataResourceWithSchema, User.class);
-		itemReader.setEmbeddedHeader(true);
+		itemReader.setEmbeddedSchema(true);
 		itemReader.setName(itemReader.getClass().getSimpleName());
 
 		verify(itemReader, avroGeneratedUsers());
