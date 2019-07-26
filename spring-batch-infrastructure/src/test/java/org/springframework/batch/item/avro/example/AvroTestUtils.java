@@ -23,7 +23,9 @@ import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
+import org.apache.avro.reflect.ReflectDatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.springframework.batch.item.avro.support.AvroTestFixtures;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -34,17 +36,22 @@ import org.springframework.core.io.Resource;
  */
 class AvroTestUtils {
 
+     public static void main(String... args) {
+        try {
+           createTestDataWithNoEmbeddedSchema();
+           createTestData();
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+     }
+
      static void createTestDataWithNoEmbeddedSchema() throws Exception {
 
-        Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
+        DatumWriter<User> userDatumWriter = new SpecificDatumWriter<>(User.class);
 
-        DatumWriter<User> userDatumWriter = new SpecificDatumWriter<User>(User.class);
-        new File("users-no-SCHEMA.avro");
-
-        FileOutputStream fileOutputStream =  new FileOutputStream("user-data-no-SCHEMA.avro");
+        FileOutputStream fileOutputStream =  new FileOutputStream("user-data-no-schema.avro");
 
         Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream,null);
-        userDatumWriter.setSchema(new Schema.Parser().parse(schemaResource.getInputStream()));
         userDatumWriter.write(new User("David", 20, "blue"), encoder);
         userDatumWriter.write(new User("Sue", 4, "red"), encoder);
         userDatumWriter.write(new User("Alana", 13, "yellow"), encoder);
@@ -56,7 +63,7 @@ class AvroTestUtils {
     }
 
 
-     static void createTestData() throws Exception {
+   static void createTestData() throws Exception {
 
         Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
 

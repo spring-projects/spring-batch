@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.avro.AvroItemReader;
 import org.springframework.batch.item.avro.builder.AvroItemReaderBuilder;
 import org.springframework.core.io.ByteArrayResource;
@@ -57,7 +58,7 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
                 .embeddedSchema(embeddedHeader)
                 .build();
 
-        avroItemReader.afterPropertiesSet();
+        avroItemReader.open(new ExecutionContext());
 
         List<T> records = new ArrayList<>();
         T record;

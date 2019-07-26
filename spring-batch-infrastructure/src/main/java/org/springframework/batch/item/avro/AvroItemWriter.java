@@ -35,20 +35,19 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
- * An {@link ItemWriter} that serializes data to an OutputStream or File using Avro.
+ * An {@link ItemWriter} that serializes data to an {@link WritableResource} using Avro.
  *
  * This does not support restart on failure.
  *
  * @since 4.2
  * @author David Turanski
  */
-public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implements InitializingBean {
+public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	private DataFileWriter<T> dataFileWriter;
 
@@ -58,9 +57,12 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 
 	private Schema schema;
 
+	private Resource schemaResource;
+
 	private Class<T> clazz;
 
 	private boolean embedSchema = true;
+
 
 	/**
 	 *
@@ -69,17 +71,8 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 	 * @param clazz the data type to be serialized.
 	 */
 	public AvroItemWriter(WritableResource resource, Resource schema, Class<T> clazz) {
-		Assert.notNull(resource, "'resource' is required.");
-		Assert.notNull(clazz, "'class' is required.");
-		Assert.notNull(schema, "'schema' is required.");
-		Assert.state(schema.exists(), "'schema'" + schema.getFilename() + " does not exist");
-
+		this.schemaResource = schema;
 		this.resource = resource;
-		try {
-			this.schema = new Schema.Parser().parse(schema.getInputStream());
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		}
 		this.clazz = clazz;
 	}
 
@@ -105,14 +98,10 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 	 */
 	@Override
 	public void open(ExecutionContext executionContext) {
-		super.open(executionContext);
-		if (this.dataFileWriter == null) {
-			return;
-		}
 		try {
-			this.dataFileWriter.create(this.schema, this.resource.getOutputStream());
+			initializeWriter();
 		} catch (IOException e) {
-			throw new IllegalStateException(e.getMessage(), e);
+			throw new ItemStreamException(e.getMessage(), e);
 		}
 	}
 
@@ -139,20 +128,24 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> implement
 		this.embedSchema = embedSchema;
 	}
 
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		initializeWriter();
-	}
-
 	private void  initializeWriter() throws IOException {
-		if (this.dataFileWriter != null) {
-			return;
-		}
+		Assert.notNull(resource, "'resource' is required.");
+		Assert.notNull(clazz, "'class' is required.");
+
 		if (this.embedSchema) {
+			Assert.notNull(this.schemaResource, "'schema' is required.");
+			Assert.state(this.schemaResource.exists(),
+					"'schema' " + this.schemaResource.getFilename() + " does not exist.");
+			try {
+				this.schema = new Schema.Parser().parse(this.schemaResource.getInputStream());
+			} catch (IOException e) {
+				throw new IllegalArgumentException(e.getMessage(), e);
+			}
 			this.dataFileWriter = new DataFileWriter<>(datumWriterForClass(this.clazz));
+			this.dataFileWriter.create(this.schema, this.resource.getOutputStream());
 		} else {
-			this.outputStreamWriter = createOutputStreamWriter(resource.getOutputStream(),datumWriterForClass(this.clazz));
+			this.outputStreamWriter = createOutputStreamWriter(resource.getOutputStream(),
+					datumWriterForClass(this.clazz));
 		}
 
 	}

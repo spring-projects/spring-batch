@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.avro.support;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,7 +28,11 @@ import java.util.stream.Collectors;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.Encoder;
+import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.reflect.ReflectData;
+import org.apache.avro.reflect.ReflectDatumWriter;
 import org.springframework.batch.item.avro.example.User;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
@@ -66,6 +71,9 @@ public abstract class AvroTestFixtures {
 	// Data written with DataFileWriter, includes embedded SCHEMA (more common)
 	protected Resource dataResourceWithSchema = new ClassPathResource(
 			"org/springframework/batch/item/avro/user-data.avro");
+
+	protected Resource plainOldUserDataResource
+			= new ClassPathResource("org/springframework/batch/item/avro/plain-old-user-data-no-schema.avro");
 
 	protected String schemaString(Resource resource) {
 		{
@@ -106,24 +114,24 @@ public abstract class AvroTestFixtures {
 
 	protected static class PlainOldUser {
 		public static final Schema SCHEMA = ReflectData.get().getSchema(PlainOldUser.class);
-		private String name;
+		private CharSequence name;
 
 		private int favoriteNumber;
 
-		private String favoriteColor;
+		private CharSequence favoriteColor;
 
 		public PlainOldUser(){
 
 		}
 
-		public PlainOldUser(String name, int favoriteNumber, String favoriteColor) {
+		public PlainOldUser(CharSequence name, int favoriteNumber, CharSequence favoriteColor) {
 			this.name = name;
 			this.favoriteNumber = favoriteNumber;
 			this.favoriteColor = favoriteColor;
 		}
 
 		public String getName() {
-			return name;
+			return name.toString();
 		}
 
 		public int getFavoriteNumber() {
@@ -131,7 +139,7 @@ public abstract class AvroTestFixtures {
 		}
 
 		public String getFavoriteColor() {
-			return favoriteColor;
+			return favoriteColor.toString();
 		}
 
 		public GenericRecord toGenericRecord() {
@@ -156,5 +164,22 @@ public abstract class AvroTestFixtures {
 		public int hashCode() {
 			return Objects.hash(name, favoriteNumber, favoriteColor);
 		}
+	}
+
+	public static void createPlainOldUsersWithNoEmbeddedSchema() throws Exception {
+
+		DatumWriter<PlainOldUser> userDatumWriter = new ReflectDatumWriter<>(AvroTestFixtures.PlainOldUser.class);
+
+		FileOutputStream fileOutputStream =  new FileOutputStream("plain-old-user-data-no-schema.avro");
+
+		Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream,null);
+		userDatumWriter.write(new PlainOldUser("David", 20, "blue"), encoder);
+		userDatumWriter.write(new PlainOldUser("Sue", 4, "red"), encoder);
+		userDatumWriter.write(new PlainOldUser("Alana", 13, "yellow"), encoder);
+		userDatumWriter.write(new PlainOldUser("Joe", 1, "pink"), encoder);
+
+		encoder.flush();
+		fileOutputStream.flush();
+		fileOutputStream.close();
 	}
 }

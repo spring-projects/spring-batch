@@ -117,7 +117,11 @@ public class AvroItemWriterBuilder<T> {
 	public AvroItemWriter<T> build() {
 
 		Assert.notNull(this.resource, "A 'resource' is required.");
-		Assert.notNull(this.resource, "A 'schema' is required.");
+
+		if (this.embedSchema) {
+			Assert.notNull(this.resource, "A 'schema' is required.");
+		}
+
 		Assert.notNull(this.type, "A 'type' is required.");
 
 		AvroItemWriter<T> avroItemWriter = new AvroItemWriter<>(this.resource, this.schema, this.type);

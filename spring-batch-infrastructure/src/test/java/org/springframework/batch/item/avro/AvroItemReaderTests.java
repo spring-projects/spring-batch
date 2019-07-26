@@ -59,6 +59,16 @@ public class AvroItemReaderTests extends AvroItemReaderTestSupport {
 		verify(itemReader, avroGeneratedUsers());
 	}
 
+	@Test
+	public void readPojosWithNoEmbeddedSchema() throws Exception {
+
+		AvroItemReader<PlainOldUser> itemReader = new AvroItemReader<>(plainOldUserDataResource, PlainOldUser.class);
+		itemReader.setEmbeddedSchema(false);
+		itemReader.setName(itemReader.getClass().getSimpleName());
+
+		verify(itemReader, plainOldUsers());
+	}
+
 	@Test(expected = IllegalStateException.class)
 	public void dataResourceDoesNotExist() {
 		new AvroItemReader<User>(new ClassPathResource("doesnotexist"), schemaResource);

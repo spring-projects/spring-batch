@@ -31,7 +31,6 @@ public abstract class AvroItemReaderTestSupport extends AvroTestFixtures {
 
 	protected <T> void verify(AvroItemReader<T> avroItemReader, List<T> actual) throws Exception {
 
-		avroItemReader.afterPropertiesSet();
 		avroItemReader.open(new ExecutionContext());
 		List<T> users = new ArrayList<>();
 

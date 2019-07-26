@@ -68,18 +68,18 @@ public class AvroItemReaderBuilderTests extends AvroItemReaderTestSupport {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithNoSchemaStringShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).embeddedSchema(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().schema("").resource(dataResource).build();
 
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithPartialConfigurationShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).embeddedSchema(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().resource(dataResource).build();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void itemReaderWithNoInputsShouldFail() {
-		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).embeddedSchema(false).build();
+		new AvroItemReaderBuilder<GenericRecord>().schema(schemaResource).build();
 	}
 
 }

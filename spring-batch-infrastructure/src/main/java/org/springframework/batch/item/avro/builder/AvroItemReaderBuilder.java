@@ -87,7 +87,7 @@ public class AvroItemReaderBuilder<T> {
 
 	/**
 	 * Configure a type to be deserialized.
-	 * @param type the class.
+	 * @param type the class to be deserialized.
 	 * @return The current instance of the builder.
 	 */
 	public AvroItemReaderBuilder<T> type(Class<T> type) {
@@ -98,7 +98,7 @@ public class AvroItemReaderBuilder<T> {
 
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
-	 * @param embeddedSchema set to false to if the input resource does not contain an Avro schema.
+	 * @param embeddedSchema set to false to if the input does not contain an Avro schema.
 	 */
 	public AvroItemReaderBuilder<T> embeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;

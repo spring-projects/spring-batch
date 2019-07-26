@@ -32,17 +32,16 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * An {@link ItemReader} that deserializes data from a File or Input Stream containing serialized Avro objects.
+ * An {@link ItemReader} that deserializes data from a {@link Resource} containing serialized Avro objects.
  *
  * @author David Turanski
  * @since 4.2
  */
-public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
 
 	private boolean embeddedSchema = true;
 
@@ -57,7 +56,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	/**
 	 *
 	 * @param resource the {@link Resource} containing objects serialized with Avro.
-	 * @param clazz the class of the objects to be deserialized. This should be an Avro generated class.
+	 * @param clazz the data type to be deserialized.
 	 */
 	public AvroItemReader(Resource resource, Class<T> clazz) {
 		Assert.notNull(resource, "'resource' is required.");
@@ -75,7 +74,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	/**
 	 *
 	 * @param data the {@link Resource} containing the data to be read.
-	 * @param schema the {@link Resource} containing the
+	 * @param schema the {@link Resource} containing the Avro schema.
 	 */
 	public AvroItemReader(Resource data, Resource schema) {
 		Assert.notNull(data, "'data' is required.");
@@ -94,15 +93,10 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
-	 * @param embeddedSchema set to false to if the input Resource does not embed an Avro schema.
+	 * @param embeddedSchema set to false to if the input does not embed an Avro schema.
 	 */
 	public void setEmbeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		initializeReader();
 	}
 
 
@@ -115,7 +109,8 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	@Override
-	protected void doOpen() {
+	protected void doOpen() throws Exception {
+		initializeReader();
 	}
 
 	@Override
@@ -128,9 +123,6 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 	private void  initializeReader() throws IOException {
-		if (this.dataFileReader != null) {
-			return;
-		}
 		if (this.embeddedSchema) {
 			this.dataFileReader = new DataFileStream<>(this.inputStream, this.datumReader);
 		} else {
