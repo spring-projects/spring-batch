@@ -75,8 +75,7 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	@Test
 	public void itemWriterWithNoEmbeddedHeaders() throws Exception {
 
-		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter(output, plainOldUserSchemaResource,PlainOldUser.class);
-		avroItemWriter.setEmbedSchema(false);
+		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter(output, PlainOldUser.class);
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.plainOldUsers());
 		avroItemWriter.close();
@@ -90,11 +89,6 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 
 		new AvroItemWriter(null, schemaResource, User.class).open(new ExecutionContext());;
 
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void shouldFailWitNoSchema() {
-        new AvroItemWriter(output, null, User.class).open(new ExecutionContext());;
 	}
 
 	@Test(expected = IllegalArgumentException.class)

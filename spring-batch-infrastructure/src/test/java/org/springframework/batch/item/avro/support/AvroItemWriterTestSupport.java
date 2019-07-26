@@ -42,8 +42,8 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
     /*
      * This item reader configured for Specific Avro types.
      */
-    protected  <T> void verifyRecords(byte[] bytes, List<T> actual, Class<T> clazz, boolean embeddedHeader) throws Exception {
-        doVerify(bytes, clazz, actual, embeddedHeader);
+    protected  <T> void verifyRecords(byte[] bytes, List<T> actual, Class<T> clazz, boolean embeddedSchema) throws Exception {
+        doVerify(bytes, clazz, actual, embeddedSchema);
     }
 
     protected  <T> void verifyRecordsWithEmbeddedHeader(byte[] bytes, List<T> actual, Class<T> clazz) throws Exception {
@@ -51,11 +51,11 @@ public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
     }
 
 
-    private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedHeader) throws Exception {
+    private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedSchema) throws Exception {
         AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>()
                 .type(clazz)
                 .resource(new ByteArrayResource(bytes))
-                .embeddedSchema(embeddedHeader)
+                .embeddedSchema(embeddedSchema)
                 .build();
 
         avroItemReader.open(new ExecutionContext());

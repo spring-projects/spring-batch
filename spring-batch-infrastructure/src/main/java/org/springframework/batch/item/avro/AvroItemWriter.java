@@ -76,6 +76,17 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		this.clazz = clazz;
 	}
 
+	/**
+	 * This constructor will create an ItemWriter that does not embedded Avro schema.
+	 *
+	 * @param resource a {@link WritableResource} to which the objects will be serialized.
+	 * @param clazz the data type to be serialized.
+	 */
+	public AvroItemWriter(WritableResource resource, Class<T> clazz) {
+		this(resource, null, clazz);
+		embedSchema = false;
+	}
+
 	@Override
 	public void write(List<? extends T> items) throws Exception {
 		items.forEach(item -> {
@@ -118,14 +129,6 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		catch (IOException e) {
 			throw new ItemStreamException(e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * Disable or enable embedding an Avro schema in the output. True by default.
-	 * @param embedSchema set to false to disable embedding an Avro schema.
-	 */
-	public void setEmbedSchema(boolean embedSchema) {
-		this.embedSchema = embedSchema;
 	}
 
 	private void  initializeWriter() throws IOException {

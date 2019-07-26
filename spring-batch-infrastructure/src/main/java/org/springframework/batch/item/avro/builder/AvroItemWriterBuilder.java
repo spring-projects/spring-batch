@@ -33,8 +33,6 @@ public class AvroItemWriterBuilder<T> {
 
 	private Resource schema;
 
-	private boolean embedSchema = true;
-
 	private String name  = AvroItemWriter.class.getSimpleName();
 
 	/**
@@ -85,17 +83,6 @@ public class AvroItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Disable or enable embedding an Avro schema in the output. True by default.
-	 *
-	 * @param embedSchema set to false to disable embedding an Avro schema.
-	 * @return The current instance of the builder.
-	 */
-	public AvroItemWriterBuilder<T> embedSchema(boolean embedSchema) {
-		this.embedSchema = embedSchema;
-		return this;
-	}
-
-	/**
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}.
 	 *
@@ -118,15 +105,13 @@ public class AvroItemWriterBuilder<T> {
 
 		Assert.notNull(this.resource, "A 'resource' is required.");
 
-		if (this.embedSchema) {
-			Assert.notNull(this.resource, "A 'schema' is required.");
-		}
-
 		Assert.notNull(this.type, "A 'type' is required.");
 
-		AvroItemWriter<T> avroItemWriter = new AvroItemWriter<>(this.resource, this.schema, this.type);
+
+		AvroItemWriter<T> avroItemWriter = this.schema != null ?
+				new AvroItemWriter(this.resource, this.schema, this.type):
+				new AvroItemWriter<>(this.resource, this.type);
 		avroItemWriter.setName(name);
-		avroItemWriter.setEmbedSchema(embedSchema);
 		return avroItemWriter;
 	}
 
