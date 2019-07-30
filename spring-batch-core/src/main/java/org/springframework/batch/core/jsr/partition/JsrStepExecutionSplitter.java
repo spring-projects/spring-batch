@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.core.jsr.partition;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.launch.JsrJobOperator;
 import org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter;
@@ -33,6 +32,7 @@ import java.util.TreeSet;
  * Provides JSR-352 specific behavior for the splitting of {@link StepExecution}s.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
@@ -80,15 +80,18 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 			}
 		});
 		JobExecution jobExecution = stepExecution.getJobExecution();
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		Collection<StepExecution> allPriorStepExecutions = jobRepository.getStepExecutions(jobInstance);
+		Collection<StepExecution> allStepExecutions = jobRepository.getStepExecutions(jobExecution.getJobInstance());
 
 		for(int i = 0; i < gridSize; i++) {
 			String stepName = this.stepName + ":partition" + i;
 			JobExecution curJobExecution = new JobExecution(jobExecution);
 			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
-
-			if(!restoreState || isStartable(curStepExecution, new ExecutionContext(), allPriorStepExecutions)) {
+			StepExecution lastStepExecution = getLastStepExecution(allStepExecutions, curStepExecution.getStepName());
+			if (lastStepExecution != null) {
+				lastStepExecution.getJobExecution().setExecutionContext(jobRepository.getJobExecutionContext(lastStepExecution.getJobExecution()));
+				lastStepExecution.setExecutionContext(jobRepository.getStepExecutionContext(lastStepExecution));
+			}
+			if(!restoreState || isStartable(curStepExecution, lastStepExecution, new ExecutionContext())) {
 				executions.add(curStepExecution);
 			}
 		}

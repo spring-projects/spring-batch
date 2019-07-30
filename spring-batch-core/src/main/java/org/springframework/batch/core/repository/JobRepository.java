@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,26 +179,22 @@ public interface JobRepository {
 	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
-	 * @return all step executions, from all job executions, for the given job instance.
-	 */
-	Collection<StepExecution> getStepExecutions(JobInstance jobInstance);
-
-	/**
+	 * Get the last step execution by step name for a given job instance.
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
-	 * @return the last execution of step for the given job instance, null otherwise.
+	 * @return the last execution of step for the given job instance.
 	 */
 	@Nullable
 	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
 
 	/**
-	 *
-	 * @param stepExecutions all step executions to filter through
-	 * @param stepName the name of the step execution that might have run.
-	 * @return the last execution of step inside the list, null otherwise.
+	 * Get all step executions for a given job instance.
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
+	 * @return all step executions for the given job instance.
 	 */
-	@Nullable
-	StepExecution getLastStepExecution(Collection<StepExecution> stepExecutions, String stepName);
+	default Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
@@ -214,5 +210,23 @@ public interface JobRepository {
 	 */
 	@Nullable
 	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
+
+	/**
+	 * Get the execution context of a given job execution.
+	 * @param jobExecution for which the execution context should be returned
+	 * @return the execution context of the given job execution
+	 */
+	default ExecutionContext getJobExecutionContext(JobExecution jobExecution) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Get the execution context of a given step execution.
+	 * @param stepExecution for which the execution context should be returned
+	 * @return the execution context of the given step execution
+	 */
+	default ExecutionContext getStepExecutionContext(StepExecution stepExecution) {
+		throw new UnsupportedOperationException();
+	}
 
 }

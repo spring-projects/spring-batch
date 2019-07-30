@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.core.partition.support;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -178,8 +180,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		Map<String, ExecutionContext> contexts = getContexts(stepExecution, gridSize);
 		Set<StepExecution> set = new HashSet<>(contexts.size());
 
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		Collection<StepExecution> allPriorStepExecutions = jobRepository.getStepExecutions(jobInstance);
+		Collection<StepExecution> allStepExecutions = jobRepository.getStepExecutions(jobExecution.getJobInstance());
 
 		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
 
@@ -187,8 +188,13 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			String stepName = this.stepName + STEP_NAME_SEPARATOR + context.getKey();
 
 			StepExecution currentStepExecution = jobExecution.createStepExecution(stepName);
+			StepExecution lastStepExecution = getLastStepExecution(allStepExecutions, currentStepExecution.getStepName());
+			if (lastStepExecution != null) {
+				lastStepExecution.getJobExecution().setExecutionContext(jobRepository.getJobExecutionContext(lastStepExecution.getJobExecution()));
+				lastStepExecution.setExecutionContext(jobRepository.getStepExecutionContext(lastStepExecution));
+			}
 
-			boolean startable = isStartable(currentStepExecution, context.getValue(), allPriorStepExecutions);
+			boolean startable = isStartable(currentStepExecution, lastStepExecution, context.getValue());
 
 			if (startable) {
 				set.add(currentStepExecution);
@@ -202,6 +208,14 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 
 		return executions;
 
+	}
+
+	@Nullable
+	protected StepExecution getLastStepExecution(Collection<StepExecution> stepExecutions, String stepName) {
+		return stepExecutions.parallelStream()
+						.filter(stepExecution -> stepExecution.getStepName().equals(stepName))
+						.min(new StepExecutionComparator())
+						.orElse(null);
 	}
 
 	private Map<String, ExecutionContext> getContexts(StepExecution stepExecution, int gridSize) {
@@ -245,32 +259,53 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	/**
 	 * Check if a step execution is startable.
 	 * @param stepExecution the step execution to check
+	 * @param lastStepExecution the last step execution of the same step
 	 * @param context the execution context of the step
 	 * @return true if the step execution is startable, false otherwise
 	 * @throws JobExecutionException if unable to check if the step execution is startable
-	 * @deprecated This method is less performant than and deprecated in favor of
-	 * {@link SimpleStepExecutionSplitter#isStartable(StepExecution, ExecutionContext, Collection)}
 	 */
-	@Deprecated
-	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
-		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
-		String stepName = stepExecution.getStepName();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
-		return isStartable(stepExecution, context, lastStepExecution);
+	protected boolean isStartable(StepExecution stepExecution, StepExecution lastStepExecution, ExecutionContext context) throws JobExecutionException {
+		return getStartable(stepExecution, lastStepExecution, context);
 	}
 
 	/**
 	 * Check if a step execution is startable.
 	 * @param stepExecution the step execution to check
 	 * @param context the execution context of the step
-	 * @param allPriorStepExecutions all the step executions in the job repository at this moment to compare against
 	 * @return true if the step execution is startable, false otherwise
 	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 * @deprecated This method is less performant than and deprecated in favor of
+	 * {@link SimpleStepExecutionSplitter#isStartable(StepExecution, StepExecution, ExecutionContext)}
 	 */
-	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context, Collection<StepExecution> allPriorStepExecutions) throws JobExecutionException {
-		String stepName = stepExecution.getStepName();
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(allPriorStepExecutions, stepName);
-		return isStartable(stepExecution, context, lastStepExecution);
+	@Deprecated
+	protected boolean isStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
+		return getStartable(stepExecution, context);
+	}
+
+	/**
+	 * Check if a step execution is startable.
+	 * @param stepExecution the step execution to check
+	 * @param context the execution context of the step
+	 * @return true if the step execution is startable, false otherwise
+	 * @throws JobExecutionException if unable to check if the step execution is startable
+	 * @deprecated This method is deprecated in favor of
+	 * {@link SimpleStepExecutionSplitter#isStartable} and will be removed in a
+	 * future version.
+	 */
+	@Deprecated
+	protected boolean getStartable(StepExecution stepExecution, StepExecution lastStepExecution, ExecutionContext context) throws JobExecutionException {
+
+		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED);
+
+		if (isRestart) {
+			stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+		}
+		else {
+			stepExecution.setExecutionContext(context);
+		}
+
+		return shouldStart(allowStartIfComplete, stepExecution, lastStepExecution) || isRestart;
+
 	}
 
 	/**
@@ -285,10 +320,11 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 	 */
 	@Deprecated
 	protected boolean getStartable(StepExecution stepExecution, ExecutionContext context) throws JobExecutionException {
-		return isStartable(stepExecution, context);
-	}
 
-	private boolean isStartable(StepExecution stepExecution, ExecutionContext context, StepExecution lastStepExecution) throws JobExecutionException {
+		JobInstance jobInstance = stepExecution.getJobExecution().getJobInstance();
+		String stepName = stepExecution.getStepName();
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, stepName);
+
 		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED);
 
 		if (isRestart) {
@@ -299,6 +335,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 		}
 
 		return shouldStart(allowStartIfComplete, stepExecution, lastStepExecution) || isRestart;
+
 	}
 
 	private boolean shouldStart(boolean allowStartIfComplete, StepExecution stepExecution, StepExecution lastStepExecution)
@@ -354,6 +391,27 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter, Initi
 			return lastStepExecution.getJobExecutionId()==null;
 		}
 		return stepExecution.getJobExecutionId().equals(lastStepExecution.getJobExecutionId());
+	}
+
+	private class StepExecutionComparator implements Comparator<StepExecution> {
+
+		@Override
+		public int compare(StepExecution stepExecution1, StepExecution stepExecution2) {
+			long startTime1 = stepExecution1.getStartTime().getTime();
+			long startTime2 = stepExecution2.getStartTime().getTime();
+			if (startTime1 < startTime2) {
+				return -1;
+			}
+			else {
+				if (startTime1 > startTime2) {
+					return 1;
+				}
+				else {
+					// Use step execution ID as the tie breaker if start time is identical
+					return stepExecution1.getId().compareTo(stepExecution2.getId());
+				}
+			}
+		}
 	}
 
 }

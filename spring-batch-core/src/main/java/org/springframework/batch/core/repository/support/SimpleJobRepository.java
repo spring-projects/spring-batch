@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,31 +217,17 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
-	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
+	@Nullable
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<>(jobExecutions.size());
 
 		for (JobExecution jobExecution : jobExecutions) {
 			stepExecutionDao.addStepExecutions(jobExecution);
-			stepExecutions.addAll(jobExecution.getStepExecutions());
-		}
-		return stepExecutions;
-	}
-
-	@Override
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		Collection<StepExecution> stepExecutions = getStepExecutions(jobInstance);
-		return getLastStepExecution(stepExecutions, stepName);
-	}
-
-	@Override
-	public StepExecution getLastStepExecution(Collection<StepExecution> allStepExecutions, String stepName) {
-
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
-
-		for (StepExecution stepExecution : allStepExecutions) {
-			if (stepName.equals(stepExecution.getStepName())) {
-				stepExecutions.add(stepExecution);
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+				if (stepName.equals(stepExecution.getStepName())) {
+					stepExecutions.add(stepExecution);
+				}
 			}
 		}
 
@@ -268,6 +254,29 @@ public class SimpleJobRepository implements JobRepository {
 		}
 
 		return latest;
+	}
+
+	@Override
+	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
+		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		List<StepExecution> stepExecutions = new ArrayList<>();
+
+		for (JobExecution jobExecution : jobExecutions) {
+			stepExecutionDao.addStepExecutions(jobExecution);
+			stepExecutions.addAll(jobExecution.getStepExecutions());
+		}
+
+		return stepExecutions;
+	}
+
+	@Override
+	public ExecutionContext getJobExecutionContext(JobExecution jobExecution) {
+		return ecDao.getExecutionContext(jobExecution);
+	}
+
+	@Override
+	public ExecutionContext getStepExecutionContext(StepExecution stepExecution) {
+		return ecDao.getExecutionContext(stepExecution);
 	}
 
 	/**

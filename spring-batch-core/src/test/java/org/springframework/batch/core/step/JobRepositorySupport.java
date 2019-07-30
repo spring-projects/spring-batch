@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 package org.springframework.batch.core.step;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobRepositorySupport implements JobRepository {
@@ -54,11 +57,6 @@ public class JobRepositorySupport implements JobRepository {
 
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		return null;
-	}
-
-	@Override
-	public StepExecution getLastStepExecution(Collection<StepExecution> stepExecutions, String stepName) {
 		return null;
 	}
 
@@ -105,11 +103,6 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	@Override
-	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
-		return null;
-	}
-
-	@Override
 	public void addAll(Collection<StepExecution> stepExecutions) {
 	}
 
@@ -123,5 +116,20 @@ public class JobRepositorySupport implements JobRepository {
 	public JobExecution createJobExecution(JobInstance jobInstance,
 			JobParameters jobParameters, String jobConfigurationLocation) {
 		return null;
+	}
+
+	@Override
+	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public ExecutionContext getJobExecutionContext(JobExecution jobExecution) {
+		return new ExecutionContext();
+	}
+
+	@Override
+	public ExecutionContext getStepExecutionContext(StepExecution stepExecution) {
+		return new ExecutionContext();
 	}
 }

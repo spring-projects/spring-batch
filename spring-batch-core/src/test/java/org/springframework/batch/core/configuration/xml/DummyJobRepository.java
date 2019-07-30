@@ -66,11 +66,6 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	}
 
 	@Override
-	public StepExecution getLastStepExecution(Collection<StepExecution> stepExecutions, String stepName) {
-		return null;
-	}
-
-	@Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return 0;
 	}
@@ -94,11 +89,6 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
-	}
-
-	@Override
-	public Collection<StepExecution> getStepExecutions(JobInstance jobInstance) {
-		return null;
 	}
 
 	@Override
