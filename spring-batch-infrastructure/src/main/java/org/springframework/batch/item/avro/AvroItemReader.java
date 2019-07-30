@@ -39,6 +39,7 @@ import org.springframework.util.Assert;
  * An {@link ItemReader} that deserializes data from a {@link Resource} containing serialized Avro objects.
  *
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  * @since 4.2
  */
 public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
@@ -102,10 +103,10 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	@Override
 	protected T doRead() throws Exception {
-	    if (inputStreamReader != null) {
-            return inputStreamReader.read();
+	    if (this.inputStreamReader != null) {
+            return this.inputStreamReader.read();
         }
-	    return dataFileReader.hasNext()? dataFileReader.next(): null;
+	    return this.dataFileReader.hasNext()? this.dataFileReader.next(): null;
 	}
 
 	@Override
@@ -116,10 +117,10 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	@Override
 	protected void doClose() throws Exception {
 		if (this.inputStreamReader != null) {
-			inputStreamReader.close();
+			this.inputStreamReader.close();
 			return;
 		}
-		dataFileReader.close();
+		this.dataFileReader.close();
 	}
 
 	private void  initializeReader() throws IOException {
@@ -160,8 +161,8 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
         }
 
         private T read() throws Exception {
-            if (!binaryDecoder.isEnd()) {
-                return datumReader.read(null, binaryDecoder);
+            if (!this.binaryDecoder.isEnd()) {
+                return this.datumReader.read(null, this.binaryDecoder);
             }
             return null;
         }

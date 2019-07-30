@@ -28,6 +28,7 @@ import org.springframework.core.io.WritableResource;
 
 /**
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 
@@ -38,62 +39,60 @@ public class AvroItemWriterTests extends AvroItemWriterTestSupport {
 	@Test
 	public void itemWriterForAvroGeneratedClass() throws Exception {
 
-		AvroItemWriter<User> avroItemWriter = new AvroItemWriter<>(output,schemaResource, User.class);
+		AvroItemWriter<User> avroItemWriter = new AvroItemWriter<>(this.output, this.schemaResource, User.class);
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.avroGeneratedUsers());
 		avroItemWriter.close();
 
-		verifyRecordsWithEmbeddedHeader(outputStream.toByteArray(), this.avroGeneratedUsers(), User.class);
+		verifyRecordsWithEmbeddedHeader(this.outputStream.toByteArray(), this.avroGeneratedUsers(), User.class);
 	}
 
 	@Test
 	public void itemWriterForGenericRecords() throws Exception {
 
 		AvroItemWriter<GenericRecord> avroItemWriter =
-                new AvroItemWriter<>(output,plainOldUserSchemaResource,GenericRecord.class);
+                new AvroItemWriter<>(this.output, this.plainOldUserSchemaResource, GenericRecord.class);
 
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.genericPlainOldUsers());
 		avroItemWriter.close();
 
-		verifyRecordsWithEmbeddedHeader(outputStream.toByteArray(), this.genericPlainOldUsers(), GenericRecord.class);
+		verifyRecordsWithEmbeddedHeader(this.outputStream.toByteArray(), this.genericPlainOldUsers(), GenericRecord.class);
 
 	}
 
 	@Test
 	public void itemWriterForPojos() throws Exception {
 
-		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter(output,plainOldUserSchemaResource, PlainOldUser.class);
+		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter<>(this.output, this.plainOldUserSchemaResource, PlainOldUser.class);
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.plainOldUsers());
 		avroItemWriter.close();
 
-		verifyRecordsWithEmbeddedHeader(outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class);
+		verifyRecordsWithEmbeddedHeader(this.outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class);
 
 	}
 
 	@Test
 	public void itemWriterWithNoEmbeddedHeaders() throws Exception {
 
-		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter(output, PlainOldUser.class);
+		AvroItemWriter<PlainOldUser> avroItemWriter = new AvroItemWriter<>(this.output, PlainOldUser.class);
 		avroItemWriter.open(new ExecutionContext());
 		avroItemWriter.write(this.plainOldUsers());
 		avroItemWriter.close();
 
-		verifyRecords(outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class, false);
+		verifyRecords(this.outputStream.toByteArray(), this.plainOldUsers(), PlainOldUser.class, false);
 
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldFailWitNoOutput() {
-
-		new AvroItemWriter(null, schemaResource, User.class).open(new ExecutionContext());;
+		new AvroItemWriter<>(null, this.schemaResource, User.class).open(new ExecutionContext());
 
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldFailWitNoType() {
-        new AvroItemWriter(output, schemaResource, null).open(new ExecutionContext());
-
+		new AvroItemWriter<>(this.output, this.schemaResource, null).open(new ExecutionContext());
 	}
 }

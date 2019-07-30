@@ -40,9 +40,9 @@ import org.springframework.core.io.Resource;
 
 /**
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AvroTestFixtures {
-
 
 	//@formatter:off
 	private final List<User> avroGeneratedUsers = Arrays.asList(
@@ -51,7 +51,7 @@ public abstract class AvroTestFixtures {
 			new User("Alana", 13, "yellow"),
 			new User("Joe", 1, "pink"));
 
-	List<PlainOldUser> plainOldUsers = Arrays.asList(
+	private List<PlainOldUser> plainOldUsers = Arrays.asList(
 			new PlainOldUser("David", 20, "blue"),
 			new PlainOldUser("Sue", 4, "red"),
 			new PlainOldUser("Alana", 13, "yellow"),

@@ -10,6 +10,7 @@ Spring Batch 4.2 adds the following features:
 
 * Support for batch metrics with https://micrometer.io[Micrometer]
 * Support for reading/writing data from/to https://kafka.apache.org[Apache Kafka] topics
+* Support for reading/writing data from/to https://avro.apache.org[Apache Avro] resources
 * Improved documentation
 
 [[whatsNewMetrics]]
@@ -30,6 +31,13 @@ For more details about this feature, please refer to the
 
 This release adds a new `KafkaItemReader` and `KafkaItemWriter` to read data from and
 write it to Kafka topics. For more details about these new components, please refer
+to the https://docs.spring.io/spring-batch/4.2.x/api/index.html[Javadoc].
+
+[[whatsNewAvro]]
+=== Apache Avro item reader/writer
+
+This release adds a new `AvroItemReader` and `AvroItemWriter` to read data from and
+write it to Avro resources. For more details about these new components, please refer
 to the https://docs.spring.io/spring-batch/4.2.x/api/index.html[Javadoc].
 
 [[whatsNewDocs]]

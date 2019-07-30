@@ -46,6 +46,7 @@ import org.springframework.util.Assert;
  *
  * @since 4.2
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
@@ -54,8 +55,6 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	private OutputStreamWriter<T> outputStreamWriter;
 
 	private WritableResource resource;
-
-	private Schema schema;
 
 	private Resource schemaResource;
 
@@ -109,6 +108,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	 */
 	@Override
 	public void open(ExecutionContext executionContext) {
+		super.open(executionContext);
 		try {
 			initializeWriter();
 		} catch (IOException e) {
@@ -120,7 +120,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	public void close() {
 		try {
 			if (this.dataFileWriter != null) {
-				dataFileWriter.close();
+				this.dataFileWriter.close();
 			}
 			else {
 				this.outputStreamWriter.close();
@@ -132,22 +132,23 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	}
 
 	private void  initializeWriter() throws IOException {
-		Assert.notNull(resource, "'resource' is required.");
-		Assert.notNull(clazz, "'class' is required.");
+		Assert.notNull(this.resource, "'resource' is required.");
+		Assert.notNull(this.clazz, "'class' is required.");
 
 		if (this.embedSchema) {
 			Assert.notNull(this.schemaResource, "'schema' is required.");
 			Assert.state(this.schemaResource.exists(),
 					"'schema' " + this.schemaResource.getFilename() + " does not exist.");
+			Schema schema;
 			try {
-				this.schema = new Schema.Parser().parse(this.schemaResource.getInputStream());
+				schema = new Schema.Parser().parse(this.schemaResource.getInputStream());
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e.getMessage(), e);
 			}
 			this.dataFileWriter = new DataFileWriter<>(datumWriterForClass(this.clazz));
-			this.dataFileWriter.create(this.schema, this.resource.getOutputStream());
+			this.dataFileWriter.create(schema, this.resource.getOutputStream());
 		} else {
-			this.outputStreamWriter = createOutputStreamWriter(resource.getOutputStream(),
+			this.outputStreamWriter = createOutputStreamWriter(this.resource.getOutputStream(),
 					datumWriterForClass(this.clazz));
 		}
 
@@ -184,8 +185,8 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		}
 
 		private void write(T datum) throws Exception {
-			datumWriter.write(datum, binaryEncoder);
-			binaryEncoder.flush();
+			this.datumWriter.write(datum, this.binaryEncoder);
+			this.binaryEncoder.flush();
 		}
 
 		private void close() {
