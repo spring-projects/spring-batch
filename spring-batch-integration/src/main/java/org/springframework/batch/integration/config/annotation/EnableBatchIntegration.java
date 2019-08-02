@@ -66,7 +66,7 @@ import org.springframework.integration.config.EnableIntegration;
  * 	&#064;Bean
  * 	public TaskletStep managerStep() {
  *       	 return this.managerStepBuilderFactory
- *       		.get("masterStep")
+ *       		.get("managerStep")
  *       		.chunk(100)
  *       		.reader(itemReader())
  *       		.outputChannel(outgoingRequestsToWorkers())

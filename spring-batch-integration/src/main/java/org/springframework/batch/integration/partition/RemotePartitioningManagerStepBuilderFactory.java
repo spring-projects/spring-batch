@@ -46,7 +46,7 @@ public class RemotePartitioningManagerStepBuilderFactory implements BeanFactoryA
 	 * @param transactionManager the transaction manager to use
 	 */
 	public RemotePartitioningManagerStepBuilderFactory(JobRepository jobRepository,
-													   JobExplorer jobExplorer, PlatformTransactionManager transactionManager) {
+		JobExplorer jobExplorer, PlatformTransactionManager transactionManager) {
 
 		this.jobRepository = jobRepository;
 		this.jobExplorer = jobExplorer;
