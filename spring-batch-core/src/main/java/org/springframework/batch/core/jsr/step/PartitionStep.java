@@ -54,14 +54,14 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 
 	/**
 	 * Delegate execution to the {@link PartitionHandler} provided. The
-	 * {@link StepExecution} passed in here becomes the parent or master
+	 * {@link StepExecution} passed in here becomes the parent or manager
 	 * execution for the partition, summarizing the status on exit of the
 	 * logical grouping of work carried out by the {@link PartitionHandler}. The
 	 * individual step executions and their input parameters (through
 	 * {@link ExecutionContext}) for the partition elements are provided by the
 	 * {@link StepExecutionSplitter}.
 	 *
-	 * @param stepExecution the master step execution for the partition
+	 * @param stepExecution the manager step execution for the partition
 	 *
 	 * @see Step#execute(StepExecution)
 	 */

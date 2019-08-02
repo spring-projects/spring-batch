@@ -18,7 +18,7 @@ package org.springframework.batch.integration.chunk;
 
 
 /**
- * Interface for a remote worker in the Remote Chunking pattern. A request comes from a master process containing some
+ * Interface for a remote worker in the Remote Chunking pattern. A request comes from a manager process containing some
  * items to be processed. Once the items are done with a response needs to be generated containing a summary of the
  * result.
  * 

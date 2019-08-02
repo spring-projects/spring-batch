@@ -645,13 +645,13 @@ not get shared across threads of execution.
 
 ### Remote Partitioning Sample
 
-This sample shows how to configure a remote partitioning job. The master step
+This sample shows how to configure a remote partitioning job. The manager step
 uses a `MessageChannelPartitionHandler` to send partitions to and receive 
 replies from workers. Two examples are shown:
 
-* A master step that polls the job repository to see if all workers have finished
+* A manager step that polls the job repository to see if all workers have finished
 their work
-* A master step that aggregates replies from workers to notify work completion
+* A manager step that aggregates replies from workers to notify work completion
 
 The sample uses an embedded JMS broker and an embedded database for simplicity
 but any option supported via Spring Integration for communication is technically
@@ -659,18 +659,18 @@ acceptable.
 
 ### Remote Chunking Sample
 
-This sample shows how to configure a remote chunking job. The master step will
+This sample shows how to configure a remote chunking job. The manager step will
 read numbers from 1 to 6 and send two chunks ({1, 2, 3} and {4, 5, 6}) to workers
 for processing and writing.
 
 This example shows how to use:
 
-* the `RemoteChunkingMasterStepBuilderFactory` to create a master step
+* the `RemoteChunkingManagerStepBuilderFactory` to create a manager step
 * the `RemoteChunkingWorkerBuilder` to configure an integration flow on the worker side.
 
 The sample uses an embedded JMS broker as a communication middleware between the
-master and workers. The usage of an embedded broker is only for simplicity's sake,
-the communication between the master and workers is still done through JMS queues
+manager and workers. The usage of an embedded broker is only for simplicity's sake,
+the communication between the manager and workers is still done through JMS queues
 and Spring Integration channels and messages are sent over the wire through a TCP port.
 
 ### Quartz Sample

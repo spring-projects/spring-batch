@@ -16,6 +16,12 @@
 
 package org.springframework.batch.core.partition.support;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
@@ -27,12 +33,6 @@ import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 /**
  * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the
@@ -90,7 +90,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	}
 
     @Override
-    protected Set<StepExecution> doHandle(StepExecution masterStepExecution,
+    protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
                                           Set<StepExecution> partitionStepExecutions) throws Exception {
         Assert.notNull(step, "A Step must be provided.");
         final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());

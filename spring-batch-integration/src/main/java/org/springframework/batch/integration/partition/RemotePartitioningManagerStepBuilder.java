@@ -228,8 +228,8 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	@Override
-	public RemotePartitioningManagerStepBuilder partitioner(String slaveStepName, Partitioner partitioner) {
-		super.partitioner(slaveStepName, partitioner);
+	public RemotePartitioningManagerStepBuilder partitioner(String workerStepName, Partitioner partitioner) {
+		super.partitioner(workerStepName, partitioner);
 		return this;
 	}
 

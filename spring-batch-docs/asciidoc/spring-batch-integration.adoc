@@ -942,7 +942,7 @@ Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatch
 annotation that can be used to simplify a remote chunking setup. This annotation provides
 two beans that can be autowired in the application context:
 
-* `RemoteChunkingMasterStepBuilderFactory`: used to configure the manager step
+* `RemoteChunkingManagerStepBuilderFactory`: used to configure the manager step
 * `RemoteChunkingWorkerBuilder`: used to configure the remote worker integration flow
 
 These APIs take care of configuring a number of components as described in the following diagram:
@@ -950,7 +950,7 @@ These APIs take care of configuring a number of components as described in the f
 .Remote Chunking Configuration
 image::{batch-asciidoc}images/remote-chunking-config.png[Remote Chunking Configuration, scaledwidth="80%"]
 
-On the manager side, the `RemoteChunkingMasterStepBuilderFactory` lets you
+On the manager side, the `RemoteChunkingManagerStepBuilderFactory` lets you
 configure a manager step by declaring:
 
 * the item reader to read items and send them to workers
@@ -982,7 +982,7 @@ public class RemoteChunkingJobConfiguration {
     public static class ManagerConfiguration {
 
         @Autowired
-        private RemoteChunkingMasterStepBuilderFactory managerStepBuilderFactory;
+        private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
 
         @Bean
         public TaskletStep managerStep() {
@@ -1265,7 +1265,7 @@ link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-
 The `@EnableBatchIntegration` annotation that can be used to simplify a remote
  partitioning setup. This annotation provides two beans useful for remote partitioning:
 
-* `RemotePartitioningMasterStepBuilderFactory`: used to configure the manager step
+* `RemotePartitioningManagerStepBuilderFactory`: used to configure the manager step
 * `RemotePartitioningWorkerStepBuilderFactory`: used to configure the worker step
 
 These APIs take care of configuring a number of components as described in the following diagram:
@@ -1276,7 +1276,7 @@ image::{batch-asciidoc}images/remote-partitioning-polling-config.png[Remote Part
 .Remote Partitioning Configuration (with replies aggregation)
 image::{batch-asciidoc}images/remote-partitioning-aggregation-config.png[Remote Partitioning Configuration (with replies aggregation), scaledwidth="80%"]
 
-On the manager side, the `RemotePartitioningMasterStepBuilderFactory` allows you to
+On the manager side, the `RemotePartitioningManagerStepBuilderFactory` allows you to
 configure a manager step by declaring:
 
 * the `Partitioner` used to partition data
@@ -1308,7 +1308,7 @@ public class RemotePartitioningJobConfiguration {
     public static class ManagerConfiguration {
 
         @Autowired
-        private RemotePartitioningMasterStepBuilderFactory managerStepBuilderFactory;
+        private RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
 
         @Bean
         public Step managerStep() {

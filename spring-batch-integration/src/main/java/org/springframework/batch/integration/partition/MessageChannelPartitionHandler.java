@@ -49,9 +49,9 @@ import org.springframework.util.CollectionUtils;
  * While a {@link org.springframework.messaging.MessageChannel} is used for sending the requests to the workers, the
  * worker's responses can be obtained in one of two ways:
  * <ul>
- *     <li>A reply channel - Slaves will respond with messages that will be aggregated via this component.</li>
- *     <li>Polling the job repository - Since the state of each slave is maintained independently within the job
- *     repository, we can poll the store to determine the state without the need of the slaves to formally respond.</li>
+ *     <li>A reply channel - Workers will respond with messages that will be aggregated via this component.</li>
+ *     <li>Polling the job repository - Since the state of each worker is maintained independently within the job
+ *     repository, we can poll the store to determine the state without the need of the workers to formally respond.</li>
  * </ul>
  *
  * Note: The reply channel for this is instance based.  Sharing this component across
@@ -98,7 +98,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);
 
 		if(pollRepositoryForResults) {
-			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for slave results");
+			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for worker results");
 		}
 
 		if(dataSource != null && jobExplorer == null) {
@@ -134,7 +134,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * How often to poll the job repository for the status of the slaves.
+	 * How often to poll the job repository for the status of the workers.
 	 *
 	 * @param pollInterval milliseconds between polls, defaults to 10000 (10 seconds).
 	 */

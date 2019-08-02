@@ -40,8 +40,8 @@ import org.springframework.util.ReflectionUtils;
  * master. The idea is to lift the existing chunk processor out of a Step that works locally, and replace it with a one
  * that writes chunks into a message channel. The existing step hands its business chunk processing responsibility over
  * to the handler produced by the factory, which then needs to be set up as a worker on the other end of the channel the
- * chunks are being sent to. Once this chunk handler is installed the application is playing the role of both the master
- * and the slave listeners in the Remote Chunking pattern for the Step in question.
+ * chunks are being sent to. Once this chunk handler is installed the application is playing the role of both the manager
+ * and the worker listeners in the Remote Chunking pattern for the Step in question.
  * 
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
