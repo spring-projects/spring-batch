@@ -31,6 +31,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
@@ -105,6 +106,7 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
+	@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 	@Test
 	public void testDecisionAfterSplit() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
