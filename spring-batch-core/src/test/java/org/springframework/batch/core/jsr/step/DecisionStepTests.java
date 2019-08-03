@@ -109,7 +109,7 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 	@Test
 	public void testDecisionAfterSplit() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
-		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "jobExecution");
+		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "execution");
 		assertEquals(String.format("Received a %s because of %s", execution.getBatchStatus(), jobExecution.getExitStatus().getExitDescription()), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
