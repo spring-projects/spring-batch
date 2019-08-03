@@ -31,7 +31,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
@@ -102,15 +102,15 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 	@Test
 	public void testDecisionAfterFlow() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterFlow-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(execution.getExitStatus(), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
-	@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 	@Test
 	public void testDecisionAfterSplit() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "jobExecution");
+		assertEquals(String.format("Received a %s because of %s", execution.getBatchStatus(), jobExecution.getExitStatus().getExitDescription()), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
 	}
