@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of
@@ -73,6 +74,7 @@ public class FlowJob extends AbstractJob {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nullable
 	@Override
 	public Step getStep(String stepName) {
 		if (!initialized) {

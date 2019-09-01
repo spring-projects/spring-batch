@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -189,6 +190,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 			counter = -1;
 		}
 
+		@Nullable
 		@Override
 		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
 			counter++;
@@ -273,6 +275,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='processed'");
 		}
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);

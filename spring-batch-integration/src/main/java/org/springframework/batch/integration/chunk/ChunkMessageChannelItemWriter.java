@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
@@ -116,6 +117,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		localState.setStepExecution(stepExecution);
 	}
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!(stepExecution.getStatus() == BatchStatus.COMPLETED)) {

@@ -33,6 +33,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -101,6 +102,7 @@ public class AvroItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 	}
 
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 	    if (this.inputStreamReader != null) {

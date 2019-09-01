@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 public class LoggingTasklet implements Tasklet {
 
@@ -32,7 +33,8 @@ public class LoggingTasklet implements Tasklet {
                 this.id = id;
         }
 
-        @Override
+        @Nullable
+		@Override
         public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
                 logger.info("tasklet executing: id=" + id);
                 return RepeatStatus.FINISHED;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.lang.Nullable;
 
 /**
  * {@link State} implementation that delegates to a {@link FlowExecutor} to
@@ -99,6 +100,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
 	 */
+	@Nullable
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		Step result = null;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +131,7 @@ public class ExtendedAbstractJobTests {
 	public void testSetValidator() throws Exception {
 		job.setJobParametersValidator(new DefaultJobParametersValidator() {
 			@Override
-			public void validate(JobParameters parameters) throws JobParametersInvalidException {
+			public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
 				throw new JobParametersInvalidException("FOO");
 			}
 		});
@@ -214,6 +215,7 @@ public class ExtendedAbstractJobTests {
 		protected void doExecute(JobExecution execution) throws JobExecutionException {
 		}
 
+		@Nullable
 		@Override
 		public Step getStep(String stepName) {
 			return null;

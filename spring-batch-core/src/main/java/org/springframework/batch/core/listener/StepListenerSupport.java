@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListene
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

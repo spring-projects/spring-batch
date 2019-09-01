@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -66,7 +67,8 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the
 	 * specified annotation
 	 */
-    @Override
+    @Nullable
+	@Override
 	public Method findMethod(Object candidate) {
 		Assert.notNull(candidate, "candidate object must not be null");
 		Class<?> targetClass = AopUtils.getTargetClass(candidate);
@@ -88,7 +90,8 @@ public class AnnotationMethodResolver implements MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method has the
 	 * specified annotation
 	 */
-    @Override
+    @Nullable
+	@Override
 	public Method findMethod(final Class<?> clazz) {
 		Assert.notNull(clazz, "class must not be null");
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<>();

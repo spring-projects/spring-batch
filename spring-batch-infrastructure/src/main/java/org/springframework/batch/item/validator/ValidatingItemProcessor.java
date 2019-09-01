@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.item.validator;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -76,7 +77,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T process(T item) throws ValidationException {
 		try {
 			validator.validate(item);

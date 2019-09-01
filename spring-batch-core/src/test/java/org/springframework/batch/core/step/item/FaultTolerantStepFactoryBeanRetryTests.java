@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.batch.item.support.AbstractItemCountingItemStreamItem
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.policy.MapRetryContextCache;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -156,6 +157,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, Integer> processor = new ItemProcessor<String, Integer>() {
+			@Nullable
 			@Override
 			public Integer process(String item) throws Exception {
 				processed.add(item);
@@ -205,6 +207,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				processed.add(item);
@@ -253,6 +256,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		};
 
 		ItemProcessor<String, String> processor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				processed.add(item);
@@ -290,6 +294,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testSuccessfulRetryWithReadFailure() throws Exception {
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -344,6 +349,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 						"c", "d", "e", "f"));
 			}
 
+			@Nullable
 			@Override
 			protected String doRead() throws Exception {
 				return reader.read();
@@ -394,6 +400,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -435,6 +442,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -499,6 +507,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList(
 				"a", "b", "c", "d", "e", "f")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -557,6 +566,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -612,6 +622,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(1);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -665,6 +676,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(
 				Arrays.asList("b")) {
+			@Nullable
 			@Override
 			public String read() {
 				String item = super.read();
@@ -715,6 +727,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		// set the cache limit stupidly low
 		factory.setRetryContextCache(new MapRetryContextCache(0));
 		ItemReader<String> provider = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() {
 				String item = "" + count;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 
 public class JsrFaultTolerantChunkProcessorTests {
 
@@ -499,6 +500,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 			super(list);
 		}
 
+		@Nullable
 		@Override
 		public String read() {
 			count++;
@@ -516,6 +518,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		protected int failCount = -1;
 		protected boolean filter = false;
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			count++;
@@ -583,7 +586,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		}
 
 		@Override
-		public void afterProcess(String item, String result) {
+		public void afterProcess(String item, @Nullable String result) {
 			afterProcess++;
 		}
 

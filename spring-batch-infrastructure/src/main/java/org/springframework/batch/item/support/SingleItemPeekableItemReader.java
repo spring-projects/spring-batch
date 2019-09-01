@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.PeekableItemReader;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -66,7 +67,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see ItemReader#read()
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		if (next != null) {
 			T item = next;
@@ -86,7 +88,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see PeekableItemReader#peek()
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T peek() throws Exception, UnexpectedInputException, ParseException {
 		if (next == null) {
 			updateDelegate(executionContext);

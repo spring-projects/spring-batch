@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -46,7 +47,7 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 	 * java.lang.String)
 	 */
     @Override
-	public FieldSet tokenize(String line) {
+	public FieldSet tokenize(@Nullable String line) {
 		return tokenizers.match(line).tokenize(line);
 	}
 

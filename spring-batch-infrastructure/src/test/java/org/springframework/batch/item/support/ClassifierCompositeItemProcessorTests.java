@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.classify.PatternMatchingClassifier;
 import org.springframework.classify.SubclassClassifier;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Jimmy Praet
@@ -35,12 +36,14 @@ public class ClassifierCompositeItemProcessorTests {
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
 		
 		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return "foo: " + item;
 			}
 		};
 		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return item;
@@ -66,18 +69,21 @@ public class ClassifierCompositeItemProcessorTests {
 		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
 		
 		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<Integer, String>() {
+			@Nullable
 			@Override
 			public String process(Integer item) throws Exception {
 				return "int: " + item;
 			}
 		};
 		ItemProcessor<Long, StringBuffer> longProcessor = new ItemProcessor<Long, StringBuffer>() {
+			@Nullable
 			@Override
 			public StringBuffer process(Long item) throws Exception {
 				return new StringBuffer("long: " + item);
 			}
 		};
 		ItemProcessor<Number, StringBuilder> defaultProcessor = new ItemProcessor<Number, StringBuilder>() {
+			@Nullable
 			@Override
 			public StringBuilder process(Number item) throws Exception {
 				return new StringBuilder("number: " + item);

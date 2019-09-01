@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -44,6 +45,7 @@ public class ChunkMonitorTests {
 	@Before
 	public void setUp() {
 		monitor.setItemReader(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return "" + (count++);
@@ -109,6 +111,7 @@ public class ChunkMonitorTests {
 	@Test(expected = ItemStreamException.class)
 	public void testOpenWithErrorInReader() {
 		monitor.setItemReader(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new IllegalStateException("Expected");
@@ -143,6 +146,7 @@ public class ChunkMonitorTests {
 	public void testUpdateWithNoStream() throws Exception {
 		monitor = new ChunkMonitor();
 		monitor.setItemReader(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return "" + (count++);

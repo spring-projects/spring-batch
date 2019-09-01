@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.lang.Nullable;
 
 /**
  * Generates configurable number of {@link Trade} items.
@@ -32,6 +33,7 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 	
 	private int counter = 0;
 
+	@Nullable
 	@Override
 	public Trade read() throws Exception {
 		if (counter < limit) {

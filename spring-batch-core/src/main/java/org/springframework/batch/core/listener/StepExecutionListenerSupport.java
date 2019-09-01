@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.core.listener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -28,6 +29,7 @@ public class StepExecutionListenerSupport implements StepExecutionListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

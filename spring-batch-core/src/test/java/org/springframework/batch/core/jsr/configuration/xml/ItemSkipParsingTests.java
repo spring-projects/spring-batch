@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.lang.Nullable;
 
 import javax.batch.api.chunk.listener.SkipProcessListener;
 import javax.batch.api.chunk.listener.SkipReadListener;
@@ -83,6 +84,7 @@ public class ItemSkipParsingTests extends AbstractJsrTestCase {
 	public static class SkipErrorGeneratingReader implements ItemReader<String> {
 		private static int count = 0;
 
+		@Nullable
 		@Override
 		public String read() throws Exception {
 			count++;
@@ -104,6 +106,7 @@ public class ItemSkipParsingTests extends AbstractJsrTestCase {
 	public static class SkipErrorGeneratingProcessor implements ItemProcessor<String, String> {
 		private static int count = 0;
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			count++;

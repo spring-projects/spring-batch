@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 import javax.batch.api.chunk.ItemReader;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -48,6 +49,7 @@ public class ItemReaderAdapter<T> extends CheckpointSupport implements org.sprin
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Nullable
 	@SuppressWarnings("unchecked")
 	@Override
 	public T read() throws Exception {

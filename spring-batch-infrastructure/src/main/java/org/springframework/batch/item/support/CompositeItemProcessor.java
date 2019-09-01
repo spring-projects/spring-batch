@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	private List<? extends ItemProcessor<?, ?>> delegates;
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {

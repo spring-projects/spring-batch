@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -149,6 +150,7 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
+	@Nullable
 	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;

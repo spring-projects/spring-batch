@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 /**
  * Tests for {@link SimpleStepFactoryBean}.
@@ -381,6 +382,7 @@ public class SimpleStepFactoryBeanTests {
 			public void write(List<? extends String> items) throws Exception {
 			}
 
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return item;
@@ -413,7 +415,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterProcess(String item, String result) {
+			public void afterProcess(String item, @Nullable String result) {
 				listenerCalls.add("process");
 			}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.lang.Nullable;
 
 /**
  * Unit test class that was used as part of the Reference Documentation.  I'm only including it in the
@@ -85,6 +86,7 @@ public class CustomItemReaderTests {
 			this.items = items;
 		}
 
+		@Nullable
 		@Override
 		public T read() throws Exception {
 			if (currentIndex < items.size()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -138,7 +139,7 @@ public class FlowStepParserTests {
 		int count = 0;
 
 		@Override
-		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+		public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 			if (count++ < 2) {
 				return new FlowExecutionStatus("OK");
 			}

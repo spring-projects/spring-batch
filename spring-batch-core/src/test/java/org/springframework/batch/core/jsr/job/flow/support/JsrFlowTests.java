@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.core.job.flow.StateSupport;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
 import org.springframework.batch.core.job.flow.support.SimpleFlowTests;
 import org.springframework.batch.core.job.flow.support.StateTransition;
+import org.springframework.lang.Nullable;
 
 public class JsrFlowTests extends SimpleFlowTests {
 
@@ -66,6 +67,7 @@ public class JsrFlowTests extends SimpleFlowTests {
 			this.stepExecution = stepExecution;
 		}
 
+		@Nullable
 		@Override
 		public StepExecution getStepExecution() {
 			return stepExecution;

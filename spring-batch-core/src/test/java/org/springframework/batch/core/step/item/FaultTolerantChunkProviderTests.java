@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.lang.Nullable;
 
 public class FaultTolerantChunkProviderTests {
 
@@ -53,6 +54,7 @@ public class FaultTolerantChunkProviderTests {
 	@Test
 	public void testProvideWithOverflow() throws Exception {
 		provider = new FaultTolerantChunkProvider<>(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new RuntimeException("Planned");

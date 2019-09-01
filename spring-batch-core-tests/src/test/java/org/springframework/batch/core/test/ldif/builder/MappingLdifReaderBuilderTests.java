@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2019 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.batch.item.ldif.builder.MappingLdifReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -210,6 +211,7 @@ public class MappingLdifReaderBuilderTests {
 	}
 
 	public class TestMapper implements RecordMapper<LdapAttributes> {
+		@Nullable
 		@Override
 		public LdapAttributes mapRecord(LdapAttributes attributes) {
 			return attributes;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -150,6 +151,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		helper.setUseStatelessSession(useStatelessSession);
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (cursor.next()) {

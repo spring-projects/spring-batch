@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 the original author or authors.
+ * Copyright 2005-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.test.ldif;
 
 import org.springframework.batch.item.ldif.RecordMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.ldap.core.LdapAttributes;
  */
 public class MyMapper implements RecordMapper<LdapAttributes> {
 
+	@Nullable
 	public LdapAttributes mapRecord(LdapAttributes attributes) {
 		return attributes;
 	}

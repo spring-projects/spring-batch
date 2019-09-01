@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,14 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 public class AsyncItemProcessorTests {
 
 	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
 	private ItemProcessor<String, String> delegate = new ItemProcessor<String, String>() {
+		@Nullable
 		public String process(String item) throws Exception {
 			return item + item;
 		};
@@ -56,6 +58,7 @@ public class AsyncItemProcessorTests {
 	@Test
 	public void testExecutionInStepScope() throws Exception {
 		delegate = new ItemProcessor<String, String>() {
+			@Nullable
 			public String process(String item) throws Exception {
 				StepContext context = StepSynchronizationManager.getContext();
 				assertTrue(context != null && context.getStepExecution() != null);

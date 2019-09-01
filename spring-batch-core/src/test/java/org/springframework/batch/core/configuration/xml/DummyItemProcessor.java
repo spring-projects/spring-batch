@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 the original author or authors.
+ * Copyright 2009-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -23,6 +24,7 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class DummyItemProcessor implements ItemProcessor<Object,Object> {
 
+	@Nullable
 	@Override
 	public Object process(Object item) throws Exception {
 		return item;

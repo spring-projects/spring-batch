@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.policy.NeverRetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -84,6 +85,7 @@ public class FaultTolerantChunkProcessorTests {
 	@Test
 	public void testTransform() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return item.equals("1") ? null : item;
@@ -99,6 +101,7 @@ public class FaultTolerantChunkProcessorTests {
 	public void testFilterCountOnSkip() throws Exception {
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				if (item.equals("1")) {
@@ -128,6 +131,7 @@ public class FaultTolerantChunkProcessorTests {
 	public void testFilterCountOnSkipInWriteWithoutRetry() throws Exception {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				if (item.equals("1")) {
@@ -156,6 +160,7 @@ public class FaultTolerantChunkProcessorTests {
 		batchRetryTemplate.setRetryPolicy(retryPolicy);
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				if (item.equals("1")) {
@@ -271,6 +276,7 @@ public class FaultTolerantChunkProcessorTests {
 	@Test
 	public void testTransformWithExceptionAndNoRollback() throws Exception {
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				if (item.equals("1")) {
@@ -563,6 +569,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				processedItems.add(item);
@@ -605,6 +612,7 @@ public class FaultTolerantChunkProcessorTests {
 		processor.setProcessorTransactional(false);
 		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				processedItems.add(item);

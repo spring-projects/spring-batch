@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.jdbc.datasource.embedded.ConnectionProperties;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseConfigurer;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -154,6 +155,7 @@ public class ConcurrentTransactionTests {
 			return new FlowBuilder<Flow>("flow")
 					.start(stepBuilderFactory.get("flow.step1")
 								.tasklet(new Tasklet() {
+									@Nullable
 									@Override
 									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 										return RepeatStatus.FINISHED;
@@ -161,6 +163,7 @@ public class ConcurrentTransactionTests {
 								}).build()
 					).next(stepBuilderFactory.get("flow.step2")
 								.tasklet(new Tasklet() {
+									@Nullable
 									@Override
 									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 										return RepeatStatus.FINISHED;
@@ -173,6 +176,7 @@ public class ConcurrentTransactionTests {
 		public Step firstStep() {
 			return stepBuilderFactory.get("firstStep")
 					.tasklet(new Tasklet() {
+						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 							System.out.println(">> Beginning concurrent job test");
@@ -185,6 +189,7 @@ public class ConcurrentTransactionTests {
 		public Step lastStep() {
 			return stepBuilderFactory.get("lastStep")
 					.tasklet(new Tasklet() {
+						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 							System.out.println(">> Ending concurrent job test");

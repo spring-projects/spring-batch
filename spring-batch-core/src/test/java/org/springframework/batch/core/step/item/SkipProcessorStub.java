@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -55,6 +56,7 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 		filter = false;
 	}
 
+	@Nullable
 	@Override
 	public T process(T item) throws Exception {
 		processed.add(item);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.Name;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -51,13 +52,13 @@ public class PatternMatchingCompositeLineMapperTests {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
 		});
@@ -87,13 +88,13 @@ public class PatternMatchingCompositeLineMapperTests {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
 		});

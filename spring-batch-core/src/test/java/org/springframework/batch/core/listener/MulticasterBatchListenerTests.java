@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.batch.core.annotation.BeforeProcess;
 import org.springframework.batch.core.annotation.BeforeRead;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -61,6 +62,7 @@ public class MulticasterBatchListenerTests {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
@@ -82,6 +84,7 @@ public class MulticasterBatchListenerTests {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
 		multicast.register(new StepListenerSupport<Integer, String>() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
@@ -758,6 +761,7 @@ public class MulticasterBatchListenerTests {
 		 * org.springframework.batch.core.listener.StepListenerSupport#afterStep
 		 * (org.springframework.batch.core.StepExecution)
 		 */
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			count++;

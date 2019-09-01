@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -61,7 +62,7 @@ public class MapJobRegistry implements JobRegistry {
 	}
 
 	@Override
-	public Job getJob(String name) throws NoSuchJobException {
+	public Job getJob(@Nullable String name) throws NoSuchJobException {
 		JobFactory factory = map.get(name);
 		if (factory == null) {
 			throw new NoSuchJobException("No job configuration with the name [" + name + "] was registered");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -485,6 +486,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		private boolean updateCalled = false;
 		private boolean closeCalled = false;
 
+		@Nullable
 		@Override
 		public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 			return null;

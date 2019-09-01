@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import javax.jms.Message;
@@ -76,7 +77,8 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 		this.itemType = itemType;
 	}
 
-    @Override
+    @Nullable
+	@Override
 	@SuppressWarnings("unchecked")
 	public T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Lucas Ward
@@ -80,7 +81,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 		}
 
 		@Override
-		public FieldSet tokenize(String line) {
+		public FieldSet tokenize(@Nullable String line) {
 			this.tokenizedLine = line;
 			return fieldSetToReturn;
 		}

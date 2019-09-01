@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.lang.Nullable;
 
 /**
  * This decider will return "CONTINUE" until the limit it reached, at which
@@ -34,7 +35,7 @@ public class LimitDecider implements JobExecutionDecider {
 	private int limit = 1;
 
 	@Override
-	public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+	public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 		if (++count >= limit) {
 			return new FlowExecutionStatus("COMPLETED");
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -35,6 +36,7 @@ public class MultiLineTradeItemReader implements ItemReader<Trade>, ItemStream {
 	/**
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Nullable
 	@Override
 	public Trade read() throws Exception {
 		Trade t = null;

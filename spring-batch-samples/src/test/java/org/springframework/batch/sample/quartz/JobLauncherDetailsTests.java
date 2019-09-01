@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -65,7 +66,7 @@ public class JobLauncherDetailsTests {
 
 		details.setJobLocator(new JobLocator() {
 			@Override
-			public org.springframework.batch.core.Job getJob(String name) throws NoSuchJobException {
+			public org.springframework.batch.core.Job getJob(@Nullable String name) throws NoSuchJobException {
 				list.add(name);
 				return new StubJob("foo");
 			}
@@ -173,6 +174,7 @@ public class JobLauncherDetailsTests {
 		public void execute(JobExecution execution) {
 		}
 
+		@Nullable
 		@Override
 		public JobParametersIncrementer getJobParametersIncrementer() {
 			return null;

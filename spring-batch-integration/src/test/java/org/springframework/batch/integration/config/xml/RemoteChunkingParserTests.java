@@ -34,6 +34,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.integration.config.ServiceActivatorFactoryBean;
 import org.springframework.integration.test.util.TestUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.MessageChannel;
 
 import static org.junit.Assert.assertNotNull;
@@ -497,6 +498,7 @@ public class RemoteChunkingParserTests {
 	}
 
 	private static class Processor implements ItemProcessor<String, String> {
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			return item;

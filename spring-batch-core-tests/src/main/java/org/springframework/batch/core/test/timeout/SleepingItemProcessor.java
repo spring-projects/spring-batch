@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 package org.springframework.batch.core.test.timeout;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 public class SleepingItemProcessor<I> implements ItemProcessor<I, I> {
 	
 	private long millisToSleep;
 
+	@Nullable
 	@Override
 	public I process(I item) throws Exception {
 		Thread.sleep(millisToSleep);

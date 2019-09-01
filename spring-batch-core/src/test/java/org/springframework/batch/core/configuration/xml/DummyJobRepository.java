@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -55,11 +56,13 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;

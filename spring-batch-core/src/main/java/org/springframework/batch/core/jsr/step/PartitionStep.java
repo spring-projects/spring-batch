@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * An extension of the {@link PartitionStep} that provides additional semantics
@@ -102,6 +103,7 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
 	 */
+	@Nullable
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		JsrPartitionHandler partitionHandler =  (JsrPartitionHandler) getPartitionHandler();

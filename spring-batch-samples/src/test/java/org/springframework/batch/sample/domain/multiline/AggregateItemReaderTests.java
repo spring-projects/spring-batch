@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 public class AggregateItemReaderTests {
 	private ItemReader<AggregateItem<String>> input;
@@ -31,6 +32,7 @@ public class AggregateItemReaderTests {
 		input = new ItemReader<AggregateItem<String>>() {
 			private int count = 0;
 
+			@Nullable
 			@Override
 			public AggregateItem<String> read() {
 				switch (count++) {

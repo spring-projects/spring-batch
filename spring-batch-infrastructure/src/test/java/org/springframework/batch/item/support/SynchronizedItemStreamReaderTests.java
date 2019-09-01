@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
+import org.springframework.lang.Nullable;
 
 /**
  * 
@@ -52,6 +53,7 @@ public class SynchronizedItemStreamReaderTests {
 		public static final String HAS_BEEN_OPENED = "hasBeenOpened";
 		public static final String UPDATE_COUNT_KEY = "updateCount";
 
+		@Nullable
 		public Integer read() throws Exception, ParseException, NonTransientResourceException {
 			cursor = cursor + 1;
 			return cursor;

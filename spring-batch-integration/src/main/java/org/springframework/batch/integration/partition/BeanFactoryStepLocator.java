@@ -9,6 +9,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -30,6 +31,7 @@ public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
 	 * Look up a bean with the provided name of type {@link Step}.
 	 * @see StepLocator#getStep(String)
 	 */
+	@Nullable
 	public Step getStep(String stepName) {
 		return beanFactory.getBean(stepName, Step.class);
 	}
