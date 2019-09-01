@@ -30,6 +30,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -175,6 +176,7 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	 *
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
+	@Nullable
 	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
@@ -190,6 +192,7 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 		return steps.keySet();
 	}
 
+	@Nullable
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		final Step step = steps.get(stepName);

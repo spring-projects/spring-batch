@@ -19,6 +19,7 @@ package org.springframework.batch.item.amqp;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -45,6 +46,7 @@ public class AmqpItemReader<T> implements ItemReader<T> {
 		this.amqpTemplate = amqpTemplate;
 	}
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public T read() {

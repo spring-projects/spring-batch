@@ -92,6 +92,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
+	@Nullable
 	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 

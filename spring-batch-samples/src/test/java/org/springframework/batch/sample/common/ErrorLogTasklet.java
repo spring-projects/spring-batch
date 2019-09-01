@@ -26,6 +26,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -38,6 +39,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	private StepExecution stepExecution;
 	private String stepName;
 
+	@Nullable
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		Assert.notNull(this.stepName, "Step name not set.  Either this class was not registered as a listener "
@@ -74,6 +76,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 		stepExecution.getJobExecution().getExecutionContext().remove("stepName");
 	}
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

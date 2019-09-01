@@ -21,11 +21,12 @@ import java.util.Properties;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.lang.Nullable;
 
 public class JobParametersConverterSupport implements JobParametersConverter {
 
 	@Override
-	public JobParameters getJobParameters(Properties properties) {
+	public JobParameters getJobParameters(@Nullable Properties properties) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 
 		if(properties != null) {
@@ -43,7 +44,7 @@ public class JobParametersConverterSupport implements JobParametersConverter {
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties getProperties(JobParameters params) {
+	public Properties getProperties(@Nullable JobParameters params) {
 		Properties properties = new Properties();
 
 		if(params != null) {

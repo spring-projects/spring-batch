@@ -45,6 +45,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 
 public class StepExecutorInterruptionTests {
 
@@ -93,6 +94,7 @@ public class StepExecutorInterruptionTests {
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+			@Nullable
 			@Override
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
@@ -155,6 +157,7 @@ public class StepExecutorInterruptionTests {
 		Thread processingThread = createThread(stepExecution);
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+			@Nullable
 			@Override
 			public Object read() throws Exception {
 				return null;
@@ -200,6 +203,7 @@ public class StepExecutorInterruptionTests {
 		});
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<Object>() {
+			@Nullable
 			@Override
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");

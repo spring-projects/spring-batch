@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
+import org.springframework.lang.Nullable;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
@@ -53,6 +54,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	private ScriptEvaluator scriptEvaluator;
 	private String itemBindingVariableName = ITEM_BINDING_VARIABLE_NAME;
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {

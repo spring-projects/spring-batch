@@ -19,6 +19,7 @@ package org.springframework.batch.item.support;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.classify.Classifier;
 import org.springframework.classify.ClassifierSupport;
+import org.springframework.lang.Nullable;
 
 /**
  * Calls one of a collection of ItemProcessors, based on a router
@@ -47,6 +48,7 @@ public class ClassifierCompositeItemProcessor<I,O> implements ItemProcessor<I, O
 	 * Delegates to injected {@link ItemProcessor} instances according to the
 	 * classification by the {@link Classifier}.
 	 */
+	@Nullable
 	@Override
 	public O process(I item) throws Exception {
 		return processItem(classifier.classify(item), item);

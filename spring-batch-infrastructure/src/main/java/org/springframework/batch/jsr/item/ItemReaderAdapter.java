@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 import javax.batch.api.chunk.ItemReader;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -48,6 +49,7 @@ public class ItemReaderAdapter<T> extends CheckpointSupport implements org.sprin
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Nullable
 	@SuppressWarnings("unchecked")
 	@Override
 	public T read() throws Exception {

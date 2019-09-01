@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -72,6 +73,7 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 				"The Json input stream must start with an array of Json objects");
 	}
 
+	@Nullable
 	@Override
 	public T read() throws Exception {
 		try {

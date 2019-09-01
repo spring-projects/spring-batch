@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.lang.Nullable;
 
 /**
  * Generates configurable number of {@link Trade} items.
@@ -32,6 +33,7 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 	
 	private int counter = 0;
 
+	@Nullable
 	@Override
 	public Trade read() throws Exception {
 		if (counter < limit) {

@@ -21,6 +21,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 public class LoggingTasklet implements Tasklet {
 
@@ -32,7 +33,8 @@ public class LoggingTasklet implements Tasklet {
                 this.id = id;
         }
 
-        @Override
+        @Nullable
+		@Override
         public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
                 logger.info("tasklet executing: id=" + id);
                 return RepeatStatus.FINISHED;

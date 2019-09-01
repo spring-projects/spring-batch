@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -120,7 +121,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @return the resulting tokens
 	 */
     @Override
-	public FieldSet tokenize(String line) {
+	public FieldSet tokenize(@Nullable String line) {
 
 		if (line == null) {
 			line = "";

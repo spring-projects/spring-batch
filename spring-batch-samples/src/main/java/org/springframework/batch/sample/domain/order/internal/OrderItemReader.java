@@ -29,6 +29,7 @@ import org.springframework.batch.sample.domain.order.Customer;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
 import org.springframework.batch.sample.domain.order.ShippingInfo;
+import org.springframework.lang.Nullable;
 
 /**
  * @author peter.zozom
@@ -58,6 +59,7 @@ public class OrderItemReader implements ItemReader<Order> {
 	/**
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Nullable
 	@Override
 	public Order read() throws Exception {
 		recordFinished = false;

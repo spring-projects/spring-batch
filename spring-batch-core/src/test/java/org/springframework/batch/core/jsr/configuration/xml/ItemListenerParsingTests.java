@@ -30,6 +30,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -116,7 +117,7 @@ public class ItemListenerParsingTests {
 		}
 
 		@Override
-		public void afterProcess(Object item, Object result) {
+		public void afterProcess(Object item, @Nullable Object result) {
 			afterProcessCount++;
 		}
 

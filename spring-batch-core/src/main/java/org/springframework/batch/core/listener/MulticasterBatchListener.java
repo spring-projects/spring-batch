@@ -170,6 +170,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	/**
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		try {

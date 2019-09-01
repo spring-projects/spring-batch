@@ -25,6 +25,7 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -43,6 +44,7 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getStepExecution() {
 		return null;

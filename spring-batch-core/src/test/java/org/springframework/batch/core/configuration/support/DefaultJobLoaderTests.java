@@ -36,6 +36,7 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -236,7 +237,8 @@ public class DefaultJobLoaderTests {
 		public void execute(JobExecution execution) {
         }
 
-        @Override
+        @Nullable
+		@Override
 		public JobParametersIncrementer getJobParametersIncrementer() {
             return null;
         }
@@ -264,7 +266,8 @@ public class DefaultJobLoaderTests {
             return Collections.emptyList();
         }
 
-        @Override
+        @Nullable
+		@Override
 		public Step getStep(String stepName) throws NoSuchStepException {
             throw new NoSuchStepException("Step [" + stepName + "] does not exist");
         }

@@ -21,6 +21,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.scope.context.JobContext;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
+import org.springframework.lang.Nullable;
 
 public class TestJob implements Job {
 
@@ -69,6 +70,7 @@ public class TestJob implements Job {
 		return false;
 	}
 
+	@Nullable
 	@Override
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;

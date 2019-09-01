@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Lucas Ward
@@ -80,7 +81,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 		}
 
 		@Override
-		public FieldSet tokenize(String line) {
+		public FieldSet tokenize(@Nullable String line) {
 			this.tokenizedLine = line;
 			return fieldSetToReturn;
 		}

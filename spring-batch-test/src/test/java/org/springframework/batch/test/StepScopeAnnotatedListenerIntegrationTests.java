@@ -43,6 +43,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -77,6 +78,7 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 			return stepExecution.getExitStatus();
 		}
 
+		@Nullable
 		@Override
 		public String read() throws Exception {
 			this.list.add("some stateful reading information");
@@ -136,6 +138,7 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 		public ItemProcessor<String, String> processor() {
 			return new ItemProcessor<String, String>() {
 
+				@Nullable
 				@Override
 				public String process(String item) throws Exception {
 					return item;

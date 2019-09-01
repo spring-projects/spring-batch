@@ -22,6 +22,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * A {@link Tasklet} implementing variations on read-process-write item
@@ -60,6 +61,7 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		this.buffering = buffering;
 	}
 
+	@Nullable
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 

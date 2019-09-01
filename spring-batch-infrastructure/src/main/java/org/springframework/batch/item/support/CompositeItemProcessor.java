@@ -18,6 +18,7 @@ package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	private List<? extends ItemProcessor<?, ?>> delegates;
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {

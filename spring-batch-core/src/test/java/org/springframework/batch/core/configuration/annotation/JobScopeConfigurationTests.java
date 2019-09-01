@@ -43,6 +43,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -220,6 +221,7 @@ public class JobScopeConfigurationTests {
 
 	public static class TaskletSupport implements Tasklet {
 
+		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			return RepeatStatus.FINISHED;

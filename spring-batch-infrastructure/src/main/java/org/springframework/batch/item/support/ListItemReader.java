@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 /**
  * An {@link ItemReader} that pulls data from a list. Useful for testing.
@@ -43,7 +44,8 @@ public class ListItemReader<T> implements ItemReader<T> {
 		}
 	}
 
-    @Override
+    @Nullable
+	@Override
 	public T read() {
 		if (!list.isEmpty()) {
 			return list.remove(0);

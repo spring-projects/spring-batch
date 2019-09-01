@@ -19,6 +19,7 @@ package org.springframework.batch.sample.domain.trade;
 import static org.springframework.batch.sample.domain.trade.CustomerOperation.*;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Lucas Ward
@@ -29,6 +30,7 @@ public class CustomerUpdateProcessor implements ItemProcessor<CustomerUpdate, Cu
 	private CustomerDao customerDao;
 	private InvalidCustomerLogger invalidCustomerLogger;
 	
+	@Nullable
 	@Override
 	public CustomerUpdate process(CustomerUpdate item) throws Exception {
 		

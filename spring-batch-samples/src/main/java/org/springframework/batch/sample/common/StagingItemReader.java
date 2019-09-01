@@ -36,6 +36,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.SerializationUtils;
 
@@ -96,6 +97,7 @@ InitializingBean, DisposableBean {
 
 	}
 
+	@Nullable
 	@Override
 	public ProcessIndicatorItemWrapper<T> read() {
 		if (!initialized) {
@@ -126,6 +128,7 @@ InitializingBean, DisposableBean {
 		return new ProcessIndicatorItemWrapper<>(id, result);
 	}
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

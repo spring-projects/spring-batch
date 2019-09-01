@@ -19,6 +19,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.lang.Nullable;
 
 /**
  * Processes the Trade - throwing validation errors if necessary.
@@ -40,6 +41,7 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 		this.failure = failure;
 	}
 
+	@Nullable
 	@Override
 	public Trade process(Trade item) throws Exception {
 		if ((failedItem == null && index++ == failure) || (failedItem != null && failedItem.equals(item))) {

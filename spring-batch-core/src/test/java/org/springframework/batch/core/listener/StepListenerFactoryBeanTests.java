@@ -55,6 +55,7 @@ import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
@@ -377,6 +378,7 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Nullable
 		@Override
 		@AfterStep
 		public ExitStatus afterStep(StepExecution stepExecution) {
@@ -397,6 +399,7 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			Assert.notNull(stepExecution, "A stepExecution is required");

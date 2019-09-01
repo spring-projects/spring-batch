@@ -19,6 +19,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -32,6 +33,7 @@ public class TestTasklet implements Tasklet {
 		this.fail = fail;
 	}
 
+	@Nullable
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (fail) {
 			throw new IllegalStateException("Planned Tasklet failure");

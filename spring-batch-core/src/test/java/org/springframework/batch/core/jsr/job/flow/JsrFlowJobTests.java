@@ -46,6 +46,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.lang.Nullable;
 
 import javax.batch.api.Decider;
 import java.util.ArrayList;
@@ -515,7 +516,7 @@ public class JsrFlowJobTests {
 		SimpleFlow flow = new JsrFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			@Override
-			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				throw new RuntimeException("Foo");
 			}

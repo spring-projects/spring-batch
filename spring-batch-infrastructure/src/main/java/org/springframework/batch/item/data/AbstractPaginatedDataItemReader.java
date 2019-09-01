@@ -18,6 +18,7 @@ package org.springframework.batch.item.data;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.Iterator;
@@ -53,6 +54,7 @@ AbstractItemCountingItemStreamItemReader<T> {
 		this.pageSize = pageSize;
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 

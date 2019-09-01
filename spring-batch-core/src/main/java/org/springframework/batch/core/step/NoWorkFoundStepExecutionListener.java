@@ -19,6 +19,7 @@ package org.springframework.batch.core.step;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.lang.Nullable;
 
 /**
  * Fails the step if no items have been processed ( item count is 0).
@@ -27,6 +28,7 @@ import org.springframework.batch.core.listener.StepExecutionListenerSupport;
  */
 public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (stepExecution.getReadCount() == 0) {

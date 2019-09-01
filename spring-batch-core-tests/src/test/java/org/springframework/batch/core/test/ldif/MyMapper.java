@@ -16,6 +16,7 @@
 package org.springframework.batch.core.test.ldif;
 
 import org.springframework.batch.item.ldif.RecordMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.ldap.core.LdapAttributes;
  */
 public class MyMapper implements RecordMapper<LdapAttributes> {
 
+	@Nullable
 	public LdapAttributes mapRecord(LdapAttributes attributes) {
 		return attributes;
 	}

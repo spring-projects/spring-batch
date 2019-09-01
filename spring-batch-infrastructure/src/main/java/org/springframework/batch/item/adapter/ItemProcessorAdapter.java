@@ -17,6 +17,7 @@
 package org.springframework.batch.item.adapter;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 /**
  * Invokes a custom method on a delegate plain old Java object which itself
@@ -31,6 +32,7 @@ public class ItemProcessorAdapter<I,O> extends AbstractMethodInvokingDelegator<O
 	 *
 	 * @see ItemProcessor#process(Object)
 	 */
+	@Nullable
 	@Override
 	public O process(I item) throws Exception {
 		return invokeDelegateMethodWithArgument(item);

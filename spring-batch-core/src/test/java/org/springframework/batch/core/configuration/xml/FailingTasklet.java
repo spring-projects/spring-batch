@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * This tasklet will call
@@ -29,6 +30,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  */
 public class FailingTasklet extends NameStoringTasklet {
 
+	@Nullable
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		super.execute(contribution, chunkContext);

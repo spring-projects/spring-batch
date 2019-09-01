@@ -20,6 +20,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +34,7 @@ public class GeneratingTradeResettingListener extends StepExecutionListenerSuppo
 
 	private GeneratingTradeItemReader reader;
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		this.reader.resetCounter();

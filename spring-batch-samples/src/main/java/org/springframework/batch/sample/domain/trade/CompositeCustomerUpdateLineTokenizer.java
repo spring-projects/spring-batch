@@ -20,6 +20,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.lang.Nullable;
 
 /**
  * Composite {@link LineTokenizer} that delegates the tokenization of a line to one of two potential
@@ -40,7 +41,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
 	@Override
-	public FieldSet tokenize(String line) {
+	public FieldSet tokenize(@Nullable String line) {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.

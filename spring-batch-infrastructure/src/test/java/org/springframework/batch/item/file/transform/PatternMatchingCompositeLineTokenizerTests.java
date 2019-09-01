@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ben Hale
@@ -46,7 +47,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
 		});
@@ -62,7 +63,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
 		});
@@ -84,7 +85,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { line });
 			}
 		}));

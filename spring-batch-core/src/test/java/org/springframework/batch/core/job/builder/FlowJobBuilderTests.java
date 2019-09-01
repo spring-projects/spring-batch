@@ -34,6 +34,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -168,7 +169,7 @@ public class FlowJobBuilderTests {
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			private int count = 0;
 			@Override
-			public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 				count++;
 				return count<2 ? new FlowExecutionStatus("ONGOING") : FlowExecutionStatus.COMPLETED;
 			}

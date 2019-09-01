@@ -30,6 +30,7 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -59,7 +60,7 @@ public class DecisionJobParserTests {
 
 	public static class TestDecider implements JobExecutionDecider {
 		@Override
-		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+		public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 			return new FlowExecutionStatus("FOO");
 		}
 	}

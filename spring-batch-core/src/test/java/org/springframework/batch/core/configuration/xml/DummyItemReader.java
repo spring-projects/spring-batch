@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -25,6 +26,7 @@ import org.springframework.batch.item.UnexpectedInputException;
  */
 public class DummyItemReader implements ItemReader<Object> {
 
+	@Nullable
 	@Override
 	public Object read() throws Exception, UnexpectedInputException, ParseException {
 		return null;

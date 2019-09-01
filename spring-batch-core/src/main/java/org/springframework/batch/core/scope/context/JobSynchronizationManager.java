@@ -37,7 +37,7 @@ public class JobSynchronizationManager {
 	private static final SynchronizationManagerSupport<JobExecution, JobContext> manager = new SynchronizationManagerSupport<JobExecution, JobContext>() {
 
 		@Override
-		protected JobContext createNewContext(JobExecution execution, BatchPropertyContext args) {
+		protected JobContext createNewContext(JobExecution execution, @Nullable BatchPropertyContext args) {
 			return new JobContext(execution);
 		}
 

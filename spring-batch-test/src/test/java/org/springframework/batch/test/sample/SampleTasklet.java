@@ -25,6 +25,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 
 public class SampleTasklet implements Tasklet {
 
@@ -41,7 +42,8 @@ public class SampleTasklet implements Tasklet {
 		this.id = id;
 	}
 
-    @Override
+    @Nullable
+	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		this.jdbcTemplate.update("insert into TESTS(ID, NAME) values (?, 'SampleTasklet" + id + "')", id);
 

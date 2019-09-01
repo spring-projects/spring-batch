@@ -18,6 +18,7 @@ package org.springframework.batch.core.listener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -28,6 +29,7 @@ public class StepExecutionListenerSupport implements StepExecutionListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

@@ -18,11 +18,12 @@ package org.springframework.batch.core.launch.support;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.lang.Nullable;
 
 public class TestJobParametersIncrementer implements JobParametersIncrementer {
 
 	@Override
-	public JobParameters getNext(JobParameters parameters) {
+	public JobParameters getNext(@Nullable JobParameters parameters) {
 		return  new JobParametersBuilder().addString("foo", "spam").toJobParameters();
 	}
 

@@ -110,7 +110,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * (java.lang.String)
 	 */
 	@Override
-	public Set<JobExecution> findRunningJobExecutions(String jobName) {
+	public Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
 		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
 		for (JobExecution jobExecution : executions) {
 			getJobExecutionDependencies(jobExecution);
@@ -128,8 +128,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getJobExecution(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
-	public JobExecution getJobExecution(Long executionId) {
+	public JobExecution getJobExecution(@Nullable Long executionId) {
 		if (executionId == null) {
 			return null;
 		}
@@ -151,8 +152,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getStepExecution(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
-	public StepExecution getStepExecution(Long jobExecutionId, Long executionId) {
+	public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
 			return null;
@@ -170,6 +172,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
@@ -182,6 +185,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstance(java
 	 * .lang.String)
 	 */
+	@Nullable
 	@Override
 	public JobInstance getLastJobInstance(String jobName) {
 		return jobInstanceDao.getLastJobInstance(jobName);

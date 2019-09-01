@@ -36,6 +36,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.lang.Nullable;
 
 public class OptimisticLockingFailureTests {
 	@Test
@@ -104,6 +105,7 @@ public class OptimisticLockingFailureTests {
 	}
 
 	public static class SleepingTasklet implements Tasklet {
+		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			Thread.sleep(2000L);

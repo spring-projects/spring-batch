@@ -29,6 +29,7 @@ import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -164,6 +165,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * @return string corresponding to logical record according to
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines in file).
 	 */
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (noInput) {
@@ -189,7 +191,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * @return next line (skip comments).getCurrentResource
 	 */
-	private String readLine() {
+	@Nullable
+	protected String readLine() {
 
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");

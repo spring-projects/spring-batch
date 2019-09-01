@@ -66,6 +66,7 @@ import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
@@ -792,7 +793,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterProcess(String item, String result) {
+			public void afterProcess(String item, @Nullable String result) {
 				listenerCalls.add(3);
 			}
 
@@ -863,6 +864,7 @@ public class FaultTolerantStepFactoryBeanTests {
 				opened = true;
 			}
 
+			@Nullable
 			@Override
 			public String read() {
 				return null;
@@ -901,6 +903,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -922,6 +925,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -963,6 +967,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -997,7 +1002,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		private boolean filterEncountered = false;
 
 		@Override
-		public void afterProcess(T item, S result) {
+		public void afterProcess(T item, @Nullable S result) {
 			if (result == null) {
 				filterEncountered = true;
 			}

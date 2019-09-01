@@ -33,6 +33,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -135,7 +136,7 @@ public class JobRepositoryTestUtilsTests {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
 			@Override
-			public JobParameters getNext(JobParameters parameters) {
+			public JobParameters getNext(@Nullable JobParameters parameters) {
 				return new JobParametersBuilder().addString("foo","bar").toJobParameters();
 			}
 		});

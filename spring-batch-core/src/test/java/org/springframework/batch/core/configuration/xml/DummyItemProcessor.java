@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -23,6 +24,7 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class DummyItemProcessor implements ItemProcessor<Object,Object> {
 
+	@Nullable
 	@Override
 	public Object process(Object item) throws Exception {
 		return item;

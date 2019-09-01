@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.NoBackOffPolicy;
@@ -271,6 +272,7 @@ public class RemoteChunkingManagerStepBuilderTest {
 			int count = 0;
 			List<String> items = Arrays.asList("a", "b", "c", "d", "d", "e", "f", "g", "h", "i");
 
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				System.out.println(">> count == " + count);

@@ -42,6 +42,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -146,6 +147,7 @@ public class JobLoaderConfigurationTests {
 		@Bean
 		protected Tasklet tasklet() {
 			return new Tasklet() {
+				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;
@@ -172,6 +174,7 @@ public class JobLoaderConfigurationTests {
 		@Bean
 		protected Step step3() throws Exception {
 			return steps.get("step3").tasklet(new Tasklet() {
+				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;

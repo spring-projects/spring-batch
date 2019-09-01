@@ -20,11 +20,12 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.lang.Nullable;
 
 public class SkipCheckingDecider implements JobExecutionDecider {
 
 	@Override
-	public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+	public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 		if (!stepExecution.getExitStatus().getExitCode().equals(
 				ExitStatus.FAILED.getExitCode())
 				&& stepExecution.getSkipCount() > 0) {

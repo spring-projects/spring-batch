@@ -24,6 +24,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -71,6 +72,7 @@ public class ExternalRetryTests {
 		jdbcTemplate.execute("delete from T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");

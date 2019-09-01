@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -65,6 +66,7 @@ public class JobLauncherTestUtilsTests {
 		@Bean
 		public Step step() {
 			return stepBuilderFactory.get("step1").tasklet(new Tasklet() {
+				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 					return null;

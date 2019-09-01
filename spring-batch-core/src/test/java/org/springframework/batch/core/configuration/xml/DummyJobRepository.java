@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dan Garrette
@@ -55,11 +56,13 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;

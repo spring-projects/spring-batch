@@ -19,12 +19,14 @@ package org.springframework.batch.item;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.lang.Nullable;
 
 
 public class ItemReaderTests {
 
 	ItemReader<String> provider = new ItemReader<String>() {
-	    @Override
+	    @Nullable
+		@Override
 		public String read() {
 			return "foo";
 		}

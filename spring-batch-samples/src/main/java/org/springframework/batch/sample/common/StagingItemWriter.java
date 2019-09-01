@@ -28,6 +28,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SerializationUtils;
@@ -101,6 +102,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
 	 * )
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;

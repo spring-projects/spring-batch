@@ -21,6 +21,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -51,6 +52,7 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	/**
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
+	@Nullable
 	public synchronized T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 		return this.delegate.read();
 	}

@@ -24,6 +24,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -152,6 +153,7 @@ public class FaultTolerantStepIntegrationTests {
 		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
 			private int cpt;
 
+			@Nullable
 			@Override
 			public Integer process(Integer item) throws Exception {
 				cpt++;

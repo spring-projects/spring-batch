@@ -22,6 +22,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Lucas Ward
@@ -55,6 +56,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * prioritizing those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(StepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {

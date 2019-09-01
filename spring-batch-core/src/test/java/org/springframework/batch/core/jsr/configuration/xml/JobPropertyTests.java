@@ -38,6 +38,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -288,6 +289,7 @@ public class JobPropertyTests extends AbstractJsrTestCase {
 		@BatchProperty
 		private String p1;
 
+		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			org.springframework.util.Assert.isTrue("p1val".equals(p1), "Expected p1val, got " + p1);

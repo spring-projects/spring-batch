@@ -30,11 +30,13 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.lang.Nullable;
 
 public class SimpleChunkProcessorTests {
 
 	private SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(
 			new ItemProcessor<String, String>() {
+				@Nullable
 				@Override
 				public String process(String item) throws Exception {
 					if (item.equals("err")) {

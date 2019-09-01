@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.PeekableItemReader;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -66,7 +67,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see ItemReader#read()
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		if (next != null) {
 			T item = next;
@@ -86,7 +88,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see PeekableItemReader#peek()
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T peek() throws Exception, UnexpectedInputException, ParseException {
 		if (next == null) {
 			updateDelegate(executionContext);

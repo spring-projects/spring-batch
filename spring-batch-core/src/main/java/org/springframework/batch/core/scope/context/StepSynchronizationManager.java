@@ -38,7 +38,7 @@ public class StepSynchronizationManager {
 			new SynchronizationManagerSupport<StepExecution, StepContext>() {
 
 		@Override
-		protected StepContext createNewContext(StepExecution execution, BatchPropertyContext propertyContext) {
+		protected StepContext createNewContext(StepExecution execution, @Nullable BatchPropertyContext propertyContext) {
 			StepContext context;
 
 			if(propertyContext != null) {

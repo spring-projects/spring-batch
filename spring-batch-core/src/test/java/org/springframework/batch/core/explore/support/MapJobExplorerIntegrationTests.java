@@ -29,6 +29,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 import java.util.Set;
 
@@ -56,6 +57,7 @@ public class MapJobExplorerIntegrationTests {
 		SimpleJob job = new SimpleJob("job");
 		TaskletStep step = new TaskletStep("step");
 		step.setTasklet(new Tasklet() {
+			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				while (block) {

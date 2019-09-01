@@ -22,6 +22,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -52,6 +53,7 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(JobInstance job) {
 	}
 
+	@Nullable
 	@Override
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
@@ -90,6 +92,7 @@ public class JobRepositorySupport implements JobRepository {
 		return false;
 	}
 
+	@Nullable
 	@Override
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;

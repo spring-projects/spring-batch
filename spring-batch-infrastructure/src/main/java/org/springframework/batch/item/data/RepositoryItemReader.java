@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
@@ -150,6 +151,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		Assert.state(sort != null, "A sort is required");
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 

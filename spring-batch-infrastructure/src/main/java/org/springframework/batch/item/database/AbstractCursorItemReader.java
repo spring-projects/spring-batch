@@ -465,6 +465,7 @@ implements InitializingBean {
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (rs == null) {

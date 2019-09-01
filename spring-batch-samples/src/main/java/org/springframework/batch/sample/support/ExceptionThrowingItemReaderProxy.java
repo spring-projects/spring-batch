@@ -18,6 +18,7 @@ package org.springframework.batch.sample.support;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 /**
  * Hacked {@link ItemReader} that throws exception on a given record number
@@ -43,6 +44,7 @@ public class ExceptionThrowingItemReaderProxy<T> implements ItemReader<T> {
 		this.throwExceptionOnRecordNumber = throwExceptionOnRecordNumber;
 	}
 
+	@Nullable
 	@Override
 	public T read() throws Exception {
 

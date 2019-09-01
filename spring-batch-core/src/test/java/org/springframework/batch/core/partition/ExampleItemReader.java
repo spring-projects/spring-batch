@@ -21,6 +21,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -61,6 +62,7 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 	/**
 	 * Reads next record from input
 	 */
+	@Nullable
 	@Override
 	public String read() throws Exception {
 		if (index >= input.length || index >= max) {

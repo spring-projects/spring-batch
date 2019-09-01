@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -144,6 +145,7 @@ public class ItemCountingItemStreamItemReaderTests {
 			openCalled = true;
 		}
 
+		@Nullable
 		@Override
 		protected String doRead() throws Exception {
 			if (!items.hasNext()) {

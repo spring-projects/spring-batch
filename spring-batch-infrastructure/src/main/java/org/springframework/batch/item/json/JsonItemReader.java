@@ -23,6 +23,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -94,6 +95,7 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.resource = resource;
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		return jsonObjectReader.read();

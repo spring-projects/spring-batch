@@ -27,6 +27,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.item.support.SynchronizedItemStreamReader;
+import org.springframework.lang.Nullable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -114,6 +115,7 @@ public class SynchronizedItemStreamReaderBuilderTests {
 
 		public static final String UPDATE_COUNT_KEY = "updateCount";
 
+		@Nullable
 		public Integer read() throws Exception, ParseException, NonTransientResourceException {
 			cursor = cursor + 1;
 			return cursor;

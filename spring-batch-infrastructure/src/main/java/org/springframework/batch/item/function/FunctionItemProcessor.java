@@ -18,6 +18,7 @@ package org.springframework.batch.item.function;
 import java.util.function.Function;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -38,6 +39,7 @@ public class FunctionItemProcessor<I, O> implements ItemProcessor<I, O>{
 		this.function = function;
 	}
 
+	@Nullable
 	@Override
 	public O process(I item) throws Exception {
 		return this.function.apply(item);

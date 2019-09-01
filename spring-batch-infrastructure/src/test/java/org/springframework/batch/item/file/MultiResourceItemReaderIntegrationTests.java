@@ -38,6 +38,7 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -485,6 +486,7 @@ public class MultiResourceItemReaderIntegrationTests {
 		private boolean updateCalled = false;
 		private boolean closeCalled = false;
 
+		@Nullable
 		@Override
 		public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 			return null;

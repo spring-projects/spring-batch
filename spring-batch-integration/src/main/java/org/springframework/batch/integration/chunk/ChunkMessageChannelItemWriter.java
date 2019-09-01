@@ -35,6 +35,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
@@ -116,6 +117,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		localState.setStepExecution(stepExecution);
 	}
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!(stepExecution.getStatus() == BatchStatus.COMPLETED)) {

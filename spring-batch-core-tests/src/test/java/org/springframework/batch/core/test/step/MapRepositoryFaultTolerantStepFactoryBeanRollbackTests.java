@@ -41,6 +41,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -176,6 +177,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			counter = -1;
 		}
 
+		@Nullable
 		@Override
 		public synchronized String read() throws Exception {
 			counter++;
@@ -236,6 +238,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			processed.clear();
 		}
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);

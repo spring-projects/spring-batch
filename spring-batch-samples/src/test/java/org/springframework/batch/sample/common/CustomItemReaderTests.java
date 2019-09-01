@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.lang.Nullable;
 
 /**
  * Unit test class that was used as part of the Reference Documentation.  I'm only including it in the
@@ -85,6 +86,7 @@ public class CustomItemReaderTests {
 			this.items = items;
 		}
 
+		@Nullable
 		@Override
 		public T read() throws Exception {
 			if (currentIndex < items.size()) {

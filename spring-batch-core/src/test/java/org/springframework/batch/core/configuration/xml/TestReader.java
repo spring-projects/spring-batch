@@ -22,6 +22,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 public class TestReader extends AbstractTestComponent implements ItemStreamReader<String> {
 
@@ -44,6 +45,7 @@ public class TestReader extends AbstractTestComponent implements ItemStreamReade
 		this.opened = opened;
 	}
 
+	@Nullable
 	@Override
 	public String read() throws Exception, UnexpectedInputException, ParseException {
 		executed = true;

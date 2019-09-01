@@ -33,6 +33,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.lang.Nullable;
 
 public class FaultTolerantChunkProviderTests {
 
@@ -53,6 +54,7 @@ public class FaultTolerantChunkProviderTests {
 	@Test
 	public void testProvideWithOverflow() throws Exception {
 		provider = new FaultTolerantChunkProvider<>(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				throw new RuntimeException("Planned");

@@ -29,6 +29,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
+import org.springframework.lang.Nullable;
 
 /**
  * Simple implementation of {@link Job} interface providing the ability to run a
@@ -102,6 +103,7 @@ public class SimpleJob extends AbstractJob {
 	 * @see
 	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
+	@Nullable
 	@Override
 	public Step getStep(String stepName) {
 		for (Step step : this.steps) {

@@ -52,6 +52,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.lang.Nullable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -160,6 +161,7 @@ public class RegisterMultiListenerTests {
 
 				private int count = 0;
 
+				@Nullable
 				@Override
 				public String read() throws Exception,
 				UnexpectedInputException, ParseException,
@@ -310,6 +312,7 @@ public class RegisterMultiListenerTests {
 			callChecker.beforeStepCalled++;
 		}
 
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			return null;

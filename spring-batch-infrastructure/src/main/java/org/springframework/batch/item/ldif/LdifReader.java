@@ -22,6 +22,7 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
@@ -134,6 +135,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
+	@Nullable
 	@Override
 	protected LdapAttributes doRead() throws Exception {
 		LdapAttributes attributes = null;

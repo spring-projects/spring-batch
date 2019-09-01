@@ -24,6 +24,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -57,6 +58,7 @@ public class DefaultUnknownJobParserTests extends AbstractJobParserTests {
 	}
 	
 	public static class UnknownListener extends StepExecutionListenerSupport {
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			stepExecution.setStatus(BatchStatus.UNKNOWN);

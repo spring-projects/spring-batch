@@ -19,6 +19,7 @@ import java.util.Date;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.sample.domain.mail.User;
+import org.springframework.lang.Nullable;
 import org.springframework.mail.SimpleMailMessage;
 
 /**
@@ -33,7 +34,8 @@ public class UserMailItemProcessor implements
     /**
      * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
      */
-    @Override
+    @Nullable
+	@Override
 	public SimpleMailMessage process( User user ) throws Exception {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo( user.getEmail() );

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -122,6 +123,7 @@ public class SingleItemPeekableItemReaderTests {
 			counter = 0;
 		}
 
+		@Nullable
 		@Override
 		protected T doRead() throws Exception {
 			if (counter>=list.size()) {

@@ -28,6 +28,7 @@ import com.google.gson.stream.JsonToken;
 
 import org.springframework.batch.item.ParseException;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -76,6 +77,7 @@ public class GsonJsonObjectReader<T> implements JsonObjectReader<T> {
 		this.jsonReader.beginArray();
 	}
 
+	@Nullable
 	@Override
 	public T read() throws Exception {
 		try {

@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 public class AggregateItemReaderTests {
 	private ItemReader<AggregateItem<String>> input;
@@ -31,6 +32,7 @@ public class AggregateItemReaderTests {
 		input = new ItemReader<AggregateItem<String>>() {
 			private int count = 0;
 
+			@Nullable
 			@Override
 			public AggregateItem<String> read() {
 				switch (count++) {
