@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -82,6 +83,16 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 
 	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_EXECUTION_ID = ?";
+
+	private static final String GET_LAST_STEP_EXECUTION = "SELECT " +
+			" SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION," +
+			" JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION" +
+			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
+			" where " +
+			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION where JE.JOB_INSTANCE_ID = ?)" +
+			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      and SE.STEP_NAME = ?" +
+			" order by SE.START_TIME desc, SE.STEP_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
@@ -290,6 +301,30 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");
+		if (executions.isEmpty()) {
+			return null;
+		} else {
+			return executions.get(0);
+		}
+	}
+
+	@Override
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		List<StepExecution> executions = getJdbcTemplate().query(
+				getQuery(GET_LAST_STEP_EXECUTION),
+				(rs, rowNum) -> {
+					Long jobExecutionId = rs.getLong(18);
+					JobExecution jobExecution = new JobExecution(jobExecutionId);
+					jobExecution.setStartTime(rs.getTimestamp(19));
+					jobExecution.setEndTime(rs.getTimestamp(20));
+					jobExecution.setStatus(BatchStatus.valueOf(rs.getString(21)));
+					jobExecution.setExitStatus(new ExitStatus(rs.getString(22), rs.getString(23)));
+					jobExecution.setCreateTime(rs.getTimestamp(24));
+					jobExecution.setLastUpdated(rs.getTimestamp(25));
+					jobExecution.setVersion(rs.getInt(26));
+					return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
+				},
+				jobInstance.getInstanceId(), stepName);
 		if (executions.isEmpty()) {
 			return null;
 		} else {

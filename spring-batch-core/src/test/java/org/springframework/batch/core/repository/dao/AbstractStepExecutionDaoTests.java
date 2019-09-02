@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -150,6 +152,38 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			assertNotNull(retrieved.getJobExecution().getJobId());
 			assertNotNull(retrieved.getJobExecution().getJobInstance());
 		}
+	}
+
+	@Transactional
+	@Test
+	public void testSaveAndGetLastExecution() {
+		Instant now = Instant.now();
+		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
+		stepExecution1.setStartTime(Date.from(now));
+		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
+		stepExecution2.setStartTime(Date.from(now.plusMillis(500)));
+
+		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
+
+		StepExecution lastStepExecution = dao.getLastStepExecution(jobInstance, "step1");
+		assertNotNull(lastStepExecution);
+		assertEquals(stepExecution2.getId(), lastStepExecution.getId());
+	}
+
+	@Transactional
+	@Test
+	public void testSaveAndGetLastExecutionWhenSameStartTime() {
+		Instant now = Instant.now();
+		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
+		stepExecution1.setStartTime(Date.from(now));
+		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
+		stepExecution2.setStartTime(Date.from(now));
+
+		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
+		StepExecution lastStepExecution = stepExecution1.getId() > stepExecution2.getId() ? stepExecution1 : stepExecution2;
+		StepExecution retrieved = dao.getLastStepExecution(jobInstance, "step1");
+		assertNotNull(retrieved);
+		assertEquals(lastStepExecution.getId(), retrieved.getId());
 	}
 
 	@Transactional
