@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
@@ -117,6 +118,29 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		return executionsByStepExecutionId.get(stepExecutionId);
+	}
+
+	@Override
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		StepExecution latest = null;
+		for (StepExecution stepExecution : executionsByStepExecutionId.values()) {
+			if (!stepExecution.getStepName().equals(stepName)
+					|| stepExecution.getJobExecution().getJobInstance().getInstanceId() != jobInstance.getInstanceId()) {
+				continue;
+			}
+			if (latest == null) {
+				latest = stepExecution;
+			}
+			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
+				latest = stepExecution;
+			}
+			// Use step execution ID as the tie breaker if start time is identical
+			if (latest.getStartTime().getTime() == stepExecution.getStartTime().getTime() &&
+					latest.getId() < stepExecution.getId()) {
+				latest = stepExecution;
+			}
+		}
+		return latest;
 	}
 
 	@Override

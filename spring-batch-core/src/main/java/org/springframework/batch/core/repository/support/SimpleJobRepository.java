@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -219,32 +218,7 @@ public class SimpleJobRepository implements JobRepository {
 	@Override
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		List<StepExecution> stepExecutions = new ArrayList<>(jobExecutions.size());
-
-		for (JobExecution jobExecution : jobExecutions) {
-			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					stepExecutions.add(stepExecution);
-				}
-			}
-		}
-
-		StepExecution latest = null;
-		for (StepExecution stepExecution : stepExecutions) {
-			if (latest == null) {
-				latest = stepExecution;
-			}
-			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
-				latest = stepExecution;
-			}
-			// Use step execution ID as the tie breaker if start time is identical
-			if (latest.getStartTime().getTime() == stepExecution.getStartTime().getTime() && 
-			        latest.getId() < stepExecution.getId()) {
-				latest = stepExecution;
-			}
-		}
+		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {
 			ExecutionContext stepExecutionContext = ecDao.getExecutionContext(latest);

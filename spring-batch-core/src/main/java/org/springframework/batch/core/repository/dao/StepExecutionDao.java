@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
@@ -64,6 +65,19 @@ public interface StepExecutionDao {
 	 */
 	@Nullable
 	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
+
+	/**
+	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance}
+	 * ordered by starting time and then id.
+	 *
+	 * @param jobInstance the parent {@link JobInstance}
+	 * @param stepName the name of the step
+	 * @return a {@link StepExecution}
+	 */
+	@Nullable
+	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
