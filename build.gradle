@@ -46,17 +46,17 @@ allprojects {
 
 		environmentProperty = project.hasProperty('environment') ? getProperty('environment') : 'hsql'
 
-		springVersionDefault = '5.2.0.BUILD-SNAPSHOT'
+		springVersionDefault = '5.2.0.RC2'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.4.RELEASE'
-		springAmqpVersion = '2.2.0.BUILD-SNAPSHOT'
-		springDataCommonsVersion = '2.2.0.BUILD-SNAPSHOT'
-		springDataGemfireVersion = '2.2.0.BUILD-SNAPSHOT'
-		springDataJpaVersion = '2.2.0.BUILD-SNAPSHOT'
-		springDataMongodbVersion = '2.2.0.BUILD-SNAPSHOT'
-		springDataNeo4jVersion = '5.2.0.BUILD-SNAPSHOT'
-		springIntegrationVersion = '5.2.0.BUILD-SNAPSHOT'
-		springKafkaVersion = '2.3.0.BUILD-SNAPSHOT'
+		springAmqpVersion = '2.2.0.RC1'
+		springDataCommonsVersion = '2.2.0.RC3'
+		springDataGemfireVersion = '2.2.0.RC3'
+		springDataJpaVersion = '2.2.0.RC3'
+		springDataMongodbVersion = '2.2.0.RC3'
+		springDataNeo4jVersion = '5.2.0.RC3'
+		springIntegrationVersion = '5.2.0.RC1'
+		springKafkaVersion = '2.3.0.RC1'
 		springLdapVersion = '2.3.2.RELEASE'
 
 		activemqVersion = '5.15.10'
