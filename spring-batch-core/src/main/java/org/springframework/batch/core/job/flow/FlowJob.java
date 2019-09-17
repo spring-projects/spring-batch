@@ -27,7 +27,6 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleStepHandler;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
-import org.springframework.lang.Nullable;
 
 /**
  * Implementation of the {@link Job} interface that allows for complex flows of
@@ -36,6 +35,7 @@ import org.springframework.lang.Nullable;
  * namespace to abstract away details.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class FlowJob extends AbstractJob {
@@ -74,7 +74,6 @@ public class FlowJob extends AbstractJob {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Nullable
 	@Override
 	public Step getStep(String stepName) {
 		if (!initialized) {

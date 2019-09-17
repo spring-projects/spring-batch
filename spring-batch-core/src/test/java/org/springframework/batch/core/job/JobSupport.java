@@ -41,6 +41,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class JobSupport implements BeanNameAware, Job, StepLocator {
 
@@ -192,7 +193,6 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 		return steps.keySet();
 	}
 
-	@Nullable
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		final Step step = steps.get(stepName);

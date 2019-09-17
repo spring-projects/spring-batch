@@ -165,7 +165,6 @@ InitializingBean {
 	 * @param stepName name of the step
 	 * @return the Step
 	 */
-	@Nullable
 	@Override
 	public abstract Step getStep(String stepName);
 

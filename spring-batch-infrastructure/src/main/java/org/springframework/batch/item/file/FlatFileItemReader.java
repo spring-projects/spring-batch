@@ -192,7 +192,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * @return next line (skip comments).getCurrentResource
 	 */
 	@Nullable
-	protected String readLine() {
+	private String readLine() {
 
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");

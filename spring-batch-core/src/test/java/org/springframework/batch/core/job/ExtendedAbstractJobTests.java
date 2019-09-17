@@ -42,6 +42,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ExtendedAbstractJobTests {
@@ -215,7 +216,6 @@ public class ExtendedAbstractJobTests {
 		protected void doExecute(JobExecution execution) throws JobExecutionException {
 		}
 
-		@Nullable
 		@Override
 		public Step getStep(String stepName) {
 			return null;

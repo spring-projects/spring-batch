@@ -32,7 +32,6 @@ import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.lang.Nullable;
 
 /**
  * An extension of the {@link PartitionStep} that provides additional semantics
@@ -40,6 +39,7 @@ import org.springframework.lang.Nullable;
  * lifecycle calls to the {@link PartitionReducer} if it is used.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class PartitionStep extends org.springframework.batch.core.partition.support.PartitionStep implements StepLocator {
@@ -103,7 +103,6 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
 	 */
-	@Nullable
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		JsrPartitionHandler partitionHandler =  (JsrPartitionHandler) getPartitionHandler();
