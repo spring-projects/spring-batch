@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.junit.runner.RunWith;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.support.ListPreparedStatementSetter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		List<Long> parameters = new ArrayList<>();
 		parameters.add(1L);
 		parameters.add(4L);
-		ListPreparedStatementSetter pss = new ListPreparedStatementSetter(parameters);
+		ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(parameters.toArray());
 
 		itemReader.setPreparedStatementSetter(pss);
 	}

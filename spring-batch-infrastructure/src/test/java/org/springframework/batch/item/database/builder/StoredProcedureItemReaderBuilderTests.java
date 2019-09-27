@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.database.builder;
 
-import java.util.Collections;
 import javax.sql.DataSource;
 
 import org.junit.After;
@@ -28,13 +27,13 @@ import test.jdbc.datasource.DerbyShutdownBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.FooRowMapper;
 import org.springframework.batch.item.database.StoredProcedureItemReader;
-import org.springframework.batch.item.database.support.ListPreparedStatementSetter;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -47,6 +46,7 @@ import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class StoredProcedureItemReaderBuilderTests {
 
@@ -87,7 +87,7 @@ public class StoredProcedureItemReaderBuilderTests {
 
 	@Test
 	public void testConfiguration() {
-		ListPreparedStatementSetter preparedStatementSetter = new ListPreparedStatementSetter(Collections.EMPTY_LIST);
+		ArgumentPreparedStatementSetter preparedStatementSetter = new ArgumentPreparedStatementSetter(null);
 
 		SqlParameter[] parameters = new SqlParameter[0];
 
