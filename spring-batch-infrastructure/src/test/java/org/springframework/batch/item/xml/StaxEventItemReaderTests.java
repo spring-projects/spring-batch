@@ -43,6 +43,9 @@ import javax.xml.transform.Source;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -138,6 +141,26 @@ public class StaxEventItemReaderTests {
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
 		source.open(executionContext);
+		// see asserts in the mock unmarshaller
+		assertNotNull(source.read());
+		assertNotNull(source.read());
+		assertNull(source.read()); // there are only two fragments
+
+		source.close();
+	}
+
+	/**
+	 * Regular usage scenario with custom encoding.
+	 */
+	@Test
+	public void testEncoding() throws Exception {
+		Charset encoding = StandardCharsets.ISO_8859_1;
+		ByteBuffer xmlResource = encoding.encode(xml);
+		source.setResource(new ByteArrayResource(xmlResource.array()));
+		source.setEncoding(encoding.toString());
+		source.afterPropertiesSet();
+		source.open(executionContext);
+
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());

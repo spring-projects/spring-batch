@@ -62,6 +62,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
+	public static final String DEFAULT_ENCODING = "UTF-8";
+
 	private FragmentEventReader fragmentReader;
 
 	private XMLEventReader eventReader;
@@ -79,6 +81,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	private boolean strict = true;
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
+
+	private String encoding = DEFAULT_ENCODING;
 
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
@@ -129,6 +133,16 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	public void setXmlInputFactory(XMLInputFactory xmlInputFactory) {
 		Assert.notNull(xmlInputFactory, "XMLInputFactory must not be null");
 		this.xmlInputFactory = xmlInputFactory;
+	}
+
+	/**
+	 * Set encoding to be used for input file.
+	 *
+	 * @param encoding the encoding to be used
+	 */
+	public void setEncoding(String encoding) {
+		Assert.notNull(encoding, "The encoding must not be null");
+		this.encoding = encoding;
 	}
 
 	/**
@@ -221,7 +235,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 
 		inputStream = resource.getInputStream();
-		eventReader = xmlInputFactory.createXMLEventReader(inputStream);
+		eventReader = xmlInputFactory.createXMLEventReader(inputStream, this.encoding);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 		noInput = false;
 
