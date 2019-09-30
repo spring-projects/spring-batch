@@ -749,9 +749,9 @@ task api(type: Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
     }
 
-	source subprojects.collect { project ->
-		project.sourceSets.main.allJava
-	}
+	source subprojects
+			.findAll { it.name != 'spring-batch-samples' && !it.name.endsWith("-tests") }
+			.collect { project -> project.sourceSets.main.allJava }
 	destinationDir = new File(buildDir, "api")
 	classpath = files(subprojects.collect { project ->
 		project.sourceSets.main.compileClasspath
