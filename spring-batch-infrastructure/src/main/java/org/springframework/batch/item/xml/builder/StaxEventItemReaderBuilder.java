@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  */
 public class StaxEventItemReaderBuilder<T> {
@@ -54,6 +55,8 @@ public class StaxEventItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
+
+	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -194,6 +197,19 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Encoding for the input file. Defaults to {@link StaxEventItemReader#DEFAULT_ENCODING}.
+	 *
+	 * @param encoding String encoding algorithm
+	 * @return the current instance of the builder
+	 * @see StaxEventItemReader#setEncoding(String)
+	 */
+	public StaxEventItemReaderBuilder<T> encoding(String encoding) {
+		this.encoding = encoding;
+
+		return this;
+	}
+
+	/**
 	 * Validates the configuration and builds a new {@link StaxEventItemReader}
 	 *
 	 * @return a new instance of the {@link StaxEventItemReader}
@@ -222,6 +238,7 @@ public class StaxEventItemReaderBuilder<T> {
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setXmlInputFactory(this.xmlInputFactory);
+		reader.setEncoding(this.encoding);
 
 		return reader;
 	}
