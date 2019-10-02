@@ -49,7 +49,7 @@ $(document).ready(function(){
         window.dispatchEvent(new Event("tocRefresh"));
         tocbot.refresh();
         Cookies.set('docToggle', 'xml', { expires: 3652 });
-    };
+    }
 
     function setJava() {
         $javaContent.show();
@@ -59,7 +59,7 @@ $(document).ready(function(){
         window.dispatchEvent(new Event("tocRefresh"));
         tocbot.refresh();
         Cookies.set('docToggle', 'java', { expires: 3652 });
-    };
+    }
 
     function setBoth() {
         $javaContent.show();
@@ -69,6 +69,6 @@ $(document).ready(function(){
         window.dispatchEvent(new Event("tocRefresh"));
         tocbot.refresh();
         Cookies.set('docToggle', 'both', { expires: 3652 });
-    };
+    }
 
 });
