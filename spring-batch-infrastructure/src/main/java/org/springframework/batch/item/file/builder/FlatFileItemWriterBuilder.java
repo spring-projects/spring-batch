@@ -33,7 +33,6 @@ import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link FlatFileItemWriter}
@@ -463,9 +462,7 @@ public class FlatFileItemWriterBuilder<T> {
 					"A list of field names or a field extractor is required");
 
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
-			if (StringUtils.hasLength(this.delimiter)) {
-				delimitedLineAggregator.setDelimiter(this.delimiter);
-			}
+			delimitedLineAggregator.setDelimiter(this.delimiter);
 
 			if (this.fieldExtractor == null) {
 				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
