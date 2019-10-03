@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link FlatFileItemWriter}
@@ -459,9 +458,7 @@ public class FlatFileItemWriterBuilder<T> {
 					"A list of field names or a field extractor is required");
 
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
-			if (StringUtils.hasLength(this.delimiter)) {
-				delimitedLineAggregator.setDelimiter(this.delimiter);
-			}
+			delimitedLineAggregator.setDelimiter(this.delimiter);
 
 			if (this.fieldExtractor == null) {
 				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
