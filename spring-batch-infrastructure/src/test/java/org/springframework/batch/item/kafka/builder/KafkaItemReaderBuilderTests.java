@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Before;
 import org.junit.Rule;
@@ -213,6 +214,7 @@ public class KafkaItemReaderBuilderTests {
 		Duration pollTimeout = Duration.ofSeconds(100);
 		String topic = "test";
 		List<Integer> partitions = Arrays.asList(0, 1);
+		Deserializer<String> deserializer = new StringDeserializer();
 
 		// when
 		KafkaItemReader<String, String> reader = new KafkaItemReaderBuilder<String, String>()
@@ -222,6 +224,8 @@ public class KafkaItemReaderBuilderTests {
 				.partitions(partitions)
 				.pollTimeout(pollTimeout)
 				.saveState(saveState)
+				.keyDeserializer(deserializer)
+				.valueDeserializer(deserializer)
 				.build();
 
 		// then
@@ -234,5 +238,7 @@ public class KafkaItemReaderBuilderTests {
 		assertEquals(partitions.get(0).intValue(), topicPartitions.get(0).partition());
 		assertEquals(topic, topicPartitions.get(1).topic());
 		assertEquals(partitions.get(1).intValue(), topicPartitions.get(1).partition());
+		assertEquals(deserializer, ReflectionTestUtils.getField(reader, "keyDeserializer"));
+		assertEquals(deserializer, ReflectionTestUtils.getField(reader, "valueDeserializer"));
 	}
 }

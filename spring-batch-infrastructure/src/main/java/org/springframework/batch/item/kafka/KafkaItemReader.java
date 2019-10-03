@@ -30,6 +30,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
+import org.apache.kafka.common.serialization.Deserializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.lang.Nullable;
@@ -69,6 +70,10 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	private Duration pollTimeout = Duration.ofSeconds(DEFAULT_POLL_TIMEOUT);
 
 	private boolean saveState = true;
+
+	private Deserializer<K> keyDeserializer;
+
+	private Deserializer<V> valueDeserializer;
 
 	/**
 	 * Create a new {@link KafkaItemReader}.
@@ -133,6 +138,22 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	}
 
 	/**
+	 * Set a custom key deserializer.
+	 * @param keyDeserializer custom key deserializer
+	 */
+	public void setKeyDeserializer(Deserializer<K> keyDeserializer) {
+		this.keyDeserializer = keyDeserializer;
+	}
+
+	/**
+	 * Set a custom value deserializer.
+	 * @param valueDeserializer custom value deserializer
+	 */
+	public void setValueDeserializer(Deserializer<V> valueDeserializer) {
+		this.valueDeserializer = valueDeserializer;
+	}
+
+	/**
 	 * The flag that determines whether to save internal state for restarts.
 	 * @return true if the flag was set
 	 */
@@ -142,7 +163,7 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	@Override
 	public void open(ExecutionContext executionContext) {
-		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties);
+		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties, keyDeserializer, valueDeserializer);
 		this.partitionOffsets = new HashMap<>();
 		for (TopicPartition topicPartition : this.topicPartitions) {
 			this.partitionOffsets.put(topicPartition, 0L);

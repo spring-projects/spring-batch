@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
+import org.apache.kafka.common.serialization.Deserializer;
 import org.springframework.batch.item.kafka.KafkaItemReader;
 import org.springframework.util.Assert;
 
@@ -49,6 +50,9 @@ public class KafkaItemReaderBuilder<K, V> {
 
 	private String name;
 
+	private Deserializer<K> keyDeserializer;
+
+	private Deserializer<V> valueDeserializer;
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
 	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
@@ -125,6 +129,26 @@ public class KafkaItemReaderBuilder<K, V> {
 		return this;
 	}
 
+	/**
+	 * Set a custom key deserializer. Default null.
+	 * @param keyDeserializer custom key deserializer
+	 * @return The current instance of the builder.
+	 */
+	public KafkaItemReaderBuilder<K, V> keyDeserializer(Deserializer<K> keyDeserializer) {
+		this.keyDeserializer = keyDeserializer;
+		return this;
+	}
+
+	/**
+	 * Set a custom value deserializer. Default null.
+	 * @param valueDeserializer custom value deserializer
+	 * @return The current instance of the builder.
+	 */
+	public KafkaItemReaderBuilder<K, V> valueDeserializer(Deserializer<V> valueDeserializer) {
+		this.valueDeserializer = valueDeserializer;
+		return this;
+	}
+
 	public KafkaItemReader<K, V> build() {
 		if (this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is set to true");
@@ -148,6 +172,8 @@ public class KafkaItemReaderBuilder<K, V> {
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);
+		reader.setKeyDeserializer(keyDeserializer);
+		reader.setValueDeserializer(valueDeserializer);
 		return reader;
 	}
 }
