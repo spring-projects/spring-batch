@@ -521,7 +521,7 @@ ref"							is not required, and only needs to be specified explicitly
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.core.partition.PartitionHandler" />
+						<tool:expected-type type="org.springframework.batch.core.partition.PartitionHandler" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -533,7 +533,7 @@ ref"							is not required, and only needs to be specified explicitly
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.core.partition.support.StepExecutionAggregator" />
+						<tool:expected-type type="org.springframework.batch.core.partition.support.StepExecutionAggregator" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -545,7 +545,7 @@ ref"							is not required, and only needs to be specified explicitly
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.core.partition.support.Partitioner" />
+						<tool:expected-type type="org.springframework.batch.core.partition.support.Partitioner" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -557,7 +557,7 @@ ref"							is not required, and only needs to be specified explicitly
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.core.Step" />
+						<tool:expected-type type="org.springframework.batch.core.Step" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
@@ -905,7 +905,7 @@ ref"							is not required, and only needs to be specified explicitly
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />
-					<tool:expected-type type="org.springframework.core.step.skip.SkipPolicy" />
+					<tool:expected-type type="org.springframework.batch.core.step.skip.SkipPolicy" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -916,7 +916,7 @@ ref"							is not required, and only needs to be specified explicitly
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />
-					<tool:expected-type type="org.springframework.batch.retry.RetryPolicy" />
+					<tool:expected-type type="org.springframework.retry.RetryPolicy" />
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
