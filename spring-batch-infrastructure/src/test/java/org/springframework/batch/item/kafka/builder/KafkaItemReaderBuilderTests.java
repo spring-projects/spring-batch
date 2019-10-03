@@ -41,6 +41,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Jean-Francois Larouche
  */
 public class KafkaItemReaderBuilderTests {
 

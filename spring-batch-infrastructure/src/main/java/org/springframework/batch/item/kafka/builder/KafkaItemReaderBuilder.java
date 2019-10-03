@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
  *
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Jean-Francois Larouche
  * @since 4.2
  * @see KafkaItemReader
  */

@@ -44,6 +44,7 @@ import static org.junit.Assert.*;
 /**
  * @author Mathieu Ouellet
  * @author Mahmoud Ben Hassine
+ * @author Jean-Francois Larouche
  */
 public class KafkaItemReaderTests {
 
@@ -85,14 +86,16 @@ public class KafkaItemReaderTests {
 		try {
 			new KafkaItemReader<>(null, "topic", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("Consumer properties must not be null", exception.getMessage());
 		}
 
 		try {
 			new KafkaItemReader<>(new Properties(), "topic", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("bootstrap.servers property must be provided", exception.getMessage());
 		}
 
@@ -101,7 +104,8 @@ public class KafkaItemReaderTests {
 		try {
 			new KafkaItemReader<>(consumerProperties, "topic", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("group.id property must be provided", exception.getMessage());
 		}
 
@@ -109,7 +113,8 @@ public class KafkaItemReaderTests {
 		try {
 			new KafkaItemReader<>(consumerProperties, "topic", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("key.deserializer property must be provided", exception.getMessage());
 		}
 
@@ -117,7 +122,8 @@ public class KafkaItemReaderTests {
 		try {
 			new KafkaItemReader<>(consumerProperties, "topic", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("value.deserializer property must be provided", exception.getMessage());
 		}
 
@@ -125,14 +131,16 @@ public class KafkaItemReaderTests {
 		try {
 			new KafkaItemReader<>(consumerProperties, "", 0);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("Topic name must not be null or empty", exception.getMessage());
 		}
 
 		try {
 			this.reader = new KafkaItemReader<>(consumerProperties, "topic");
 			fail("Expected exception was not thrown");
-		} catch (Exception exception) {
+		}
+		catch (Exception exception) {
 			assertEquals("At least one partition must be provided", exception.getMessage());
 		}
 
@@ -145,21 +153,24 @@ public class KafkaItemReaderTests {
 		try {
 			this.reader.setPollTimeout(null);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("pollTimeout must not be null", exception.getMessage());
 		}
 
 		try {
 			this.reader.setPollTimeout(Duration.ZERO);
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("pollTimeout must not be zero", exception.getMessage());
 		}
 
 		try {
 			this.reader.setPollTimeout(Duration.ofSeconds(-1));
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("pollTimeout must not be negative", exception.getMessage());
 		}
 	}
