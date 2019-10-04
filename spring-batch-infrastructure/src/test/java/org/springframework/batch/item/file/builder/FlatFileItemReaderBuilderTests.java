@@ -269,6 +269,51 @@ public class FlatFileItemReaderBuilderTests {
 	}
 
 	@Test
+	public void testEmptyComments() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1,2,3\n4,5,6"))
+				.comments(new String[]{})
+				.delimited()
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		item = reader.read();
+		assertEquals(4, item.getFirst());
+		assertEquals(5, item.getSecond());
+		assertEquals("6", item.getThird());
+		assertNull(reader.read());
+	}
+
+	@Test
+	public void testDefaultComments() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1,2,3\n4,5,6"))
+				.delimited()
+				.names(new String[] {"first", "second", "third"})
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		item = reader.read();
+		assertEquals(4, item.getFirst());
+		assertEquals(5, item.getSecond());
+		assertEquals("6", item.getThird());
+		assertNull(reader.read());
+	}
+
+	@Test
 	public void testPrototypeBean() throws Exception {
 		BeanFactory factory = new AnnotationConfigApplicationContext(Beans.class);
 
