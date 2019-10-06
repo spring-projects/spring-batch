@@ -38,7 +38,7 @@ public class JdbcPagingFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addDouble("credit", 0.)
+		JobParameters jobParameters = super.getUniqueJobParametersBuilder().addDouble("credit", 0.)
 				.toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 		StepSynchronizationManager.close();
@@ -47,7 +47,7 @@ public class JdbcPagingFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected JobParameters getUniqueJobParameters() {
-		return new JobParametersBuilder(super.getUniqueJobParameters()).addDouble("credit", 10000.).toJobParameters();
+		return super.getUniqueJobParametersBuilder().addDouble("credit", 10000.).toJobParameters();
 	}
 
 }
