@@ -274,10 +274,10 @@ It should be noted that `afterJob` will be
 [source, java]
 ----
 public void afterJob(JobExecution jobExecution){
-    if( jobExecution.getStatus() == BatchStatus.COMPLETED ){
+    if (jobExecution.getStatus() == BatchStatus.COMPLETED ) {
         //job success
     }
-    else if(jobExecution.getStatus() == BatchStatus.FAILED){
+    else if (jobExecution.getStatus() == BatchStatus.FAILED) {
         //job failure
     }
 }

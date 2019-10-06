@@ -382,7 +382,7 @@ from `read`, an `Integer` is returned. This number can then be used to query for
 image::{batch-asciidoc}images/drivingQueryJob.png[Driving Query Example, scaledwidth="60%"]
 
 An `ItemProcessor` should be used to transform the key obtained from the driving query
-into a full 'Foo' object. An existing DAO can be used to query for the full object based
+into a full `Foo` object. An existing DAO can be used to query for the full object based
 on the key.
 
 [[multiLineRecords]]
@@ -602,7 +602,7 @@ public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSuppo
 
 The preceding `StepExecutionListener` inspects the `readCount` property of the
 `StepExecution` during the 'afterStep' phase to determine if no items were read. If that
-is the case, an exit code of FAILED is returned, indicating that the `Step` should fail.
+is the case, an exit code `FAILED` is returned, indicating that the `Step` should fail.
 Otherwise, `null` is returned, which does not affect the status of the `Step`.
 
 [[passingDataToFutureSteps]]
@@ -699,7 +699,7 @@ public Step step1() {
 public ExecutionContextPromotionListener promotionListener() {
 	ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-	listener.setKeys(new String[] {"someKey" });
+	listener.setKeys(new String[] {"someKey"});
 
 	return listener;
 }

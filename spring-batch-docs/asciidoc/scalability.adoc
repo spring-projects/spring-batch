@@ -59,7 +59,7 @@ as shown in the following example:
 [source, java, role="javaContent"]
 ----
 @Bean
-public TaskExecutor taskExecutor(){
+public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("spring_batch");
 }
 
@@ -214,7 +214,7 @@ public Flow flow2() {
 }
 
 @Bean
-public TaskExecutor taskExecutor(){
+public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("spring_batch");
 }
 ----

@@ -60,7 +60,7 @@ However, if the underlying resource is transactional (such as a JMS queue) then 
 `read` may return the same logical item on subsequent calls in a rollback scenario. It is
 also worth noting that a lack of items to process by an `ItemReader` does not cause an
 exception to be thrown. For example, a database `ItemReader` that is configured with a
-query that returns 0 results returns `null` on the first invocation of read.
+query that returns 0 results returns `null` on the first invocation of `read`.
 
 [[itemWriter]]
 === `ItemWriter`
@@ -155,14 +155,14 @@ public class Bar {
     public Bar(Foo foo) {}
 }
 
-public class FooProcessor implements ItemProcessor<Foo,Bar>{
+public class FooProcessor implements ItemProcessor<Foo, Bar> {
     public Bar process(Foo foo) throws Exception {
         //Perform simple transformation, convert a Foo to a Bar
         return new Bar(foo);
     }
 }
 
-public class BarWriter implements ItemWriter<Bar>{
+public class BarWriter implements ItemWriter<Bar> {
     public void write(List<? extends Bar> bars) throws Exception {
         //write bars
     }
@@ -232,14 +232,14 @@ public class Foobar {
     public Foobar(Bar bar) {}
 }
 
-public class FooProcessor implements ItemProcessor<Foo,Bar>{
+public class FooProcessor implements ItemProcessor<Foo, Bar> {
     public Bar process(Foo foo) throws Exception {
         //Perform simple transformation, convert a Foo to a Bar
         return new Bar(foo);
     }
 }
 
-public class BarProcessor implements ItemProcessor<Bar,Foobar>{
+public class BarProcessor implements ItemProcessor<Bar, Foobar> {
     public Foobar process(Bar bar) throws Exception {
         return new Foobar(bar);
     }
@@ -261,8 +261,8 @@ A `FooProcessor` and a `BarProcessor` can be 'chained' together to give the resu
 CompositeItemProcessor<Foo,Foobar> compositeProcessor =
                                       new CompositeItemProcessor<Foo,Foobar>();
 List itemProcessors = new ArrayList();
-itemProcessors.add(new FooTransformer());
-itemProcessors.add(new BarTransformer());
+itemProcessors.add(new FooProcessor());
+itemProcessors.add(new BarProcessor());
 compositeProcessor.setDelegates(itemProcessors);
 ----
 
@@ -528,7 +528,7 @@ creating `Resource` objects beyond showing the following simple example:
 Resource resource = new FileSystemResource("resources/trades.csv");
 ----
 
-In complex batch environments, the directory structures are often managed by the EAI
+In complex batch environments, the directory structures are often managed by the Enterprise Application Integration (EAI)
 infrastructure, where drop zones for external interfaces are established for moving files
 from FTP locations to batch processing locations and vice versa. File moving utilities
 are beyond the scope of the Spring Batch architecture, but it is not unusual for batch
@@ -749,8 +749,8 @@ The file can then be read by correctly constructing a `FlatFileItemReader` and c
 ----
 FlatFileItemReader<Player> itemReader = new FlatFileItemReader<>();
 itemReader.setResource(new FileSystemResource("resources/players.csv"));
-//DelimitedLineTokenizer defaults to comma as its delimiter
 DefaultLineMapper<Player> lineMapper = new DefaultLineMapper<>();
+//DelimitedLineTokenizer defaults to comma as its delimiter
 lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
 lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
 itemReader.setLineMapper(lineMapper);
@@ -774,7 +774,7 @@ as shown in the following example:
 
 [source, java]
 ----
-tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"});
+tokenizer.setNames(new String[] {"ID", "lastName", "firstName", "position", "birthYear", "debutYear"});
 ----
 
 A `FieldSetMapper` can use this information as follows:
@@ -785,7 +785,7 @@ A `FieldSetMapper` can use this information as follows:
 public class PlayerMapper implements FieldSetMapper<Player> {
     public Player mapFieldSet(FieldSet fs) {
 
-       if(fs == null){
+       if (fs == null) {
            return null;
        }
 
@@ -878,7 +878,7 @@ in the form of ranges, as shown in the following example:
 [source, xml, role="xmlContent"]
 ----
 <bean id="fixedLengthLineTokenizer"
-      class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
+      class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
     <property name="names" value="ISIN,Quantity,Price,Customer" />
     <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 </bean>
@@ -905,10 +905,10 @@ public FixedLengthTokenizer fixedLengthTokenizer() {
 	FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
 
 	tokenizer.setNames("ISIN", "Quantity", "Price", "Customer");
-	tokenizer.setColumns(new Range(1-12),
-						new Range(13-15),
-						new Range(16-20),
-						new Range(21-29));
+	tokenizer.setColumns(new Range(1, 12),
+						new Range(13, 15),
+						new Range(16, 20),
+						new Range(21, 29));
 
 	return tokenizer;
 }
@@ -1054,7 +1054,7 @@ tokenizer.setNames(new String[] {"A", "B", "C", "D"});
 try {
     tokenizer.tokenize("a,b,c");
 }
-catch(IncorrectTokenCountException e){
+catch (IncorrectTokenCountException e) {
     assertEquals(4, e.getExpectedCount());
     assertEquals(3, e.getActualCount());
 }
@@ -2816,7 +2816,7 @@ reads from a provided list. We start by implementing the most basic contract of
 
 [source, java]
 ----
-public class CustomItemReader<T> implements ItemReader<T>{
+public class CustomItemReader<T> implements ItemReader<T> {
 
     List<T> items;
 
@@ -2890,10 +2890,10 @@ public class CustomItemReader<T> implements ItemReader<T>, ItemStream {
     }
 
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        if(executionContext.containsKey(CURRENT_INDEX)){
+        if (executionContext.containsKey(CURRENT_INDEX)) {
             currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
         }
-        else{
+        else {
             currentIndex = 0;
         }
     }
@@ -3221,7 +3221,7 @@ an instance of the `MappingLdifReader`.
 ===== `AvroItemReader`
 The `AvroItemReader` reads serialized Avro data from a Resource.
 Each read returns an instance of the type specified by a Java class or Avro Schema.
-The reader may be optionnally configured  for input that embeds an Avro schema or not.
+The reader may be optionally configured  for input that embeds an Avro schema or not.
 Spring Batch provides an `AvroItemReaderBuilder` to construct an instance of the `AvroItemReader`.
 
 [[specializedWriters]]
