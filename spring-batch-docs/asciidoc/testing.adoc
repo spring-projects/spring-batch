@@ -159,7 +159,7 @@ public class SkipSampleFunctionalTests {
 === Testing Individual Steps
 
 For complex batch jobs, test cases in the end-to-end testing
-    approach may become unmanageable. It these cases, it may be more useful to
+    approach may become unmanageable. In these cases, it may be more useful to
     have test cases to test individual steps on their own. The
     `JobLauncherTestUtils` class contains a method called
     `launchStep`, which takes a step name and runs just

@@ -495,7 +495,7 @@ the `playerLoad` step contains no additional configuration. It can be started an
 of times, and, if complete, is skipped. The `gameLoad` step, however, needs to be run
 every time in case extra files have been added since it last ran. It has
 'allow-start-if-complete' set to 'true' in order to always be started. (It is assumed
-that the database tables games are loaded into has a process indicator on it, to ensure
+that the database table games are loaded into has a process indicator on it, to ensure
 new games can be properly found by the summarization step). The summarization step,
 which is the most important in the job, is configured to have a start limit of 2. This
 is useful because if the step continually fails, a new exit code is returned to the

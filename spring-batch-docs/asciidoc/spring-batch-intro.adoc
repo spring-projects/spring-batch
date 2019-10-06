@@ -33,7 +33,7 @@ Spring Batch provides reusable functions that are essential in processing large 
 of records, including logging/tracing, transaction management, job processing statistics,
 job restart, skip, and resource management. It also provides more advanced technical
 services and features that enable extremely high-volume and high performance batch jobs
-though optimization and partitioning techniques. Spring Batch can be used in both simple
+through optimization and partitioning techniques. Spring Batch can be used in both simple
 use cases (such as reading a file into a database or running a stored procedure) as well
 as complex, high volume use cases (such as moving high volumes of data between databases,
 transforming it, and so on). High-volume batch jobs can leverage the framework in a
