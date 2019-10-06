@@ -32,7 +32,7 @@ public class RepositoryFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addDouble("credit", 0.)
+		JobParameters jobParameters = super.getUniqueJobParametersBuilder().addDouble("credit", 0.)
 				.toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 		StepSynchronizationManager.close();
@@ -41,6 +41,6 @@ public class RepositoryFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected JobParameters getUniqueJobParameters() {
-		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("credit", "10000").toJobParameters();
+		return super.getUniqueJobParametersBuilder().addString("credit", "10000").toJobParameters();
 	}
 }

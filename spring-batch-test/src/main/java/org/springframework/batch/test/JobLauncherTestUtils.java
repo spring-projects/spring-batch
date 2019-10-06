@@ -26,6 +26,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
@@ -164,6 +165,14 @@ public class JobLauncherTestUtils {
 		parameters.put("random", new JobParameter(this.secureRandom.nextLong()));
 		return new JobParameters(parameters);
 	}
+
+    /**
+     * @return a new JobParametersBuilder object containing only a parameter for the
+     * current timestamp, to ensure that the job instance will be unique.
+     */
+    public JobParametersBuilder getUniqueJobParametersBuilder() {
+        return new JobParametersBuilder(this.getUniqueJobParameters());
+    }
 
 	/**
 	 * Convenient method for subclasses to grab a {@link StepRunner} for running

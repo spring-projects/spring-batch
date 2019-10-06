@@ -38,7 +38,7 @@ public class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		JobParameters jobParameters = new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+		JobParameters jobParameters = super.getUniqueJobParametersBuilder().addString("inputFile",
 				"file:./build/test-outputs/delimitedOutput.csv").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 		StepSynchronizationManager.close();
@@ -47,7 +47,7 @@ public class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected JobParameters getUniqueJobParameters() {
-		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("inputFile",
+		return super.getUniqueJobParametersBuilder().addString("inputFile",
 				"data/iosample/input/delimited.csv").addString("outputFile",
 				"file:./build/test-outputs/delimitedOutput.csv").toJobParameters();
 	}
