@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.batch.item.database.Order;
 /**
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Benjamin Hetz
  */
 public abstract class AbstractSqlPagingQueryProviderTests {
 
@@ -102,6 +103,48 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 		pagingQueryProvider.setSortKeys(sortKeys);
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
 		assertEquals(getJumpToItemQueryForFirstPageWithMultipleSortKeys(), s);
+	}
+	
+	@Test
+	public void testRemoveKeyWordsFollowedBySpaceChar() {
+		String selectClause = "SELECT id, 'yes', false";
+		String fromClause = "FROM test.verification_table";
+		String whereClause = "WHERE TRUE";
+		pagingQueryProvider.setSelectClause(selectClause);
+		pagingQueryProvider.setFromClause(fromClause);
+		pagingQueryProvider.setWhereClause(whereClause);
+		
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
+	}
+
+	@Test
+	public void testRemoveKeyWordsFollowedByTabChar() {
+		String selectClause = "SELECT\tid, 'yes', false";
+		String fromClause = "FROM\ttest.verification_table";
+		String whereClause = "WHERE\tTRUE";
+		pagingQueryProvider.setSelectClause(selectClause);
+		pagingQueryProvider.setFromClause(fromClause);
+		pagingQueryProvider.setWhereClause(whereClause);
+
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
+	}
+
+	@Test
+	public void testRemoveKeyWordsFollowedByNewLineChar() {
+		String selectClause = "SELECT\nid, 'yes', false";
+		String fromClause = "FROM\ntest.verification_table";
+		String whereClause = "WHERE\nTRUE";
+		pagingQueryProvider.setSelectClause(selectClause);
+		pagingQueryProvider.setFromClause(fromClause);
+		pagingQueryProvider.setWhereClause(whereClause);
+
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
 	}
 	
 	@Test
