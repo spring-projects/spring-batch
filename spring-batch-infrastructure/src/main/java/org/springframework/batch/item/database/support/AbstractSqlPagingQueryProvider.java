@@ -242,9 +242,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	private String removeKeyWord(String keyWord, String clause) {
 		String temp = clause.trim();
-		String keyWordString = keyWord + " ";
-		if (temp.toLowerCase().startsWith(keyWordString) && temp.length() > keyWordString.length()) {
-			return temp.substring(keyWordString.length());
+		int len = keyWord.length();
+		if (temp.toLowerCase().startsWith(keyWord) && Character.isWhitespace(temp.charAt(len)) && temp.length() > len + 1) {
+			return temp.substring(len + 1);
 		}
 		else {
 			return temp;

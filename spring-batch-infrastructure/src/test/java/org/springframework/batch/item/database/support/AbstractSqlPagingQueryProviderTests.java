@@ -105,6 +105,51 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 	
 	@Test
+	public void testRemoveKeyWordsFollowedBySpaceChar() {
+		String selectWithSpace = "SELECT id, 'yes', false";
+		String fromWithSpace = "FROM test.verification_table";
+		String whereWithSpace = "WHERE TRUE";
+		pagingQueryProvider.setSelectClause( selectWithSpace );
+		pagingQueryProvider.setFromClause( fromWithSpace );
+		pagingQueryProvider.setWhereClause( whereWithSpace );
+		
+		
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
+	}
+
+	@Test
+	public void testRemoveKeyWordsFollowedByTabChar() {
+		String selectWithSpace = "SELECT\tid, 'yes', false";
+		String fromWithSpace = "FROM\ttest.verification_table";
+		String whereWithSpace = "WHERE\tTRUE";
+		pagingQueryProvider.setSelectClause( selectWithSpace );
+		pagingQueryProvider.setFromClause( fromWithSpace );
+		pagingQueryProvider.setWhereClause( whereWithSpace );
+
+
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
+	}
+
+	@Test
+	public void testRemoveKeyWordsFollowedByNewLineChar() {
+		String selectWithSpace = "SELECT\nid, 'yes', false";
+		String fromWithSpace = "FROM\ntest.verification_table";
+		String whereWithSpace = "WHERE\nTRUE";
+		pagingQueryProvider.setSelectClause( selectWithSpace );
+		pagingQueryProvider.setFromClause( fromWithSpace );
+		pagingQueryProvider.setWhereClause( whereWithSpace );
+
+
+		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
+		assertEquals("test.verification_table", pagingQueryProvider.getFromClause());
+		assertEquals("TRUE", pagingQueryProvider.getWhereClause());
+	}
+	
+	@Test
 	public abstract void testGenerateFirstPageQuery();
 
 	@Test
