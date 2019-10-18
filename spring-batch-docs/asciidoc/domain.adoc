@@ -144,7 +144,7 @@ executions (`JobExecution` is discussed in more detail later in this chapter), a
 one `JobInstance` corresponding to a particular `Job` and identifying `JobParameters` can
 run at a given time.
 
-The definition of a `JobInstance` has absolutely no bearing on the data the to be loaded.
+The definition of a `JobInstance` has absolutely no bearing on the data to be loaded.
 It is entirely up to the `ItemReader` implementation to determine how data is loaded. For
 example, in the EndOfDay scenario, there may be a column on the data that indicates the
 'effective date' or 'schedule date' to which the data belongs. So, the January 1st run
