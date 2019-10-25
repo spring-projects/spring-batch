@@ -4,44 +4,6 @@
 
 [[whatsNew]]
 
-== What's New in Spring Batch 4.2
+== What's New in Spring Batch 4.3
 
-Spring Batch 4.2 adds the following features:
-
-* Support for batch metrics with https://micrometer.io[Micrometer]
-* Support for reading/writing data from/to https://kafka.apache.org[Apache Kafka] topics
-* Support for reading/writing data from/to https://avro.apache.org[Apache Avro] resources
-* Improved documentation
-
-[[whatsNewMetrics]]
-=== Batch metrics with Micrometer
-
-This release introduces a new feature that lets you monitor your batch jobs
-by using Micrometer. By default, Spring Batch collects metrics (such as job duration,
-step duration, item read and write throughput, and others) and registers them in Micrometer's
-global metrics registry under the `spring.batch` prefix.
-These metrics can be sent to any https://micrometer.io/docs/concepts#_supported_monitoring_systems[monitoring system]
-supported by Micrometer.
-
-For more details about this feature, please refer to the
-<<monitoring-and-metrics.adoc#monitoring-and-metrics,Monitoring and metrics>> chapter.
-
-[[whatsNewKafka]]
-=== Apache Kafka item reader/writer
-
-This release adds a new `KafkaItemReader` and `KafkaItemWriter` to read data from and
-write it to Kafka topics. For more details about these new components, please refer
-to the https://docs.spring.io/spring-batch/4.2.x/api/index.html[Javadoc].
-
-[[whatsNewAvro]]
-=== Apache Avro item reader/writer
-
-This release adds a new `AvroItemReader` and `AvroItemWriter` to read data from and
-write it to Avro resources. For more details about these new components, please refer
-to the https://docs.spring.io/spring-batch/4.2.x/api/index.html[Javadoc].
-
-[[whatsNewDocs]]
-=== Documentation updates
-
-The reference documentation has been updated to match the same style as other
-Spring projects.
+TDB

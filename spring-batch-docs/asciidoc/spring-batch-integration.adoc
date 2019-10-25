@@ -936,7 +936,7 @@ configured `SimpleChunkProcessor`, which is where you would provide a reference 
 when it receives chunks from the manager.
 
 For more information, see the section of the "Scalability" chapter on
-link:$$https://docs.spring.io/spring-batch/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
+link:$$https://docs.spring.io/spring-batch/docs/current/reference/html/scalability.html#remoteChunking$$[Remote Chunking].
 
 Starting from version 4.1, Spring Batch Integration introduces the `@EnableBatchIntegration`
 annotation that can be used to simplify a remote chunking setup. This annotation provides

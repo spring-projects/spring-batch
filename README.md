@@ -2,7 +2,7 @@
 
 # Spring Batch [![build status](https://build.spring.io/plugins/servlet/wittified/build-status/BATCH-GRAD)](https://build.spring.io/browse/BATCH-GRAD)
 
-Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/SpringSource/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
+Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/spring-projects/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
 
 If you are looking for a runtime orchestration tool for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Cloud Data Flow](https://cloud.spring.io/spring-cloud-dataflow/).  It is an orchestration tool for deploying and executing data integration based microservices including Spring Batch applications.
 
@@ -36,13 +36,16 @@ It requires an internet connection for download, and access to a Maven repositor
 
 # Getting Help
 
-Read the main project [website](https://projects.spring.io/spring-batch/) and the [User Guide](https://docs.spring.io/spring-batch/trunk/reference/). Look at the source code and the Javadocs.  For more detailed questions, use the [forum](https://forum.spring.io/forum/spring-projects/batch).  If you are new to Spring as well as to Spring Batch, look for information about [Spring projects](https://spring.io/projects).
+Read the main project [website](https://projects.spring.io/spring-batch/) and the [User Guide](https://docs.spring.io/spring-batch/docs/current/reference/). 
+Look at the source code and the Javadocs.
+For more detailed questions, use [StackOverflow](https://stackoverflow.com/questions/tagged/spring-batch).
+If you are new to Spring as well as to Spring Batch, look for information about [Spring projects](https://spring.io/projects).
 
 # Contributing to Spring Batch
 
 Here are some ways for you to get involved in the community:
 
-* Get involved with the Spring community on the Spring Community Forums.  Please help out on the [forum](https://forum.spring.io/forum/spring-projects/batch) by responding to questions and joining the debate.
+* Get involved with the Spring community on the Spring Community Forums.  Please help out on the [gitter channel](https://gitter.im/spring-batch/Lobby) by responding to questions and joining the debate.
 * Create [JIRA](https://jira.spring.io/browse/BATCH) tickets for bugs and new features and comment and vote on the ones that you are interested in.
 * Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](https://help.github.com/forking/).  If you want to contribute code this way, please familiarize yourself with the process outlined for contributing to Spring projects here: [Contributor Guidelines](https://github.com/spring-projects/spring-batch/blob/master/CONTRIBUTING.md).
 * Watch for upcoming articles on Spring by [subscribing](feed://assets.spring.io/drupal/node/feed.xml) to spring.io
@@ -51,4 +54,3 @@ Before we accept a non-trivial patch or pull request we will need you to sign th
 
 # Code of Conduct
  This project adheres to the [Contributor Covenant ](https://github.com/spring-projects/spring-batch/blob/master/CODE_OF_CONDUCT.adoc). By participating, you  are expected to uphold this code. Please report unacceptable behavior to spring-code-of-conduct@pivotal.io.
- 

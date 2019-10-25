@@ -1,3 +1,3 @@
 = Spring Batch - Reference Documentation
 
-:batch-asciidoc: https://docs.spring.io/spring-batch/reference/html/
+:batch-asciidoc: https://docs.spring.io/spring-batch/docs/current/reference/html/
