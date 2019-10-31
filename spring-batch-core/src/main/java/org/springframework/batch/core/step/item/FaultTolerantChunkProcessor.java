@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -580,8 +580,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
 		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
 
-		//BATCH-2442 : do not scan skipped items
-		if (!inputs.getSkips().isEmpty()) {
+		if (!inputs.getSkips().isEmpty() && inputs.getItems().size() != outputs.getItems().size()) {
 			if (outputIterator.hasNext()) {
 				outputIterator.remove();
 				return;
