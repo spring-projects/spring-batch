@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010-2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.core.test.step;
 
 import java.util.ArrayList;
@@ -17,6 +32,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.FaultTolerantStepBuilder;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
@@ -193,6 +209,53 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(7, stepExecution.getReadCount());
 		assertEquals(6, stepExecution.getWriteCount());
 		assertEquals(1, stepExecution.getProcessSkipCount());
+	}
+
+	@Test(timeout = 3000)
+	public void testExceptionInProcessAndWriteDuringChunkScan() throws Exception {
+		// Given
+		ListItemReader<Integer> itemReader = new ListItemReader<>(Arrays.asList(1, 2, 3));
+
+		ItemProcessor<Integer, Integer> itemProcessor = new ItemProcessor<Integer, Integer>() {
+			@Override
+			public Integer process(Integer item) throws Exception {
+				if (item.equals(2)) {
+					throw new Exception("Error during process item " + item);
+				}
+				return item;
+			}
+		};
+
+		ItemWriter<Integer> itemWriter = new ItemWriter<Integer>() {
+			@Override
+			public void write(List<? extends Integer> items) throws Exception {
+				if (items.contains(3)) {
+					throw new Exception("Error during write");
+				}
+			}
+		};
+
+		Step step = new StepBuilderFactory(jobRepository, transactionManager).get("step")
+				.<Integer, Integer>chunk(5)
+				.reader(itemReader)
+				.processor(itemProcessor)
+				.writer(itemWriter)
+				.faultTolerant()
+				.skipPolicy(new AlwaysSkipItemSkipPolicy())
+				.build();
+
+		// When
+		StepExecution stepExecution = execute(step);
+
+		// Then
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
+		assertEquals(3, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getWriteCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(1, stepExecution.getProcessSkipCount());
+		assertEquals(3, stepExecution.getRollbackCount());
+		assertEquals(2, stepExecution.getCommitCount());
 	}
 
 	private List<Integer> createItems() {
