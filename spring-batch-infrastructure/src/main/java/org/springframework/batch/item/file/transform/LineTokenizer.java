@@ -18,6 +18,8 @@ package org.springframework.batch.item.file.transform;
 
 import org.springframework.lang.Nullable;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Interface that is used by framework to split string obtained typically from a
  * file into tokens.
