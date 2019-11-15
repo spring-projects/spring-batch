@@ -420,7 +420,7 @@ The following example shows a declarative retry that uses the Spring AOP
 </aop:config>
 
 <bean id="retryAdvice"
-    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/>
+    class="org.springframework.retry.interceptor.RetryOperationsInterceptor"/>
 ----
 
 [role="javaContent"]
