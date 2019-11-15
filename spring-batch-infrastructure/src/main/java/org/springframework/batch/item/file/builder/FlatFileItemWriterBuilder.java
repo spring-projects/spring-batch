@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
@@ -43,6 +46,8 @@ import org.springframework.util.StringUtils;
  * @see FlatFileItemWriter
  */
 public class FlatFileItemWriterBuilder<T> {
+
+	protected Log logger = LogFactory.getLog(getClass());
 
 	private Resource resource;
 
@@ -489,10 +494,14 @@ public class FlatFileItemWriterBuilder<T> {
 
 		Assert.isTrue(this.lineAggregator != null || this.delimitedBuilder != null || this.formattedBuilder != null,
 				"A LineAggregator or a DelimitedBuilder or a FormattedBuilder is required");
-		Assert.notNull(this.resource, "A Resource is required");
 
 		if(this.saveState) {
 			Assert.hasText(this.name, "A name is required when saveState is true");
+		}
+
+		if(this.resource == null) {
+			logger.debug("The resource is null. This is only a valid scenario when " +
+					"injecting it later as in when using the MultiResourceItemWriter");
 		}
 
 		FlatFileItemWriter<T> writer = new FlatFileItemWriter<>();
