@@ -436,7 +436,7 @@ _4. Addition of a Processing Indicator_
 This involves the addition of a new column to the input table, which acts as an
 indicator. As a preprocessing step, all indicators are marked as being non-processed.
 During the record fetch stage of the batch application, records are read on the condition
-that that record is marked as being non-processed, and once they are read (with lock),
+that record is marked as being non-processed, and once they are read (with lock),
 they are marked as being in processing. When that record is completed, the indicator is
 updated to either complete or error. Many instances of a batch application can be started
 without a change, as the additional column ensures that a record is only processed once.
