@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -344,7 +344,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	/**
-	 * Explicitly request certain exceptions (and subclasses) to be skipped.
+	 * Explicitly request certain exceptions (and subclasses) to be skipped. These
+	 * exceptions (and their subclasses) might be thrown during any phase of the chunk
+	 * processing (read, process, write) but separate counts are made of skips on
+	 * read, process and write inside the step execution.
 	 *
 	 * @param type the exception type.
 	 * @return this for fluent chaining
