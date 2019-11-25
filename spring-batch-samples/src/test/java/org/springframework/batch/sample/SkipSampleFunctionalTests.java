@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -39,6 +44,11 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.sample.common.SkipCheckingListener;
 import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
+import org.springframework.batch.sample.skip.SkippableExceptionDuringProcessSample;
+import org.springframework.batch.sample.skip.SkippableExceptionDuringReadSample;
+import org.springframework.batch.sample.skip.SkippableExceptionDuringWriteSample;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,6 +64,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  * @author Robert Kasanicky
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
@@ -177,6 +188,76 @@ public class SkipSampleFunctionalTests {
 		//
 		assertTrue(id1 != id2);
 		assertTrue(!execution1.getJobId().equals(execution2.getJobId()));
+	}
+
+	/*
+	 * When a skippable exception is thrown during reading, the item is skipped
+	 * from the chunk and is not passed to the chunk processor (So it will not be
+	 * processed nor written).
+	 */
+	@Test
+	public void testSkippableExceptionDuringRead() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringReadSample.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+
+		// then
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(0, stepExecution.getProcessSkipCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	/*
+	 * When a skippable exception is thrown during processing, items will re-processed
+	 * one by one and the faulty item will be skipped from the chunk (it will not be
+	 * passed to the writer).
+	 */
+	@Test
+	public void testSkippableExceptionDuringProcess() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringProcessSample.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+
+		// then
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getProcessSkipCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+	}
+
+	/*
+	 * When a skippable exception is thrown during writing, the item writer (which receives a chunk of items)
+	 * does not know which item caused the issue. Hence, it will "scan" the chunk item by item
+	 * and only the faulty item will be skipped (technically, the commit-interval will be re-set to 1
+	 * and each item will re-processed/re-written in its own transaction).
+	 */
+	@Test
+	public void testSkippableExceptionDuringWrite() throws Exception {
+		// given
+		ApplicationContext context = new AnnotationConfigApplicationContext(SkippableExceptionDuringWriteSample.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
+
+		// when
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+
+		// then
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(0, stepExecution.getProcessSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 	}
 
 	private void validateLaunchWithSkips(JobExecution jobExecution) {
