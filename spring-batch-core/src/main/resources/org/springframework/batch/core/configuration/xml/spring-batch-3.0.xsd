@@ -841,6 +841,9 @@
 					are declared as included take precedence over the same value if it is also excluded.
 					Exceptions that are already marked as no-rollback
 					are automatically skippable (but it doesn't hurt to add them again here).
+					Exceptions (and their subclasses) that are declared might be thrown
+					during any phase of the chunk processing (read, process, write) but separate counts
+					are made of skips on read, process and write inside the step execution.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>

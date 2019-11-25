@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package org.springframework.batch.core.step.skip;
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public interface SkipPolicy {
 
@@ -31,7 +32,7 @@ public interface SkipPolicy {
 	 * {@code skipCount&lt;0}. Implementations should avoid throwing any
 	 * undeclared exceptions.
 	 * 
-	 * @param t exception encountered while reading
+	 * @param t exception encountered while processing
 	 * @param skipCount currently running count of skips
 	 * @return true if processing should continue, false otherwise.
 	 * @throws SkipLimitExceededException if a limit is breached
