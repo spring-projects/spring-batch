@@ -329,7 +329,7 @@ step.
 
 There is a simple example that can be copied and extended in the unit test suite for
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples/src/main/resources/jobs[Spring
-Batch Samples] (see `Partition*Job.xml` configuration).
+Batch Samples] (see `partition*Job.xml` configuration).
 
 Spring Batch creates step executions for the partitions called "step1:partition0", and so
 on. Many people prefer to call the manager step "step1:manager" for consistency. You can
