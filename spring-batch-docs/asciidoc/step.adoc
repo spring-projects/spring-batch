@@ -588,7 +588,9 @@ public Step step1() {
 
 In the preceding example, a `FlatFileItemReader` is used. If, at any point, a
 `FlatFileParseException` is thrown, the item is skipped and counted against the total
-skip limit of 10. Separate counts are made of skips on read, process, and write inside
+skip limit of 10. Exceptions (and their subclasses) that are declared might be thrown
+during any phase of the chunk processing (read, process, write) but separate counts
+are made of skips on read, process, and write inside
 the step execution, but the limit applies across all skips. Once the skip limit is
 reached, the next exception found causes the step to fail. In other words, the eleventh
 skip triggers the exception, not the tenth.
