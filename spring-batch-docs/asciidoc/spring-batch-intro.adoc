@@ -387,7 +387,7 @@ This involves breaking the input record set into an even number of portions (for
 10, where each portion has exactly 1/10th of the entire record set). Each portion is then
 processed by one instance of the batch/extract application.
 
-In order to use this approach, preprocessing is required to split the recordset up. The
+In order to use this approach, preprocessing is required to split the record set up. The
 result of this split will be a lower and upper bound placement number which can be used
 as input to the batch/extract application in order to restrict its processing to only its
 portion.
@@ -422,7 +422,7 @@ realized. There is no dynamic configuration of the number of batch instances use
 _3. Breakup by Views_
 
 This approach is basically breakup by a key column but on the database level. It involves
-breaking up the recordset into views. These views are used by each instance of the batch
+breaking up the record set into views. These views are used by each instance of the batch
 application during its processing. The breakup is done by grouping the data.
 
 With this option, each instance of a batch application has to be configured to hit a
@@ -441,8 +441,8 @@ they are marked as being in processing. When that record is completed, the indic
 updated to either complete or error. Many instances of a batch application can be started
 without a change, as the additional column ensures that a record is only processed once.
 // TODO On completion, what is the record marked as? Same for on error. (I expected a
-sentence or two on the order of "On completion, indicators are marked as being
-complete.")
+// sentence or two on the order of "On completion, indicators are marked as being
+// complete.")
 
 With this option, I/O on the table increases dynamically. In the case of an updating
 batch application, this impact is reduced, as a write must occur anyway.
