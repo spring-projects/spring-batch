@@ -86,10 +86,10 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 			else if (key.endsWith("(int)")) {
 				key = key.replace("(int)", "");
 				if (executionContext.containsKey(key)) {
-					builder.addLong(key, (long) executionContext.getInt(key));
+					builder.addInteger(key, executionContext.getInt(key));
 				}
 				else if (jobParameters.containsKey(key)) {
-					builder.addLong(key, (Long) jobParameters.get(key).getValue());
+					builder.addInteger(key, (Integer) jobParameters.get(key).getValue());
 				}
 			}
 			else if (key.endsWith("(double)")) {

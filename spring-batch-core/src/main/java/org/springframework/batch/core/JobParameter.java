@@ -52,6 +52,18 @@ public class JobParameter implements Serializable {
 	}
 
 	/**
+	 * Construct a new JobParameter as a Integer.
+	 *
+	 * @param parameter {@link Integer} instance.
+	 * @param identifying true if JobParameter should be identifying.
+	 */
+	public JobParameter(Integer parameter, boolean identifying) {
+		this.parameter = parameter;
+		parameterType = ParameterType.INTEGER;
+		this.identifying = identifying;
+	}
+
+	/**
 	 * Construct a new JobParameter as a Long.
 	 *
 	 * @param parameter {@link Long} instance.
@@ -96,6 +108,17 @@ public class JobParameter implements Serializable {
 	public JobParameter(String parameter) {
 		this.parameter = parameter;
 		parameterType = ParameterType.STRING;
+		this.identifying = true;
+	}
+
+	/**
+	 * Construct a new JobParameter as a Integer.
+	 *
+	 * @param parameter {@link Integer} instance.
+	 */
+	public JobParameter(Integer parameter) {
+		this.parameter = parameter;
+		parameterType = ParameterType.INTEGER;
 		this.identifying = true;
 	}
 
@@ -186,6 +209,6 @@ public class JobParameter implements Serializable {
 	 */
 	public enum ParameterType {
 
-		STRING, DATE, LONG, DOUBLE;
+		STRING, DATE, INTEGER, LONG, DOUBLE;
 	}
 }

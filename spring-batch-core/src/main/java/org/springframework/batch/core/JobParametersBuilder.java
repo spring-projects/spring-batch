@@ -150,6 +150,31 @@ public class JobParametersBuilder {
 	}
 
 	/**
+	 * Add a new identifying Integer parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addInteger(String key, Integer parameter) {
+		this.parameterMap.put(key, new JobParameter(parameter, true));
+		return this;
+	}
+
+	/**
+	 * Add a new Integer parameter for the given key.
+	 *
+	 * @param key - parameter accessor.
+	 * @param parameter - runtime parameter
+	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @return a reference to this object.
+	 */
+	public JobParametersBuilder addInteger(String key, Integer parameter, boolean identifying) {
+		this.parameterMap.put(key, new JobParameter(parameter, identifying));
+		return this;
+	}
+
+	/**
 	 * Add a new identifying Long parameter for the given key.
 	 *
 	 * @param key - parameter accessor.

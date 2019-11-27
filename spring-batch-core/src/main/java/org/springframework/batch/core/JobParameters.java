@@ -54,6 +54,39 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
+	 * Typesafe Getter for the Integer represented by the provided key.
+	 * 
+	 * @param key The key to get a value for
+	 * @return The <code>Integer</code> value or {@code null} if the key is absent
+	 */
+	@Nullable
+	public Integer getInteger(String key){
+		if (!parameters.containsKey(key)) {
+			return null;
+		}
+		return (Integer)parameters.get(key).getValue();
+	}
+
+	/**
+	 * Typesafe Getter for the Integer represented by the provided key.  If the
+	 * key does not exist, the default value will be returned.
+	 *
+	 * @param key to return the value for
+	 * @param defaultValue to return if the value doesn't exist
+	 * @return the parameter represented by the provided key, defaultValue
+	 * otherwise.
+	 */
+	@Nullable
+	public Integer getInteger(String key, @Nullable Integer defaultValue){
+		if(parameters.containsKey(key)){
+			return getInteger(key);
+		}
+		else{
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * Typesafe Getter for the Long represented by the provided key.
 	 * 
 	 * @param key The key to get a value for
@@ -64,8 +97,7 @@ public class JobParameters implements Serializable {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
-		Object value = parameters.get(key).getValue();
-		return value==null ? null : ((Long)value).longValue();
+		return (Long)parameters.get(key).getValue();
 	}
 
 	/**
@@ -150,8 +182,7 @@ public class JobParameters implements Serializable {
 		if (!parameters.containsKey(key)) {
 			return null;
 		}
-		Double value = (Double)parameters.get(key).getValue();
-		return value==null ? null : value.doubleValue();
+		return (Double)parameters.get(key).getValue();
 	}
 
 	/**
