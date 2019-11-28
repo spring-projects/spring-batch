@@ -70,7 +70,8 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private Resource resource;
 
-	private List<String> comments = new ArrayList<>();
+	private List<String> comments =
+			new ArrayList<>(Arrays.asList(FlatFileItemReader.DEFAULT_COMMENT_PREFIXES));
 
 	private int linesToSkip = 0;
 
@@ -165,6 +166,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	/**
 	 * Add a string to the list of Strings that indicate commented lines.
+	 * Defaults to {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
 	 *
 	 * @param comment the string to define a commented line.
 	 * @return The current instance of the builder.
@@ -176,15 +178,16 @@ public class FlatFileItemReaderBuilder<T> {
 	}
 
 	/**
-	 * An array of Strings that indicate lines that are comments (and therefore skipped by
-	 * the reader.
+	 * Set an array of Strings that indicate lines that are comments (and therefore skipped by
+	 * the reader). This method overrides the default comment prefixes which are
+	 * {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
 	 *
 	 * @param comments an array of strings to identify comments.
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemReader#setComments(String[])
 	 */
-	public FlatFileItemReaderBuilder<T> comments(String[] comments) {
-		this.comments.addAll(Arrays.asList(comments));
+	public FlatFileItemReaderBuilder<T> comments(String... comments) {
+		this.comments = Arrays.asList(comments);
 		return this;
 	}
 

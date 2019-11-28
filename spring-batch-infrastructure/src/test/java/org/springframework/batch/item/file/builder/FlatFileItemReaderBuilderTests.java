@@ -295,7 +295,7 @@ public class FlatFileItemReaderBuilderTests {
 	public void testDefaultComments() throws Exception {
 		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
 				.name("fooReader")
-				.resource(getResource("1,2,3\n4,5,6"))
+				.resource(getResource("1,2,3\n4,5,6\n#this is a default comment"))
 				.delimited()
 				.names(new String[] {"first", "second", "third"})
 				.targetType(Foo.class)
