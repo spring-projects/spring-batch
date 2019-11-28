@@ -254,7 +254,7 @@ public class FlatFileItemReaderBuilderTests {
 	public void testComments() throws Exception {
 		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
 				.name("fooReader")
-				.resource(getResource("1,2,3\n@this is a comment\n+so is this\n4,5,6"))
+				.resource(getResource("1,2,3\n@this is a comment\n+so is this\n#so is this too\n4,5,6"))
 				.comments("@", "+")
 				.delimited()
 				.names("first", "second", "third")

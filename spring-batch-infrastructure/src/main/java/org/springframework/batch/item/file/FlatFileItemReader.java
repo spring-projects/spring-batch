@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
  * about the problematic line and its line number.
  * 
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -50,6 +51,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
+	public static final String[] DEFAULT_COMMENT_PREFIXES = new String[] { "#" };
+
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
 	private Resource resource;
@@ -58,7 +61,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private int lineCount = 0;
 
-	private String[] comments = new String[] { "#" };
+	private String[] comments = DEFAULT_COMMENT_PREFIXES;
 
 	private boolean noInput = false;
 
@@ -134,7 +137,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * Setter for comment prefixes. Can be used to ignore header lines as well by using e.g. the first couple of column
-	 * names as a prefix.
+	 * names as a prefix. Defaults to {@link #DEFAULT_COMMENT_PREFIXES}.
 	 * 
 	 * @param comments an array of comment line prefixes.
 	 */
