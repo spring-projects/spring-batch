@@ -129,7 +129,7 @@ public class FlatFileItemWriterBuilderTests {
 				.lineSeparator("$")
 				.delimited()
 				.delimiter("")
-				.names("first", "second", "third")
+				.names(new String[] {"first", "second", "third"})
 				.encoding("UTF-16LE")
 				.headerCallback(writer1 -> writer1.append("HEADER"))
 				.footerCallback(writer12 -> writer12.append("FOOTER"))

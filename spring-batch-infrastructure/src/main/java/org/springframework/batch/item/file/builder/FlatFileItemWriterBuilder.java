@@ -462,7 +462,9 @@ public class FlatFileItemWriterBuilder<T> {
 					"A list of field names or a field extractor is required");
 
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
-			delimitedLineAggregator.setDelimiter(this.delimiter);
+			if (this.delimiter != null) {
+				delimitedLineAggregator.setDelimiter(this.delimiter);
+			}
 
 			if (this.fieldExtractor == null) {
 				BeanWrapperFieldExtractor<T> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
