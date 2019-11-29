@@ -119,7 +119,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 	apply plugin: 'merge'
 
 	jacoco {
-		toolVersion = "0.8.2"
+		toolVersion = "0.8.5"
 	}
 
     compileJava {
