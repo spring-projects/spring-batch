@@ -396,7 +396,6 @@ about indexing:
 |Default Table Name|Where Clause|Frequency
 |BATCH_JOB_INSTANCE|JOB_NAME = ? and JOB_KEY = ?|Every time a job is launched
 |BATCH_JOB_EXECUTION|JOB_INSTANCE_ID = ?|Every time a job is restarted
-|BATCH_EXECUTION_CONTEXT|EXECUTION_ID = ? and KEY_NAME = ?|On commit interval, a.k.a. chunk
 |BATCH_STEP_EXECUTION|VERSION = ?|On commit interval, a.k.a. chunk (and at start and end of
             step)
 |BATCH_STEP_EXECUTION|STEP_NAME = ? and JOB_EXECUTION_ID = ?|Before each step execution
