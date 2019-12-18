@@ -474,7 +474,7 @@ public Step gameLoad() {
 
 @Bean
 public Step playerSummarization() {
-	return this.stepBuilderFactor.get("playerSummarization")
+	return this.stepBuilderFactory.get("playerSummarization")
 			.startLimit(2)
 			.<String, String>chunk(10)
 			.reader(playerSummarizationSource())
