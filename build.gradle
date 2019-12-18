@@ -24,7 +24,7 @@ plugins {
 ext {
 	linkHomepage = 'https://projects.spring.io/spring-batch/'
 	linkCi       = 'https://build.spring.io/browse/BATCH'
-	linkIssue    = 'https://jira.spring.io/browse/BATCH'
+	linkIssue    = 'https://github.com/spring-projects/spring-batch/issues'
 	linkScmUrl           = 'https://github.com/spring-projects/spring-batch'
 	linkScmConnection    = 'git://github.com/spring-projects/spring-batch.git'
 	linkScmDevConnection = 'git@github.com:spring-projects/spring-batch.git'

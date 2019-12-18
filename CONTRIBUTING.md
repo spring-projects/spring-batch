@@ -9,9 +9,9 @@ Please refer back to this document as a checklist before issuing any pull reques
 
 Not sure what a *pull request* is, or how to submit one?  Take a look at GitHub's excellent [help documentation][] first.
 
-## Search JIRA first; create an issue if necessary
+## Search Github issues first; create an issue if necessary
 
-Is there already an issue that addresses your concern?  Do a bit of searching in our [JIRA issue tracker][] to see if you can find something similar. If not, please create a new issue before submitting a pull request unless the change is truly trivial, e.g. typo fixes, removing compiler warnings, etc.
+Is there already an issue that addresses your concern?  Do a bit of searching in [Github issues][] to see if you can find something similar. If not, please create a new issue before submitting a pull request unless the change is truly trivial, e.g. typo fixes, removing compiler warnings, etc.
 
 ## Sign the contributor license agreement
 
@@ -39,7 +39,7 @@ _you should see branches on origin as well as upstream, including 'master'_
 
 ## A Day in the Life of a Contributor
 
-* _Always_ work on topic branches (Typically use the Jira ticket ID as the branch name).
+* _Always_ work on topic branches (Typically use the Github issue ID as the branch name).
   - For example, to create and switch to a new branch for issue BATCH-123: `git checkout -b BATCH-123`
 * You might be working on several different topic branches at any given time, but when at a stopping point for one of those branches, commit (a local operation).
 * Please follow the "Commit Guidelines" described in this chapter of Pro Git: [https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project](https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines)
@@ -151,7 +151,7 @@ Use @since tags for newly-added public API types and methods e.g.
 
 ## Submit JUnit test cases for all behavior changes
 
-Search the codebase to find related unit tests and add additional @Test methods within. It is also acceptable to submit test cases on a per JIRA issue basis.
+Search the codebase to find related unit tests and add additional @Test methods within. It is also acceptable to submit test cases on a per Github issue basis.
 
 ## Squash commits
 
@@ -184,10 +184,10 @@ or locally for the *spring-batch repository only by omitting the '--global' flag
 
 See the [checking out and building][] section of the README for instructions. Make sure that all tests pass prior to submitting your pull request.
 
-## Mention your pull request on the associated JIRA issue
+## Mention your pull request on the associated Github issue
 
-Add a comment to the associated JIRA issue(s) linking to your new pull request.
+Add a comment to the associated Github issue(s) linking to your new pull request.
 
 [help documentation]: https://help.github.com/send-pull-requests
-[JIRA issue tracker]: https://jira.spring.io/browse/BATCH
+[Github issues]: https://github.com/spring-projects/spring-batch/issues
 [checking out and building]: https://github.com/spring-projects/spring-batch#building-from-source
