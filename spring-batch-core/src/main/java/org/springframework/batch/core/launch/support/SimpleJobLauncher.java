@@ -60,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Alexei Klenin
  *
  * @since 1.0
  *
@@ -70,9 +71,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 
-	private JobRepository jobRepository;
+	protected JobRepository jobRepository;
 
-	private TaskExecutor taskExecutor;
+	protected TaskExecutor taskExecutor;
 
 	/**
 	 * Run the provided job with the given {@link JobParameters}. The
@@ -96,11 +97,17 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	public JobExecution run(final Job job, final JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
 			JobParametersInvalidException {
+		final JobExecution jobExecution = createJobExecution(job, jobParameters);
+		launchJobExecution(job, jobExecution);
+		return jobExecution;
+	}
 
+	protected JobExecution createJobExecution(final Job job, final JobParameters jobParameters)
+			throws JobRestartException, JobExecutionAlreadyRunningException, JobParametersInvalidException,
+			JobInstanceAlreadyCompleteException {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
-		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
 		if (lastExecution != null) {
 			if (!job.isRestartable()) {
@@ -118,8 +125,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				} else if (status == BatchStatus.UNKNOWN) {
 					throw new JobRestartException(
 							"Cannot restart step [" + execution.getStepName() + "] from UNKNOWN status. "
-								+ "The last execution ended with a failure that could not be rolled back, "
-								+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
+									+ "The last execution ended with a failure that could not be rolled back, "
+									+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
 			}
 		}
@@ -134,50 +141,21 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		 * <i>and</i> fail a job execution for this instance between the last
 		 * assertion and the next method returning successfully.
 		 */
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		return jobRepository.createJobExecution(job.getName(), jobParameters);
+	}
+
+	protected void launchJobExecution(final Job job, final JobExecution jobExecution) {
+		JobExecutionTask jobExecutionTask = new JobExecutionTask(job, jobExecution);
 
 		try {
-			taskExecutor.execute(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
-								+ "]");
-						job.execute(jobExecution);
-						Duration jobExecutionDuration = BatchMetrics.calculateDuration(jobExecution.getStartTime(), jobExecution.getEndTime());
-						logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-								+ "] and the following status: [" + jobExecution.getStatus() + "]"
-								+ (jobExecutionDuration == null ? "" : " in " + BatchMetrics.formatDuration(jobExecutionDuration)));
-					}
-					catch (Throwable t) {
-						logger.info("Job: [" + job
-								+ "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
-								+ "]", t);
-						rethrow(t);
-					}
-				}
-
-				private void rethrow(Throwable t) {
-					if (t instanceof RuntimeException) {
-						throw (RuntimeException) t;
-					}
-					else if (t instanceof Error) {
-						throw (Error) t;
-					}
-					throw new IllegalStateException(t);
-				}
-			});
-		}
-		catch (TaskRejectedException e) {
+			taskExecutor.execute(jobExecutionTask);
+		} catch (TaskRejectedException taskRejectedException) {
 			jobExecution.upgradeStatus(BatchStatus.FAILED);
 			if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
-				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+				jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(taskRejectedException));
 			}
 			jobRepository.update(jobExecution);
 		}
-
-		return jobExecution;
 	}
 
 	/**
@@ -208,6 +186,45 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		if (taskExecutor == null) {
 			logger.info("No TaskExecutor has been set, defaulting to synchronous executor.");
 			taskExecutor = new SyncTaskExecutor();
+		}
+	}
+
+	protected class JobExecutionTask implements Runnable {
+		private final Job job;
+		private final JobExecution jobExecution;
+
+		public JobExecutionTask(final Job job, final JobExecution jobExecution) {
+			this.job = job;
+			this.jobExecution = jobExecution;
+		}
+
+		@Override
+		public void run() {
+			JobParameters jobParameters = jobExecution.getJobParameters();
+
+			try {
+				logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
+				job.execute(jobExecution);
+				Duration jobExecutionDuration = BatchMetrics.calculateDuration(jobExecution.getStartTime(), jobExecution.getEndTime());
+				logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
+						+ "] and the following status: [" + jobExecution.getStatus() + "]"
+						+ (jobExecutionDuration == null ? "" : " in " + BatchMetrics.formatDuration(jobExecutionDuration)));
+			} catch (Throwable jobExecutionException) {
+				logger.info("Job: [" + job
+						+ "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
+						+ "]", jobExecutionException);
+				rethrow(jobExecutionException);
+			}
+		}
+
+		private void rethrow(Throwable throwable) {
+			if (throwable instanceof RuntimeException) {
+				throw (RuntimeException) throwable;
+			} else if (throwable instanceof Error) {
+				throw (Error) throwable;
+			} else {
+				throw new IllegalStateException(throwable);
+			}
 		}
 	}
 }
