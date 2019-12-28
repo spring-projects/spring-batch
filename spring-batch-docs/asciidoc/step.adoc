@@ -1461,8 +1461,8 @@ the following example:
 public Job job() {
 	return this.jobBuilderFactory.get("job")
 				.start(stepA())
-				.on("*").to(stepB())
-				.from(stepA()).on("FAILED").to(stepC())
+				.on("FAILED").to(stepC())
+				.from(stepA()).on("*").to(stepB())
 				.end()
 				.build();
 }
@@ -1486,9 +1486,9 @@ For example, "c*t" matches "cat" and "count", while "c?t" matches "cat" but not 
 
 While there is no limit to the number of transition elements on a `Step`, if the `Step`
 execution results in an `ExitStatus` that is not covered by an element, then the
-framework throws an exception and the `Job` fails. The framework automatically orders
-transitions from most specific to least specific. This means that, even if the ordering
-were swapped for "stepA" in the example above, an `ExitStatus` of "FAILED" would still go
+framework throws an exception and the `Job` fails. The framework requires
+transitions to be specified from most specific to least specific. This means that, even if the ordering
+were swapped in the example above, an `ExitStatus` of "FAILED" would not go
 to "stepC".
 
 [[batchStatusVsExitStatus]]
