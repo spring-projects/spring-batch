@@ -7,7 +7,7 @@ Please refer back to this document as a checklist before issuing any pull reques
 
 ## Understand the basics
 
-Not sure what a *pull request* is, or how to submit one?  Take a look at GitHub's excellent [help documentation][] first.
+Not sure what a *pull request* is, or how to submit one?  Take a look at the excellent [GitHub help documentation][] first.
 
 ## Search Github issues first; create an issue if necessary
 
@@ -47,7 +47,7 @@ _you should see branches on origin as well as upstream, including 'master'_
 * When ready to resolve an issue or to collaborate with others, you can push your branch to origin (your fork), e.g.: `git push origin BATCH-123`
 * If you want to collaborate with another contributor, have them fork your repository (add it as a remote) and `git fetch <your-username>` to grab your branch. Alternatively, they can use `git fetch --all` to sync their local state with all of their remotes.
 * If you grant that collaborator push access to your repository, they can even apply their changes to your branch.
-* When ready for your contribution to be reviewed for potential inclusion in the master branch of the canonical *spring-batch* repository (what you know as 'upstream'), issue a pull request to the *spring-projects* repository (for more detail, see [https://help.github.com/send-pull-requests/](https://help.github.com/send-pull-requests/)).
+* When ready for your contribution to be reviewed for potential inclusion in the master branch of the canonical *spring-batch* repository (what you know as 'upstream'), issue a pull request to the *spring-projects* repository (for more detail, see [GitHub help documentation][]).
 * The project lead may merge your changes into the upstream master branch as-is, he may keep the pull request open yet add a comment about something that should be modified, or he might reject the pull request by closing it.
 * A prerequisite for any pull request is that it will be cleanly merge-able with the upstream master's current state. **This is the responsibility of any contributor.** If your pull request cannot be applied cleanly, the project lead will most likely add a comment requesting that you make it merge-able. For a full explanation, see the Pro Git section on rebasing: [https://git-scm.com/book/en/v2/Git-Branching-Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing). As stated there: "> Often, you’ll do this to make sure your commits apply cleanly on a remote branch — perhaps in a project to which you’re trying to contribute but that you don’t maintain."
 
@@ -188,6 +188,6 @@ See the [checking out and building][] section of the README for instructions. Ma
 
 Add a comment to the associated Github issue(s) linking to your new pull request.
 
-[help documentation]: https://help.github.com/send-pull-requests
+[GitHub help documentation]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests
 [Github issues]: https://github.com/spring-projects/spring-batch/issues
 [checking out and building]: https://github.com/spring-projects/spring-batch#building-from-source
