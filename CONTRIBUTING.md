@@ -188,6 +188,6 @@ See the [checking out and building][] section of the README for instructions. Ma
 
 Add a comment to the associated Github issue(s) linking to your new pull request.
 
-[help documentation]: https://help.github.com/send-pull-requests
+[help documentation]: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests
 [Github issues]: https://github.com/spring-projects/spring-batch/issues
 [checking out and building]: https://github.com/spring-projects/spring-batch#building-from-source
