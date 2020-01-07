@@ -1,5 +1,0 @@
-#macro (sequence $name $value)CREATE TABLE ${name} (
-	ID INTEGER PRIMARY KEY AUTOINCREMENT
-);
-#end
-#macro (notnull $name $type)ALTER COLUMN ${name} ${type} NOT NULL#end
