@@ -636,6 +636,7 @@ project('spring-batch-samples') {
 		optional "org.postgresql:postgresql:$postgresqlVersion"
 		optional "org.springframework:spring-web:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
+		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
 		optional "org.springframework.amqp:spring-amqp:$springAmqpVersion"
 		optional ("org.springframework.amqp:spring-rabbit:$springAmqpVersion") {
 			exclude group: "org.springframework", module: "spring-messaging"
