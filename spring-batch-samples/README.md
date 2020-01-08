@@ -60,6 +60,7 @@ jpa                         |                 |                    |           |
 multiRecordtype             |                 |          x         |           |                 |                 |                  |                     |            |     x     |                |            |     x
 multiResource               |       x         |                    |           |                 |                 |                  |                     |      x     |           |                |            |     x
 [XML Input Output](#xml-input-output)                 |                 |                    |    x      |                 |                 |                  |                     |            |           |        x       |            |
+[MongoDB sample](#mongodb-sample)                 |                 |                    |           |                 |        x         |                  |                     |            |     x      |                |            |
 
 
 ### Common Sample Source Structures
@@ -985,4 +986,20 @@ Once started, you need to [configure Prometheus as data source in Grafana](https
 and import the ready-to-use dashboard in `spring-batch-samples/src/grafana/spring-batch-dashboard.json`.
 
 Finally, run the `org.springframework.batch.sample.metrics.BatchMetricsApplication`
+class without any argument to start the sample.
+
+# MongoDB sample
+
+This sample is a showcase of MongoDB support in Spring Batch. It copies data from
+an input collection to an output collection using `MongoItemReader` and `MongoItemWriter`.
+
+To run the sample, you need to have a MongoDB server up and running on `localhost:27017` 
+(you can change these defaults in `mongodb-sample.properties`). If you use docker,
+you can run the following command to start a MongoDB server:
+
+```
+$>docker run --name mongodb --rm -d -p 27017:27017 mongo
+```
+
+Once MongoDB is up and running, run the `org.springframework.batch.sample.mongodb.MongoDBSampleApp`
 class without any argument to start the sample.
