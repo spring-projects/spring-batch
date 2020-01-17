@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
@@ -36,12 +37,13 @@ public interface ItemProcessor<I, O> {
 	 * processing.  If the returned result is null, it is assumed that processing of the item
 	 * should not continue.
 	 * 
-	 * @param item to be processed
+	 * @param item to be processed.  A {@code null} will never reach this method because the only possible sources 
+	 * are ItemReader (which indicates no more items) and ItemProcessor (which indicates a filtered item). 
 	 * @return potentially modified or new item for continued processing, {@code null} if processing of the
 	 *  provided item should not continue.
 	 *
 	 * @throws Exception thrown if exception occurs during processing.
 	 */
 	@Nullable
-	O process(I item) throws Exception;
+	O process(@NonNull I item) throws Exception;
 }
