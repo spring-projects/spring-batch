@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,4 +84,22 @@ public class JpaItemWriterBuilderTests {
 			assertEquals("Incorrect message", "EntityManagerFactory must be provided", ise.getMessage());
 		}
 	}
+
+	@Test
+	public void testPersist() throws Exception {
+		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
+				.entityManagerFactory(this.entityManagerFactory)
+				.usePersist(true)
+				.build();
+
+		itemWriter.afterPropertiesSet();
+
+		List<String> items = Arrays.asList("foo", "bar");
+
+		itemWriter.write(items);
+
+		verify(this.entityManager).persist(items.get(0));
+		verify(this.entityManager).persist(items.get(1));
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
 public class JpaItemWriterBuilder<T> {
 
 	private EntityManagerFactory entityManagerFactory;
+	private boolean usePersist = false;
 
 	/**
 	 * The JPA {@link EntityManagerFactory} to obtain an entity manager from. Required.
@@ -45,6 +46,19 @@ public class JpaItemWriterBuilder<T> {
 	}
 
 	/**
+	 * Set whether the entity manager should perform a persist instead of a merge.
+	 *
+	 * @param usePersist defaults to false
+	 * @return this instance for method chaining
+	 * @see JpaItemWriter#setUsePersist(boolean)
+	 */
+	public JpaItemWriterBuilder<T> usePersist(boolean usePersist) {
+		this.usePersist = usePersist;
+
+		return this;
+	}
+
+	/**
 	 * Returns a fully built {@link JpaItemWriter}.
 	 *
 	 * @return the writer
@@ -55,6 +69,7 @@ public class JpaItemWriterBuilder<T> {
 
 		JpaItemWriter<T> writer = new JpaItemWriter<>();
 		writer.setEntityManagerFactory(this.entityManagerFactory);
+		writer.setUsePersist(this.usePersist);
 
 		return writer;
 	}
