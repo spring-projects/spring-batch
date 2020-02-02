@@ -84,4 +84,22 @@ public class JpaItemWriterBuilderTests {
 			assertEquals("Incorrect message", "EntityManagerFactory must be provided", ise.getMessage());
 		}
 	}
+
+	@Test
+	public void testPersist() throws Exception {
+		JpaItemWriter<String> itemWriter = new JpaItemWriterBuilder<String>()
+				.entityManagerFactory(this.entityManagerFactory)
+				.usePersist(true)
+				.build();
+
+		itemWriter.afterPropertiesSet();
+
+		List<String> items = Arrays.asList("foo", "bar");
+
+		itemWriter.write(items);
+
+		verify(this.entityManager).persist(items.get(0));
+		verify(this.entityManager).persist(items.get(1));
+	}
+
 }
