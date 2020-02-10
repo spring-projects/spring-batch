@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ import java.util.List;
  * @author Robert Kasanicky
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Baris Cubukcuoglu
  *
  * @see JobRepository
  * @see JobInstanceDao
@@ -235,17 +236,7 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	@Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
-		int count = 0;
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					count++;
-				}
-			}
-		}
-		return count;
+		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 
 	/**
