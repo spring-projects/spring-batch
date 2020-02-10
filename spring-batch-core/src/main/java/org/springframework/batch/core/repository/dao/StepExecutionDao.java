@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,4 +86,15 @@ public interface StepExecutionDao {
 	 */
 	void addStepExecutions(JobExecution jobExecution);
 
+	/**
+	 * Counts all the {@link StepExecution} for a given step name.
+	 *
+	 * @param jobInstance the parent {@link JobInstance}
+	 * @param stepName the name of the step
+	 * @since 4.3
+	 * @return the count of {@link StepExecution}s for a given step
+	 */
+	default int countStepExecutions(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
 }

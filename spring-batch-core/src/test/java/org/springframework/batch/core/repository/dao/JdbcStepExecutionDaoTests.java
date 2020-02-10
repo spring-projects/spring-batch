@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -75,4 +76,16 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 	}
 
+	@Transactional
+	@Test
+	public void testCountStepExecutions() {
+		// Given
+		dao.saveStepExecution(stepExecution);
+
+		// When
+		int result = dao.countStepExecutions(jobInstance, stepExecution.getStepName());
+
+		// Then
+		assertEquals(1, result);
+	}
 }
