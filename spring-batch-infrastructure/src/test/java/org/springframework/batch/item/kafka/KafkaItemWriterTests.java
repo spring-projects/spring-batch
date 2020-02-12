@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Takaaki Shimbo
+ */
 public class KafkaItemWriterTests {
 
 	@Mock
@@ -39,6 +42,10 @@ public class KafkaItemWriterTests {
 	private KafkaItemKeyMapper itemKeyMapper;
 
 	private KafkaItemWriter<String, String> writer;
+
+	private String defaultTopic = "defaultTopic";
+
+	private String topic = "topic";
 
 	@Before
 	public void setUp() throws Exception {
@@ -83,24 +90,47 @@ public class KafkaItemWriterTests {
 	}
 
 	@Test
-	public void testBasicWrite() throws Exception {
+	public void testBasicWriteWithDefaultTopic() throws Exception {
 		List<String> items = Arrays.asList("val1", "val2");
 
 		this.writer.write(items);
 
-		verify(this.kafkaTemplate).sendDefault(items.get(0), items.get(0));
-		verify(this.kafkaTemplate).sendDefault(items.get(1), items.get(1));
+		verify(this.kafkaTemplate).send(defaultTopic, items.get(0), items.get(0));
+		verify(this.kafkaTemplate).send(defaultTopic, items.get(1), items.get(1));
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception {
+	public void testBasicDeleteWithDefaultTopic() throws Exception {
 		List<String> items = Arrays.asList("val1", "val2");
 		this.writer.setDelete(true);
 
 		this.writer.write(items);
 
-		verify(this.kafkaTemplate).sendDefault(items.get(0), null);
-		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
+		verify(this.kafkaTemplate).send(defaultTopic, items.get(0), null);
+		verify(this.kafkaTemplate).send(defaultTopic, items.get(1), null);
+	}
+
+	@Test
+	public void testBasicWriteWithSetTopic() throws Exception {
+		List<String> items = Arrays.asList("val1", "val2");
+		this.writer.setTopic(topic);
+
+		this.writer.write(items);
+
+		verify(this.kafkaTemplate).send(topic, items.get(0), items.get(0));
+		verify(this.kafkaTemplate).send(topic, items.get(1), items.get(1));
+	}
+
+	@Test
+	public void testBasicDeleteWithSetTopic() throws Exception {
+		List<String> items = Arrays.asList("val1", "val2");
+		this.writer.setDelete(true);
+		this.writer.setTopic(topic);
+
+		this.writer.write(items);
+
+		verify(this.kafkaTemplate).send(topic, items.get(0), null);
+		verify(this.kafkaTemplate).send(topic, items.get(1), null);
 	}
 
 	static class KafkaItemKeyMapper implements Converter<String, String> {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -28,6 +29,7 @@ import org.springframework.util.Assert;
  * </p>
  *
  * @author Mathieu Ouellet
+ * @author Takaaki Shimbo
  * @since 4.2
  *
  */
@@ -35,20 +37,28 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	private KafkaTemplate<K, T> kafkaTemplate;
 
+	/**
+	 * @since 4.3
+	 */
+	private String topic;
+
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {
-			this.kafkaTemplate.sendDefault(key, null);
+			this.kafkaTemplate.send(topic, key, null);
 		}
 		else {
-			this.kafkaTemplate.sendDefault(key, value);
+			this.kafkaTemplate.send(topic, key, value);
 		}
 	}
 
 	@Override
 	protected void init() {
 		Assert.notNull(this.kafkaTemplate, "KafkaTemplate must not be null.");
-		Assert.notNull(this.kafkaTemplate.getDefaultTopic(), "KafkaTemplate must have the default topic set.");
+		if (StringUtils.isEmpty(topic)) {
+			Assert.notNull(this.kafkaTemplate.getDefaultTopic(), "KafkaTemplate must have a topic set.");
+			topic = this.kafkaTemplate.getDefaultTopic();
+		}
 	}
 
 	/**
@@ -57,5 +67,15 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	 */
 	public void setKafkaTemplate(KafkaTemplate<K, T> kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
+	}
+
+	/**
+	 * Set the topic that the record will be appended to.
+	 *
+	 * @param topic name
+	 * @since 4.3
+	 */
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 }

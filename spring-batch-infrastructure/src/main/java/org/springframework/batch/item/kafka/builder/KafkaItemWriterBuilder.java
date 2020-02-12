@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link KafkaItemWriter}
  *
  * @author Mathieu Ouellet
+ * @author Takaaki Shimbo
  * @since 4.2
  */
 public class KafkaItemWriterBuilder<K, V> {
@@ -34,6 +35,8 @@ public class KafkaItemWriterBuilder<K, V> {
 	private Converter<V, K> itemKeyMapper;
 
 	private boolean delete;
+
+	private String topic;
 
 	/**
 	 * Establish the KafkaTemplate to be used by the KafkaItemWriter.
@@ -72,6 +75,21 @@ public class KafkaItemWriterBuilder<K, V> {
 	}
 
 	/**
+	 * Set the topic that the record will be appended to.
+	 * If this value is not set, the default topic of #{@link KafkaTemplate} is used.
+	 *
+	 * @param topic name that the record will be appended to.
+	 * @return The current instance of the builder.
+	 * @author Takaaki Shimbo
+	 * @since 4.3
+	 * @see KafkaItemWriter#setTopic(String)
+	 */
+	public KafkaItemWriterBuilder<K, V> topic(String topic) {
+		this.topic = topic;
+		return this;
+	}
+
+	/**
 	 * Validates and builds a {@link KafkaItemWriter}.
 	 * @return a {@link KafkaItemWriter}
 	 */
@@ -83,6 +101,7 @@ public class KafkaItemWriterBuilder<K, V> {
 		writer.setKafkaTemplate(this.kafkaTemplate);
 		writer.setItemKeyMapper(this.itemKeyMapper);
 		writer.setDelete(this.delete);
+		writer.setTopic(this.topic);
 		return writer;
 	}
 }

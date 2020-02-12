@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mathieu Ouellet
+ * @author Takaaki Shimbo
  */
 public class KafkaItemWriterBuilderTests {
 
@@ -70,15 +71,20 @@ public class KafkaItemWriterBuilderTests {
 	public void testKafkaItemWriterBuild() {
 		// given
 		boolean delete = true;
+		String topic = "topic";
 
 		// when
 		KafkaItemWriter<String, String> writer = new KafkaItemWriterBuilder<String, String>()
-				.kafkaTemplate(this.kafkaTemplate).itemKeyMapper(this.itemKeyMapper).delete(delete).build();
-
+				.kafkaTemplate(this.kafkaTemplate)
+				.itemKeyMapper(this.itemKeyMapper)
+				.topic(topic)
+				.delete(delete)
+				.build();
 		// then
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "delete"));
 		assertEquals(this.itemKeyMapper, ReflectionTestUtils.getField(writer, "itemKeyMapper"));
 		assertEquals(this.kafkaTemplate, ReflectionTestUtils.getField(writer, "kafkaTemplate"));
+		assertEquals(topic, ReflectionTestUtils.getField(writer, "topic"));
 	}
 
 	static class KafkaItemKeyMapper implements Converter<String, String> {
