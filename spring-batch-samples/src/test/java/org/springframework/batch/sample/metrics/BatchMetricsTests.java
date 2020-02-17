@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.metrics.BatchMetrics;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -51,9 +49,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+/**
+ * @author Mahmoud Ben Hassine
+ */
 public class BatchMetricsTests {
 
-	private static final int EXPECTED_SPRING_BATCH_METRICS = 6;
+	private static final int EXPECTED_SPRING_BATCH_METRICS = 10;
 
 	@Test
 	public void testCalculateDuration() {
@@ -147,6 +148,8 @@ public class BatchMetricsTests {
 		List<Meter> meters = Metrics.globalRegistry.getMeters();
 		assertTrue(meters.size() >= EXPECTED_SPRING_BATCH_METRICS);
 
+		// Job metrics
+
 		try {
 			Metrics.globalRegistry.get("spring.batch.job")
 					.tag("name", "job")
@@ -164,6 +167,8 @@ public class BatchMetricsTests {
 			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active" +
 					" registered in the global registry: " + e.getMessage());
 		}
+		
+		// Step 1 (tasklet) metrics
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.step")
@@ -175,6 +180,8 @@ public class BatchMetricsTests {
 			fail("There should be a meter of type TIMER named spring.batch.step" +
 					" registered in the global registry: " + e.getMessage());
 		}
+		
+		// Step 2 (simple chunk-oriented) metrics
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.step")
@@ -219,6 +226,52 @@ public class BatchMetricsTests {
 			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
 					" registered in the global registry: " + e.getMessage());
 		}
+		
+		// Step 3 (fault-tolerant chunk-oriented) metrics
+
+		try {
+			Metrics.globalRegistry.get("spring.batch.step")
+					.tag("name", "step3")
+					.tag("job.name", "job")
+					.tag("status", "COMPLETED")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step" +
+					" registered in the global registry: " + e.getMessage());
+		}
+
+		try {
+			Metrics.globalRegistry.get("spring.batch.item.read")
+					.tag("job.name", "job")
+					.tag("step.name", "step3")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.read" +
+					" registered in the global registry: " + e.getMessage());
+		}
+
+		try {
+			Metrics.globalRegistry.get("spring.batch.item.process")
+					.tag("job.name", "job")
+					.tag("step.name", "step3")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.process" +
+					" registered in the global registry: " + e.getMessage());
+		}
+
+		try {
+			Metrics.globalRegistry.get("spring.batch.chunk.write")
+					.tag("job.name", "job")
+					.tag("step.name", "step3")
+					.tag("status", "SUCCESS")
+					.timer();
+		} catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
+					" registered in the global registry: " + e.getMessage());
+		}
 	}
 
 	@Configuration
@@ -241,25 +294,23 @@ public class BatchMetricsTests {
 		}
 
 		@Bean
-		public ItemReader<Integer> itemReader() {
-			return new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-		}
-
-		@Bean
-		public ItemWriter<Integer> itemWriter() {
-			return items -> {
-				for (Integer item : items) {
-					System.out.println("item = " + item);
-				}
-			};
-		}
-
-		@Bean
 		public Step step2() {
 			return stepBuilderFactory.get("step2")
-					.<Integer, Integer>chunk(5)
-					.reader(itemReader())
-					.writer(itemWriter())
+					.<Integer, Integer>chunk(2)
+					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
+					.writer(items -> items.forEach(System.out::println))
+					.build();
+		}
+
+		@Bean
+		public Step step3() {
+			return stepBuilderFactory.get("step3")
+					.<Integer, Integer>chunk(2)
+					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
+					.writer(items -> items.forEach(System.out::println))
+					.faultTolerant()
+					.skip(Exception.class)
+					.skipLimit(3)
 					.build();
 		}
 
@@ -268,6 +319,7 @@ public class BatchMetricsTests {
 			return jobBuilderFactory.get("job")
 					.start(step1())
 					.next(step2())
+					.next(step3())
 					.build();
 		}
 	}
