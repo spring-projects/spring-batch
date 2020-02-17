@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -222,6 +226,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
+					Timer.Sample sample = BatchMetrics.createTimerSample();
+					String status = BatchMetrics.STATUS_SUCCESS;
 					O output = null;
 					try {
 						count.incrementAndGet();
@@ -239,6 +245,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						}
 					}
 					catch (Exception e) {
+						status = BatchMetrics.STATUS_FAILURE;
 						if (rollbackClassifier.classify(e)) {
 							// Default is to rollback unless the classifier
 							// allows us to continue
@@ -261,6 +268,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 									"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
 									e);
 						}
+					}
+					finally {
+						stopTimer(sample, contribution.getStepExecution(), "item.process", status, "Item processing");
 					}
 					if (output == null) {
 						// No need to re-process filtered items
@@ -332,10 +342,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				if (!data.scanning()) {
 					chunkMonitor.setChunkSize(inputs.size());
+					Timer.Sample sample = BatchMetrics.createTimerSample();
+					String status = BatchMetrics.STATUS_SUCCESS;
 					try {
 						doWrite(outputs.getItems());
 					}
 					catch (Exception e) {
+						status = BatchMetrics.STATUS_FAILURE;
 						if (rollbackClassifier.classify(e)) {
 							throw e;
 						}
@@ -347,6 +360,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						 */
 						throw new ForceRollbackForWriteSkipException(
 								"Force rollback on skippable exception so that skipped item can be located.", e);
+					}
+					finally {
+						stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 					}
 					contribution.incrementWriteCount(outputs.size());
 				}

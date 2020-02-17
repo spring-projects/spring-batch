@@ -27,6 +27,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.ItemListenerSupport;
@@ -55,7 +57,7 @@ public class FaultTolerantChunkProcessorTests {
 	private FaultTolerantChunkProcessor<String, String> processor;
 
 	private StepContribution contribution = new StepExecution("foo",
-			new JobExecution(0L)).createStepContribution();
+			new JobExecution(new JobInstance(0L, "job"), new JobParameters())).createStepContribution();
 
 	@Before
 	public void setUp() {
