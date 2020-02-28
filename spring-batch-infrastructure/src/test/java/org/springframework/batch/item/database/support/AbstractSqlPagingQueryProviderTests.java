@@ -106,12 +106,12 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	
 	@Test
 	public void testRemoveKeyWordsFollowedBySpaceChar() {
-		String selectWithSpace = "SELECT id, 'yes', false";
-		String fromWithSpace = "FROM test.verification_table";
-		String whereWithSpace = "WHERE TRUE";
-		pagingQueryProvider.setSelectClause( selectWithSpace );
-		pagingQueryProvider.setFromClause( fromWithSpace );
-		pagingQueryProvider.setWhereClause( whereWithSpace );
+		String selectClause = "SELECT id, 'yes', false";
+		String fromClause = "FROM test.verification_table";
+		String whereClause = "WHERE TRUE";
+		pagingQueryProvider.setSelectClause( selectClause );
+		pagingQueryProvider.setFromClause( fromClause );
+		pagingQueryProvider.setWhereClause( whereClause );
 		
 		
 		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
@@ -121,12 +121,12 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testRemoveKeyWordsFollowedByTabChar() {
-		String selectWithSpace = "SELECT\tid, 'yes', false";
-		String fromWithSpace = "FROM\ttest.verification_table";
-		String whereWithSpace = "WHERE\tTRUE";
-		pagingQueryProvider.setSelectClause( selectWithSpace );
-		pagingQueryProvider.setFromClause( fromWithSpace );
-		pagingQueryProvider.setWhereClause( whereWithSpace );
+		String selectClause = "SELECT\tid, 'yes', false";
+		String fromClause = "FROM\ttest.verification_table";
+		String whereClause = "WHERE\tTRUE";
+		pagingQueryProvider.setSelectClause( selectClause );
+		pagingQueryProvider.setFromClause( fromClause );
+		pagingQueryProvider.setWhereClause( whereClause );
 
 
 		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
@@ -136,12 +136,12 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public void testRemoveKeyWordsFollowedByNewLineChar() {
-		String selectWithSpace = "SELECT\nid, 'yes', false";
-		String fromWithSpace = "FROM\ntest.verification_table";
-		String whereWithSpace = "WHERE\nTRUE";
-		pagingQueryProvider.setSelectClause( selectWithSpace );
-		pagingQueryProvider.setFromClause( fromWithSpace );
-		pagingQueryProvider.setWhereClause( whereWithSpace );
+		String selectClause = "SELECT\nid, 'yes', false";
+		String fromClause = "FROM\ntest.verification_table";
+		String whereClause = "WHERE\nTRUE";
+		pagingQueryProvider.setSelectClause( selectClause );
+		pagingQueryProvider.setFromClause( fromClause );
+		pagingQueryProvider.setWhereClause( whereClause );
 
 
 		assertEquals("id, 'yes', false", pagingQueryProvider.getSelectClause());
