@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,14 +46,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Test cases for usage of {@link SpringBatchTest} annotation.
+ * Test cases for usage of {@link SpringBatchTest} annotation with JUnit 4.
  *
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@ContextConfiguration(classes = SpringBatchTestTests.JobConfiguration.class)
-public class SpringBatchTestTests {
+@ContextConfiguration(classes = SpringBatchTestJUnit4Tests.JobConfiguration.class)
+public class SpringBatchTestJUnit4Tests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
