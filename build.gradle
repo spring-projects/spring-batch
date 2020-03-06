@@ -39,6 +39,7 @@ allprojects {
 		maven { url 'https://repo.spring.io/libs-snapshot' }
 		maven { url 'https://repo.spring.io/libs-milestone' }
 		maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url 'https://maven.google.com' }
 		mavenCentral()
 	}
 
@@ -105,6 +106,8 @@ allprojects {
 		docResourcesVersion = '0.1.1.RELEASE'
 		assertjVersion='3.15.0'
 		mongoDbDriverSyncVersion='4.0.0-beta1'
+		bigqueryVersion = '1.108.0'
+		hadoopCommonVersion = '3.2.1'
 	}
 
 	apply plugin: 'idea'
@@ -387,6 +390,8 @@ project('spring-batch-infrastructure') {
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
 		optional "org.springframework.kafka:spring-kafka:$springKafkaVersion"
 		optional "org.apache.avro:avro:$apacheAvroVersion"
+		optional "com.google.cloud:google-cloud-bigquery:$bigqueryVersion"
+		optional "org.apache.hadoop:hadoop-common:$hadoopCommonVersion"
 
 		// JSR-305 only used for non-required meta-annotations
 		compileOnly("com.google.code.findbugs:jsr305:3.0.2")
