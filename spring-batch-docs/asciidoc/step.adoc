@@ -1873,15 +1873,22 @@ previously discussed transition elements, such as the 'next' attribute or the 'n
 [source, java, role="javaContent"]
 ----
 @Bean
-public Job job() {
-	Flow flow1 = new FlowBuilder<SimpleFlow>("flow1")
+public Flow flow1() {
+	return new FlowBuilder<SimpleFlow>("flow1")
 			.start(step1())
 			.next(step2())
 			.build();
-	Flow flow2 = new FlowBuilder<SimpleFlow>("flow2")
+}
+
+@Bean
+public Flow flow2() {
+	return new FlowBuilder<SimpleFlow>("flow2")
 			.start(step3())
 			.build();
+}
 
+@Bean
+public Job job(Flow flow1, Flow flow2) {
 	return this.jobBuilderFactory.get("job")
 				.start(flow1)
 				.split(new SimpleAsyncTaskExecutor())
