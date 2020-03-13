@@ -20,10 +20,13 @@
             an `ItemReader`.
 |AggregateItemReader|An `ItemReader` that delivers a list as its
             item, storing up objects from the injected `ItemReader` until they
-            are ready to be packed out as a collection. This `ItemReader` should
-            mark the beginning and end of records with the constant values in
-            `FieldSetMapper AggregateItemReader#__$$BEGIN_RECORD$$__` and
-            `AggregateItemReader#__$$END_RECORD$$__`.
+            are ready to be packed out as a collection. This class must be used 
+            as a wrapper for a custom `ItemReader` that can identify the record 
+            boundaries. The custom reader should mark the beginning and end of 
+            records by returning an `AggregateItem` which responds `true` to its 
+            query methods `isHeader()` and `isFooter()`. Note that this reader
+            is not part of the library of readers provided by Spring Batch
+            but given as a sample in `spring-batch-samples`.
 |AmqpItemReader|Given a Spring `AmqpTemplate`, it provides
             synchronous receive methods. The `receiveAndConvert()` method
             lets you receive POJO objects.
