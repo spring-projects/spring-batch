@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -522,6 +522,24 @@ public class FlatFileItemReaderBuilderTests {
 				.build();
 
 		assertEquals(encoding, ReflectionTestUtils.getField(reader, "encoding"));
+	}
+
+	@Test
+	public void testErrorMessageWhenNoFieldSetMapperIsProvided() {
+		try {
+			new FlatFileItemReaderBuilder<Foo>()
+					.name("fooReader")
+					.resource(getResource("1;2;3"))
+					.lineTokenizer(line -> new DefaultFieldSet(line.split(";")))
+					.build();
+		} catch (IllegalStateException exception) {
+			String exceptionMessage = exception.getMessage();
+			if (exceptionMessage.equals("No LineTokenizer implementation was provided.")) {
+				fail("Error message should not be 'No LineTokenizer implementation was provided.'" +
+						" when a LineTokenizer is provided");
+			}
+			assertEquals("No FieldSetMapper implementation was provided.", exceptionMessage);
+		}
 	}
 
 	private Resource getResource(String contents) {
