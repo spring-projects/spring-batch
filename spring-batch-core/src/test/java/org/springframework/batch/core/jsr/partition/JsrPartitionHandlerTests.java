@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.util.StopWatch;
 
 import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionAnalyzer;
@@ -44,8 +45,10 @@ import java.util.Collection;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
@@ -53,7 +56,7 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 	private JsrPartitionHandler handler;
 	private JobRepository repository = new JobRepositorySupport();
 	private StepExecution stepExecution;
-	private int count;
+	private AtomicInteger count;
 	private BatchPropertyContext propertyContext;
 	private JsrStepExecutionSplitter stepSplitter;
 
@@ -65,12 +68,12 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		stepSplitter = new JsrStepExecutionSplitter(repository, false, "step1", true);
 		Analyzer.collectorData = "";
 		Analyzer.status = "";
-		count = 0;
+		count = new AtomicInteger(0);
 		handler = new JsrPartitionHandler();
 		handler.setStep(new StepSupport() {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
-				count++;
+				count.incrementAndGet();
 				stepExecution.setStatus(org.springframework.batch.core.BatchStatus.COMPLETED);
 				stepExecution.setExitStatus(new ExitStatus("done"));
 			}
@@ -114,6 +117,14 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 
 		handler.setJobRepository(repository);
 		handler.afterPropertiesSet();
+
+		handler.setPollingInterval(-1);
+		try {
+			handler.afterPropertiesSet();
+			fail("Polling interval was not checked for");
+		} catch(IllegalArgumentException iae) {
+			assertEquals("The polling interval must be positive", iae.getMessage());
+		}
 	}
 
 	@Test
@@ -125,7 +136,24 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		Collection<StepExecution> executions = handler.handle(stepSplitter, stepExecution);
 
 		assertEquals(3, executions.size());
-		assertEquals(3, count);
+		assertEquals(3, count.get());
+	}
+
+	@Test
+	public void testPollingPartitionsCompletion() throws Exception {
+		handler.setThreads(3);
+		handler.setPartitions(3);
+		handler.setPollingInterval(1000);
+		handler.afterPropertiesSet();
+
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		Collection<StepExecution> executions = handler.handle(stepSplitter, stepExecution);
+		stopWatch.stop();
+
+		assertEquals(3, executions.size());
+		assertEquals(3, count.get());
+		assertTrue(stopWatch.getLastTaskTimeMillis() >= 1000);
 	}
 
 	@Test
@@ -146,7 +174,7 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
-		assertEquals(3, count);
+		assertEquals(3, count.get());
 	}
 
 	@Test
@@ -167,7 +195,7 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
-		assertEquals(3, count);
+		assertEquals(3, count.get());
 	}
 
 	@Test
@@ -194,14 +222,14 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(3, executions.size());
-		assertEquals(3, count);
+		assertEquals(3, count.get());
 		assertEquals("value1", propertyContext.getStepProperties("step1:partition0").get("key1"));
 		assertEquals("value2", propertyContext.getStepProperties("step1:partition1").get("key1"));
 	}
 
 	@Test
 	public void testAnalyzer() throws Exception {
-		Queue<Serializable> queue = new ConcurrentLinkedQueue<Serializable>();
+		Queue<Serializable> queue = new ConcurrentLinkedQueue<>();
 		queue.add("foo");
 		queue.add("bar");
 
@@ -214,7 +242,7 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		Collection<StepExecution> executions = handler.handle(new JsrStepExecutionSplitter(repository, false, "step1", true), stepExecution);
 
 		assertEquals(2, executions.size());
-		assertEquals(2, count);
+		assertEquals(2, count.get());
 		assertEquals("foobar", Analyzer.collectorData);
 		assertEquals("COMPLETEDdone", Analyzer.status);
 	}

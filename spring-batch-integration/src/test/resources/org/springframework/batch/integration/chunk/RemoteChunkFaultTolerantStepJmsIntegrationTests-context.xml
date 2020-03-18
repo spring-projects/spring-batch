@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:integration="http://www.springframework.org/schema/integration" xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:context="http://www.springframework.org/schema/context" xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
-	xmlns:jms="http://www.springframework.org/schema/jms" xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
-		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
-		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:integration="http://www.springframework.org/schema/integration"
+	   xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	   xmlns:jms="http://www.springframework.org/schema/jms"
+	   xsi:schemaLocation="http://www.springframework.org/schema/jms https://www.springframework.org/schema/jms/spring-jms.xsd
+		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jms https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
 
 	<import resource="classpath:/jms-context.xml" />
 
@@ -54,7 +53,7 @@
 		<property name="receiveTimeout" value="1000" />
 	</bean>
 
-	<int-jms:outbound-channel-adapter connection-factory="connectionFactory" channel="requests"
+	<int-jms:outbound-channel-adapter connection-factory="jmsConnectionFactory" channel="requests"
 		destination-name="requests" />
 	<integration:channel id="requests" />
 	<integration:channel id="incoming" />
@@ -83,7 +82,7 @@
 					<bean class="org.springframework.integration.jms.JmsDestinationPollingSource">
 						<constructor-arg>
 							<bean class="org.springframework.jms.core.JmsTemplate">
-								<property name="connectionFactory" ref="connectionFactory" />
+								<property name="connectionFactory" ref="jmsConnectionFactory" />
 								<property name="defaultDestinationName" value="replies" />
 								<property name="receiveTimeout" value="100" />
 							</bean>
@@ -95,7 +94,7 @@
 		</integration:interceptors>
 	</integration:channel>
 
-	<jms:listener-container connection-factory="connectionFactory" transaction-manager="transactionManager"
+	<jms:listener-container connection-factory="jmsConnectionFactory" transaction-manager="transactionManager"
 		acknowledge="transacted">
 		<jms:listener destination="requests" response-destination="replies" ref="chunkHandler" method="handleChunk" />
 	</jms:listener-container>

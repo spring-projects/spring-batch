@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,15 +65,17 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	/**
 	 * Create a factory instance with the resource specified. The resources are Spring configuration files or java
 	 * packages containing configuration files.
+	 *
+	 * @param resource resource to be used in the creation of the ApplicationContext.
 	 */
 	public AbstractApplicationContextFactory(Object... resource) {
 
 		this.resources = resource;
-		beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
+		beanFactoryPostProcessorClasses = new ArrayList<>();
 		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(PropertySourcesPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
-		beanPostProcessorExcludeClasses = new ArrayList<Class<?>>();
+		beanPostProcessorExcludeClasses = new ArrayList<>();
 		/*
 		 * Assume that a BeanPostProcessor that is BeanFactoryAware must be specific to the parent and remove it from
 		 * the child (e.g. an AutoProxyCreator will not work properly). Unfortunately there might still be a a
@@ -111,7 +113,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	public void setBeanFactoryPostProcessorClasses(
 			Class<? extends BeanFactoryPostProcessor>[] beanFactoryPostProcessorClasses) {
-		this.beanFactoryPostProcessorClasses = new ArrayList<Class<? extends BeanFactoryPostProcessor>>();
+		this.beanFactoryPostProcessorClasses = new ArrayList<>();
 		for (int i = 0; i < beanFactoryPostProcessorClasses.length; i++) {
 			this.beanFactoryPostProcessorClasses.add(beanFactoryPostProcessorClasses[i]);
 		}
@@ -126,7 +128,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	 * @param beanPostProcessorExcludeClasses the classes to set
 	 */
 	public void setBeanPostProcessorExcludeClasses(Class<?>[] beanPostProcessorExcludeClasses) {
-		this.beanPostProcessorExcludeClasses = new ArrayList<Class<?>>();
+		this.beanPostProcessorExcludeClasses = new ArrayList<>();
 		for (int i = 0; i < beanPostProcessorExcludeClasses.length; i++) {
 			this.beanPostProcessorExcludeClasses.add(beanPostProcessorExcludeClasses[i]);
 		}
@@ -202,20 +204,20 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory parent,
 			ConfigurableListableBeanFactory beanFactory) {
 		if (copyConfiguration && parent != null) {
-			List<BeanPostProcessor> parentPostProcessors = new ArrayList<BeanPostProcessor>();
-			List<BeanPostProcessor> childPostProcessors = new ArrayList<BeanPostProcessor>();
+			List<BeanPostProcessor> parentPostProcessors = new ArrayList<>();
+			List<BeanPostProcessor> childPostProcessors = new ArrayList<>();
 
 			childPostProcessors.addAll(beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
-					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>());
+					.getBeanPostProcessors() : new ArrayList<>());
 			parentPostProcessors.addAll(parent instanceof AbstractBeanFactory ? ((AbstractBeanFactory) parent)
-					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>());
+					.getBeanPostProcessors() : new ArrayList<>());
 
 			try {
 				Class<?> applicationContextAwareProcessorClass =
 						ClassUtils.forName("org.springframework.context.support.ApplicationContextAwareProcessor",
 								parent.getBeanClassLoader());
 
-				for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(parentPostProcessors)) {
+				for (BeanPostProcessor beanPostProcessor : new ArrayList<>(parentPostProcessors)) {
 					if (applicationContextAwareProcessorClass.isAssignableFrom(beanPostProcessor.getClass())) {
 						logger.debug("Removing parent ApplicationContextAwareProcessor");
 						parentPostProcessors.remove(beanPostProcessor);
@@ -226,11 +228,11 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 				throw new IllegalStateException(e);
 			}
 
-			List<BeanPostProcessor> aggregatedPostProcessors = new ArrayList<BeanPostProcessor>();
+			List<BeanPostProcessor> aggregatedPostProcessors = new ArrayList<>();
 			aggregatedPostProcessors.addAll(childPostProcessors);
 			aggregatedPostProcessors.addAll(parentPostProcessors);
 
-			for (BeanPostProcessor beanPostProcessor : new ArrayList<BeanPostProcessor>(aggregatedPostProcessors)) {
+			for (BeanPostProcessor beanPostProcessor : new ArrayList<>(aggregatedPostProcessors)) {
 				for (Class<?> cls : beanPostProcessorExcludeClasses) {
 					if (cls.isAssignableFrom(beanPostProcessor.getClass())) {
 						if (logger.isDebugEnabled()) {
@@ -244,7 +246,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 			beanFactory.copyConfigurationFrom(parent);
 
 			List<BeanPostProcessor> beanPostProcessors = beanFactory instanceof AbstractBeanFactory ? ((AbstractBeanFactory) beanFactory)
-					.getBeanPostProcessors() : new ArrayList<BeanPostProcessor>();
+					.getBeanPostProcessors() : new ArrayList<>();
 
 			beanPostProcessors.clear();
 			beanPostProcessors.addAll(aggregatedPostProcessors);

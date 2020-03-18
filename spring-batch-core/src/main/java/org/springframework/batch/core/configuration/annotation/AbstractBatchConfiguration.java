@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ import java.util.Collection;
  * 
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  * @see EnableBatchProcessing
  */
@@ -49,7 +50,7 @@ import java.util.Collection;
 public abstract class AbstractBatchConfiguration implements ImportAware {
 
 	@Autowired(required = false)
-	private Collection<DataSource> dataSources;
+	private DataSource dataSource;
 
 	private BatchConfigurer configurer;
 
@@ -93,20 +94,16 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			if (dataSources == null || dataSources.isEmpty()) {
+			if (dataSource == null) {
 				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer();
 				configurer.initialize();
 				this.configurer = configurer;
 				return configurer;
-			} else if(dataSources != null && dataSources.size() == 1) {
-				DataSource dataSource = dataSources.iterator().next();
+			} else {
 				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
 				configurer.initialize();
 				this.configurer = configurer;
 				return configurer;
-			} else {
-				throw new IllegalStateException("To use the default BatchConfigurer the context must contain no more than" +
-														"one DataSource, found " + dataSources.size());
 			}
 		}
 		if (configurers.size() > 1) {
@@ -121,7 +118,7 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 }
 
 /**
- * Extract step scope configuration into a separate unit so that it can be non-static.
+ * Extract job/step scope configuration into a separate unit.
  * 
  * @author Dave Syer
  * 
@@ -129,19 +126,18 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 @Configuration
 class ScopeConfiguration {
 
-	private StepScope stepScope = new StepScope();
-
-	private JobScope jobScope = new JobScope();
-
 	@Bean
-	public StepScope stepScope() {
+	public static StepScope stepScope() {
+		StepScope stepScope = new StepScope();
 		stepScope.setAutoProxy(false);
 		return stepScope;
 	}
 
 	@Bean
-	public JobScope jobScope() {
+	public static JobScope jobScope() {
+		JobScope jobScope = new JobScope();
 		jobScope.setAutoProxy(false);
 		return jobScope;
 	}
+
 }

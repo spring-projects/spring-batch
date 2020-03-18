@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,10 @@
 
 package org.springframework.batch.repeat.support;
 
-import org.springframework.core.task.TaskExecutor;
-
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
+
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Abstraction for queue of {@link ResultHolder} objects. Acts a bit likeT a
@@ -35,9 +35,9 @@ import java.util.concurrent.BlockingQueue;
 interface ResultQueue<T> {
 
 	/**
-	 * In a master-slave pattern, the master calls this method paired with
+	 * In a manager-worker pattern, the manager calls this method paired with
 	 * {@link #take()} to manage the flow of items. Normally a task is submitted
-	 * for processing in another thread, at which point the master uses this
+	 * for processing in another thread, at which point the manager uses this
 	 * method to keep track of the number of expected results. It has the
 	 * personality of an counter increment, rather than a work queue, which is
 	 * usually managed elsewhere, e.g. by a {@link TaskExecutor}.<br><br>
@@ -50,7 +50,7 @@ interface ResultQueue<T> {
 
 	/**
 	 * Once it is expecting a result, clients call this method to satisfy the
-	 * expectation. In a master-worker pattern, the workers call this method to
+	 * expectation. In a manager-worker pattern, the workers call this method to
 	 * deposit the result of a finished task on the queue for collection.
 	 * 
 	 * @param result the result for later collection.
@@ -72,7 +72,7 @@ interface ResultQueue<T> {
 	T take() throws NoSuchElementException, InterruptedException;
 
 	/**
-	 * Used by master thread to verify that there are results available from
+	 * Used by manager thread to verify that there are results available from
 	 * {@link #take()} without possibly having to block and wait.
 	 * 
 	 * @return true if there are no results available
@@ -80,7 +80,7 @@ interface ResultQueue<T> {
 	boolean isEmpty();
 
 	/**
-	 * Check if any results are expected. Usually used by master thread to drain
+	 * Check if any results are expected. Usually used by manager thread to drain
 	 * queue when it is finished.
 	 * 
 	 * @return true if more results are expected, but possibly not yet

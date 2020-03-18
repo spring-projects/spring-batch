@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,8 @@ public class JdbcParameterUtils {
 	 * suite the batch processing requirements.
 	 *
 	 * @param sql String to search in. Returns 0 if the given String is <code>null</code>.
+	 * @param namedParameterHolder holder for the named parameters
+	 * @return the number of named parameter placeholders
 	 */
 	public static int countParameterPlaceholders(String sql, List<String> namedParameterHolder ) {
 		if (sql == null) {
@@ -53,7 +55,7 @@ public class JdbcParameterUtils {
 
 		char[] statement = sql.toCharArray();
 		boolean withinQuotes = false;
-		Map<String, StringBuilder> namedParameters = new HashMap<String, StringBuilder>();
+		Map<String, StringBuilder> namedParameters = new HashMap<>();
 		char currentQuote = '-';
 		int parameterCount = 0;
 		int i = 0;

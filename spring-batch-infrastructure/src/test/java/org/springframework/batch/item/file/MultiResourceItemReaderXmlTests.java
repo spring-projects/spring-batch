@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.xml.StaxEventItemReader;
-import org.springframework.batch.item.xml.StaxUtils;
+import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -43,9 +43,9 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
     @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
 
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
 
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
@@ -55,7 +55,7 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
 				Attribute attr;
 				try {
-					XMLEventReader eventReader = StaxUtils.getXmlEventReader(source );
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source );
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();

@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,6 +42,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -146,6 +147,7 @@ public class JobLoaderConfigurationTests {
 		@Bean
 		protected Tasklet tasklet() {
 			return new Tasklet() {
+				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;
@@ -172,6 +174,7 @@ public class JobLoaderConfigurationTests {
 		@Bean
 		protected Step step3() throws Exception {
 			return steps.get("step3").tasklet(new Tasklet() {
+				@Nullable
 				@Override
 				public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
 					return RepeatStatus.FINISHED;

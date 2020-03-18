@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -32,6 +33,8 @@ import org.springframework.util.Assert;
  * Subclasses are inherently <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
+ * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractItemCountingItemStreamItemReader<T> extends AbstractItemStreamItemReader<T> {
 
@@ -48,9 +51,10 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	/**
 	 * Read next item from input.
 	 * 
-	 * @return item
+	 * @return an item or {@code null} if the data source is exhausted
 	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
 	 */
+	@Nullable
 	protected abstract T doRead() throws Exception;
 
 	/**
@@ -79,6 +83,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 	}
 
+	@Nullable
 	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		if (currentItemCount >= maxItemCount) {
@@ -119,9 +124,10 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	 * 
 	 * @see #setName(String)
 	 * 
-	 * @param count the value of the maximum item count
+	 * @param count the value of the maximum item count.  count must be greater than zero.
 	 */
 	public void setMaxItemCount(int count) {
+		Assert.isTrue(count > 0, "count must be greater than zero");
 		this.maxItemCount = count;
 	}
 

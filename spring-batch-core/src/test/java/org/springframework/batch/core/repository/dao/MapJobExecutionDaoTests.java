@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -78,8 +78,8 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 		// Support objects for this testing
 		final CountDownLatch latch = new CountDownLatch(1);
-		final SortedSet<Long> ids = Collections.synchronizedSortedSet(new TreeSet<Long>()); // TODO Change to SkipList w/JDK6
-		final AtomicReference<Exception> exception = new AtomicReference<Exception>(null);
+		final SortedSet<Long> ids = Collections.synchronizedSortedSet(new TreeSet<>()); // TODO Change to SkipList w/JDK6
+		final AtomicReference<Exception> exception = new AtomicReference<>(null);
 
 		// Implementation of the high-concurrency code
 		final Runnable codeUnderTest = new Runnable() {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,13 +35,13 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	private volatile boolean terminateOnly;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
 	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but
 	 * should be set to the enclosing repeat context if there is one, e.g. if
 	 * this context is an inner loop.
-	 * @param parent
+	 * @param parent {@link RepeatContext} to be used as the parent context.
 	 */
 	public RepeatContextSupport(RepeatContext parent) {
 		super();
@@ -128,7 +128,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -143,12 +143,12 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
     @Override
 	public void close() {
 
-		List<RuntimeException> errors = new ArrayList<RuntimeException>();
+		List<RuntimeException> errors = new ArrayList<>();
 
 		Set<Map.Entry<String, Set<Runnable>>> copy;
 
 		synchronized (callbacks) {
-			copy = new HashSet<Map.Entry<String, Set<Runnable>>>(callbacks.entrySet());
+			copy = new HashSet<>(callbacks.entrySet());
 		}
 
 		for (Map.Entry<String, Set<Runnable>> entry : copy) {

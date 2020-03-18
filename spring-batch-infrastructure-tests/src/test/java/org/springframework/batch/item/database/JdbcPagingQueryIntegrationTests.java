@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,17 +16,12 @@
 
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -36,13 +31,19 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.database.support.AbstractSqlPagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -51,6 +52,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "JdbcPagingItemReaderCommonTests-context.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JdbcPagingQueryIntegrationTests {
 
 	private static Log logger = LogFactory.getLog(JdbcPagingQueryIntegrationTests.class);
@@ -71,7 +73,8 @@ public class JdbcPagingQueryIntegrationTests {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
 		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
-		jdbcTemplate.update("DELETE from T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+//		jdbcTemplate.update("DELETE from T_FOOS");
 		for(int i = 0; i < names.length; i++) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
 			maxId++;
@@ -81,7 +84,8 @@ public class JdbcPagingQueryIntegrationTests {
 
 	@After
 	public void destroy() {
-		jdbcTemplate.update("DELETE from T_FOOS");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
+//		jdbcTemplate.update("DELETE from T_FOOS");
 	}
 
 	@Test
@@ -125,7 +129,7 @@ public class JdbcPagingQueryIntegrationTests {
 	@Test
 	public void testQueryFromStartWithGroupBy() throws Exception {
 		AbstractSqlPagingQueryProvider queryProvider = (AbstractSqlPagingQueryProvider) getPagingQueryProvider();
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("NAME", Order.ASCENDING);
 		sortKeys.put("CODE", Order.DESCENDING);
 		queryProvider.setSortKeys(sortKeys);
@@ -162,7 +166,7 @@ public class JdbcPagingQueryIntegrationTests {
 
 	private Map<String, Object> getStartAfterValues(
 			PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
-		Map<String, Object> startAfterValues = new LinkedHashMap<String, Object>();
+		Map<String, Object> startAfterValues = new LinkedHashMap<>();
 		for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 			startAfterValues.put(sortKey.getKey(), list.get(list.size() - 1).get(sortKey.getKey()));
 		}
@@ -187,7 +191,6 @@ public class JdbcPagingQueryIntegrationTests {
 		Object startAfterValue = list.get(0).entrySet().iterator().next().getValue();
 		list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), startAfterValue);
 		assertEquals(pageSize, list.size());
-		expected = "[{id=" + (minId + pageSize);
 	}
 
 	protected PagingQueryProvider getPagingQueryProvider() throws Exception {
@@ -196,7 +199,7 @@ public class JdbcPagingQueryIntegrationTests {
 		factory.setDataSource(dataSource);
 		factory.setSelectClause("select ID, NAME, VALUE");
 		factory.setFromClause("from T_FOOS");
-		Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeys = new LinkedHashMap<>();
 		sortKeys.put("VALUE", Order.ASCENDING);
 		factory.setSortKeys(sortKeys);
 		return factory.getObject();
@@ -204,14 +207,14 @@ public class JdbcPagingQueryIntegrationTests {
 	}
 	
 	private List<Object> getParameterList(Map<String, Object> values, Map<String, Object> sortKeyValue) {
-		SortedMap<String, Object> sm = new TreeMap<String, Object>();
+		SortedMap<String, Object> sm = new TreeMap<>();
 		if (values != null) {
 			sm.putAll(values);
 		}
-		List<Object> parameterList = new ArrayList<Object>();
+		List<Object> parameterList = new ArrayList<>();
 		parameterList.addAll(sm.values());
 		if (sortKeyValue != null && sortKeyValue.size() > 0) {
-			List<Map.Entry<String, Object>> keys = new ArrayList<Map.Entry<String,Object>>(sortKeyValue.entrySet());
+			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
 			for(int i = 0; i < keys.size(); i++) {
 				for(int j = 0; j < i; j++) {

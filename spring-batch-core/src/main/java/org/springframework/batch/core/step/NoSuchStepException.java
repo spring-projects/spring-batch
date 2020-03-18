@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ public class NoSuchStepException extends RuntimeException {
 
 	/**
 	 * Create a new exception instance with the message provided.
-	 * @param message
+	 * @param message the message to be used for this exception.
 	 */
 	public NoSuchStepException(String message) {
 		super(message);

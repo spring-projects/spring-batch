@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package org.springframework.batch.item.validator;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -43,6 +44,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 
 	/**
 	 * Creates a ValidatingItemProcessor based on the given Validator.
+	 *
+	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public ValidatingItemProcessor(Validator<? super T> validator) {
 		this.validator = validator;
@@ -51,7 +54,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	/**
 	 * Set the validator used to validate each item.
 	 * 
-	 * @param validator
+	 * @param validator the {@link Validator} instance to be used.
 	 */
 	public void setValidator(Validator<? super T> validator) {
 		this.validator = validator;
@@ -60,7 +63,9 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	/**
 	 * Should the processor filter invalid records instead of skipping them?
 	 * 
-	 * @param filter
+	 * @param filter if set to {@code true}, items that fail validation are filtered
+	 * ({@code null} is returned).  Otherwise, a {@link ValidationException} will be
+	 * thrown.
 	 */
 	public void setFilter(boolean filter) {
 		this.filter = filter;
@@ -72,7 +77,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, Initiali
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
-    @Override
+    @Nullable
+	@Override
 	public T process(T item) throws ValidationException {
 		try {
 			validator.validate(item);

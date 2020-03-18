@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,6 @@
  */
 
 package org.springframework.batch.item.file.transform;
-
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -30,6 +27,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of {@link FieldSet} using Java using Java primitive
@@ -90,7 +90,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(int)
 	 */
 	public DefaultFieldSet(String[] tokens) {
-		this.tokens = tokens == null ? null : (String[]) tokens.clone();
+		this.tokens = tokens == null ? null : tokens.clone();
 		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
 
@@ -102,8 +102,8 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see FieldSet#readString(String)
 	 */
 	public DefaultFieldSet(String[] tokens, String[] names) {
-		Assert.notNull(tokens);
-		Assert.notNull(names);
+		Assert.notNull(tokens, "Tokens must not be null");
+		Assert.notNull(names, "Names must not be null");
 		if (tokens.length != names.length) {
 			throw new IllegalArgumentException("Field names must be same length as values: names="
 					+ Arrays.asList(names) + ", values=" + Arrays.asList(tokens));
@@ -228,7 +228,7 @@ public class DefaultFieldSet implements FieldSet {
 
 		String value = readAndTrim(index);
 
-		return trueValue.equals(value) ? true : false;
+		return trueValue.equals(value);
 	}
 
 	/*
@@ -649,6 +649,8 @@ public class DefaultFieldSet implements FieldSet {
 
 	/**
 	 * Read and trim the {@link String} value at '<code>index</code>'.
+	 *
+	 * @param index the offset in the token array to obtain the value to be trimmed.
 	 * 
 	 * @return null if the field value is <code>null</code>.
 	 */
@@ -664,9 +666,12 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	/**
-	 * Read and trim the {@link String} value from column with given '
-	 * <code>name</code>.
-	 * 
+	 * Retrieve the index of where a specified column is located based on the
+	 * {@code name} parameter.
+	 *
+	 * @param name the value to search in the {@link List} of names.
+	 * @return the index in the {@link List} of names where the name was found.
+	 *
 	 * @throws IllegalArgumentException if a column with given name is not
 	 * defined.
 	 */
@@ -718,8 +723,8 @@ public class DefaultFieldSet implements FieldSet {
 
 		int result = 1;
 
-		for (int i = 0; i < tokens.length; i++) {
-			result = 31 * result + (tokens[i] == null ? 0 : tokens[i].hashCode());
+		for (String token : tokens) {
+			result = 31 * result + (token == null ? 0 : token.hashCode());
 		}
 
 		return result;

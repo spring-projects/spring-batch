@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.lang.Nullable;
 
 
 /**
@@ -29,6 +30,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  *
  * @author Dave Syer
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public abstract class SynchronizationManagerSupport<E, C> {
@@ -47,25 +49,26 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * to cover the single threaded case, so that the API is the same as
 	 * multi-threaded.
 	 */
-	private final ThreadLocal<Stack<E>> executionHolder = new ThreadLocal<Stack<E>>();
+	private final ThreadLocal<Stack<E>> executionHolder = new ThreadLocal<>();
 
 	/**
 	 * Reference counter for each execution: how many threads are using the
 	 * same one?
 	 */
-	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<E, AtomicInteger>();
+	private final Map<E, AtomicInteger> counts = new ConcurrentHashMap<>();
 
 	/**
 	 * Simple map from a running execution to the associated context.
 	 */
-	private final Map<E, C> contexts = new ConcurrentHashMap<E, C>();
+	private final Map<E, C> contexts = new ConcurrentHashMap<>();
 
 	/**
-	 * Getter for the current context if there is one, otherwise returns null.
+	 * Getter for the current context if there is one, otherwise returns {@code null}.
 	 *
-	 * @return the current context or null if there is none (if one
+	 * @return the current context or {@code null} if there is none (if one
 	 *         has not been registered for this thread).
 	 */
+	@Nullable
 	public C getContext() {
 		if (getCurrent().isEmpty()) {
 			return null;
@@ -84,7 +87,8 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * @return a new context or the current one if it has the same
 	 *         execution
 	 */
-	public C register(E execution) {
+	@Nullable
+	public C register(@Nullable E execution) {
 		if (execution == null) {
 			return null;
 		}
@@ -107,10 +111,12 @@ public abstract class SynchronizationManagerSupport<E, C> {
 	 * context is available in the enclosing block.
 	 *
 	 * @param execution the execution to register
+	 * @param propertyContext instance of {@link BatchPropertyContext} to be registered with this thread.
 	 * @return a new context or the current one if it has the same
 	 *         execution
 	 */
-	public C register(E execution, BatchPropertyContext propertyContext) {
+	@Nullable
+	public C register(@Nullable E execution, @Nullable BatchPropertyContext propertyContext) {
 		if (execution == null) {
 			return null;
 		}
@@ -173,7 +179,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	public Stack<E> getCurrent() {
 		if (executionHolder.get() == null) {
-			executionHolder.set(new Stack<E>());
+			executionHolder.set(new Stack<>());
 		}
 		return executionHolder.get();
 	}
@@ -196,6 +202,6 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	protected abstract void close(C context);
 
-	protected abstract C createNewContext(E execution, BatchPropertyContext propertyContext);
+	protected abstract C createNewContext(E execution, @Nullable BatchPropertyContext propertyContext);
 
 }

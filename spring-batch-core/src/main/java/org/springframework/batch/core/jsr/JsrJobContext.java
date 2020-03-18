@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import javax.batch.runtime.BatchStatus;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -31,6 +32,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrJobContext implements javax.batch.runtime.context.JobContext {
@@ -44,7 +46,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 		this.jobExecution = jobExecution;
 	}
 
-	public void setProperties(Properties properties) {
+	public void setProperties(@Nullable Properties properties) {
 		this.properties = properties != null ? properties : new Properties();
 	}
 
@@ -108,6 +110,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	 * @see javax.batch.runtime.context.JobContext#getExitStatus()
 	 */
 	@Override
+	@Nullable
 	public String getExitStatus() {
 		return exitStatusSet.get() ? jobExecution.getExitStatus().getExitCode() : null;
 	}

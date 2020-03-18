@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  */
 public class MapStepRegistry implements StepRegistry {
 
-	private final ConcurrentMap<String, Map<String, Step>> map = new ConcurrentHashMap<String, Map<String, Step>>();
+	private final ConcurrentMap<String, Map<String, Step>> map = new ConcurrentHashMap<>();
 
 	@Override
 	public void register(String jobName, Collection<Step> steps) throws DuplicateJobException {
@@ -45,7 +45,7 @@ public class MapStepRegistry implements StepRegistry {
 		Assert.notNull(steps, "The job steps cannot be null.");
 
 
-		final Map<String, Step> jobSteps = new HashMap<String, Step>();
+		final Map<String, Step> jobSteps = new HashMap<>();
 		for (Step step : steps) {
 			jobSteps.put(step.getName(), step);
 		}

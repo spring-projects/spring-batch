@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +15,19 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import javax.batch.api.Batchlet;
 import javax.batch.runtime.JobExecution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+
 import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
@@ -37,9 +36,10 @@ import org.springframework.beans.factory.xml.DocumentLoader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.SimpleSaxErrorHandler;
-import org.w3c.dom.Document;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(jobParameters);
 		applicationContext.setValidating(false);
-		applicationContext.load(new ClassPathResource("baseContext.xml"),
+		applicationContext.load(new ClassPathResource("jsrBaseContext.xml"),
 				new ClassPathResource("/META-INF/batch.xml"),
 				new ClassPathResource("/META-INF/batch-jobs/jsrPropertyPreparseTestJob.xml"));
 		applicationContext.refresh();
@@ -105,7 +105,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 		@SuppressWarnings("resource")
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(jobParameters);
 		applicationContext.setValidating(false);
-		applicationContext.load(new ClassPathResource("baseContext.xml"),
+		applicationContext.load(new ClassPathResource("jsrBaseContext.xml"),
 				new ClassPathResource("/META-INF/batch.xml"),
 				new ClassPathResource("/META-INF/batch-jobs/jsrPropertyPreparseTestJob.xml"));
 		applicationContext.refresh();
@@ -132,7 +132,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 		@SuppressWarnings("resource")
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(jobParameters);
 		applicationContext.setValidating(false);
-		applicationContext.load(new ClassPathResource("baseContext.xml"),
+		applicationContext.load(new ClassPathResource("jsrBaseContext.xml"),
 				new ClassPathResource("/META-INF/batch.xml"),
 				new ClassPathResource("/META-INF/batch-jobs/jsrPropertyPreparseTestJob.xml"));
 		applicationContext.refresh();
@@ -155,7 +155,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 	public void testGenerationOfBeanDefinitionsForMultipleReferences() throws Exception {
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(new Properties());
 		applicationContext.setValidating(false);
-		applicationContext.load(new ClassPathResource("baseContext.xml"),
+		applicationContext.load(new ClassPathResource("jsrBaseContext.xml"),
 				new ClassPathResource("/META-INF/batch.xml"),
 				new ClassPathResource("/META-INF/batch-jobs/jsrUniqueInstanceTests.xml"));
 		applicationContext.refresh();
@@ -209,7 +209,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 	public void testGenerationOfSpringBeanDefinitionsForMultipleReferences() {
 		JsrXmlApplicationContext applicationContext = new JsrXmlApplicationContext(new Properties());
 		applicationContext.setValidating(false);
-		applicationContext.load(new ClassPathResource("baseContext.xml"),
+		applicationContext.load(new ClassPathResource("jsrBaseContext.xml"),
 				new ClassPathResource("/META-INF/batch-jobs/jsrSpringInstanceTests.xml"));
 
 		applicationContext.refresh();
@@ -251,7 +251,7 @@ public class JsrBeanDefinitionDocumentReaderTests extends AbstractJsrTestCase {
 	}
 
 	private Document getDocument(String location) {
-		InputStream inputStream = ClassLoader.class.getResourceAsStream(location);
+		InputStream inputStream = this.getClass().getResourceAsStream(location);
 
 		try {
 			return documentLoader.loadDocument(new InputSource(inputStream),

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	/**
 	 * Lines ending in this terminator String signal the end of a record.
 	 * 
-	 * @param suffix
+	 * @param suffix suffix to indicate the end of a record
 	 */
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
@@ -48,7 +48,7 @@ public class SuffixRecordSeparatorPolicy extends DefaultRecordSeparatorPolicy {
 	 * Flag to indicate that the decision to terminate a record should ignore
 	 * whitespace at the end of the line.
 	 * 
-	 * @param ignoreWhitespace
+	 * @param ignoreWhitespace indicator
 	 */
 	public void setIgnoreWhitespace(boolean ignoreWhitespace) {
 		this.ignoreWhitespace = ignoreWhitespace;

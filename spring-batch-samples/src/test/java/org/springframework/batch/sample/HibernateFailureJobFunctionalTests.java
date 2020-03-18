@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.orm.hibernate3.HibernateJdbcException;
+import org.springframework.orm.hibernate5.HibernateJdbcException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -154,7 +154,7 @@ public class HibernateFailureJobFunctionalTests {
 	 * Credit was increased by CREDIT_INCREASE
 	 */
 	protected void validatePostConditions() throws Exception {
-		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
+		final List<BigDecimal> matches = new ArrayList<>();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
 			@Override

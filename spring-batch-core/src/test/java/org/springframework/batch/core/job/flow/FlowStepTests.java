@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -73,7 +73,7 @@ public class FlowStepTests {
 		step.setJobRepository(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
-		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		StepState step2 = new StepState(new StubStep("step2"));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end0"));
@@ -105,7 +105,7 @@ public class FlowStepTests {
 		step.setJobRepository(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
-		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		StepState step2 = new StepState(new StubStep("step2", true));
 		transitions.add(StateTransition.createStateTransition(step2, ExitStatus.FAILED.getExitCode(), "end0"));
@@ -141,7 +141,7 @@ public class FlowStepTests {
 		step.setJobRepository(jobRepository);
 
 		SimpleFlow flow = new SimpleFlow("job");
-		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		List<StateTransition> transitions = new ArrayList<>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end0"));
 		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);

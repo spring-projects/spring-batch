@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ import org.springframework.util.ClassUtils;
 public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T> 
                 implements InitializingBean {
 
-	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<T>();
+	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<>();
 
 	private Map<String, Object> parameterValues;
 
@@ -108,7 +108,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	 *
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<? extends T> queryProvider) {
 		helper.setQueryProvider(queryProvider);
 	}
 
@@ -159,7 +159,7 @@ public class HibernatePagingItemReader<T> extends AbstractPagingItemReader<T>
 	protected void doReadPage() {
 
 		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
+			results = new CopyOnWriteArrayList<>();
 		}
 		else {
 			results.clear();

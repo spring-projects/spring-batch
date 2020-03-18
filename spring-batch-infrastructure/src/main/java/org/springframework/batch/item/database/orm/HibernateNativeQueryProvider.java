@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,9 @@
 
 package org.springframework.batch.item.database.orm;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
+
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +33,7 @@ import org.springframework.util.StringUtils;
  * 
  * @param <E> entity returned by executing the query
  */
-public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider {
+public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider<E> {
 
 	private String sqlQuery;
 
@@ -40,18 +41,19 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 
 	/**
 	 * <p>
-	 * Create an {@link SQLQuery} from the session provided (preferring
+	 * Create an {@link NativeQuery} from the session provided (preferring
 	 * stateless if both are available).
 	 * </p>
 	 */
     @Override
-	public SQLQuery createQuery() {
+	@SuppressWarnings("unchecked")
+	public NativeQuery<E> createQuery() {
 
 		if (isStatelessSession()) {
-			return getStatelessSession().createSQLQuery(sqlQuery).addEntity(entityClass);
+			return getStatelessSession().createNativeQuery(sqlQuery).addEntity(entityClass);
 		}
 		else {
-			return getStatefulSession().createSQLQuery(sqlQuery).addEntity(entityClass);
+			return getStatefulSession().createNativeQuery(sqlQuery).addEntity(entityClass);
 		}
 	}
 

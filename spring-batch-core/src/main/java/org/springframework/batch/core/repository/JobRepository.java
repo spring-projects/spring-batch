@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.util.Collection;
@@ -43,6 +44,7 @@ import java.util.Collection;
  * @author Robert Kasanicky
  * @author David Turanski
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public interface JobRepository {
 
@@ -71,10 +73,10 @@ public interface JobRepository {
 	 * with, the {@link JobParameters} used to execute it with and the location of the configuration
 	 * file that defines the job.
 	 *
-	 * @param jobInstance
-	 * @param jobParameters
-	 * @param jobConfigurationLocation
-	 * @return the new {@link JobExecution}
+	 * @param jobInstance {@link JobInstance} instance to initialize the new JobExecution.
+	 * @param jobParameters {@link JobParameters} instance to initialize the new JobExecution.
+	 * @param jobConfigurationLocation {@link String} instance to initialize the new JobExecution.
+	 * @return the new {@link JobExecution}.
 	 */
 	JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters, String jobConfigurationLocation);
 
@@ -105,6 +107,7 @@ public interface JobRepository {
 	 * @param jobParameters the runtime parameters for the job
 	 *
 	 * @return a valid {@link JobExecution} for the arguments provided
+	 *
 	 * @throws JobExecutionAlreadyRunningException if there is a
 	 * {@link JobExecution} already running for the job instance with the
 	 * provided job and parameters.
@@ -124,7 +127,7 @@ public interface JobRepository {
 	 * Preconditions: {@link JobExecution} must contain a valid
 	 * {@link JobInstance} and be saved (have an id assigned).
 	 *
-	 * @param jobExecution
+	 * @param jobExecution {@link JobExecution} instance to be updated in the repo.
 	 */
 	void update(JobExecution jobExecution);
 
@@ -136,7 +139,7 @@ public interface JobRepository {
 	 *
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 *
-	 * @param stepExecution
+	 * @param stepExecution {@link StepExecution} instance to be added to the repo.
 	 */
 	void add(StepExecution stepExecution);
 
@@ -147,7 +150,7 @@ public interface JobRepository {
 	 *
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 *
-	 * @param stepExecutions
+	 * @param stepExecutions collection of {@link StepExecution} instances to be added to the repo.
 	 */
 	void addAll(Collection<StepExecution> stepExecutions);
 
@@ -156,7 +159,7 @@ public interface JobRepository {
 	 *
 	 * Preconditions: {@link StepExecution} must be saved (have an id assigned).
 	 *
-	 * @param stepExecution
+	 * @param stepExecution {@link StepExecution} instance to be updated in the repo.
 	 */
 	void update(StepExecution stepExecution);
 
@@ -164,24 +167,27 @@ public interface JobRepository {
 	 * Persist the updated {@link ExecutionContext}s of the given
 	 * {@link StepExecution}.
 	 *
-	 * @param stepExecution
+	 * @param stepExecution {@link StepExecution} instance to be used to update the context.
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * Persist the updated {@link ExecutionContext} of the given
 	 * {@link JobExecution}.
-	 * @param jobExecution
+	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
 	 */
 	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
+	@Nullable
 	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
 
 	/**
+	 * @param jobInstance {@link JobInstance} instance containing the step executions.
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
 	 */
@@ -192,6 +198,7 @@ public interface JobRepository {
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */
+	@Nullable
 	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
 
 }

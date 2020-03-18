@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -238,7 +238,7 @@ public class TransactionalStaxEventItemWriterTests {
         @Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			try {
-				StaxUtils.getXmlEventWriter(result).add(XMLEventFactory.newInstance().createComment(graph.toString()));
+				StaxTestUtils.getXmlEventWriter(result).add(XMLEventFactory.newInstance().createComment(graph.toString()));
 			}
 			catch ( Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
@@ -255,7 +255,7 @@ public class TransactionalStaxEventItemWriterTests {
 	 * @return new instance of fully configured writer
 	 */
 	private StaxEventItemWriter<Object> createItemWriter() throws Exception {
-		StaxEventItemWriter<Object> source = new StaxEventItemWriter<Object>();
+		StaxEventItemWriter<Object> source = new StaxEventItemWriter<>();
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,11 +36,13 @@ import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.batch.core.step.StepLocator;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.lang.Nullable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
  * @author Stephane Nicoll
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultJobLoaderTests {
 
@@ -221,13 +223,13 @@ public class DefaultJobLoaderTests {
     private static final String BASIC_JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     private static final String JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     public static class BasicStubJob implements Job {
@@ -236,7 +238,8 @@ public class DefaultJobLoaderTests {
 		public void execute(JobExecution execution) {
         }
 
-        @Override
+        @Nullable
+		@Override
 		public JobParametersIncrementer getJobParametersIncrementer() {
             return null;
         }
@@ -264,7 +267,7 @@ public class DefaultJobLoaderTests {
             return Collections.emptyList();
         }
 
-        @Override
+		@Override
 		public Step getStep(String stepName) throws NoSuchStepException {
             throw new NoSuchStepException("Step [" + stepName + "] does not exist");
         }

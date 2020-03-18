@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -210,7 +210,7 @@ public class TaskletParser {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, exceptionListName);
 		if (children.size() == 1) {
 			Element exceptionClassesElement = children.get(0);
-			ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
+			ManagedList<TypedStringValue> list = new ManagedList<>();
 			list.setMergeEnabled(exceptionClassesElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(exceptionClassesElement.getAttribute(MERGE_ATTR)));
 			addExceptionClasses("include", exceptionClassesElement, list, parserContext);

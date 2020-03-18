@@ -1,0 +1,14 @@
+[
+ {
+  "isin" : "123",
+  "quantity" : 5,
+  "price" : 10.5,
+  "customer" : "foo"
+},
+ {
+  "isin" : "456",
+  "quantity" : 10,
+  "price" : 20.5,
+  "customer" : "bar"
+}
+]

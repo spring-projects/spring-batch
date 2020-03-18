@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-
 import javax.sql.DataSource;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
@@ -25,9 +27,8 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractDatabaseItemStreamItemReaderTests extends AbstractItemStreamItemReaderTests {
 
@@ -49,7 +50,6 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 
 	/**
 	 * Sub-classes can override this and create their own context.
-	 * @throws Exception
 	 */
 	protected void initializeContext() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");

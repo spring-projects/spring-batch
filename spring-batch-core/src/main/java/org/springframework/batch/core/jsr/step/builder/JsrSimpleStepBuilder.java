@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.step.BatchletStep;
 import org.springframework.batch.core.jsr.step.item.JsrChunkProcessor;
@@ -45,6 +44,7 @@ import org.springframework.util.Assert;
  * pattern defined by the spec.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @param <I> The input type for the step
  * @param <O> The output type for the step
@@ -123,10 +123,10 @@ public class JsrSimpleStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		Assert.state(getReader() != null, "ItemReader must be provided");
 		Assert.state(getProcessor() != null || getWriter() != null, "ItemWriter or ItemProcessor must be provided");
 		RepeatOperations repeatOperations = createRepeatOperations();
-		ChunkProvider<I> chunkProvider = new JsrChunkProvider<I>();
-		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor<I, O>(getReader(), getProcessor(), getWriter(), repeatOperations);
-		chunkProcessor.setListeners(new ArrayList<StepListener>(getItemListeners()));
-		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
+		ChunkProvider<I> chunkProvider = new JsrChunkProvider<>();
+		JsrChunkProcessor<I, O> chunkProcessor = new JsrChunkProcessor<>(getReader(), getProcessor(), getWriter(), repeatOperations);
+		chunkProcessor.setListeners(new ArrayList<>(getItemListeners()));
+		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
 		return tasklet;
 	}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2013 the original author or authors.
+ * Copyright 2009-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -51,7 +52,7 @@ public class NonAbstractStepTests {
 	/**
 	 * Sequence of events encountered during step execution.
 	 */
-	final List<String> events = new ArrayList<String>();
+	final List<String> events = new ArrayList<>();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(1L,
 			"jobName"), new JobParameters()));
@@ -98,6 +99,7 @@ public class NonAbstractStepTests {
 			return name + "#" + event;
 		}
 
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);

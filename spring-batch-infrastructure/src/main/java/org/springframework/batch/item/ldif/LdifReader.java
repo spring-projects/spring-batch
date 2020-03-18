@@ -1,11 +1,11 @@
 /*
- * Copyright 2005-2014 the original author or authors.
+ * Copyright 2005-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
@@ -74,7 +75,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
 	 * input resource does not exist.
-	 * @param strict false by default
+	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
@@ -134,6 +135,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
+	@Nullable
 	@Override
 	protected LdapAttributes doRead() throws Exception {
 		LdapAttributes attributes = null;
@@ -155,6 +157,11 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 		}
 	}
 
+	/**
+	 * Establishes the resource that will be used as the input for the LdifReader.
+	 *
+	 * @param resource the resource that will be read.
+	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 		this.ldifParser = new LdifParser(resource);
@@ -162,7 +169,7 @@ public class LdifReader extends AbstractItemCountingItemStreamItemReader<LdapAtt
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "A resource is required to parse.");
-		Assert.notNull(ldifParser);
+		Assert.notNull(ldifParser, "A parser is required");
 	}
 
 }

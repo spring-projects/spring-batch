@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *	  http://www.apache.org/licenses/LICENSE-2.0
+ *	  https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,7 +47,7 @@ public class DerbyPagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		}
 	}
 	
-	// derby version numbering is M.m.f.p [ {alpha|beta} ] see http://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
+	// derby version numbering is M.m.f.p [ {alpha|beta} ] see https://db.apache.org/derby/papers/versionupgrade.html#Basic+Numbering+Scheme
 	private boolean isDerbyVersionSupported(String version) {
 		String[] minimalVersionParts = MINIMAL_DERBY_VERSION.split("\\.");
 		String[] versionParts = version.split("[\\. ]");

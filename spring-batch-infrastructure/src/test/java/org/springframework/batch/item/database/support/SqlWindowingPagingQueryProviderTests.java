@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -107,7 +107,7 @@ public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQuery
 		pagingQueryProvider.setFromClause("foo_e E, foo_i I");
 		pagingQueryProvider.setWhereClause("E.id=I.id");
 		
-		Map<String, Order> sortKeys = new HashMap<String, Order>();
+		Map<String, Order> sortKeys = new HashMap<>();
 		sortKeys.put("E.id", Order.DESCENDING);		
 		pagingQueryProvider.setSortKeys(sortKeys);
 		

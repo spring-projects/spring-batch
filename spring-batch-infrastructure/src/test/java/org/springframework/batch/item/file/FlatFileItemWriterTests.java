@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,22 @@
 
 package org.springframework.batch.item.file;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -32,18 +45,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -63,7 +64,7 @@ import static org.junit.Assert.fail;
 public class FlatFileItemWriterTests {
 
 	// object under test
-	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
+	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -86,7 +87,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setResource(new FileSystemResource(outputFile));
 		writer.setLineSeparator("\n");
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.setEncoding("UTF-8");
@@ -176,6 +177,8 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteWithAppendRestartOnSecondChunk() throws Exception {
+		// This should be overridden via the writer#setAppendAllowed(true)
+		writer.setShouldDeleteIfExists(true);
 		writer.setAppendAllowed(true);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("test1"));
@@ -522,8 +525,8 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testOpenWithNonWritableFile() throws Exception {
-		writer = new FlatFileItemWriter<String>();
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer = new FlatFileItemWriter<>();
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		FileSystemResource file = new FileSystemResource("build/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
@@ -544,7 +547,7 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -556,9 +559,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testDefaultStreamContext() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter<>();
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);

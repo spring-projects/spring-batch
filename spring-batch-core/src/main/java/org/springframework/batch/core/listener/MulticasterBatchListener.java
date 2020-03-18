@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.batch.api.chunk.listener.RetryProcessListener;
@@ -32,11 +33,13 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
 ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadListener, RetryProcessListener, RetryWriteListener {
@@ -45,13 +48,13 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
-	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<T>();
+	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<>();
 
-	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<T, S>();
+	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<>();
 
-	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
+	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<>();
 
-	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<T, S>();
+	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<>();
 
 	private CompositeRetryReadListener retryReadListener = new CompositeRetryReadListener();
 
@@ -82,6 +85,8 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	 * Register the listener for callbacks on the appropriate interfaces
 	 * implemented. Any {@link StepListener} can be provided, or an
 	 * {@link ItemStream}. Other types will be ignored.
+	 *
+	 * @param listener the {@link StepListener} instance to be registered.
 	 */
 	public void register(StepListener listener) {
 		if (listener instanceof StepExecutionListener) {
@@ -122,23 +127,20 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 * @param item
-	 * @param result
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#afterProcess(java.lang.Object,
 	 * java.lang.Object)
 	 */
 	@Override
-	public void afterProcess(T item, S result) {
+	public void afterProcess(T item, @Nullable S result) {
 		try {
 			itemProcessListener.afterProcess(item, result);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterProcess.", e);
+			throw new StepListenerFailedException("Error in afterProcess.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#beforeProcess(java.lang.Object)
 	 */
 	@Override
@@ -147,13 +149,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemProcessListener.beforeProcess(item);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeProcess.", e);
+			throw new StepListenerFailedException("Error in beforeProcess.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param item
-	 * @param ex
 	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#onProcessError(java.lang.Object,
 	 * java.lang.Exception)
 	 */
@@ -170,6 +170,7 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	/**
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		try {
@@ -181,7 +182,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 * @param stepExecution
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	@Override
@@ -195,7 +195,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk(ChunkContext context)
 	 */
 	@Override
@@ -204,12 +203,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			chunkListener.afterChunk(context);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterChunk.", e);
+			throw new StepListenerFailedException("Error in afterChunk.", getTargetException(e));
 		}
 	}
 
 	/**
-	 *
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk(ChunkContext context)
 	 */
 	@Override
@@ -218,12 +216,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			chunkListener.beforeChunk(context);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeChunk.", e);
+			throw new StepListenerFailedException("Error in beforeChunk.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
 	@Override
@@ -232,12 +229,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemReadListener.afterRead(item);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterRead.", e);
+			throw new StepListenerFailedException("Error in afterRead.", getTargetException(e));
 		}
 	}
 
 	/**
-	 *
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#beforeRead()
 	 */
 	@Override
@@ -246,12 +242,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemReadListener.beforeRead();
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeRead.", e);
+			throw new StepListenerFailedException("Error in beforeRead.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param ex
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#onReadError(java.lang.Exception)
 	 */
 	@Override
@@ -265,7 +260,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 *
 	 * @see ItemWriteListener#afterWrite(List)
 	 */
 	@Override
@@ -274,12 +268,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemWriteListener.afterWrite(items);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterWrite.", e);
+			throw new StepListenerFailedException("Error in afterWrite.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param items
 	 * @see ItemWriteListener#beforeWrite(List)
 	 */
 	@Override
@@ -288,13 +281,11 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			itemWriteListener.beforeWrite(items);
 		}
 		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeWrite.", e);
+			throw new StepListenerFailedException("Error in beforeWrite.", getTargetException(e));
 		}
 	}
 
 	/**
-	 * @param ex
-	 * @param items
 	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
 	@Override
@@ -308,7 +299,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 * @param t
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	@Override
@@ -317,8 +307,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 * @param item
-	 * @param t
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
@@ -328,8 +316,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	}
 
 	/**
-	 * @param item
-	 * @param t
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object,
 	 * Throwable)
 	 */
@@ -373,5 +359,18 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 		} catch (Exception e) {
 			throw new BatchRuntimeException(e);
 		}
+	}
+
+	/**
+	 * Unwrap the target exception from a wrapped {@link InvocationTargetException}.
+	 * @param e the exception to introspect
+	 * @return the target exception if any
+	 */
+	private Throwable getTargetException(RuntimeException e) {
+		Throwable cause = e.getCause();
+		if (cause != null && cause instanceof InvocationTargetException) {
+			return ((InvocationTargetException) cause).getTargetException();
+		}
+		return e;
 	}
 }

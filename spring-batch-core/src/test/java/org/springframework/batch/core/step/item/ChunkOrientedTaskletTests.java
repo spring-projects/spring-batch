@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,11 +37,11 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testHandle() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
-				Chunk<String> chunk = new Chunk<String>();
+				Chunk<String> chunk = new Chunk<>();
 				chunk.add("foo");
 				return chunk;
 			}
@@ -63,7 +63,7 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testFail() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				throw new RuntimeException("Foo!");
@@ -90,11 +90,11 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testExitCode() throws Exception {
-		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<>(new ChunkProvider<String>() {
 			@Override
 			public Chunk<String> provide(StepContribution contribution) throws Exception {
 				contribution.incrementReadCount();
-				Chunk<String> chunk = new Chunk<String>();
+				Chunk<String> chunk = new Chunk<>();
 				chunk.add("foo");
 				chunk.setEnd();
 				return chunk;

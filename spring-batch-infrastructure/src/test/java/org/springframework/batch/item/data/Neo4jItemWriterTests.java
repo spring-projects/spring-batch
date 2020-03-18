@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.item.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,77 +22,128 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.neo4j.template.Neo4jOperations;
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.SessionFactory;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 public class Neo4jItemWriterTests {
 
 	private Neo4jItemWriter<String> writer;
+
 	@Mock
-	private Neo4jOperations template;
+	private SessionFactory sessionFactory;
+	@Mock
+	private Session session;
 
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		writer = new Neo4jItemWriter<String>();
-
-		writer.setTemplate(template);
 	}
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception{
-		writer = new Neo4jItemWriter<String>();
+
+		writer = new Neo4jItemWriter<>();
 
 		try {
 			writer.afterPropertiesSet();
-			fail("Template was not set but exception was not thrown.");
+			fail("SessionFactory was not set but exception was not thrown.");
 		} catch (IllegalStateException iae) {
-			assertEquals("A Neo4JOperations implementation is required", iae.getMessage());
+			assertEquals("A SessionFactory is required", iae.getMessage());
 		} catch (Throwable t) {
 			fail("Wrong exception was thrown.");
 		}
 
-		writer.setTemplate(template);
+		writer.setSessionFactory(this.sessionFactory);
+
+		writer.afterPropertiesSet();
+
+		writer = new Neo4jItemWriter<>();
+
+		writer.setSessionFactory(this.sessionFactory);
 
 		writer.afterPropertiesSet();
 	}
 
 	@Test
-	public void testWriteNull() throws Exception {
+	public void testWriteNullSession() throws Exception {
+
+		writer = new Neo4jItemWriter<>();
+
+		writer.setSessionFactory(this.sessionFactory);
+		writer.afterPropertiesSet();
+
 		writer.write(null);
 
-		verifyZeroInteractions(template);
+		verifyZeroInteractions(this.session);
 	}
 
 	@Test
-	public void testWriteNoItems() throws Exception {
-		writer.write(new ArrayList<String>());
+	public void testWriteNullWithSession() throws Exception {
+		writer = new Neo4jItemWriter<>();
 
-		verifyZeroInteractions(template);
+		writer.setSessionFactory(this.sessionFactory);
+		writer.afterPropertiesSet();
+
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
+		writer.write(null);
+
+		verifyZeroInteractions(this.session);
 	}
 
 	@Test
-	public void testWriteItems() throws Exception {
-		List<String> items = new ArrayList<String>();
+	public void testWriteNoItemsWithSession() throws Exception {
+		writer = new Neo4jItemWriter<>();
+
+		writer.setSessionFactory(this.sessionFactory);
+		writer.afterPropertiesSet();
+
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
+		writer.write(new ArrayList<>());
+
+		verifyZeroInteractions(this.session);
+	}
+
+	@Test
+	public void testWriteItemsWithSession() throws Exception {
+		writer = new Neo4jItemWriter<>();
+
+		writer.setSessionFactory(this.sessionFactory);
+		writer.afterPropertiesSet();
+
+		List<String> items = new ArrayList<>();
 		items.add("foo");
 		items.add("bar");
 
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(items);
 
-		verify(template).save("foo");
-		verify(template).save("bar");
+		verify(this.session).save("foo");
+		verify(this.session).save("bar");
 	}
 
 	@Test
-	public void testDeleteItems() throws Exception {
-		List<String> items = new ArrayList<String>();
+	public void testDeleteItemsWithSession() throws Exception {
+		writer = new Neo4jItemWriter<>();
+
+		writer.setSessionFactory(this.sessionFactory);
+		writer.afterPropertiesSet();
+
+		List<String> items = new ArrayList<>();
 		items.add("foo");
 		items.add("bar");
 
 		writer.setDelete(true);
 
+		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(items);
 
-		verify(template).delete("foo");
-		verify(template).delete("bar");
+		verify(this.session).delete("foo");
+		verify(this.session).delete("bar");
 	}
 }

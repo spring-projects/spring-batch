@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -51,6 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 JobInstanceDao, InitializingBean {
@@ -79,7 +81,10 @@ JobInstanceDao, InitializingBean {
 	private static final String FIND_JOB_NAMES = "SELECT distinct JOB_NAME from %PREFIX%JOB_INSTANCE order by JOB_NAME";
 
 	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
-	
+
+	private static final String FIND_LAST_JOB_INSTANCE_BY_JOB_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE I1 where" +
+			" I1.JOB_NAME = ? and I1.JOB_INSTANCE_ID in (SELECT max(I2.JOB_INSTANCE_ID) from %PREFIX%JOB_INSTANCE I2 where I2.JOB_NAME = ?)";
+
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
@@ -130,6 +135,7 @@ JobInstanceDao, InitializingBean {
 	 *             if any {@link JobParameters} fields are null.
 	 */
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(final String jobName,
 			final JobParameters jobParameters) {
 
@@ -153,7 +159,7 @@ JobInstanceDao, InitializingBean {
 		if (instances.isEmpty()) {
 			return null;
 		} else {
-			Assert.state(instances.size() == 1);
+			Assert.state(instances.size() == 1, "instance count must be 1 but was " + instances.size());
 			return instances.get(0);
 		}
 	}
@@ -166,7 +172,8 @@ JobInstanceDao, InitializingBean {
 	 * (java.lang.Long)
 	 */
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	@Nullable
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
 
 		try {
 			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID),
@@ -199,7 +206,7 @@ JobInstanceDao, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#
 	 * getLastJobInstances(java.lang.String, int)
 	 */
 	@Override
@@ -208,7 +215,7 @@ JobInstanceDao, InitializingBean {
 
 		ResultSetExtractor<List<JobInstance>> extractor = new ResultSetExtractor<List<JobInstance>>() {
 
-			private List<JobInstance> list = new ArrayList<JobInstance>();
+			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public List<JobInstance> extractData(ResultSet rs) throws SQLException,
@@ -236,11 +243,31 @@ JobInstanceDao, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 *
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#
+	 * getLastJobInstance(java.lang.String)
+	 */
+	@Override
+	@Nullable
+	public JobInstance getLastJobInstance(String jobName) {
+		try {
+			return getJdbcTemplate().queryForObject(
+					getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
+					new Object[] { jobName, jobName },
+					new JobInstanceRowMapper());
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see
 	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
 	 * (org.springframework.batch.core.JobExecution)
 	 */
 	@Override
+	@Nullable
 	public JobInstance getJobInstance(JobExecution jobExecution) {
 
 		try {
@@ -256,7 +283,7 @@ JobInstanceDao, InitializingBean {
 	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstanceCount(java.lang.String)
 	 */
 	@Override
-	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 
 		try {
 			return getJdbcTemplate().queryForObject(
@@ -282,7 +309,7 @@ JobInstanceDao, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobIncrementer);
+		Assert.notNull(jobIncrementer, "JobIncrementer is required");
 	}
 
 	/**
@@ -307,7 +334,7 @@ JobInstanceDao, InitializingBean {
 	public List<JobInstance> findJobInstancesByName(String jobName, final int start, final int count) {
 		@SuppressWarnings("rawtypes")
 		ResultSetExtractor extractor = new ResultSetExtractor() {
-			private List<JobInstance> list = new ArrayList<JobInstance>();
+			private List<JobInstance> list = new ArrayList<>();
 
 			@Override
 			public Object extractData(ResultSet rs) throws SQLException,

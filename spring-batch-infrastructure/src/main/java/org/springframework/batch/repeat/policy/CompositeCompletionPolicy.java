@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,7 +39,8 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	/**
 	 * Setter for the policies.
 	 * 
-	 * @param policies
+	 * @param policies an array of completion policies to be used to determine
+	 *  {@link #isComplete(RepeatContext)}  by consensus.
 	 */
 	public void setPolicies(CompletionPolicy[] policies) {
 		this.policies = Arrays.asList(policies).toArray(new CompletionPolicy[policies.length]);
@@ -87,7 +88,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 */
     @Override
 	public RepeatContext start(RepeatContext context) {
-		List<RepeatContext> list = new ArrayList<RepeatContext>();
+		List<RepeatContext> list = new ArrayList<>();
 		for (int i = 0; i < policies.length; i++) {
 			list.add(policies[i].start(context));
 		}

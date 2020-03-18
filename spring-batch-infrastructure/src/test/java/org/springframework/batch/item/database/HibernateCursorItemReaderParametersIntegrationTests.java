@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@ import java.util.Collections;
 
 import org.hibernate.StatelessSession;
 
+import org.springframework.batch.item.sample.Foo;
+
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
  * 
@@ -29,9 +31,9 @@ public class HibernateCursorItemReaderParametersIntegrationTests extends
 		AbstractHibernateCursorItemReaderIntegrationTests {
 
     @Override
-	protected void setQuery(HibernateCursorItemReader<?> reader) {
+	protected void setQuery(HibernateCursorItemReader<Foo> reader) {
 		reader.setQueryString("from Foo where name like :name");
-		reader.setParameterValues(Collections.singletonMap("name", (Object) "bar%"));
+		reader.setParameterValues(Collections.singletonMap("name", "bar%"));
 	}
 
 }

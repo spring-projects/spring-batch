@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -120,7 +120,7 @@ public class JsrStepContextFactoryBeanTests {
 
 	@Test
 	public void getObjectMultiThread() throws Exception {
-		List<Future<StepContext>> stepContexts = new ArrayList<Future<StepContext>>();
+		List<Future<StepContext>> stepContexts = new ArrayList<>();
 
 		AsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
 
@@ -144,7 +144,7 @@ public class JsrStepContextFactoryBeanTests {
 			}));
 		}
 
-		Set<StepContext> contexts = new HashSet<StepContext>();
+		Set<StepContext> contexts = new HashSet<>();
 		for (Future<StepContext> future : stepContexts) {
 			contexts.add(future.get());
 		}
@@ -161,7 +161,7 @@ public class JsrStepContextFactoryBeanTests {
 			when(propertyContext.getStepProperties("step" + i)).thenReturn(props);
 		}
 
-		List<Future<StepContext>> stepContexts = new ArrayList<Future<StepContext>>();
+		List<Future<StepContext>> stepContexts = new ArrayList<>();
 
 		AsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
 
@@ -185,7 +185,7 @@ public class JsrStepContextFactoryBeanTests {
 			}));
 		}
 
-		Set<StepContext> contexts = new HashSet<StepContext>();
+		Set<StepContext> contexts = new HashSet<>();
 		for (Future<StepContext> future : stepContexts) {
 			contexts.add(future.get());
 		}

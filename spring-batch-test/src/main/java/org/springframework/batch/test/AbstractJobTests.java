@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,6 +67,7 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @deprecated (from 2.1) use {@link JobLauncherTestUtils} instead
  */
+@Deprecated
 public abstract class AbstractJobTests implements ApplicationContextAware {
 
 	/** Logger */
@@ -125,7 +126,8 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * Launch the entire job, including all steps.
 	 * 
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 *
+	 * @throws Exception is thrown if error occurs.
 	 */
 	protected JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
@@ -134,9 +136,10 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	/**
 	 * Launch the entire job, including all steps
 	 * 
-	 * @param jobParameters
+	 * @param jobParameters parameters for the job
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 *
+	 * @throws Exception is thrown if error occurs.
 	 */
 	protected JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);
@@ -147,7 +150,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * current timestamp, to ensure that the job instance will be unique.
 	 */
 	protected JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
 	}

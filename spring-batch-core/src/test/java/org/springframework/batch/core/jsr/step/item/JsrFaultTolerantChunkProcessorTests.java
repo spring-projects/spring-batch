@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 
 public class JsrFaultTolerantChunkProcessorTests {
 
@@ -59,7 +60,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 	@Before
 	public void setUp() throws Exception {
 
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 
 		for (int i = 0; i < 25; i++) {
 			items.add("item " + i);
@@ -70,7 +71,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		writer = new StoringItemWriter();
 		listener = new CountingListener();
 
-		builder = new JsrFaultTolerantStepBuilder<String, String>(new StepBuilder("step1"));
+		builder = new JsrFaultTolerantStepBuilder<>(new StepBuilder("step1"));
 		builder.setBatchPropertyContext(new BatchPropertyContext());
 		repository = new MapJobRepositoryFactoryBean().getObject();
 		builder.repository(repository);
@@ -80,7 +81,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 
 	@Test
 	public void testNoInputNoListeners() throws Exception{
-		reader = new FailingListItemReader(new ArrayList<String>());
+		reader = new FailingListItemReader(new ArrayList<>());
 		Step step = builder.chunk(25).reader(reader).processor(processor).writer(writer).listener((ItemReadListener<String>) listener).build();
 
 		runStep(step);
@@ -499,6 +500,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 			super(list);
 		}
 
+		@Nullable
 		@Override
 		public String read() {
 			count++;
@@ -516,6 +518,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		protected int failCount = -1;
 		protected boolean filter = false;
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			count++;
@@ -532,7 +535,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 
 	public static class StoringItemWriter implements ItemWriter<String>{
 
-		protected List<String> results = new ArrayList<String>();
+		protected List<String> results = new ArrayList<>();
 		protected boolean fail = false;
 
 		@Override
@@ -583,7 +586,7 @@ public class JsrFaultTolerantChunkProcessorTests {
 		}
 
 		@Override
-		public void afterProcess(String item, String result) {
+		public void afterProcess(String item, @Nullable String result) {
 			afterProcess++;
 		}
 

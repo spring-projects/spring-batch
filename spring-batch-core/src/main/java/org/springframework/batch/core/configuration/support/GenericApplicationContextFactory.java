@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,7 +69,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		} else if (allObjectsOfType(resources, String.class)) {
 			 context = new ResourceAnnotationApplicationContext(parent, resources);
 		} else {
-			List<Class<?>> types = new ArrayList<Class<?>>();
+			List<Class<?>> types = new ArrayList<>();
 			for (Object resource : resources) {
 				types.add(resource.getClass());
 			}
@@ -137,12 +137,18 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		 * @param parent
 		 */
 		public ResourceXmlApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
-			helper = new ApplicationContextHelper(parent, this, resources) {
+
+			class ResourceXmlApplicationContextHelper extends ApplicationContextHelper {
+
+				ResourceXmlApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+					super(parent, context, config);
+				}
+
 				@Override
 				protected String generateId(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
   					try {
- 						List<String> uris = new ArrayList<String>();
+ 						List<String> uris = new ArrayList<>();
  						for (Resource resource : resources) {
  							uris.add(resource.getURI().toString());
  						}
@@ -155,9 +161,10 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 				@Override
 				protected void loadConfiguration(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
- 					load(resources);
+					load(resources);
 				}
-			};
+			}
+			helper = new ResourceXmlApplicationContextHelper(parent, this, resources);
 			refresh();
 		}
 
@@ -179,12 +186,18 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		private final ApplicationContextHelper helper;
 
 		public ResourceAnnotationApplicationContext(ConfigurableApplicationContext parent, Object... resources) {
-			helper = new ApplicationContextHelper(parent, this, resources) {
+
+			class ResourceAnnotationApplicationContextHelper extends ApplicationContextHelper {
+
+				public ResourceAnnotationApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+					super(parent, context, config);
+				}
+
 				@Override
 				protected String generateId(Object... configs) {
 					if (allObjectsOfType(configs, Class.class)) {
 						Class<?>[] types = Arrays.copyOfRange(configs, 0, configs.length, Class[].class);
-						List<String> names = new ArrayList<String>();
+						List<String> names = new ArrayList<>();
 						for (Class<?> type : types) {
 							names.add(type.getName());
 						}
@@ -205,7 +218,8 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 						scan(pkgs);
 					}
 				}
-			};
+			}
+			helper = new ResourceAnnotationApplicationContextHelper(parent, this, resources);
 			refresh();
 		}
 

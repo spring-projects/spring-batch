@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,24 +15,24 @@
  */
 package org.springframework.batch.core.jsr.step;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
-import org.springframework.util.Assert;
-
+import java.util.List;
+import java.util.Properties;
 import javax.batch.api.Decider;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
-import java.util.List;
-import java.util.Properties;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,9 +47,7 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 		StepExecutionCountingDecider.previousStepCount = 0;
 
 		if(jobExplorer == null) {
-			BeanFactoryLocator beanFactoryLocactor = ContextSingletonBeanFactoryLocator.getInstance();
-			BeanFactoryReference ref = beanFactoryLocactor.useBeanFactory("baseContext");
-			baseContext = (ApplicationContext) ref.getFactory();
+			baseContext = new GenericXmlApplicationContext("jsrBaseContext.xml");
 
 			baseContext.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
@@ -104,14 +102,15 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 	@Test
 	public void testDecisionAfterFlow() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterFlow-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(execution.getExitStatus(), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
 	public void testDecisionAfterSplit() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "execution");
+		assertEquals(String.format("Received a %s because of %s", execution.getBatchStatus(), jobExecution.getExitStatus().getExitDescription()), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
 	}
@@ -143,8 +142,8 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 
 		@Override
 		public String decide(StepExecution[] executions) throws Exception {
-			Assert.isTrue(executions.length == 1);
-			Assert.isTrue(executions[0].getStepName().equals("step1"));
+			Assert.isTrue(executions.length == 1, "Invalid array length");
+			Assert.isTrue(executions[0].getStepName().equals("step1"), "Incorrect step name");
 
 			if(runs == 0) {
 				runs++;

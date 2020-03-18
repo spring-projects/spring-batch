@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,18 +15,19 @@
  */
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator.InvocationTargetThrowableWrapper;
-import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link AbstractMethodInvokingDelegator}
@@ -75,7 +76,7 @@ public class AbstractDelegatorTests {
 
 		// using the arguments setter should work equally well
 		foo.setName("foo");
-		Assert.state(!foo.getName().equals(NEW_FOO_NAME));
+		assertTrue(!foo.getName().equals(NEW_FOO_NAME));
 		delegator.setArguments(new Object[] { NEW_FOO_NAME });
 		delegator.afterPropertiesSet();
 		delegator.invokeDelegateMethod();
@@ -286,7 +287,7 @@ public class AbstractDelegatorTests {
 
 	private static class FooService {
 
-		private List<Foo> processedFooNameValuePairs = new ArrayList<Foo>();
+		private List<Foo> processedFooNameValuePairs = new ArrayList<>();
 
 		@SuppressWarnings("unused")
 		public void processNameValuePair(String name, int value) {

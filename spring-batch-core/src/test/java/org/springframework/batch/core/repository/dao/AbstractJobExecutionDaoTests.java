@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +23,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -36,8 +32,16 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Parent Test Class for {@link JdbcJobExecutionDao} and {@link MapJobExecutionDao}.
+ */
 public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao dao;
@@ -96,7 +100,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Test
 	public void testFindExecutionsOrdering() {
 
-		List<JobExecution> execs = new ArrayList<JobExecution>();
+		List<JobExecution> execs = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
 			JobExecution exec = new JobExecution(jobInstance, jobParameters);
@@ -193,14 +197,24 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testFindRunningExecutions() {
-
+		//Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
-		exec.setEndTime(new Date(1L));
+		exec.setStartTime(new Date(1L));
+		exec.setEndTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
+		//BATCH-2675
+		//Abnormal JobExecution as both StartTime and EndTime are null
+		//This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setLastUpdated(new Date(5L));
+		dao.saveJobExecution(exec);
+
+		//Running JobExecution as StartTime is populated but EndTime is null
+		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setStartTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
@@ -307,13 +321,13 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao.saveJobExecution(exec1);
 
 		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		Assert.state(exec1.getId() != null);
+		assertTrue(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.STARTED);
 		exec2.setVersion(7);
-		Assert.state(exec1.getVersion() != exec2.getVersion());
-		Assert.state(exec1.getStatus() != exec2.getStatus());
+		assertTrue(exec1.getVersion() != exec2.getVersion());
+		assertTrue(exec1.getStatus() != exec2.getStatus());
 
 		dao.synchronizeStatus(exec2);
 
@@ -334,13 +348,13 @@ public abstract class AbstractJobExecutionDaoTests {
 		dao.saveJobExecution(exec1);
 
 		JobExecution exec2 = new JobExecution(jobInstance, jobParameters);
-		Assert.state(exec1.getId() != null);
+		assertTrue(exec1.getId() != null);
 		exec2.setId(exec1.getId());
 
 		exec2.setStatus(BatchStatus.UNKNOWN);
 		exec2.setVersion(7);
-		Assert.state(exec1.getVersion() != exec2.getVersion());
-		Assert.state(exec1.getStatus().isLessThan(exec2.getStatus()));
+		assertTrue(exec1.getVersion() != exec2.getVersion());
+		assertTrue(exec1.getStatus().isLessThan(exec2.getStatus()));
 
 		dao.synchronizeStatus(exec2);
 

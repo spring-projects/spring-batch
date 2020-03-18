@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,9 +37,9 @@ public class BatchPropertyContext {
 	private static final String PARTITION_INDICATOR = ":partition";
 
 	private Properties jobProperties = new Properties();
-	private Map<String, Properties> stepProperties = new HashMap<String, Properties>();
-	private Map<String, Properties> artifactProperties = new HashMap<String, Properties>();
-	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<String, Map<String, Properties>>();
+	private Map<String, Properties> stepProperties = new HashMap<>();
+	private Map<String, Properties> artifactProperties = new HashMap<>();
+	private Map<String, Map<String, Properties>> stepArtifactProperties = new HashMap<>();
 
 	/**
 	 * <p>
@@ -134,7 +134,7 @@ public class BatchPropertyContext {
 		Assert.hasText(stepName, "Step name must be provided");
 		Assert.notNull(properties, "Step properties must not be null");
 
-		Map<String, Properties> stepProperties = new HashMap<String, Properties>();
+		Map<String, Properties> stepProperties = new HashMap<>();
 		stepProperties.put(stepName, properties);
 
 		setStepProperties(stepProperties);

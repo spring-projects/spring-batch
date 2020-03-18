@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ import org.junit.Test;
  */
 public class DirectPollerTests {
 
-	private Set<String> repository = new HashSet<String>();
+	private Set<String> repository = new HashSet<>();
 
 	@Test
 	public void testSimpleSingleThreaded() throws Exception {
@@ -42,7 +42,7 @@ public class DirectPollerTests {
 
             @Override
 			public String call() throws Exception {
-				Set<String> executions = new HashSet<String>(repository);
+				Set<String> executions = new HashSet<>(repository);
 				if (executions.isEmpty()) {
 					return null;
 				}
@@ -67,7 +67,7 @@ public class DirectPollerTests {
 
             @Override
 			public String call() throws Exception {
-				Set<String> executions = new HashSet<String>(repository);
+				Set<String> executions = new HashSet<>(repository);
 				if (executions.isEmpty()) {
 					return null;
 				}
@@ -92,7 +92,7 @@ public class DirectPollerTests {
 
             @Override
 			public String call() throws Exception {
-				Set<String> executions = new HashSet<String>(repository);
+				Set<String> executions = new HashSet<>(repository);
 				if (executions.isEmpty()) {
 					return null;
 				}
@@ -101,7 +101,7 @@ public class DirectPollerTests {
 
 		};
 
-		Poller<String> poller = new DirectPoller<String>(100L);
+		Poller<String> poller = new DirectPoller<>(100L);
 
 		sleepAndCreateStringInBackground(500L);
 

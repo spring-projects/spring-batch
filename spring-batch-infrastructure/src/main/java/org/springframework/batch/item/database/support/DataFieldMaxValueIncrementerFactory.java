@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,11 +41,16 @@ public interface DataFieldMaxValueIncrementerFactory {
 	/**
 	 * Returns boolean indicated whether or not the provided string is supported by this
 	 * factory.
+	 *
+	 * @param databaseType {@link String} containing the database type.
+	 * @return true if the incrementerType is supported by this database type. Else false is returned.
 	 */
 	public boolean isSupportedIncrementerType(String databaseType);
 
 	/**
 	 * Returns the list of supported database incrementer types
+	 *
+	 * @return  an array of {@link String}s containing the supported incrementer types.
 	 */
 	public String[] getSupportedIncrementerTypes();
 }

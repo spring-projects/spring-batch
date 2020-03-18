@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
  * factory for components of type {@link Step}.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
@@ -31,7 +32,7 @@ public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
 	 * @see StepLocator#getStep(String)
 	 */
 	public Step getStep(String stepName) {
-		return (Step) beanFactory.getBean(stepName, Step.class);
+		return beanFactory.getBean(stepName, Step.class);
 	}
 
 	/**

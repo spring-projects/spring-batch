@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,7 +48,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		interceptor = new RepeatOperationsInterceptor();
 		target = new ServiceImpl();
 		ProxyFactory factory = new ProxyFactory(RepeatOperations.class.getClassLoader());
-		factory.setInterfaces(new Class[] { Service.class });
+		factory.setInterfaces(Service.class);
 		factory.setTarget(target);
 		service = (Service) factory.getProxy();
 	}
@@ -67,7 +67,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testSetTemplate() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
             @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
@@ -87,7 +87,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testCallbackNotExecuted() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
             @Override
 			public RepeatStatus iterate(RepeatCallback callback) {
@@ -101,7 +101,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong exception message: "+message, message.toLowerCase().indexOf("no result available")>=0);
+			assertTrue("Wrong exception message: "+message, message.toLowerCase().contains("no result available"));
 		}
 		assertEquals(1, calls.size());
 	}
@@ -160,7 +160,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List<Object> list = new ArrayList<Object>();
+		final List<Object> list = new ArrayList<>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
             @Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -182,7 +182,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
                 @Override
 				public Method getMethod() {
 					try {
-						return Object.class.getMethod("toString", new Class[0]);
+						return Object.class.getMethod("toString");
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e);

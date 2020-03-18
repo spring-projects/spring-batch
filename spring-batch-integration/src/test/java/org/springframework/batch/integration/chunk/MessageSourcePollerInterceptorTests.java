@@ -48,7 +48,7 @@ public class MessageSourcePollerInterceptorTests {
 		}
 
 		public Message<String> receive() {
-			return new GenericMessage<String>(payload);
+			return new GenericMessage<>(payload);
 		}
 	}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.launch.support;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +26,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -50,23 +43,32 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.lang.Nullable;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleJobOperatorTests {
@@ -81,22 +83,14 @@ public class SimpleJobOperatorTests {
 
 	private JobParameters jobParameters;
 
-	/**
-	 * @throws Exception
-	 *
-	 */
 	@Before
 	public void setUp() throws Exception {
 
 		job = new JobSupport("foo") {
+			@Nullable
 			@Override
 			public JobParametersIncrementer getJobParametersIncrementer() {
-				return new JobParametersIncrementer() {
-					@Override
-					public JobParameters getNext(JobParameters parameters) {
-						return jobParameters;
-					}
-				};
+				return parameters -> jobParameters;
 			}
 		};
 
@@ -104,7 +98,7 @@ public class SimpleJobOperatorTests {
 
 		jobOperator.setJobRegistry(new MapJobRegistry() {
 			@Override
-			public Job getJob(String name) throws NoSuchJobException {
+			public Job getJob(@Nullable String name) throws NoSuchJobException {
 				if (name.equals("foo")) {
 					return job;
 				}
@@ -113,17 +107,11 @@ public class SimpleJobOperatorTests {
 
 			@Override
 			public Set<String> getJobNames() {
-				return new HashSet<String>(Arrays.asList(new String[] { "foo", "bar" }));
+				return new HashSet<>(Arrays.asList(new String[] { "foo", "bar" }));
 			}
 		});
 
-		jobOperator.setJobLauncher(new JobLauncher() {
-			@Override
-			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException {
-				return new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters, null);
-			}
-		});
+		jobOperator.setJobLauncher((job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters, null));
 
 		jobExplorer = mock(JobExplorer.class);
 
@@ -134,13 +122,13 @@ public class SimpleJobOperatorTests {
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
-			public JobParameters getJobParameters(Properties props) {
+			public JobParameters getJobParameters(@Nullable Properties props) {
 				assertTrue("Wrong properties", props.containsKey("a"));
 				return jobParameters;
 			}
 
 			@Override
-			public Properties getProperties(JobParameters params) {
+			public Properties getProperties(@Nullable JobParameters params) {
 				return PropertiesConverter.stringToProperties("a=b");
 			}
 		});
@@ -165,10 +153,10 @@ public class SimpleJobOperatorTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.launch.support.SimpleJobOperator#startNextInstance(java.lang.String)}
 	 * .
-	 * @throws Exception
 	 */
 	@Test
 	public void testStartNextInstanceSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
@@ -374,7 +362,7 @@ public class SimpleJobOperatorTests {
 
 		when(step.getTasklet()).thenReturn(tasklet);
 		when(step.getName()).thenReturn("test_job.step1");
-		when(jobRegistry.getJob(anyString())).thenReturn(job);
+		when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 
 		jobOperator.setJobRegistry(jobRegistry);
@@ -383,6 +371,24 @@ public class SimpleJobOperatorTests {
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
+	
+	@Test
+	public void testStopTaskletWhenJobNotRegistered() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		StoppableTasklet tasklet = mock(StoppableTasklet.class);
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		verify(tasklet, never()).stop();
+	}
 
 	@Test
 	public void testStopTaskletException() throws Exception {
@@ -390,6 +396,7 @@ public class SimpleJobOperatorTests {
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		StoppableTasklet tasklet = new StoppableTasklet() {
 
+			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution,
 					ChunkContext chunkContext) throws Exception {
@@ -410,7 +417,7 @@ public class SimpleJobOperatorTests {
 
 			when(step.getTasklet()).thenReturn(tasklet);
 			when(step.getName()).thenReturn("test_job.step1");
-			when(jobRegistry.getJob(anyString())).thenReturn(job);
+			when(jobRegistry.getJob(any(String.class))).thenReturn(job);
 			when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 
 			jobOperator.setJobRegistry(jobRegistry);
@@ -453,7 +460,7 @@ public class SimpleJobOperatorTests {
 
 		@Override
 		public Collection<String> getStepNames() {
-			return Arrays.asList("test_job.step1");
+			return Collections.singletonList("test_job.step1");
 		}
 
 		@Override

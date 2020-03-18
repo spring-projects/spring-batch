@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,13 @@
 
 package org.springframework.batch.core.explore.support;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
@@ -27,7 +30,6 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -38,14 +40,13 @@ import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
-import javax.sql.DataSource;
-
 /**
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobExplorer} using JDBC DAO implementations. Requires the user
  * to describe what kind of database they are using.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
@@ -70,7 +71,7 @@ implements InitializingBean {
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
-	 * The default, if not injected, is the {@link XStreamExecutionContextStringSerializer}.
+	 * The default, if not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
 	 *
 	 * @param serializer used to serialize/deserialize an {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
@@ -123,14 +124,11 @@ implements InitializingBean {
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
-			jdbcOperations = new JdbcTemplate(dataSource);	
+			jdbcOperations = new JdbcTemplate(dataSource);
 		}	
 
 		if(serializer == null) {
-			XStreamExecutionContextStringSerializer defaultSerializer = new XStreamExecutionContextStringSerializer();
-			defaultSerializer.afterPropertiesSet();
-
-			serializer = defaultSerializer;
+			serializer = new Jackson2ExecutionContextStringSerializer();
 		}
 	}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.step.builder;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.function.Function;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -40,18 +47,13 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.function.FunctionItemProcessor;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.ReflectionUtils;
 import org.springframework.util.Assert;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Step builder for simple item processing (chunk oriented) steps. Items are read and cached in chunks, and then
@@ -61,6 +63,7 @@ import java.util.Set;
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  */
@@ -74,13 +77,15 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	private ItemProcessor<? super I, ? extends O> processor;
 
+	private Function<? super I, ? extends O> itemProcessorFunction;
+
 	private int chunkSize = 0;
 
 	private RepeatOperations chunkOperations;
 
 	private CompletionPolicy completionPolicy;
 
-	private Set<StepListener> itemListeners = new LinkedHashSet<StepListener>();
+	private Set<StepListener> itemListeners = new LinkedHashSet<>();
 
 	private boolean readerTransactionalQueue = false;
 
@@ -111,8 +116,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	public FaultTolerantStepBuilder<I, O> faultTolerant() {
-		FaultTolerantStepBuilder<I, O> builder = new FaultTolerantStepBuilder<I, O>(this);
-		return builder;
+		return new FaultTolerantStepBuilder<>(this);
 	}
 
 	/**
@@ -153,13 +157,13 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	@Override
 	protected Tasklet createTasklet() {
 		Assert.state(reader != null, "ItemReader must be provided");
-		Assert.state(processor != null || writer != null, "ItemWriter or ItemProcessor must be provided");
+		Assert.state(writer != null, "ItemWriter must be provided");
 		RepeatOperations repeatOperations = createChunkOperations();
-		SimpleChunkProvider<I> chunkProvider = new SimpleChunkProvider<I>(reader, repeatOperations);
-		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<I, O>(processor, writer);
-		chunkProvider.setListeners(new ArrayList<StepListener>(itemListeners));
-		chunkProcessor.setListeners(new ArrayList<StepListener>(itemListeners));
-		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<I>(chunkProvider, chunkProcessor);
+		SimpleChunkProvider<I> chunkProvider = new SimpleChunkProvider<>(getReader(), repeatOperations);
+		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(getProcessor(), getWriter());
+		chunkProvider.setListeners(new ArrayList<>(itemListeners));
+		chunkProcessor.setListeners(new ArrayList<>(itemListeners));
+		ChunkOrientedTasklet<I> tasklet = new ChunkOrientedTasklet<>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!readerTransactionalQueue);
 		return tasklet;
 	}
@@ -231,6 +235,19 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	/**
+	 * A {@link Function} to be delegated to as an {@link ItemProcessor}.  If this is set,
+	 * it will take precedence over any {@code ItemProcessor} configured via
+	 * {@link #processor(ItemProcessor)}.
+	 *
+	 * @param function the function to delegate item processing to
+	 * @return this for fluent chaining
+	 */
+	public SimpleStepBuilder<I, O> processor(Function<? super I, ? extends O> function) {
+		this.itemProcessorFunction = function;
+		return this;
+	}
+
+	/**
 	 * Sets a flag to say that the reader is transactional (usually a queue), which is to say that failed items might be
 	 * rolled back and re-presented in a subsequent transaction. Default is false, meaning that the items are read
 	 * outside a transaction and possibly cached.
@@ -248,11 +265,12 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public SimpleStepBuilder listener(Object listener) {
+	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 
-		Set<Method> itemListenerMethods = new HashSet<Method>();
+		Set<Method> itemListenerMethods = new HashSet<>();
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeRead.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterRead.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeProcess.class));
@@ -270,7 +288,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		}
 
 		@SuppressWarnings("unchecked")
-		SimpleStepBuilder result = this;
+		SimpleStepBuilder<I, O> result = this;
 		return result;
 	}
 
@@ -339,6 +357,10 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	protected ItemProcessor<? super I, ? extends O> getProcessor() {
+		if(this.itemProcessorFunction != null) {
+			this.processor = new FunctionItemProcessor<>(this.itemProcessorFunction);
+		}
+
 		return processor;
 	}
 

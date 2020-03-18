@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +18,13 @@ package org.springframework.batch.core.step.tasklet;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * Strategy for processing in a step.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface Tasklet {
@@ -38,8 +40,11 @@ public interface Tasklet {
 	 * @param chunkContext attributes shared between invocations but not between
 	 * restarts
 	 * @return an {@link RepeatStatus} indicating whether processing is
-	 * continuable.
+	 * continuable. Returning {@code null} is interpreted as {@link RepeatStatus#FINISHED}
+	 *
+	 * @throws Exception thrown if error occurs during execution.
 	 */
+	@Nullable
 	RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
 
 }

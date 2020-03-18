@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,9 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.spi.CurrentSessionContext;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.orm.hibernate3.HibernateOperations;
+import org.springframework.orm.hibernate5.HibernateOperations;
 import org.springframework.util.Assert;
 
 /**
@@ -49,7 +50,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	protected static final Log logger = LogFactory
 			.getLog(HibernateItemWriter.class);
 
-	private HibernateOperations hibernateTemplate;
 	private SessionFactory sessionFactory;
 
 	private boolean clearSession = true;
@@ -66,17 +66,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the {@link HibernateOperations} property.
-	 *
-	 * @param hibernateTemplate
-	 *            the hibernateTemplate to set
-	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
-	 */
-	public void setHibernateTemplate(HibernateOperations hibernateTemplate) {
-		this.hibernateTemplate = hibernateTemplate;
-	}
-
-	/**
 	 * Set the Hibernate SessionFactory to be used internally.
 	 *
 	 * @param sessionFactory session factory to be used by the writer
@@ -86,12 +75,12 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a hibernateTemplate.
+	 * Check mandatory properties - there must be a sessionFactory.
 	 */
 	@Override
 	public void afterPropertiesSet() {
-		Assert.state(!(hibernateTemplate == null && sessionFactory == null),
-				"Either HibernateOperations or SessionFactory must be provided");
+		Assert.state(sessionFactory != null,
+				"SessionFactory must be provided");
 	}
 
 	/**
@@ -102,19 +91,10 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void write(List<? extends T> items) {
-		if(sessionFactory == null) {
-			doWrite(hibernateTemplate, items);
-			hibernateTemplate.flush();
-			if (clearSession) {
-				hibernateTemplate.clear();
-			}
-		}
-		else {
-			doWrite(sessionFactory, items);
-			sessionFactory.getCurrentSession().flush();
-			if(clearSession) {
-				sessionFactory.getCurrentSession().clear();
-			}
+		doWrite(sessionFactory, items);
+		sessionFactory.getCurrentSession().flush();
+		if(clearSession) {
+			sessionFactory.getCurrentSession().clear();
 		}
 	}
 
@@ -159,6 +139,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 *            the list of items to use for the write
 	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
 	 */
+	@Deprecated
 	protected void doWrite(HibernateOperations hibernateTemplate,
 			List<? extends T> items) {
 

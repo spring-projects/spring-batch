@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,6 +53,7 @@ import org.springframework.util.ReflectionUtils;
 /**
  * @author Dave Syer
  * @author Josh Long
+ * @author Mahmoud Ben Hassine
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -90,7 +91,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private List<String> savedStepNames = new ArrayList<String>();
+	private List<String> savedStepNames = new ArrayList<>();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -205,7 +206,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 			}
 		}
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		// Step names not saved by this one (it geosn't have that tasklet)
+		// Step names not saved by this one (it doesn't have that tasklet)
 		assertEquals("[]", savedStepNames.toString());
 		List<String> stepNames = getStepNames(jobExecution);
 		assertEquals(7, stepNames.size());
@@ -224,7 +225,7 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	}
 
 	private List<String> getStepNames(JobExecution jobExecution) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			list.add(stepExecution.getStepName());
 		}

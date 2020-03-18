@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,17 +15,12 @@
  */
 package org.springframework.batch.item.xml;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
-import org.junit.runners.JUnit4;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -34,14 +29,15 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.XmlMappingException;
 
-@RunWith(JUnit4.class)
+import static org.junit.Assert.assertTrue;
+
 public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 
     @Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
 		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
@@ -49,7 +45,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
 				Attribute attr = null ;
 				try {
-					XMLEventReader eventReader = StaxUtils.getXmlEventReader( source);
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader( source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();

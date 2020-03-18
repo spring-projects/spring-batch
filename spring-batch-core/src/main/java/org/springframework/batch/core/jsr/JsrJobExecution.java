@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,8 @@ public class JsrJobExecution implements javax.batch.runtime.JobExecution {
 	private JobParametersConverter parametersConverter;
 
 	/**
-	 * @param execution for all information to be delegated from
+	 * @param execution for all information to be delegated from.
+	 * @param parametersConverter instance of {@link JobParametersConverter}.
 	 */
 	public JsrJobExecution(org.springframework.batch.core.JobExecution execution, JobParametersConverter parametersConverter) {
 		Assert.notNull(execution, "A JobExecution is required");

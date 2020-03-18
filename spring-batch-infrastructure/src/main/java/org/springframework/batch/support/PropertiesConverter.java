@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -96,7 +96,7 @@ public final class PropertiesConverter {
 	 * an empty properties object is passed in, a blank string is returned,
 	 * otherwise it's string representation is returned.
 	 * 
-	 * @param propertiesToParse
+	 * @param propertiesToParse contains the properties be converted.
 	 * @return String representation of properties object
 	 */
 	public static String propertiesToString(Properties propertiesToParse) {

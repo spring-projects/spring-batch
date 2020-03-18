@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,12 +35,12 @@ public class ItemReadListenerAdapterTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		adapter = new ItemReadListenerAdapter<String>(delegate);
+		adapter = new ItemReadListenerAdapter<>(delegate);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNullDelegate() {
-		adapter = new ItemReadListenerAdapter<String>(null);
+		adapter = new ItemReadListenerAdapter<>(null);
 	}
 
 	@Test

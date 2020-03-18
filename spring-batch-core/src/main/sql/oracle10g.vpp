@@ -1,3 +1,0 @@
-#macro (sequence $name $value)CREATE SEQUENCE ${name} START WITH ${value} MINVALUE 0 MAXVALUE 9223372036854775807 NOCYCLE;
-#end
-#macro (notnull $name $type)MODIFY ${name} NOT NULL#end

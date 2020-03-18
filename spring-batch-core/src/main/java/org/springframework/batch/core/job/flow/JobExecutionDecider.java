@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.lang.Nullable;
 
 /**
  * Interface allowing for programmatic access to the decision on what the status
@@ -25,6 +26,7 @@ import org.springframework.batch.core.StepExecution;
  * implementation could check that value to determine the status of the flow. 
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public interface JobExecutionDecider {
@@ -35,9 +37,9 @@ public interface JobExecutionDecider {
 	 * determine the next step in the job.
 	 * 
 	 * @param jobExecution a job execution
-	 * @param stepExecution the latest step execution (may be null)
+	 * @param stepExecution the latest step execution (may be {@code null})
 	 * @return the exit status code
 	 */
-	FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution);
+	FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution);
 
 }
