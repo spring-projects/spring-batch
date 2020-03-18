@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 	<!--  Initialise the database before every test case: -->
 	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
@@ -17,11 +17,12 @@
 		</property>
 	</bean>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
 		<property name="password" value="${batch.jdbc.password}" />
+		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">

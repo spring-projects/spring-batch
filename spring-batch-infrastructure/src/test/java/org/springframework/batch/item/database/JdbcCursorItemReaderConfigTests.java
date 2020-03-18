@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,24 +15,29 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 import javax.sql.DataSource;
 
 import org.junit.Test;
-import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.ArgumentCaptor;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(JUnit4.class)
 public class JdbcCursorItemReaderConfigTests {
@@ -53,7 +58,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
 		reader.setUseSharedExtendedConnection(true);
 		reader.setSql("select foo from bar");
@@ -85,7 +90,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
@@ -98,6 +103,41 @@ public class JdbcCursorItemReaderConfigTests {
 						return null;
 					}
 				});
+	}
+
+	@Test
+	public void testOverrideConnectionAutoCommit() throws Exception {
+		boolean initialAutoCommit= false;
+		boolean neededAutoCommit = true;
+
+		DataSource ds = mock(DataSource.class);
+		Connection con = mock(Connection.class);
+		when(con.getAutoCommit()).thenReturn(initialAutoCommit);
+		PreparedStatement ps = mock(PreparedStatement.class);
+		when(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY,
+				ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
+		when(ds.getConnection()).thenReturn(con);
+
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
+		reader.setDataSource(ds);
+		reader.setSql("select foo from bar");
+		reader.setConnectionAutoCommit(neededAutoCommit);
+
+		// Check "open" outside of a transaction (see AbstractStep#execute())
+		final ExecutionContext ec = new ExecutionContext();
+		reader.open(ec);
+
+		ArgumentCaptor<Boolean> autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
+		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
+		assertEquals(neededAutoCommit, autoCommitCaptor.getValue());
+
+		reset(con);
+		reader.close();
+
+		// Check restored autocommit value
+		autoCommitCaptor = ArgumentCaptor.forClass(Boolean.class);
+		verify(con, times(1)).setAutoCommit(autoCommitCaptor.capture());
+		assertEquals(initialAutoCommit, autoCommitCaptor.getValue());
 	}
 
 }

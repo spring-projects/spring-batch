@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
@@ -104,7 +105,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			if (logger.isDebugEnabled()) {
 				logger.debug("Dispatching chunk: " + request);
 			}
-			messagingGateway.send(new GenericMessage<ChunkRequest<T>>(request));
+			messagingGateway.send(new GenericMessage<>(request));
 			localState.incrementExpected();
 
 		}
@@ -116,6 +117,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		localState.setStepExecution(stepExecution);
 	}
 
+	@Nullable
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!(stepExecution.getStatus() == BatchStatus.COMPLETED)) {
@@ -171,7 +173,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	public Collection<StepContribution> getStepContributions() {
-		List<StepContribution> contributions = new ArrayList<StepContribution>();
+		List<StepContribution> contributions = new ArrayList<>();
 		for (ChunkResponse response : localState.pollChunkResponses()) {
 			StepContribution contribution = response.getStepContribution();
 			if (logger.isDebugEnabled()) {
@@ -216,6 +218,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * @throws IllegalStateException if the result contains the wrong job instance id (maybe we are sharing a channel
 	 * and we shouldn't be)
 	 */
+	@SuppressWarnings("unchecked")
 	private void getNextResult() throws AsynchronousFailureException {
 		Message<ChunkResponse> message = (Message<ChunkResponse>) messagingGateway.receive(replyChannel);
 		if (message != null) {
@@ -273,14 +276,14 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 		private StepExecution stepExecution;
 
-		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<ChunkResponse>();
+		private final Queue<ChunkResponse> contributions = new LinkedBlockingQueue<>();
 
 		public int getExpecting() {
 			return expected.get() - actual.get();
 		}
 
 		public <T> ChunkRequest<T> getRequest(List<? extends T> items) {
-			return new ChunkRequest<T>(current.incrementAndGet(), items, getJobId(), createStepContribution());
+			return new ChunkRequest<>(current.incrementAndGet(), items, getJobId(), createStepContribution());
 		}
 
 		public void open(int expectedValue, int actualValue) {
@@ -289,7 +292,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 
 		public Collection<ChunkResponse> pollChunkResponses() {
-			Collection<ChunkResponse> set = new ArrayList<ChunkResponse>();
+			Collection<ChunkResponse> set = new ArrayList<>();
 			synchronized (contributions) {
 				ChunkResponse item = contributions.poll();
 				while (item != null) {

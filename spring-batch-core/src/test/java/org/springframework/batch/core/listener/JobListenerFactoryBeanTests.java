@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -95,7 +95,7 @@ public class JobListenerFactoryBeanTests {
 		Object listener = JobListenerFactoryBean.getListener(delegate);
 		Object other = JobListenerFactoryBean.getListener(delegate);
 		assertTrue(listener instanceof JobExecutionListener);
-		Set<JobExecutionListener> listeners = new HashSet<JobExecutionListener>();
+		Set<JobExecutionListener> listeners = new HashSet<>();
 		listeners.add((JobExecutionListener) listener);
 		listeners.add((JobExecutionListener) other);
 		assertTrue(listeners.contains(listener));
@@ -191,7 +191,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -209,7 +209,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -226,7 +226,7 @@ public class JobListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		factoryBean.getObject();

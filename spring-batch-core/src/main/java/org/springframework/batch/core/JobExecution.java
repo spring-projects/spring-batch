@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core;
 
-import org.springframework.batch.item.ExecutionContext;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -25,16 +23,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Batch domain object representing the execution of a job.
  *
  * @author Lucas Ward
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Dimitrios Liapis
  *
  */
 @SuppressWarnings("serial")
@@ -44,7 +47,7 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = new CopyOnWriteArraySet<StepExecution>();
+	private volatile Collection<StepExecution> stepExecutions = Collections.synchronizedSet(new LinkedHashSet<>());
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -60,7 +63,7 @@ public class JobExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
 	private final String jobConfigurationName;
 
@@ -86,8 +89,12 @@ public class JobExecution extends Entity {
 	 * constructor is the only valid one from a modeling point of view.
 	 *
 	 * @param job the job of which this execution is a part
+	 * @param id {@link Long} that represents the id for the JobExecution.
+	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
+	 * @param jobConfigurationName {@link String} instance that represents the
+	 * job configuration name (used with JSR-352).
 	 */
-	public JobExecution(JobInstance job, Long id, JobParameters jobParameters, String jobConfigurationName) {
+	public JobExecution(JobInstance job, Long id, @Nullable JobParameters jobParameters, String jobConfigurationName) {
 		super(id);
 		this.jobInstance = job;
 		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
@@ -106,6 +113,7 @@ public class JobExecution extends Entity {
 	 * Constructor for transient (unsaved) instances.
 	 *
 	 * @param job the enclosing {@link JobInstance}
+	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
 		this(job, null, jobParameters, null);
@@ -181,7 +189,7 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * @param exitStatus
+	 * @param exitStatus {@link ExitStatus} instance to be used for job execution.
 	 */
 	public void setExitStatus(ExitStatus exitStatus) {
 		this.exitStatus = exitStatus;
@@ -207,12 +215,14 @@ public class JobExecution extends Entity {
 	 * @return the step executions that were registered
 	 */
 	public Collection<StepExecution> getStepExecutions() {
-		return Collections.unmodifiableList(new ArrayList<StepExecution>(stepExecutions));
+		return Collections.unmodifiableList(new ArrayList<>(stepExecutions));
 	}
 
 	/**
 	 * Register a step execution with the current job execution.
 	 * @param stepName the name of the step the new execution is associated with
+	 * @return {@link StepExecution} an empty {@code StepExecution} associated with this
+	 * 	{@code JobExecution}.
 	 */
 	public StepExecution createStepExecution(String stepName) {
 		StepExecution stepExecution = new StepExecution(stepName, this);
@@ -224,10 +234,11 @@ public class JobExecution extends Entity {
 	 * Test if this {@link JobExecution} indicates that it is running. It should
 	 * be noted that this does not necessarily mean that it has been persisted
 	 * as such yet.
-	 * @return true if the end time is null
+	 *
+	 * @return true if the end time is null and the start time is not null
 	 */
 	public boolean isRunning() {
-		return endTime == null;
+		return startTime != null && endTime == null;
 	}
 
 	/**
@@ -291,7 +302,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Package private method for re-constituting the step executions from
 	 * existing instances.
-	 * @param stepExecution
+	 * @param stepExecution execution to be added
 	 */
 	void addStepExecution(StepExecution stepExecution) {
 		stepExecutions.add(stepExecution);
@@ -310,7 +321,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Set the last time this JobExecution was updated.
 	 *
-	 * @param lastUpdated
+	 * @param lastUpdated {@link Date} instance to mark job execution's lastUpdated attribute.
 	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -323,7 +334,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Add the provided throwable to the failure exception list.
 	 *
-	 * @param t
+	 * @param t {@link Throwable} instance to be added failure exception list.
 	 */
 	public synchronized void addFailureException(Throwable t) {
 		this.failureExceptions.add(t);
@@ -338,21 +349,26 @@ public class JobExecution extends Entity {
 	 */
 	public synchronized List<Throwable> getAllFailureExceptions() {
 
-		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
+		Set<Throwable> allExceptions = new HashSet<>(failureExceptions);
 		for (StepExecution stepExecution : stepExecutions) {
 			allExceptions.addAll(stepExecution.getFailureExceptions());
 		}
 
-		return new ArrayList<Throwable>(allExceptions);
+		return new ArrayList<>(allExceptions);
 	}
 
 	/**
 	 * Deserialize and ensure transient fields are re-instantiated when read
-	 * back
+	 * back.
+	 *
+	 * @param stream instance of {@link ObjectInputStream}.
+	 *
+	 * @throws IOException thrown if error occurs during read.
+	 * @throws ClassNotFoundException thrown if class is not found.
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		failureExceptions = new ArrayList<Throwable>();
+		failureExceptions = new ArrayList<>();
 	}
 
 	/*
@@ -377,5 +393,4 @@ public class JobExecution extends Entity {
 			this.stepExecutions.addAll(stepExecutions);
 		}
 	}
-
 }

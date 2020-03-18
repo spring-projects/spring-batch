@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,9 @@ package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+
 import org.springframework.batch.item.file.LineMapper;
 
 /**
@@ -51,7 +52,7 @@ public class JsonLineMapper implements LineMapper<Map<String, Object>> {
     @Override
 	public Map<String, Object> mapLine(String line, int lineNumber) throws Exception {
 		Map<String, Object> result;
-		JsonParser parser = factory.createJsonParser(line);
+		JsonParser parser = factory.createParser(line);
 		@SuppressWarnings("unchecked")
 		Map<String, Object> token = parser.readValueAs(Map.class);
 		result = token;

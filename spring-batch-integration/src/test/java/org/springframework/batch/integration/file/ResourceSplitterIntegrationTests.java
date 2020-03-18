@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -70,7 +70,7 @@ public class ResourceSplitterIntegrationTests {
 	@Ignore //FIXME
 	// This broke with Integration 2.0 in a milestone, so watch out when upgrading...
 	public void testVanillaConversion() throws Exception {
-		resources.send(new GenericMessage<String>("classpath:*-context.xml"));
+		resources.send(new GenericMessage<>("classpath:*-context.xml"));
 		Message<Resource> message = (Message<Resource>) requests.receive(200L);
 		assertNotNull(message);
 		message = (Message<Resource>) requests.receive(100L);

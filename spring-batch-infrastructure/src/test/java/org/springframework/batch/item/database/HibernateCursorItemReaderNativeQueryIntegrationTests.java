@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,13 +25,13 @@ import org.springframework.batch.item.sample.Foo;
 public class HibernateCursorItemReaderNativeQueryIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
   
     @Override
-    protected void setQuery(HibernateCursorItemReader<?> hibernateReader) throws Exception {
+    protected void setQuery(HibernateCursorItemReader<Foo> hibernateReader) throws Exception {
 
     	String nativeQuery = "select * from T_FOOS";
         
         //creating a native query provider as it would be created in configuration
         HibernateNativeQueryProvider<Foo> queryProvider = 
-            new HibernateNativeQueryProvider<Foo>();
+            new HibernateNativeQueryProvider<>();
 
         queryProvider.setSqlQuery(nativeQuery);
         queryProvider.setEntityClass(Foo.class);

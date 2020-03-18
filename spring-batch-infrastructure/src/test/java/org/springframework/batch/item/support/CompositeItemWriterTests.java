@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ import org.springframework.batch.item.ItemWriter;
 public class CompositeItemWriterTests {
 
 	// object under test
-	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<Object>();
+	private CompositeItemWriter<Object> itemWriter = new CompositeItemWriter<>();
 
 	/**
 	 * Regular usage scenario. All injected processors should be called.
@@ -45,7 +45,7 @@ public class CompositeItemWriterTests {
 		final int NUMBER_OF_WRITERS = 10;
 		List<Object> data = Collections.singletonList(new Object());
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public class CompositeItemWriterTests {
 		}
 		writer.write(data);
 
-		List<ItemWriter<? super Object>> writers = new ArrayList<ItemWriter<? super Object>>();
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
 		writers.add(writer);
 
 		itemWriter.setDelegates(writers);

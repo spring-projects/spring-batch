@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.lang.Nullable;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return
@@ -31,6 +32,7 @@ import org.springframework.batch.repeat.RepeatStatus;
  * @see AbstractMethodInvokingDelegator
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
@@ -42,8 +44,12 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 *
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
+	@Nullable
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		if (getArguments() == null) {
+			setArguments(new Object[]{contribution, chunkContext});
+		}
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;
 	}

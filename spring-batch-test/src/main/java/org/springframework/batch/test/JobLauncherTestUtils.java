@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -62,6 +63,7 @@ import org.springframework.context.ApplicationContext;
  * @author Lucas Ward
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 public class JobLauncherTestUtils {
@@ -135,7 +137,7 @@ public class JobLauncherTestUtils {
 	 * Launch the entire job, including all steps.
 	 * 
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs launching the job.
 	 */
 	public JobExecution launchJob() throws Exception {
 		return this.launchJob(this.getUniqueJobParameters());
@@ -144,9 +146,9 @@ public class JobLauncherTestUtils {
 	/**
 	 * Launch the entire job, including all steps
 	 * 
-	 * @param jobParameters
+	 * @param jobParameters instance of {@link JobParameters}.
 	 * @return JobExecution, so that the test can validate the exit status
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs launching the job.
 	 */
 	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);
@@ -157,7 +159,7 @@ public class JobLauncherTestUtils {
 	 * current timestamp, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("random", new JobParameter((long) (Math.random() * JOB_PARAMETER_MAXIMUM)));
 		return new JobParameters(parameters);
 	}
@@ -223,7 +225,7 @@ public class JobLauncherTestUtils {
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(String stepName, JobParameters jobParameters, @Nullable ExecutionContext jobExecutionContext) {
 		if (!(job instanceof StepLocator)) {
 			throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
 					+ job.getName() + " does not implement StepLocator");

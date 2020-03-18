@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,7 @@ public class StepListenerMethodInterceptorTests {
 	@Test
 	public void testNormalCase() throws Throwable{
 
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		for(Method method : TestClass.class.getMethods()){
 			invokerMap.put(method.getName(), asSet( new SimpleMethodInvoker(testClass, method)));
 		}
@@ -59,7 +59,7 @@ public class StepListenerMethodInterceptorTests {
 	@Test
 	public void testMultipleInvokersPerName() throws Throwable{
 
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method1", false));
 		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method2", false));
 		invokerMap.put("method1", invokers);
@@ -72,7 +72,7 @@ public class StepListenerMethodInterceptorTests {
 
 	@Test
 	public void testExitStatusReturn() throws Throwable{
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
 		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
 		invokerMap.put("method3", invokers);
@@ -81,7 +81,7 @@ public class StepListenerMethodInterceptorTests {
 	}
 
 	public Set<MethodInvoker> asSet(MethodInvoker methodInvoker){
-		Set<MethodInvoker> invokerSet = new HashSet<MethodInvoker>();
+		Set<MethodInvoker> invokerSet = new HashSet<>();
 		invokerSet.add(methodInvoker);
 		return invokerSet;
 	}

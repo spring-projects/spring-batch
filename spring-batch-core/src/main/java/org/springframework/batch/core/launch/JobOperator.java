@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.launch;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -26,10 +30,6 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Low level interface for inspecting and controlling jobs with access only to
@@ -50,7 +50,8 @@ public interface JobOperator {
 	 * @param instanceId the id of a {@link JobInstance}
 	 * @return the id values of all the {@link JobExecution JobExecutions}
 	 * associated with this instance
-	 * @throws NoSuchJobInstanceException
+	 * @throws NoSuchJobInstanceException if the {@link JobInstance} associated with the
+	 * 	{@code instanceId} cannot be found.
 	 */
 	List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException;
 
@@ -62,7 +63,7 @@ public interface JobOperator {
 	 * @param start the start index of the instances
 	 * @param count the maximum number of values to return
 	 * @return the id values of the {@link JobInstance JobInstances}
-	 * @throws NoSuchJobException
+	 * @throws NoSuchJobException is thrown if no {@link JobInstance}s for the jobName exist.
 	 */
 	List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException;
 
@@ -99,7 +100,7 @@ public interface JobOperator {
 	 * name
 	 * @throws JobInstanceAlreadyExistsException if a job instance with this
 	 * name and parameters already exists
-	 * @throws JobParametersInvalidException 
+	 * @throws JobParametersInvalidException thrown if any of the job parameters are invalid.
 	 */
 	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException;
 
@@ -140,11 +141,14 @@ public interface JobOperator {
 	 * @param jobName the name of the job to launch
 	 * @return the {@link JobExecution} id of the execution created when the job
 	 * is launched
+	 *
 	 * @throws NoSuchJobException if there is no such job definition available
 	 * @throws JobParametersNotFoundException if the parameters cannot be found
-	 * @throws JobParametersInvalidException 
-	 * @throws UnexpectedJobExecutionException 
+	 * @throws JobParametersInvalidException thrown if some of the job parameters are invalid.
 	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
+	 * @throws JobRestartException thrown if a job is restarted illegally.
+	 * @throws JobExecutionAlreadyRunningException thrown if attempting to restart a job that is already executing.
+	 * @throws JobInstanceAlreadyCompleteException thrown if attempting to restart a completed job.
 	 */
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
 			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException, UnexpectedJobExecutionException, JobParametersInvalidException;
@@ -197,17 +201,17 @@ public interface JobOperator {
 	 */
 	Set<String> getJobNames();
 
-    /**
-     * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored
-     * because the process died this is the best way to mark a job as finished
-     * with (as opposed to STOPPED). An abandoned job execution can be
-     * restarted, but a stopping one cannot.
-     *
-     * @param jobExecutionId the job execution id to abort
-     * @return the {@link JobExecution} that was aborted
-     * @throws NoSuchJobExecutionException
-     * @throws JobExecutionAlreadyRunningException if the job is running (it
-     * should be stopped first)
-     */
-    JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
+	/**
+	 * Mark the {@link JobExecution} as ABANDONED. If a stop signal is ignored
+	 * because the process died this is the best way to mark a job as finished
+	 * with (as opposed to STOPPED). An abandoned job execution cannot be
+	 * restarted by the framework.
+	 *
+	 * @param jobExecutionId the job execution id to abort
+	 * @return the {@link JobExecution} that was aborted
+	 * @throws NoSuchJobExecutionException thrown if there is no job execution for the jobExecutionId.
+	 * @throws JobExecutionAlreadyRunningException if the job is running (it
+	 * should be stopped first)
+	 */
+	JobExecution abandon(long jobExecutionId) throws NoSuchJobExecutionException, JobExecutionAlreadyRunningException;
 }

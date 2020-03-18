@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,6 +65,7 @@ import org.springframework.batch.item.ExecutionContext;
  *
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 public class SimpleJobTests {
 
@@ -78,7 +79,7 @@ public class SimpleJobTests {
 
 	private ExecutionContextDao ecDao;
 
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List<Serializable> list = new ArrayList<>();
 
 	private JobInstance jobInstance;
 
@@ -122,7 +123,7 @@ public class SimpleJobTests {
 			}
 		});
 
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(step1);
 		steps.add(step2);
 		job.setName("testJob");
@@ -194,7 +195,7 @@ public class SimpleJobTests {
 				return false;
 			}
 		};
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(testStep);
 		job.setSteps(steps);
 		job.execute(jobExecution);
@@ -355,7 +356,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testStepAlreadyCompleteInSameExecution() throws Exception {
-		List<Step> steps = new ArrayList<Step>();
+		List<Step> steps = new ArrayList<>();
 		steps.add(step1);
 		steps.add(step2);
 		// Two steps with the same name should both be executed, since
@@ -372,7 +373,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testNoSteps() throws Exception {
-		job.setSteps(new ArrayList<Step>());
+		job.setSteps(new ArrayList<>());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
@@ -578,7 +579,7 @@ public class SimpleJobTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
+		 * @see org.springframework.batch.core.step.StepSupport#execute(org.
 		 * springframework.batch.core.StepExecution)
 		 */
 		@Override

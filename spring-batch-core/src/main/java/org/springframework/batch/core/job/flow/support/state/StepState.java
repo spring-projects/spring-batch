@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,7 @@ import org.springframework.batch.core.step.StepLocator;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class StepState extends AbstractState implements StepLocator, StepHolder {
@@ -67,9 +68,6 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return new FlowExecutionStatus(executor.executeStep(step));
 	}
 
-	/**
-	 * @deprecated in favor of using {@link StepLocator#getStep(String)}.
-	 */
 	@Override
 	public Step getStep() {
 		return step;
@@ -88,7 +86,7 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	 */
 	@Override
 	public Collection<String> getStepNames() {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 
 		names.add(step.getName());
 

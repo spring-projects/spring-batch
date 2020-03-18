@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,15 @@
  */
 
 package org.springframework.batch.item.file.mapping;
+
+import java.beans.PropertyEditor;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
@@ -27,25 +36,18 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.DataBinder;
 
-import java.beans.PropertyEditor;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
  * {@link FieldSet} to be mapped should have field name meta data corresponding
  * to bean property paths in an instance of the desired type. The instance is
- * created and initialized either by referring to to a prototype object by bean
+ * created and initialized either by referring to a prototype object by bean
  * name in the enclosing BeanFactory, or by providing a class to instantiate
  * reflectively.<br>
  * <br>
@@ -63,7 +65,11 @@ import java.util.concurrent.ConcurrentMap;
  * can inject {@link PropertyEditor} instances directly through the
  * {@link #setCustomEditors(Map) customEditors} property, or you can override
  * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
- * methods, or you can provide a custom {@link FieldSet} implementation.<br>
+ * methods, or you can provide a custom {@link FieldSet} implementation.
+ * You can also use a {@link ConversionService} to convert to the desired type
+ * through the {@link #setConversionService(ConversionService) conversionService}
+ * property.
+ * <br>
  * <br>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
@@ -85,6 +91,7 @@ import java.util.concurrent.ConcurrentMap;
  * match is found. If more than one match is found there will be an error.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
@@ -96,11 +103,15 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private BeanFactory beanFactory;
 
-	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<DistanceHolder, ConcurrentMap<String, String>>();
+	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<>();
 
 	private int distanceLimit = 5;
 
 	private boolean strict = true;
+
+	private ConversionService conversionService;
+
+	private boolean isCustomEditorsSet;
 
 	/*
 	 * (non-Javadoc)
@@ -166,6 +177,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null || type != null, "Either name or type must be provided.");
 		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
+		Assert.state(!this.isCustomEditorsSet || this.conversionService == null, "Both customEditor and conversionService cannot be specified together.");
 	}
 
 	/**
@@ -198,7 +210,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * {@link #initBinder(DataBinder)} and
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
 	 * 
-	 * @param target
+	 * @param target Object to bind to
 	 * @return a {@link DataBinder} that can be used to bind properties to the
 	 * target.
 	 */
@@ -207,6 +219,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		binder.setIgnoreUnknownFields(!this.strict);
 		initBinder(binder);
 		registerCustomEditors(binder);
+		if(this.conversionService != null) {
+			binder.setConversionService(this.conversionService);
+		}
 		return binder;
 	}
 
@@ -232,10 +247,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		try {
 			return type.newInstance();
 		}
-		catch (InstantiationException e) {
-			ReflectionUtils.handleReflectionException(e);
-		}
-		catch (IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -243,20 +255,23 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * @param bean
-	 * @param properties
-	 * @return
+	 * @param bean Object to get properties for
+	 * @param properties Properties to retrieve
 	 */
 	private Properties getBeanProperties(Object bean, Properties properties) {
+
+		if (this.distanceLimit == 0) {
+			return properties;
+		}
 
 		Class<?> cls = bean.getClass();
 
 		// Map from field names to property names
 		DistanceHolder distanceKey = new DistanceHolder(cls, distanceLimit);
 		if (!propertiesMatched.containsKey(distanceKey)) {
-			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<String, String>());
+			propertiesMatched.putIfAbsent(distanceKey, new ConcurrentHashMap<>());
 		}
-		Map<String, String> matches = new HashMap<String, String>(propertiesMatched.get(distanceKey));
+		Map<String, String> matches = new HashMap<>(propertiesMatched.get(distanceKey));
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Set<String> keys = new HashSet(properties.keySet());
@@ -285,7 +300,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			}
 		}
 
-		propertiesMatched.replace(distanceKey, new ConcurrentHashMap<String, String>(matches));
+		propertiesMatched.replace(distanceKey, new ConcurrentHashMap<>(matches));
 		return properties;
 	}
 
@@ -357,10 +372,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException e) {
-				ReflectionUtils.handleReflectionException(e);
-			}
-			catch (IllegalAccessException e) {
+			catch (InstantiationException | IllegalAccessException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}
@@ -378,10 +390,35 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields
 	 * that cannot be mapped to the bean.
 	 * 
-	 * @param strict
+	 * @param strict indicator
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
+	}
+
+
+	/**
+	 * Public setter for the 'conversionService' property.
+	 * {@link #createBinder(Object)} will use it if not null.
+	 *
+	 * @param conversionService {@link ConversionService} to be used for type conversions
+	 */
+	public void setConversionService(ConversionService conversionService) {
+		this.conversionService = conversionService;
+	}
+
+	/**
+	 * Specify the {@link PropertyEditor custom editors} to register.
+	 *
+	 *
+	 * @param customEditors a map of Class to PropertyEditor (or class name to
+	 * PropertyEditor).
+	 * @see CustomEditorConfigurer#setCustomEditors(Map)
+	 */
+	@Override
+	public void setCustomEditors(Map<? extends Object, ? extends PropertyEditor> customEditors) {
+		this.isCustomEditorsSet = true;
+		super.setCustomEditors(customEditors);
 	}
 
 	private static class DistanceHolder {

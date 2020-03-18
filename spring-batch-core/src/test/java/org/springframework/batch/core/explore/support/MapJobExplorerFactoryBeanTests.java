@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,10 +18,13 @@ package org.springframework.batch.core.explore.support;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+
+import java.util.Date;
 
 /**
  * Tests for {@link MapJobExplorerFactoryBean}.
@@ -36,8 +39,13 @@ public class MapJobExplorerFactoryBeanTests {
 	public void testCreateExplorer() throws Exception {
 
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.getObject().createJobExecution("foo", new JobParameters());
-		
+		JobRepository jobRepository = repositoryFactory.getObject();
+		JobExecution jobExecution = jobRepository.createJobExecution("foo", new JobParameters());
+
+		//simulating a running job execution
+		jobExecution.setStartTime(new Date());
+		jobRepository.update(jobExecution);
+
 		MapJobExplorerFactoryBean tested = new MapJobExplorerFactoryBean(repositoryFactory);
 		tested.afterPropertiesSet();
 

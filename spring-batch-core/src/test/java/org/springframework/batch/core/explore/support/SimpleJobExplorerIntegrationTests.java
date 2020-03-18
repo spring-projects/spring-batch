@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.explore.support;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import test.jdbc.datasource.DataSourceInitializer;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -53,7 +53,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import test.jdbc.datasource.DataSourceInitializer;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Integration test for the BATCH-2034 issue.
@@ -100,7 +100,7 @@ public class SimpleJobExplorerIntegrationTests {
 		@Bean
 		public SimpleFlow simpleFlow() {
 			SimpleFlow simpleFlow = new SimpleFlow("simpleFlow");
-			List<StateTransition> transitions = new ArrayList<StateTransition>();
+			List<StateTransition> transitions = new ArrayList<>();
 			transitions.add(StateTransition.createStateTransition(new StepState(dummyStep()), "end0"));
 			transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
 			simpleFlow.setStateTransitions(transitions);

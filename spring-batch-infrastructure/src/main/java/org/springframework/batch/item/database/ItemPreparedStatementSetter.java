@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,7 @@ public interface ItemPreparedStatementSetter<T> {
 	/**
 	 * Set parameter values on the given PreparedStatement as determined from
 	 * the provided item.
+	 * @param item the item to obtain the values from
 	 * @param ps the PreparedStatement to invoke setter methods on
 	 * @throws SQLException if a SQLException is encountered (i.e. there is no
 	 * need to catch SQLException)

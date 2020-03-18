@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -83,7 +83,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * @throws IllegalArgumentException if the argument is null
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		Assert.notNull(taskExecutor);
+		Assert.notNull(taskExecutor, "A TaskExecutor is required");
 		this.taskExecutor = taskExecutor;
 	}
 
@@ -99,7 +99,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 
-		ExecutingRunnable runnable = null;
+		ExecutingRunnable runnable;
 
 		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
 

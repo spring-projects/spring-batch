@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.test.step;
-
-import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -41,12 +40,13 @@ import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for {@link FaultTolerantStepFactoryBean}.
@@ -81,7 +81,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 		writer = new SkipWriterStub();
 		processor = new SkipProcessorStub();
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setTransactionManager(transactionManager);
 		factory.setBeanName("stepName");
@@ -144,7 +144,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 				assertEquals(5, stepExecution.getSkipCount());
-				List<String> processed = new ArrayList<String>(processor.getProcessed());
+				List<String> processed = new ArrayList<>(processor.getProcessed());
 				Collections.sort(processed);
 				assertEquals("[1, 1, 2, 2, 3, 3, 4, 4, 5, 5]", processed.toString());
 
@@ -177,14 +177,14 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			counter = -1;
 		}
 
+		@Nullable
 		@Override
-		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
+		public synchronized String read() throws Exception {
 			counter++;
 			if (counter >= items.length) {
 				return null;
 			}
-			String item = items[counter];
-			return item;
+			return items[counter];
 		}
 	}
 
@@ -192,7 +192,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> written = new CopyOnWriteArrayList<String>();
+		private List<String> written = new CopyOnWriteArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -228,7 +228,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new CopyOnWriteArrayList<String>();
+		private List<String> processed = new CopyOnWriteArrayList<>();
 		
 		public List<String> getProcessed() {
 			return processed;
@@ -238,6 +238,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			processed.clear();
 		}
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);
@@ -246,8 +247,9 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		for (Class<? extends Throwable> arg : args) {
 			map.put(arg, true);
 		}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 	private Map<String, Integer> mapping;
 
 	public SimpleJvmExitCodeMapper() {
-		mapping = new HashMap<String, Integer>();
+		mapping = new HashMap<>();
 		mapping.put(ExitStatus.COMPLETED.getExitCode(), JVM_EXITCODE_COMPLETED);
 		mapping.put(ExitStatus.FAILED.getExitCode(), JVM_EXITCODE_GENERIC_ERROR);
 		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, JVM_EXITCODE_JOB_ERROR);

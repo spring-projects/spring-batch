@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,7 +123,7 @@ public class CoreNamespaceUtils {
 			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder.genericBeanDefinition(
 					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-			ManagedMap<String, String> editors = new ManagedMap<String, String>();
+			ManagedMap<String, String> editors = new ManagedMap<>();
 			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
 			customEditorConfigurer.getPropertyValues().addPropertyValue("customEditors", editors);
 			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, customEditorConfigurer);
@@ -181,7 +181,7 @@ public class CoreNamespaceUtils {
 	 * Should this element be treated as incomplete? If it has a parent or is
 	 * abstract, then it may not have all properties.
 	 *
-	 * @param element
+	 * @param element to be evaluated.
 	 * @return TRUE if the element is abstract or has a parent
 	 */
 	public static boolean isUnderspecified(Element element) {
@@ -189,7 +189,7 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * @param element
+	 * @param element to be evaluated.
 	 * @return TRUE if the element is abstract
 	 */
 	public static boolean isAbstract(Element element) {

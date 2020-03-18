@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,9 +35,9 @@ import org.springframework.mail.SimpleMailMessage;
  */
 public class TestMailSender implements MailSender {
 
-	private List<String> subjectsToFail = new ArrayList<String>();
+	private List<String> subjectsToFail = new ArrayList<>();
 
-	private List<SimpleMailMessage> received = new ArrayList<SimpleMailMessage>();
+	private List<SimpleMailMessage> received = new ArrayList<>();
 
 	public void clear() {
 		received.clear();
@@ -53,8 +53,8 @@ public class TestMailSender implements MailSender {
 	}
 
 	@Override
-	public void send(SimpleMailMessage[] simpleMessages) throws MailException {
-		Map<Object, Exception> failedMessages = new LinkedHashMap<Object, Exception>();
+	public void send(SimpleMailMessage... simpleMessages) throws MailException {
+		Map<Object, Exception> failedMessages = new LinkedHashMap<>();
 		for (SimpleMailMessage simpleMessage : simpleMessages) {
 			if (subjectsToFail.contains(simpleMessage.getSubject())) {
 				failedMessages.put(simpleMessage, new MessagingException());

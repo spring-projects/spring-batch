@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,6 +43,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -58,6 +59,8 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Dimitrios Liapis
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -83,7 +86,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ " from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String GET_RUNNING_EXECUTIONS = "SELECT E.JOB_EXECUTION_ID, E.START_TIME, E.END_TIME, E.STATUS, E.EXIT_CODE, E.EXIT_MESSAGE, E.CREATE_TIME, E.LAST_UPDATED, E.VERSION, "
-			+ "E.JOB_INSTANCE_ID, E.JOB_CONFIGURATION_LOCATION from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
+			+ "E.JOB_INSTANCE_ID, E.JOB_CONFIGURATION_LOCATION from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.START_TIME is not NULL and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
@@ -164,15 +167,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * Validate JobExecution. At a minimum, JobId, StartTime, EndTime, and
-	 * Status cannot be null.
+	 * Validate JobExecution. At a minimum, JobId, Status, CreateTime cannot be null.
 	 *
 	 * @param jobExecution
 	 * @throws IllegalArgumentException
 	 */
 	private void validateJobExecution(JobExecution jobExecution) {
 
-		Assert.notNull(jobExecution);
+		Assert.notNull(jobExecution, "jobExecution cannot be null");
 		Assert.notNull(jobExecution.getJobId(), "JobExecution Job-Id cannot be null.");
 		Assert.notNull(jobExecution.getStatus(), "JobExecution status cannot be null.");
 		Assert.notNull(jobExecution.getCreateTime(), "JobExecution create time cannot be null");
@@ -229,17 +231,18 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
+				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
 						new Object[] { jobExecution.getId() });
 				throw new OptimisticLockingFailureException("Attempt to update job execution id="
 						+ jobExecution.getId() + " with wrong version (" + jobExecution.getVersion()
-						+ "), where current version is " + curentVersion);
+						+ "), where current version is " + currentVersion);
 			}
 
 			jobExecution.incrementVersion();
 		}
 	}
 
+	@Nullable
 	@Override
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 
@@ -261,10 +264,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * getLastJobExecution(java.lang.String)
 	 */
 	@Override
+	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
 		try {
 			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
@@ -279,13 +283,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
-		final Set<JobExecution> result = new HashSet<JobExecution>();
+		final Set<JobExecution> result = new HashSet<>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
@@ -356,11 +360,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * @param executionId
-	 * @return
+	 * @param executionId {@link Long} containing the id for the execution.
+	 * @return job parameters for the requested execution id
 	 */
 	protected JobParameters getJobParameters(Long executionId) {
-		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		final Map<String, JobParameter> map = new HashMap<>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {

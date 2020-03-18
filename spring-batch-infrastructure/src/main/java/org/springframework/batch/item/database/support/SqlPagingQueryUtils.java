@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -156,6 +156,7 @@ public class SqlPagingQueryUtils {
 	 * 
 	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
 	 * implementation specifics
+	 * @param selectClause {@link String} containing the select portion of the query.
 	 * @param remainingPageQuery is this query for the remaining pages (true) as
 	 * opposed to the first page (false)
 	 * @param rowNumClause the implementation specific row num clause to be used
@@ -242,7 +243,8 @@ public class SqlPagingQueryUtils {
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
 	 * 
-	 * @param provider
+	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
+	 * used for pagination.
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	public static String buildSortClause(AbstractSqlPagingQueryProvider provider) {
@@ -252,7 +254,8 @@ public class SqlPagingQueryUtils {
 	/**
 	 * Generates ORDER BY attributes based on the sort keys.
 	 * 
-	 * @param sortKeys
+	 * @param sortKeys {@link Map} where the key is the name of the column to be
+	 * sorted and the value contains the {@link Order}.
 	 * @return a String that can be appended to an ORDER BY clause.
 	 */
 	public static String buildSortClause(Map<String, Order> sortKeys) {
@@ -280,13 +283,15 @@ public class SqlPagingQueryUtils {
 	/**
 	 * Appends the where conditions required to query for the subsequent pages.
 	 * 
-	 * @param provider
-	 * @param sql
+	 * @param provider the {@link AbstractSqlPagingQueryProvider} to be used for
+	 * pagination.
+	 * @param sql {@link StringBuilder} containing the sql to be used for the
+	 * query.
 	 */
 	public static void buildSortConditions(
 			AbstractSqlPagingQueryProvider provider, StringBuilder sql) {
-		List<Map.Entry<String, Order>> keys = new ArrayList<Map.Entry<String,Order>>(provider.getSortKeys().entrySet());
-		List<String> clauses = new ArrayList<String>();
+		List<Map.Entry<String, Order>> keys = new ArrayList<>(provider.getSortKeys().entrySet());
+		List<String> clauses = new ArrayList<>();
 		
 		for(int i = 0; i < keys.size(); i++) {
 			StringBuilder clause = new StringBuilder();

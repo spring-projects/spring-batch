@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,9 +58,12 @@ import org.springframework.util.Assert;
  * cumulative result.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
+
+	private static final int DEFAULT_POLLING_INTERVAL = 500;
 
 	// TODO: Replace with proper Channel and Messages once minimum support level for Spring is 4
 	private Queue<Serializable> partitionDataQueue;
@@ -73,7 +76,8 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	private BatchPropertyContext propertyContext;
 	private JobRepository jobRepository;
 	private boolean allowStartIfComplete = false;
-	private Set<String> partitionStepNames = new HashSet<String>();
+	private Set<String> partitionStepNames = new HashSet<>();
+	private int pollingInterval = DEFAULT_POLLING_INTERVAL;
 
 	private static final String STEP_NAME_SEPARATOR = ":";
 	private static final String PARTITION_KEY = "partition";
@@ -162,14 +166,22 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		this.jobRepository = jobRepository;
 	}
 
+	/**
+	 * @param pollingInterval the duration of partitions completion polling interval
+	 *                       (in milliseconds). The default value is 500ms.
+	 */
+	public void setPollingInterval(int pollingInterval) {
+		this.pollingInterval = pollingInterval;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.partition.PartitionHandler#handle(org.springframework.batch.core.partition.StepExecutionSplitter, org.springframework.batch.core.StepExecution)
 	 */
 	@Override
 	public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter,
 			StepExecution stepExecution) throws Exception {
-		final List<Future<StepExecution>> tasks = new ArrayList<Future<StepExecution>>();
-		final Set<StepExecution> result = new HashSet<StepExecution>();
+		final List<Future<StepExecution>> tasks = new ArrayList<>();
+		final Set<StepExecution> result = new HashSet<>();
 		final ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
 
 		int stepExecutionCount = jobRepository.getStepExecutionCount(stepExecution.getJobExecution().getJobInstance(), stepExecution.getStepName());
@@ -230,6 +242,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			final List<Future<StepExecution>> tasks,
 			final Set<StepExecution> result) throws Exception {
 		while(true) {
+			Thread.sleep(pollingInterval);
 			try {
 				lock.lock();
 				while(!partitionDataQueue.isEmpty()) {
@@ -251,9 +264,9 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 
 	/**
 	 * Uses either the {@link PartitionMapper} or the hard coded configuration to split
-	 * the supplied master StepExecution into the slave StepExecutions.
+	 * the supplied manager StepExecution into the worker StepExecutions.
 	 *
-	 * @param stepExecution master {@link StepExecution}
+	 * @param stepExecution manager {@link StepExecution}
 	 * @param isRestart true if this step is being restarted
 	 * @return a {@link Set} of {@link StepExecution}s to be executed
 	 * @throws Exception
@@ -261,7 +274,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	 */
 	private Set<StepExecution> splitStepExecution(StepExecution stepExecution,
 			boolean isRestart) throws Exception, JobExecutionException {
-		Set<StepExecution> partitionStepExecutions = new HashSet<StepExecution>();
+		Set<StepExecution> partitionStepExecutions = new HashSet<>();
 		if(isRestart) {
 			if(mapper != null) {
 				PartitionPlan plan = mapper.mapPartitions();
@@ -309,7 +322,10 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			throw new IllegalArgumentException("Either a number of threads or partitions are required");
 		}
 
-		stepExecution.getExecutionContext().put("partitionPlanState", new PartitionPlanState(plan));
+		PartitionPlanState partitionPlanState = new PartitionPlanState();
+		partitionPlanState.setPartitionPlan(plan);
+
+		stepExecution.getExecutionContext().put("partitionPlanState", partitionPlanState);
 
 		stepSplitter = new JsrStepExecutionSplitter(jobRepository, allowStartIfComplete, stepExecution.getStepName(), restoreState);
 		partitionStepExecutions = stepSplitter.split(stepExecution, plan.getPartitions());
@@ -369,7 +385,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 	 */
 	protected FutureTask<StepExecution> createTask(final Step step,
 			final StepExecution stepExecution) {
-		return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+		return new FutureTask<>(new Callable<StepExecution>() {
 			@Override
 			public StepExecution call() throws Exception {
 				step.execute(stepExecution);
@@ -386,9 +402,10 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		Assert.notNull(propertyContext, "A BatchPropertyContext is required");
 		Assert.isTrue(mapper != null || (threads > 0 || partitions > 0), "Either a mapper implementation or the number of partitions/threads is required");
 		Assert.notNull(jobRepository, "A JobRepository is required");
+		Assert.isTrue(pollingInterval >= 0, "The polling interval must be positive");
 
 		if(partitionDataQueue == null) {
-			partitionDataQueue = new LinkedBlockingQueue<Serializable>();
+			partitionDataQueue = new LinkedBlockingQueue<>();
 		}
 
 		if(lock == null) {
@@ -418,6 +435,15 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 			partitionProperties = plan.getPartitionProperties();
 			partitions = plan.getPartitions();
 			threads = plan.getThreads();
+		}
+
+		public PartitionPlanState() {
+		}
+
+		public void setPartitionPlan(PartitionPlan plan) {
+			this.partitionProperties = plan.getPartitionProperties();
+			this.partitions = plan.getPartitions();
+			this.threads = plan.getThreads();
 		}
 
 		/* (non-Javadoc)

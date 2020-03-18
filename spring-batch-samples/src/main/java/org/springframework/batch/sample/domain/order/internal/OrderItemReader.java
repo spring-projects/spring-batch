@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import org.springframework.batch.sample.domain.order.Customer;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
 import org.springframework.batch.sample.domain.order.ShippingInfo;
+import org.springframework.lang.Nullable;
 
 /**
  * @author peter.zozom
@@ -56,9 +57,9 @@ public class OrderItemReader implements ItemReader<Order> {
 	private ItemReader<FieldSet> fieldSetReader;
 
 	/**
-	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
+	@Nullable
 	@Override
 	public Order read() throws Exception {
 		recordFinished = false;
@@ -138,7 +139,7 @@ public class OrderItemReader implements ItemReader<Order> {
 		else if (LineItem.LINE_ID_ITEM.equals(lineId)) {
 			log.debug("MAPPING LINE ITEM");
 			if (order.getLineItems() == null) {
-				order.setLineItems(new ArrayList<LineItem>());
+				order.setLineItems(new ArrayList<>());
 			}
 			order.getLineItems().add(itemMapper.mapFieldSet(fieldSet));
 		}

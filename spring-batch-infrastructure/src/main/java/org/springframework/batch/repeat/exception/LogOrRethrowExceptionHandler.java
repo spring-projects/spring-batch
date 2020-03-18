@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -70,7 +70,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<Throwable, Level>(Level.RETHROW);
+	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<>(Level.RETHROW);
 
 	/**
 	 * Setter for the {@link Classifier} used by this handler. The default is to
@@ -86,7 +86,8 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * Classify the throwables and decide whether to rethrow based on the
 	 * result. The context is not used.
 	 * 
-	 * @throws Throwable
+	 * @throws Throwable thrown if {@link LogOrRethrowExceptionHandler#exceptionClassifier}
+	 * is classified as {@link Level#RETHROW}.
 	 * 
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */

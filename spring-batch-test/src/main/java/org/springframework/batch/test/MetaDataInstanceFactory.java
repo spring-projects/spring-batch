@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -166,9 +166,10 @@ public class MetaDataInstanceFactory {
 	/**
 	 * Create a {@link StepExecution} with the parameters provided.
 	 *
-	 * @param stepName the stepName for the {@link StepExecution}
-	 * @param executionId the id for the {@link StepExecution}
-	 * @return a {@link StepExecution} with the given {@link JobExecution}
+	 * @param jobExecution instance of {@link JobExecution}.
+	 * @param stepName the name for the {@link StepExecution}.
+	 * @param executionId the id for the {@link StepExecution}.
+	 * @return a {@link StepExecution} with the given {@link JobExecution}.
 	 */
 	public static StepExecution createStepExecution(JobExecution jobExecution, String stepName, Long executionId) {
 		StepExecution stepExecution = jobExecution.createStepExecution(stepName);

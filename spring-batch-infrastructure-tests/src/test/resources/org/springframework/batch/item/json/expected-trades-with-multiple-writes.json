@@ -1,0 +1,6 @@
+[
+ {"isin":"123","quantity":5,"price":10.5,"customer":"foo"},
+ {"isin":"456","quantity":10,"price":20.5,"customer":"bar"},
+ {"isin":"789","quantity":15,"price":30.5,"customer":"foobar"},
+ {"isin":"987","quantity":20,"price":40.5,"customer":"barfoo"}
+]

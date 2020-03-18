@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +16,8 @@
 
 package org.springframework.batch.repeat.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -44,6 +39,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -100,7 +99,7 @@ public class AsynchronousTests {
 		}
 	}
 
-	private volatile List<String> list = new ArrayList<String>();
+	private volatile List<String> list = new ArrayList<>();
 
 	private void assertInitialState() {
 		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
@@ -176,7 +175,7 @@ public class AsynchronousTests {
 		assertTrue(list.size() >= 1);
 
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
@@ -190,9 +189,9 @@ public class AsynchronousTests {
 	}
 
 	/**
-	 * @param list
-	 * @param timeout
-	 * @throws InterruptedException 
+	 * @param list resource to monitor
+	 * @param timeout how long to monitor for
+	 * @throws InterruptedException If interrupted while waiting
 	 */
 	private void waitFor(List<String> list, int size, int timeout) throws InterruptedException {
 		int count = 0;

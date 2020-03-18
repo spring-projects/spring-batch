@@ -1,11 +1,11 @@
 /*
- * Copyright 2011-2013 the original author or authors.
+ * Copyright 2011-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.util.Assert;
  * injected <code>JobParametersValidator</code>s
  *
  * @author Morten Andersen-Gott
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeJobParametersValidator implements JobParametersValidator, InitializingBean {
@@ -42,7 +44,7 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 	 * @throws JobParametersInvalidException if the parameters are invalid
 	 */
 	@Override
-	public void validate(JobParameters parameters)	throws JobParametersInvalidException {
+	public void validate(@Nullable JobParameters parameters) throws JobParametersInvalidException {
 		for (JobParametersValidator validator : validators) {
 			validator.validate(parameters);
 		}
@@ -50,7 +52,7 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 
 	/**
 	 * Public setter for the validators
-	 * @param validators
+	 * @param validators list of validators to be used by the CompositeJobParametersValidator.
 	 */
 	public void setValidators(List<JobParametersValidator> validators) {
 		this.validators = validators;

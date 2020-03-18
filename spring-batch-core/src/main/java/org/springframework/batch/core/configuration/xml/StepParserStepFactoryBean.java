@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,23 @@
  */
 
 package org.springframework.batch.core.configuration.xml;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.batch.api.chunk.listener.RetryProcessListener;
+import javax.batch.api.chunk.listener.RetryReadListener;
+import javax.batch.api.chunk.listener.RetryWriteListener;
+import javax.batch.api.chunk.listener.SkipProcessListener;
+import javax.batch.api.chunk.listener.SkipReadListener;
+import javax.batch.api.chunk.listener.SkipWriteListener;
+import javax.batch.api.partition.PartitionCollector;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -79,23 +96,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
 
-import javax.batch.api.chunk.listener.RetryProcessListener;
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.api.chunk.listener.RetryWriteListener;
-import javax.batch.api.chunk.listener.SkipProcessListener;
-import javax.batch.api.chunk.listener.SkipReadListener;
-import javax.batch.api.chunk.listener.SkipWriteListener;
-import javax.batch.api.partition.PartitionCollector;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
  * properties that are configurable on the &lt;step/&gt; (and its inner &lt;tasklet/&gt;). Based on which properties are
@@ -130,7 +130,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private PlatformTransactionManager transactionManager;
 
-	private Set<Object> stepExecutionListeners = new LinkedHashSet<Object>();
+	private Set<Object> stepExecutionListeners = new LinkedHashSet<>();
 
 	//
 	// Flow Elements
@@ -174,7 +174,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private Isolation isolation;
 
-	private Set<ChunkListener> chunkListeners = new LinkedHashSet<ChunkListener>();
+	private Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
 
 	//
 	// Chunk Attributes
@@ -218,21 +218,21 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	//
 	private RetryListener[] retryListeners;
 
-	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
+	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<>();
 
-	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
+	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<>();
 
 	private ItemStream[] streams;
 
-	private Set<ItemReadListener<I>> readListeners = new LinkedHashSet<ItemReadListener<I>>();
+	private Set<ItemReadListener<I>> readListeners = new LinkedHashSet<>();
 
-	private Set<ItemWriteListener<O>> writeListeners = new LinkedHashSet<ItemWriteListener<O>>();
+	private Set<ItemWriteListener<O>> writeListeners = new LinkedHashSet<>();
 
-	private Set<ItemProcessListener<I, O>> processListeners = new LinkedHashSet<ItemProcessListener<I, O>>();
+	private Set<ItemProcessListener<I, O>> processListeners = new LinkedHashSet<>();
 
-	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<SkipListener<I, O>>();
+	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
 
-	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<org.springframework.batch.core.jsr.RetryListener>();
+	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<>();
 
 	//
 	// Additional
@@ -428,7 +428,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	protected FaultTolerantStepBuilder<I, O> getFaultTolerantStepBuilder(String stepName) {
-		return new FaultTolerantStepBuilder<I, O>(new StepBuilder(stepName));
+		return new FaultTolerantStepBuilder<>(new StepBuilder(stepName));
 	}
 
 	protected void registerItemListeners(SimpleStepBuilder<I, O> builder) {
@@ -468,7 +468,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	protected SimpleStepBuilder<I, O> getSimpleStepBuilder(String stepName) {
-		return new SimpleStepBuilder<I, O>(new StepBuilder(stepName));
+		return new SimpleStepBuilder<>(new StepBuilder(stepName));
 	}
 
 	/**
@@ -509,7 +509,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 			if (transactionTimeout != null) {
 				attribute.setTimeout(transactionTimeout);
 			}
-			Collection<Class<? extends Throwable>> exceptions = noRollbackExceptionClasses == null ? new HashSet<Class<? extends Throwable>>()
+			Collection<Class<? extends Throwable>> exceptions = noRollbackExceptionClasses == null ? new HashSet<>()
 					: noRollbackExceptionClasses;
 			final BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(exceptions, false);
 			builder.transactionAttribute(new DefaultTransactionAttribute(attribute) {
@@ -757,7 +757,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * Public setter for {@link JobRepository}.
 	 *
-	 * @param jobRepository
+	 * @param jobRepository {@link JobRepository} instance to be used by the step.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -766,7 +766,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * The number of times that the step should be allowed to start
 	 *
-	 * @param startLimit
+	 * @param startLimit int containing the number of times a step should be allowed to start.
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
@@ -775,7 +775,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	/**
 	 * A preconfigured {@link Tasklet} to use.
 	 *
-	 * @param tasklet
+	 * @param tasklet {@link Tasklet} instance to be used by step.
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
@@ -786,7 +786,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * @return transactionManager
+	 * @return transactionManager instance of {@link PlatformTransactionManager}
+	 * used by the step.
 	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
@@ -817,15 +818,15 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipReadListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>((SkipReadListener) listener, null, null);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<>((SkipReadListener) listener, null, null);
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipProcessListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>(null,(SkipProcessListener) listener, null);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<>(null, (SkipProcessListener) listener, null);
 				skipListeners.add(skipListener);
 			}
 			if(listener instanceof SkipWriteListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<I, O>(null, null, (SkipWriteListener) listener);
+				SkipListener<I, O> skipListener = new SkipListenerAdapter<>(null, null, (SkipWriteListener) listener);
 				skipListeners.add(skipListener);
 			}
 			if (listener instanceof StepExecutionListener) {
@@ -849,7 +850,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				readListeners.add(readListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemReadListener) {
-				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<I>((javax.batch.api.chunk.listener.ItemReadListener) listener);
+				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<>((javax.batch.api.chunk.listener.ItemReadListener) listener);
 				readListeners.add(itemListener);
 			}
 			if (listener instanceof ItemWriteListener) {
@@ -857,7 +858,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				writeListeners.add(writeListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemWriteListener) {
-				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<O>((javax.batch.api.chunk.listener.ItemWriteListener) listener);
+				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<>((javax.batch.api.chunk.listener.ItemWriteListener) listener);
 				writeListeners.add(itemListener);
 			}
 			if (listener instanceof ItemProcessListener) {
@@ -865,7 +866,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				processListeners.add(processListener);
 			}
 			if(listener instanceof javax.batch.api.chunk.listener.ItemProcessListener) {
-				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<I, O>((javax.batch.api.chunk.listener.ItemProcessListener) listener);
+				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<>((javax.batch.api.chunk.listener.ItemProcessListener) listener);
 				processListeners.add(itemListener);
 			}
 			if(listener instanceof RetryReadListener) {
@@ -1105,7 +1106,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	 * Public setter for exception classes that when raised won't crash the job but will result in transaction rollback
 	 * and the item which handling caused the exception will be skipped.
 	 *
-	 * @param exceptionClasses
+	 * @param exceptionClasses {@link Map} containing the {@link Throwable}s as
+	 * the keys and the values are {@link Boolean}s, that if true the item is skipped.
 	 */
 	public void setSkippableExceptionClasses(Map<Class<? extends Throwable>, Boolean> exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
@@ -1135,28 +1137,28 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * @param hasChunkElement
+	 * @param hasChunkElement true if step has &lt;chunk/&gt; element.
 	 */
 	public void setHasChunkElement(boolean hasChunkElement) {
 		this.hasChunkElement = hasChunkElement;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;chunk&gt; element
+	 * @return true if the defined step has a &lt;chunk/&gt; element
 	 */
 	protected boolean hasChunkElement() {
 		return this.hasChunkElement;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;tasklet&gt; element
+	 * @return true if the defined step has a &lt;tasklet/&gt; element
 	 */
 	protected boolean hasTasklet() {
 		return this.tasklet != null;
 	}
 
 	/**
-	 * @return true if the defined step has a &lt;partition&gt; element
+	 * @return true if the defined step has a &lt;partition/&gt; element
 	 */
 	protected boolean hasPartitionElement() {
 		return this.partitionHandler != null;

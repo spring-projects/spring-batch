@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,12 +28,12 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
-	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<ItemWriteListener<? super S>>();
+	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param itemWriteListeners
+	 * @param itemWriteListeners list of {@link ItemWriteListener}s to be called when write events occur.
 	 */
 	public void setListeners(List<? extends ItemWriteListener<? super S>> itemWriteListeners) {
 		this.listeners.setItems(itemWriteListeners);
@@ -42,7 +42,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param itemWriteListener
+	 * @param itemWriteListener list of {@link ItemWriteListener}s to be registered.
 	 */
 	public void register(ItemWriteListener<? super S> itemWriteListener) {
 		listeners.add(itemWriteListener);

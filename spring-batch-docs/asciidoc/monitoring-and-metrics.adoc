@@ -1,0 +1,69 @@
+:batch-asciidoc: ./
+:toc: left
+:toclevels: 4
+
+[[monitoring-and-metrics]]
+
+== Monitoring and metrics
+
+Since version 4.2, Spring Batch provides support for batch monitoring and metrics
+based on link:$$https://micrometer.io/$$[Micrometer]. This section describes
+which metrics are provided out-of-the-box and how to contribute custom metrics.
+
+[[built-in-metrics]]
+
+=== Built-in metrics
+
+Metrics collection does not require any specific configuration. All metrics provided
+by the framework are registered in
+link:$$https://micrometer.io/docs/concepts#_global_registry$$[Micrometer's global registry]
+under the `spring.batch` prefix. The following table explains all the metrics in details:
+
+|===============
+|__Metric Name__|__Type__|__Description__
+|`spring.batch.job`|`TIMER`|Duration of job execution
+|`spring.batch.job.active`|`LONG_TASK_TIMER`|Currently active jobs
+|`spring.batch.step`|`TIMER`|Duration of step execution
+|`spring.batch.item.read`|`TIMER`|Duration of item reading
+|`spring.batch.item.process`|`TIMER`|Duration of item processing
+|`spring.batch.chunk.write`|`TIMER`|Duration of chunk writing
+|===============
+
+[[custom-metrics]]
+
+=== Custom metrics
+
+If you want to use your own metrics in your custom components, we recommend using
+Micrometer APIs directly. The following is an example of how to time a `Tasklet`:
+
+[source, java]
+----
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
+
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+
+public class MyTimedTasklet implements Tasklet {
+
+	@Override
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+		Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+		String status = "success";
+		try {
+			// do some work
+		} catch (Exception e) {
+			// handle exception
+			status = "failure";
+		} finally {
+			sample.stop(Timer.builder("my.tasklet.timer")
+					.description("Duration of MyTimedTasklet")
+					.tag("status", status)
+					.register(Metrics.globalRegistry));
+		}
+		return RepeatStatus.FINISHED;
+	}
+}
+----

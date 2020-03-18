@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
@@ -32,7 +32,7 @@ public class HibernateCursorItemReaderCommonTests extends AbstractDatabaseItemSt
 
 		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<Foo>();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<>();
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
 		reader.setUseStatelessSession(true);

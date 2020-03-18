@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,6 +54,8 @@ public interface RepeatContext extends AttributeAccessor {
 
 	/**
 	 * Public accessor for the complete flag.
+	 *
+	 * @return indicator if the repeat is complete
 	 */
 	boolean isCompleteOnly();
 
@@ -66,6 +68,8 @@ public interface RepeatContext extends AttributeAccessor {
 	/**
 	 * Public accessor for the termination flag. If this flag is set then the
 	 * complete flag will also be.
+	 *
+	 * @return indicates if the repeat should terminate
 	 */
 	boolean isTerminateOnly();
 

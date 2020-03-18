@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+
+  prometheus:
+    image: prom/prometheus:v2.7.2
+    container_name: 'prometheus'
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  pushgateway:
+    image: prom/pushgateway:v0.6.0
+    container_name: 'pushgateway'
+    ports:
+      - '9091:9091'
+
+  grafana:
+    image: grafana/grafana:6.0.2
+    container_name: 'grafana'
+    ports:
+      - '3000:3000'

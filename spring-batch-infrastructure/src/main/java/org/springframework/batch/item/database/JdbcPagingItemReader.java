@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,7 +51,8 @@ import org.springframework.util.ClassUtils;
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position. On restart it uses the last sort key value to locate the
  * first page to read (so it doesn't matter if the successfully processed items
- * have been removed or modified).
+ * have been removed or modified). It is important to have a unique key constraint
+ * on the sort key to guarantee that no data is lost between executions.
  * </p>
  * 
  * <p>
@@ -71,6 +72,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
@@ -163,14 +165,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "DataSource may not be null");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Assert.notNull(queryProvider);
+		Assert.notNull(queryProvider, "QueryProvider may not be null");
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());
@@ -180,7 +182,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 		if (results == null) {
-			results = new CopyOnWriteArrayList<T>();
+			results = new CopyOnWriteArrayList<>();
 		}
 		else {
 			results.clear();
@@ -253,7 +255,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			startAfterValues = (Map<String, Object>) executionContext.get(getExecutionContextKey(START_AFTER_VALUE));
 
 			if(startAfterValues == null) {
-				startAfterValues = new LinkedHashMap<String, Object>();
+				startAfterValues = new LinkedHashMap<>();
 			}
 		}
 
@@ -285,7 +287,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private Map<String, Object> getParameterMap(Map<String, Object> values, Map<String, Object> sortKeyValues) {
-		Map<String, Object> parameterMap = new LinkedHashMap<String, Object>();
+		Map<String, Object> parameterMap = new LinkedHashMap<>();
 		if (values != null) {
 			parameterMap.putAll(values);
 		}
@@ -301,14 +303,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private List<Object> getParameterList(Map<String, Object> values, Map<String, Object> sortKeyValue) {
-		SortedMap<String, Object> sm = new TreeMap<String, Object>();
+		SortedMap<String, Object> sm = new TreeMap<>();
 		if (values != null) {
 			sm.putAll(values);
 		}
-		List<Object> parameterList = new ArrayList<Object>();
+		List<Object> parameterList = new ArrayList<>();
 		parameterList.addAll(sm.values());
 		if (sortKeyValue != null && sortKeyValue.size() > 0) {
-			List<Map.Entry<String, Object>> keys = new ArrayList<Map.Entry<String,Object>>(sortKeyValue.entrySet());
+			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
 			for(int i = 0; i < keys.size(); i++) {
 				for(int j = 0; j < i; j++) {
@@ -328,7 +330,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private class PagingRowMapper implements RowMapper<T> {
 		@Override
 		public T mapRow(ResultSet rs, int rowNum) throws SQLException {
-			startAfterValues = new LinkedHashMap<String, Object>();
+			startAfterValues = new LinkedHashMap<>();
 			for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 				startAfterValues.put(sortKey.getKey(), rs.getObject(sortKey.getKey()));
 			}

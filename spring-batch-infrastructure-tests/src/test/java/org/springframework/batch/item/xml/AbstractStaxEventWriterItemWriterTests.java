@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,21 @@
 package org.springframework.batch.item.xml;
 
 import java.io.File;
-import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
+import org.xmlunit.matchers.CompareMatcher;
+
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.ClassPathResource;
@@ -42,13 +43,15 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StopWatch;
 
+import static org.junit.Assert.assertThat;
+
 public abstract class AbstractStaxEventWriterItemWriterTests {
 	
 	private Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
 
-	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<Trade>();
+	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<>();
 
 	private Resource resource;
 
@@ -93,11 +96,11 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 		writer.close();
 		stopWatch.stop();
 		logger.info("Timing for XML writer: " + stopWatch);
-		XMLUnit.setIgnoreWhitespace(true);
-		// String content = FileUtils.readFileToString(resource.getFile());
-		// System.err.println(content);
-		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
 
+		assertThat(
+				Input.from(expected.getFile()),
+				CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
+						.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
 	}
 
 	@Before

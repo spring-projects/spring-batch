@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,16 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.util.Assert;
-
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.Batchlet;
 import javax.batch.api.chunk.AbstractItemReader;
@@ -31,16 +36,12 @@ import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.springframework.batch.core.jsr.AbstractJsrTestCase;
+import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -53,9 +54,9 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	@Before
 	public void before() {
 		MyBatchlet.processed = 0;
-		MyBatchlet.threadNames = Collections.synchronizedSet(new HashSet<String>());
-		MyBatchlet.artifactNames = Collections.synchronizedSet(new HashSet<String>());
-		PartitionCollector.artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		MyBatchlet.threadNames = Collections.synchronizedSet(new HashSet<>());
+		MyBatchlet.artifactNames = Collections.synchronizedSet(new HashSet<>());
+		PartitionCollector.artifactNames = Collections.synchronizedSet(new HashSet<>());
 	}
 
 	@Test
@@ -221,21 +222,21 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		public void analyzeCollectorData(Serializable data) throws Exception {
 			name = artifactName;
 
-			Assert.isTrue(data.equals("c"));
+			Assert.isTrue(data.equals("c"), "Expected c but was " + data);
 			jobContext.setExitStatus(jobContext.getExitStatus() + data + "a");
 		}
 
 		@Override
 		public void analyzeStatus(BatchStatus batchStatus, String exitStatus)
 				throws Exception {
-			Assert.isTrue(batchStatus.equals(BatchStatus.COMPLETED));
+			Assert.isTrue(batchStatus.equals(BatchStatus.COMPLETED), String.format("expected %s but received %s", BatchStatus.COMPLETED, batchStatus));
 			jobContext.setExitStatus(jobContext.getExitStatus() + "AS");
 		}
 	}
 
 	public static class PartitionCollector implements javax.batch.api.partition.PartitionCollector {
 
-		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Inject
 		@BatchProperty
@@ -292,8 +293,8 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	public static class MyBatchlet implements Batchlet {
 
 		protected static int processed = 0;
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
-		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
+		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Inject
 		@BatchProperty
@@ -325,12 +326,12 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 	public static class ItemReader extends AbstractItemReader {
 
 		private List<Integer> items;
-		protected static Vector<Integer> processedItems = new Vector<Integer>();
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Vector<Integer> processedItems = new Vector<>();
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Override
 		public void open(Serializable checkpoint) throws Exception {
-			items = new ArrayList<Integer>();
+			items = new ArrayList<>();
 			items.add(1);
 			items.add(2);
 			items.add(3);
@@ -351,8 +352,8 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 
 	public static class ItemWriter extends AbstractItemWriter {
 
-		protected static Vector<Integer> processedItems = new Vector<Integer>();
-		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
+		protected static Vector<Integer> processedItems = new Vector<>();
+		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
 
 		@Override
 		public void writeItems(List<Object> items) throws Exception {

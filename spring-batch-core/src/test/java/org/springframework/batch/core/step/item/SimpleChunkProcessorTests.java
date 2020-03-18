@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,11 +30,13 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.lang.Nullable;
 
 public class SimpleChunkProcessorTests {
 
-	private SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<String, String>(
+	private SimpleChunkProcessor<String, String> processor = new SimpleChunkProcessor<>(
 			new ItemProcessor<String, String>() {
+				@Nullable
 				@Override
 				public String process(String item) throws Exception {
 					if (item.equals("err")) {
@@ -55,7 +57,7 @@ public class SimpleChunkProcessorTests {
 	private StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(
 			new JobInstance(123L, "job"), new JobParameters())));
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
 	@Before
 	public void setUp() {
@@ -64,7 +66,7 @@ public class SimpleChunkProcessorTests {
 
 	@Test
 	public void testProcess() throws Exception {
-		Chunk<String> chunk = new Chunk<String>();
+		Chunk<String> chunk = new Chunk<>();
 		chunk.add("foo");
 		chunk.add("err");
 		chunk.add("bar");

@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
@@ -57,6 +58,16 @@ import org.springframework.util.MethodInvoker;
  * <p>
  * This implementation is thread-safe between calls to {@link #open(ExecutionContext)}, but remember to use
  * <code>saveState=false</code> if used in a multi-threaded client (no restart available).
+ * </p>
+ *
+ * <p>It is important to note that this is a paging item reader and exceptions that are
+ * thrown while reading the page itself (mapping results to objects, etc in the
+ * {@link RepositoryItemReader#doPageRead()}) will not be skippable since this reader has
+ * no way of knowing if an exception should be skipped and therefore will continue to read
+ * the same page until the skip limit is exceeded.</p>
+ *
+ * <p>
+ * NOTE: The {@code RepositoryItemReader} only reads Java Objects i.e. non primitives.
  * </p>
  *
  * @author Michael Minella
@@ -127,7 +138,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Specifies what method on the repository to call.  This method must take
 	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
 	 *
-	 * @param methodName
+	 * @param methodName name of the method to invoke
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
@@ -140,6 +151,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		Assert.state(sort != null, "A sort is required");
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 
@@ -187,15 +199,16 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Available for overriding as needed.
 	 *
 	 * @return the list of items that make up the page
-	 * @throws Exception
+	 * @throws Exception Based on what the underlying method throws or related to the
+	 * 			calling of the method
 	 */
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
-		Pageable pageRequest = new PageRequest(page, pageSize, sort);
+		Pageable pageRequest = PageRequest.of(page, pageSize, sort);
 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
-		List<Object> parameters = new ArrayList<Object>();
+		List<Object> parameters = new ArrayList<>();
 
 		if(arguments != null && arguments.size() > 0) {
 			parameters.addAll(arguments);
@@ -224,23 +237,20 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<Sort.Order>();
+		List<Sort.Order> sortValues = new ArrayList<>();
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
 			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
 		}
 
-		return new Sort(sortValues);
+		return Sort.by(sortValues);
 	}
 
 	private Object doInvoke(MethodInvoker invoker) throws Exception{
 		try {
 			invoker.prepare();
 		}
-		catch (ClassNotFoundException e) {
-			throw new DynamicMethodInvocationException(e);
-		}
-		catch (NoSuchMethodException e) {
+		catch (ClassNotFoundException | NoSuchMethodException e) {
 			throw new DynamicMethodInvocationException(e);
 		}
 

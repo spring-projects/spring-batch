@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.lang.Nullable;
 
 /**
  * Composite {@link LineTokenizer} that delegates the tokenization of a line to one of two potential
@@ -40,7 +41,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
 	@Override
-	public FieldSet tokenize(String line) {
+	public FieldSet tokenize(@Nullable String line) {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.
@@ -75,8 +76,8 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	/**
 	 * Set the {@link LineTokenizer} that will be used to tokenize any lines that begin with
 	 * A, U, or D, and are thus a customer operation.
-	 * 
-	 * @param customerTokenizer
+	 *
+	 * @param customerTokenizer tokenizer to delegate to for customer operation records
 	 */
 	public void setCustomerTokenizer(LineTokenizer customerTokenizer) {
 		this.customerTokenizer = customerTokenizer;
@@ -86,7 +87,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	 * Set the {@link LineTokenizer} that will be used to tokenize any lines that being with
 	 * F and is thus a footer record.
 	 * 
-	 * @param footerTokenizer
+	 * @param footerTokenizer tokenizer to delegate to for footer records
 	 */
 	public void setFooterTokenizer(LineTokenizer footerTokenizer) {
 		this.footerTokenizer = footerTokenizer;

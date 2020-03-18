@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -94,7 +95,7 @@ public class JobRepositoryTestUtilsTests {
 	@Test
 	public void testRemoveJobExecutionsWithSameJobInstance() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
-		List<JobExecution> list = new ArrayList<JobExecution>();
+		List<JobExecution> list = new ArrayList<>();
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		jobExecution.setEndTime(new Date());
 		list.add(jobExecution);
@@ -135,7 +136,7 @@ public class JobRepositoryTestUtilsTests {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
 			@Override
-			public JobParameters getNext(JobParameters parameters) {
+			public JobParameters getNext(@Nullable JobParameters parameters) {
 				return new JobParametersBuilder().addString("foo","bar").toJobParameters();
 			}
 		});

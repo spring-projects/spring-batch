@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,11 +50,11 @@ import org.springframework.retry.policy.RetryContextCache;
  */
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
-	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
+	private Map<Class<? extends Throwable>, Boolean> skippableExceptionClasses = new HashMap<>();
 
-	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new HashSet<Class<? extends Throwable>>();
+	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new HashSet<>();
 
-	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<Class<? extends Throwable>, Boolean>();
+	private Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses = new HashMap<>();
 
 	private int cacheCapacity = 0;
 
@@ -209,7 +209,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * @param processorTransactional
+	 * @param processorTransactional boolean indicates if the {@code ItemProcessor} participates in the transaction.
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
 		this.processorTransactional = processorTransactional;
@@ -217,7 +217,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	@Override
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
-		return new FaultTolerantStepBuilder<T, S>(new StepBuilder(name));
+		return new FaultTolerantStepBuilder<>(new StepBuilder(name));
 	}
 
 	@Override

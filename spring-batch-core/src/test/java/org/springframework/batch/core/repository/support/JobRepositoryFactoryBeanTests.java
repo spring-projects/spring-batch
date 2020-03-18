@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,28 +15,21 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Types;
 import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.DefaultExecutionContextSerializer;
-import org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.core.serializer.Serializer;
 import org.springframework.dao.DataAccessException;
@@ -45,10 +38,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.jdbc.support.lob.OracleLobHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Lucas Ward
@@ -115,7 +114,7 @@ public class JobRepositoryFactoryBeanTests {
 
 		factory.afterPropertiesSet();
 		LobHandler lobHandler = (LobHandler) ReflectionTestUtils.getField(factory, "lobHandler");
-		assertTrue(lobHandler instanceof OracleLobHandler);
+		assertTrue(lobHandler instanceof DefaultLobHandler);
 
 	}
 
@@ -154,7 +153,7 @@ public class JobRepositoryFactoryBeanTests {
 
 		factory.afterPropertiesSet();
 		Serializer<Map<String, Object>> serializer = (Serializer<Map<String,Object>>) ReflectionTestUtils.getField(factory, "serializer");
-		assertTrue(serializer instanceof XStreamExecutionContextStringSerializer);
+		assertTrue(serializer instanceof Jackson2ExecutionContextStringSerializer);
 	}
 
 	@Test

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -94,7 +94,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	/**
 	 * Check mandatory properties (name).
 	 *
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -114,7 +114,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 
 		flow.setStateTransitionComparator(stateTransitionComparator);
 
-		List<StateTransition> updatedTransitions = new ArrayList<StateTransition>();
+		List<StateTransition> updatedTransitions = new ArrayList<>();
 		for (StateTransition stateTransition : stateTransitions) {
 			State state = getProxyState(stateTransition.getState());
 			updatedTransitions.add(StateTransition.switchOriginAndDestination(stateTransition, state,
@@ -161,7 +161,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	 * @param state The state that will be used to create the StepState
 	 * @param oldName The name to be replaced
 	 * @param stateName The name for the new State
-	 * @return
+	 * @return a state for the requested data
 	 */
 	protected State createNewStepState(State state, String oldName,
 			String stateName) {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,10 @@ public interface StaxWriterCallback {
 	/**
 	 * Write contents using the supplied {@link XMLEventWriter}. It is not
 	 * required to flush the writer inside this method.
+	 *
+	 * @param writer the {@link XMLEventWriter} to be used to write the contents.
+	 *
+	 * @throws IOException thrown if an error occurs during writing.
 	 */
 	void write(XMLEventWriter writer) throws IOException;
 }

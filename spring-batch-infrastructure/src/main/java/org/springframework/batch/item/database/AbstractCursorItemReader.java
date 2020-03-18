@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -102,6 +103,8 @@ import org.springframework.util.Assert;
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Thomas Risberg
+ * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 implements InitializingBean {
@@ -134,6 +137,9 @@ implements InitializingBean {
 
 	private boolean useSharedExtendedConnection = false;
 
+	private Boolean connectionAutoCommit;
+
+	private boolean initialConnectionAutoCommit;
 
 	public AbstractCursorItemReader() {
 		super();
@@ -246,7 +252,7 @@ implements InitializingBean {
 	/**
 	 * Moves the cursor in the ResultSet to the position specified by the row
 	 * parameter by traversing the ResultSet.
-	 * @param row
+	 * @param row The index of the row to move to
 	 */
 	private void moveCursorToRow(int row) {
 		try {
@@ -356,10 +362,21 @@ implements InitializingBean {
 		return useSharedExtendedConnection;
 	}
 
+	/**
+	 * Set whether "autoCommit" should be overridden for the connection used by the cursor. If not set, defaults to
+	 * Connection / Datasource default configuration.
+	 *
+	 * @param autoCommit value used for {@link Connection#setAutoCommit(boolean)}.
+	 * @since 4.0
+	 */
+	public void setConnectionAutoCommit(boolean autoCommit) {
+		this.connectionAutoCommit = autoCommit;
+	}
+
 	public abstract String getSql();
 
 	/**
-	 * Check the result set is in synch with the currentRow attribute. This is
+	 * Check the result set is in sync with the currentRow attribute. This is
 	 * important to ensure that the user hasn't modified the current row.
 	 */
 	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
@@ -380,6 +397,11 @@ implements InitializingBean {
 		JdbcUtils.closeResultSet(this.rs);
 		rs = null;
 		cleanupOnClose();
+
+		if(this.con != null) {
+			this.con.setAutoCommit(this.initialConnectionAutoCommit);
+		}
+
 		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
 			((ExtendedConnectionDataSourceProxy)dataSource).stopCloseSuppression(this.con);
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -424,6 +446,12 @@ implements InitializingBean {
 			else {
 				this.con = dataSource.getConnection();
 			}
+
+			this.initialConnectionAutoCommit = this.con.getAutoCommit();
+
+			if (this.connectionAutoCommit != null && this.con.getAutoCommit() != this.connectionAutoCommit) {
+				this.con.setAutoCommit(this.connectionAutoCommit);
+			}
 		}
 		catch (SQLException se) {
 			close();
@@ -437,6 +465,7 @@ implements InitializingBean {
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (rs == null) {
@@ -459,13 +488,14 @@ implements InitializingBean {
 
 	/**
 	 * Read the cursor and map to the type of object this reader should return. This method must be
-	 * overriden by subclasses.
+	 * overridden by subclasses.
 	 *
 	 * @param rs The current result set
 	 * @param currentRow Current position of the result set
 	 * @return the mapped object at the cursor position
 	 * @throws SQLException if interactions with the current result set fail
 	 */
+	@Nullable
 	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
 	/**

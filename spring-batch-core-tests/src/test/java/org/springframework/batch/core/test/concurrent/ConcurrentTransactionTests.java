@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,10 @@
  */
 package org.springframework.batch.core.test.concurrent;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.sql.DataSource;
 
 import org.junit.Test;
@@ -56,10 +53,13 @@ import org.springframework.jdbc.datasource.embedded.ConnectionProperties;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseConfigurer;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ClassUtils;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michael Minella
@@ -100,7 +100,7 @@ public class ConcurrentTransactionTests {
 
 		/**
 		 * This datasource configuration configures the HSQLDB instance using MVCC.  When
-		 * configurd using the default behavior, transaction serialization errors are
+		 * configured using the default behavior, transaction serialization errors are
 		 * thrown (default configuration example below).
 		 *
 		 * 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
@@ -117,6 +117,7 @@ public class ConcurrentTransactionTests {
 			embeddedDatabaseFactory.setDatabaseConfigurer(new EmbeddedDatabaseConfigurer() {
 
 				@Override
+				@SuppressWarnings("unchecked")
 				public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
 					try {
 						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver", this.getClass().getClassLoader()));
@@ -154,6 +155,7 @@ public class ConcurrentTransactionTests {
 			return new FlowBuilder<Flow>("flow")
 					.start(stepBuilderFactory.get("flow.step1")
 								.tasklet(new Tasklet() {
+									@Nullable
 									@Override
 									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 										return RepeatStatus.FINISHED;
@@ -161,6 +163,7 @@ public class ConcurrentTransactionTests {
 								}).build()
 					).next(stepBuilderFactory.get("flow.step2")
 								.tasklet(new Tasklet() {
+									@Nullable
 									@Override
 									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 										return RepeatStatus.FINISHED;
@@ -173,6 +176,7 @@ public class ConcurrentTransactionTests {
 		public Step firstStep() {
 			return stepBuilderFactory.get("firstStep")
 					.tasklet(new Tasklet() {
+						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 							System.out.println(">> Beginning concurrent job test");
@@ -185,6 +189,7 @@ public class ConcurrentTransactionTests {
 		public Step lastStep() {
 			return stepBuilderFactory.get("lastStep")
 					.tasklet(new Tasklet() {
+						@Nullable
 						@Override
 						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 							System.out.println(">> Ending concurrent job test");

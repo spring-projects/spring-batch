@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,7 @@ import org.springframework.util.ClassUtils;
 
 public abstract class AbstractStaxEventReaderItemReaderTests {
 
-	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<Trade>();
+	protected StaxEventItemReader<Trade> reader = new StaxEventItemReader<>();
 
 	@Before
 	public void setUp() throws Exception {
@@ -46,7 +46,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 		reader.setResource(new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "input.xml")));
 		reader.open(new ExecutionContext());
 		Trade result;
-		List<Trade> results = new ArrayList<Trade>();
+		List<Trade> results = new ArrayList<>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}
@@ -59,7 +59,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests {
 				.addResourcePathToPackagePath(getClass(), "input-nested.xml")));
 		reader.open(new ExecutionContext());
 		Trade result;
-		List<Trade> results = new ArrayList<Trade>();
+		List<Trade> results = new ArrayList<>();
 		while ((result = reader.read()) != null) {
 			results.add(result);
 		}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,7 +49,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * @param checkpointKey key to store the checkpoint object with in the {@link ExecutionContext}
 	 */
 	public CheckpointSupport(String checkpointKey) {
-		Assert.hasText(checkpointKey);
+		Assert.hasText(checkpointKey, "checkpointKey is required");
 		this.checkpointKey = checkpointKey;
 	}
 
@@ -60,7 +60,9 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	public void open(ExecutionContext executionContext)
 			throws ItemStreamException {
 		try {
-			doOpen((Serializable) executionContext.get(getExecutionContextKey(checkpointKey)));
+			String executionContextKey = getExecutionContextKey(checkpointKey);
+			Serializable checkpoint = (Serializable) executionContext.get(executionContextKey);
+			doOpen(checkpoint);
 		} catch (Exception e) {
 			throw new ItemStreamException(e);
 		}
@@ -70,7 +72,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * Used to open a batch artifact with previously saved checkpoint information.
 	 *
 	 * @param checkpoint previously saved checkpoint object
-	 * @throws Exception
+	 * @throws Exception thrown by the implementation
 	 */
 	protected abstract void doOpen(Serializable checkpoint) throws Exception;
 
@@ -92,7 +94,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	 * batch artifact.
 	 *
 	 * @return the current state of the batch artifact
-	 * @throws Exception
+	 * @throws Exception thrown by the implementation
 	 */
 	protected abstract Serializable doCheckpoint() throws Exception;
 
@@ -111,7 +113,7 @@ public abstract class CheckpointSupport extends ItemStreamSupport{
 	/**
 	 * Used to close the underlying batch artifact
 	 *
-	 * @throws Exception
+	 * @throws Exception thrown by the underlying implementation
 	 */
 	protected abstract void doClose() throws Exception;
 

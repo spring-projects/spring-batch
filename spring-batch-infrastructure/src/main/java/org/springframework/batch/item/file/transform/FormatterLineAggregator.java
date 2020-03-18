@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,9 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	/**
 	 * Set the format string used to aggregate items.
-	 * 
+	 *
+	 * @param format {@link String} containing the format to use.
+	 *
 	 * @see Formatter
 	 */
 	public void setFormat(String format) {
@@ -78,7 +80,7 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 	@Override
 	protected String doAggregate(Object[] fields) {
 
-		Assert.notNull(format);
+		Assert.notNull(format, "A format is required");
 
 		String value = String.format(locale, format, fields);
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private Map<String, String> configurations = new HashMap<String, String>();
+	private Map<String, String> configurations = new HashMap<>();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -49,7 +49,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
 	@Override
 	public Map<String, String> getConfigurations() {
-		Map<String, String> result = new HashMap<String, String>(configurations);
+		Map<String, String> result = new HashMap<>(configurations);
 		for (String jobName : registry.getJobNames()) {
 			try {
 				Job configuration = registry.getJob(jobName);

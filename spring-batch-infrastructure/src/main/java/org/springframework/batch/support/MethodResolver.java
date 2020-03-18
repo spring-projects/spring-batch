@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,10 +18,13 @@ package org.springframework.batch.support;
 
 import java.lang.reflect.Method;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Strategy interface for detecting a single Method on a Class.
  * 
  * @author Mark Fisher
+ * @author Mahmoud Ben Hassine
  */
 public interface MethodResolver {
 
@@ -38,6 +41,7 @@ public interface MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method defined on the
 	 * given candidate's Class matches this resolver's criteria
 	 */
+	@Nullable
 	Method findMethod(Object candidate) throws IllegalArgumentException;
 
 	/**
@@ -52,6 +56,7 @@ public interface MethodResolver {
 	 * @throws IllegalArgumentException if more than one Method defined on the
 	 * given Class matches this resolver's criteria
 	 */
+	@Nullable
 	Method findMethod(Class<?> clazz);
 
 }

@@ -49,14 +49,19 @@ import org.springframework.util.CollectionUtils;
  * While a {@link org.springframework.messaging.MessageChannel} is used for sending the requests to the workers, the
  * worker's responses can be obtained in one of two ways:
  * <ul>
- *     <li>A reply channel - Slaves will respond with messages that will be aggregated via this component.</li>
- *     <li>Polling the job repository - Since the state of each slave is maintained independently within the job
- *     repository, we can poll the store to determine the state without the need of the slaves to formally respond.</li>
+ *     <li>A reply channel - Workers will respond with messages that will be aggregated via this component.</li>
+ *     <li>Polling the job repository - Since the state of each worker is maintained independently within the job
+ *     repository, we can poll the store to determine the state without the need of the workers to formally respond.</li>
  * </ul>
+ *
+ * Note: The reply channel for this is instance based.  Sharing this component across
+ * multiple step instances may result in the crossing of messages.  It's recommended that
+ * this component be step or job scoped.
  *
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 @MessageEndpoint
@@ -93,7 +98,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);
 
 		if(pollRepositoryForResults) {
-			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for slave results");
+			logger.debug("MessageChannelPartitionHandler is configured to poll the job repository for worker results");
 		}
 
 		if(dataSource != null && jobExplorer == null) {
@@ -102,12 +107,17 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			jobExplorerFactoryBean.afterPropertiesSet();
 			jobExplorer = jobExplorerFactoryBean.getObject();
 		}
+
+		if (!pollRepositoryForResults && replyChannel == null) {
+			replyChannel = new QueueChannel();
+		}//end if
+
 	}
 
 	/**
 	 * When using job repository polling, the time limit to wait.
 	 *
-	 * @param timeout millisconds to wait, defaults to -1 (no timeout).
+	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
 	 */
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
@@ -124,7 +134,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	/**
-	 * How often to poll the job repository for the status of the slaves.
+	 * How often to poll the job repository for the status of the workers.
 	 *
 	 * @param pollInterval milliseconds between polls, defaults to 10000 (10 seconds).
 	 */
@@ -145,7 +155,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	 * A pre-configured gateway for sending and receiving messages to the remote workers. Using this property allows a
 	 * large degree of control over the timeouts and other properties of the send. It should have channels set up
 	 * internally: <ul> <li>request channel capable of accepting {@link StepExecutionRequest} payloads</li> <li>reply
-	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the repoy should be set
+	 * channel that returns a list of {@link StepExecution} results</li> </ul> The timeout for the reply should be set
 	 * sufficiently long that the remote steps have time to complete.
 	 *
 	 * @param messagingGateway the {@link org.springframework.integration.core.MessagingTemplate} to set
@@ -181,7 +191,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	 * @param messages the messages to be aggregated
 	 * @return the list as it was passed in
 	 */
-	@Aggregator(sendPartialResultsOnExpiry = true)
+	@Aggregator(sendPartialResultsOnExpiry = "true")
 	public List<?> aggregate(@Payloads List<?> messages) {
 		return messages;
 	}
@@ -204,20 +214,14 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		final Set<StepExecution> split = stepExecutionSplitter.split(masterStepExecution, gridSize);
 
 		if(CollectionUtils.isEmpty(split)) {
-			return null;
+			return split;
 		}
 
 		int count = 0;
 
-		PollableChannel currentReplyChannel = replyChannel;
-
-		if (!pollRepositoryForResults && currentReplyChannel == null) {
-			currentReplyChannel = new QueueChannel();
-		}//end if
-
 		for (StepExecution stepExecution : split) {
 			Message<StepExecutionRequest> request = createMessage(count++, split.size(), new StepExecutionRequest(
-					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), currentReplyChannel);
+					stepName, stepExecution.getJobExecutionId(), stepExecution.getId()), replyChannel);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Sending request: " + request);
 			}
@@ -225,7 +229,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		}
 
 		if(!pollRepositoryForResults) {
-			return receiveReplies(currentReplyChannel);
+			return receiveReplies(replyChannel);
 		}
 		else {
 			return pollReplies(masterStepExecution, split);
@@ -233,7 +237,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 	}
 
 	private Collection<StepExecution> pollReplies(final StepExecution masterStepExecution, final Set<StepExecution> split) throws Exception {
-		final Collection<StepExecution> result = new ArrayList<StepExecution>(split.size());
+		final Collection<StepExecution> result = new ArrayList<>(split.size());
 
 		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
 			@Override
@@ -265,7 +269,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 			}
 		};
 
-		Poller<Collection<StepExecution>> poller = new DirectPoller<Collection<StepExecution>>(pollInterval);
+		Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
 		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
 
 		if(timeout >= 0) {

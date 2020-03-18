@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 /**
  * An {@link ItemReader} that pulls data from a list. Useful for testing.
@@ -39,11 +40,12 @@ public class ListItemReader<T> implements ItemReader<T> {
 			this.list = list;
 		}
 		else {
-			this.list = new ArrayList<T>(list);
+			this.list = new ArrayList<>(list);
 		}
 	}
 
-    @Override
+    @Nullable
+	@Override
 	public T read() {
 		if (!list.isEmpty()) {
 			return list.remove(0);

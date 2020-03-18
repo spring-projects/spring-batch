@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,7 +46,9 @@ public interface JobLauncher {
 	 * one created. A exception will only be thrown if there is a failure to
 	 * start the job. If the job encounters some error while processing, the
 	 * JobExecution will be returned, and the status will need to be inspected.
-	 * 
+	 *
+	 * @param job the job to be executed.
+	 * @param jobParameters the parameters passed to this execution of the job.
 	 * @return the {@link JobExecution} if it returns synchronously. If the
 	 * implementation is asynchronous, the status might well be unknown.
 	 * 

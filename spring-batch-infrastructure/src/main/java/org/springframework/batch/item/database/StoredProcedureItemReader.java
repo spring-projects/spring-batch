@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.metadata.CallMetaDataContext;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -81,7 +82,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 *
-	 * @param rowMapper
+	 * @param rowMapper the RowMapper to use to map the results
 	 */
 	public void setRowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
@@ -92,7 +93,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * should be a complete and valid SQL statement, as it will be run directly
 	 * without any modification.
 	 *
-	 * @param sprocedureName
+	 * @param sprocedureName the SQL used to call the statement
 	 */
 	public void setProcedureName(String sprocedureName) {
 		this.procedureName = sprocedureName;
@@ -102,7 +103,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the PreparedStatementSetter to use if any parameter values that need
 	 * to be set in the supplied query.
 	 *
-	 * @param preparedStatementSetter
+	 * @param preparedStatementSetter used to populate the SQL
 	 */
 	public void setPreparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
@@ -120,6 +121,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Set whether this stored procedure is a function.
+	 *
+	 * @param function indicator
 	 */
 	public void setFunction(boolean function) {
 		this.function = function;
@@ -228,6 +231,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	}
 
+	@Nullable
 	@Override
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);

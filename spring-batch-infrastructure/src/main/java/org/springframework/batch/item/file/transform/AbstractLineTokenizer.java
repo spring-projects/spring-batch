@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,9 @@ package org.springframework.batch.item.file.transform;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 /**
  * Abstract class handling common concerns of various {@link LineTokenizer}
@@ -77,10 +80,25 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * Setter for column names. Optional, but if set, then all lines must have
 	 * as many or fewer tokens.
 	 * 
-	 * @param names
+	 * @param names names of each column
 	 */
-	public void setNames(String[] names) {
-		this.names = names==null ? null : Arrays.asList(names).toArray(new String[names.length]);
+	public void setNames(String... names) {
+		if(names == null) {
+			this.names = null;
+		}
+		else {
+			boolean valid = false;
+			for (String name : names) {
+				if(StringUtils.hasText(name)) {
+					valid = true;
+					break;
+				}
+			}
+
+			if(valid) {
+				this.names = Arrays.asList(names).toArray(new String[names.length]);
+			}
+		}
 	}
 
 	/**
@@ -103,13 +121,13 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @return the resulting tokens
 	 */
     @Override
-	public FieldSet tokenize(String line) {
+	public FieldSet tokenize(@Nullable String line) {
 
 		if (line == null) {
 			line = "";
 		}
 
-		List<String> tokens = new ArrayList<String>(doTokenize(line));
+		List<String> tokens = new ArrayList<>(doTokenize(line));
 		
 		// if names are set and strict flag is false
 		if ( ( names.length != 0 ) && ( ! strict ) ) {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,7 +57,7 @@ public abstract class AbstractListenerParser {
 	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.addPropertyValue("delegate", parseListenerElement(element, parserContext, builder.getRawBeanDefinition()));
 
-		ManagedMap<String, String> metaDataMap = new ManagedMap<String, String>();
+		ManagedMap<String, String> metaDataMap = new ManagedMap<>();
 		for (String metaDataPropertyName : getMethodNameAttributes()) {
 			String listenerMethod = element.getAttribute(metaDataPropertyName);
 			if (StringUtils.hasText(listenerMethod)) {
@@ -125,7 +125,7 @@ public abstract class AbstractListenerParser {
 	}
 
 	private List<String> getMethodNameAttributes() {
-		List<String> methodNameAttributes = new ArrayList<String>();
+		List<String> methodNameAttributes = new ArrayList<>();
 		for (ListenerMetaData metaData : getMetaDataValues()) {
 			methodNameAttributes.add(metaData.getPropertyName());
 		}

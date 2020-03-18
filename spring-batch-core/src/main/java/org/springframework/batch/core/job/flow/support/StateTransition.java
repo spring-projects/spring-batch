@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow.support;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.support.PatternMatcher;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public final class StateTransition {
@@ -53,6 +55,7 @@ public final class StateTransition {
 	 *
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state) {
 		return createStateTransition(state, null, null);
@@ -67,6 +70,7 @@ public final class StateTransition {
 	 * transition
 	 * @param pattern the pattern to match in the exit status of the
 	 * {@link State}
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createEndStateTransition(State state, String pattern) {
 		return createStateTransition(state, pattern, null);
@@ -80,7 +84,7 @@ public final class StateTransition {
 	 * @param state the new state for the origin
 	 * @param next the new name for the destination
 	 *
-	 * @return a {@link StateTransition}
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition switchOriginAndDestination(StateTransition stateTransition, State state, String next) {
 		return createStateTransition(state, stateTransition.pattern, next);
@@ -93,6 +97,7 @@ public final class StateTransition {
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param next the name of the next {@link State} to execute
+	 * @return {@link StateTransition} that was created.
 	 */
 	public static StateTransition createStateTransition(State state, String next) {
 		return createStateTransition(state, null, next);
@@ -105,14 +110,15 @@ public final class StateTransition {
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 * @param pattern the pattern to match in the exit status of the
-	 * {@link State}
-	 * @param next the name of the next {@link State} to execute
+	 * {@link State} (can be {@code null})
+	 * @param next the name of the next {@link State} to execute (can be {@code null})
+	 * @return {@link StateTransition} that was created.
 	 */
-	public static StateTransition createStateTransition(State state, String pattern, String next) {
+	public static StateTransition createStateTransition(State state, @Nullable String pattern, @Nullable String next) {
 		return new StateTransition(state, pattern, next);
 	}
 
-	private StateTransition(State state, String pattern, String next) {
+	private StateTransition(State state, @Nullable String pattern, @Nullable String next) {
 		super();
 		if (!StringUtils.hasText(pattern)) {
 			this.pattern = "*";

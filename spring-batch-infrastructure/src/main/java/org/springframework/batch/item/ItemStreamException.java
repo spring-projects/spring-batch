@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,7 @@ package org.springframework.batch.item;
 public class ItemStreamException extends RuntimeException {
 
 	/**
-	 * @param message
+	 * @param message the String that contains a detailed message.
 	 */
 	public ItemStreamException(String message) {
 		super(message);
@@ -35,6 +35,7 @@ public class ItemStreamException extends RuntimeException {
 	 * Constructs a new instance with a message and nested exception.
 	 * 
 	 * @param msg the exception message.
+	 * @param nested the cause of the exception.
 	 * 
 	 */
 	public ItemStreamException(String msg, Throwable nested) {
@@ -43,6 +44,8 @@ public class ItemStreamException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a nested exception and empty message.
+	 *
+	 * @param nested the cause of the exception.
 	 */
 	public ItemStreamException(Throwable nested) {
 		super(nested);
