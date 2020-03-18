@@ -398,7 +398,7 @@ implements InitializingBean {
 		rs = null;
 		cleanupOnClose();
 
-		if(this.con != null) {
+		if(this.con != null && !this.con.isClosed()) {
 			this.con.setAutoCommit(this.initialConnectionAutoCommit);
 		}
 
