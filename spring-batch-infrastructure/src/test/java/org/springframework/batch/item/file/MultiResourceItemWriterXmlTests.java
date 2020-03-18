@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,7 +28,7 @@ import javax.xml.transform.Result;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
-import org.springframework.batch.item.xml.StaxUtils;
+import org.springframework.batch.item.xml.StaxTestUtils;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
@@ -47,7 +47,8 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	@Before
 	public void setUp() throws Exception {
-		delegate = new StaxEventItemWriter<String>();
+		super.createFile();
+		delegate = new StaxEventItemWriter<>();
 		delegate.setMarshaller(new SimpleMarshaller());
 	}
 
@@ -62,7 +63,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 			try {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
-				XMLEventWriter writer = StaxUtils.getXmlEventWriter(result);
+				XMLEventWriter writer = StaxTestUtils.getXmlEventWriter(result);
 				writer.add(factory.createStartDocument("UTF-8"));
 				writer.add(factory.createStartElement("prefix", "namespace", graph.toString()));
 				writer.add(factory.createEndElement("prefix", "namespace", graph.toString()));
@@ -88,8 +89,9 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 	@Test
 	public void multiResourceWritingWithRestart() throws Exception {
-		
-		setUp(delegate);
+
+		super.setUp(delegate);
+		tested.open(executionContext);
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
@@ -102,6 +104,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 
 		tested.update(executionContext);
 		tested.close();
+
 
 		assertEquals(xmlDocStart + "<prefix:4/>" + xmlDocEnd, readFile(part2));
 		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd,

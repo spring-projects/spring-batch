@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +23,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.orm.hibernate3.HibernateOperations;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
@@ -39,8 +38,6 @@ import org.springframework.orm.hibernate3.HibernateOperations;
  */
 public class HibernateItemWriterTests {
 
-	HibernateOperations ht;
-
 	HibernateItemWriter<Object> writer;
 
 	SessionFactory factory;
@@ -48,10 +45,11 @@ public class HibernateItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		writer = new HibernateItemWriter<Object>();
-		ht = mock(HibernateOperations.class,"ht");
+		writer = new HibernateItemWriter<>();
 		factory = mock(SessionFactory.class);
 		currentSession = mock(Session.class);
+
+		when(this.factory.getCurrentSession()).thenReturn(this.currentSession);
 	}
 
 	/**
@@ -62,14 +60,14 @@ public class HibernateItemWriterTests {
 	 */
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new HibernateItemWriter<Object>();
+		writer = new HibernateItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalStateException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("HibernateOperations") >= 0);
+			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("SessionFactory") >= 0);
 		}
 	}
 
@@ -79,22 +77,21 @@ public class HibernateItemWriterTests {
 	 *
 	 * @throws Exception
 	 */
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testAfterPropertiesSetWithDelegate() throws Exception {
-		writer.setHibernateTemplate(ht);
+		writer.setSessionFactory(this.factory);
 		writer.afterPropertiesSet();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
-		writer.setHibernateTemplate(ht);
-		when(ht.contains("foo")).thenReturn(true);
-		when(ht.contains("bar")).thenReturn(false);
-		ht.saveOrUpdate("bar");
-		ht.flush();
-		ht.clear();
+		this.writer.setSessionFactory(this.factory);
+		when(this.currentSession.contains("foo")).thenReturn(true);
+		when(this.currentSession.contains("bar")).thenReturn(false);
+		this.currentSession.saveOrUpdate("bar");
+		this.currentSession.flush();
+		this.currentSession.clear();
 
 		List<String> items = Arrays.asList(new String[] { "foo", "bar" });
 		writer.write(items);
@@ -104,9 +101,9 @@ public class HibernateItemWriterTests {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
-		writer.setHibernateTemplate(ht);
+		this.writer.setSessionFactory(this.factory);
 		final RuntimeException ex = new RuntimeException("ERROR");
-		when(ht.contains("foo")).thenThrow(ex);
+		when(this.currentSession.contains("foo")).thenThrow(ex);
 
 		try {
 			writer.write(Collections.singletonList("foo"));

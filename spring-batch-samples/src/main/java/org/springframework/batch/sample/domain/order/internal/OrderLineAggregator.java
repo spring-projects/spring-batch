@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,7 +55,8 @@ public class OrderLineAggregator implements LineAggregator<Order> {
 	/**
 	 * Set aggregators for all types of lines in the output file
 	 * 
-	 * @param aggregators
+	 * @param aggregators Map of LineAggregators used to map the various record types for
+	 * 					each order
 	 */
 	public void setAggregators(Map<String, LineAggregator<Object>> aggregators) {
 		this.aggregators = aggregators;

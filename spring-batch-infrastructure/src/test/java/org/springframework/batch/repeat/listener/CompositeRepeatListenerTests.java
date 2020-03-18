@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	private CompositeRepeatListener listener = new CompositeRepeatListener();
 	private RepeatContext context = new RepeatContextSupport(null);
 
-	private List<Object> list = new ArrayList<Object>();
+	private List<Object> list = new ArrayList<>();
 
 	/**
 	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.

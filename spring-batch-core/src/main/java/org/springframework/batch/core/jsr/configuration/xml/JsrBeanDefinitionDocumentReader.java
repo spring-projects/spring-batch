@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,6 +51,7 @@ import org.w3c.dom.traversal.NodeIterator;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocumentReader {
@@ -64,12 +65,12 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 	private static final String JOB_PARAMETERS_KEY_NAME = "jobParameters";
 	private static final String JOB_PARAMETERS_BEAN_DEFINITION_NAME = "jsr_jobParameters";
 	private static final Log LOG = LogFactory.getLog(JsrBeanDefinitionDocumentReader.class);
-	private static final Pattern PROPERTY_KEY_SEPERATOR = Pattern.compile("'([^']*?)'");
+	private static final Pattern PROPERTY_KEY_SEPARATOR = Pattern.compile("'([^']*?)'");
 	private static final Pattern OPERATOR_PATTERN = Pattern.compile("(#\\{(job(Properties|Parameters))[^}]+\\})");
 
 	private BeanDefinitionRegistry beanDefinitionRegistry;
 	private JsrExpressionParser expressionParser = new JsrExpressionParser();
-	private Map<String, Properties> propertyMap = new HashMap<String, Properties>();
+	private Map<String, Properties> propertyMap = new HashMap<>();
 
 	/**
 	 * <p>
@@ -114,9 +115,9 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 		Properties jobParameters = new Properties();
 
 		if (getBeanDefinitionRegistry().containsBeanDefinition(JOB_PARAMETERS_BEAN_DEFINITION_NAME)) {
-			BeanDefinition beanDefintion = getBeanDefinitionRegistry().getBeanDefinition(JOB_PARAMETERS_BEAN_DEFINITION_NAME);
+			BeanDefinition beanDefinition = getBeanDefinitionRegistry().getBeanDefinition(JOB_PARAMETERS_BEAN_DEFINITION_NAME);
 
-			Properties properties = (Properties) beanDefintion.getConstructorArgumentValues()
+			Properties properties = (Properties) beanDefinition.getConstructorArgumentValues()
 					.getGenericArgumentValue(Properties.class)
 					.getValue();
 
@@ -185,7 +186,7 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 		Matcher jobParameterMatcher = OPERATOR_PATTERN.matcher(value);
 
 		while (jobParameterMatcher.find()) {
-			Matcher jobParameterKeyMatcher = PROPERTY_KEY_SEPERATOR.matcher(jobParameterMatcher.group(1));
+			Matcher jobParameterKeyMatcher = PROPERTY_KEY_SEPARATOR.matcher(jobParameterMatcher.group(1));
 
 			if (jobParameterKeyMatcher.find()) {
 				String propertyType = jobParameterMatcher.group(2);
@@ -226,7 +227,7 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 		NodeIterator iterator = traversal.createNodeIterator(root, NodeFilter.SHOW_ELEMENT, null, true);
 
 		BeanDefinitionRegistry registry = getBeanDefinitionRegistry();
-		Map<String, Integer> referenceCountMap = new HashMap<String, Integer>();
+		Map<String, Integer> referenceCountMap = new HashMap<>();
 
 		for (Node n = iterator.nextNode(); n != null; n = iterator.nextNode()) {
 			NamedNodeMap map = n.getAttributes();

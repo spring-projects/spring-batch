@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2009 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +15,24 @@
  */
 package org.springframework.batch.core.resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
@@ -49,7 +50,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 		
-		itemReader = new JdbcCursorItemReader<Foo>();
+		itemReader = new JdbcCursorItemReader<>();
 		itemReader.setDataSource(dataSource);
 		itemReader.setSql("select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?");
 		itemReader.setIgnoreWarnings(true);
@@ -60,12 +61,11 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		itemReader.setMaxRows(100);
 		itemReader.setQueryTimeout(1000);
 		itemReader.setSaveState(true);
-		ListPreparedStatementSetter pss = new ListPreparedStatementSetter();
-		List<Long> parameters = new ArrayList<Long>();
+		List<Long> parameters = new ArrayList<>();
 		parameters.add(1L);
 		parameters.add(4L);
-		pss.setParameters(parameters);
-		
+		ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(parameters.toArray());
+
 		itemReader.setPreparedStatementSetter(pss);
 	}
 	

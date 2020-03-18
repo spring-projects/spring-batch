@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,8 @@ import org.springframework.core.task.TaskExecutor;
  * multiple times with different input parameters (in the form of execution context). Useful for parallelization.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ * @author Dimitrios Liapis
  *
  * @since 2.2
  */
@@ -67,12 +69,12 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	 * Add a partitioner which can be used to create a {@link StepExecutionSplitter}. Use either this or an explicit
 	 * {@link #splitter(StepExecutionSplitter)} but not both.
 	 *
-	 * @param slaveStepName the name of the slave step (used to construct step execution names)
+	 * @param workerStepName the name of the worker step (used to construct step execution names)
 	 * @param partitioner a partitioner to use
 	 * @return this for fluent chaining
 	 */
-	public PartitionStepBuilder partitioner(String slaveStepName, Partitioner partitioner) {
-		this.stepName = slaveStepName;
+	public PartitionStepBuilder partitioner(String workerStepName, Partitioner partitioner) {
+		this.stepName = workerStepName;
 		this.partitioner = partitioner;
 		return this;
 	}
@@ -121,7 +123,7 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 	/**
 	 * A hint to the {@link #splitter(StepExecutionSplitter)} about how many step executions are required. If running
 	 * locally or remotely through a {@link #taskExecutor(TaskExecutor)} determines precisely the number of step
-	 * execution sin the first attempt at a partition step execution.
+	 * executions in the first attempt at a partition step execution.
 	 *
 	 * @param gridSize the grid size
 	 * @return this for fluent chaining
@@ -133,7 +135,7 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 
 	/**
 	 * Provide an explicit {@link StepExecutionSplitter} instead of having one build from the
-	 * {@link #partitioner(String, Partitioner)}. USeful if you need more control over the splitting.
+	 * {@link #partitioner(String, Partitioner)}. Useful if you need more control over the splitting.
 	 *
 	 * @param splitter a step execution splitter
 	 * @return this for fluent chaining

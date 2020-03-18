@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -53,6 +55,7 @@ import org.springframework.util.StringUtils;
  * The implementation is <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -75,6 +78,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private boolean strict = true;
 
+	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
+
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
 	}
@@ -82,7 +87,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	/**
 	 * In strict mode the reader will throw an exception on
 	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the input resource does not exist.
-	 * @param strict false by default
+	 * @param strict true by default
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
@@ -111,10 +116,19 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * @param fragmentRootElementNames list of the names of the root element of the fragment
 	 */
 	public void setFragmentRootElementNames(String[] fragmentRootElementNames) {
-		this.fragmentRootElementNames = new ArrayList<QName>();
+		this.fragmentRootElementNames = new ArrayList<>();
 		for (String fragmentRootElementName : fragmentRootElementNames) {
 			this.fragmentRootElementNames.add(parseFragmentRootElementName(fragmentRootElementName));
 		}
+	}
+
+	/**
+	 * Set the {@link XMLInputFactory}.
+	 * @param xmlInputFactory to use
+	 */
+	public void setXmlInputFactory(XMLInputFactory xmlInputFactory) {
+		Assert.notNull(xmlInputFactory, "XMLInputFactory must not be null");
+		this.xmlInputFactory = xmlInputFactory;
 	}
 
 	/**
@@ -139,6 +153,8 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 * 
 	 * This implementation simply looks for the next corresponding element, it does not care about element nesting. You
 	 * will need to override this method to correctly handle composite fragments.
+	 *
+	 * @param reader the {@link XMLEventReader} to be used to find next fragment.
 	 * 
 	 * @return <code>true</code> if next fragment was found, <code>false</code> otherwise.
 	 * 
@@ -205,7 +221,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 
 		inputStream = resource.getInputStream();
-		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
+		eventReader = xmlInputFactory.createXMLEventReader(inputStream);
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 		noInput = false;
 
@@ -214,8 +230,9 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	/**
 	 * Move to next fragment and map it to item.
 	 */
+	@Nullable
 	@Override
-	protected T doRead() throws Exception {
+	protected T doRead() throws IOException, XMLStreamException {
 
 		if (noInput) {
 			return null;

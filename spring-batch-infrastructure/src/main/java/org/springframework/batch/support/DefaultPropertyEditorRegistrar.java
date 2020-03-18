@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,7 +63,7 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
 	 */
 	public void setCustomEditors(Map<? extends Object, ? extends PropertyEditor> customEditors) {
-		this.customEditors = new HashMap<Class<?>, PropertyEditor>();
+		this.customEditors = new HashMap<>();
 		for (Entry<? extends Object, ? extends PropertyEditor> entry : customEditors.entrySet()) {
 			Object key = entry.getKey();
 			Class<?> requiredType = null;

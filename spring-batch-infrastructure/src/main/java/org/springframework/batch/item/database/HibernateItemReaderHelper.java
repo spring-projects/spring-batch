@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,11 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -35,8 +38,10 @@ import org.springframework.util.StringUtils;
  * queries.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
+@SuppressWarnings("rawtypes")
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -45,7 +50,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private String queryName = "";
 
-	private HibernateQueryProvider queryProvider;
+	private HibernateQueryProvider<? extends T> queryProvider;
 
 	private boolean useStatelessSession = true;
 
@@ -70,7 +75,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	/**
 	 * @param queryProvider Hibernate query provider
 	 */
-	public void setQueryProvider(HibernateQueryProvider queryProvider) {
+	public void setQueryProvider(HibernateQueryProvider<? extends T> queryProvider) {
 		this.queryProvider = queryProvider;
 	}
 
@@ -104,11 +109,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
 					"queryString or queryName must be set");
 		}
-		// making sure that the appropriate (Hibernate) query provider is set
-		else {
-			Assert.state(queryProvider != null, "Hibernate query provider must be set");
-		}
-
 	}
 
 	/**
@@ -197,7 +197,9 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			statelessSession = null;
 		}
 		if (statefulSession != null) {
-			statefulSession.close();
+
+			Method close = ReflectionUtils.findMethod(Session.class, "close");
+			ReflectionUtils.invokeMethod(close, statefulSession);
 			statefulSession = null;
 		}
 	}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,6 +91,8 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	/**
 	 * Allows customization of the suffix of the created resources based on the
 	 * index.
+	 *
+	 * @param suffixCreator {@link ResourceSuffixCreator} to be used by the writer.
 	 */
 	public void setResourceSuffixCreator(ResourceSuffixCreator suffixCreator) {
 		this.suffixCreator = suffixCreator;
@@ -99,6 +101,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	/**
 	 * After this limit is exceeded the next chunk will be written into newly
 	 * created resource.
+	 *
+	 * @param itemCountLimitPerResource int item threshold used to determine when a new
+	 * resource should be created.
 	 */
 	public void setItemCountLimitPerResource(int itemCountLimitPerResource) {
 		this.itemCountLimitPerResource = itemCountLimitPerResource;
@@ -106,6 +111,9 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	/**
 	 * Delegate used for actual writing of the output.
+	 *
+	 * @param delegate {@link ResourceAwareItemWriterItemStream} that will be used
+	 * to write the output.
 	 */
 	public void setDelegate(ResourceAwareItemWriterItemStream<? super T> delegate) {
 		this.delegate = delegate;
@@ -116,18 +124,26 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	 * the same directory and use the same name as this prototype with appended
 	 * suffix (according to
 	 * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
+	 *
+	 * @param resource The prototype resource.
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
 
+
+	/**
+	 * Indicates that the state of the reader will be saved after each commit.
+	 *
+	 * @param saveState true the state is saved.
+	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
 
     @Override
 	public void close() throws ItemStreamException {
-                super.close();
+		super.close();
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
 		if (opened) {
@@ -137,7 +153,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 1);
 		currentResourceItemCount = executionContext.getInt(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
 
@@ -151,6 +167,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		if (executionContext.containsKey(getExecutionContextKey(CURRENT_RESOURCE_ITEM_COUNT))) {
 			// It's a restart
 			delegate.open(executionContext);
+			opened = true;
 		}
 		else {
 			opened = false;
@@ -159,7 +176,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		if (saveState) {
 			if (opened) {
 				delegate.update(executionContext);

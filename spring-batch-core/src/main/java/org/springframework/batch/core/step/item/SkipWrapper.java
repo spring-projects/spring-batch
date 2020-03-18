@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,13 @@
 
 package org.springframework.batch.core.step.item;
 
+import org.springframework.lang.Nullable;
+
 /**
  * Wrapper for an item and its exception if it failed processing.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class SkipWrapper<T> {
@@ -29,21 +32,21 @@ public class SkipWrapper<T> {
 	final private T item;
 
 	/**
-	 * @param item
+	 * @param item the item being wrapped.
 	 */
 	public SkipWrapper(T item) {
 		this(item, null);
 	}
 
 	/**
-	 * @param e
+	 * @param e instance of {@link Throwable} that being wrapped.
 	 */
 	public SkipWrapper(Throwable e) {
 		this(null, e);
 	}
 
 
-	public SkipWrapper(T item, Throwable e) {
+	public SkipWrapper(T item, @Nullable Throwable e) {
 		this.item = item;
 		this.exception = e;
 	}
@@ -52,6 +55,7 @@ public class SkipWrapper<T> {
 	 * Public getter for the exception.
 	 * @return the exception
 	 */
+	@Nullable
 	public Throwable getException() {
 		return exception;
 	}

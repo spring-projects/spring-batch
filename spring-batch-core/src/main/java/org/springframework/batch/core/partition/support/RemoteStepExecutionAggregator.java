@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -90,7 +90,7 @@ public class RemoteStepExecutionAggregator implements StepExecutionAggregator, I
 		if (executions == null) {
 			return;
 		}
-		Collection<StepExecution> updates = new ArrayList<StepExecution>();
+		Collection<StepExecution> updates = new ArrayList<>();
 		for (StepExecution stepExecution : executions) {
 			Long id = stepExecution.getId();
 			Assert.state(id != null, "StepExecution has null id. It must be saved first: " + stepExecution);

@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,12 +18,14 @@ package org.springframework.batch.core.jsr;
 import javax.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
  * Wrapper class for {@link javax.batch.api.chunk.listener.ItemProcessListener}
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @param <T> input type
  * @param <S> output type
@@ -37,7 +39,7 @@ public class ItemProcessListenerAdapter<T,S> implements ItemProcessListener<T, S
 	 * @param delegate to be called within the batch lifecycle
 	 */
 	public ItemProcessListenerAdapter(javax.batch.api.chunk.listener.ItemProcessListener delegate) {
-		Assert.notNull(delegate, "An ItemProcessListener is requred");
+		Assert.notNull(delegate, "An ItemProcessListener is required");
 		this.delegate = delegate;
 	}
 
@@ -51,7 +53,7 @@ public class ItemProcessListenerAdapter<T,S> implements ItemProcessListener<T, S
 	}
 
 	@Override
-	public void afterProcess(T item, S result) {
+	public void afterProcess(T item, @Nullable S result) {
 		try {
 			delegate.afterProcess(item, result);
 		} catch (Exception e) {

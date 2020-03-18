@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,18 +32,19 @@ import org.springframework.util.ObjectUtils;
  * callback inside a {@link Step}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class StepContextRepeatCallback implements RepeatCallback {
 
-	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<ChunkContext>();
+	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<>();
 
 	private final StepExecution stepExecution;
 
 	private final Log logger = LogFactory.getLog(StepContextRepeatCallback.class);
 
 	/**
-	 * @param stepExecution
+	 * @param stepExecution instance of {@link StepExecution} to be used by StepContextRepeatCallback.
 	 */
 	public StepContextRepeatCallback(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;

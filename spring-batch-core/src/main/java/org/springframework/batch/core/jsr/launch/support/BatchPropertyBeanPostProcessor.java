@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,7 +56,7 @@ import org.springframework.util.StringUtils;
 public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware {
 	private static final String SCOPED_TARGET_BEAN_PREFIX = "scopedTarget.";
 	private static final Log LOGGER = LogFactory.getLog(BatchPropertyBeanPostProcessor.class);
-	private static final Set<Class<? extends Annotation>> REQUIRED_ANNOTATIONS = new HashSet<Class<? extends Annotation>>();
+	private static final Set<Class<? extends Annotation>> REQUIRED_ANNOTATIONS = new HashSet<>();
 
 	private JsrExpressionParser jsrExpressionParser;
 	private BatchPropertyContext batchPropertyContext;

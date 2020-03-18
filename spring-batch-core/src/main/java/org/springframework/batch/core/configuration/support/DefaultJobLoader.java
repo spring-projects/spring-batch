@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -45,6 +46,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Stephane Nicoll
+ * @author Mahmoud Ben Hassine
  */
 public class DefaultJobLoader implements JobLoader, InitializingBean {
 
@@ -53,9 +55,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	private JobRegistry jobRegistry;
 	private StepRegistry stepRegistry;
 
-	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<ApplicationContextFactory, ConfigurableApplicationContext>();
+	private Map<ApplicationContextFactory, ConfigurableApplicationContext> contexts = new ConcurrentHashMap<>();
 
-	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<ConfigurableApplicationContext, Collection<String>>();
+	private Map<ConfigurableApplicationContext, Collection<String>> contextToJobNames = new ConcurrentHashMap<>();
 
 	/**
 	 * Default constructor useful for declarative configuration.
@@ -77,9 +79,9 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 * Creates a job loader with the job and step registries provided.
 	 *
 	 * @param jobRegistry a {@link JobRegistry}
-	 * @param stepRegistry a {@link StepRegistry}
+	 * @param stepRegistry a {@link StepRegistry} (can be {@code null})
 	 */
-	public DefaultJobLoader(JobRegistry jobRegistry, StepRegistry stepRegistry) {
+	public DefaultJobLoader(JobRegistry jobRegistry, @Nullable StepRegistry stepRegistry) {
 		this.jobRegistry = jobRegistry;
 		this.stepRegistry = stepRegistry;
 	}
@@ -160,7 +162,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 		// Try to detect auto-registration (e.g. through a bean post processor)
 		boolean autoRegistrationDetected = jobNamesAfter.size() > jobNamesBefore.size();
 
-		Collection<String> jobsRegistered = new HashSet<String>();
+		Collection<String> jobsRegistered = new HashSet<>();
 		if (autoRegistrationDetected) {
 			for (String name : jobNamesAfter) {
 				if (!jobNamesBefore.contains(name)) {
@@ -196,7 +198,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 		}
 
-		Collection<Job> result = new ArrayList<Job>();
+		Collection<Job> result = new ArrayList<>();
 		for (String name : jobsRegistered) {
 			try {
 				result.add(jobRegistry.getJob(name));
@@ -227,7 +229,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 	 */
 	private Collection<Step> getSteps(final StepLocator stepLocator, final ApplicationContext jobApplicationContext) {
 		final Collection<String> stepNames = stepLocator.getStepNames();
-		final Collection<Step> result = new ArrayList<Step>();
+		final Collection<Step> result = new ArrayList<>();
 		for (String stepName : stepNames) {
 			result.add(stepLocator.getStep(stepName));
 		}

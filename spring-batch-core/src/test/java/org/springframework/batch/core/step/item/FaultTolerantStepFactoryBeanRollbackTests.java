@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,20 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
@@ -42,14 +51,6 @@ import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -82,11 +83,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		reader = new SkipReaderStub<String>();
-		processor = new SkipProcessorStub<String>();
-		writer = new SkipWriterStub<String>();
+		reader = new SkipReaderStub<>();
+		processor = new SkipProcessorStub<>();
+		writer = new SkipWriterStub<>();
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -272,7 +273,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setItemProcessor(processor);
 
 		@SuppressWarnings("unchecked")
-		List<Class<? extends Throwable>> exceptions = Arrays.<Class<? extends Throwable>>asList(Exception.class);
+		List<Class<? extends Throwable>> exceptions = Arrays.asList(Exception.class);
 		factory.setNoRollbackExceptionClasses(exceptions);
 		@SuppressWarnings("unchecked")
 		Map<Class<? extends Throwable>, Boolean> skippable = getExceptionMap(Exception.class);
@@ -290,7 +291,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 3, 4, 5]", writer.getCommitted().toString());
 		// No rollback on 2 so processor has side effect
 		assertEquals("[1, 2, 3, 4, 5]", processor.getCommitted().toString());
-		List<String> processed = new ArrayList<String>(processor.getProcessed());
+		List<String> processed = new ArrayList<>(processor.getProcessed());
 		Collections.sort(processed);
 		assertEquals("[1, 2, 3, 4, 5]", processed.toString());
 		assertEquals(0, stepExecution.getSkipCount());
@@ -521,7 +522,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testSkipInWriterTransactionalReader() throws Exception {
 		writer.setFailures("4");
-		ItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
+		ItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
 		factory.setItemReader(reader);
 		factory.setCommitInterval(30);
 		factory.setSkipLimit(10);
@@ -596,8 +597,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		return Arrays.<Class<? extends Throwable>> asList(arg);
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		for (Class<? extends Throwable> arg : args) {
 			map.put(arg, true);
 		}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 
 	private List<? extends ItemProcessor<?, ?>> delegates;
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
@@ -53,7 +55,7 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 	}
     
     /* 
-     * Helper method to work around wildcard capture compiler error: see http://docs.oracle.com/javase/tutorial/java/generics/capture.html
+     * Helper method to work around wildcard capture compiler error: see https://docs.oracle.com/javase/tutorial/java/generics/capture.html
      * The method process(capture#1-of ?) in the type ItemProcessor<capture#1-of ?,capture#2-of ?> is not applicable for the arguments (Object)
      */
     @SuppressWarnings("unchecked")
@@ -67,8 +69,14 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
 	}
 
+	/**
+	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be
+	 * processed.
+	 * @param delegates list of {@link ItemProcessor} delegates that will work on the
+	 * item.
+	 */
 	public void setDelegates(List<? extends ItemProcessor<?, ?>> delegates) {
 		this.delegates = delegates;
-	}	
+	}
 
 }

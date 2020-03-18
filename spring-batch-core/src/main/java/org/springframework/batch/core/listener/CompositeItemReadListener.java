@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,12 +28,12 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
-	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<ItemReadListener<? super T>>();
+	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param itemReadListeners
+	 * @param itemReadListeners list of {@link ItemReadListener}s to be called when read events occur.
 	 */
 	public void setListeners(List<? extends ItemReadListener<? super T>> itemReadListeners) {
 		this.listeners.setItems(itemReadListeners);
@@ -42,7 +42,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param itemReaderListener
+	 * @param itemReaderListener instance of {@link ItemReadListener} to be registered.
 	 */
 	public void register(ItemReadListener<? super T> itemReaderListener) {
 		listeners.add(itemReaderListener);
@@ -81,7 +81,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 */
 	@Override
 	public void onReadError(Exception ex) {
-		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ItemReadListener<? super T>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener<? super T> listener = iterator.next();
 			listener.onReadError(ex);
 		}

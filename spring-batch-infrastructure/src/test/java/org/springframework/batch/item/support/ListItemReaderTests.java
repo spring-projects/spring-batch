@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 public class ListItemReaderTests extends TestCase {
 
-	ListItemReader<String> reader = new ListItemReader<String>(Arrays.asList(new String[] { "a", "b", "c" }));
+	ListItemReader<String> reader = new ListItemReader<>(Arrays.asList(new String[]{"a", "b", "c"}));
 
 	public void testNext() throws Exception {
 		assertEquals("a", reader.read());
@@ -36,8 +36,8 @@ public class ListItemReaderTests extends TestCase {
 	}
 
 	public void testChangeList() throws Exception {
-		List<String> list = new ArrayList<String>(Arrays.asList(new String[] { "a", "b", "c" }));
-		reader = new ListItemReader<String>(list);
+		List<String> list = new ArrayList<>(Arrays.asList(new String[]{"a", "b", "c"}));
+		reader = new ListItemReader<>(list);
 		assertEquals("a", reader.read());
 		list.clear();
 		assertEquals(0, list.size());

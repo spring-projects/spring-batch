@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,6 +50,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	protected static final Log logger = LogFactory.getLog(JpaItemWriter.class);
 
 	private EntityManagerFactory entityManagerFactory;
+	private boolean usePersist = false;
 
 	/**
 	 * Set the EntityManager to be used internally.
@@ -58,6 +59,15 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
+	}
+	
+	/**
+	 * Set whether the EntityManager should perform a persist instead of a merge.
+	 * 
+	 * @param usePersist whether to use persist instead of merge.
+	 */
+	public void setUsePersist(boolean usePersist) {
+		this.usePersist = usePersist;
 	}
 
 	/**
@@ -98,16 +108,21 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		}
 
 		if (!items.isEmpty()) {
-			long mergeCount = 0;
+			long addedToContextCount = 0;
 			for (T item : items) {
 				if (!entityManager.contains(item)) {
-					entityManager.merge(item);
-					mergeCount++;
+					if(usePersist) {
+						entityManager.persist(item);
+					}
+					else {
+						entityManager.merge(item);
+					}					
+					addedToContextCount++;
 				}
 			}
 			if (logger.isDebugEnabled()) {
-				logger.debug(mergeCount + " entities merged.");
-				logger.debug((items.size() - mergeCount) + " entities found in persistence context.");
+				logger.debug(addedToContextCount + " entities " + (usePersist ? " persisted." : "merged."));
+				logger.debug((items.size() - addedToContextCount) + " entities found in persistence context.");
 			}
 		}
 

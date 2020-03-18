@@ -1,0 +1,45 @@
+:doctype: book
+:toc: left
+:toclevels: 4
+:sectnums:
+:onlyonetoggle: true
+
+include::header/index-header.adoc[]
+
+include::toggle.adoc[]
+
+include::spring-batch-intro.adoc[]
+
+include::whatsnew.adoc[]
+
+include::domain.adoc[]
+
+include::job.adoc[]
+
+include::step.adoc[]
+
+include::readersAndWriters.adoc[]
+
+include::scalability.adoc[]
+
+include::repeat.adoc[]
+
+include::retry.adoc[]
+
+include::testing.adoc[]
+
+include::common-patterns.adoc[]
+
+include::jsr-352.adoc[]
+
+include::spring-batch-integration.adoc[]
+
+include::monitoring-and-metrics.adoc[]
+
+include::appendix.adoc[]
+
+include::schema-appendix.adoc[]
+
+include::transaction-appendix.adoc[]
+
+include::glossary.adoc[]

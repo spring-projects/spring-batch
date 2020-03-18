@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,12 @@
 
 package org.springframework.batch.core.partition.support;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
@@ -23,17 +29,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.step.StepHolder;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 /**
  * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the
@@ -55,6 +54,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 
     @Override
 	public void afterPropertiesSet() throws Exception {
+		Assert.state(step != null, "A Step must be provided.");
 	}
 
 	/**
@@ -74,7 +74,6 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	 *
 	 * @param step the {@link Step} instance to use to execute business logic
 	 */
-    @Required
 	public void setStep(Step step) {
 		this.step = step;
 	}
@@ -91,11 +90,11 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
 	}
 
     @Override
-    protected Set<StepExecution> doHandle(StepExecution masterStepExecution,
+    protected Set<StepExecution> doHandle(StepExecution managerStepExecution,
                                           Set<StepExecution> partitionStepExecutions) throws Exception {
         Assert.notNull(step, "A Step must be provided.");
-        final Set<Future<StepExecution>> tasks = new HashSet<Future<StepExecution>>(getGridSize());
-        final Set<StepExecution> result = new HashSet<StepExecution>();
+        final Set<Future<StepExecution>> tasks = new HashSet<>(getGridSize());
+        final Set<StepExecution> result = new HashSet<>();
 
         for (final StepExecution stepExecution : partitionStepExecutions) {
             final FutureTask<StepExecution> task = createTask(step, stepExecution);
@@ -133,7 +132,7 @@ public class TaskExecutorPartitionHandler extends AbstractPartitionHandler imple
      */
     protected FutureTask<StepExecution> createTask(final Step step,
                                                    final StepExecution stepExecution) {
-        return new FutureTask<StepExecution>(new Callable<StepExecution>() {
+        return new FutureTask<>(new Callable<StepExecution>() {
             @Override
             public StepExecution call() throws Exception {
                 step.execute(stepExecution);

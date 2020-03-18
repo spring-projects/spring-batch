@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public class JsrSplitState extends org.springframework.batch.core.job.flow.suppo
 
 	/**
 	 * @param flows {@link Flow}s to be executed in parallel
-	 * @param name
+	 * @param name the name to be associated with the split state.
 	 */
 	public JsrSplitState(Collection<Flow> flows, String name) {
 		super(flows, name);
@@ -53,7 +53,7 @@ public class JsrSplitState extends org.springframework.batch.core.job.flow.suppo
 	 */
 	@Override
 	protected FlowExecutionStatus doAggregation(Collection<FlowExecution> results, FlowExecutor executor) {
-		List<String> stepNames = new ArrayList<String>();
+		List<String> stepNames = new ArrayList<>();
 
 		for (Flow curFlow : getFlows()) {
 			JsrFlow flow = (JsrFlow) curFlow;

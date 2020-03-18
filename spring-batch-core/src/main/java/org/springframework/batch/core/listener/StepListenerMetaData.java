@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,7 +91,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	}
 
 	static{
-		propertyMap = new HashMap<String, StepListenerMetaData>();
+		propertyMap = new HashMap<>();
 		for(StepListenerMetaData metaData : values()){
 			propertyMap.put(metaData.getPropertyName(), metaData);
 		}
@@ -125,7 +125,7 @@ public enum StepListenerMetaData implements ListenerMetaData {
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 *
-	 * @param propertyName
+	 * @param propertyName property name to retrieve data for.
 	 * @return meta data with supplied property name, null if none exists.
 	 */
 	public static StepListenerMetaData fromPropertyName(String propertyName){

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,11 @@ package org.springframework.batch.item.database;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
@@ -37,13 +37,13 @@ AbstractGenericDataSourceItemReaderIntegrationTests {
 
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
-		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
+		factoryBean.setMappingLocations(new ClassPathResource("Foo.hbm.xml", getClass()));
 		customizeSessionFactory(factoryBean);
 		factoryBean.afterPropertiesSet();
 
 		SessionFactory sessionFactory = factoryBean.getObject();
 
-		HibernateCursorItemReader<Foo> hibernateReader = new HibernateCursorItemReader<Foo>();
+		HibernateCursorItemReader<Foo> hibernateReader = new HibernateCursorItemReader<>();
 		setQuery(hibernateReader);
 		hibernateReader.setSessionFactory(sessionFactory);
 		hibernateReader.setUseStatelessSession(isUseStatelessSession());
@@ -57,7 +57,7 @@ AbstractGenericDataSourceItemReaderIntegrationTests {
 	protected void customizeSessionFactory(LocalSessionFactoryBean factoryBean) {
 	}
 
-	protected void setQuery(HibernateCursorItemReader<?> reader) throws Exception {
+	protected void setQuery(HibernateCursorItemReader<Foo> reader) throws Exception {
 		reader.setQueryString("from Foo");
 	}
 

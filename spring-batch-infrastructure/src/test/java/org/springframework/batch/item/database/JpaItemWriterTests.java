@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -36,7 +37,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * @author Thomas Risberg
  * @author Will Schipp
- * 
+ * @author Chris Cranford
+ * @author Mahmoud Ben Hassine
  */
 public class JpaItemWriterTests {
 
@@ -49,14 +51,14 @@ public class JpaItemWriterTests {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			TransactionSynchronizationManager.clearSynchronization();
 		}
-		writer = new JpaItemWriter<Object>();
+		writer = new JpaItemWriter<>();
 		emf = mock(EntityManagerFactory.class,"emf");
 		writer.setEntityManagerFactory(emf);
 	}
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new JpaItemWriter<Object>();
+		writer = new JpaItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -81,6 +83,18 @@ public class JpaItemWriterTests {
 
 		writer.write(items);
 
+		TransactionSynchronizationManager.unbindResource(emf);
+	}
+
+	@Test
+	public void testPersist() throws Exception {
+		writer.setUsePersist(true);
+		EntityManager em = mock(EntityManager.class, "em");
+		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
+		List<String> items = Arrays.asList("persist1", "persist2");
+		writer.write(items);
+		verify(em).persist(items.get(0));
+		verify(em).persist(items.get(1));
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 

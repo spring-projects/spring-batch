@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,18 @@ public class DelimitedLineTokenizerTests {
 		assertTrue(TOKEN_MATCHES, tokens.readString(0).equals("First string"));
 		assertTrue(TOKEN_MATCHES, tokens.readString(1).equals(""));
 	}
+
+    @Test
+    public void testBlankString() {
+        FieldSet tokens = tokenizer.tokenize("   ");
+        assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+    }
+
+    @Test
+    public void testEmptyString() {
+        FieldSet tokens = tokenizer.tokenize("\"\"");
+        assertTrue(TOKEN_MATCHES, tokens.readString(0).equals(""));
+    }
 
 	@Test
 	public void testInvalidConstructorArgument() {
@@ -130,20 +142,20 @@ public class DelimitedLineTokenizerTests {
 		FieldSet line = tokenizer.tokenize("a b c");
 		assertEquals(3, line.getFieldCount());
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testDelimitedLineTokenizerNullDelimiter() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(null);
 		tokenizer.tokenize("a b c");
 	}
-	
-	@Test(expected=IllegalStateException.class)
+
+	@Test(expected=IllegalArgumentException.class)
 	public void testDelimitedLineTokenizerEmptyString() throws Exception {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
 		tokenizer.afterPropertiesSet();
 		tokenizer.tokenize("a b c");
 	}
-	
+
 	@Test
 	public void testDelimitedLineTokenizerString() {
 		AbstractLineTokenizer tokenizer = new DelimitedLineTokenizer(" b ");

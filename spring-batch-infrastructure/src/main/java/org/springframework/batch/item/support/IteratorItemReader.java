@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,7 @@ package org.springframework.batch.item.support;
 import java.util.Iterator;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -29,6 +28,7 @@ import org.springframework.util.Assert;
  * 
  * @author Juliusz Brzostek
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public class IteratorItemReader<T> implements ItemReader<T> {
 
@@ -63,8 +63,9 @@ public class IteratorItemReader<T> implements ItemReader<T> {
 	 * Implementation of {@link ItemReader#read()} that just iterates over the
 	 * iterator provided.
 	 */
-    @Override
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+    @Nullable
+	@Override
+	public T read() {
 		if (iterator.hasNext())
 			return iterator.next();
 		else

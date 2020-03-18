@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.step.item;
-
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -44,15 +41,19 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.StringUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+
 public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<>();
 
-	private List<String> items = Arrays.asList(new String[] { "1", "2", "3", "4", "5" });
+	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
-	private ListItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory
+	private ListItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory
 			.createTransactionalList(items));
 
 	private SkipWriterStub writer = new SkipWriterStub();
@@ -71,7 +72,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(SkippableException.class, true);
 		skippableExceptions.put(SkippableRuntimeException.class, true);
 		factory.setSkippableExceptionClasses(skippableExceptions);
@@ -86,6 +87,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock(SkipListener.class);

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,8 +15,16 @@
  */
 package org.springframework.batch.item.database;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
@@ -28,19 +36,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.util.Assert;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * <p>{@link ItemWriter} that uses the batching features from
  * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
  * provided.</p>
  *
- * The user must provide an SQL query and a special callback in the for of either
+ * The user must provide an SQL query and a special callback for either of
  * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}.
  * You can use either named parameters or the traditional '?' placeholders. If you use the
  * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
@@ -62,19 +63,19 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	protected NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
-	private ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
+	protected ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
-	private ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
+	protected ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
 
-	private String sql;
+	protected String sql;
 
-	private boolean assertUpdates = true;
+	protected boolean assertUpdates = true;
 
-	private int parameterCount;
+	protected int parameterCount;
 
-	private boolean usingNamedParameters;
+	protected boolean usingNamedParameters;
 
 	/**
 	 * Public setter for the flag that determines whether an assertion is made
@@ -141,7 +142,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	public void afterPropertiesSet() {
 		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
 		Assert.notNull(sql, "An SQL statement is required.");
-		List<String> namedParameters = new ArrayList<String>();
+		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
 		if (namedParameters.size() > 0) {
 			if (parameterCount != namedParameters.size()) {
@@ -157,7 +158,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public void write(final List<? extends T> items) throws Exception {
 
@@ -167,11 +168,11 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				logger.debug("Executing batch with " + items.size() + " items.");
 			}
 
-			int[] updateCounts = null;
+			int[] updateCounts;
 
 			if (usingNamedParameters) {
-				if(items.get(0) instanceof Map) {
-					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[0]));
+				if(items.get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
+					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[items.size()]));
 				} else {
 					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
 					int i = 0;

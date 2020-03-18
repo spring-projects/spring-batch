@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,13 +44,14 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 public class AsyncTaskletStepTests {
 
 	private static Log logger = LogFactory.getLog(AsyncTaskletStepTests.class);
 
-	private List<String> processed = new CopyOnWriteArrayList<String>();
+	private List<String> processed = new CopyOnWriteArrayList<>();
 
 	private TaskletStep step;
 
@@ -74,7 +75,7 @@ public class AsyncTaskletStepTests {
 
 	private int concurrencyLimit = 300;
 
-	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<String>();
+	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
 
 	private void setUp() throws Exception {
 
@@ -85,7 +86,7 @@ public class AsyncTaskletStepTests {
 
 		RepeatTemplate chunkTemplate = new RepeatTemplate();
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ListItemReader<String>(items), itemProcessor, itemWriter,
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ListItemReader<>(items), itemProcessor, itemWriter,
 				chunkTemplate));
 
 		jobRepository = new JobRepositorySupport();
@@ -116,7 +117,7 @@ public class AsyncTaskletStepTests {
 	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
-		items = new ArrayList<String>(Arrays.asList(StringUtils
+		items = new ArrayList<>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25")));
 
 		setUp();
@@ -175,6 +176,7 @@ public class AsyncTaskletStepTests {
 		concurrencyLimit = 1;
 		items = Arrays.asList("one", "barf", "three", "four");
 		itemProcessor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				logger.info("Item: "+item);

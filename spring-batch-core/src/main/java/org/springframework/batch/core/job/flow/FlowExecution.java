@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,8 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	private final FlowExecutionStatus status;
 
 	/**
-	 * @param name
-	 * @param status
+	 * @param name the flow name to be associated with the FlowExecution.
+	 * @param status the {@link FlowExecutionStatus} to be associated with the FlowExecution.
 	 */
 	public FlowExecution(String name, FlowExecutionStatus status) {
 		this.name = name;
@@ -54,7 +54,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	 *
 	 * @see Comparable#compareTo(Object)
 	 *
-	 * @param other
+	 * @param other the {@link FlowExecution} instance to compare with this instance.
 	 * @return negative, zero or positive as per the contract
 	 */
 	@Override

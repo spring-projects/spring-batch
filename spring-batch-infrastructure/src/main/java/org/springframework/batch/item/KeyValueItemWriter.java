@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  * 
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -59,7 +59,8 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	/**
 	 * Set the {@link Converter} to use to derive the key from the item
-	 * @param itemKeyMapper
+	 *
+	 * @param itemKeyMapper the {@link Converter} used to derive a key from an item.
 	 */
 	public void setItemKeyMapper(Converter<V, K> itemKeyMapper) {
 		this.itemKeyMapper = itemKeyMapper;
@@ -67,7 +68,9 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 
 	/**
 	 * Sets the delete flag to have the item writer perform deletes
-	 * @param delete
+	 *
+	 * @param delete if true {@link ItemWriter} will perform deletes,
+	 * 		if false not to perform deletes.
 	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -40,6 +41,7 @@ import org.springframework.util.StringUtils;
  * about the problematic line and its line number.
  * 
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -49,6 +51,8 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
+	public static final String[] DEFAULT_COMMENT_PREFIXES = new String[] { "#" };
+
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
 	private Resource resource;
@@ -57,7 +61,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private int lineCount = 0;
 
-	private String[] comments = new String[] { "#" };
+	private String[] comments = DEFAULT_COMMENT_PREFIXES;
 
 	private boolean noInput = false;
 
@@ -122,7 +126,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * Factory for the {@link BufferedReader} that will be used to extract lines from the file. The default is fine for
-	 * plain text files, but this is a useful strategy for binary files where the standard BufferedReaader from java.io
+	 * plain text files, but this is a useful strategy for binary files where the standard BufferedReader from java.io
 	 * is limiting.
 	 * 
 	 * @param bufferedReaderFactory the bufferedReaderFactory to set
@@ -133,7 +137,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	/**
 	 * Setter for comment prefixes. Can be used to ignore header lines as well by using e.g. the first couple of column
-	 * names as a prefix.
+	 * names as a prefix. Defaults to {@link #DEFAULT_COMMENT_PREFIXES}.
 	 * 
 	 * @param comments an array of comment line prefixes.
 	 */
@@ -164,6 +168,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	 * @return string corresponding to logical record according to
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span multiple lines in file).
 	 */
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (noInput) {
@@ -189,6 +194,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	/**
 	 * @return next line (skip comments).getCurrentResource
 	 */
+	@Nullable
 	private String readLine() {
 
 		if (reader == null) {

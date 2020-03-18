@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 package org.springframework.batch.core;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.Nullable;
 
 /**
  * Listener interface for the processing of an item.  Implementations
@@ -24,6 +25,7 @@ import org.springframework.batch.item.ItemProcessor;
  * exceptions thrown by the processor.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface ItemProcessListener<T, S> extends StepListener {
@@ -37,13 +39,13 @@ public interface ItemProcessListener<T, S> extends StepListener {
 	
 	/**
 	 * Called after {@link ItemProcessor#process(Object)} returns.  If the
-	 * processor returns null, this method will still be called, with
-	 * a null result, allowing for notification of 'filtered' items.
+	 * processor returns {@code null}, this method will still be called, with
+	 * a {code null} result, allowing for notification of 'filtered' items.
 	 * 
 	 * @param item to be processed
 	 * @param result of processing
 	 */
-	void afterProcess(T item, S result);
+	void afterProcess(T item, @Nullable S result);
 	
 	/**
 	 * Called if an exception was thrown from {@link ItemProcessor#process(Object)}.

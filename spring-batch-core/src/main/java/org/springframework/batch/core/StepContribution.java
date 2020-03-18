@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.io.Serializable;
  * they can be applied at a chunk boundary.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -43,17 +44,21 @@ public class StepContribution implements Serializable {
 
 	private ExitStatus exitStatus = ExitStatus.EXECUTING;
 
+	private volatile StepExecution stepExecution;
+
 	/**
-	 * @param execution
+	 * @param execution {@link StepExecution} the stepExecution used to initialize
+	 * {@code skipCount}.
 	 */
 	public StepContribution(StepExecution execution) {
+		this.stepExecution = execution;
 		this.parentSkipCount = execution.getSkipCount();
 	}
 
 	/**
 	 * Set the {@link ExitStatus} for this contribution.
 	 *
-	 * @param status
+	 * @param status {@link ExitStatus} instance to be used to set the exit status.
 	 */
 	public void setExitStatus(ExitStatus status) {
 		this.exitStatus = status;
@@ -70,6 +75,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items processed.
+	 *
+	 * @param count int amount to increment by.
 	 */
 	public void incrementFilterCount(int count) {
 		filterCount += count;
@@ -84,6 +91,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the counter for the number of items written.
+	 *
+	 * @param count int amount to increment by.
 	 */
 	public void incrementWriteCount(int count) {
 		writeCount += count;
@@ -109,6 +118,7 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the filter counter.
+	 *
 	 * @return the filter counter
 	 */
 	public int getFilterCount() {
@@ -141,6 +151,8 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Increment the read skip count for this contribution
+	 *
+	 * @param count int amount to increment by.
 	 */
 	public void incrementReadSkipCount(int count) {
 		readSkipCount += count;
@@ -176,10 +188,19 @@ public class StepContribution implements Serializable {
 
 	/**
 	 * Public getter for the process skip count.
+	 *
 	 * @return the process skip count
 	 */
 	public int getProcessSkipCount() {
 		return processSkipCount;
+	}
+
+	/**
+	 * Public getter for the parent step execution of this contribution.
+	 * @return parent step execution of this contribution
+	 */
+	public StepExecution getStepExecution() {
+		return stepExecution;
 	}
 
 	/*

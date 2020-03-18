@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +16,16 @@
 
 package org.springframework.batch.item.database.support;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
+import org.hibernate.query.NativeQuery;
 import org.junit.Test;
+
 import org.springframework.batch.item.database.orm.HibernateNativeQueryProvider;
-import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Anatoly Polinsky
@@ -36,39 +37,41 @@ public class HibernateNativeQueryProviderTests {
 	protected HibernateNativeQueryProvider<Foo> hibernateQueryProvider;
 
 	public HibernateNativeQueryProviderTests() {
-		hibernateQueryProvider = new HibernateNativeQueryProvider<Foo>();
+		hibernateQueryProvider = new HibernateNativeQueryProvider<>();
 		hibernateQueryProvider.setEntityClass(Foo.class);
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testCreateQueryWithStatelessSession() {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
 		StatelessSession session = mock(StatelessSession.class);
-		SQLQuery query = mock(SQLQuery.class);
+		NativeQuery<Foo> query = mock(NativeQuery.class);
 
-		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setStatelessSession(session);
-		Assert.notNull(hibernateQueryProvider.createQuery());
+		assertNotNull(hibernateQueryProvider.createQuery());
 
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void shouldCreateQueryWithStatefulSession() {
 		String sqlQuery = "select * from T_FOOS";
 		hibernateQueryProvider.setSqlQuery(sqlQuery);
 
 		Session session = mock(Session.class);
-		SQLQuery query = mock(SQLQuery.class);
+		NativeQuery<Foo> query = mock(NativeQuery.class);
 
-		when(session.createSQLQuery(sqlQuery)).thenReturn(query);
+		when(session.createNativeQuery(sqlQuery)).thenReturn(query);
 		when(query.addEntity(Foo.class)).thenReturn(query);
 
 		hibernateQueryProvider.setSession(session);
-		Assert.notNull(hibernateQueryProvider.createQuery());
+		assertNotNull(hibernateQueryProvider.createQuery());
 
 	}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,18 +16,18 @@
 
 package org.springframework.batch.item.database.support;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.database.JdbcParameterUtils;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided
@@ -42,11 +42,15 @@ import java.util.Map;
  * Provides properties and preparation for the mandatory "selectClause" and
  * "fromClause" as well as for the optional "whereClause". Also provides
  * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
- * the sort key must be a true key and not just a column to order by.
+ * the sort key must be a true key and not just a column to order by. It is important
+ * to have a unique key constraint on the sort key to guarantee that no data is lost
+ * between executions.
  * 
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Benjamin Hetz
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
@@ -57,7 +61,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	private String whereClause;
 	
-	private Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+	private Map<String, Order> sortKeys = new LinkedHashMap<>();
 
 	private String groupClause;
 
@@ -182,7 +186,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 */
     @Override
 	public void init(DataSource dataSource) throws Exception {
-		Assert.notNull(dataSource);
+		Assert.notNull(dataSource, "A DataSource is required");
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
 		Assert.notEmpty(sortKeys, "sortKey must be specified");
@@ -195,7 +199,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		if(groupClause != null) {
 			sql.append(" GROUP BY ").append(groupClause);
 		}
-		List<String> namedParameters = new ArrayList<String>();
+		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);
 		if (namedParameters.size() > 0) {
 			if (parameterCount != namedParameters.size()) {
@@ -239,9 +243,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	private String removeKeyWord(String keyWord, String clause) {
 		String temp = clause.trim();
-		String keyWordString = keyWord + " ";
-		if (temp.toLowerCase().startsWith(keyWordString) && temp.length() > keyWordString.length()) {
-			return temp.substring(keyWordString.length());
+		int length = keyWord.length();
+		if (temp.toLowerCase().startsWith(keyWord) && Character.isWhitespace(temp.charAt(length)) && temp.length() > length + 1) {
+			return temp.substring(length + 1);
 		}
 		else {
 			return temp;
@@ -254,7 +258,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 */
 	@Override
 	public Map<String, Order> getSortKeysWithoutAliases() {
-		Map<String, Order> sortKeysWithoutAliases = new LinkedHashMap<String, Order>();
+		Map<String, Order> sortKeysWithoutAliases = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Order> sortKeyEntry : sortKeys.entrySet()) {
 			String key = sortKeyEntry.getKey();

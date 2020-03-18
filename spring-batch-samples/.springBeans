@@ -43,7 +43,6 @@
 		<config>src/main/resources/jobs/iosample/hibernate.xml</config>
 		<config>src/main/resources/jobs/hibernateJob.xml</config>
 		<config>src/main/resources/jobs/iosample/jpa.xml</config>
-		<config>src/main/resources/jobs/iosample/ibatis.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/domain/trade/internal/JdbcCustomerDebitDaoTests-context.xml</config>
 		<config>src/main/resources/jobs/loopFlowSample.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemReaderTests-context.xml</config>
@@ -425,19 +424,6 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
-			</configs>
-			<profiles>
-			</profiles>
-		</configSet>
-		<configSet>
-			<name><![CDATA[ibatis]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-				<config>src/main/resources/jobs/iosample/ibatis.xml</config>
 			</configs>
 			<profiles>
 			</profiles>

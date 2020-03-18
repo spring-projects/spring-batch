@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
+import org.springframework.lang.Nullable;
 
 /**
  * 
@@ -52,6 +53,7 @@ public class SynchronizedItemStreamReaderTests {
 		public static final String HAS_BEEN_OPENED = "hasBeenOpened";
 		public static final String UPDATE_COUNT_KEY = "updateCount";
 
+		@Nullable
 		public Integer read() throws Exception, ParseException, NonTransientResourceException {
 			cursor = cursor + 1;
 			return cursor;
@@ -90,7 +92,7 @@ public class SynchronizedItemStreamReaderTests {
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		final TestItemReader testItemReader = new TestItemReader();
-		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReader<Integer>();
+		final SynchronizedItemStreamReader<Integer> synchronizedItemStreamReader = new SynchronizedItemStreamReader<>();
 		synchronizedItemStreamReader.setDelegate(testItemReader);
 
 		// Open the ItemReader and make sure it's initialized properly.
@@ -101,7 +103,7 @@ public class SynchronizedItemStreamReaderTests {
 		/* Set up SIZE threads that read from the reader and updates the execution 
 		 * context.
 		 */
-		final Set<Integer> ecSet = new HashSet<Integer>();
+		final Set<Integer> ecSet = new HashSet<>();
 		final int SIZE = 20;
 		Thread[] threads = new Thread[SIZE];
 		for (int i = 0; i < SIZE; i++) {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -133,7 +133,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList<BeanDefinition> listeners = new ManagedList<BeanDefinition>();
+			ManagedList<BeanDefinition> listeners = new ManagedList<>();
 			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");

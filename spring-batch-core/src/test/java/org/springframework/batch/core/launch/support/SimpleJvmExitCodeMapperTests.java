@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,12 +31,12 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		ecm = new SimpleJvmExitCodeMapper();
-		Map<String, Integer> ecmMap = new HashMap<String, Integer>();
+		Map<String, Integer> ecmMap = new HashMap<>();
 		ecmMap.put("MY_CUSTOM_CODE", new Integer(3));
 		ecm.setMapping(ecmMap);
 
 		ecm2 = new SimpleJvmExitCodeMapper();
-		Map<String, Integer> ecm2Map = new HashMap<String, Integer>();
+		Map<String, Integer> ecm2Map = new HashMap<>();
 		ecm2Map.put(ExitStatus.COMPLETED.getExitCode(), new Integer(-1));
 		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
 		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(-3));
@@ -49,7 +49,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		super.tearDown();
 	}
 
-	public void testGetExitCodeWithpPredefinedCodes() {
+	public void testGetExitCodeWithPredefinedCodes() {
 		assertEquals(
 				ecm.intValue(ExitStatus.COMPLETED.getExitCode()),
 				ExitCodeMapper.JVM_EXITCODE_COMPLETED);

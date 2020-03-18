@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,6 +38,7 @@ import org.springframework.util.MethodInvoker;
  * by {@link InvocationTargetThrowableWrapper}.
  *
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
@@ -50,9 +51,10 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	/**
 	 * Invoker the target method with arguments set by
 	 * {@link #setArguments(Object[])}.
+	 *
 	 * @return object returned by invoked method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
-	 * used throws exception
+	 *
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethod() throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -62,10 +64,11 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * Invokes the target method with given argument.
+	 *
 	 * @param object argument for the target method
 	 * @return object returned by target method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
-	 * used throws exception
+	 *
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -75,10 +78,11 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * Invokes the target method with given arguments.
+	 *
 	 * @param args arguments for the invoked method
 	 * @return object returned by invoked method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
-	 * used throws exception
+	 *
+	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArguments(Object[] args) throws Exception {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -107,10 +111,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		try {
 			invoker.prepare();
 		}
-		catch (ClassNotFoundException e) {
-			throw new DynamicMethodInvocationException(e);
-		}
-		catch (NoSuchMethodException e) {
+		catch (ClassNotFoundException | NoSuchMethodException e) {
 			throw new DynamicMethodInvocationException(e);
 		}
 
@@ -132,8 +133,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(targetObject);
-		Assert.hasLength(targetMethod);
+		Assert.notNull(targetObject, "targetObject must not be null");
+		Assert.hasLength(targetMethod, "targetMethod must not be empty");
 		Assert.state(targetClassDeclaresTargetMethod(),
 				"target class must declare a method with matching name and parameter types");
 	}
@@ -148,7 +149,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		Method[] memberMethods = invoker.getTargetClass().getMethods();
 		Method[] declaredMethods = invoker.getTargetClass().getDeclaredMethods();
 
-		List<Method> allMethods = new ArrayList<Method>();
+		List<Method> allMethods = new ArrayList<>();
 		allMethods.addAll(Arrays.asList(memberMethods));
 		allMethods.addAll(Arrays.asList(declaredMethods));
 
@@ -213,6 +214,14 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		this.arguments = arguments == null ? null : Arrays.asList(arguments).toArray();
 	}
 
+	/**
+	 * Return arguments.
+	 * @return arguments
+	 */
+	protected Object[] getArguments() {
+		return arguments;
+	}
+	
 	/**
 	 * Used to wrap a {@link Throwable} (not an {@link Exception}) thrown by a
 	 * reflectively-invoked delegate.

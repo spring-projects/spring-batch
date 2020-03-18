@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.lang.Nullable;
 
 public class AggregateItemReaderTests {
 	private ItemReader<AggregateItem<String>> input;
@@ -31,6 +32,7 @@ public class AggregateItemReaderTests {
 		input = new ItemReader<AggregateItem<String>>() {
 			private int count = 0;
 
+			@Nullable
 			@Override
 			public AggregateItem<String> read() {
 				switch (count++) {
@@ -39,7 +41,7 @@ public class AggregateItemReaderTests {
 				case 1:
 				case 2:
 				case 3:
-					return new AggregateItem<String>("line");
+					return new AggregateItem<>("line");
 				case 4:
 					return AggregateItem.getFooter();
 				default:
@@ -49,7 +51,7 @@ public class AggregateItemReaderTests {
 
 		};
 
-		provider = new AggregateItemReader<String>();
+		provider = new AggregateItemReader<>();
 		provider.setItemReader(input);
 	}
 

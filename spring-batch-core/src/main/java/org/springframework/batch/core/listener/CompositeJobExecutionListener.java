@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,12 +28,12 @@ import org.springframework.core.Ordered;
  */
 public class CompositeJobExecutionListener implements JobExecutionListener {
 
-	private OrderedComposite<JobExecutionListener> listeners = new OrderedComposite<JobExecutionListener>();
+	private OrderedComposite<JobExecutionListener> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link JobExecutionListener}s to be called when job execution events occur.
 	 */
 	public void setListeners(List<? extends JobExecutionListener> listeners) {
 		this.listeners.setItems(listeners);
@@ -42,7 +42,7 @@ public class CompositeJobExecutionListener implements JobExecutionListener {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param jobExecutionListener
+	 * @param jobExecutionListener instance {@link JobExecutionListener} to be registered.
 	 */
 	public void register(JobExecutionListener jobExecutionListener) {
 		listeners.add(jobExecutionListener);

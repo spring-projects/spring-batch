@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,7 +69,7 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -152,7 +152,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		});
 
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
@@ -219,7 +219,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		});
 
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (text != null) {
 			text = (String) txJmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,6 +48,7 @@ public class JsrEndState extends org.springframework.batch.core.job.flow.support
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
+	 * @param code the exit status.
 	 */
 	public JsrEndState(FlowExecutionStatus status, String code, String name) {
 		super(status, code, name, false);
@@ -58,6 +59,7 @@ public class JsrEndState extends org.springframework.batch.core.job.flow.support
 	 * @param name The name of the state
 	 * @param abandon flag to indicate that previous step execution can be
 	 * marked as abandoned (if there is one)
+	 * @param code the exit status.
 	 *
 	 */
 	public JsrEndState(FlowExecutionStatus status, String code, String name, boolean abandon) {

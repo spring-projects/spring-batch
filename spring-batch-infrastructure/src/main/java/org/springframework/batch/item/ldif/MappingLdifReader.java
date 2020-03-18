@@ -1,11 +1,11 @@
 /*
- * Copyright 2005-2014 the original author or authors.
+ * Copyright 2005-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.util.Assert;
@@ -35,11 +36,6 @@ import org.springframework.util.ClassUtils;
  * is not required, the {@link LdifReader LdifReader} should be used instead. It simply returns an {@link LdapAttributes LdapAttributes}
  * object which can be consumed and manipulated as necessary by {@link org.springframework.batch.item.ItemProcessor ItemProcessor} or any
  * output service.
- * <p>
- * {@link LdifReader LdifReader} usage is mimics that of the FlatFileItemReader for all intensive purposes. Adjustments have been made to
- * process records instead of lines, however.  As such, the {@link #recordsToSkip recordsToSkip} attribute indicates the number of records
- * from the top of the file that should not be processed.  Implementations of the {@link RecordCallbackHandler RecordCallbackHandler}
- * interface can be used to execute operations on those skipped records.
  * <p>
  * As with the {@link org.springframework.batch.item.file.FlatFileItemReader FlatFileItemReader}, the {@link #strict strict} option
  * differentiates between whether or not to require the resource to exist before processing.  In the case of a value set to false, a warning
@@ -143,6 +139,7 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 		}
 	}
 
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		LdapAttributes attributes = null;
@@ -171,7 +168,7 @@ public class MappingLdifReader<T> extends AbstractItemCountingItemStreamItemRead
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(resource, "A resource is required to parse.");
-		Assert.notNull(ldifParser);
+		Assert.notNull(ldifParser, "A parser is required");
 	}
 
 }

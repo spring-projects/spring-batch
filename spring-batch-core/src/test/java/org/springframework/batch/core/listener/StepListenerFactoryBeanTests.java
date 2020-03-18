@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +15,17 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
-import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
@@ -61,7 +55,14 @@ import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
+import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
 /**
  * @author Lucas Ward
@@ -135,7 +136,7 @@ public class StepListenerFactoryBeanTests {
 		// method name, that all three will be called
 		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
@@ -147,7 +148,7 @@ public class StepListenerFactoryBeanTests {
 	public void testAnnotatingInterfaceResultsInOneCall() throws Exception {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "afterStep");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
@@ -329,7 +330,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		@SuppressWarnings("unchecked")
@@ -349,7 +350,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		@SuppressWarnings("unchecked")
@@ -367,7 +368,7 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		factoryBean.setDelegate(delegate);
-		Map<String, String> metaDataMap = new HashMap<String, String>();
+		Map<String, String> metaDataMap = new HashMap<>();
 		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
 		factoryBean.setMetaDataMap(metaDataMap);
 		factoryBean.getObject();
@@ -377,10 +378,11 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Nullable
 		@Override
 		@AfterStep
 		public ExitStatus afterStep(StepExecution stepExecution) {
-			Assert.notNull(stepExecution);
+			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;
 		}
@@ -397,9 +399,10 @@ public class StepListenerFactoryBeanTests {
 
 		int callcount = 0;
 
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
-			Assert.notNull(stepExecution);
+			Assert.notNull(stepExecution, "A stepExecution is required");
 			callcount++;
 			return null;
 		}
@@ -489,7 +492,7 @@ public class StepListenerFactoryBeanTests {
 
 		@AfterRead
 		public void afterReadMethod(Object item) {
-			Assert.notNull(item);
+			Assert.notNull(item, "An item is required");
 			afterReadCalled = true;
 		}
 

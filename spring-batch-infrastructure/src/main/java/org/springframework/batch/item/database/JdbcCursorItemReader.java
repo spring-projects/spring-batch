@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -52,13 +53,13 @@ import org.springframework.util.ClassUtils;
  */
 public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 
-	PreparedStatement preparedStatement;
+	private PreparedStatement preparedStatement;
 
-	PreparedStatementSetter preparedStatementSetter;
+	private PreparedStatementSetter preparedStatementSetter;
 
-	String sql;
+	private String sql;
 
-	RowMapper<T> rowMapper;
+	private RowMapper<T> rowMapper;
 
 	public JdbcCursorItemReader() {
 		super();
@@ -68,7 +69,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 *
-	 * @param rowMapper
+	 * @param rowMapper the mapper used to map each item
 	 */
 	public void setRowMapper(RowMapper<T> rowMapper) {
 		this.rowMapper = rowMapper;
@@ -79,7 +80,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	 * should be a complete and valid SQL statement, as it will be run directly
 	 * without any modification.
 	 *
-	 * @param sql
+	 * @param sql SQL statement
 	 */
 	public void setSql(String sql) {
 		this.sql = sql;
@@ -89,7 +90,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	 * Set the PreparedStatementSetter to use if any parameter values that need
 	 * to be set in the supplied query.
 	 *
-	 * @param preparedStatementSetter
+	 * @param preparedStatementSetter PreparedStatementSetter responsible for filling out the statement
 	 */
 	public void setPreparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
@@ -134,6 +135,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 
+	@Nullable
 	@Override
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);

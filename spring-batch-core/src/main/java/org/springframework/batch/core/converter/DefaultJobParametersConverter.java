@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
@@ -58,6 +59,7 @@ import java.util.Properties;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
@@ -92,7 +94,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters getJobParameters(Properties props) {
+	public JobParameters getJobParameters(@Nullable Properties props) {
 
 		if (props == null || props.isEmpty()) {
 			return new JobParameters();
@@ -188,7 +190,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties getProperties(JobParameters params) {
+	public Properties getProperties(@Nullable JobParameters params) {
 
 		if (params == null || params.isEmpty()) {
 			return new Properties();

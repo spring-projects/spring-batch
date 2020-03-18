@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,7 @@ import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueI
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -43,12 +44,13 @@ import org.springframework.util.Assert;
  * for BATCH_JOB_INSTANCE records.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrJobParametersConverter implements JobParametersConverter, InitializingBean {
 
 	public static final String JOB_RUN_ID = "jsr_batch_run_id";
-	public DataFieldMaxValueIncrementer incremeter;
+	public DataFieldMaxValueIncrementer incrementer;
 	public String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 	public DataSource dataSource;
 
@@ -75,14 +77,14 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 	public void afterPropertiesSet() throws Exception {
 		DataFieldMaxValueIncrementerFactory factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 
-		this.incremeter = factory.getIncrementer(DatabaseType.fromMetaData(dataSource).name(), tablePrefix + "JOB_SEQ");
+		this.incrementer = factory.getIncrementer(DatabaseType.fromMetaData(dataSource).name(), tablePrefix + "JOB_SEQ");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getJobParameters(java.util.Properties)
 	 */
 	@Override
-	public JobParameters getJobParameters(Properties properties) {
+	public JobParameters getJobParameters(@Nullable Properties properties) {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		boolean runIdFound = false;
 
@@ -100,7 +102,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 		}
 
 		if(!runIdFound) {
-			builder.addLong(JOB_RUN_ID, incremeter.nextLongValue());
+			builder.addLong(JOB_RUN_ID, incrementer.nextLongValue());
 		}
 
 		return builder.toJobParameters();
@@ -110,7 +112,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 	 * @see org.springframework.batch.core.converter.JobParametersConverter#getProperties(org.springframework.batch.core.JobParameters)
 	 */
 	@Override
-	public Properties getProperties(JobParameters params) {
+	public Properties getProperties(@Nullable JobParameters params) {
 		Properties properties = new Properties();
 		boolean runIdFound = false;
 
@@ -125,7 +127,7 @@ public class JsrJobParametersConverter implements JobParametersConverter, Initia
 		}
 
 		if(!runIdFound) {
-			properties.setProperty(JOB_RUN_ID, String.valueOf(incremeter.nextLongValue()));
+			properties.setProperty(JOB_RUN_ID, String.valueOf(incrementer.nextLongValue()));
 		}
 
 		return properties;

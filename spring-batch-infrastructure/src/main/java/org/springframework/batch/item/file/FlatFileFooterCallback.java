@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,10 @@ public interface FlatFileFooterCallback {
 	/**
 	 * Write contents to a file using the supplied {@link Writer}. It is not
 	 * required to flush the writer inside this method.
+	 *
+	 * @param writer the {@link Writer} to be used to write the footer.
+	 *
+	 * @throws IOException if error occurs during writing.
 	 */
 	void writeFooter(Writer writer) throws IOException;
 }

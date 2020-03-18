@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,11 +25,10 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.Ordered;
@@ -40,6 +39,7 @@ import org.springframework.core.io.Resource;
  * 
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class AutomaticJobRegistrarTests {
@@ -63,6 +63,20 @@ public class AutomaticJobRegistrarTests {
 		assertEquals(Ordered.LOWEST_PRECEDENCE, registrar.getOrder());
 		registrar.setOrder(1);
 		assertEquals(1, registrar.getOrder());
+
+	}
+
+	@Test
+	public void testDefaultAutoStartup() throws Exception {
+
+		assertTrue(registrar.isAutoStartup());
+
+	}
+
+	@Test
+	public void testDefaultPhase() throws Exception {
+
+		assertEquals(Integer.MIN_VALUE + 1000, registrar.getPhase());
 
 	}
 
@@ -176,41 +190,26 @@ public class AutomaticJobRegistrarTests {
 
 	}
 
-	@SuppressWarnings("resource")
 	@Test
-	public void testInitCalledOnContextRefreshed() throws Exception {
+	public void testStartStopRunningWithCallback() throws Exception {
 
+		Runnable callback = Mockito.mock(Runnable.class);
 		Resource[] jobPaths = new Resource[] { new ClassPathResource(
 				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		registrar.setApplicationContext(new ClassPathXmlApplicationContext(
-				"/org/springframework/batch/core/launch/support/test-environment-with-registry-and-auto-register.xml"));
-		GenericApplicationContext applicationContext = new GenericApplicationContext();
-		applicationContext.refresh();
-		setUpApplicationContextFactories(jobPaths, applicationContext);
-		registrar.setApplicationContext(applicationContext);
-		registrar.onApplicationEvent(new ContextRefreshedEvent(applicationContext));
-		assertEquals(2, registry.getJobNames().size());
-	}
-
-	@Test
-	public void testClearCalledOnContextClosed() throws Exception {
-
-		Resource[] jobPaths = new Resource[] { new ClassPathResource(
-				"org/springframework/batch/core/launch/support/2jobs.xml") };
-		@SuppressWarnings("resource")
-		GenericApplicationContext applicationContext = new GenericApplicationContext();
-		applicationContext.refresh();
-		setUpApplicationContextFactories(jobPaths, applicationContext);
-		registrar.setApplicationContext(applicationContext);
+		setUpApplicationContextFactories(jobPaths, null);
+		registrar.start();
+		assertTrue(registrar.isRunning());
 		registrar.start();
 		assertEquals(2, registry.getJobNames().size());
-		registrar.onApplicationEvent(new ContextClosedEvent(applicationContext));
+		registrar.stop(callback);
+		assertFalse(registrar.isRunning());
 		assertEquals(0, registry.getJobNames().size());
+		Mockito.verify(callback, Mockito.times(1)).run();
 
 	}
 
 	private void setUpApplicationContextFactories(Resource[] jobPaths, ApplicationContext parent) {
-		Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
+		Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
 		for (Resource resource : jobPaths) {
 			GenericApplicationContextFactory factory = new GenericApplicationContextFactory(resource);
 			factory.setApplicationContext(parent);

@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,12 +31,12 @@ import org.springframework.util.MethodInvoker;
 
 /**
  * <p>
- * A {@link org.springframework.batch.item.ItemReader} wrapper for a
+ * A {@link org.springframework.batch.item.ItemWriter} wrapper for a
  * {@link org.springframework.data.repository.CrudRepository} from Spring Data.
  * </p>
  *
  * <p>
- * It depends on {@link org.springframework.data.repository.CrudRepository#save(Iterable)}
+ * It depends on {@link org.springframework.data.repository.CrudRepository#saveAll(Iterable)}
  * method to store the items for the chunk.  Performance will be determined by that
  * implementation more than this writer.
  * </p>
@@ -47,7 +47,12 @@ import org.springframework.util.MethodInvoker;
  * transactions.
  * </p>
  *
+ * <p>
+ * NOTE: The {@code RepositoryItemWriter} only stores Java Objects i.e. non primitives.
+ * </p>
+ *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  */
 public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -59,10 +64,10 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	private String methodName;
 
 	/**
-	 * Specifies what method on the repository to call.  This method must the type of
+	 * Specifies what method on the repository to call.  This method must have the type of
 	 * object passed to this writer as the <em>sole</em> argument.
 	 *
-	 * @param methodName
+	 * @param methodName {@link String} containing the method name.
 	 */
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
@@ -91,10 +96,12 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	}
 
 	/**
-	 * Performs the actual write to the repository.  This can be overriden by
+	 * Performs the actual write to the repository.  This can be overridden by
 	 * a subclass if necessary.
 	 *
 	 * @param items the list of items to be persisted.
+	 *
+	 * @throws Exception thrown if error occurs during writing.
 	 */
 	protected void doWrite(List<? extends T> items) throws Exception {
 		if (logger.isDebugEnabled()) {

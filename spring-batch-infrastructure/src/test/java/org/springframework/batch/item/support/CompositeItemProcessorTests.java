@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class CompositeItemProcessorTests {
 
-	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<Object, Object>();
+	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<>();
 
 	private ItemProcessor<Object, Object> processor1;
 	private ItemProcessor<Object, Object> processor2;
@@ -61,12 +61,12 @@ public class CompositeItemProcessorTests {
 	@Test
 	public void testTransform() throws Exception {
 		Object item = new Object();
-		Object itemAfterFirstTransfromation = new Object();
+		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
 
-		when(processor2.process(itemAfterFirstTransfromation)).thenReturn(itemAfterSecondTransformation);
+		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
 
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 
@@ -78,7 +78,7 @@ public class CompositeItemProcessorTests {
 	@Test
 	@SuppressWarnings({"unchecked", "serial"})
 	public void testItemProcessorGenerics() throws Exception {
-		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<String, String>();
+		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<>();
 		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
 		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
 		composite.setDelegates(new ArrayList<ItemProcessor<?,?>>() {{

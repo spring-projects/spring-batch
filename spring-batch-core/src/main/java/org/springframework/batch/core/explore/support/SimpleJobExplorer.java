@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,7 @@ import java.util.Set;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  * @see JobExplorer
  * @see JobInstanceDao
@@ -92,11 +94,23 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * (non-Javadoc)
 	 *
 	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getLastJobExecution(
+	 * org.springframework.batch.core.JobInstance)
+	 */
+	@Nullable
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+		return jobExecutionDao.getLastJobExecution(jobInstance);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
 	 * org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions
 	 * (java.lang.String)
 	 */
 	@Override
-	public Set<JobExecution> findRunningJobExecutions(String jobName) {
+	public Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
 		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
 		for (JobExecution jobExecution : executions) {
 			getJobExecutionDependencies(jobExecution);
@@ -114,8 +128,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getJobExecution(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
-	public JobExecution getJobExecution(Long executionId) {
+	public JobExecution getJobExecution(@Nullable Long executionId) {
 		if (executionId == null) {
 			return null;
 		}
@@ -137,8 +152,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getStepExecution(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
-	public StepExecution getStepExecution(Long jobExecutionId, Long executionId) {
+	public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
 		if (jobExecution == null) {
 			return null;
@@ -156,9 +172,23 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
 	 * .lang.Long)
 	 */
+	@Nullable
 	@Override
-	public JobInstance getJobInstance(Long instanceId) {
+	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getLastJobInstance(java
+	 * .lang.String)
+	 */
+	@Nullable
+	@Override
+	public JobInstance getLastJobInstance(String jobName) {
+		return jobInstanceDao.getLastJobInstance(jobName);
 	}
 
 	/*
@@ -187,7 +217,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @see org.springframework.batch.core.explore.JobExplorer#getJobInstanceCount(java.lang.String)
 	 */
 	@Override
-	public int getJobInstanceCount(String jobName) throws NoSuchJobException {
+	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
 	}
 

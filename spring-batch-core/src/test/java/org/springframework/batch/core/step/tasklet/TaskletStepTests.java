@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,15 +63,16 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class TaskletStepTests {
 
-	List<String> processed = new ArrayList<String>();
+	List<String> processed = new ArrayList<>();
 
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List<Serializable> list = new ArrayList<>();
 
 	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		@Override
@@ -98,7 +99,7 @@ public class TaskletStepTests {
 	};
 
 	private ItemReader<String> getReader(String[] args) {
-		return new ListItemReader<String>(Arrays.asList(args));
+		return new ListItemReader<>(Arrays.asList(args));
 	}
 
 	private TaskletStep getStep(String[] strings) throws Exception {
@@ -110,7 +111,7 @@ public class TaskletStepTests {
 		// Only process one item:
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(strings), itemWriter, template));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(strings), itemWriter, template));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
@@ -176,7 +177,7 @@ public class TaskletStepTests {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step = getStep(new String[0]);
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[0]), itemWriter,
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[0]), itemWriter,
 				new RepeatTemplate()));
 		step.setStepOperations(new RepeatTemplate());
 		step.execute(stepExecution);
@@ -246,6 +247,7 @@ public class TaskletStepTests {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -253,7 +255,7 @@ public class TaskletStepTests {
 
 		};
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -271,6 +273,7 @@ public class TaskletStepTests {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -279,7 +282,7 @@ public class TaskletStepTests {
 
 		};
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -297,6 +300,7 @@ public class TaskletStepTests {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -305,8 +309,9 @@ public class TaskletStepTests {
 
 		};
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				return ExitStatus.FAILED.addExitDescription("FOO");
@@ -333,7 +338,7 @@ public class TaskletStepTests {
 	@Test
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(tasklet, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(tasklet, itemWriter));
 		step.registerStream(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -392,7 +397,7 @@ public class TaskletStepTests {
 	@Test
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(tasklet, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(tasklet, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -413,7 +418,8 @@ public class TaskletStepTests {
 	 */
 	@Test
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new ItemReader<String>() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				return "foo";
@@ -428,6 +434,7 @@ public class TaskletStepTests {
 	@Test
 	public void testStreamManager() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
+			@Nullable
 			@Override
 			public String read() {
 				return "foo";
@@ -439,7 +446,7 @@ public class TaskletStepTests {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(reader, itemWriter));
 		step.registerStream(reader);
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -480,6 +487,7 @@ public class TaskletStepTests {
 				list.add("foo");
 			}
 
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("bar");
@@ -519,6 +527,7 @@ public class TaskletStepTests {
 		final ExitStatus customStatus = new ExitStatus("COMPLETED_CUSTOM");
 
 		step.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("afterStepCalled");
@@ -542,13 +551,15 @@ public class TaskletStepTests {
 	@Test
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("exception");
 				return null;
 			}
 		});
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(new MockRestartableItemReader() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(new MockRestartableItemReader() {
+			@Nullable
 			@Override
 			public String read() throws RuntimeException {
 				throw new RuntimeException("FOO");
@@ -564,6 +575,7 @@ public class TaskletStepTests {
 	@Test
 	public void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
+			@Nullable
 			@Override
 			public String read() {
 				return "foo";
@@ -575,7 +587,7 @@ public class TaskletStepTests {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(reader, itemWriter));
 		step.setStreams(new ItemStream[] { reader });
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -604,6 +616,7 @@ public class TaskletStepTests {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
 
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -612,7 +625,7 @@ public class TaskletStepTests {
 
 		};
 
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -630,13 +643,14 @@ public class TaskletStepTests {
 	public void testStatusForNormalFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -654,13 +668,14 @@ public class TaskletStepTests {
 	public void testStatusForErrorFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new Error("Foo");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -679,13 +694,14 @@ public class TaskletStepTests {
 	public void testStatusForResetFailedException() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		step.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
@@ -774,7 +790,7 @@ public class TaskletStepTests {
 				throw new RuntimeException("Bar");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
 		step.registerStream(itemReader);
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
@@ -801,13 +817,14 @@ public class TaskletStepTests {
 	@Test
 	public void testRestartAfterFailureInFirstChunk() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
+			@Nullable
 			@Override
 			public String read() throws RuntimeException {
 				// fail on the very first item
 				throw new RuntimeException("CRASH!");
 			}
 		};
-		step.setTasklet(new TestingChunkOrientedTasklet<String>(reader, itemWriter));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(reader, itemWriter));
 		step.registerStream(reader);
 
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance, jobParameters));
@@ -845,6 +862,7 @@ public class TaskletStepTests {
 	@Test
 	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
 		StepExecutionListener listener = new StepExecutionListenerSupport() {
+			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				throw new RuntimeException("exception thrown in afterStep to signal failure");
@@ -862,6 +880,7 @@ public class TaskletStepTests {
 	public void testNoRollbackFor() throws Exception {
 
 		step.setTasklet(new Tasklet() {
+			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				throw new RuntimeException("Bar");
@@ -887,6 +906,7 @@ public class TaskletStepTests {
 	@Test
 	public void testTaskletExecuteReturnNull() throws Exception {
 		step.setTasklet(new Tasklet() {
+			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 				return null;
@@ -931,6 +951,7 @@ public class TaskletStepTests {
 
 		private boolean restoreFromCalled = false;
 
+		@Nullable
 		@Override
 		public String read() {
 			return "item";
@@ -951,6 +972,7 @@ public class TaskletStepTests {
 			return restoreFromCalled;
 		}
 
+		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			return null;

@@ -7,7 +7,6 @@ import org.springframework.integration.core.MessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.util.Assert;
 
 
@@ -20,7 +19,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  *
  */
-public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter implements InitializingBean {
+public class MessageSourcePollerInterceptor implements ChannelInterceptor, InitializingBean {
 
 	private static Log logger = LogFactory.getLog(MessageSourcePollerInterceptor.class);
 
@@ -70,7 +69,7 @@ public class MessageSourcePollerInterceptor extends ChannelInterceptorAdapter im
 	 * Receive from the {@link MessageSource} and send immediately to the input channel, so that the call that we are
 	 * intercepting always a message to receive.
 	 *
-	 * @see ChannelInterceptorAdapter#preReceive(MessageChannel)
+	 * @see ChannelInterceptor#preReceive(MessageChannel)
 	 */
 	@Override
 	public boolean preReceive(MessageChannel channel) {

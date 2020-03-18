@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +15,23 @@
  */
 package org.springframework.batch.jsr.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.batch.api.chunk.ItemReader;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ItemReaderAdapterTests {
 
@@ -45,17 +45,18 @@ public class ItemReaderAdapterTests {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		adapter = new ItemReaderAdapter<String>(delegate);
+		adapter = new ItemReaderAdapter<>(delegate);
+		adapter.setName("jsrReader");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		adapter = new ItemReaderAdapter<String>(null);
+		adapter = new ItemReaderAdapter<>(null);
 	}
 
 	@Test
 	public void testOpen() throws Exception {
-		when(executionContext.get("ItemReader.reader.checkpoint")).thenReturn("checkpoint");
+		when(executionContext.get("jsrReader.reader.checkpoint")).thenReturn("checkpoint");
 
 		adapter.open(executionContext);
 
@@ -64,7 +65,7 @@ public class ItemReaderAdapterTests {
 
 	@Test(expected=ItemStreamException.class)
 	public void testOpenException() throws Exception {
-		when(executionContext.get("ItemReader.reader.checkpoint")).thenReturn("checkpoint");
+		when(executionContext.get("jsrReader.reader.checkpoint")).thenReturn("checkpoint");
 
 		doThrow(new Exception("expected")).when(delegate).open("checkpoint");
 
@@ -77,7 +78,7 @@ public class ItemReaderAdapterTests {
 
 		adapter.update(executionContext);
 
-		verify(executionContext).put("ItemReader.reader.checkpoint", "checkpoint");
+		verify(executionContext).put("jsrReader.reader.checkpoint", "checkpoint");
 	}
 
 	@Test(expected=ItemStreamException.class)
@@ -111,7 +112,7 @@ public class ItemReaderAdapterTests {
 	@Test
 	@SuppressWarnings("serial")
 	public void testCheckpointChange() throws Exception {
-		ItemReaderAdapter<String> adapter = new ItemReaderAdapter<String>(new ItemReader() {
+		ItemReaderAdapter<String> adapter = new ItemReaderAdapter<>(new ItemReader() {
 
 			private CheckpointContainer container = null;
 			private List<String> items = new ArrayList<String>() {{
@@ -179,7 +180,7 @@ public class ItemReaderAdapterTests {
 
 		@Override
 		public String toString() {
-			return "CheckpointContinaer has a count of " + count;
+			return "CheckpointContainer has a count of " + count;
 		}
 	}
 }

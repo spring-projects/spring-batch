@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.database.orm;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ItemReader;
@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemReader;
  * @since 2.1
  * 
  */
-public interface HibernateQueryProvider {
+public interface HibernateQueryProvider<T> {
 
 	/**
 	 * <p>
@@ -43,7 +43,7 @@ public interface HibernateQueryProvider {
 	 * 
 	 * @return created query
 	 */
-	Query createQuery();
+	Query<T> createQuery();
 
 	/**
 	 * <p>

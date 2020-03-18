@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,12 +30,14 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 public class AsyncItemProcessorTests {
 
-	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<String, String>();
+	private AsyncItemProcessor<String, String> processor = new AsyncItemProcessor<>();
 
 	private ItemProcessor<String, String> delegate = new ItemProcessor<String, String>() {
+		@Nullable
 		public String process(String item) throws Exception {
 			return item + item;
 		};
@@ -56,6 +58,7 @@ public class AsyncItemProcessorTests {
 	@Test
 	public void testExecutionInStepScope() throws Exception {
 		delegate = new ItemProcessor<String, String>() {
+			@Nullable
 			public String process(String item) throws Exception {
 				StepContext context = StepSynchronizationManager.getContext();
 				assertTrue(context != null && context.getStepExecution() != null);
@@ -75,7 +78,7 @@ public class AsyncItemProcessorTests {
 	public void testMultiExecution() throws Exception {
 		processor.setDelegate(delegate);
 		processor.setTaskExecutor(new SimpleAsyncTaskExecutor());
-		List<Future<String>> list = new ArrayList<Future<String>>();
+		List<Future<String>> list = new ArrayList<>();
 		for (int count = 0; count < 10; count++) {
 			list.add(processor.process("foo" + count));
 		}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
+
+import org.w3c.dom.Element;
 
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -35,7 +37,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;chunk/&gt; element inside a step.
@@ -67,8 +68,11 @@ public class ChunkElementParser {
 			StepListenerMetaData.itemListenerMetaData());
 
 	/**
-	 * @param element
-	 * @param parserContext
+	 * @param bd {@link AbstractBeanDefinition} instance of the containing bean.
+	 * @param element the element to parse
+	 * @param parserContext the context to use
+	 * @param underspecified if true, a fatal error will not be raised if attribute
+	 * or element is missing.
 	 */
 	protected void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, boolean underspecified) {
 
@@ -124,7 +128,7 @@ public class ChunkElementParser {
 				new ExceptionElementParser().parse(element, parserContext, "skippable-exception-classes");
 		if (StringUtils.hasText(skipLimit)) {
 			if (skippableExceptions == null) {
-				skippableExceptions = new ManagedMap<TypedStringValue, Boolean>();
+				skippableExceptions = new ManagedMap<>();
 				skippableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
@@ -149,7 +153,7 @@ public class ChunkElementParser {
 				new ExceptionElementParser().parse(element, parserContext, "retryable-exception-classes");
 		if (StringUtils.hasText(retryLimit)) {
 			if (retryableExceptions == null) {
-				retryableExceptions = new ManagedMap<TypedStringValue, Boolean>();
+				retryableExceptions = new ManagedMap<>();
 				retryableExceptions.setMergeEnabled(true);
 			}
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
@@ -283,7 +287,7 @@ public class ChunkElementParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<BeanMetadataElement>();
+			ManagedList<BeanMetadataElement> retryListenerBeans = new ManagedList<>();
 			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans, enclosing);
@@ -305,7 +309,7 @@ public class ChunkElementParser {
 	private void handleStreamsElement(Element element, MutablePropertyValues propertyValues, ParserContext parserContext) {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
-			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<RuntimeBeanReference>();
+			ManagedList<RuntimeBeanReference> streamBeans = new ManagedList<>();
 			streamBeans.setMergeEnabled(streamsElement.hasAttribute(MERGE_ATTR)
 					&& Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");

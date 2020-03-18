@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,16 +20,17 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.SessionFactory;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
  * <p>
- * A {@link ItemWriter} implementation that writes to a Neo4j database using an
- * implementation of Spring Data's {@link Neo4jOperations}.
+ * A {@link ItemWriter} implementation that writes to a Neo4j database.
  * </p>
  *
  * <p>
@@ -38,6 +39,8 @@ import org.springframework.util.CollectionUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  *
  */
 public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -47,19 +50,25 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private boolean delete = false;
 
-	private Neo4jOperations template;
+	private SessionFactory sessionFactory;
 
+	/**
+	 * Boolean flag indicating whether the writer should save or delete the item at write
+	 * time.
+	 * @param delete true if write should delete item, false if item should be saved.
+	 * Default is false.
+	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
 
 	/**
-	 * Set the {@link Neo4jOperations} to be used to save items
-	 *
-	 * @param template the template implementation to be used
+	 * Establish the session factory that will be used to create {@link Session} instances
+	 * for interacting with Neo4j.
+	 * @param sessionFactory sessionFactory to be used.
 	 */
-	public void setTemplate(Neo4jOperations template) {
-		this.template = template;
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 	/**
@@ -69,7 +78,8 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(template != null, "A Neo4JOperations implementation is required");
+		Assert.state(this.sessionFactory != null,
+				"A SessionFactory is required");
 	}
 
 	/**
@@ -85,21 +95,33 @@ public class Neo4jItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Performs the actual write using the template.  This can be overriden by
+	 * Performs the actual write using the template.  This can be overridden by
 	 * a subclass if necessary.
 	 *
 	 * @param items the list of items to be persisted.
 	 */
 	protected void doWrite(List<? extends T> items) {
 		if(delete) {
-			for (T t : items) {
-				template.delete(t);
-			}
+			delete(items);
 		}
 		else {
-			for (T t : items) {
-				template.save(t);
-			}
+			save(items);
+		}
+	}
+
+	private void delete(List<? extends T> items) {
+		Session session = this.sessionFactory.openSession();
+
+		for(T item : items) {
+			session.delete(item);
+		}
+	}
+
+	private void save(List<? extends T> items) {
+		Session session = this.sessionFactory.openSession();
+
+		for (T item : items) {
+			session.save(item);
 		}
 	}
 }

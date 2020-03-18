@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -33,9 +37,6 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Dave Syer
@@ -89,7 +90,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * is available (null is fine, but the quality of error reports is better if
 	 * it is available).
 	 *
-	 * @param jobFactoryRef
+	 * @param jobFactoryRef name of the ref
 	 */
 	protected void setJobFactoryRef(String jobFactoryRef) {
 		this.jobFactoryRef = jobFactoryRef;
@@ -112,7 +113,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		List<BeanDefinition> stateTransitions = new ArrayList<BeanDefinition>();
+		List<BeanDefinition> stateTransitions = new ArrayList<>();
 
 		SplitParser splitParser = new SplitParser(jobFactoryRef);
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
@@ -120,7 +121,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		parserContext.pushContainingComponent(compositeDef);
 
 		boolean stepExists = false;
-		Map<String, Set<String>> reachableElementMap = new LinkedHashMap<String, Set<String>>();
+		Map<String, Set<String>> reachableElementMap = new LinkedHashMap<>();
 		String startElement = null;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -162,7 +163,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		}
 
 		// Ensure that all elements are reachable
-		Set<String> allReachableElements = new HashSet<String>();
+		Set<String> allReachableElements = new HashSet<>();
 		findAllReachableElements(startElement, reachableElementMap, allReachableElements);
 		for (String elementId : reachableElementMap.keySet()) {
 			if (!allReachableElements.contains(elementId)) {
@@ -170,7 +171,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 
-		ManagedList<BeanDefinition> managedList = new ManagedList<BeanDefinition>();
+		ManagedList<BeanDefinition> managedList = new ManagedList<>();
 		managedList.addAll(stateTransitions);
 		builder.addPropertyValue("stateTransitions", managedList);
 
@@ -179,11 +180,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Find all of the elements that are pointed to by this element.
 	 *
-	 * @param element
+	 * @param element The parent element
 	 * @return a collection of reachable element names
 	 */
 	private Set<String> findReachableElements(Element element) {
-		Set<String> reachableElements = new HashSet<String>();
+		Set<String> reachableElements = new HashSet<>();
 
 		String nextAttribute = element.getAttribute(NEXT_ATTR);
 		if (StringUtils.hasText(nextAttribute)) {
@@ -208,8 +209,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Find all of the elements reachable from the startElement.
 	 *
-	 * @param startElement
-	 * @param reachableElementMap
+	 * @param startElement name of the element to start from
+	 * @param reachableElementMap Map of elements that can be reached from the startElement
 	 * @param accumulator a collection of reachable element names
 	 */
 	protected void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
@@ -252,7 +253,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
 			BeanDefinition stateDef, Element element) {
 
-		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
+		Collection<BeanDefinition> list = new ArrayList<>();
 
 		String shortNextAttribute = element.getAttribute(NEXT_ATTR);
 		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
@@ -261,7 +262,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		}
 
 		boolean transitionElementExists = false;
-		List<String> patterns = new ArrayList<String>();
+		List<String> patterns = new ArrayList<>();
 		for (String transitionName : new String[] { NEXT_ELE, STOP_ELE, END_ELE, FAIL_ELE }) {
 			List<Element> transitionElements = DomUtils.getChildElementsByTagName(element, transitionName);
 			for (Element transitionElement : transitionElements) {
@@ -293,7 +294,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * @param transitionElement The element to parse
 	 * @param patterns a list of patterns on state transitions for this element
-	 * @param element
+	 * @param element {@link Element} representing the source.
 	 * @param parserContext the parser context for the bean factory
 	 */
 	protected static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
@@ -341,6 +342,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
+	 * @param abandon the abandon flag to be used by the transition.
 	 * @return a collection of
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
@@ -374,7 +376,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 		}
 
-		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
+		Collection<BeanDefinition> list = new ArrayList<>();
 		list.add(getStateTransitionReference(parserContext, stateDef, on, next));
 		if (endState != null) {
 			//

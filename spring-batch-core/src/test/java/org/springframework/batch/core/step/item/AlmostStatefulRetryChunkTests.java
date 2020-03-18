@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.step.item;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +25,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -50,7 +50,7 @@ public class AlmostStatefulRetryChunkTests {
 	private int count = 0;
 
 	public AlmostStatefulRetryChunkTests(String[] args, int limit) {
-		chunk = new Chunk<String>();
+		chunk = new Chunk<>();
 		for (String string : args) {
 			chunk.add(string);
 		}
@@ -60,7 +60,7 @@ public class AlmostStatefulRetryChunkTests {
 	@Test
 	public void testRetry() throws Exception {
 		logger.debug("Starting simple scenario");
-		List<String> items = new ArrayList<String>(chunk.getItems());
+		List<String> items = new ArrayList<>(chunk.getItems());
 		int before = items.size();
 		items.removeAll(Collections.singleton("fail"));
 		boolean error = true;
@@ -81,8 +81,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param chunk
-	 * @throws Exception
+	 * @param chunk  Chunk to retry
 	 */
 	private void statefulRetry(Chunk<String> chunk) throws Exception {
 		if (retryAttempts <= retryLimit) {
@@ -113,8 +112,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param chunk
-	 * @throws Exception
+	 * @param chunk Chunk to recover
 	 */
 	private void recover(Chunk<String> chunk) throws Exception {
 		for (Chunk<String>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
@@ -129,8 +127,7 @@ public class AlmostStatefulRetryChunkTests {
 	}
 
 	/**
-	 * @param items
-	 * @throws Exception
+	 * @param items items to write
 	 */
 	private void doWrite(List<String> items) throws Exception {
 		if (items.contains("fail")) {
@@ -140,7 +137,7 @@ public class AlmostStatefulRetryChunkTests {
 
 	@Parameters
 	public static List<Object[]> data() {
-		List<Object[]> params = new ArrayList<Object[]>();
+		List<Object[]> params = new ArrayList<>();
 		params.add(new Object[] { new String[] { "foo" }, 0 });
 		params.add(new Object[] { new String[] { "foo", "bar" }, 0 });
 		params.add(new Object[] { new String[] { "foo", "bar", "spam" }, 0 });

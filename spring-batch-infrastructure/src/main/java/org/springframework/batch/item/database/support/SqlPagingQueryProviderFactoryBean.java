@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,9 @@
 package org.springframework.batch.item.database.support;
 
 import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2VSE;
 import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
 import static org.springframework.batch.support.DatabaseType.HSQL;
@@ -65,12 +67,14 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 
 	private Map<String, Order> sortKeys;
 
-	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
+	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<>();
 
 
 	{
 		providers.put(DB2, new Db2PagingQueryProvider());
+		providers.put(DB2VSE, new Db2PagingQueryProvider());
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());
+		providers.put(DB2AS400, new Db2PagingQueryProvider());
 		providers.put(DERBY,new DerbyPagingQueryProvider());
 		providers.put(HSQL,new HsqlPagingQueryProvider());
 		providers.put(H2,new H2PagingQueryProvider());
@@ -134,7 +138,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 	public void setSortKey(String key) {
 		Assert.doesNotContain(key, ",", "String setter is valid for a single ASC key only");
 		
-		Map<String, Order> keys = new LinkedHashMap<String, Order>();
+		Map<String, Order> keys = new LinkedHashMap<>();
 		keys.put(key, Order.ASCENDING);
 		
 		this.sortKeys = keys;

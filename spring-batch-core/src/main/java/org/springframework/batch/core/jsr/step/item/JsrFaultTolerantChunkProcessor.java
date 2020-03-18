@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -122,7 +122,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
 	 * @return I an item
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	@Override
 	protected I provide(final StepContribution contribution, final Chunk<I> chunk) throws Exception {
@@ -211,7 +211,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	 * @param contribution a {@link StepContribution}
 	 * @param item an item to be processed
 	 * @return O an item that has been processed if a processor is available
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -283,7 +283,7 @@ public class JsrFaultTolerantChunkProcessor<I,O> extends JsrChunkProcessor<I, O>
 	 *
 	 * @param contribution a {@link StepContribution}
 	 * @param chunk a {@link Chunk}
-	 * @throws Exception
+	 * @throws Exception thrown if error occurs.
 	 */
 	@Override
 	protected void persist(final StepContribution contribution, final Chunk<O> chunk) throws Exception {

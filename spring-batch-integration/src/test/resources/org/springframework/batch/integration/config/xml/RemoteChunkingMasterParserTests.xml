@@ -7,12 +7,12 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:int="http://www.springframework.org/schema/integration"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
-		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 https://www.springframework.org/schema/beans/spring-beans.xsd
 		 http://www.springframework.org/schema/batch
-		 http://www.springframework.org/schema/batch/spring-batch.xsd
+		 https://www.springframework.org/schema/batch/spring-batch.xsd
 		 http://www.springframework.org/schema/batch-integration
-		 http://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd
-		 http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+		 https://www.springframework.org/schema/batch-integration/spring-batch-integration-3.1.xsd
+		 http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd">
 
 	<batch:job id="processingJob">
 		<batch:step id="process">
@@ -48,7 +48,7 @@
 	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		  p:location="classpath:batch-${ENVIRONMENT:hsql}.properties"/>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		  p:driverClassName="${batch.jdbc.driver}" p:url="${batch.jdbc.url}"
 		  p:username="${batch.jdbc.user}" p:password="${batch.jdbc.password}"/>
 

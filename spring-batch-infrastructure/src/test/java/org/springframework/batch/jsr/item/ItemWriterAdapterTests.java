@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +15,23 @@
  */
 package org.springframework.batch.jsr.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.batch.api.chunk.ItemWriter;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ItemWriterAdapterTests {
 
@@ -45,17 +45,18 @@ public class ItemWriterAdapterTests {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		adapter = new ItemWriterAdapter<String>(delegate);
+		adapter = new ItemWriterAdapter<>(delegate);
+		adapter.setName("jsrWriter");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateWithNull() {
-		adapter = new ItemWriterAdapter<String>(null);
+		adapter = new ItemWriterAdapter<>(null);
 	}
 
 	@Test
 	public void testOpen() throws Exception {
-		when(executionContext.get("ItemWriter.writer.checkpoint")).thenReturn("checkpoint");
+		when(executionContext.get("jsrWriter.writer.checkpoint")).thenReturn("checkpoint");
 
 		adapter.open(executionContext);
 
@@ -64,7 +65,7 @@ public class ItemWriterAdapterTests {
 
 	@Test(expected=ItemStreamException.class)
 	public void testOpenException() throws Exception {
-		when(executionContext.get("ItemWriter.writer.checkpoint")).thenReturn("checkpoint");
+		when(executionContext.get("jsrWriter.writer.checkpoint")).thenReturn("checkpoint");
 
 		doThrow(new Exception("expected")).when(delegate).open("checkpoint");
 
@@ -77,7 +78,7 @@ public class ItemWriterAdapterTests {
 
 		adapter.update(executionContext);
 
-		verify(executionContext).put("ItemWriter.writer.checkpoint", "checkpoint");
+		verify(executionContext).put("jsrWriter.writer.checkpoint", "checkpoint");
 	}
 
 	@Test(expected=ItemStreamException.class)
@@ -116,7 +117,7 @@ public class ItemWriterAdapterTests {
 
 	@Test
 	public void testCheckpointChange() throws Exception {
-		ItemWriterAdapter<String> adapter = new ItemWriterAdapter<String>(new ItemWriter() {
+		ItemWriterAdapter<String> adapter = new ItemWriterAdapter<>(new ItemWriter() {
 
 			private CheckpointContainer container = null;
 
@@ -142,7 +143,7 @@ public class ItemWriterAdapterTests {
 
 		ExecutionContext context = new ExecutionContext();
 
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 		items.add("foo");
 		items.add("bar");
 		items.add("baz");
@@ -176,7 +177,7 @@ public class ItemWriterAdapterTests {
 
 		@Override
 		public String toString() {
-			return "CheckpointContinaer has a count of " + count;
+			return "CheckpointContainer has a count of " + count;
 		}
 	}
 }

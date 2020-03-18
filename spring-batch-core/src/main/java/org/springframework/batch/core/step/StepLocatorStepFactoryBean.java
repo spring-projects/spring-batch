@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,14 +34,14 @@ public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 	public String stepName;
 
 	/**
-	 * @param stepLocator
+	 * @param stepLocator instance of {@link StepLocator} to be used by the factory bean.
 	 */
 	public void setStepLocator(StepLocator stepLocator) {
 		this.stepLocator = stepLocator;
 	}
 
 	/**
-	 * @param stepName
+	 * @param stepName the name to be associated with the step.
 	 */
 	public void setStepName(String stepName) {
 		this.stepName = stepName;

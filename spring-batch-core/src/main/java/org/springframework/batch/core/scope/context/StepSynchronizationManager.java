@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.batch.core.scope.context;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Central convenience class for framework use in managing the step scope
@@ -28,6 +29,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepSynchronizationManager {
@@ -36,7 +38,7 @@ public class StepSynchronizationManager {
 			new SynchronizationManagerSupport<StepExecution, StepContext>() {
 
 		@Override
-		protected StepContext createNewContext(StepExecution execution, BatchPropertyContext propertyContext) {
+		protected StepContext createNewContext(StepExecution execution, @Nullable BatchPropertyContext propertyContext) {
 			StepContext context;
 
 			if(propertyContext != null) {
@@ -55,11 +57,12 @@ public class StepSynchronizationManager {
 	};
 
 	/**
-	 * Getter for the current context if there is one, otherwise returns null.
+	 * Getter for the current context if there is one, otherwise returns {@code null}.
 	 *
-	 * @return the current {@link StepContext} or null if there is none (if one
+	 * @return the current {@link StepContext} or {@code null} if there is none (if one
 	 * has not been registered for this thread).
 	 */
+	@Nullable
 	public static StepContext getContext() {
 		return manager.getContext();
 	}
@@ -83,6 +86,8 @@ public class StepSynchronizationManager {
 	 * context is available in the enclosing block.
 	 *
 	 * @param stepExecution the step context to register
+	 * @param propertyContext an instance of {@link BatchPropertyContext} to be
+	 * used by the StepSynchronizationManager.
 	 * @return a new {@link StepContext} or the current one if it has the same
 	 * {@link StepExecution}
 	 */

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -121,7 +123,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Test
 	public void testSaveAndGetExecutions() {
 
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			StepExecution se = new StepExecution("step" + i, jobExecution);
 			se.setStatus(BatchStatus.STARTED);
@@ -153,6 +155,38 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	@Transactional
+	@Test
+	public void testSaveAndGetLastExecution() {
+		Instant now = Instant.now();
+		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
+		stepExecution1.setStartTime(Date.from(now));
+		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
+		stepExecution2.setStartTime(Date.from(now.plusMillis(500)));
+
+		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
+
+		StepExecution lastStepExecution = dao.getLastStepExecution(jobInstance, "step1");
+		assertNotNull(lastStepExecution);
+		assertEquals(stepExecution2.getId(), lastStepExecution.getId());
+	}
+
+	@Transactional
+	@Test
+	public void testSaveAndGetLastExecutionWhenSameStartTime() {
+		Instant now = Instant.now();
+		StepExecution stepExecution1 = new StepExecution("step1", jobExecution);
+		stepExecution1.setStartTime(Date.from(now));
+		StepExecution stepExecution2 = new StepExecution("step1", jobExecution);
+		stepExecution2.setStartTime(Date.from(now));
+
+		dao.saveStepExecutions(Arrays.asList(stepExecution1, stepExecution2));
+		StepExecution lastStepExecution = stepExecution1.getId() > stepExecution2.getId() ? stepExecution1 : stepExecution2;
+		StepExecution retrieved = dao.getLastStepExecution(jobInstance, "step1");
+		assertNotNull(retrieved);
+		assertEquals(lastStepExecution.getId(), retrieved.getId());
+	}
+
+	@Transactional
 	@Test(expected = IllegalArgumentException.class)
 	public void testSaveNullCollectionThrowsException() {
 		dao.saveStepExecutions(null);
@@ -161,7 +195,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional
 	@Test
 	public void testSaveEmptyCollection() {
-		dao.saveStepExecutions(new ArrayList<StepExecution>());
+		dao.saveStepExecutions(new ArrayList<>());
 	}
 
 	@Transactional

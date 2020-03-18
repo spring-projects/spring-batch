@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.launch.support;
+
+import java.time.Duration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +28,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -56,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @since 1.0
  *
@@ -78,13 +82,15 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	 * @param job the job to be run.
 	 * @param jobParameters the {@link JobParameters} for this particular
 	 * execution.
-	 * @return JobExecutionAlreadyRunningException if the JobInstance already
+	 * @return the {@link JobExecution} if it returns synchronously. If the
+	 * implementation is asynchronous, the status might well be unknown.
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance already
 	 * exists and has an execution already running.
 	 * @throws JobRestartException if the execution would be a re-start, but a
 	 * re-start is either not allowed or not needed.
 	 * @throws JobInstanceAlreadyCompleteException if this instance has already
 	 * completed successfully
-	 * @throws JobParametersInvalidException
+	 * @throws JobParametersInvalidException thrown if jobParameters is invalid.
 	 */
 	@Override
 	public JobExecution run(final Job job, final JobParameters jobParameters)
@@ -139,8 +145,10 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
 								+ "]");
 						job.execute(jobExecution);
+						Duration jobExecutionDuration = BatchMetrics.calculateDuration(jobExecution.getStartTime(), jobExecution.getEndTime());
 						logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-								+ "] and the following status: [" + jobExecution.getStatus() + "]");
+								+ "] and the following status: [" + jobExecution.getStatus() + "]"
+								+ (jobExecutionDuration == null ? "" : " in " + BatchMetrics.formatDuration(jobExecutionDuration)));
 					}
 					catch (Throwable t) {
 						logger.info("Job: [" + job
@@ -173,9 +181,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
-	 * Set the JobRepsitory.
+	 * Set the JobRepository.
 	 *
-	 * @param jobRepository
+	 * @param jobRepository instance of {@link JobRepository}.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
@@ -184,7 +192,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	/**
 	 * Set the TaskExecutor. (Optional)
 	 *
-	 * @param taskExecutor
+	 * @param taskExecutor instance of {@link TaskExecutor}.
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;

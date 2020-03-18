@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,12 +27,12 @@ import org.springframework.core.Ordered;
  */
 public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 
-	private OrderedComposite<SkipListener<? super T,? super S>> listeners = new OrderedComposite<SkipListener<? super T,? super S>>();
+	private OrderedComposite<SkipListener<? super T,? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.
 	 *
-	 * @param listeners
+	 * @param listeners list of {@link SkipListener}s to be called when skip events occur.
 	 */
 	public void setListeners(List<? extends SkipListener<? super T,? super S>> listeners) {
 		this.listeners.setItems(listeners);
@@ -41,7 +41,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	/**
 	 * Register additional listener.
 	 *
-	 * @param listener
+	 * @param listener instance of {@link SkipListener} to be registered.
 	 */
 	public void register(SkipListener<? super T,? super S> listener) {
 		listeners.add(listener);

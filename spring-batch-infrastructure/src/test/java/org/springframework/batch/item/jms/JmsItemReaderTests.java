@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 public class JmsItemReaderTests {
 
-	JmsItemReader<String> itemReader = new JmsItemReader<String>();
+	JmsItemReader<String> itemReader = new JmsItemReader<>();
 
 	@Test
 	public void testNoItemTypeSunnyDay() {
@@ -61,7 +61,7 @@ public class JmsItemReaderTests {
 		Date date = new java.sql.Date(0L);
 		when(jmsTemplate.receiveAndConvert()).thenReturn(date);
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		JmsItemReader<Date> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		assertEquals(date, itemReader.read());
@@ -73,7 +73,7 @@ public class JmsItemReaderTests {
 		JmsOperations jmsTemplate = mock(JmsOperations.class);
 		when(jmsTemplate.receiveAndConvert()).thenReturn("foo");
 
-		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		JmsItemReader<Date> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Date.class);
 		try {
@@ -92,7 +92,7 @@ public class JmsItemReaderTests {
 		Message message = mock(Message.class);
 		when(jmsTemplate.receive()).thenReturn(message);
 
-		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		JmsItemReader<Message> itemReader = new JmsItemReader<>();
 		itemReader.setJmsTemplate(jmsTemplate);
 		itemReader.setItemType(Message.class);
 		assertEquals(message, itemReader.read());
