@@ -67,7 +67,7 @@ allprojects {
 		commonsLangVersion = '3.9'
 		commonsPoolVersion = '1.6'
 		derbyVersion = '10.14.2.0'
-		groovyVersion = '2.5.8'
+		groovyVersion = '2.5.10'
 		hamcrestVersion = '2.2'
 		h2databaseVersion = '1.4.200'
 		hibernateVersion = '5.4.9.Final'
@@ -945,5 +945,5 @@ or specify the Gradle property `TCK_HOME`, e.g: ./gradlew runTck -PTCK_HOME=/pat
 
 wrapper {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '4.10.3'
+	gradleVersion = '6.3'
 }
