@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 package org.springframework.batch.core;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.util.Assert;
+import org.springframework.util.DigestUtils;
 
 /**
  * Default implementation of the {@link JobKeyGenerator} interface.
@@ -57,19 +55,8 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 				stringBuffer.append(key).append("=").append(value).append(";");
 			}
 		}
-
-		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalStateException(
-					"MD5 algorithm not available.  Fatal (should be in the JDK).");
-		}
-
-		try {
-			byte[] bytes = digest.digest(stringBuffer.toString().getBytes(
-					"UTF-8"));
-			return String.format("%032x", new BigInteger(1, bytes));
+			return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException(
 					"UTF-8 encoding not available.  Fatal (should be in the JDK).");
