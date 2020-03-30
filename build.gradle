@@ -102,7 +102,7 @@ allprojects {
 		jaxbImplVersion = '2.3.0.1'
 		micrometerVersion = '1.3.2'
 		prometheusPushgatewayVersion = '0.8.0'
-		docResourcesVersion = '0.1.1.RELEASE'
+		docResourcesVersion = '0.2.0.RELEASE'
 		assertjVersion='3.13.2'
 	}
 
@@ -712,7 +712,7 @@ asciidoctor {
 		// use provided highlighter
 		'source-highlighter=highlight.js',
 		'highlightjsdir=js/highlight',
-		'highlightjs-theme=atom-one-dark-reasonable',
+		'highlightjs-theme=github',
 		'idprefix': '',
 		'idseparator': '-',
 		'spring-version': project.version,
