@@ -469,7 +469,7 @@ public class FlatFileItemReaderBuilder<T> {
 			reader.setLineMapper(this.lineMapper);
 		}
 		else {
-			Assert.state(validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
+			Assert.state(validatorValue == 0 || validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
 					"Only one LineTokenizer option may be configured");
 
 			DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
