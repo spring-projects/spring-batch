@@ -541,6 +541,18 @@ public class FlatFileItemReaderBuilderTests {
 			assertEquals("No FieldSetMapper implementation was provided.", exceptionMessage);
 		}
 	}
+	@Test
+	public void testErrorMessageWhenNoLineTokenizerWasProvided() {
+		try {
+			new FlatFileItemReaderBuilder<Foo>()
+					.name("fooReader")
+					.resource(getResource("1;2;3"))
+					.build();
+		} catch (IllegalStateException exception) {
+			String exceptionMessage = exception.getMessage();
+			assertEquals("No LineTokenizer implementation was provided.", exceptionMessage);
+		}
+	}
 
 	private Resource getResource(String contents) {
 		return new ByteArrayResource(contents.getBytes());
