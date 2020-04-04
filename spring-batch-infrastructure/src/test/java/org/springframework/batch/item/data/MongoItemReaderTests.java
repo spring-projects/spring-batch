@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Michael Minella
+ * @author Parikshit Dutta
+ */
 public class MongoItemReaderTests {
 
 	private MongoItemReader<String> reader;
@@ -310,7 +314,46 @@ public class MongoItemReaderTests {
 		assertEquals(100, actualQuery.getLimit());
 		assertEquals(0, actualQuery.getSkip());
 	}
-	
+
+	@Test
+	public void testQueryObjectWithoutLimit() throws Exception {
+		reader = new MongoItemReader<>();
+		reader.setTemplate(template);
+
+		reader.setQuery(new Query());
+		reader.setTargetType(String.class);
+		reader.setPageSize(100);
+
+		reader.afterPropertiesSet();
+
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertFalse(reader.doPageRead().hasNext());
+
+		Query actualQuery = queryContainer.getValue();
+		assertEquals(100, actualQuery.getLimit());
+	}
+
+	@Test
+	public void testQueryObjectWithoutLimitAndPageSize() throws Exception {
+		reader = new MongoItemReader<>();
+		reader.setTemplate(template);
+
+		reader.setQuery(new Query());
+		reader.setTargetType(String.class);
+
+		reader.afterPropertiesSet();
+
+		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
+		when(template.find(queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertFalse(reader.doPageRead().hasNext());
+
+		Query actualQuery = queryContainer.getValue();
+		assertEquals(10, actualQuery.getLimit());
+	}
+
 	@Test
 	public void testQueryObjectWithCollection() throws Exception {
 		reader = new MongoItemReader<>();
