@@ -79,6 +79,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Takaaki Iida
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 	
@@ -240,10 +241,6 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		
 		if (queryString != null) {
 			Assert.state(sort != null, "A sort is required.");
-		}
-
-		if (query != null && query.getLimit() != 0) {
-			log.warn("PageSize in Query object was ignored. Please set it by MongoItemReader.setPageSize().");
 		}
 	}
 
