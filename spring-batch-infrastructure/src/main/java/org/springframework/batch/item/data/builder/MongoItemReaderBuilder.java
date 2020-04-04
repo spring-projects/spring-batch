@@ -34,6 +34,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Parikshit Dutta
  * @since 4.0
  * @see MongoItemReader
  */
@@ -285,9 +286,6 @@ public class MongoItemReaderBuilder<T> {
 
 		if(StringUtils.hasText(this.jsonQuery)) {
 			Assert.notNull(this.sorts, "sorts map is required.");
-		}
-		else {
-			Assert.state(this.query.getLimit() != 0, "PageSize in Query object was ignored.");
 		}
 
 		MongoItemReader<T> reader = new MongoItemReader<>();

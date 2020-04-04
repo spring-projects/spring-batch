@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Parikshit Dutta
  */
 public class MongoItemReaderBuilderTests {
 	@Mock
@@ -143,6 +144,41 @@ public class MongoItemReaderBuilderTests {
 		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
 		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 		assertEquals("collection", collectionContainer.getValue());
+	}
+
+	@Test
+	public void testWithoutQueryLimit() throws Exception {
+		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query(new Query())
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50)
+				.build();
+
+		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertNull("reader should not return result", reader.read());
+
+		Query query = this.queryContainer.getValue();
+		assertEquals(50, query.getLimit());
+	}
+
+	@Test
+	public void testWithoutQueryLimitAndPageSize() throws Exception {
+		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query(new Query())
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.build();
+
+		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertNull("reader should not return result", reader.read());
+
+		Query query = this.queryContainer.getValue();
+		assertEquals(10, query.getLimit());
 	}
 
 	@Test
