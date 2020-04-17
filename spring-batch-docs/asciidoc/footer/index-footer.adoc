@@ -2,7 +2,7 @@
 Lucas Ward, Dave Syer, Thomas Risberg, Robert Kasanicky, Dan Garrette, Wayne Lund,
 Michael Minella, Chris Schaefer, Gunnar Hillert, Glenn Renfro, Jay Bryant, Mahmoud Ben Hassine
 
-Copyright © 2009 - 2019 Pivotal, Inc. All Rights
+Copyright © 2009 - 2020 Pivotal, Inc. All Rights
 Reserved.
 
 Copies of this document may be made for your own use and for
