@@ -28,6 +28,8 @@ import java.util.List;
  * {@link SynchronizedItemStreamWriter#write write()} method
  *
  * @author Dimitrios Liapis
+ *
+ * @param <T> type of object being written
  */
 public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, InitializingBean {
 
@@ -62,6 +64,6 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.delegate, "A delegate item reader is required");
+		Assert.notNull(this.delegate, "A delegate item writer is required");
 	}
 }
