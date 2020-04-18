@@ -87,7 +87,7 @@ propagation attribute a value of `REQUIRES_NEW`.
 [[stoppingAJobManuallyForBusinessReasons]]
 === Stopping a Job Manually for Business Reasons
 
-Spring Batch provides a `stop()` method through the `JobLauncher` interface, but this is
+Spring Batch provides a `stop()` method through the `JobOperator` interface, but this is
 really for use by the operator rather than the application programmer. Sometimes, it is
 more convenient or makes more sense to stop a job execution from within the business
 logic.
