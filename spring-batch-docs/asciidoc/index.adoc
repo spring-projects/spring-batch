@@ -19,6 +19,7 @@ administration.
 controlling step flow.
 <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> :: Item readers
 and writers interfaces and how to use them.
+<<processor.adoc#processor,ItemProcessor>> :: Item processor interface and how to use it.
 <<scalability.adoc#scalability,Scaling and Parallel Processing>> :: Multi-threaded steps,
 parallel steps, remote chunking and partitioning.
 <<repeat.adoc#repeat,Repeat>> :: Completion policies and exception handling of repetitive actions.

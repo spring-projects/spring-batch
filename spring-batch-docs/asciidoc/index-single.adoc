@@ -20,6 +20,8 @@ include::step.adoc[]
 
 include::readersAndWriters.adoc[]
 
+include::processor.adoc[]
+
 include::scalability.adoc[]
 
 include::repeat.adoc[]
