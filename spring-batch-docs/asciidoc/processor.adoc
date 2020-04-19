@@ -264,18 +264,8 @@ that the result is `null` and avoids adding that item to the list of records del
 the `ItemWriter`. As usual, an exception thrown from the `ItemProcessor` results in a
 skip.
 
-[[faultTolerant]]
-==== Fault Tolerance
-
-When a chunk is rolled back, items that have been cached during reading may be
-reprocessed.  If a step is configured to be fault tolerant (typically by using skip or
-retry processing), any `ItemProcessor` used should be implemented in a way that is
-idempotent.  Typically that would consist of performing no changes on the input item for
-the `ItemProcessor` and only updating the
-instance that is the result.
-
 [[validatingInput]]
-=== Validating Input
+==== Validating Input
 
 In the <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter, multiple approaches to parsing input have been
 discussed. Each major implementation throws an exception if it is not 'well-formed'. The
@@ -377,3 +367,13 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
     return beanValidatingItemProcessor;
 }
 ----
+
+[[faultTolerant]]
+==== Fault Tolerance
+
+When a chunk is rolled back, items that have been cached during reading may be
+reprocessed.  If a step is configured to be fault tolerant (typically by using skip or
+retry processing), any `ItemProcessor` used should be implemented in a way that is
+idempotent.  Typically that would consist of performing no changes on the input item for
+the `ItemProcessor` and only updating the
+instance that is the result.
