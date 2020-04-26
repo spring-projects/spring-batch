@@ -16,6 +16,7 @@
 
 package org.springframework.batch.test;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,7 +161,7 @@ public class JobLauncherTestUtils {
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("random", new JobParameter((long) (Math.random() * JOB_PARAMETER_MAXIMUM)));
+		parameters.put("random", new JobParameter(new SecureRandom().nextLong()));
 		return new JobParameters(parameters);
 	}
 
