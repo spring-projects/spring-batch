@@ -16,7 +16,6 @@
 package org.springframework.batch.item.support.builder;
 
 import org.junit.Test;
-
 import org.springframework.batch.item.support.AbstractSynchronizedItemStreamWriterTests;
 import org.springframework.batch.item.support.SynchronizedItemStreamWriter;
 
@@ -27,14 +26,18 @@ import org.springframework.batch.item.support.SynchronizedItemStreamWriter;
  */
 public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchronizedItemStreamWriterTests {
 
-	@Test
-	public void givenMultipleThreads_whenAllCallSynchronizedItemStreamWriter_thenThreadSafe() throws Exception {
-		TestItemWriter testItemWriter = new TestItemWriter();
-		SynchronizedItemStreamWriter<Integer> synchronizedItemStreamWriter =
-				new SynchronizedItemStreamWriterBuilder<Integer>()
-						.delegate(testItemWriter)
-						.build();
-		multiThreadedInvocation(synchronizedItemStreamWriter);
+
+	@Override
+	protected SynchronizedItemStreamWriter<Object> createNewSynchronizedItemStreamWriter() {
+		return new SynchronizedItemStreamWriterBuilder<>()
+				.delegate(delegate)
+				.build();
 	}
 
+	@Test
+	public void testBuilderDelegateIsNotNull() {
+		expectedException.expect(IllegalArgumentException.class);
+		expectedException.expectMessage("A delegate is required");
+		new SynchronizedItemStreamWriterBuilder<>().build();
+	}
 }
