@@ -323,7 +323,7 @@ public IntegrationFlow integrationFlow(JobLaunchingGateway jobLaunchingGateway) 
     return IntegrationFlows.from(Files.inboundAdapter(new File("/tmp/myfiles")).
                     filter(new SimplePatternFileListFilter("*.csv")),
             c -> c.poller(Pollers.fixedRate(1000).maxMessagesPerPoll(1))).
-            handle(fileMessageToJobRequest()).
+            transform(fileMessageToJobRequest()).
             handle(jobLaunchingGateway).
             log(LoggingHandler.Level.WARN, "headers.id + ': ' + payload").
             get();
