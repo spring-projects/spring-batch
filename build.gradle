@@ -12,13 +12,14 @@ buildscript {
 		classpath 'io.spring.gradle:spring-io-plugin:0.0.5.RELEASE'
 		classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
 		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2"
-		classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.6"
-		classpath "org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16"
 	}
 }
 
 plugins {
 	id 'org.sonarqube' version '2.6.2'
+	id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+	id 'org.asciidoctor.jvm.gems' version '3.1.0'
+	id 'org.asciidoctor.jvm.convert' version '3.1.0'
 }
 
 ext {
@@ -651,12 +652,6 @@ project('spring-batch-samples') {
 	}
 }
 
-apply plugin: "org.asciidoctor.convert"
-
-asciidoctorj {
-	version = '1.5.5'
-}
-
 configurations {
 	docs
 }
@@ -677,26 +672,31 @@ task prepareAsciidocBuild(type: Sync) {
 	into "$buildDir/asciidoc/assemble"
 }
 
-task('makePDF', type: org.asciidoctor.gradle.AsciidoctorTask){
+asciidoctorPdf {
 	dependsOn prepareAsciidocBuild
-	backends 'pdf'
-	sourceDir "$buildDir/asciidoc/assemble"
-	sources {
-		include 'index-single.adoc'
-	}
-	options doctype: 'book', eruby: 'erubis'
-	logDocuments = true
-	attributes 'icons': 'font',
+	baseDirFollowsSourceFile()
+
+	asciidoctorj {
+		sourceDir "$buildDir/asciidoc/assemble"
+		inputs.dir(sourceDir)
+		sources {
+			include 'index-single.adoc'
+		}
+		options doctype: 'book'
+		logDocuments = true
+		attributes 'icons': 'font',
 		'sectanchors': '',
 		'sectnums': '',
 		'toc': '',
 		'source-highlighter' : 'coderay',
-		revnumber: project.version
+		revnumber: project.version,
+		'project-version': project.version
+	}
 }
 
 asciidoctor {
-	dependsOn makePDF
-	backends 'html5'
+	dependsOn asciidoctorPdf
+	baseDirFollowsSourceFile()
 	sourceDir "$buildDir/asciidoc/assemble"
 	resources {
 		from(sourceDir) {
@@ -713,9 +713,9 @@ asciidoctor {
 		'icons': 'font',
     'sectanchors': '',
 		// use provided highlighter
-		'source-highlighter=highlight.js',
-		'highlightjsdir=js/highlight',
-		'highlightjs-theme=github',
+		'source-highlighter': 'highlight.js',
+		'highlightjsdir': 'js/highlight',
+		'highlightjs-theme': 'github',
 		'idprefix': '',
 		'idseparator': '-',
 		'spring-version': project.version,
@@ -803,7 +803,7 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (makePDF) {
+		from (asciidoctorPdf) {
 			include "index-single.pdf"
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
 			into 'reference/pdf'
