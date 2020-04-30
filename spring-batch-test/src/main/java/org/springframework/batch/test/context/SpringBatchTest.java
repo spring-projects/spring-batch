@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.JobScopeTestExecutionListener;
 import org.springframework.batch.test.StepScopeTestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Annotation that can be specified on a test class that runs Spring Batch based tests.
@@ -45,7 +48,7 @@ import org.springframework.test.context.TestExecutionListeners;
  * </li>
  * </ul>
  * <p>
- * A typical usage of this annotation is like:
+ * A typical usage of this annotation with JUnit 4 is like:
  *
  * <pre class="code">
  * &#064;RunWith(SpringRunner.class)
@@ -79,6 +82,40 @@ import org.springframework.test.context.TestExecutionListeners;
  * }
  * </pre>
  *
+ * For JUnit 5, this annotation can be used without having to manually register the
+ * {@link SpringExtension} since {@code @SpringBatchTest} is meta-annotated with
+ * {@code @ExtendWith(SpringExtension.class)}:
+ *
+ * <pre class="code">
+ * &#064;SpringBatchTest
+ * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
+ * public class MyBatchJobTests {
+ *
+ *    &#064;@Autowired
+ *    private JobLauncherTestUtils jobLauncherTestUtils;
+ *
+ *    &#064;@Autowired
+ *    private JobRepositoryTestUtils jobRepositoryTestUtils;
+ *
+ *    &#064;BeforeEach
+ *    public void clearJobExecutions() {
+ *       this.jobRepositoryTestUtils.removeJobExecutions();
+ *    }
+ *
+ *    &#064;Test
+ *    public void testMyJob() throws Exception {
+ *       // given
+ *       JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
+ *
+ *       // when
+ *       JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+ *
+ *       // then
+ *       Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+ *    }
+ * 
+ * }
+ * </pre>
  * @author Mahmoud Ben Hassine
  * @since 4.1
  * @see JobLauncherTestUtils
@@ -94,5 +131,6 @@ import org.springframework.test.context.TestExecutionListeners;
 		listeners = {StepScopeTestExecutionListener.class, JobScopeTestExecutionListener.class},
 		mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
+@ExtendWith(SpringExtension.class)
 public @interface SpringBatchTest {
 }

@@ -85,6 +85,7 @@ allprojects {
 		jettisonVersion = '1.2' //? => upgrade to 1.4 and the build fails (deprecated anyway via xstream)
 		jmsVersion = '2.0.1'
 		junitVersion = '4.13'
+		junitJupiterVersion = '5.6.2'
 		log4jVersion = '2.13.0'
 		mysqlVersion = '8.0.18'
 		mockitoVersion = '3.1.0'
@@ -515,8 +516,11 @@ project('spring-batch-test') {
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "org.mockito:mockito-core:$mockitoVersion"
 
+		testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
+
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
         optional "javax.batch:javax.batch-api:$javaxBatchApiVersion"
+		optional "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
 	}
 }
 
