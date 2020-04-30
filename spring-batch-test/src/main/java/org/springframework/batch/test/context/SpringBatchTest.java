@@ -81,9 +81,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *
  * }
  * </pre>
- * 
- * For JUnit 5, this annotation can be used without having to extend the test class
- * with {@link SpringExtension} as it is meta-annotated with {@code @ExtendWith(SpringExtension.class)}:
+ *
+ * For JUnit 5, this annotation can be used without having to manually register the
+ * {@link SpringExtension} since {@code @SpringBatchTest} is meta-annotated with
+ * {@code @ExtendWith(SpringExtension.class)}:
  *
  * <pre class="code">
  * &#064;SpringBatchTest

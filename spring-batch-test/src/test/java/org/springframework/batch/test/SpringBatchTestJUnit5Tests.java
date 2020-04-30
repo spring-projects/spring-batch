@@ -51,7 +51,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Mahmoud Ben Hassine
  */
 @SpringBatchTest
-@ContextConfiguration(classes = SpringBatchTestJUnit5Tests.JobConfiguration.class)
+@ContextConfiguration
 public class SpringBatchTestJUnit5Tests {
 
 	@Autowired

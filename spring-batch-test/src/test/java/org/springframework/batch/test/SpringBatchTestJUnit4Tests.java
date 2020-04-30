@@ -52,7 +52,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@ContextConfiguration(classes = SpringBatchTestJUnit4Tests.JobConfiguration.class)
+@ContextConfiguration
 public class SpringBatchTestJUnit4Tests {
 
 	@Autowired
