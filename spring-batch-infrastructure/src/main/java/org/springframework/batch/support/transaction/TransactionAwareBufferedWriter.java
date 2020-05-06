@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,9 +210,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 	public void write(char[] cbuf, int off, int len) throws IOException {
 
 		if (!transactionActive()) {
-			char [] subArray = new char[len];
-			System.arraycopy(cbuf, off, subArray, 0, len);
-			byte[] bytes = new String(subArray).getBytes(encoding);
+			byte[] bytes = new String(cbuf, off, len).getBytes(encoding);
 			int length = bytes.length;
 			ByteBuffer bb = ByteBuffer.wrap(bytes);
 			int bytesWritten = channel.write(bb);
@@ -224,5 +222,28 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 		StringBuilder buffer = getCurrentBuffer();
 		buffer.append(cbuf, off, len);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.io.Writer#write(String, int, int)
+	 */
+	@Override
+	public void write(String str, int off, int len) throws IOException {
+
+		if (!transactionActive()) {
+			byte[] bytes = str.substring(off, off + len).getBytes(encoding);
+			int length = bytes.length;
+			ByteBuffer bb = ByteBuffer.wrap(bytes);
+			int bytesWritten = channel.write(bb);
+			if(bytesWritten != length) {
+				throw new IOException("Unable to write all data.  Bytes to write: " + len + ".  Bytes written: " + bytesWritten);
+			}
+			return;
+		}
+
+		StringBuilder buffer = getCurrentBuffer();
+		buffer.append(str, off, len);
 	}
 }
