@@ -5,6 +5,14 @@ Have something you'd like to contribute to **Spring Batch**? We welcome pull req
 
 Please refer back to this document as a checklist before issuing any pull request; this will save time for everyone!
 
+## Code of Conduct
+
+Please see our [code of conduct](https://github.com/spring-projects/.github/blob/master/CODE_OF_CONDUCT.md).
+
+## Reporting Security Vulnerabilities
+
+Please see our [Security policy](https://github.com/spring-projects/spring-batch/security/policy).
+
 ## Understand the basics
 
 Not sure what a *pull request* is, or how to submit one?  Take a look at the excellent [GitHub help documentation][] first.

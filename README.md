@@ -4,6 +4,14 @@ Spring Batch is a lightweight, comprehensive batch framework designed to enable 
 
 If you are looking for a runtime orchestration tool for your Batch applications, or need a management console to view current and historic executions, take a look at [Spring Cloud Data Flow](https://cloud.spring.io/spring-cloud-dataflow/).  It is an orchestration tool for deploying and executing data integration based microservices including Spring Batch applications.
 
+## Code of Conduct
+
+Please see our [code of conduct](https://github.com/spring-projects/.github/blob/master/CODE_OF_CONDUCT.md).
+
+## Reporting Security Vulnerabilities
+
+Please see our [Security policy](https://github.com/spring-projects/spring-batch/security/policy).
+
 # Building from Source
 
 Clone the git repository using the URL on the Github home page:
@@ -49,6 +57,3 @@ Here are some ways for you to get involved in the community:
 * Watch for upcoming articles on Spring by [subscribing](feed://assets.spring.io/drupal/node/feed.xml) to [spring.io](https://spring.io).
 
 Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
-
-# Code of Conduct
- This project adheres to the [Contributor Covenant ](https://github.com/spring-projects/spring-batch/blob/master/CODE_OF_CONDUCT.adoc). By participating, you  are expected to uphold this code. Please report unacceptable behavior to spring-code-of-conduct@pivotal.io.
