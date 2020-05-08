@@ -106,6 +106,7 @@ allprojects {
 		docResourcesVersion = '0.2.1.RELEASE'
 		assertjVersion='3.15.0'
 		mongoDbDriverSyncVersion='4.0.0-beta1'
+		testcontainersVersion='1.14.1'
 	}
 
 	apply plugin: 'idea'
@@ -429,8 +430,9 @@ project('spring-batch-core-tests') {
 		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
 		testCompile "org.springframework:spring-test:$springVersion"
 		testCompile "org.springframework:spring-jdbc:$springVersion"
+		testCompile "org.testcontainers:mysql:$testcontainersVersion"
+		testCompile "mysql:mysql-connector-java:$mysqlVersion"
 
-		runtime "mysql:mysql-connector-java:$mysqlVersion"
 		runtime "org.postgresql:postgresql:$postgresqlVersion"
 		runtime "javax.batch:javax.batch-api:$javaxBatchApiVersion"
 
