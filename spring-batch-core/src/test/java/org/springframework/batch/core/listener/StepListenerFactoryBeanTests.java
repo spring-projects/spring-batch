@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,15 +57,18 @@ import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
 /**
  * @author Lucas Ward
- *
+ * @author Alexei Klenin
  */
 public class StepListenerFactoryBeanTests {
 
@@ -83,13 +85,9 @@ public class StepListenerFactoryBeanTests {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStepAndChunk() throws Exception {
+	public void testStepAndChunk() {
 		TestListener testListener = new TestListener();
 		factoryBean.setDelegate(testListener);
-		//		Map<String, String> metaDataMap = new HashMap<String, String>();
-		//		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
-		//		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
-		//		factoryBean.setMetaDataMap(metaDataMap);
 		String readItem = "item";
 		Integer writeItem = 2;
 		List<Integer> writeItems = Arrays.asList(writeItem);
@@ -129,11 +127,13 @@ public class StepListenerFactoryBeanTests {
 		assertTrue(testListener.onSkipInWriteCalled);
 	}
 
+	/**
+	 * Test to make sure if someone has annotated a method, implemented the
+	 * interface, and given a string
+	 * method name, that all three will be called
+	 */
 	@Test
-	public void testAllThreeTypes() throws Exception {
-		// Test to make sure if someone has annotated a method, implemented the
-		// interface, and given a string
-		// method name, that all three will be called
+	public void testAllThreeTypes() {
 		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
 		factoryBean.setDelegate(delegate);
 		Map<String, String> metaDataMap = new HashMap<>();
@@ -145,7 +145,7 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testAnnotatingInterfaceResultsInOneCall() throws Exception {
+	public void testAnnotatingInterfaceResultsInOneCall() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
 		Map<String, String> metaDataMap = new HashMap<>();
@@ -157,7 +157,7 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testVanillaInterface() throws Exception {
+	public void testVanillaInterface() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
 		Object listener = factoryBean.getObject();
@@ -167,7 +167,7 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testVanillaInterfaceWithProxy() throws Exception {
+	public void testVanillaInterfaceWithProxy() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		ProxyFactory factory = new ProxyFactory(delegate);
 		factoryBean.setDelegate(factory.getProxy());
@@ -178,7 +178,7 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testFactoryMethod() throws Exception {
+	public void testFactoryMethod() {
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		Object listener = StepListenerFactoryBean.getListener(delegate);
 		assertTrue(listener instanceof StepExecutionListener);
@@ -188,7 +188,7 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testAnnotationsWithOrdered() throws Exception {
+	public void testAnnotationsWithOrdered() {
 		Object delegate = new Ordered() {
 			@BeforeStep
 			public void foo(StepExecution execution) {
@@ -205,14 +205,14 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testProxiedAnnotationsFactoryMethod() throws Exception {
+	public void testProxiedAnnotationsFactoryMethod() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
@@ -221,12 +221,12 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testInterfaceIsListener() throws Exception {
+	public void testInterfaceIsListener() {
 		assertTrue(StepListenerFactoryBean.isListener(new ThreeStepExecutionListener()));
 	}
 
 	@Test
-	public void testAnnotationsIsListener() throws Exception {
+	public void testAnnotationsIsListener() {
 		assertTrue(StepListenerFactoryBean.isListener(new Object() {
 			@BeforeStep
 			public void foo(StepExecution execution) {
@@ -235,28 +235,23 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testProxyWithNoTarget() throws Exception {
+	public void testProxyWithNoTarget() {
 		ProxyFactory factory = new ProxyFactory();
 		factory.addInterface(DataSource.class);
-		factory.addAdvice(new MethodInterceptor() {
-			@Override
-			public Object invoke(MethodInvocation invocation) throws Throwable {
-				return null;
-			}
-		});
+		factory.addAdvice((MethodInterceptor) invocation -> null);
 		Object proxy = factory.getProxy();
 		assertFalse(StepListenerFactoryBean.isListener(proxy));
 	}
 
 	@Test
-	public void testProxiedAnnotationsIsListener() throws Exception {
+	public void testProxiedAnnotationsIsListener() {
 		Object delegate = new InitializingBean() {
 			@BeforeStep
 			public void foo(StepExecution execution) {
 			}
 
 			@Override
-			public void afterPropertiesSet() throws Exception {
+			public void afterPropertiesSet() {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
@@ -266,15 +261,18 @@ public class StepListenerFactoryBeanTests {
 	}
 
 	@Test
-	public void testMixedIsListener() throws Exception {
+	public void testMixedIsListener() {
 		assertTrue(StepListenerFactoryBean.isListener(new MultipleAfterStep()));
 	}
 
 	@Test
-	public void testNonListener() throws Exception {
+	public void testNonListener() {
 		Object delegate = new Object();
-		factoryBean.setDelegate(delegate);
-		assertTrue(factoryBean.getObject() instanceof StepListener);
+		IllegalArgumentException exception = assertThrows(
+				IllegalArgumentException.class, () -> factoryBean.setDelegate(delegate));
+		assertThat(
+				exception.getMessage(),
+				startsWith("Object of type [java.lang.Object] is not a valid step listener."));
 	}
 
 	@Test
@@ -328,6 +326,10 @@ public class StepListenerFactoryBeanTests {
 			public void aMethod() {
 				executed = true;
 			}
+
+			@BeforeStep
+			public void beforeStep(StepExecution execution) {
+			}
 		};
 		factoryBean.setDelegate(delegate);
 		Map<String, String> metaDataMap = new HashMap<>();
@@ -347,6 +349,10 @@ public class StepListenerFactoryBeanTests {
 				executed = true;
 				assertEquals("foo", items.get(0));
 				assertEquals("bar", items.get(1));
+			}
+
+			@BeforeStep
+			public void beforeStep(StepExecution execution) {
 			}
 		};
 		factoryBean.setDelegate(delegate);

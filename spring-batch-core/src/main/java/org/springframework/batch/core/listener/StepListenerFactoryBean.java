@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.jsr.JsrStepListenerMetaData;
 
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
@@ -23,11 +27,22 @@ import org.springframework.batch.core.StepListener;
  *
  * @author Lucas Ward
  * @author Dan Garrette
+ * @author Alexei KLENIN
  * @since 2.0
  * @see AbstractListenerFactoryBean
  * @see StepListenerMetaData
  */
 public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepListener> {
+	private static final String STR_STEP_LISTENER_ANNOTATIONS_LIST = Stream
+			.of(StepListenerMetaData.values())
+			.map(StepListenerMetaData::getAnnotation)
+			.map(Class::getSimpleName)
+			.map(annotation -> String.format("\t- @%s\n", annotation))
+			.collect(Collectors.joining());
+	private static final String ERR_OBJECT_NOT_STEP_LISTENER_TEMPLATE =
+			"Object of type [%s] is not a valid step listener. " +
+			"It must ether implement StepListener interface or have methods annotated with any of:\n" +
+			STR_STEP_LISTENER_ANNOTATIONS_LIST;
 
 	@Override
 	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
@@ -47,6 +62,11 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepLis
 	@Override
 	public Class<StepListener> getObjectType() {
 		return StepListener.class;
+	}
+
+	@Override
+	public void setDelegate(Object delegate) {
+		super.setDelegate(assertListener(delegate));
 	}
 
 	/**
@@ -72,6 +92,30 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean<StepLis
 	 *         annotations
 	 */
 	public static boolean isListener(Object delegate) {
-		return AbstractListenerFactoryBean.isListener(delegate, StepListener.class, StepListenerMetaData.values());
+		ListenerMetaData[] metaDataValues = Stream
+				.<ListenerMetaData> concat(
+					Stream.of(StepListenerMetaData.values()),
+					Stream.of(JsrStepListenerMetaData.values()))
+				.toArray(ListenerMetaData[]::new);
+
+		return AbstractListenerFactoryBean.isListener(delegate, StepListener.class, metaDataValues);
+	}
+
+	/**
+	 * Asserts that {@code delegate} is a valid step listener. If this is not a case, throws an
+	 * {@link IllegalArgumentException} with message detailing the problem. Object is a valid
+	 * step listener is it ether implements interface {@link StepListener} or has any method
+	 * annotated with one of marker annotations.
+	 *
+	 * @param delegate the object to check
+	 * @return valid step execution listener
+	 */
+	public static Object assertListener(Object delegate) {
+		if (!isListener(delegate)) {
+			throw new IllegalArgumentException(String.format(
+					ERR_OBJECT_NOT_STEP_LISTENER_TEMPLATE, delegate.getClass().getName()));
+		}
+
+		return delegate;
 	}
 }
