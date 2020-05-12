@@ -20,9 +20,14 @@ Clone the git repository using the URL on the Github home page:
     $ cd spring-batch
 
 ## Command Line
-Gradle is the build tool used for Spring Batch.  You can perform a full build of Spring Batch via the command:
+
+Gradle is the build tool used for Spring Batch. You can build the project via the command:
 
     $ ./gradlew build
+
+If you want to perform a full build with all integration tests, ensure you have Docker installed then run:
+
+    $ ./gradlew build -Palltests
 
 ## Spring Tool Suite (STS)
 In STS (or any Eclipse distro or other IDE with Gradle support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
