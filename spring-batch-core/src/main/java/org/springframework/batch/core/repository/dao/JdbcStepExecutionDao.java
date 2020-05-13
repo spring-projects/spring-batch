@@ -110,7 +110,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
 			" where " +
 			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
-			"where JE.JOB_INSTANCE_ID = ?)" +
+			"where JOB_INSTANCE_ID = ?)" +
 			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
 			"      and SE.STEP_NAME = ?";
 
