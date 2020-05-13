@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,31 @@ import org.springframework.util.Assert;
  * Creates a fully qualified {@link SynchronizedItemStreamWriter}.
  *
  * @author Dimitrios Liapis
+ * @author Mahmoud Ben Hassine
  */
 public class SynchronizedItemStreamWriterBuilder<T> {
 
 	private ItemStreamWriter<T> delegate;
 
+	/**
+	 * Set the delegate {@link ItemStreamWriter}.
+	 * 
+	 * @param delegate the delegate to set
+	 * @return this instance for method chaining
+	 */
 	public SynchronizedItemStreamWriterBuilder<T> delegate(ItemStreamWriter<T> delegate) {
 		this.delegate = delegate;
 
 		return this;
 	}
 
+	/**
+	 * Returns a fully constructed {@link SynchronizedItemStreamWriter}.
+	 * 
+	 * @return a new {@link SynchronizedItemStreamWriter}
+	 */
 	public SynchronizedItemStreamWriter<T> build() {
-		Assert.notNull(this.delegate, "A delegate is required");
+		Assert.notNull(this.delegate, "A delegate item writer is required");
 
 		SynchronizedItemStreamWriter<T> writer = new SynchronizedItemStreamWriter<>();
 		writer.setDelegate(this.delegate);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,24 @@ import java.util.List;
 
 /**
  * An {@link ItemStreamWriter} decorator with a synchronized
- * {@link SynchronizedItemStreamWriter#write write()} method
+ * {@link SynchronizedItemStreamWriter#write write()} method.
+ * 
+ * This decorator is useful when using a non thread-safe item writer
+ * in a multi-threaded step. Typical delegate examples are the
+ * {@link org.springframework.batch.item.json.JsonFileItemWriter JsonFileItemWriter}
+ * and {@link org.springframework.batch.item.xml.StaxEventItemWriter StaxEventItemWriter}.
+ * 
+ * <p>
+ * <strong>It should be noted that synchronizing writes might introduce
+ * some performance degradation, so this decorator should be used
+ * wisely and only when necessary. For example, using a 
+ * {@link org.springframework.batch.item.file.FlatFileItemWriter FlatFileItemWriter} in
+ * a multi-threaded step does NOT require synchronizing writes, so using
+ * this decorator in such use case might be counter-productive.</strong>
+ * </p>
  *
  * @author Dimitrios Liapis
+ * @author Mahmoud Ben Hassine
  *
  * @param <T> type of object being written
  */
@@ -35,12 +50,17 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 
 	private ItemStreamWriter<T> delegate;
 
+	/**
+	 * Set the delegate {@link ItemStreamWriter}.
+	 * 
+	 * @param delegate the delegate to set
+	 */
 	public void setDelegate(ItemStreamWriter<T> delegate) {
 		this.delegate = delegate;
 	}
 
 	/**
-	 * This delegates to the write method of the <code>delegate</code>
+	 * This method delegates to the {@code write} method of the {@code delegate}.
 	 */
 	@Override
 	public synchronized void write(List<? extends T> items) throws Exception {
