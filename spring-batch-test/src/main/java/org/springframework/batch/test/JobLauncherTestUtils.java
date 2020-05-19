@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ import org.springframework.lang.Nullable;
  * <p>
  * It should be noted that using any of the methods that don't contain
  * {@link JobParameters} in their signature, will result in one being created
- * with the current system time as a parameter. This will ensure restartability
- * when no parameters are provided.
+ * with a random number of type {@code long} as a parameter. This will ensure
+ * restartability when no parameters are provided.
  * </p>
  * 
  * @author Lucas Ward
@@ -69,7 +69,7 @@ import org.springframework.lang.Nullable;
  */
 public class JobLauncherTestUtils {
 
-	private static final long JOB_PARAMETER_MAXIMUM = 1000000;
+	private SecureRandom secureRandom = new SecureRandom();
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -156,12 +156,12 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * @return a new JobParameters object containing only a parameter for the
-	 * current timestamp, to ensure that the job instance will be unique.
+	 * @return a new JobParameters object containing only a parameter with a
+	 * random number of type {@code long}, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<>();
-		parameters.put("random", new JobParameter(new SecureRandom().nextLong()));
+		parameters.put("random", new JobParameter(this.secureRandom.nextLong()));
 		return new JobParameters(parameters);
 	}
 
