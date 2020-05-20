@@ -907,9 +907,6 @@ The following example shows how to register a `stream` on a `step` in XML:
     </tasklet>
 </step>
 
-[role="javaContent"]
-The following example shows how to register a `stream` on a `step` in Java:
-
 <beans:bean id="compositeWriter"
             class="org.springframework.batch.item.support.CompositeItemWriter">
     <beans:property name="delegates">
@@ -920,6 +917,9 @@ The following example shows how to register a `stream` on a `step` in Java:
     </beans:property>
 </beans:bean>
 ----
+
+[role="javaContent"]
+The following example shows how to register a `stream` on a `step` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -2279,8 +2279,8 @@ The following example shows how to access the `ExecutionContext` in XML:
 </bean>
 ----
 
-[role="xmlContent"]
-The following example shows how to access the `ExecutionContext` in XML:
+[role="javaContent"]
+The following example shows how to access the `ExecutionContext` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]

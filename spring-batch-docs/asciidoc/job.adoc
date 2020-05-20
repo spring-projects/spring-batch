@@ -579,7 +579,7 @@ way. However, since a call to the `create*` method is quite short, it is unlikel
 can be overridden.
 
 [role="xmlContent"]
-The following example shows how to the isolation level in XML:
+The following example shows how to override the isolation level in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -589,7 +589,7 @@ The following example shows how to the isolation level in XML:
 ----
 
 [role="javaContent"]
-The following example shows how to the isolation level in Java:
+The following example shows how to override the isolation level in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
