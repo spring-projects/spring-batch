@@ -2,14 +2,14 @@
 :toc: left
 :toclevels: 4
 
-[[processor]]
-== ItemProcessor
+[[itemProcessor]]
+== Item processing
 
 ifndef::onlyonetoggle[]
 include::toggle.adoc[]
 endif::onlyonetoggle[]
 
-The `ItemReader` and `ItemWriter` interfaces are both very useful for their specific
+The <<readersAndWriters.adoc#readersAndWriters,ItemReader and ItemWriter interfaces>> are both very useful for their specific
 tasks, but what if you want to insert business logic before writing? One option for both
 reading and writing is to use the composite pattern: Create an `ItemWriter` that contains
 another `ItemWriter` or an `ItemReader` that contains another `ItemReader`. The following
@@ -117,7 +117,7 @@ public Job ioSampleJob() {
 @Bean
 public Step step1() {
 	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+				.<Foo, Bar>chunk(2)
 				.reader(fooReader())
 				.processor(fooProcessor())
 				.writer(barWriter())
@@ -129,7 +129,7 @@ A difference between `ItemProcessor` and `ItemReader` or `ItemWriter` is that an
 is optional for a `Step`.
 
 [[chainingItemProcessors]]
-==== Chaining ItemProcessors
+=== Chaining ItemProcessors
 
 Performing a single transformation is useful in many scenarios, but what if you want to
 'chain' together multiple `ItemProcessor` implementations? This can be accomplished using
@@ -223,7 +223,7 @@ public Job ioSampleJob() {
 @Bean
 public Step step1() {
 	return this.stepBuilderFactory.get("step1")
-				.<String, String>chunk(2)
+				.<Foo, Foobar>chunk(2)
 				.reader(fooReader())
 				.processor(compositeProcessor())
 				.writer(foobarWriter())
@@ -245,7 +245,7 @@ public CompositeItemProcessor compositeProcessor() {
 ----
 
 [[filteringRecords]]
-==== Filtering Records
+=== Filtering Records
 
 One typical use for an item processor is to filter out records before they are passed to
 the `ItemWriter`. Filtering is an action distinct from skipping. Skipping indicates that
@@ -265,7 +265,7 @@ the `ItemWriter`. As usual, an exception thrown from the `ItemProcessor` results
 skip.
 
 [[validatingInput]]
-==== Validating Input
+=== Validating Input
 
 In the <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter, multiple approaches to parsing input have been
 discussed. Each major implementation throws an exception if it is not 'well-formed'. The
@@ -369,7 +369,7 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
 ----
 
 [[faultTolerant]]
-==== Fault Tolerance
+=== Fault Tolerance
 
 When a chunk is rolled back, items that have been cached during reading may be
 reprocessed.  If a step is configured to be fault tolerant (typically by using skip or
