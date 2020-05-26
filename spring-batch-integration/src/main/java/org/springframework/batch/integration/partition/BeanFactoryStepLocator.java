@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
  * factory for components of type {@link Step}.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {

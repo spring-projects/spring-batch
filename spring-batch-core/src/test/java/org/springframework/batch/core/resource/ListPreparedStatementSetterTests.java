@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,7 +75,7 @@ public class ListPreparedStatementSetterTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		List<Long> parameters = new ArrayList<Long>();
+		List<Long> parameters = new ArrayList<>();
 		parameters.add(1L);
 		parameters.add(4L);
 		pss = new ListPreparedStatementSetter(parameters);
@@ -85,7 +85,7 @@ public class ListPreparedStatementSetterTests {
 	@Test
 	public void testSetValues() {
 
-		final List<String> results = new ArrayList<String>();
+		final List<String> results = new ArrayList<>();
 		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss,
 				new RowCallbackHandler() {
 			@Override

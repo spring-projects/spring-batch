@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,15 +51,15 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	private boolean initialized = false;
 
-	private AtomicReference<JobRepository> jobRepository = new AtomicReference<JobRepository>();
+	private AtomicReference<JobRepository> jobRepository = new AtomicReference<>();
 
-	private AtomicReference<JobLauncher> jobLauncher = new AtomicReference<JobLauncher>();
+	private AtomicReference<JobLauncher> jobLauncher = new AtomicReference<>();
 
-	private AtomicReference<JobRegistry> jobRegistry = new AtomicReference<JobRegistry>();
+	private AtomicReference<JobRegistry> jobRegistry = new AtomicReference<>();
 
-	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<PlatformTransactionManager>();
+	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<>();
 
-	private AtomicReference<JobExplorer> jobExplorer = new AtomicReference<JobExplorer>();
+	private AtomicReference<JobExplorer> jobExplorer = new AtomicReference<>();
 
 	@Override
 	@Bean
@@ -93,7 +93,7 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	private <T> T createLazyProxy(AtomicReference<T> reference, Class<T> type) {
 		ProxyFactory factory = new ProxyFactory();
-		factory.setTargetSource(new ReferenceTargetSource<T>(reference));
+		factory.setTargetSource(new ReferenceTargetSource<>(reference));
 		factory.addAdvice(new PassthruAdvice());
 		factory.setInterfaces(new Class<?>[] { type });
 		@SuppressWarnings("unchecked")

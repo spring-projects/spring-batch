@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,9 @@ package org.springframework.batch.core.job;
 import java.util.Collection;
 import java.util.Date;
 
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -36,6 +39,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -43,6 +47,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -54,6 +59,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
 InitializingBean {
@@ -211,6 +217,7 @@ InitializingBean {
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
 	@Override
+	@Nullable
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
 	}
@@ -287,12 +294,16 @@ InitializingBean {
 	@Override
 	public final void execute(JobExecution execution) {
 
+		Assert.notNull(execution, "jobExecution must not be null");
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Job execution starting: " + execution);
 		}
 
 		JobSynchronizationManager.register(execution);
-
+		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs");
+		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
+		Timer.Sample timerSample = BatchMetrics.createTimerSample();
 		try {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -348,12 +359,17 @@ InitializingBean {
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
+				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
+						Tag.of("name", execution.getJobInstance().getJobName()),
+						Tag.of("status", execution.getExitStatus().getExitCode())
+				));
+				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
 				try {
 					listener.afterJob(execution);
 				} catch (Exception e) {
-					logger.error("Exception encountered in afterStep callback", e);
+					logger.error("Exception encountered in afterJob callback", e);
 				}
 
 				jobRepository.update(execution);

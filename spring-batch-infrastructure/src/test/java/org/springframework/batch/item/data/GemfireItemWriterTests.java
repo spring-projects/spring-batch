@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,15 +40,15 @@ public class GemfireItemWriterTests {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		writer = new GemfireItemWriter<String, Foo>();
+		writer = new GemfireItemWriter<>();
 		writer.setTemplate(template);
-		writer.setItemKeyMapper(new SpELItemKeyMapper<String, Foo>("bar.val"));
+		writer.setItemKeyMapper(new SpELItemKeyMapper<>("bar.val"));
 		writer.afterPropertiesSet();
 	}
 
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new GemfireItemWriter<String, Foo>();
+		writer = new GemfireItemWriter<>();
 
 		try {
 			writer.afterPropertiesSet();
@@ -63,7 +63,7 @@ public class GemfireItemWriterTests {
 		} catch (IllegalArgumentException iae) {
 		}
 
-		writer.setItemKeyMapper(new SpELItemKeyMapper<String, Foo>("foo"));
+		writer.setItemKeyMapper(new SpELItemKeyMapper<>("foo"));
 		writer.afterPropertiesSet();
 	}
 
@@ -105,7 +105,7 @@ public class GemfireItemWriterTests {
 				add(new Foo(new Bar("val2")));
 			}
 		};
-		writer = new GemfireItemWriter<String, Foo>();
+		writer = new GemfireItemWriter<>();
 		writer.setTemplate(template);
 		writer.setItemKeyMapper(new Converter<Foo, String>() {
 

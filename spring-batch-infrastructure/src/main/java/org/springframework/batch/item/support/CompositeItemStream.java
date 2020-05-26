@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,11 +27,12 @@ import org.springframework.batch.item.ItemStreamException;
  * Simple {@link ItemStream} that delegates to a list of other streams.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class CompositeItemStream implements ItemStream {
 
-	private List<ItemStream> streams = new ArrayList<ItemStream>();
+	private final List<ItemStream> streams = new ArrayList<>();
 
 	/**
 	 * Public setter for the {@link ItemStream}s.
@@ -39,7 +40,7 @@ public class CompositeItemStream implements ItemStream {
 	 * @param streams array of {@link ItemStream}.
 	 */
 	public void setStreams(ItemStream[] streams) {
-		this.streams = Arrays.asList(streams);
+		this.streams.addAll(Arrays.asList(streams));
 	}
 
 	/**

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.PeekableItemReader;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -66,7 +67,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see ItemReader#read()
 	 */
-    @Override
+	@Nullable
+	@Override
 	public T read() throws Exception, UnexpectedInputException, ParseException {
 		if (next != null) {
 			T item = next;
@@ -86,7 +88,8 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * 
 	 * @see PeekableItemReader#peek()
 	 */
-    @Override
+	@Nullable
+	@Override
 	public T peek() throws Exception, UnexpectedInputException, ParseException {
 		if (next == null) {
 			updateDelegate(executionContext);
@@ -102,7 +105,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#close()
 	 */
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
 		next = null;
 		if (delegate instanceof ItemStream) {
@@ -119,7 +122,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#open(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		next = null;
 		if (delegate instanceof ItemStream) {
@@ -137,7 +140,7 @@ public class SingleItemPeekableItemReader<T> implements ItemStreamReader<T>, Pee
 	 * @throws ItemStreamException if there is a problem
 	 * @see ItemStream#update(ExecutionContext)
 	 */
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (next != null) {
 			// Get the last state from the delegate instead of using

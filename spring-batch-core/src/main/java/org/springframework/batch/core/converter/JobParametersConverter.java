@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.lang.Nullable;
 
 /**
  * A factory for {@link JobParameters} instances. A job can be executed with
@@ -27,6 +28,7 @@ import org.springframework.batch.core.JobParametersBuilder;
  * This converter allows job parameters to be converted to and from Properties.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  * @see JobParametersBuilder
  * 
@@ -41,7 +43,7 @@ public interface JobParametersConverter {
 	 * @return a {@link JobParameters} properties converted to the correct
 	 * types.
 	 */
-	public JobParameters getJobParameters(Properties properties);
+	JobParameters getJobParameters(@Nullable Properties properties);
 
 	/**
 	 * The inverse operation: get a {@link Properties} instance. If given null
@@ -50,5 +52,5 @@ public interface JobParametersConverter {
 	 * @param params the {@link JobParameters} instance to be converted.
 	 * @return a representation of the parameters as properties
 	 */
-	public Properties getProperties(JobParameters params);
+	Properties getProperties(@Nullable JobParameters params);
 }

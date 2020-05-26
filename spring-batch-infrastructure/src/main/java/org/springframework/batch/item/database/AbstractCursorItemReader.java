@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,7 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -103,6 +104,7 @@ import org.springframework.util.Assert;
  * @author Robert Kasanicky
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
 implements InitializingBean {
@@ -374,7 +376,7 @@ implements InitializingBean {
 	public abstract String getSql();
 
 	/**
-	 * Check the result set is in synch with the currentRow attribute. This is
+	 * Check the result set is in sync with the currentRow attribute. This is
 	 * important to ensure that the user hasn't modified the current row.
 	 */
 	private void verifyCursorPosition(long expectedCurrentRow) throws SQLException {
@@ -396,7 +398,7 @@ implements InitializingBean {
 		rs = null;
 		cleanupOnClose();
 
-		if(this.con != null) {
+		if(this.con != null && !this.con.isClosed()) {
 			this.con.setAutoCommit(this.initialConnectionAutoCommit);
 		}
 
@@ -463,6 +465,7 @@ implements InitializingBean {
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
+	@Nullable
 	@Override
 	protected T doRead() throws Exception {
 		if (rs == null) {
@@ -485,13 +488,14 @@ implements InitializingBean {
 
 	/**
 	 * Read the cursor and map to the type of object this reader should return. This method must be
-	 * overriden by subclasses.
+	 * overridden by subclasses.
 	 *
 	 * @param rs The current result set
 	 * @param currentRow Current position of the result set
 	 * @return the mapped object at the cursor position
 	 * @throws SQLException if interactions with the current result set fail
 	 */
+	@Nullable
 	protected abstract T readCursor(ResultSet rs, int currentRow) throws SQLException;
 
 	/**

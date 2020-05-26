@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,6 +48,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -91,7 +92,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 		writer = new SkipWriterStub(dataSource);
 		processor = new SkipProcessorStub(dataSource);
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(transactionManager);
@@ -152,10 +153,10 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 				step.execute(stepExecution);
 				assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-				List<String> committed = new ArrayList<String>(writer.getCommitted());
+				List<String> committed = new ArrayList<>(writer.getCommitted());
 				Collections.sort(committed);
 				assertEquals("[1, 2, 3, 4, 5]", committed.toString());
-				List<String> processed = new ArrayList<String>(processor.getCommitted());
+				List<String> processed = new ArrayList<>(processor.getCommitted());
 				Collections.sort(processed);
 				assertEquals("[1, 2, 3, 4, 5]", processed.toString());
 				assertEquals(0, stepExecution.getSkipCount());
@@ -189,6 +190,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 			counter = -1;
 		}
 
+		@Nullable
 		@Override
 		public synchronized String read() throws Exception, UnexpectedInputException, ParseException {
 			counter++;
@@ -202,7 +204,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 	private static class SkipWriterStub implements ItemWriter<String> {
 
-		private List<String> written = new ArrayList<String>();
+		private List<String> written = new ArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -247,7 +249,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new ArrayList<String>();
+		private List<String> processed = new ArrayList<>();
 
 		private JdbcTemplate jdbcTemplate;
 
@@ -273,6 +275,7 @@ public class FaultTolerantStepFactoryBeanIntegrationTests {
 			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='processed'");
 		}
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);

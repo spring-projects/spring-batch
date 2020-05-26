@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +20,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.mongodb.util.JSON;
-
+import org.bson.Document;
+import org.bson.codecs.DecoderContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,6 +35,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.util.json.ParameterBindingDocumentCodec;
+import org.springframework.data.mongodb.util.json.ParameterBindingJsonReader;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -77,12 +78,13 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Takaaki Iida
+ * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 	
 	private static final Logger log = LoggerFactory.getLogger(MongoItemReader.class);
 	
-	private static final Pattern PLACEHOLDER = Pattern.compile("\\?(\\d+)");
 	private MongoOperations template;
 	private Query query;
 	private String queryString;
@@ -91,7 +93,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private String hint;
 	private String fields;
 	private String collection;
-	private List<Object> parameterValues;
+	private List<Object> parameterValues = new ArrayList<>();
 
 	public MongoItemReader() {
 		super();
@@ -145,6 +147,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * @param parameterValues values
 	 */
 	public void setParameterValues(List<Object> parameterValues) {
+		Assert.notNull(parameterValues, "Parameter values must not be null");
 		this.parameterValues = parameterValues;
 	}
 
@@ -239,29 +242,13 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		if (queryString != null) {
 			Assert.state(sort != null, "A sort is required.");
 		}
-
-		if (query != null && query.getLimit() != 0) {
-			log.warn("PageSize in Query object was ignored. Please set it by MongoItemReader.setPageSize().");
-		}
 	}
 
-	// Copied from StringBasedMongoQuery...is there a place where this type of logic is already exposed?
 	private String replacePlaceholders(String input, List<Object> values) {
-		Matcher matcher = PLACEHOLDER.matcher(input);
-		String result = input;
-
-		while (matcher.find()) {
-			String group = matcher.group();
-			int index = Integer.parseInt(matcher.group(1));
-			result = result.replace(group, getParameterWithIndex(values, index));
-		}
-
-		return result;
-	}
-
-	// Copied from StringBasedMongoQuery...is there a place where this type of logic is already exposed?
-	private String getParameterWithIndex(List<Object> values, int index) {
-		return JSON.serialize(values.get(index));
+		ParameterBindingJsonReader reader = new ParameterBindingJsonReader(input, values.toArray());
+		DecoderContext decoderContext = DecoderContext.builder().build();
+		Document document = new ParameterBindingDocumentCodec().decode(reader, decoderContext);
+		return document.toJson();
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {

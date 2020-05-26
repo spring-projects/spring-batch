@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -91,6 +91,7 @@ import org.springframework.validation.DataBinder;
  * match is found. If more than one match is found there will be an error.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
@@ -102,7 +103,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private BeanFactory beanFactory;
 
-	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<DistanceHolder, ConcurrentMap<String, String>>();
+	private ConcurrentMap<DistanceHolder, ConcurrentMap<String, String>> propertiesMatched = new ConcurrentHashMap<>();
 
 	private int distanceLimit = 5;
 
@@ -246,10 +247,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		try {
 			return type.newInstance();
 		}
-		catch (InstantiationException e) {
-			ReflectionUtils.handleReflectionException(e);
-		}
-		catch (IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -261,6 +259,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * @param properties Properties to retrieve
 	 */
 	private Properties getBeanProperties(Object bean, Properties properties) {
+
+		if (this.distanceLimit == 0) {
+			return properties;
+		}
 
 		Class<?> cls = bean.getClass();
 
@@ -370,10 +372,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException e) {
-				ReflectionUtils.handleReflectionException(e);
-			}
-			catch (IllegalAccessException e) {
+			catch (InstantiationException | IllegalAccessException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}

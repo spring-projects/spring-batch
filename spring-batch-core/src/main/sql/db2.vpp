@@ -1,3 +1,0 @@
-#macro (sequence $name $value)CREATE SEQUENCE ${name} AS BIGINT MAXVALUE 9223372036854775807 NO CYCLE;
-#end
-#macro (notnull $name $type)ALTER COLUMN ${name} SET NOT NULL#end

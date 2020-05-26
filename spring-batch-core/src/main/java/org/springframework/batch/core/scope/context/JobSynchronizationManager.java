@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package org.springframework.batch.core.scope.context;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Central convenience class for framework use in managing the job scope
@@ -28,6 +29,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
  *
  * @author Dave Syer
  * @author Jimmy Praet
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JobSynchronizationManager {
@@ -35,7 +37,7 @@ public class JobSynchronizationManager {
 	private static final SynchronizationManagerSupport<JobExecution, JobContext> manager = new SynchronizationManagerSupport<JobExecution, JobContext>() {
 
 		@Override
-		protected JobContext createNewContext(JobExecution execution, BatchPropertyContext args) {
+		protected JobContext createNewContext(JobExecution execution, @Nullable BatchPropertyContext args) {
 			return new JobContext(execution);
 		}
 
@@ -46,11 +48,12 @@ public class JobSynchronizationManager {
 	};
 
 	/**
-	 * Getter for the current context if there is one, otherwise returns null.
+	 * Getter for the current context if there is one, otherwise returns {@code null}.
 	 *
-	 * @return the current {@link JobContext} or null if there is none (if one
+	 * @return the current {@link JobContext} or {@code null} if there is none (if one
 	 * has not been registered for this thread).
 	 */
+	@Nullable
 	public static JobContext getContext() {
 		return manager.getContext();
 	}

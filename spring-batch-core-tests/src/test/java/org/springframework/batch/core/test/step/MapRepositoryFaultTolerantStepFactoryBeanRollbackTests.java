@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -176,6 +177,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			counter = -1;
 		}
 
+		@Nullable
 		@Override
 		public synchronized String read() throws Exception {
 			counter++;
@@ -190,7 +192,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> written = new CopyOnWriteArrayList<String>();
+		private List<String> written = new CopyOnWriteArrayList<>();
 
 		private Collection<String> failures = Collections.emptySet();
 
@@ -226,7 +228,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 
 		private final Log logger = LogFactory.getLog(getClass());
 
-		private List<String> processed = new CopyOnWriteArrayList<String>();
+		private List<String> processed = new CopyOnWriteArrayList<>();
 		
 		public List<String> getProcessed() {
 			return processed;
@@ -236,6 +238,7 @@ public class MapRepositoryFaultTolerantStepFactoryBeanRollbackTests {
 			processed.clear();
 		}
 
+		@Nullable
 		@Override
 		public String process(String item) throws Exception {
 			processed.add(item);

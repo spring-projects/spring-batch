@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,8 @@ import org.springframework.util.StringUtils;
  * A fluent builder API for the configuration of a {@link StoredProcedureItemReader}.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0.0
  * @see StoredProcedureItemReader
  */
@@ -283,7 +285,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setParameters(SqlParameter[])
 	 */
-	public StoredProcedureItemReaderBuilder<T> parameters(SqlParameter[] parameters) {
+	public StoredProcedureItemReaderBuilder<T> parameters(SqlParameter... parameters) {
 		this.parameters = parameters;
 
 		return this;
@@ -318,7 +320,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 	/**
 	 * Validates configuration and builds a new reader instance
 	 *
-	 * @return a fully constructerd {@link StoredProcedureItemReader}
+	 * @return a fully constructed {@link StoredProcedureItemReader}
 	 */
 	public StoredProcedureItemReader<T> build() {
 		if(this.saveState) {

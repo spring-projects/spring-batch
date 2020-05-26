@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.classify.PatternMatchingClassifier;
 import org.springframework.classify.SubclassClassifier;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Jimmy Praet
@@ -32,15 +33,17 @@ public class ClassifierCompositeItemProcessorTests {
 	
 	@Test
 	public void testBasicClassifierCompositeItemProcessor() throws Exception {
-		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<String, String>();
+		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
 		
 		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return "foo: " + item;
 			}
 		};
 		ItemProcessor<String, String> defaultProcessor = new ItemProcessor<String, String>() {
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return item;
@@ -48,10 +51,10 @@ public class ClassifierCompositeItemProcessorTests {
 		};
 		
 		Map<String, ItemProcessor<?, ? extends String>> routingConfiguration = 
-				new HashMap<String, ItemProcessor<?, ? extends String>>();
+				new HashMap<>();
 		routingConfiguration.put("foo", fooProcessor);
 		routingConfiguration.put("*", defaultProcessor);
-		processor.setClassifier(new PatternMatchingClassifier<ItemProcessor<?, ? extends String>>(routingConfiguration));
+		processor.setClassifier(new PatternMatchingClassifier<>(routingConfiguration));
 		
 		assertEquals("bar", processor.process("bar"));
 		assertEquals("foo: foo", processor.process("foo"));
@@ -63,21 +66,24 @@ public class ClassifierCompositeItemProcessorTests {
 	 */
 	@Test
 	public void testGenericsClassifierCompositeItemProcessor() throws Exception {
-		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<Number, CharSequence>();
+		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
 		
 		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<Integer, String>() {
+			@Nullable
 			@Override
 			public String process(Integer item) throws Exception {
 				return "int: " + item;
 			}
 		};
 		ItemProcessor<Long, StringBuffer> longProcessor = new ItemProcessor<Long, StringBuffer>() {
+			@Nullable
 			@Override
 			public StringBuffer process(Long item) throws Exception {
 				return new StringBuffer("long: " + item);
 			}
 		};
 		ItemProcessor<Number, StringBuilder> defaultProcessor = new ItemProcessor<Number, StringBuilder>() {
+			@Nullable
 			@Override
 			public StringBuilder process(Number item) throws Exception {
 				return new StringBuilder("number: " + item);
@@ -85,9 +91,9 @@ public class ClassifierCompositeItemProcessorTests {
 		};
 		
 		SubclassClassifier<Number, ItemProcessor<?, ? extends CharSequence>> classifier = 
-				new SubclassClassifier<Number, ItemProcessor<?, ? extends CharSequence>>();
+				new SubclassClassifier<>();
 		Map<Class<? extends Number>, ItemProcessor<?, ? extends CharSequence>> typeMap = 
-				new HashMap<Class<? extends Number>, ItemProcessor<?, ? extends CharSequence>>();
+				new HashMap<>();
 		typeMap.put(Integer.class, intProcessor);
 		typeMap.put(Long.class, longProcessor);
 		typeMap.put(Number.class, defaultProcessor);

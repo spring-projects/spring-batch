@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,7 +61,7 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 	@Override
 	public Set<StepExecution> split(StepExecution stepExecution, int gridSize)
 			throws JobExecutionException {
-		Set<StepExecution> executions = new TreeSet<StepExecution>(new Comparator<StepExecution>() {
+		Set<StepExecution> executions = new TreeSet<>(new Comparator<StepExecution>() {
 
 			@Override
 			public int compare(StepExecution arg0, StepExecution arg1) {
@@ -84,7 +84,7 @@ public class JsrStepExecutionSplitter extends SimpleStepExecutionSplitter {
 			JobExecution curJobExecution = new JobExecution(jobExecution);
 			StepExecution curStepExecution = new StepExecution(stepName, curJobExecution);
 
-			if(!restoreState || getStartable(curStepExecution, new ExecutionContext())) {
+			if(!restoreState || isStartable(curStepExecution, new ExecutionContext())) {
 				executions.add(curStepExecution);
 			}
 		}

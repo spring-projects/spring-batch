@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -153,7 +153,7 @@ public class ChunkParser {
 				}
 			} else if(name.equals(NO_ROLLBACK_EXCEPTION_CLASSES_ELEMENT)) {
 				//TODO: Update to support excludes
-				ManagedList<TypedStringValue> list = new ManagedList<TypedStringValue>();
+				ManagedList<TypedStringValue> list = new ManagedList<>();
 
 				for (Element child : DomUtils.getChildElementsByTagName(nestedElement, INCLUDE_ELEMENT)) {
 					String className = child.getAttribute(CLASS_ATTRIBUTE);

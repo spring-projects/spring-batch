@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
+ * @author Drummond Dawson
+ * @author Parikshit Dutta
  */
 public class MongoItemReaderBuilderTests {
 	@Mock
@@ -68,8 +70,8 @@ public class MongoItemReaderBuilderTests {
 		Query query = this.queryContainer.getValue();
 		assertEquals(50, query.getLimit());
 		assertEquals(0, query.getSkip());
-		assertEquals("{ }", query.getQueryObject().toJson());
-		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
+		assertEquals("{}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
 
 	@Test
@@ -118,9 +120,65 @@ public class MongoItemReaderBuilderTests {
 		assertNull("reader should not return result", reader.read());
 
 		Query query = this.queryContainer.getValue();
-		assertEquals("{ \"name\" : \"foo\" }", query.getQueryObject().toJson());
-		assertEquals("{ \"name\" : -1 }", query.getSortObject().toJson());
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 		assertEquals("collection", collectionContainer.getValue());
+	}
+
+	@Test
+	public void testVarargs() throws Exception {
+		MongoItemReader<String> reader = getBasicBuilder()
+				.parameterValues("foo")
+				.jsonQuery("{ name : ?0 }")
+				.collection("collection")
+				.build();
+
+		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
+
+		when(this.template.find(this.queryContainer.capture(), eq(String.class), collectionContainer.capture()))
+				.thenReturn(new ArrayList<>());
+
+		assertNull("reader should not return result", reader.read());
+
+		Query query = this.queryContainer.getValue();
+		assertEquals("{\"name\": \"foo\"}", query.getQueryObject().toJson());
+		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
+		assertEquals("collection", collectionContainer.getValue());
+	}
+
+	@Test
+	public void testWithoutQueryLimit() throws Exception {
+		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query(new Query())
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.pageSize(50)
+				.build();
+
+		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertNull("reader should not return result", reader.read());
+
+		Query query = this.queryContainer.getValue();
+		assertEquals(50, query.getLimit());
+	}
+
+	@Test
+	public void testWithoutQueryLimitAndPageSize() throws Exception {
+		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query(new Query())
+				.sorts(this.sortOptions)
+				.name("mongoReaderTest")
+				.build();
+
+		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+
+		assertNull("reader should not return result", reader.read());
+
+		Query query = this.queryContainer.getValue();
+		assertEquals(10, query.getLimit());
 	}
 
 	@Test

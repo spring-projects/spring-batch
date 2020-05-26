@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import org.springframework.batch.item.database.HibernateItemWriter;
 import org.springframework.batch.item.sample.Foo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,6 +92,7 @@ public class HibernateItemWriterBuilderTests {
 		try {
 			new HibernateItemWriterBuilder<Foo>()
 					.build();
+			fail("sessionFactory is required");
 		}
 		catch (IllegalStateException ise) {
 			assertEquals("Incorrect message", "SessionFactory must be provided", ise.getMessage());

@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
+ * @author Drummond Dawson
  */
 public class CompositeItemWriterBuilderTests {
 
@@ -50,6 +51,28 @@ public class CompositeItemWriterBuilderTests {
 			writers.add(writer);
 		}
 		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writers).build();
+		itemWriter.write(data);
+
+		for (ItemWriter<? super Object> writer : writers) {
+			verify(writer).write(data);
+		}
+
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testProcessVarargs() throws Exception {
+
+		List<Object> data = Collections.singletonList(new Object());
+
+		List<ItemWriter<? super Object>> writers = new ArrayList<>();
+
+		ItemWriter<? super Object> writer1 = mock(ItemWriter.class);
+		writers.add(writer1);
+		ItemWriter<? super Object> writer2 = mock(ItemWriter.class);
+		writers.add(writer2);
+
+		CompositeItemWriter<Object> itemWriter = new CompositeItemWriterBuilder<>().delegates(writer1, writer2).build();
 		itemWriter.write(data);
 
 		for (ItemWriter<? super Object> writer : writers) {

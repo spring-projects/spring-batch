@@ -6,7 +6,9 @@
 
 == Scaling and Parallel Processing
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 Many batch processing problems can be solved with single threaded, single process jobs,
 so it is always a good idea to properly check if that meets your needs before thinking
@@ -39,8 +41,7 @@ The simplest way to start parallel processing is to add a `TaskExecutor` to your
 configuration.
 
 [role="xmlContent"]
-For example, you might add an attribute of the `tasklet`, as shown in the
-following example:
+For example, you might add an attribute of the `tasklet`, as follows:
 
 [source, xml, role="xmlContent"]
 ----
@@ -50,14 +51,14 @@ following example:
 ----
 
 [role="javaContent"]
-When using java configuration, a `TaskExecutor` can be added to the step
+When using java configuration, a `TaskExecutor` can be added to the step,
 as shown in the following example:
 
 .Java Configuration
 [source, java, role="javaContent"]
 ----
 @Bean
-public TaskExecutor taskExecutor(){
+public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("spring_batch");
 }
 
@@ -72,7 +73,7 @@ public Step sampleStep(TaskExecutor taskExecutor) {
 }
 ----
 
-In this example, the taskExecutor is a reference to another bean definition that
+In this example, the `taskExecutor` is a reference to another bean definition that
 implements the `TaskExecutor` interface.
 https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/task/TaskExecutor.html[`TaskExecutor`]
 is a standard Spring interface, so consult the Spring User Guide for details of available
@@ -99,7 +100,8 @@ For example you might increase the throttle-limit, as shown in the following exa
 ----
 
 [role="javaContent"]
-When using java configuration, the builders provide access to the throttle limit:
+When using Java configuration, the builders provide access to the throttle limit, as shown
+in the following example:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -128,7 +130,7 @@ writers from Spring Batch are not designed for multi-threaded use. It is, howeve
 possible to work with stateless or thread safe readers and writers, and there is a sample
 (called `parallelJob`) in the
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring
-Batch Samples] that show the use of a process indicator (see
+Batch Samples] that shows the use of a process indicator (see
 <<readersAndWriters.adoc#process-indicator,Preventing State Persistence>>) to keep track
 of items that have been processed in a database input table.
 
@@ -136,10 +138,10 @@ Spring Batch provides some implementations of `ItemWriter` and `ItemReader`.  Us
 they say in the Javadoc if they are thread safe or not or what you have to do to avoid
 problems in a concurrent environment.  If there is no information in the Javadoc, you can
 check the implementation to see if there is any state.  If a reader is not thread safe,
-it may still be efficient to use it in your own synchronizing delegator. You can
-synchronize the call to `read()` and as long as the processing and writing is the most
-expensive part of the chunk, your step may still complete much faster than it would in a
-single threaded configuration.
+you can decorate it with the provided `SynchronizedItemStreamReader` or use it in your own
+synchronizing delegator. You can synchronize the call to `read()` and as long as the
+processing and writing is the most expensive part of the chunk, your step may still
+complete much faster than it would in a single threaded configuration.
 
 [[scalabilityParallelSteps]]
 
@@ -173,7 +175,7 @@ as shown in the following example:
 ----
 
 [role="javaContent"]
-When using java configuration, executing steps `(step1,step2)` in parallel with `step3`
+When using Java configuration, executing steps `(step1,step2)` in parallel with `step3`
 is straightforward, as shown in the following example:
 
 .Java Configuration
@@ -212,7 +214,7 @@ public Flow flow2() {
 }
 
 @Bean
-public TaskExecutor taskExecutor(){
+public TaskExecutor taskExecutor() {
     return new SimpleAsyncTaskExecutor("spring_batch");
 }
 ----
@@ -236,13 +238,13 @@ pattern:
 .Remote Chunking
 image::{batch-asciidoc}images/remote-chunking.png[Remote Chunking, scaledwidth="60%"]
 
-The master component is a single process, and the slaves are multiple remote processes.
-This pattern works best if the master is not a bottleneck, so the processing must be more
+The manager component is a single process, and the workers are multiple remote processes.
+This pattern works best if the manager is not a bottleneck, so the processing must be more
 expensive than the reading of items (as is often the case in practice).
 
-The master is an implementation of a Spring Batch `Step` with the `ItemWriter` replaced
+The manager is an implementation of a Spring Batch `Step` with the `ItemWriter` replaced
 by a generic version that knows how to send chunks of items to the middleware as
-messages. The slaves are standard listeners for whatever middleware is being used (for
+messages. The workers are standard listeners for whatever middleware is being used (for
 example, with JMS, they would be `MesssageListener` implementations), and their role is
 to process the chunks of items using a standard `ItemWriter` or `ItemProcessor` plus
 `ItemWriter`, through the `ChunkProcessor` interface. One of the advantages of using this
@@ -252,7 +254,7 @@ and work is shared through the middleware, so that, if the listeners are all eag
 consumers, then load balancing is automatic.
 
 The middleware has to be durable, with guaranteed delivery and a single consumer for each
-message. JMS is the obvious candidate, but other options (such as Java Spaces exist in
+message. JMS is the obvious candidate, but other options (such as JavaSpaces) exist in
 the grid computing and shared memory product space.
 
 See the section on
@@ -272,12 +274,12 @@ pattern:
 image::{batch-asciidoc}images/partitioning-overview.png[Partitioning Overview, scaledwidth="60%"]
 
 The `Job` runs on the left-hand side as a sequence of `Step` instances, and one of the
-`Step` instances is labeled as a master. The slaves in this picture are all identical
-instances of a `Step`, which could in fact take the place of the master, resulting in the
-same outcome for the `Job`. The slaves are typically going to be remote services but
-could also be local threads of execution. The messages sent by the master to the slaves
+`Step` instances is labeled as a manager. The workers in this picture are all identical
+instances of a `Step`, which could in fact take the place of the manager, resulting in the
+same outcome for the `Job`. The workers are typically going to be remote services but
+could also be local threads of execution. The messages sent by the manager to the workers
 in this pattern do not need to be durable or have guaranteed delivery. Spring Batch
-metadata in the JobRepository ensures that each slave is executed once and only once for
+metadata in the `JobRepository` ensures that each worker is executed once and only once for
 each `Job` execution.
 
 The SPI in Spring Batch consists of a special implementation of `Step` (called the
@@ -288,16 +290,17 @@ and their role is shown in the following sequence diagram:
 .Partitioning SPI
 image::{batch-asciidoc}images/partitioning-spi.png[Partitioning SPI, scaledwidth="60%"]
 
-The `Step` on the right in this case is the "remote" slave, so, potentially, there are
+The `Step` on the right in this case is the "`remote`" worker, so, potentially, there are
 many objects and or processes playing this role, and the `PartitionStep` is shown driving
 the execution.
 
 [role="xmlContent"]
-The following example shows the `PartitionStep` configuration:
+The following example shows the `PartitionStep` configuration when using XML
+configuration:
 
 [source, xml, role="xmlContent"]
 ----
-<step id="step1.master">
+<step id="step1.manager">
     <partition step="step1" partitioner="partitioner">
         <handler grid-size="10" task-executor="taskExecutor"/>
     </partition>
@@ -305,14 +308,15 @@ The following example shows the `PartitionStep` configuration:
 ----
 
 [role="javaContent"]
-The following example shows the `PartitionStep` configuration using java configuration:
+The following example shows the `PartitionStep` configuration when using Java
+configuration:
 
 .Java Configuration
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1Master() {
-    return stepBuilderFactory.get("step1.master")
+public Step step1Manager() {
+    return stepBuilderFactory.get("step1.manager")
         .<String, String>partitioner("step1", partitioner())
         .step(step1())
         .gridSize(10)
@@ -327,10 +331,10 @@ step.
 
 There is a simple example that can be copied and extended in the unit test suite for
 https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples/src/main/resources/jobs[Spring
-Batch Samples] (see `Partition*Job.xml` configuration).
+Batch Samples] (see `partition*Job.xml` configuration).
 
 Spring Batch creates step executions for the partitions called "step1:partition0", and so
-on. Many people prefer to call the master step "step1:master" for consistency. You can
+on. Many people prefer to call the manager step "step1:manager" for consistency. You can
 use an alias for the step (by specifying the `name` attribute instead of the `id`
 attribute).
 
@@ -365,7 +369,7 @@ following example:
 
 [source, xml, role="xmlContent"]
 ----
-<step id="step1.master">
+<step id="step1.manager">
     <partition step="step1" handler="handler"/>
 </step>
 
@@ -384,8 +388,8 @@ as shown in the following example:
 [source, java, role="javaContent"]
 ----
 @Bean
-public Step step1Master() {
-    return stepBuilderFactory.get("step1.master")
+public Step step1Manager() {
+    return stepBuilderFactory.get("step1.manager")
         .partitioner("step1", partitioner())
         .partitionHandler(partitionHandler())
         .build();
@@ -411,7 +415,7 @@ copying large numbers of files or replicating filesystems into content managemen
 systems. It can also be used for remote execution by providing a `Step` implementation
 that is a proxy for a remote invocation (such as using Spring Remoting).
 
-[[stepExecutionSplitter]]
+[[partitioner]]
 
 ==== Partitioner
 
@@ -467,8 +471,10 @@ the `Partitioner` output might resemble the content of the following table:
 |filecopy:partition2|fileName=/home/data/three
 |===============
 
-Then the file name can be bound to a step using late binding to the execution context, as
-shown in the following example:
+Then the file name can be bound to a step using late binding to the execution context.
+
+[role="xmlContent"]
+The following example shows how to define late binding in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -478,6 +484,9 @@ shown in the following example:
     <property name="resources" value="#{stepExecutionContext[fileName]}/*"/>
 </bean>
 ----
+
+[role="xmlContent"]
+The following example shows how to define late binding in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
  * @author Rob Harrop
  * @author Dave Syer
  * @author Michael Minella
+ * @author Olivier Bourgain
  */
 public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	implements InitializingBean {
@@ -143,18 +144,17 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
 		// line is never null in current implementation
 		// line is checked in parent: AbstractLineTokenizer.tokenize()
-		char[] chars = line.toCharArray();
 		boolean inQuoted = false;
 		int lastCut = 0;
-		int length = chars.length;
+		int length = line.length();
 		int fieldCount = 0;
 		int endIndexLastDelimiter = -1;
 
 		for (int i = 0; i < length; i++) {
-			char currentChar = chars[i];
+			char currentChar = line.charAt(i);
 			boolean isEnd = (i == (length - 1));
 
-            boolean isDelimiter = endsWithDelimiter(chars, i, endIndexLastDelimiter);
+            boolean isDelimiter = endsWithDelimiter(line, i, endIndexLastDelimiter);
 
 			if ((isDelimiter && !inQuoted) || isEnd) {
 				endIndexLastDelimiter = i;
@@ -169,7 +169,7 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 
 				if (includedFields == null || includedFields.contains(fieldCount)) {
                     String value =
-                            substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(chars, lastCut, endPosition);
+                            substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(line, lastCut, endPosition);
 					tokens.add(value);
 				}
 
@@ -194,42 +194,44 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
 	}
 
     /**
-     * Trim and leading or trailing quotes (and any leading or trailing
+     * Trim any leading or trailing quotes (and any leading or trailing
      * whitespace before or after the quotes) from within the specified character
      * array beginning at the specified offset index for the specified count.
      * <p/>
      * Quotes are escaped with double instances of the quote character.
      *
-     * @param chars  the character array
+     * @param line  the string
      * @param offset index from which to begin extracting substring
      * @param count  length of substring
      * @return a substring from the specified offset within the character array
      * with any leading or trailing whitespace trimmed.
      * @see String#trim()
      */
-    private String substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(char chars[], int offset, int count) {
+    private String substringWithTrimmedWhitespaceAndQuotesIfQuotesPresent(String line, int offset, int count) {
         int start = offset;
         int len = count;
 
-        while ((start < (start + len - 1)) && (chars[start] <= ' ')) {
+        while ((start < (start + len - 1)) && (line.charAt(start) <= ' ')) {
             start++;
             len--;
         }
 
-        while ((start < (start + len)) && ((start + len - 1 < chars.length) && (chars[start + len - 1] <= ' '))) {
+        while ((start < (start + len)) && ((start + len - 1 < line.length()) && (line.charAt(start + len - 1) <= ' '))) {
             len--;
         }
 
         String value;
 
-        if ((chars.length >= 2) && (chars[start] == quoteCharacter) && (chars[start + len - 1] == quoteCharacter)) {
-            value = new String(chars, start + 1, len - 2);
+        if ((line.length() >= 2) && (line.charAt(start) == quoteCharacter) && (line.charAt(start + len - 1) == quoteCharacter)) {
+			int beginIndex = start + 1;
+			int endIndex = len - 2;
+			value = line.substring(beginIndex, beginIndex + endIndex);
             if (value.contains(escapedQuoteString)) {
                 value = StringUtils.replace(value, escapedQuoteString, quoteString);
             }
         }
         else {
-            value = new String(chars, offset, count);
+            value = line.substring(offset, offset + count);
         }
 
         return value;
@@ -244,21 +246,21 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer
      * another delimiter.  Also checks that the specified end index is
      * sufficiently large to be able to match the length of a delimiter.
      *
-     * @param chars    the character array
+     * @param line     the string
      * @param end      the index in up to which the delimiter should be matched
      * @param previous the index of the end of the last delimiter
      * @return <code>true</code> if the character(s) from the specified end
      * match the delimiter character(s), otherwise false
      * @see DelimitedLineTokenizer#DelimitedLineTokenizer(String)
      */
-    private boolean endsWithDelimiter(char[] chars, int end, int previous) {
+    private boolean endsWithDelimiter(String line, int end, int previous) {
         boolean result = false;
 
         if (end - previous >= delimiter.length()) {
             if (end >= delimiter.length() - 1) {
                 result = true;
-                for (int j = 0; j < delimiter.length() && (((end - delimiter.length() + 1) + j) < chars.length); j++) {
-                    if (delimiter.charAt(j) != chars[(end - delimiter.length() + 1) + j]) {
+                for (int j = 0; j < delimiter.length() && (((end - delimiter.length() + 1) + j) < line.length()); j++) {
+                    if (delimiter.charAt(j) != line.charAt((end - delimiter.length() + 1) + j)) {
                         result = false;
                     }
                 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,9 +62,9 @@ public class BatchMessageListenerContainerIntegrationTests {
 	@Autowired
 	private BatchMessageListenerContainer container;
 
-	private volatile BlockingQueue<String> recovered = new LinkedBlockingQueue<String>();
+	private volatile BlockingQueue<String> recovered = new LinkedBlockingQueue<>();
 
-	private volatile BlockingQueue<String> processed = new LinkedBlockingQueue<String>();
+	private volatile BlockingQueue<String> processed = new LinkedBlockingQueue<>();
 
 	@After
 	@Before
@@ -103,7 +103,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 		container.start();
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		SortedSet<String> result = new TreeSet<String>();
+		SortedSet<String> result = new TreeSet<>();
 		for (int i = 0; i < 2; i++) {
 			result.add(processed.poll(5, TimeUnit.SECONDS));
 		}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,6 +39,7 @@ import org.springframework.batch.item.ExecutionContext;
  * lifecycle calls to the {@link PartitionReducer} if it is used.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class PartitionStep extends org.springframework.batch.core.partition.support.PartitionStep implements StepLocator {
@@ -54,14 +55,14 @@ public class PartitionStep extends org.springframework.batch.core.partition.supp
 
 	/**
 	 * Delegate execution to the {@link PartitionHandler} provided. The
-	 * {@link StepExecution} passed in here becomes the parent or master
+	 * {@link StepExecution} passed in here becomes the parent or manager
 	 * execution for the partition, summarizing the status on exit of the
 	 * logical grouping of work carried out by the {@link PartitionHandler}. The
 	 * individual step executions and their input parameters (through
 	 * {@link ExecutionContext}) for the partition elements are provided by the
 	 * {@link StepExecutionSplitter}.
 	 *
-	 * @param stepExecution the master step execution for the partition
+	 * @param stepExecution the manager step execution for the partition
 	 *
 	 * @see Step#execute(StepExecution)
 	 */

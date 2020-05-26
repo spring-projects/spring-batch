@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,7 @@ public class DefaultExecutionContextSerializerTests extends AbstractExecutionCon
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testSerializeNonSerializable() throws Exception {
-		Map<String, Object> m1 = new HashMap<String, Object>();
+		Map<String, Object> m1 = new HashMap<>();
 		m1.put("object1", new Object());
 
 		serializer.serialize(m1, new ByteArrayOutputStream());

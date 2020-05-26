@@ -6,8 +6,6 @@
 
 == Spring Batch Introduction
 
-include::toggle.adoc[]
-
 Many applications within the enterprise domain require bulk processing to perform
 business operations in mission critical environments. These business operations include:
 
@@ -35,7 +33,7 @@ Spring Batch provides reusable functions that are essential in processing large 
 of records, including logging/tracing, transaction management, job processing statistics,
 job restart, skip, and resource management. It also provides more advanced technical
 services and features that enable extremely high-volume and high performance batch jobs
-though optimization and partitioning techniques. Spring Batch can be used in both simple
+through optimization and partitioning techniques. Spring Batch can be used in both simple
 use cases (such as reading a file into a database or running a stored procedure) as well
 as complex, high volume use cases (such as moving high volumes of data between databases,
 transforming it, and so on). High-volume batch jobs can leverage the framework in a
@@ -143,36 +141,47 @@ which is its own library).
 
 The following key principles, guidelines, and general considerations should be considered
 when building a batch solution.
+
 * Remember that a batch architecture typically affects on-line architecture and vice
 versa. Design with both architectures and environments in mind using common building
 blocks when possible.
+
 * Simplify as much as possible and avoid building complex logical structures in single
 batch applications.
+
 * Keep the processing and storage of data physically close together (in other words, keep
 your data where your processing occurs).
+
 * Minimize system resource use, especially I/O. Perform as many operations as possible in
 internal memory.
+
 * Review application I/O (analyze SQL statements) to ensure that unnecessary physical I/O
-is avoided.  In particular, the following four common flaws need to be looked for:
+is avoided. In particular, the following four common flaws need to be looked for:
 ** Reading data for every transaction when the data could be read once and cached or kept
 in the working storage.
 ** Rereading data for a transaction where the data was read earlier in the same
 transaction.
 ** Causing unnecessary table or index scans.
 ** Not specifying key values in the WHERE clause of an SQL statement.
+
 * Do not do things twice in a batch run. For instance, if you need data summarization for
 reporting purposes, you should (if possible) increment stored totals when data is being
 initially processed, so your reporting application does not have to reprocess the same
 data.
+
 * Allocate enough memory at the beginning of a batch application to avoid time-consuming
 reallocation during the process.
+
 * Always assume the worst with regard to data integrity. Insert adequate checks and
 record validation to maintain data integrity.
+
 * Implement checksums for internal validation where possible. For example, flat files
 should have a trailer record telling the total of records in the file and an aggregate of
 the key fields.
+
 * Plan and execute stress tests as early as possible in a production-like environment
 with realistic data volumes.
+
 * In large batch systems, backups can be challenging, especially if the system is running
 concurrent with on-line on a 24-7 basis. Database backups are typically well taken care
 of in the on-line design, but file backups should be considered to be just as important.
@@ -304,7 +313,7 @@ record contention and therefore either a physical or logical lock needs to be ob
 retrieval time. One type of pessimistic logical locking uses a dedicated lock-column in
 the database table. When an application retrieves the row for update, it sets a flag in
 the lock column. With the flag in place, other applications attempting to retrieve the
-same row logically fail. When the application that set the flag updates the row, it also
+same row logically fail. When the application that sets the flag updates the row, it also
 clears the flag, enabling the row to be retrieved by other applications. Please note that
 the integrity of data must be maintained also between the initial fetch and the setting
 of the flag, for example by using db locks (such as `SELECT FOR UPDATE`). Note also that
@@ -378,7 +387,7 @@ This involves breaking the input record set into an even number of portions (for
 10, where each portion has exactly 1/10th of the entire record set). Each portion is then
 processed by one instance of the batch/extract application.
 
-In order to use this approach, preprocessing is required to split the recordset up. The
+In order to use this approach, preprocessing is required to split the record set up. The
 result of this split will be a lower and upper bound placement number which can be used
 as input to the batch/extract application in order to restrict its processing to only its
 portion.
@@ -413,7 +422,7 @@ realized. There is no dynamic configuration of the number of batch instances use
 _3. Breakup by Views_
 
 This approach is basically breakup by a key column but on the database level. It involves
-breaking up the recordset into views. These views are used by each instance of the batch
+breaking up the record set into views. These views are used by each instance of the batch
 application during its processing. The breakup is done by grouping the data.
 
 With this option, each instance of a batch application has to be configured to hit a
@@ -432,8 +441,8 @@ they are marked as being in processing. When that record is completed, the indic
 updated to either complete or error. Many instances of a batch application can be started
 without a change, as the additional column ensures that a record is only processed once.
 // TODO On completion, what is the record marked as? Same for on error. (I expected a
-sentence or two on the order of "On completion, indicators are marked as being
-complete.")
+// sentence or two on the order of "On completion, indicators are marked as being
+// complete.")
 
 With this option, I/O on the table increases dynamically. In the case of an updating
 batch application, this impact is reduced, as a write must occur anyway.

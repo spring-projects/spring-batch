@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ public class SplitStateTests {
 	@Test
 	public void testBasicHandling() throws Exception {
 
-		Collection<Flow> flows  = new ArrayList<Flow>();
+		Collection<Flow> flows  = new ArrayList<>();
 		Flow flow1 = mock(Flow.class);
 		Flow flow2 = mock(Flow.class);
 		flows.add(flow1);

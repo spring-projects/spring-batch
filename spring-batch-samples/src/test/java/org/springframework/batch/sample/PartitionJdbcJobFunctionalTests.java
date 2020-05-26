@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -69,7 +69,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 				.containsBeanDefinition("outputTestReader"));
 
 		open(inputReader);
-		List<CustomerCredit> inputs = new ArrayList<CustomerCredit>(getCredits(inputReader));
+		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
 		close(inputReader);
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -79,7 +79,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 		ItemReader<CustomerCredit> outputReader = (ItemReader<CustomerCredit>) applicationContext
 				.getBean("outputTestReader");
 		open(outputReader);
-		List<CustomerCredit> outputs = new ArrayList<CustomerCredit>(getCredits(outputReader));
+		List<CustomerCredit> outputs = new ArrayList<>(getCredits(outputReader));
 		close(outputReader);
 
 		assertEquals(inputs.size(), outputs.size());
@@ -98,7 +98,7 @@ public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware 
 	 */
 	private Set<CustomerCredit> getCredits(ItemReader<CustomerCredit> reader) throws Exception {
 		CustomerCredit credit;
-		Set<CustomerCredit> result = new LinkedHashSet<CustomerCredit>();
+		Set<CustomerCredit> result = new LinkedHashSet<>();
 		while ((credit = reader.read()) != null) {
 			result.add(credit);
 		}

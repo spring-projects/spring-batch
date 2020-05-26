@@ -1,11 +1,11 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,6 +74,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link JsrJobOperator}.
+ */
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	private JobOperator jsrJobOperator;
@@ -210,6 +213,8 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test(expected=JobExecutionIsRunningException.class)
 	public void testAbandonJobRunning() throws Exception {
 		JobExecution jobExecution = new JobExecution(5L);
+		jobExecution.setStartTime(new Date(1L));
+
 		when(jobExplorer.getJobExecution(5L)).thenReturn(jobExecution);
 
 		jsrJobOperator.abandon(5L);
@@ -230,7 +235,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetJobExecutionsRoseyScenario() {
 		org.springframework.batch.core.JobInstance jobInstance = new org.springframework.batch.core.JobInstance(5L, "my job");
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 		executions.add(new JobExecution(2L));
 
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(executions);
@@ -255,7 +260,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test(expected=NoSuchJobInstanceException.class)
 	public void testGetJobExecutionsNoneReturned() {
 		org.springframework.batch.core.JobInstance jobInstance = new org.springframework.batch.core.JobInstance(5L, "my job");
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(executions);
 
@@ -309,7 +314,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetJobInstancesRoseyScenario() {
-		List<JobInstance> instances = new ArrayList<JobInstance>();
+		List<JobInstance> instances = new ArrayList<>();
 		instances.add(new JobInstance(1L, "myJob"));
 		instances.add(new JobInstance(2L, "myJob"));
 		instances.add(new JobInstance(3L, "myJob"));
@@ -331,7 +336,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test(expected=NoSuchJobException.class)
 	public void testGetJobInstancesZeroInstancesReturned() {
-		List<JobInstance> instances = new ArrayList<JobInstance>();
+		List<JobInstance> instances = new ArrayList<>();
 
 		when(jobExplorer.getJobInstances("myJob", 0, 3)).thenReturn(instances);
 
@@ -340,7 +345,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetJobNames() {
-		List<String> jobNames = new ArrayList<String>();
+		List<String> jobNames = new ArrayList<>();
 		jobNames.add("job1");
 		jobNames.add("job2");
 
@@ -372,7 +377,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test(expected=NoSuchJobException.class)
 	public void testGetNoRunningExecutions() {
-		Set<JobExecution> executions = new HashSet<JobExecution>();
+		Set<JobExecution> executions = new HashSet<>();
 
 		when(jobExplorer.findRunningJobExecutions("myJob")).thenReturn(executions);
 
@@ -381,7 +386,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
 	@Test
 	public void testGetRunningExecutions() {
-		Set<JobExecution> executions = new HashSet<JobExecution>();
+		Set<JobExecution> executions = new HashSet<>();
 		executions.add(new JobExecution(5L));
 
 		when(jobExplorer.findRunningJobExecutions("myJob")).thenReturn(executions);
@@ -392,7 +397,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetStepExecutionsRoseyScenario() {
 		JobExecution jobExecution = new JobExecution(5L);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		stepExecutions.add(new StepExecution("step1", jobExecution, 1L));
 		stepExecutions.add(new StepExecution("step2", jobExecution, 2L));
 		jobExecution.addStepExecutions(stepExecutions);
@@ -415,7 +420,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Test
 	public void testGetStepExecutionsPartitionedStepScenario() {
 		JobExecution jobExecution = new JobExecution(5L);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		stepExecutions.add(new StepExecution("step1", jobExecution, 1L));
 		stepExecutions.add(new StepExecution("step2", jobExecution, 2L));
 		stepExecutions.add(new StepExecution("step2:partition0", jobExecution, 2L));

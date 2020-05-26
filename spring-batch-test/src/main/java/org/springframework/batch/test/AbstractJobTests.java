@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -150,7 +150,7 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	 * current timestamp, to ensure that the job instance will be unique.
 	 */
 	protected JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
 	}

@@ -6,7 +6,10 @@
 
 == Common Batch Patterns
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
+
 
 Some batch jobs can be assembled purely from off-the-shelf components in Spring Batch.
 For instance, the `ItemReader` and `ItemWriter` implementations can be configured to
@@ -41,14 +44,16 @@ public class ItemFailureLoggerListener extends ItemListenerSupport {
         logger.error("Encountered error on read", e);
     }
 
-    public void onWriteError(Exception ex, Object item) {
+    public void onWriteError(Exception ex, List<? extends Object> items) {
         logger.error("Encountered error on write", ex);
     }
 }
 ----
 
-Having implemented this listener it, must be registered with a step, as shown in the
-following example:
+Having implemented this listener, it must be registered with a step.
+
+[role="xmlContent"]
+The following example shows how to register a listener with a step in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -63,6 +68,9 @@ following example:
 </step>
 ----
 
+[role="javaContent"]
+The following example shows how to register a listener with a step Java:
+
 .Java Configuration
 [source, java, role="javaContent"]
 ----
@@ -75,7 +83,7 @@ public Step simpleStep() {
 }
 ----
 
-Remember that, if your listener does anything in an `onError()` method, it must be inside
+IMPORTANT: if your listener does anything in an `onError()` method, it must be inside
 a transaction that is going to be rolled back. If you need to use a transactional
 resource, such as a database, inside an `onError()` method, consider adding a declarative
 transaction to that method (see Spring Core Reference Guide for details), and giving its
@@ -84,7 +92,7 @@ propagation attribute a value of `REQUIRES_NEW`.
 [[stoppingAJobManuallyForBusinessReasons]]
 === Stopping a Job Manually for Business Reasons
 
-Spring Batch provides a `stop()` method through the `JobLauncher` interface, but this is
+Spring Batch provides a `stop()` method through the `JobOperator` interface, but this is
 really for use by the operator rather than the application programmer. Sometimes, it is
 more convenient or makes more sense to stop a job execution from within the business
 logic.
@@ -95,12 +103,14 @@ in the following example:
 
 [source, java]
 ----
-public class PoisonPillItemWriter implements ItemWriter<T> {
+public class PoisonPillItemProcessor<T> implements ItemProcessor<T, T> {
 
-    public void write(T item) throws Exception {
+    @Override
+    public T process(T item) throws Exception {
         if (isPoisonPill(item)) {
-            throw new PoisonPillException("Posion pill detected: " + item);
-       }
+            throw new PoisonPillException("Poison pill detected: " + item);
+        }
+        return item;
     }
 }
 ----
@@ -129,8 +139,10 @@ public class EarlyCompletionItemReader implements ItemReader<T> {
 The previous example actually relies on the fact that there is a default implementation
 of the `CompletionPolicy` strategy that signals a complete batch when the item to be
 processed is `null`. A more sophisticated completion policy could be implemented and
-injected into the `Step` through the `SimpleStepFactoryBean`, as shown in the following
-example:
+injected into the `Step` through the `SimpleStepFactoryBean`.
+
+[role="xmlContent"]
+The following example shows how to inject a completion policy into a step in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -144,6 +156,9 @@ example:
 
 <bean id="completionPolicy" class="org.example...SpecialCompletionPolicy"/>
 ----
+
+[role="javaContent"]
+The following example shows how to inject a completion policy into a step in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -176,7 +191,7 @@ public class CustomItemWriter extends ItemListenerSupport implements StepListene
 
     public void afterRead(Object item) {
         if (isPoisonPill(item)) {
-            stepExecution.setTerminateOnly(true);
+            stepExecution.setTerminateOnly();
        }
     }
 
@@ -191,12 +206,15 @@ so this is always an abnormal ending to a job.
 [[addingAFooterRecord]]
 ===  Adding a Footer Record
 
-Often, when writing to flat files, a "footer" record must be appended to the end of the
+Often, when writing to flat files, a "`footer`" record must be appended to the end of the
 file, after all processing has be completed. This can be achieved using the
 `FlatFileFooterCallback` interface provided by Spring Batch. The `FlatFileFooterCallback`
 (and its counterpart, the `FlatFileHeaderCallback`) are optional properties of the
-`FlatFileItemWriter` and can be added to an item writer as shown in the following
-example:
+`FlatFileItemWriter` and can be added to an item writer.
+
+[role="xmlContent"]
+The following example shows how to use the `FlatFileHeaderCallback` and the
+`FlatFileFooterCallback` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -208,6 +226,10 @@ example:
     <property name="footerCallback" ref="footerCallback" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to use the `FlatFileHeaderCallback` and the
+`FlatFileFooterCallback` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -256,7 +278,7 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    public void write(List<? extends Trade> items) {
+    public void write(List<? extends Trade> items) throws Exception {
         BigDecimal chunkTotal = BigDecimal.ZERO;
         for (Trade trade : items) {
             chunkTotal = chunkTotal.add(trade.getAmount());
@@ -279,7 +301,7 @@ public class TradeItemWriter implements ItemWriter<Trade>,
 This `TradeItemWriter` stores a `totalAmount` value that is increased with the `amount`
 from each `Trade` item written. After the last `Trade` is processed, the framework calls
 `writeFooter`, which puts the `totalAmount` into the file. Note that the `write` method
-makes use of a temporary variable, `chunkTotalAmount`, that stores the total of the
+makes use of a temporary variable, `chunkTotal`, that stores the total of the
 `Trade` amounts in the chunk. This is done to ensure that, if a skip occurs in the
 `write` method, the `totalAmount` is left unchanged. It is only at the end of the `write`
 method, once we are guaranteed that no exceptions are thrown, that we update the
@@ -287,7 +309,10 @@ method, once we are guaranteed that no exceptions are thrown, that we update the
 
 In order for the `writeFooter` method to be called, the `TradeItemWriter` (which
 implements `FlatFileFooterCallback`) must be wired into the `FlatFileItemWriter` as the
-`footerCallback`. The following example shows how to do so:
+`footerCallback`.
+
+[role="xmlContent"]
+The following example shows how to wire the `TradeItemWriter` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -302,6 +327,9 @@ implements `FlatFileFooterCallback`) must be wired into the `FlatFileItemWriter`
    <property name="footerCallback" ref="tradeItemWriter" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to wire the `TradeItemWriter` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -377,11 +405,11 @@ from `read`, an `Integer` is returned. This number can then be used to query for
 image::{batch-asciidoc}images/drivingQueryJob.png[Driving Query Example, scaledwidth="60%"]
 
 An `ItemProcessor` should be used to transform the key obtained from the driving query
-into a full 'Foo' object. An existing DAO can be used to query for the full object based
+into a full `Foo` object. An existing DAO can be used to query for the full object based
 on the key.
 
 [[multiLineRecords]]
-==== Multi-Line Records
+=== Multi-Line Records
 
 While it is usually the case with flat files that each record is confined to a single
 line, it is common that a file might have records spanning multiple lines with multiple
@@ -404,7 +432,10 @@ multi-line record as a group, so that it can be passed to the `ItemWriter` intac
 Because a single record spans multiple lines and because we may not know how many lines
 there are, the `ItemReader` must be careful to always read an entire record. In order to
 do this, a custom `ItemReader` should be implemented as a wrapper for the
-`FlatFileItemReader`, as shown in the following example:
+`FlatFileItemReader`.
+
+[role="xmlContent"]
+The following example shows how to implement a custom `ItemReader` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -416,15 +447,16 @@ do this, a custom `ItemReader` should be implemented as a wrapper for the
             <property name="lineMapper">
                 <bean class="org.spr...DefaultLineMapper">
                     <property name="lineTokenizer" ref="orderFileTokenizer"/>
-                    <property name="fieldSetMapper">
-                        <bean class="org.spr...PassThroughFieldSetMapper" />
-                    </property>
+                    <property name="fieldSetMapper" ref="orderFieldSetMapper"/>
                 </bean>
             </property>
         </bean>
     </property>
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to implement a custom `ItemReader` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -440,12 +472,13 @@ public MultiLineTradeItemReader itemReader() {
 
 @Bean
 public FlatFileItemReader flatFileItemReader() {
-	FlatFileItemReader<Trade> reader = new FlatFileItemReaderBuilder<Trade>()
+	FlatFileItemReader<Trade> reader = new FlatFileItemReaderBuilder<>()
 			.name("flatFileItemReader")
-			.resource(new ClasspathResource("data/iosample/input/multiLine.txt"))
+			.resource(new ClassPathResource("data/iosample/input/multiLine.txt"))
 			.lineTokenizer(orderFileTokenizer())
-			.fieldSetMapper(new PassThroughFieldSetMapper())
+			.fieldSetMapper(orderFieldSetMapper())
 			.build();
+	return reader;
 }
 ----
 
@@ -455,7 +488,10 @@ delegate `FlatFileItemReader`. See
 link:readersAndWriters.html#flatFileItemReader[`FlatFileItemReader` in the Readers and
 Writers chapter] for more details. The delegate reader then uses a
 `PassThroughFieldSetMapper` to deliver a `FieldSet` for each line back to the wrapping
-`ItemReader`, as shown in the following example:
+`ItemReader`.
+
+[role="xmlContent"]
+The following example shows how to ensure that each line is properly tokenized in XML:
 
 .XML Content
 [source, xml, role="xmlContent"]
@@ -472,6 +508,9 @@ Writers chapter] for more details. The delegate reader then uses a
 </bean>
 ----
 
+[role="javaContent"]
+The following example shows how to ensure that each line is properly tokenized in Java:
+
 .Java Content
 [source, java, role="javaContent"]
 ----
@@ -487,7 +526,7 @@ public PatternMatchingCompositeLineTokenizer orderFileTokenizer() {
 	tokenizers.put("NCU*", customerLineTokenizer());
 	tokenizers.put("BAD*", billingAddressLineTokenizer());
 
-	tokenizer.setTokenizers(tokenizers());
+	tokenizer.setTokenizers(tokenizers);
 
 	return tokenizer;
 }
@@ -541,7 +580,10 @@ common metadata about the run would be lost. Furthermore, a multi-step job would
 need to be split up into multiple jobs as well.
 
 Because the need is so common, Spring Batch provides a `Tasklet` implementation for
-calling system commands, as shown in the following example:
+calling system commands.
+
+[role="xmlContent"]
+The following example shows how to call an external command in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -552,6 +594,9 @@ calling system commands, as shown in the following example:
     <property name="timeout" value="5000" />
 </bean>
 ----
+
+[role="javaContent"]
+The following example shows how to call an external command in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -575,11 +620,11 @@ exceptional. The `Step` is simply considered to have found no work and completes
 items read. All of the `ItemReader` implementations provided out of the box in Spring
 Batch default to this approach. This can lead to some confusion if nothing is written out
 even when input is present (which usually happens if a file was misnamed or some similar
-issue arises) For this reason, the metadata itself should be inspected to determine how
+issue arises). For this reason, the metadata itself should be inspected to determine how
 much work the framework found to be processed. However, what if finding no input is
 considered exceptional? In this case, programmatically checking the metadata for no items
 processed and causing failure is the best solution. Because this is a common use case,
-Spring Batch provides a listener is provided with exactly this functionality, as shown in
+Spring Batch provides a listener with exactly this functionality, as shown in
 the class definition for `NoWorkFoundStepExecutionListener`:
 
 [source, java]
@@ -598,7 +643,7 @@ public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSuppo
 
 The preceding `StepExecutionListener` inspects the `readCount` property of the
 `StepExecution` during the 'afterStep' phase to determine if no items were read. If that
-is the case, an exit code of FAILED is returned, indicating that the `Step` should fail.
+is the case, an exit code `FAILED` is returned, indicating that the `Step` should fail.
 Otherwise, `null` is returned, which does not affect the status of the `Step`.
 
 [[passingDataToFutureSteps]]
@@ -635,13 +680,16 @@ public class SavingItemWriter implements ItemWriter<Object> {
 }
 ----
 
-To make the data available to future `Steps`, it must be "promoted" to the `Job`
+To make the data available to future `Steps`, it must be "`promoted`" to the `Job`
 `ExecutionContext` after the step has finished. Spring Batch provides the
 `ExecutionContextPromotionListener` for this purpose. The listener must be configured
 with the keys related to the data in the `ExecutionContext` that must be promoted. It can
 also, optionally, be configured with a list of exit code patterns for which the promotion
 should occur (`COMPLETED` is the default). As with all listeners, it must be registered
-on the`Step` as shown in the following example:
+on the `Step`.
+
+[role="xmlContent"]
+The following example shows how to promote a step to the `Job` `ExecutionContext` in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -662,9 +710,16 @@ on the`Step` as shown in the following example:
 </job>
 
 <beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener">
-    <beans:property name="keys" value="someKey"/>
+    <beans:property name="keys">
+        <list>
+            <value>someKey</value>
+        </list>
+    </beans:property>
 </beans:bean>
 ----
+
+[role="xmlContent"]
+The following example shows how to promote a step to the `Job` `ExecutionContext` in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -674,7 +729,6 @@ public Job job1() {
 	return this.jobBuilderFactory.get("job1")
 				.start(step1())
 				.next(step1())
-				.end()
 				.build();
 }
 
@@ -692,7 +746,7 @@ public Step step1() {
 public ExecutionContextPromotionListener promotionListener() {
 	ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 
-	listener.setKeys("someKey");
+	listener.setKeys(new String[] {"someKey"});
 
 	return listener;
 }

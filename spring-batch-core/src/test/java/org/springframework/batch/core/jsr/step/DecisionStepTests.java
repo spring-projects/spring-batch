@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
@@ -101,14 +102,15 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 	@Test
 	public void testDecisionAfterFlow() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterFlow-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		assertEquals(execution.getExitStatus(), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(3, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 	}
 
 	@Test
 	public void testDecisionAfterSplit() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
-		assertEquals(BatchStatus.COMPLETED, execution.getBatchStatus());
+		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "execution");
+		assertEquals(String.format("Received a %s because of %s", execution.getBatchStatus(), jobExecution.getExitStatus().getExitDescription()), BatchStatus.COMPLETED, execution.getBatchStatus());
 		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
 		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
 	}

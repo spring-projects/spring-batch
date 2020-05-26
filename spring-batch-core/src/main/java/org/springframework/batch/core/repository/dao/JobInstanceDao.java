@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.lang.Nullable;
 
 /**
  * Data Access Object for job instances.
@@ -29,6 +30,7 @@ import org.springframework.batch.core.launch.NoSuchJobException;
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface JobInstanceDao {
@@ -56,24 +58,27 @@ public interface JobInstanceDao {
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters with which the job was executed
 	 * @return {@link JobInstance} object matching the job name and
-	 * {@link JobParameters} or null
+	 * {@link JobParameters} or {@code null}
 	 */
+	@Nullable
 	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Fetch the job instance with the provided identifier.
 	 *
 	 * @param instanceId the job identifier
-	 * @return the job instance with this identifier or null if it doesn't exist
+	 * @return the job instance with this identifier or {@code null} if it doesn't exist
 	 */
-	JobInstance getJobInstance(Long instanceId);
+	@Nullable
+	JobInstance getJobInstance(@Nullable Long instanceId);
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
 	 *
 	 * @param jobExecution the JobExecution
-	 * @return the JobInstance for the provided execution or null if it doesn't exist.
+	 * @return the JobInstance for the provided execution or {@code null} if it doesn't exist.
 	 */
+	@Nullable
 	JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
@@ -90,6 +95,18 @@ public interface JobInstanceDao {
 	 * @return the job instances with this name or empty if none
 	 */
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
+
+	/**
+	 * Fetch the last job instance by Id for the given job.
+	 * @param jobName name of the job
+	 * @return the last job instance by Id if any or null otherwise
+	 *
+	 * @since 4.2
+	 */
+	@Nullable
+	default JobInstance getLastJobInstance(String jobName) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs
@@ -122,6 +139,6 @@ public interface JobInstanceDao {
 	 *
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
-	int getJobInstanceCount(String jobName) throws NoSuchJobException;
+	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
 }

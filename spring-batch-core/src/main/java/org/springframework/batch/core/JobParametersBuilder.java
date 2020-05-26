@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ package org.springframework.batch.core;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -29,7 +28,7 @@ import org.springframework.util.Assert;
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
  * {@link JobParameter} objects are immutable, and must be instantiated separately
- * to ensure typesafety. Once created, it can be used in the
+ * to ensure type safety. Once created, it can be used in the
  * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
  * various parameter types and creating a valid {@link JobParameters} once
  * finished.<br>
@@ -40,6 +39,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  * @see JobParameters
  * @see JobParameter
@@ -201,7 +201,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Conversion method that takes the current state of this builder and
-	 * returns it as a JobruntimeParameters object.
+	 * returns it as a JobParameters object.
 	 *
 	 * @return a valid {@link JobParameters} object.
 	 */
@@ -238,6 +238,10 @@ public class JobParametersBuilder {
 	/**
 	 * Initializes the {@link JobParameters} based on the state of the {@link Job}.  This
 	 * should be called after all parameters have been entered into the builder.
+	 * All parameters already set on this builder instance will be appended to
+	 * those retrieved from the job incrementer, overriding any with the same key (Same
+	 * behaviour as {@link org.springframework.batch.core.launch.support.CommandLineJobRunner}
+	 * with "-next" option and {@link org.springframework.batch.core.launch.JobOperator#startNextInstance(String)})
 	 *
 	 * @param job the job for which the {@link JobParameters} are being constructed.
 	 * @return a reference to this object.
@@ -245,59 +249,34 @@ public class JobParametersBuilder {
 	 * @since 4.0
 	 */
 	public JobParametersBuilder getNextJobParameters(Job job) {
-		if(this.jobExplorer == null) {
-			throw new IllegalStateException("A JobExplore is required to get next job parameters");
-		}
+		Assert.state(this.jobExplorer != null, "A JobExplorer is required to get next job parameters");
+		Assert.notNull(job, "Job must not be null");
+		Assert.notNull(job.getJobParametersIncrementer(), "No job parameters incrementer found for job=" + job.getName());
 
 		String name = job.getName();
-		JobParameters nextParameters = new JobParameters();
-		List<JobInstance> lastInstances = this.jobExplorer.getJobInstances(name, 0, 1);
+		JobParameters nextParameters;
+		JobInstance lastInstance = this.jobExplorer.getLastJobInstance(name);
 		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
-		if (lastInstances.isEmpty()) {
+		if (lastInstance == null) {
 			// Start from a completely clean sheet
-			if (incrementer != null) {
-				nextParameters = incrementer.getNext(new JobParameters());
-			}
+			nextParameters = incrementer.getNext(new JobParameters());
 		}
 		else {
-			List<JobExecution> previousExecutions = this.jobExplorer
-					.getJobExecutions(lastInstances.get(0));
-			JobExecution previousExecution = previousExecutions.get(0);
+			JobExecution previousExecution = this.jobExplorer.getLastJobExecution(lastInstance);
 			if (previousExecution == null) {
 				// Normally this will not happen - an instance exists with no executions
-				if (incrementer != null) {
-					nextParameters = incrementer.getNext(new JobParameters());
-				}
+				nextParameters = incrementer.getNext(new JobParameters());
 			}
-			else if (isStoppedOrFailed(previousExecution) && job.isRestartable()) {
-				// Retry a failed or stopped execution
-				nextParameters = previousExecution.getJobParameters();
-				// Non-identifying additional parameters can be removed to a retry
-				removeNonIdentifying(this.parameterMap);
-			}
-			else if (incrementer != null) {
-				// New instance so increment the parameters if we can
+			else {
 				nextParameters = incrementer.getNext(previousExecution.getJobParameters());
 			}
 		}
 
-		this.parameterMap = addJobParameters(nextParameters)
-								.toJobParameters()
-								.getParameters();
+		// start with parameters from the incrementer
+		Map<String, JobParameter> nextParametersMap = new HashMap<>(nextParameters.getParameters());
+		// append new parameters (overriding those with the same key)
+		nextParametersMap.putAll(this.parameterMap);
+		this.parameterMap = nextParametersMap;
 		return this;
-	}
-
-	private void removeNonIdentifying(Map<String, JobParameter> parameters) {
-		HashMap<String, JobParameter> copy = new HashMap<>(parameters);
-		for (Map.Entry<String, JobParameter> parameter : copy.entrySet()) {
-			if (!parameter.getValue().isIdentifying()) {
-				parameters.remove(parameter.getKey());
-			}
-		}
-	}
-
-	private boolean isStoppedOrFailed(JobExecution execution) {
-		BatchStatus status = execution.getStatus();
-		return (status == BatchStatus.STOPPED || status == BatchStatus.FAILED);
 	}
 }

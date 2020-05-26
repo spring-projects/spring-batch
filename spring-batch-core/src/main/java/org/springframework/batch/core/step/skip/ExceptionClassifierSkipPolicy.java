@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,7 +51,7 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	 * to create a {@link Classifier} to locate a policy.
 	 */
 	public void setPolicyMap(Map<Class<? extends Throwable>, SkipPolicy> policyMap) {
-		SubclassClassifier<Throwable, SkipPolicy> subclassClassifier = new SubclassClassifier<Throwable, SkipPolicy>(
+		SubclassClassifier<Throwable, SkipPolicy> subclassClassifier = new SubclassClassifier<>(
 				policyMap, new NeverSkipItemSkipPolicy());
 		this.classifier = subclassClassifier;
 	}

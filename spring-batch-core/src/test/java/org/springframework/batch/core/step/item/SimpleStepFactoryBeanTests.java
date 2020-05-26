@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -57,18 +59,22 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.lang.Nullable;
 
 /**
  * Tests for {@link SimpleStepFactoryBean}.
  */
 public class SimpleStepFactoryBeanTests {
 
-	private List<Exception> listened = new ArrayList<Exception>();
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
+	private List<Exception> listened = new ArrayList<>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao(), new MapExecutionContextDao());
 
-	private List<String> written = new ArrayList<String>();
+	private List<String> written = new ArrayList<>();
 
 	private ItemWriter<String> writer = new ItemWriter<String>() {
 		@Override
@@ -77,7 +83,7 @@ public class SimpleStepFactoryBeanTests {
 		}
 	};
 
-	private ItemReader<String> reader;
+	private ItemReader<String> reader = new ListItemReader<>(Arrays.asList("a", "b", "c"));
 
 	private SimpleJob job = new SimpleJob();
 
@@ -93,9 +99,31 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
+	public void testMandatoryReader() throws Exception {
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setItemWriter(writer);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemReader must be provided");
+
+		factory.getObject();
+	}
+
+	@Test
+	public void testMandatoryWriter() throws Exception {
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
+		factory.setItemReader(reader);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemWriter must be provided");
+
+		factory.getObject();
+	}
+
+	@Test
 	public void testSimpleJob() throws Exception {
 
-		job.setSteps(new ArrayList<Step>());
+		job.setSteps(new ArrayList<>());
 		AbstractStep step = (AbstractStep) getStepFactory("foo", "bar").getObject();
 		step.setName("step1");
 		job.addStep(step);
@@ -346,7 +374,7 @@ public class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		final List<String> listenerCalls = new ArrayList<String>();
+		final List<String> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemProcessor<String, String>,
 		ItemReadListener<String>, ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
@@ -354,6 +382,7 @@ public class SimpleStepFactoryBeanTests {
 			public void write(List<? extends String> items) throws Exception {
 			}
 
+			@Nullable
 			@Override
 			public String process(String item) throws Exception {
 				return item;
@@ -386,7 +415,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterProcess(String item, String result) {
+			public void afterProcess(String item, @Nullable String result) {
 				listenerCalls.add("process");
 			}
 
@@ -436,7 +465,7 @@ public class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		final List<String> listenerCalls = new ArrayList<String>();
+		final List<String> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemWriteListener<String> {
 			@Override
@@ -475,38 +504,12 @@ public class SimpleStepFactoryBeanTests {
 
 	}
 
-	@Test
-	public void testNullWriter() throws Exception {
-
-		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
-		factory.setItemWriter(null);
-		factory.setItemProcessor(new ItemProcessor<String, String>() {
-			@Override
-			public String process(String item) throws Exception {
-				written.add(item);
-				return null;
-			}
-		});
-
-		Step step = factory.getObject();
-
-		job.setSteps(Collections.singletonList(step));
-
-		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-
-		job.execute(jobExecution);
-
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals("[foo, bar, spam]", written.toString());
-
-	}
-
 	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {
-		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<String, String>();
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 
-		List<String> items = new ArrayList<String>();
+		List<String> items = new ArrayList<>();
 		items.addAll(Arrays.asList(args));
-		reader = new ListItemReader<String>(items);
+		reader = new ListItemReader<>(items);
 
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);

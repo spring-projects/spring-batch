@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,7 +53,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	private List<String> items = Arrays.asList("1", "2", "3", "4", "5");
 
-	private ListItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory
+	private ListItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory
 			.createTransactionalList(items));
 
 	private SkipWriterStub writer = new SkipWriterStub();
@@ -72,7 +72,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(SkippableException.class, true);
 		skippableExceptions.put(SkippableRuntimeException.class, true);
 		factory.setSkippableExceptionClasses(skippableExceptions);

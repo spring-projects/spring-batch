@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ public class LimitCheckingItemSkipPolicyTests {
 
 	@Before
 	public void setUp() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(FlatFileParseException.class, true);
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions);
 	}
@@ -67,7 +67,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getSkippableSubsetSkipPolicy() {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, true);
 		skippableExceptions.put(ItemWriterException.class, false);
 		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);
@@ -104,7 +104,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	}
 
 	private LimitCheckingItemSkipPolicy getFatalSubsetSkipPolicy() {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, false);
 		skippableExceptions.put(ItemWriterException.class, true);
 		return new LimitCheckingItemSkipPolicy(1, skippableExceptions);

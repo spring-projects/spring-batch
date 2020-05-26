@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,7 +72,7 @@ public class StepExecution extends Entity {
 
 	private volatile int filterCount;
 
-	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Constructor with mandatory properties.
@@ -511,7 +511,7 @@ public class StepExecution extends Entity {
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		failureExceptions = new ArrayList<Throwable>();
+		failureExceptions = new ArrayList<>();
 	}
 
 	/*

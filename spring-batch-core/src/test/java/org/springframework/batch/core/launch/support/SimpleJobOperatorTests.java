@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,6 +53,7 @@ import org.springframework.batch.core.step.tasklet.StoppableTasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.PropertiesConverter;
+import org.springframework.lang.Nullable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,11 +61,14 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleJobOperatorTests {
@@ -83,6 +87,7 @@ public class SimpleJobOperatorTests {
 	public void setUp() throws Exception {
 
 		job = new JobSupport("foo") {
+			@Nullable
 			@Override
 			public JobParametersIncrementer getJobParametersIncrementer() {
 				return parameters -> jobParameters;
@@ -93,7 +98,7 @@ public class SimpleJobOperatorTests {
 
 		jobOperator.setJobRegistry(new MapJobRegistry() {
 			@Override
-			public Job getJob(String name) throws NoSuchJobException {
+			public Job getJob(@Nullable String name) throws NoSuchJobException {
 				if (name.equals("foo")) {
 					return job;
 				}
@@ -117,13 +122,13 @@ public class SimpleJobOperatorTests {
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
-			public JobParameters getJobParameters(Properties props) {
+			public JobParameters getJobParameters(@Nullable Properties props) {
 				assertTrue("Wrong properties", props.containsKey("a"));
 				return jobParameters;
 			}
 
 			@Override
-			public Properties getProperties(JobParameters params) {
+			public Properties getProperties(@Nullable JobParameters params) {
 				return PropertiesConverter.stringToProperties("a=b");
 			}
 		});
@@ -151,6 +156,7 @@ public class SimpleJobOperatorTests {
 	 */
 	@Test
 	public void testStartNextInstanceSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
 		JobInstance jobInstance = new JobInstance(321L, "foo");
 		when(jobExplorer.getJobInstances("foo", 0, 1)).thenReturn(Collections.singletonList(jobInstance));
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(new JobExecution(jobInstance, new JobParameters())));
@@ -365,6 +371,24 @@ public class SimpleJobOperatorTests {
 		jobOperator.stop(111L);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
+	
+	@Test
+	public void testStopTaskletWhenJobNotRegistered() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		StoppableTasklet tasklet = mock(StoppableTasklet.class);
+		JobRegistry jobRegistry = mock(JobRegistry.class);
+		TaskletStep step = mock(TaskletStep.class);
+		
+		when(step.getTasklet()).thenReturn(tasklet);
+		when(jobRegistry.getJob(job.getName())).thenThrow(new NoSuchJobException("Unable to find job"));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
+		
+		jobOperator.setJobRegistry(jobRegistry);
+		jobOperator.stop(111L);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
+		verify(tasklet, never()).stop();
+	}
 
 	@Test
 	public void testStopTaskletException() throws Exception {
@@ -372,6 +396,7 @@ public class SimpleJobOperatorTests {
 		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
 		StoppableTasklet tasklet = new StoppableTasklet() {
 
+			@Nullable
 			@Override
 			public RepeatStatus execute(StepContribution contribution,
 					ChunkContext chunkContext) throws Exception {

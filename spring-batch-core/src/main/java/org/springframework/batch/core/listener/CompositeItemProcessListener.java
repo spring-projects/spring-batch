@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,14 +20,16 @@ import java.util.List;
 
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.core.Ordered;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T, S> {
 
-	private OrderedComposite<ItemProcessListener<? super T, ? super S>> listeners = new OrderedComposite<ItemProcessListener<? super T, ? super S>>();
+	private OrderedComposite<ItemProcessListener<? super T, ? super S>> listeners = new OrderedComposite<>();
 
 	/**
 	 * Public setter for the listeners.
@@ -54,7 +56,7 @@ public class CompositeItemProcessListener<T, S> implements ItemProcessListener<T
 	 * java.lang.Object)
 	 */
 	@Override
-	public void afterProcess(T item, S result) {
+	public void afterProcess(T item, @Nullable S result) {
 		for (Iterator<ItemProcessListener<? super T, ? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemProcessListener<? super T, ? super S> listener = iterator.next();
 			listener.afterProcess(item, result);

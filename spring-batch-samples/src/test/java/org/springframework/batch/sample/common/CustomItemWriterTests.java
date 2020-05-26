@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 public class CustomItemWriterTests {
 	@Test
 	public void testFlush() throws Exception {
-		CustomItemWriter<String> itemWriter = new CustomItemWriter<String>();
+		CustomItemWriter<String> itemWriter = new CustomItemWriter<>();
 		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(1, itemWriter.getOutput().size());
 		itemWriter.write(Arrays.asList("2","3"));

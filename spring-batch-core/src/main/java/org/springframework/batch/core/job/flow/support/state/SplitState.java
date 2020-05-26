@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,16 +84,16 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 		// TODO: collect the last StepExecution from the flows as well, so they
 		// can be abandoned if necessary
-		Collection<Future<FlowExecution>> tasks = new ArrayList<Future<FlowExecution>>();
+		Collection<Future<FlowExecution>> tasks = new ArrayList<>();
 
 		for (final Flow flow : flows) {
 
-			final FutureTask<FlowExecution> task = new FutureTask<FlowExecution>(new Callable<FlowExecution>() {
-				@Override
-				public FlowExecution call() throws Exception {
-					return flow.start(executor);
-				}
-			});
+			final FutureTask<FlowExecution> task = new FutureTask<>(new Callable<FlowExecution>() {
+                @Override
+                public FlowExecution call() throws Exception {
+                    return flow.start(executor);
+                }
+            });
 
 			tasks.add(task);
 
@@ -106,7 +106,7 @@ public class SplitState extends AbstractState implements FlowHolder {
 
 		}
 
-		Collection<FlowExecution> results = new ArrayList<FlowExecution>();
+		Collection<FlowExecution> results = new ArrayList<>();
 
 		// Could use a CompletionService here?
 		for (Future<FlowExecution> task : tasks) {

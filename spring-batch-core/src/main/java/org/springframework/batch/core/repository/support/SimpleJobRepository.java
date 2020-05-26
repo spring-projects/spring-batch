@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,9 +32,9 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +50,8 @@ import java.util.List;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
+ * @author Baris Cubukcuoglu
  *
  * @see JobRepository
  * @see JobInstanceDao
@@ -215,33 +217,9 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
-
-		for (JobExecution jobExecution : jobExecutions) {
-			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					stepExecutions.add(stepExecution);
-				}
-			}
-		}
-
-		StepExecution latest = null;
-		for (StepExecution stepExecution : stepExecutions) {
-			if (latest == null) {
-				latest = stepExecution;
-			}
-			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
-				latest = stepExecution;
-			}
-			// Use step execution ID as the tie breaker if start time is identical
-			if (latest.getStartTime().getTime() == stepExecution.getStartTime().getTime() && 
-			        latest.getId() < stepExecution.getId()) {
-				latest = stepExecution;
-			}
-		}
+		StepExecution latest = stepExecutionDao.getLastStepExecution(jobInstance, stepName);
 
 		if (latest != null) {
 			ExecutionContext stepExecutionContext = ecDao.getExecutionContext(latest);
@@ -258,17 +236,7 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	@Override
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
-		int count = 0;
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			stepExecutionDao.addStepExecutions(jobExecution);
-			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
-				if (stepName.equals(stepExecution.getStepName())) {
-					count++;
-				}
-			}
-		}
-		return count;
+		return stepExecutionDao.countStepExecutions(jobInstance, stepName);
 	}
 
 	/**
@@ -289,6 +257,7 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	@Override
+	@Nullable
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		if (jobInstance == null) {

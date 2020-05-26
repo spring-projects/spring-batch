@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +16,11 @@
 
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +56,8 @@ import org.springframework.batch.core.step.StepSupport;
  *
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Dimitrios Liapis
+ * @author Baris Cubukcuoglu
  *
  */
 public class SimpleJobRepositoryTests {
@@ -107,7 +110,7 @@ public class SimpleJobRepositoryTests {
 
 		stepConfiguration2 = new StepSupport("TestStep2");
 
-		List<Step> stepConfigurations = new ArrayList<Step>();
+		List<Step> stepConfigurations = new ArrayList<>();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
 
@@ -118,7 +121,7 @@ public class SimpleJobRepositoryTests {
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
 
-		steps = new ArrayList<String>();
+		steps = new ArrayList<>();
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
@@ -181,7 +184,7 @@ public class SimpleJobRepositoryTests {
 
 	@Test
 	public void testSaveStepExecutions() {
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>();
+		List<StepExecution> stepExecutions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			StepExecution stepExecution = new StepExecution("stepName" + i, jobExecution);
 			stepExecutions.add(stepExecution);
@@ -240,6 +243,7 @@ public class SimpleJobRepositoryTests {
 	@Test(expected = JobExecutionAlreadyRunningException.class)
 	public void testCreateJobExecutionAlreadyRunning() throws Exception {
 		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setStartTime(new Date());
 		jobExecution.setEndTime(null);
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
@@ -270,4 +274,16 @@ public class SimpleJobRepositoryTests {
 		jobRepository.createJobExecution("foo", new JobParameters());
 	}
 
+	@Test
+	public void testGetStepExecutionCount() {
+		// Given
+		int expectedResult = 1;
+		when(stepExecutionDao.countStepExecutions(jobInstance, "stepName")).thenReturn(expectedResult);
+
+		// When
+		int actualResult = jobRepository.getStepExecutionCount(jobInstance, "stepName");
+
+		// Then
+		assertEquals(expectedResult, actualResult);
+	}
 }

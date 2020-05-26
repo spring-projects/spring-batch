@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
 		reader.setUseSharedExtendedConnection(true);
 		reader.setSql("select foo from bar");
@@ -90,7 +90,7 @@ public class JdbcCursorItemReaderConfigTests {
 		con.commit();
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		final ExecutionContext ec = new ExecutionContext();
@@ -118,7 +118,7 @@ public class JdbcCursorItemReaderConfigTests {
 				ResultSet.CONCUR_READ_ONLY)).thenReturn(ps);
 		when(ds.getConnection()).thenReturn(con);
 
-		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);
 		reader.setSql("select foo from bar");
 		reader.setConnectionAutoCommit(neededAutoCommit);

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,12 +33,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -58,6 +60,8 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
+ * @author Baris Cubukcuoglu
  *
  * @see StepExecutionDao
  */
@@ -65,23 +69,50 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final Log logger = LogFactory.getLog(JdbcStepExecutionDao.class);
 
-	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, "
-			+ "END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED) "
-			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, " +
+			"STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, " +
+			"WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, " +
+			"ROLLBACK_COUNT, LAST_UPDATED) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, "
-			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?"
+			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, "
+			+ "ROLLBACK_COUNT = ?, LAST_UPDATED = ?"
 			+ " where STEP_EXECUTION_ID = ? and VERSION = ?";
 
-	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
+	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, " +
+			"STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, " +
+			"WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from %PREFIX%STEP_EXECUTION " +
+			"where JOB_EXECUTION_ID = ?";
 
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 
 	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_EXECUTION_ID = ?";
 
-	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
+	private static final String GET_LAST_STEP_EXECUTION = "SELECT " +
+			" SE.STEP_EXECUTION_ID, SE.STEP_NAME, SE.START_TIME, SE.END_TIME, SE.STATUS, SE.COMMIT_COUNT, " +
+			"SE.READ_COUNT, SE.FILTER_COUNT, SE.WRITE_COUNT, SE.EXIT_CODE, SE.EXIT_MESSAGE, SE.READ_SKIP_COUNT, " +
+			"SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION," +
+			" JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, " +
+			"JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION" +
+			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
+			" where " +
+			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
+			"where JOB_INSTANCE_ID = ?)" +
+			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      and SE.STEP_NAME = ?" +
+			" order by SE.START_TIME desc, SE.STEP_EXECUTION_ID desc";
+
+	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE " +
+			"STEP_EXECUTION_ID=?";
+
+	private static final String COUNT_STEP_EXECUTIONS = "SELECT COUNT(*) " +
+			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
+			" where " +
+			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
+			"where JOB_INSTANCE_ID = ?)" +
+			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      and SE.STEP_NAME = ?";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -108,7 +139,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	/**
 	 * Save a StepExecution. A unique id will be generated by the
-	 * stepExecutionIncrementor, and then set in the StepExecution. All values
+	 * stepExecutionIncrementer, and then set in the StepExecution. All values
 	 * will then be stored via an INSERT statement.
 	 *
 	 * @see StepExecutionDao#saveStepExecution(StepExecution)
@@ -186,7 +217,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		validateStepExecution(stepExecution);
 		stepExecution.setId(stepExecutionIncrementer.nextLongValue());
 		stepExecution.incrementVersion(); //Should be 0
-		List<Object[]> parameters = new ArrayList<Object[]>();
+		List<Object[]> parameters = new ArrayList<>();
 		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
 		Object[] parameterValues = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),
@@ -251,11 +282,11 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int curentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
+				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
 						new Object[] { stepExecution.getId() }, Integer.class);
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
 						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
-						+ "), where current version is " + curentVersion);
+						+ "), where current version is " + currentVersion);
 			}
 
 			stepExecution.incrementVersion();
@@ -281,6 +312,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
 				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepExecutionId);
@@ -295,9 +327,38 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		List<StepExecution> executions = getJdbcTemplate().query(
+				getQuery(GET_LAST_STEP_EXECUTION),
+				(rs, rowNum) -> {
+					Long jobExecutionId = rs.getLong(18);
+					JobExecution jobExecution = new JobExecution(jobExecutionId);
+					jobExecution.setStartTime(rs.getTimestamp(19));
+					jobExecution.setEndTime(rs.getTimestamp(20));
+					jobExecution.setStatus(BatchStatus.valueOf(rs.getString(21)));
+					jobExecution.setExitStatus(new ExitStatus(rs.getString(22), rs.getString(23)));
+					jobExecution.setCreateTime(rs.getTimestamp(24));
+					jobExecution.setLastUpdated(rs.getTimestamp(25));
+					jobExecution.setVersion(rs.getInt(26));
+					return new StepExecutionRowMapper(jobExecution).mapRow(rs, rowNum);
+				},
+				jobInstance.getInstanceId(), stepName);
+		if (executions.isEmpty()) {
+			return null;
+		} else {
+			return executions.get(0);
+		}
+	}
+
+	@Override
 	public void addStepExecutions(JobExecution jobExecution) {
 		getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS), new StepExecutionRowMapper(jobExecution),
 				jobExecution.getId());
+	}
+
+	@Override
+	public int countStepExecutions(JobInstance jobInstance, String stepName) {
+		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), new Object[] { jobInstance.getInstanceId(), stepName }, Integer.class);
 	}
 
 	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {

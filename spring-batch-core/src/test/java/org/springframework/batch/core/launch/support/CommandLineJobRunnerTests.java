@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -45,6 +46,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -52,6 +54,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CommandLineJobRunnerTests {
@@ -242,7 +245,7 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(3L, jobName));
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -258,7 +261,7 @@ public class CommandLineJobRunnerTests {
 		String[] args = new String[] { jobPath, "-stop", jobName };
 		StubJobExplorer.jobInstances = Arrays.asList(new JobInstance(5L, jobName));
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -267,7 +270,7 @@ public class CommandLineJobRunnerTests {
 		JobInstance jobInstance = new JobInstance(3L, jobName);
 		StubJobExplorer.jobInstances = Arrays.asList(jobInstance);
 		CommandLineJobRunner.main(args);
-		assertEquals(0, StubSystemExiter.status);
+		assertEquals(1, StubSystemExiter.status);
 	}
 
 	@Test
@@ -357,7 +360,7 @@ public class CommandLineJobRunnerTests {
 	@Test
 	public void testNextFirstInSequence() throws Throwable {
 		String[] args = new String[] { jobPath, "-next", jobName };
-		StubJobExplorer.jobInstances = new ArrayList<JobInstance>();
+		StubJobExplorer.jobInstances = new ArrayList<>();
 		CommandLineJobRunner.main(args);
 		assertEquals(0, StubSystemExiter.status);
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "spam").toJobParameters();
@@ -447,19 +450,20 @@ public class CommandLineJobRunnerTests {
 
 	public static class StubJobExplorer implements JobExplorer {
 
-		static List<JobInstance> jobInstances = new ArrayList<JobInstance>();
+		static List<JobInstance> jobInstances = new ArrayList<>();
 
 		static JobExecution jobExecution;
 
 		static JobParameters jobParameters = new JobParameters();
 
 		@Override
-		public Set<JobExecution> findRunningJobExecutions(String jobName) {
-			throw new UnsupportedOperationException();
+		public Set<JobExecution> findRunningJobExecutions(@Nullable String jobName) {
+			return new HashSet<>();
 		}
 
+		@Nullable
 		@Override
-		public JobExecution getJobExecution(Long executionId) {
+		public JobExecution getJobExecution(@Nullable Long executionId) {
 			if (jobExecution != null) {
 				return jobExecution;
 			}
@@ -500,23 +504,37 @@ public class CommandLineJobRunnerTests {
 			return jobExecution;
 		}
 
+		@Nullable
 		@Override
-		public JobInstance getJobInstance(Long instanceId) {
+		public JobInstance getJobInstance(@Nullable Long instanceId) {
 			throw new UnsupportedOperationException();
+		}
+
+		@Nullable
+		@Override
+		public JobInstance getLastJobInstance(String jobName) {
+			return null;
+		}
+
+		@Nullable
+		@Override
+		public JobExecution getLastJobExecution(JobInstance jobInstance) {
+			return null;
 		}
 
 		@Override
 		public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 			if (jobInstances == null) {
-				return new ArrayList<JobInstance>();
+				return new ArrayList<>();
 			}
 			List<JobInstance> result = jobInstances;
 			jobInstances = null;
 			return result;
 		}
 
+		@Nullable
 		@Override
-		public StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId) {
+		public StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -531,7 +549,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
-		public int getJobInstanceCount(String jobName)
+		public int getJobInstanceCount(@Nullable String jobName)
 				throws NoSuchJobException {
 			int count = 0;
 
@@ -557,13 +575,13 @@ public class CommandLineJobRunnerTests {
 		static boolean called = false;
 
 		@Override
-		public JobParameters getJobParameters(Properties properties) {
+		public JobParameters getJobParameters(@Nullable Properties properties) {
 			called = true;
 			return delegate.getJobParameters(properties);
 		}
 
 		@Override
-		public Properties getProperties(JobParameters params) {
+		public Properties getProperties(@Nullable JobParameters params) {
 			throw new UnsupportedOperationException();
 		}
 

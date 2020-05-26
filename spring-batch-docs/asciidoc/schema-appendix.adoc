@@ -35,6 +35,16 @@ modified with additional indexes and constraints as desired. The file names are 
 form `schema-\*.sql`, where "*" is the short name of the target database platform.
 The scripts are in the package `org.springframework.batch.core`.
 
+[[migrationDDLScripts]]
+==== Migration DDL Scripts
+
+Spring Batch provides migration DDL scripts that you need to execute when you upgrade versions.
+These scripts can be found in the Core Jar file under `org/springframework/batch/core/migration`.
+Migration scripts are organized into folders corresponding to version numbers in which they were introduced:
+
+* `2.2`: contains scripts needed if you are migrating from a version before `2.2` to version `2.2`
+* `4.1`: contains scripts needed if you are migrating from a version before `4.1` to version `4.1`
+
 [[metaDataVersion]]
 ==== Version
 
@@ -282,7 +292,7 @@ possible.
 * `LAST_UPDATED`: Timestamp representing the last time this execution was persisted.
 
 [[metaDataBatchJobExecutionContext]]
-=== BATCH_JOB_EXECUTION_CONTEXT
+=== `BATCH_JOB_EXECUTION_CONTEXT`
 
 The `BATCH_JOB_EXECUTION_CONTEXT` table holds all information relevant to the
 `ExecutionContext` of a `Job`. There is exactly one `Job` `ExecutionContext` per
@@ -386,7 +396,6 @@ about indexing:
 |Default Table Name|Where Clause|Frequency
 |BATCH_JOB_INSTANCE|JOB_NAME = ? and JOB_KEY = ?|Every time a job is launched
 |BATCH_JOB_EXECUTION|JOB_INSTANCE_ID = ?|Every time a job is restarted
-|BATCH_EXECUTION_CONTEXT|EXECUTION_ID = ? and KEY_NAME = ?|On commit interval, a.k.a. chunk
 |BATCH_STEP_EXECUTION|VERSION = ?|On commit interval, a.k.a. chunk (and at start and end of
             step)
 |BATCH_STEP_EXECUTION|STEP_NAME = ? and JOB_EXECUTION_ID = ?|Before each step execution

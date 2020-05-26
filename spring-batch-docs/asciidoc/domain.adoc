@@ -6,7 +6,9 @@
 
 == The Domain Language of Batch
 
+ifndef::onlyonetoggle[]
 include::toggle.adoc[]
+endif::onlyonetoggle[]
 
 To any experienced batch architect, the overall concepts of batch processing used in
 Spring Batch should be familiar and comfortable. There are "Jobs" and "Steps" and
@@ -61,10 +63,11 @@ global to all steps, such as restartability. The job configuration contains:
 
 ifdef::backend-html5[]
 [role="javaContent"]
-A default simple implementation of the Job interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-When using java based configuration, a collection of builders is made available for the
-instantiation of a `Job`, as shown in the following example:
+For those who use Java configuration, Spring Batch provices a default implementation of
+the Job interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. When using java based configuration, a collection of
+builders is made available for the instantiation of a `Job`, as shown in the following
+example:
 
 [source, java, role="javaContent"]
 ----
@@ -80,10 +83,11 @@ public Job footballJob() {
 ----
 
 [role="xmlContent"]
-A default simple implementation of the `Job` interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-However, the batch namespace abstracts away the need to instantiate it directly. Instead,
-the `<job>` tag can be used as shown in the following example:
+For those who use XML configuration, Spring Batch provides a default implementation of the
+`Job` interface in the form of the `SimpleJob` class, which creates some standard
+functionality on top of `Job`. However, the batch namespace abstracts away the need to
+instantiate it directly. Instead, the `<job>` element can be used, as shown in the
+following example:
 
 [source, xml, role="xmlContent"]
 ----
@@ -96,9 +100,9 @@ the `<job>` tag can be used as shown in the following example:
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-A default simple implementation of the Job interface is provided by Spring Batch in the
-form of the `SimpleJob` class, which creates some standard functionality on top of `Job`.
-When using java based configuration, a collection of builders are made available for the
+Spring Batch provides a default implementation of the Job interface in the form of the
+`SimpleJob` class, which creates some standard functionality on top of `Job`. When using
+Java-based configuration, a collection of builders are made available for the
 instantiation of a `Job`, as shown in the following example:
 
 [source, java]
@@ -142,7 +146,7 @@ executions (`JobExecution` is discussed in more detail later in this chapter), a
 one `JobInstance` corresponding to a particular `Job` and identifying `JobParameters` can
 run at a given time.
 
-The definition of a `JobInstance` has absolutely no bearing on the data the to be loaded.
+The definition of a `JobInstance` has absolutely no bearing on the data to be loaded.
 It is entirely up to the `ItemReader` implementation to determine how data is loaded. For
 example, in the EndOfDay scenario, there may be a column on the data that indicates the
 'effective date' or 'schedule date' to which the data belongs. So, the January 1st run
@@ -168,8 +172,8 @@ image::{batch-asciidoc}images/job-stereotypes-parameters.png[Job Parameters, sca
 In the preceding example, where there are two instances, one for January 1st, and another
 for January 2nd, there is really only one `Job`, but it has two `JobParameter` objects:
 one that was started with a job parameter of 01-01-2017 and another that was started with
-a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job` +
-identifying `JobParameters`. This allows a developer to effectively control how a
+a parameter of 01-02-2017. Thus, the contract can be defined as: `JobInstance` = `Job`
+ + identifying `JobParameters`. This allows a developer to effectively control how a
 `JobInstance` is defined, since they control what parameters are passed in.
 
 NOTE: Not all job parameters are required to contribute to the identification of a
@@ -382,12 +386,12 @@ finishes successfully, the status is `BatchStatus.COMPLETED`.
 
 |startTime
 |A `java.util.Date` representing the current system time when the execution was started.
-This field is empty if the job has yet to start.
+This field is empty if the step has yet to start.
 
 |endTime
 
 |A `java.util.Date` representing the current system time when the execution finished,
-regardless of whether or not it was successful. This field is empty if the job has yet to
+regardless of whether or not it was successful. This field is empty if the step has yet to
 exit.
 
 |exitStatus
@@ -454,7 +458,7 @@ the metadata tables would look like the following example:
 |EndOfDayJob
 |===
 
-.BATCH_JOB_PARAMS
+.BATCH_JOB_EXECUTION_PARAMS
 |===
 |JOB_INST_ID|TYPE_CD|KEY_NAME|DATE_VAL
 |1
@@ -563,8 +567,8 @@ the course of execution, `StepExecution` and `JobExecution` implementations are 
 by passing them to the repository.
 
 [role="xmlContent"]
-The batch namespace provides support for configuring a `JobRepository` instance with the
-`<job-repository>` tag, as shown in the following example:
+The Spring Batch XML namespace provides support for configuring a `JobRepository` instance
+with the `<job-repository>` tag, as shown in the following example:
 
 [source, xml, role="xmlContent"]
 ----
@@ -572,7 +576,7 @@ The batch namespace provides support for configuring a `JobRepository` instance 
 ----
 
 [role="javaContent"]
-When using java configuration, `@EnableBatchProcessing` annotation provides a
+When using Java configuration, the `@EnableBatchProcessing` annotation provides a
 `JobRepository` as one of the components automatically configured out of the box.
 
 === JobLauncher
@@ -585,7 +589,8 @@ When using java configuration, `@EnableBatchProcessing` annotation provides a
 public interface JobLauncher {
 
 public JobExecution run(Job job, JobParameters jobParameters)
-            throws JobExecutionAlreadyRunningException, JobRestartException;
+            throws JobExecutionAlreadyRunningException, JobRestartException,
+                   JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 }
 ----
 It is expected that implementations obtain a valid `JobExecution` from the
@@ -632,9 +637,9 @@ xmlns:beans="http://www.springframework.org/schema/beans"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="
    http://www.springframework.org/schema/beans
-   http://www.springframework.org/schema/beans/spring-beans.xsd
+   https://www.springframework.org/schema/beans/spring-beans.xsd
    http://www.springframework.org/schema/batch
-   http://www.springframework.org/schema/batch/spring-batch.xsd">
+   https://www.springframework.org/schema/batch/spring-batch.xsd">
 
 <job id="ioSampleJob">
     <step id="step1">

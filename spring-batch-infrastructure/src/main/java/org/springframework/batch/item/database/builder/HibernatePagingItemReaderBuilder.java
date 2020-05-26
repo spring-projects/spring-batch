@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see HibernatePagingItemReader
  */
@@ -182,7 +183,7 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setQueryProvider(HibernateQueryProvider)
 	 */
-	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider queryProvider) {
+	public HibernatePagingItemReaderBuilder<T> queryProvider(HibernateQueryProvider<T> queryProvider) {
 		this.queryProvider = queryProvider;
 
 		return this;
@@ -223,8 +224,24 @@ public class HibernatePagingItemReaderBuilder<T> {
 	 * @param useStatelessSession Defaults to false
 	 * @return this instance for method chaining
 	 * @see HibernatePagingItemReader#setUseStatelessSession(boolean)
+	 * @deprecated This method is deprecated in favor of
+	 * {@link HibernatePagingItemReaderBuilder#useStatelessSession} and will be
+	 * removed in a future version.
 	 */
+	@Deprecated
 	public HibernatePagingItemReaderBuilder<T> useSatelessSession(boolean useStatelessSession) {
+		return useStatelessSession(useStatelessSession);
+	}
+
+	/**
+	 * Indicator for whether to use a {@link org.hibernate.StatelessSession}
+	 * (<code>true</code>) or a {@link org.hibernate.Session} (<code>false</code>).
+	 *
+	 * @param useStatelessSession Defaults to false
+	 * @return this instance for method chaining
+	 * @see HibernatePagingItemReader#setUseStatelessSession(boolean)
+	 */
+	public HibernatePagingItemReaderBuilder<T> useStatelessSession(boolean useStatelessSession) {
 		this.statelessSession = useStatelessSession;
 
 		return this;

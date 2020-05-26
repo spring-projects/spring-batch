@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,6 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
 
 /**
  * A {@link ChannelInterceptor} that adds the current {@link StepExecution} (if
@@ -34,7 +33,7 @@ import org.springframework.messaging.support.ChannelInterceptorAdapter;
  * @author Dave Syer
  *
  */
-public class StepExecutionInterceptor extends ChannelInterceptorAdapter {
+public class StepExecutionInterceptor implements ChannelInterceptor {
 
 	/**
 	 * The name of the header

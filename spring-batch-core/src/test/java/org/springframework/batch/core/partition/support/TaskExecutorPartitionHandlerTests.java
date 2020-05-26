@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ public class TaskExecutorPartitionHandlerTests {
 
 	private int count = 0;
 
-	private Collection<String> stepExecutions = new TreeSet<String>();
+	private Collection<String> stepExecutions = new TreeSet<>();
 
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(1L));
 
@@ -56,7 +56,7 @@ public class TaskExecutorPartitionHandlerTests {
 
 		@Override
 		public Set<StepExecution> split(StepExecution stepExecution, int gridSize) throws JobExecutionException {
-			HashSet<StepExecution> result = new HashSet<StepExecution>();
+			HashSet<StepExecution> result = new HashSet<>();
 			for (int i = gridSize; i-- > 0;) {
 				result.add(stepExecution.getJobExecution().createStepExecution("foo" + i));
 			}
@@ -74,6 +74,20 @@ public class TaskExecutorPartitionHandlerTests {
 			}
 		});
 		handler.afterPropertiesSet();
+	}
+
+	@Test
+	public void testConfiguration() throws Exception {
+		handler = new TaskExecutorPartitionHandler();
+		try {
+			handler.afterPropertiesSet();
+			fail("Expected IllegalStateException when no step is set");
+		}
+		catch (IllegalStateException e) {
+			// expected
+			String message = e.getMessage();
+			assertEquals("Wrong message: " + message, "A Step must be provided.", message);
+		}
 	}
 
 	@Test

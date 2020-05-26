@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,7 +79,7 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     protected final Log logger = LogFactory.getLog(getClass());
 
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes =
-            new LinkedHashSet<Class<? extends Annotation>>();
+            new LinkedHashSet<>();
 
     private String requiredParameterName = "required";
 
@@ -90,10 +90,10 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     private ConfigurableListableBeanFactory beanFactory;
 
     private final Map<Class<?>, Constructor<?>[]> candidateConstructorsCache =
-            new ConcurrentHashMap<Class<?>, Constructor<?>[]>(64);
+            new ConcurrentHashMap<>(64);
 
     private final Map<Class<?>, InjectionMetadata> injectionMetadataCache =
-            new ConcurrentHashMap<Class<?>, InjectionMetadata>(64);
+            new ConcurrentHashMap<>(64);
 
 
     /**
@@ -212,7 +212,7 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                 candidateConstructors = this.candidateConstructorsCache.get(beanClass);
                 if (candidateConstructors == null) {
                     Constructor<?>[] rawCandidates = beanClass.getDeclaredConstructors();
-                    List<Constructor<?>> candidates = new ArrayList<Constructor<?>>(rawCandidates.length);
+                    List<Constructor<?>> candidates = new ArrayList<>(rawCandidates.length);
                     Constructor<?> requiredConstructor = null;
                     Constructor<?> defaultConstructor = null;
                     for (Constructor<?> candidate : rawCandidates) {
@@ -248,10 +248,10 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                         if (requiredConstructor == null && defaultConstructor != null) {
                             candidates.add(defaultConstructor);
                         }
-                        candidateConstructors = candidates.toArray(new Constructor[candidates.size()]);
+                        candidateConstructors = candidates.toArray(new Constructor<?>[candidates.size()]);
                     }
                     else {
-                        candidateConstructors = new Constructor[0];
+                        candidateConstructors = new Constructor<?>[0];
                     }
                     this.candidateConstructorsCache.put(beanClass, candidateConstructors);
                 }
@@ -308,11 +308,11 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
     }
 
     protected InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {
-        LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<InjectionMetadata.InjectedElement>();
+        LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<>();
         Class<?> targetClass = clazz;
 
         do {
-            LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<InjectionMetadata.InjectedElement>();
+            LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<>();
             for (Field field : targetClass.getDeclaredFields()) {
                 Annotation annotation = findAutowiredAnnotation(field);
                 if (annotation != null) {
@@ -468,7 +468,7 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                 }
                 else {
                     DependencyDescriptor descriptor = new DependencyDescriptor(field, this.required);
-                    Set<String> autowiredBeanNames = new LinkedHashSet<String>(1);
+                    Set<String> autowiredBeanNames = new LinkedHashSet<>(1);
                     TypeConverter typeConverter = beanFactory.getTypeConverter();
                     value = beanFactory.resolveDependency(descriptor, beanName, autowiredBeanNames, typeConverter);
                     synchronized (this) {
@@ -536,7 +536,7 @@ class SpringAutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
                     Class<?>[] paramTypes = method.getParameterTypes();
                     arguments = new Object[paramTypes.length];
                     DependencyDescriptor[] descriptors = new DependencyDescriptor[paramTypes.length];
-                    Set<String> autowiredBeanNames = new LinkedHashSet<String>(paramTypes.length);
+                    Set<String> autowiredBeanNames = new LinkedHashSet<>(paramTypes.length);
                     TypeConverter typeConverter = beanFactory.getTypeConverter();
                     for (int i = 0; i < arguments.length; i++) {
                         MethodParameter methodParam = new MethodParameter(method, i);

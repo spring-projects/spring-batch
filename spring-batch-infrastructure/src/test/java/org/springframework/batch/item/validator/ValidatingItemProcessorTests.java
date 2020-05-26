@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ public class ValidatingItemProcessorTests {
 	@Test
 	public void testSuccessfulValidation() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
 		validator.validate(ITEM);
 
@@ -45,7 +45,7 @@ public class ValidatingItemProcessorTests {
 	@Test(expected = ValidationException.class)
 	public void testFailedValidation() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 
 		processFailedValidation(tested);
 	}
@@ -53,7 +53,7 @@ public class ValidatingItemProcessorTests {
 	@Test
 	public void testFailedValidation_Filter() throws Exception {
 
-		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
+		ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<>(validator);
 		tested.setFilter(true);
 
 		assertNull(processFailedValidation(tested));

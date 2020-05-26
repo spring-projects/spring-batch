@@ -1,3 +1,0 @@
-#macro (sequence $name $value)CREATE SEQUENCE ${name};
-#end
-#macro (notnull $name $type)ALTER COLUMN ${name} ${type} NOT NULL#end

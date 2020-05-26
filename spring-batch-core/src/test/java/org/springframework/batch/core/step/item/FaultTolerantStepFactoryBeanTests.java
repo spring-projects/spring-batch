@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +27,10 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import org.junit.rules.ExpectedException;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -64,6 +66,7 @@ import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
@@ -76,6 +79,9 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 public class FaultTolerantStepFactoryBeanTests {
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -133,6 +139,28 @@ public class FaultTolerantStepFactoryBeanTests {
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
 		stepExecution = jobExecution.createStepExecution(factory.getName());
 		repository.add(stepExecution);
+	}
+
+	@Test
+	public void testMandatoryReader() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setItemWriter(writer);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemReader must be provided");
+
+		factory.getObject();
+	}
+
+	@Test
+	public void testMandatoryWriter() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<>();
+		factory.setItemReader(reader);
+
+		expectedException.expect(IllegalStateException.class);
+		expectedException.expectMessage("ItemWriter must be provided");
+
+		factory.getObject();
 	}
 
 	/**
@@ -287,7 +315,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setFailures("2");
 		reader.setExceptionType(ItemStreamException.class);
 
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		map.put(ItemStreamException.class, true);
 		factory.setSkippableExceptionClasses(map);
 
@@ -347,7 +375,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testProcessFilter() throws Exception {
 		processor.setFailures("4");
 		processor.setFilter(true);
-		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
+		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<>();
 		factory.setListeners(new StepListener[] { listenerStub });
 		Step step = factory.getObject();
 
@@ -366,30 +394,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
 		assertEquals(expectedOutput, writer.getWritten());
-
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
-	}
-
-	@Test
-	public void testNullWriter() throws Exception {
-
-		factory.setItemWriter(null);
-		Step step = factory.getObject();
-
-		step.execute(stepExecution);
-
-		assertEquals(0, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount());
-		assertEquals(5, stepExecution.getReadCount());
-		// Write count is incremented even if nothing happens
-		assertEquals(5, stepExecution.getWriteCount());
-		assertEquals(0, stepExecution.getFilterCount());
-		assertEquals(0, stepExecution.getRollbackCount());
-
-		// writer skips "4"
-		assertTrue(reader.getRead().contains("4"));
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
@@ -434,7 +438,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testFatalException() throws Exception {
 		reader.setFailures("2");
 
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
 		map.put(SkippableException.class, true);
 		map.put(SkippableRuntimeException.class, true);
 		map.put(FatalRuntimeException.class, false);
@@ -525,7 +529,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		reader.setFailures("1", "3", "5");
 		writer.setFailures();
 
-		final List<Throwable> listenerCalls = new ArrayList<Throwable>();
+		final List<Throwable> listenerCalls = new ArrayList<>();
 
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
@@ -750,7 +754,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testAutoRegisterItemListeners() throws Exception {
 		reader.setFailures("2");
 
-		final List<Integer> listenerCalls = new ArrayList<Integer>();
+		final List<Integer> listenerCalls = new ArrayList<>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
 		ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
@@ -789,7 +793,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			}
 
 			@Override
-			public void afterProcess(String item, String result) {
+			public void afterProcess(String item, @Nullable String result) {
 				listenerCalls.add(3);
 			}
 
@@ -860,6 +864,7 @@ public class FaultTolerantStepFactoryBeanTests {
 				opened = true;
 			}
 
+			@Nullable
 			@Override
 			public String read() {
 				return null;
@@ -898,6 +903,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -919,6 +925,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -960,6 +967,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			public void update(ExecutionContext executionContext) throws ItemStreamException {
 			}
 
+			@Nullable
 			@Override
 			public String read() throws Exception, UnexpectedInputException, ParseException {
 				return null;
@@ -994,7 +1002,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		private boolean filterEncountered = false;
 
 		@Override
-		public void afterProcess(T item, S result) {
+		public void afterProcess(T item, @Nullable S result) {
 			if (result == null) {
 				filterEncountered = true;
 			}
@@ -1095,7 +1103,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	private SkipPolicy getSkippableSubsetSkipPolicy() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(WriteFailedException.class, true);
 		skippableExceptions.put(ItemWriterException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);
@@ -1103,7 +1111,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	private SkipPolicy getFatalSubsetSkipPolicy() throws Exception {
-		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<Class<? extends Throwable>, Boolean>();
+		Map<Class<? extends Throwable>, Boolean> skippableExceptions = new HashMap<>();
 		skippableExceptions.put(ItemWriterException.class, true);
 		skippableExceptions.put(WriteFailedException.class, false);
 		factory.setSkippableExceptionClasses(skippableExceptions);

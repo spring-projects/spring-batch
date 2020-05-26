@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,7 +51,8 @@ import org.springframework.util.ClassUtils;
  * needed as {@link #read()} method is called, returning an object corresponding
  * to current position. On restart it uses the last sort key value to locate the
  * first page to read (so it doesn't matter if the successfully processed items
- * have been removed or modified).
+ * have been removed or modified). It is important to have a unique key constraint
+ * on the sort key to guarantee that no data is lost between executions.
  * </p>
  * 
  * <p>
@@ -71,6 +72,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {

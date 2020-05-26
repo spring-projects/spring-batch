@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,9 +18,6 @@ package org.springframework.batch.item.data.builder;
 
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
@@ -33,6 +30,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link RepositoryItemWriter}.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see RepositoryItemWriter
  */
@@ -122,13 +120,13 @@ public class RepositoryItemWriterBuilder<T> {
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
-		private RepositoryItemWriterBuilder.RepositoryMethodIterceptor repositoryInvocationHandler;
+		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private CrudRepository<?, ?> repository;
 
 		public RepositoryMethodReference(CrudRepository<?, ?> repository) {
 			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryItemWriterBuilder.RepositoryMethodIterceptor();
+			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
 		}
 
 		/**
@@ -136,6 +134,7 @@ public class RepositoryItemWriterBuilder<T> {
 		 * information about the method.
 		 * @return T is a proxy of the object passed in in the constructor
 		 */
+		@SuppressWarnings("unchecked")
 		public T methodIs() {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(this.repository.getClass());
@@ -152,7 +151,7 @@ public class RepositoryItemWriterBuilder<T> {
 		}
 	}
 
-	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 		private String methodName;
 
 		@Override

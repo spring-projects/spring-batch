@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
+ * @author Drummond Dawson
  */
 public class CompositeItemProcessorBuilderTests {
 
@@ -57,13 +58,27 @@ public class CompositeItemProcessorBuilderTests {
 	@Test
 	public void testTransform() throws Exception {
 		Object item = new Object();
-		Object itemAfterFirstTransfromation = new Object();
+		Object itemAfterFirstTransformation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
 				.delegates(this.processors).build();
 
-		when(processor1.process(item)).thenReturn(itemAfterFirstTransfromation);
-		when(processor2.process(itemAfterFirstTransfromation)).thenReturn(itemAfterSecondTransformation);
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
+		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
+
+		assertSame(itemAfterSecondTransformation, composite.process(item));
+	}
+
+	@Test
+	public void testTransformVarargs() throws Exception {
+		Object item = new Object();
+		Object itemAfterFirstTransformation = new Object();
+		Object itemAfterSecondTransformation = new Object();
+		CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessorBuilder<>()
+				.delegates(this.processor1, this.processor2).build();
+
+		when(processor1.process(item)).thenReturn(itemAfterFirstTransformation);
+		when(processor2.process(itemAfterFirstTransformation)).thenReturn(itemAfterSecondTransformation);
 
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 	}
@@ -71,6 +86,8 @@ public class CompositeItemProcessorBuilderTests {
 	@Test
 	public void testNullOrEmptyDelegates() throws Exception {
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(new ArrayList<>()),
+				"The delegates list must have one or more delegates.");
+		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(),
 				"The delegates list must have one or more delegates.");
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>(),
 				"A list of delegates is required.");

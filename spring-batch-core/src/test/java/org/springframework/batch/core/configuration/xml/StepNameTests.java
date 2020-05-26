@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ import org.springframework.util.ClassUtils;
 @RunWith(Parameterized.class)
 public class StepNameTests {
 
-	private Map<String, StepLocator> stepLocators = new HashMap<String, StepLocator>();
+	private Map<String, StepLocator> stepLocators = new HashMap<>();
 
 	private ApplicationContext context;
 
@@ -77,7 +77,7 @@ public class StepNameTests {
 
 	@Parameters
 	public static List<Object[]> data() throws Exception {
-		List<Object[]> list = new ArrayList<Object[]>();
+		List<Object[]> list = new ArrayList<>();
 		ResourceArrayPropertyEditor editor = new ResourceArrayPropertyEditor();
 		editor.setAsText("classpath*:" + ClassUtils.addResourcePathToPackagePath(StepNameTests.class, "*.xml"));
 		Resource[] resources = (Resource[]) editor.getValue();

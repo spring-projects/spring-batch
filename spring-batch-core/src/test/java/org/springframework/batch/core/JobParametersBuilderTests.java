@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,7 +23,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
@@ -31,6 +33,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,6 +42,7 @@ import static org.mockito.Mockito.when;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobParametersBuilderTests {
@@ -54,6 +58,9 @@ public class JobParametersBuilderTests {
 	private List<JobExecution> jobExecutionList;
 
 	private Date date = new Date(System.currentTimeMillis());
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
 
 	@Before
 	public void initialize() {
@@ -125,10 +132,10 @@ public class JobParametersBuilderTests {
 		this.parametersBuilder.addDouble("DOUBLE", null);
 
 		JobParameters parameters = this.parametersBuilder.toJobParameters();
-		assertEquals(null, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(0L, parameters.getLong("LONG").longValue());
-		assertEquals(null, parameters.getString("STRING"));
-		assertEquals(0, parameters.getLong("DOUBLE").doubleValue(), 1e-15);
+		assertNull(parameters.getDate("SCHEDULE_DATE"));
+		assertNull(parameters.getLong("LONG"));
+		assertNull(parameters.getString("STRING"));
+		assertNull(parameters.getLong("DOUBLE"));
 	}
 
 	@Test
@@ -171,7 +178,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testPropreties() {
+	public void testProperties() {
 		Properties props = new Properties();
 		props.setProperty("SCHEDULE_DATE", "A DATE");
 		props.setProperty("LONG", "1");
@@ -197,9 +204,10 @@ public class JobParametersBuilderTests {
 
 	@Test
 	public void testGetNextJobParametersNoIncrementer(){
+		expectedException.expect(IllegalArgumentException.class);
+		expectedException.expectMessage("No job parameters incrementer found for job=simpleJob");
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
 	}
 
 	@Test
@@ -225,14 +233,13 @@ public class JobParametersBuilderTests {
 		initializeForNextJobParameters();
 		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", new Long(1), false);
 		this.parametersBuilder.getNextJobParameters(this.job);
-		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 3);
+		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 5);
 	}
 
 	@Test
 	public void testGetNextJobParametersNoPreviousExecution(){
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		this.jobExecutionList.add(null);
 		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();

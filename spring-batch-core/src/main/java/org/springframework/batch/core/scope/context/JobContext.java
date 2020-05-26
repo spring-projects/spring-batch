@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -44,13 +45,14 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Jimmy Praet (create JobContext based on {@link StepContext})
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JobContext extends SynchronizedAttributeAccessor {
 
 	private JobExecution jobExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	public JobContext(JobExecution jobExecution) {
 		super();
@@ -83,7 +85,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : jobExecution.getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -94,7 +96,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the {@link JobParameters}
 	 */
 	public Map<String, Object> getJobParameters() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, JobParameter> entry : jobExecution.getJobParameters().getParameters()
 				.entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
@@ -114,7 +116,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -134,6 +136,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
 	@Override
+	@Nullable
 	public Object removeAttribute(String name) {
 		unregisterDestructionCallbacks(name);
 		return super.removeAttribute(name);
@@ -146,7 +149,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 */
 	public void close() {
 
-		List<Exception> errors = new ArrayList<Exception>();
+		List<Exception> errors = new ArrayList<>();
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 

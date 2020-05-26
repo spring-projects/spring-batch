@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2013 the original author or authors.
+ * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,12 +23,14 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
+import org.springframework.lang.Nullable;
 
 /**
  * Enumeration for {@link JobExecutionListener} meta data, which ties together the names
  * of methods, their interfaces, annotation, and expected arguments.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  * @see JobListenerFactoryBean
  */
@@ -50,7 +52,7 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	}
 
 	static{
-		propertyMap = new HashMap<String, JobListenerMetaData>();
+		propertyMap = new HashMap<>();
 		for(JobListenerMetaData metaData : values()){
 			propertyMap.put(metaData.getPropertyName(), metaData);
 		}
@@ -85,8 +87,9 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	 * Return the relevant meta data for the provided property name.
 	 *
 	 * @param propertyName name of the property to retrieve.
-	 * @return meta data with supplied property name, null if none exists.
+	 * @return meta data with supplied property name, {@code null} if none exists.
 	 */
+	@Nullable
 	public static JobListenerMetaData fromPropertyName(String propertyName){
 		return propertyMap.get(propertyName);
 	}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.StepHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.lang.Nullable;
 
 /**
  * Implementation of {@link FlowExecutor} for use in components that need to
@@ -33,11 +34,12 @@ import org.springframework.batch.core.repository.JobRestartException;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobFlowExecutor implements FlowExecutor {
 
-	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
+	private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<>();
 
 	private final JobExecution execution;
 
@@ -108,6 +110,7 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getStepExecution() {
 		return stepExecutionHolder.get();
 	}

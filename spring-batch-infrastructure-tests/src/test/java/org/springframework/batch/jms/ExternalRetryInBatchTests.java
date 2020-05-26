@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
@@ -81,6 +82,7 @@ public class ExternalRetryInBatchTests {
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReader<String>() {
+			@Nullable
 			@Override
 			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -102,9 +104,9 @@ public class ExternalRetryInBatchTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<>();
 
-	private List<String> recovered = new ArrayList<String>();
+	private List<String> recovered = new ArrayList<>();
 
 	@Test
 	public void testExternalRetryRecoveryInBatch() throws Exception {
@@ -204,7 +206,7 @@ public class ExternalRetryInBatchTests {
 
 	private List<String> getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List<String> msgs = new ArrayList<>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

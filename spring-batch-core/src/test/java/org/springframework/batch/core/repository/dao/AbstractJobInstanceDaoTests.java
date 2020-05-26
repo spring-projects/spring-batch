@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -152,6 +152,33 @@ public abstract class AbstractJobInstanceDaoTests {
 		assertTrue("Last instance should be first on the list", jobInstances.get(0).getId() > jobInstances.get(1)
 				.getId());
 
+	}
+
+	@Transactional
+	@Test
+	public void testGetLastInstance() throws Exception {
+		testCreateAndRetrieve();
+
+		// unrelated job instance that should be ignored by the query
+		dao.createJobInstance("anotherJob", new JobParameters());
+
+		// we need two instances of the same job to check ordering
+		dao.createJobInstance(fooJob, new JobParameters());
+
+		List<JobInstance> jobInstances = dao.getJobInstances(fooJob, 0, 2);
+		assertEquals(2, jobInstances.size());
+		JobInstance lastJobInstance = dao.getLastJobInstance(fooJob);
+		assertNotNull(lastJobInstance);
+		assertEquals(fooJob, lastJobInstance.getJobName());
+		assertEquals("Last instance should be first on the list",
+				jobInstances.get(0), lastJobInstance);
+	}
+
+	@Transactional
+	@Test
+	public void testGetLastInstanceWhenNoInstance() {
+		JobInstance lastJobInstance = dao.getLastJobInstance("NonExistingJob");
+		assertNull(lastJobInstance);
 	}
 
 	/**

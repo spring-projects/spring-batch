@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,7 +51,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	 * values are passed are ignored (to prevent {@code}@Autowired{@code} from overwriting
 	 * the value).
 	 *
-	 * @param dataSource
+	 * @param dataSource The data source to use
 	 */
 	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
@@ -59,7 +59,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 			this.dataSource = dataSource;
 		}
 
-		if(this.transactionManager == null) {
+		if(getTransactionManager() == null) {
+			logger.warn("No transaction manager was provided, using a DataSourceTransactionManager");
 			this.transactionManager = new DataSourceTransactionManager(this.dataSource);
 		}
 	}
@@ -96,11 +97,12 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 			if(dataSource == null) {
 				logger.warn("No datasource was provided...using a Map based JobRepository");
 
-				if(this.transactionManager == null) {
+				if(getTransactionManager() == null) {
+					logger.warn("No transaction manager was provided, using a ResourcelessTransactionManager");
 					this.transactionManager = new ResourcelessTransactionManager();
 				}
 
-				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(this.transactionManager);
+				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(getTransactionManager());
 				jobRepositoryFactory.afterPropertiesSet();
 				this.jobRepository = jobRepositoryFactory.getObject();
 
@@ -128,7 +130,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(dataSource);
-		factory.setTransactionManager(transactionManager);
+		factory.setTransactionManager(getTransactionManager());
 		factory.afterPropertiesSet();
 		return factory.getObject();
 	}

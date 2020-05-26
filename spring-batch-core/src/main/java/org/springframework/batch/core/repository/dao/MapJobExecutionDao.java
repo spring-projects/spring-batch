@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.SerializationUtils;
 
@@ -38,7 +39,7 @@ import org.springframework.util.SerializationUtils;
 public class MapJobExecutionDao implements JobExecutionDao {
 
 	// JDK6 Make this into a ConcurrentSkipListMap: adds and removes tend to be very near the front or back
-	private final ConcurrentMap<Long, JobExecution> executionsById = new ConcurrentHashMap<Long, JobExecution>();
+	private final ConcurrentMap<Long, JobExecution> executionsById = new ConcurrentHashMap<>();
 
 	private final AtomicLong currentId = new AtomicLong(0L);
 
@@ -62,7 +63,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	@Override
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 		for (JobExecution exec : executionsById.values()) {
 			if (exec.getJobInstance().equals(jobInstance)) {
 				executions.add(copy(exec));
@@ -96,7 +97,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 		synchronized (jobExecution) {
 			if (!persistedExecution.getVersion().equals(jobExecution.getVersion())) {
-				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + id
+				throw new OptimisticLockingFailureException("Attempt to update job execution id=" + id
 						+ " with wrong version (" + jobExecution.getVersion() + "), where current version is "
 						+ persistedExecution.getVersion());
 			}
@@ -105,8 +106,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		}
 	}
 
+	@Nullable
 	@Override
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+	public JobExecution getLastJobExecution(@Nullable JobInstance jobInstance) {
 		JobExecution lastExec = null;
 		for (JobExecution exec : executionsById.values()) {
 			if (!exec.getJobInstance().equals(jobInstance)) {
@@ -125,12 +127,12 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#
 	 * findRunningJobExecutions(java.lang.String)
 	 */
 	@Override
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
-		Set<JobExecution> result = new HashSet<JobExecution>();
+		Set<JobExecution> result = new HashSet<>();
 		for (JobExecution exec : executionsById.values()) {
 			if (!exec.getJobInstance().getJobName().equals(jobName) || !exec.isRunning()) {
 				continue;
@@ -148,6 +150,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	 * (java.lang.Long)
 	 */
 	@Override
+	@Nullable
 	public JobExecution getJobExecution(Long executionId) {
 		return copy(executionsById.get(executionId));
 	}

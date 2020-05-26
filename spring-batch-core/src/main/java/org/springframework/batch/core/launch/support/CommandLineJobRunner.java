@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,10 +21,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -36,8 +34,8 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
@@ -47,7 +45,6 @@ import org.springframework.batch.core.launch.JobExecutionNotFailedException;
 import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobExecutionNotStoppedException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -158,6 +155,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 1.0
  */
 public class CommandLineJobRunner {
@@ -355,10 +353,9 @@ public class CommandLineJobRunner {
 			}
 
 			if (opts.contains("-next")) {
-				JobParameters nextParameters = getNextJobParameters(job);
-				Map<String, JobParameter> map = new HashMap<String, JobParameter>(nextParameters.getParameters());
-				map.putAll(jobParameters.getParameters());
-				jobParameters = new JobParameters(map);
+				jobParameters = new JobParametersBuilder(jobParameters, jobExplorer)
+						.getNextJobParameters(job)
+						.toJobParameters();
 			}
 
 			JobExecution jobExecution = launcher.run(job, jobParameters);
@@ -396,7 +393,7 @@ public class CommandLineJobRunner {
 
 		int start = 0;
 		int count = 100;
-		List<JobExecution> executions = new ArrayList<JobExecution>();
+		List<JobExecution> executions = new ArrayList<>();
 		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, start, count);
 
 		while (!lastInstances.isEmpty()) {
@@ -435,7 +432,7 @@ public class CommandLineJobRunner {
 		if (jobExecutions.isEmpty()) {
 			return null;
 		}
-		List<JobExecution> result = new ArrayList<JobExecution>();
+		List<JobExecution> result = new ArrayList<>();
 		for (JobExecution jobExecution : jobExecutions) {
 			if (jobExecution.getStatus() != BatchStatus.ABANDONED) {
 				result.add(jobExecution);
@@ -445,15 +442,16 @@ public class CommandLineJobRunner {
 	}
 
 	private List<JobExecution> getRunningJobExecutions(String jobIdentifier) {
-		List<JobExecution> jobExecutions = getJobExecutionsWithStatusGreaterThan(jobIdentifier, BatchStatus.COMPLETED);
-		if (jobExecutions.isEmpty()) {
-			return null;
-		}
-		List<JobExecution> result = new ArrayList<JobExecution>();
-		for (JobExecution jobExecution : jobExecutions) {
-			if (jobExecution.isRunning()) {
+		Long executionId = getLongIdentifier(jobIdentifier);
+		List<JobExecution> result = new ArrayList<>();
+		if (executionId != null) {
+			JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+			if (jobExecution != null && jobExecution.isRunning()) {
 				result.add(jobExecution);
 			}
+		}
+		else {
+			result.addAll(jobExplorer.findRunningJobExecutions(jobIdentifier));
 		}
 		return result.isEmpty() ? null : result;
 	}
@@ -466,35 +464,6 @@ public class CommandLineJobRunner {
 			// Not an ID - must be a name
 			return null;
 		}
-	}
-
-	/**
-	 * @param job the job that we need to find the next parameters for
-	 * @return the next job parameters if they can be located
-	 * @throws JobParametersNotFoundException if there is a problem
-	 */
-	private JobParameters getNextJobParameters(Job job) throws JobParametersNotFoundException {
-		String jobIdentifier = job.getName();
-		JobParameters jobParameters;
-		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobIdentifier, 0, 1);
-
-		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
-		if (incrementer == null) {
-			throw new JobParametersNotFoundException("No job parameters incrementer found for job=" + jobIdentifier);
-		}
-
-		if (lastInstances.isEmpty()) {
-			jobParameters = incrementer.getNext(new JobParameters());
-			if (jobParameters == null) {
-				throw new JobParametersNotFoundException("No bootstrap parameters found from incrementer for job="
-						+ jobIdentifier);
-			}
-		}
-		else {
-			List<JobExecution> lastExecutions = jobExplorer.getJobExecutions(lastInstances.get(0));
-			jobParameters = incrementer.getNext(lastExecutions.get(0).getJobParameters());
-		}
-		return jobParameters;
 	}
 
 	/**
@@ -514,7 +483,7 @@ public class CommandLineJobRunner {
 	 * interpreted either as the name of the job or the id of the job execution
 	 * that failed.</li>
 	 * <li>-next: (optional) if the job has a {@link JobParametersIncrementer}
-	 * that can be used to launch the next in a sequence</li>
+	 * that can be used to launch the next instance in a sequence</li>
 	 * <li>jobPath: the xml application context containing a {@link Job}
 	 * <li>jobIdentifier: the bean id of the job or id of the failed execution
 	 * in the case of a restart.
@@ -532,7 +501,7 @@ public class CommandLineJobRunner {
 
 		CommandLineJobRunner command = new CommandLineJobRunner();
 
-		List<String> newargs = new ArrayList<String>(Arrays.asList(args));
+		List<String> newargs = new ArrayList<>(Arrays.asList(args));
 
 		try {
 			if (System.in.available() > 0) {
@@ -556,8 +525,8 @@ public class CommandLineJobRunner {
 			}
 		}
 
-		Set<String> opts = new HashSet<String>();
-		List<String> params = new ArrayList<String>();
+		Set<String> opts = new LinkedHashSet<>();
+		List<String> params = new ArrayList<>();
 
 		int count = 0;
 		String jobPath = null;

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,7 +123,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 
 	private Map<String, Order> getSortKeysReplaced(Object qualifierReplacement) {
 		final String newQualifier = "" + qualifierReplacement;
-		final Map<String, Order> sortKeys = new LinkedHashMap<String, Order>();
+		final Map<String, Order> sortKeys = new LinkedHashMap<>();
 		for (Map.Entry<String, Order> sortKey : getSortKeys().entrySet()) {
 			sortKeys.put(sortKey.getKey().replaceFirst("^.*\\.", newQualifier), sortKey.getValue());
 		}

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,7 +48,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 
 	private final Log logger = LogFactory.getLog(getClass());
 	private ItemReader<? extends I> itemReader;
-	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
+	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<>();
 	private RepeatOperations repeatTemplate;
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
 	private ItemWriter<? super O> itemWriter;
@@ -83,7 +83,7 @@ public class JsrChunkProcessor<I,O> implements ChunkProcessor<I> {
 			throws Exception {
 
 		final AtomicInteger filterCount = new AtomicInteger(0);
-		final Chunk<O> output = new Chunk<O>();
+		final Chunk<O> output = new Chunk<>();
 
 		repeatTemplate.iterate(new RepeatCallback() {
 

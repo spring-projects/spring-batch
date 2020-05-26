@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,7 +64,7 @@ import static org.junit.Assert.fail;
 public class FlatFileItemWriterTests {
 
 	// object under test
-	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
+	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<>();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -87,7 +87,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setResource(new FileSystemResource(outputFile));
 		writer.setLineSeparator("\n");
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.setEncoding("UTF-8");
@@ -525,8 +525,8 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testOpenWithNonWritableFile() throws Exception {
-		writer = new FlatFileItemWriter<String>();
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer = new FlatFileItemWriter<>();
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		FileSystemResource file = new FileSystemResource("build/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
@@ -547,7 +547,7 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -559,9 +559,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testDefaultStreamContext() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter<>();
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);

@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.batch.item.file.BufferedReaderFactory;
+import org.springframework.batch.item.file.DefaultBufferedReaderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineCallbackHandler;
 import org.springframework.batch.item.file.LineMapper;
@@ -53,6 +55,8 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0
  * @see FlatFileItemReader
  */
@@ -62,12 +66,18 @@ public class FlatFileItemReaderBuilder<T> {
 
 	private boolean strict = true;
 
+	private String encoding = FlatFileItemReader.DEFAULT_CHARSET;
+
 	private RecordSeparatorPolicy recordSeparatorPolicy =
 			new SimpleRecordSeparatorPolicy();
 
+	private BufferedReaderFactory bufferedReaderFactory =
+			new DefaultBufferedReaderFactory();
+
 	private Resource resource;
 
-	private List<String> comments = new ArrayList<>();
+	private List<String> comments =
+			new ArrayList<>(Arrays.asList(FlatFileItemReader.DEFAULT_COMMENT_PREFIXES));
 
 	private int linesToSkip = 0;
 
@@ -162,6 +172,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 	/**
 	 * Add a string to the list of Strings that indicate commented lines.
+	 * Defaults to {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
 	 *
 	 * @param comment the string to define a commented line.
 	 * @return The current instance of the builder.
@@ -173,15 +184,16 @@ public class FlatFileItemReaderBuilder<T> {
 	}
 
 	/**
-	 * An array of Strings that indicate lines that are comments (and therefore skipped by
-	 * the reader.
+	 * Set an array of Strings that indicate lines that are comments (and therefore skipped by
+	 * the reader). This method overrides the default comment prefixes which are
+	 * {@link FlatFileItemReader#DEFAULT_COMMENT_PREFIXES}.
 	 *
 	 * @param comments an array of strings to identify comments.
 	 * @return The current instance of the builder.
 	 * @see FlatFileItemReader#setComments(String[])
 	 */
-	public FlatFileItemReaderBuilder<T> comments(String[] comments) {
-		this.comments.addAll(Arrays.asList(comments));
+	public FlatFileItemReaderBuilder<T> comments(String... comments) {
+		this.comments = Arrays.asList(comments);
 		return this;
 	}
 
@@ -196,6 +208,19 @@ public class FlatFileItemReaderBuilder<T> {
 		this.recordSeparatorPolicy = policy;
 		return this;
 	}
+
+	/**
+	 * Configure a custom {@link BufferedReaderFactory} for the reader.
+	 *
+	 * @param factory custom factory
+	 * @return The current instance of the builder.
+	 * @see FlatFileItemReader#setBufferedReaderFactory(BufferedReaderFactory)
+	 */
+	public FlatFileItemReaderBuilder<T> bufferedReaderFactory(BufferedReaderFactory factory) {
+		this.bufferedReaderFactory = factory;
+		return this;
+	}
+
 
 	/**
 	 * The {@link Resource} to be used as input.
@@ -219,6 +244,19 @@ public class FlatFileItemReaderBuilder<T> {
 	 */
 	public FlatFileItemReaderBuilder<T> strict(boolean strict) {
 		this.strict = strict;
+		return this;
+	}
+
+	/**
+	 * Configure the encoding used by the reader to read the input source.
+	 * Default value is {@link FlatFileItemReader#DEFAULT_CHARSET}.
+	 *
+	 * @param encoding to use to read the input source.
+	 * @return The current instance of the builder.
+	 * @see FlatFileItemReader#setEncoding(String)
+	 */
+	public FlatFileItemReaderBuilder<T> encoding(String encoding) {
+		this.encoding = encoding;
 		return this;
 	}
 
@@ -412,6 +450,7 @@ public class FlatFileItemReaderBuilder<T> {
 		}
 
 		Assert.notNull(this.recordSeparatorPolicy, "A RecordSeparatorPolicy is required.");
+		Assert.notNull(this.bufferedReaderFactory, "A BufferedReaderFactory is required.");
 		int validatorValue = this.tokenizerValidator.intValue();
 
 		FlatFileItemReader<T> reader = new FlatFileItemReader<>();
@@ -420,18 +459,22 @@ public class FlatFileItemReaderBuilder<T> {
 			reader.setName(this.name);
 		}
 
+		if(StringUtils.hasText(this.encoding)) {
+			reader.setEncoding(this.encoding);
+		}
+
 		reader.setResource(this.resource);
 
 		if(this.lineMapper != null) {
 			reader.setLineMapper(this.lineMapper);
 		}
 		else {
-			Assert.state(validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
+			Assert.state(validatorValue == 0 || validatorValue == 1 || validatorValue == 2 || validatorValue == 4,
 					"Only one LineTokenizer option may be configured");
 
 			DefaultLineMapper<T> lineMapper = new DefaultLineMapper<>();
 
-			if(this.lineTokenizer != null && this.fieldSetMapper != null) {
+			if(this.lineTokenizer != null) {
 				lineMapper.setLineTokenizer(this.lineTokenizer);
 			}
 			else if(this.fixedLengthBuilder != null) {
@@ -472,13 +515,11 @@ public class FlatFileItemReaderBuilder<T> {
 		}
 
 		reader.setLinesToSkip(this.linesToSkip);
-
-		if(!this.comments.isEmpty()) {
-			reader.setComments(this.comments.toArray(new String[this.comments.size()]));
-		}
+		reader.setComments(this.comments.toArray(new String[this.comments.size()]));
 
 		reader.setSkippedLinesCallback(this.skippedLinesCallback);
 		reader.setRecordSeparatorPolicy(this.recordSeparatorPolicy);
+		reader.setBufferedReaderFactory(this.bufferedReaderFactory);
 		reader.setMaxItemCount(this.maxItemCount);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setSaveState(this.saveState);
@@ -551,7 +592,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The instance of the builder for chaining.
 		 * @see DelimitedLineTokenizer#setIncludedFields(int[])
 		 */
-		public DelimitedBuilder<T> includedFields(Integer[] fields) {
+		public DelimitedBuilder<T> includedFields(Integer... fields) {
 			this.includedFields.addAll(Arrays.asList(fields));
 			return this;
 		}
@@ -590,7 +631,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The parent {@link FlatFileItemReaderBuilder}
 		 * @see DelimitedLineTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String [] names) {
+		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}
@@ -608,7 +649,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 			tokenizer.setNames(this.names.toArray(new String[this.names.size()]));
 
-			if(StringUtils.hasText(this.delimiter)) {
+			if(StringUtils.hasLength(this.delimiter)) {
 				tokenizer.setDelimiter(this.delimiter);
 			}
 
@@ -637,7 +678,7 @@ public class FlatFileItemReaderBuilder<T> {
 				tokenizer.afterPropertiesSet();
 			}
 			catch (Exception e) {
-				throw new IllegalStateException("Unable to intialize DelimitedLineTokenizer", e);
+				throw new IllegalStateException("Unable to initialize DelimitedLineTokenizer", e);
 			}
 
 			return tokenizer;
@@ -671,7 +712,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return This instance for chaining
 		 * @see FixedLengthTokenizer#setColumns(Range[])
 		 */
-		public FixedLengthBuilder<T> columns(Range[] ranges) {
+		public FixedLengthBuilder<T> columns(Range... ranges) {
 			this.ranges.addAll(Arrays.asList(ranges));
 			return this;
 		}
@@ -708,7 +749,7 @@ public class FlatFileItemReaderBuilder<T> {
 		 * @return The parent builder
 		 * @see FixedLengthTokenizer#setNames(String[])
 		 */
-		public FlatFileItemReaderBuilder<T> names(String [] names) {
+		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
 		}

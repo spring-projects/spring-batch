@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -89,12 +89,12 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testGetMultipleInMultipleThreads() throws Exception {
 
-		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> tasks = new ArrayList<>();
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
 			final Long id = 123L + i;
-			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+			FutureTask<String> task = new FutureTask<>(new Callable<String>() {
 				@Override
 				public String call() throws Exception {
 					JobExecution jobExecution = new JobExecution(id);
@@ -125,7 +125,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testGetSameInMultipleThreads() throws Exception {
 
-		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
+		List<FutureTask<String>> tasks = new ArrayList<>();
 		final JobExecution jobExecution = new JobExecution(11L);
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		executionContext.put("foo", "foo");
@@ -134,7 +134,7 @@ public class AsyncJobScopeIntegrationTests implements BeanFactoryAware {
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
-			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+			FutureTask<String> task = new FutureTask<>(new Callable<String>() {
 				@Override
 				public String call() throws Exception {
 					ExecutionContext executionContext = jobExecution.getExecutionContext();

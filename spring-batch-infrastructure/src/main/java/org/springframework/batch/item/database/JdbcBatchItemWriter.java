@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
  * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
  * provided.</p>
  *
- * The user must provide an SQL query and a special callback in the for of either
+ * The user must provide an SQL query and a special callback for either of
  * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}.
  * You can use either named parameters or the traditional '?' placeholders. If you use the
  * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
@@ -63,19 +63,19 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
-	private NamedParameterJdbcOperations namedParameterJdbcTemplate;
+	protected NamedParameterJdbcOperations namedParameterJdbcTemplate;
 
-	private ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
+	protected ItemPreparedStatementSetter<T> itemPreparedStatementSetter;
 
-	private ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
+	protected ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider;
 
-	private String sql;
+	protected String sql;
 
-	private boolean assertUpdates = true;
+	protected boolean assertUpdates = true;
 
-	private int parameterCount;
+	protected int parameterCount;
 
-	private boolean usingNamedParameters;
+	protected boolean usingNamedParameters;
 
 	/**
 	 * Public setter for the flag that determines whether an assertion is made

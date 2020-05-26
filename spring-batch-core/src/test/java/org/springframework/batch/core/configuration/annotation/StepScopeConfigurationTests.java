@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +37,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.lang.Nullable;
 
 import java.util.concurrent.Callable;
 
@@ -45,6 +46,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepScopeConfigurationTests {
@@ -76,9 +78,9 @@ public class StepScopeConfigurationTests {
 	}
 
 	@Test
-	public void testXmlStepScopeWithInheritence() throws Exception {
+	public void testXmlStepScopeWithInheritance() throws Exception {
 		context = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritence-context.xml");
+				"org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsInheritance-context.xml");
 		StepSynchronizationManager.register(stepExecution);
 		SimpleHolder value = (SimpleHolder) context.getBean("child");
 		assertEquals("STEP", value.call());
@@ -288,6 +290,7 @@ public class StepScopeConfigurationTests {
 
 	public static class TaskletSupport implements Tasklet {
 
+		@Nullable
 		@Override
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			return RepeatStatus.FINISHED;

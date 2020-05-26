@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.test;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -55,18 +57,19 @@ import org.springframework.context.ApplicationContext;
  * <p>
  * It should be noted that using any of the methods that don't contain
  * {@link JobParameters} in their signature, will result in one being created
- * with the current system time as a parameter. This will ensure restartability
- * when no parameters are provided.
+ * with a random number of type {@code long} as a parameter. This will ensure
+ * restartability when no parameters are provided.
  * </p>
  * 
  * @author Lucas Ward
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 public class JobLauncherTestUtils {
 
-	private static final long JOB_PARAMETER_MAXIMUM = 1000000;
+	private SecureRandom secureRandom = new SecureRandom();
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -153,12 +156,12 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * @return a new JobParameters object containing only a parameter for the
-	 * current timestamp, to ensure that the job instance will be unique.
+	 * @return a new JobParameters object containing only a parameter with a
+	 * random number of type {@code long}, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
-		parameters.put("random", new JobParameter((long) (Math.random() * JOB_PARAMETER_MAXIMUM)));
+		Map<String, JobParameter> parameters = new HashMap<>();
+		parameters.put("random", new JobParameter(this.secureRandom.nextLong()));
 		return new JobParameters(parameters);
 	}
 
@@ -223,7 +226,7 @@ public class JobLauncherTestUtils {
 	 * loaded into the Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(String stepName, JobParameters jobParameters, @Nullable ExecutionContext jobExecutionContext) {
 		if (!(job instanceof StepLocator)) {
 			throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
 					+ job.getName() + " does not implement StepLocator");

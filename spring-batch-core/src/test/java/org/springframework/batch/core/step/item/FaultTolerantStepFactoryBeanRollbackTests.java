@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -83,11 +83,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		reader = new SkipReaderStub<String>();
-		processor = new SkipProcessorStub<String>();
-		writer = new SkipWriterStub<String>();
+		reader = new SkipReaderStub<>();
+		processor = new SkipProcessorStub<>();
+		writer = new SkipWriterStub<>();
 
-		factory = new FaultTolerantStepFactoryBean<String, String>();
+		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -291,7 +291,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals("[1, 3, 4, 5]", writer.getCommitted().toString());
 		// No rollback on 2 so processor has side effect
 		assertEquals("[1, 2, 3, 4, 5]", processor.getCommitted().toString());
-		List<String> processed = new ArrayList<String>(processor.getProcessed());
+		List<String> processed = new ArrayList<>(processor.getProcessed());
 		Collections.sort(processed);
 		assertEquals("[1, 2, 3, 4, 5]", processed.toString());
 		assertEquals(0, stepExecution.getSkipCount());
@@ -522,7 +522,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testSkipInWriterTransactionalReader() throws Exception {
 		writer.setFailures("4");
-		ItemReader<String> reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
+		ItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
 		factory.setItemReader(reader);
 		factory.setCommitInterval(30);
 		factory.setSkipLimit(10);

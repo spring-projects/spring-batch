@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,7 +76,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 	@Override
 	public Object getObject() {
 		if (metaDataMap == null) {
-			metaDataMap = new HashMap<String, String>();
+			metaDataMap = new HashMap<>();
 		}
 		// Because all annotations and interfaces should be checked for, make
 		// sure that each meta data
@@ -88,15 +88,15 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 		}
 
-		Set<Class<?>> listenerInterfaces = new HashSet<Class<?>>();
+		Set<Class<?>> listenerInterfaces = new HashSet<>();
 
 		// For every entry in the map, try and find a method by interface, name,
 		// or annotation. If the same
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<>();
 		boolean synthetic = false;
 		for (Entry<String, String> entry : metaDataMap.entrySet()) {
 			final ListenerMetaData metaData = this.getMetaDataFromPropertyName(entry.getKey());
-			Set<MethodInvoker> invokers = new HashSet<MethodInvoker>();
+			Set<MethodInvoker> invokers = new HashSet<>();
 
 			MethodInvoker invoker;
 			invoker = getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), delegate,
@@ -225,7 +225,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 			}
 
 			if(targetSource != null && targetSource.getTargetClass() != null && targetSource.getTargetClass().isInterface()) {
-				logger.warn(String.format("%s is an interface.  The implementing class will not be queried for annotation based listener configurations.  If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.", targetSource.getTargetClass().getName()));
+				logger.warn(String.format("%s is an interface. The implementing class will not be queried for annotation based listener configurations. If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.", targetSource.getTargetClass().getName()));
 			}
 		}
 		for (ListenerMetaData metaData : metaDataValues) {

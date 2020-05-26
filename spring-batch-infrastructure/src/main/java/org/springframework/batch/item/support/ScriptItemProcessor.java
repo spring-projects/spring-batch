@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.support;
 
+import org.springframework.lang.Nullable;
 import org.springframework.scripting.support.StaticScriptSource;
 import org.springframework.util.StringUtils;
 import org.springframework.batch.item.ItemProcessor;
@@ -53,10 +54,11 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	private ScriptEvaluator scriptEvaluator;
 	private String itemBindingVariableName = ITEM_BINDING_VARIABLE_NAME;
 
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public O process(I item) throws Exception {
-		Map<String, Object> arguments = new HashMap<String, Object>();
+		Map<String, Object> arguments = new HashMap<>();
 		arguments.put(itemBindingVariableName, item);
 
 		return (O) scriptEvaluator.evaluate(getScriptSource(), arguments);
@@ -106,9 +108,24 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 		this.itemBindingVariableName = itemBindingVariableName;
 	}
 
+	/**
+	 * <p>
+	 * Provides the ability to set a custom {@link org.springframework.scripting.ScriptEvaluator}
+	 * implementation. If not set, a {@link org.springframework.scripting.support.StandardScriptEvaluator}
+	 * will be used by default.
+	 * </p>
+	 *
+	 * @param scriptEvaluator the {@link org.springframework.scripting.ScriptEvaluator} to use
+	 */
+	public void setScriptEvaluator(ScriptEvaluator scriptEvaluator) {
+		this.scriptEvaluator = scriptEvaluator;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		scriptEvaluator = new StandardScriptEvaluator();
+		if(scriptEvaluator == null) {
+			scriptEvaluator = new StandardScriptEvaluator();
+		}
 
 		Assert.state(scriptSource != null || script != null,
 				"Either the script source or script file must be provided");
@@ -116,9 +133,9 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 		Assert.state(scriptSource == null || script == null,
 				"Either a script source or script file must be provided, not both");
 
-		if (scriptSource != null) {
+		if (scriptSource != null && scriptEvaluator instanceof StandardScriptEvaluator) {
 			Assert.isTrue(!StringUtils.isEmpty(language),
-					"Language must be provided when using script source");
+					"Language must be provided when using the default ScriptEvaluator and raw source code");
 
 			((StandardScriptEvaluator) scriptEvaluator).setLanguage(language);
 		}

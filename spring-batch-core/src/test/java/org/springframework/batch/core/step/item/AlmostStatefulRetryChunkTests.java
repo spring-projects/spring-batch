@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,7 +50,7 @@ public class AlmostStatefulRetryChunkTests {
 	private int count = 0;
 
 	public AlmostStatefulRetryChunkTests(String[] args, int limit) {
-		chunk = new Chunk<String>();
+		chunk = new Chunk<>();
 		for (String string : args) {
 			chunk.add(string);
 		}
@@ -60,7 +60,7 @@ public class AlmostStatefulRetryChunkTests {
 	@Test
 	public void testRetry() throws Exception {
 		logger.debug("Starting simple scenario");
-		List<String> items = new ArrayList<String>(chunk.getItems());
+		List<String> items = new ArrayList<>(chunk.getItems());
 		int before = items.size();
 		items.removeAll(Collections.singleton("fail"));
 		boolean error = true;
@@ -137,7 +137,7 @@ public class AlmostStatefulRetryChunkTests {
 
 	@Parameters
 	public static List<Object[]> data() {
-		List<Object[]> params = new ArrayList<Object[]>();
+		List<Object[]> params = new ArrayList<>();
 		params.add(new Object[] { new String[] { "foo" }, 0 });
 		params.add(new Object[] { new String[] { "foo", "bar" }, 0 });
 		params.add(new Object[] { new String[] { "foo", "bar", "spam" }, 0 });

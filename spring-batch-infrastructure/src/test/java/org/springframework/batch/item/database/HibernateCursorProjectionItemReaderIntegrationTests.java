@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,7 +68,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	@Test
 	public void testMultipleItemsInProjection() throws Exception {
-		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();
+		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value, f.name from Foo f");
 		Object[] foo1 = reader.read();
 		assertEquals(1, foo1[0]);
@@ -76,7 +76,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	@Test
 	public void testSingleItemInProjection() throws Exception {
-		HibernateCursorItemReader<Object> reader = new HibernateCursorItemReader<Object>();
+		HibernateCursorItemReader<Object> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value from Foo f");
 		Object foo1 = reader.read();
 		assertEquals(1, foo1);
@@ -84,7 +84,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	@Test
 	public void testSingleItemInProjectionWithArrayType() throws Exception {
-		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();
+		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<>();
 		initializeItemReader(reader, "select f.value from Foo f");
 		try {
 			Object[] foo1 = reader.read();

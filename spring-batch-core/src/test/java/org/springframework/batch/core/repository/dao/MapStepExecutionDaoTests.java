@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2012 the original author or authors.
+ * Copyright 2008-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -117,4 +117,26 @@ public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		assertEquals(BatchStatus.COMPLETED, jobStepExecution.getStatus());
 	}
 
+	@Test
+	public void testCountStepExecutions() {
+		// Given
+		StepExecutionDao tested = new MapStepExecutionDao();
+		JobExecution jobExecution = new JobExecution(jobInstance, 88L, null, null);
+
+		StepExecution firstStepExecution = new StepExecution("Step one", jobExecution);
+		firstStepExecution.setStatus(BatchStatus.STARTED);
+
+		tested.saveStepExecution(firstStepExecution);
+
+		StepExecution secondStepExecution = new StepExecution("Step two", jobExecution);
+		secondStepExecution.setStatus(BatchStatus.STARTED);
+
+		tested.saveStepExecution(secondStepExecution);
+
+		// When
+		int result = tested.countStepExecutions(jobInstance, firstStepExecution.getStepName());
+
+		// Then
+		assertEquals(1, result);
+	}
 }

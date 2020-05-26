@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.stream.XMLInputFactory;
+
 import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
@@ -49,6 +52,8 @@ public class StaxEventItemReaderBuilder<T> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
+
+	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -176,6 +181,19 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Set the {@link XMLInputFactory}.
+	 *
+	 * @param xmlInputFactory to use
+	 * @return The current instance of the builder
+	 * @see StaxEventItemReader#setXmlInputFactory(XMLInputFactory)
+	 */
+	public StaxEventItemReaderBuilder<T> xmlInputFactory(XMLInputFactory xmlInputFactory) {
+		this.xmlInputFactory = xmlInputFactory;
+
+		return this;
+	}
+
+	/**
 	 * Validates the configuration and builds a new {@link StaxEventItemReader}
 	 *
 	 * @return a new instance of the {@link StaxEventItemReader}
@@ -203,6 +221,7 @@ public class StaxEventItemReaderBuilder<T> {
 		reader.setUnmarshaller(this.unmarshaller);
 		reader.setCurrentItemCount(this.currentItemCount);
 		reader.setMaxItemCount(this.maxItemCount);
+		reader.setXmlInputFactory(this.xmlInputFactory);
 
 		return reader;
 	}

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,11 +25,9 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.Lifecycle;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.ApplicationContextEvent;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
@@ -40,19 +38,24 @@ import org.springframework.util.Assert;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.1
  */
-public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationListener<ApplicationContextEvent>, ApplicationContextAware,
+public class AutomaticJobRegistrar implements Ordered, SmartLifecycle, ApplicationContextAware,
 		InitializingBean {
 
-	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<ApplicationContextFactory>();
+	private Collection<ApplicationContextFactory> applicationContextFactories = new ArrayList<>();
 
 	private JobLoader jobLoader;
 
 	private ApplicationContext applicationContext;
 
 	private volatile boolean running = false;
+
+	private int phase = Integer.MIN_VALUE + 1000;
+
+	private boolean autoStartup = true;
 
 	private Object lifecycleMonitor = new Object();
 
@@ -126,25 +129,6 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 	}
 
 	/**
-	 * Creates all the application contexts required and set up job registry entries with all the instances of
-	 * {@link Job} found therein. Also closes the contexts when the enclosing context is closed.
-	 *
-	 * @see InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public final void onApplicationEvent(ApplicationContextEvent event) {
-		// TODO: With Spring 3 a SmartLifecycle is started automatically
-		if (event.getSource() == applicationContext) {
-			if (event instanceof ContextRefreshedEvent) {
-				start();
-			}
-			else if (event instanceof ContextClosedEvent) {
-				stop();
-			}
-		}
-	}
-
-	/**
 	 * Delegates to {@link JobLoader#clear()}.
 	 *
 	 * @see Lifecycle#stop()
@@ -191,6 +175,38 @@ public class AutomaticJobRegistrar implements Ordered, Lifecycle, ApplicationLis
 		synchronized (this.lifecycleMonitor) {
 			return running;
 		}
+	}
+
+	@Override
+	public boolean isAutoStartup() {
+		return autoStartup;
+	}
+
+	/**
+	 * @param autoStartup true for auto start.
+	 * @see #isAutoStartup()
+	 */
+	public void setAutoStartup(boolean autoStartup) {
+		this.autoStartup = autoStartup;
+	}
+
+	@Override
+	public int getPhase() {
+		return phase;
+	}
+
+	/**
+	 * @param phase the phase.
+	 * @see #getPhase()
+	 */
+	public void setPhase(int phase) {
+		this.phase = phase;
+	}
+
+	@Override
+	public void stop(Runnable callback) {
+		stop();
+		callback.run();
 	}
 
 }

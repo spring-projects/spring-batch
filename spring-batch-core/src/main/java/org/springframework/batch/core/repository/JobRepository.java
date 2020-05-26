@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Isolation;
 
 import java.util.Collection;
@@ -43,6 +44,7 @@ import java.util.Collection;
  * @author Robert Kasanicky
  * @author David Turanski
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public interface JobRepository {
 
@@ -181,6 +183,7 @@ public interface JobRepository {
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
+	@Nullable
 	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
 
 	/**
@@ -195,6 +198,7 @@ public interface JobRepository {
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */
+	@Nullable
 	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
 
 }

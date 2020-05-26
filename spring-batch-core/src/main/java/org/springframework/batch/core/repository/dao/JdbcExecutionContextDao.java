@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,6 +52,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
@@ -87,6 +88,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param serializer {@link ExecutionContextSerializer} instance to use.
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
+		Assert.notNull(serializer, "Serializer must not be null");
 		this.serializer = serializer;
 	}
 
@@ -190,7 +192,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void saveExecutionContexts(Collection<StepExecution> stepExecutions) {
 		Assert.notNull(stepExecutions, "Attempt to save an null collection of step executions");
-		Map<Long, String> serializedContexts = new HashMap<Long, String>(stepExecutions.size());
+		Map<Long, String> serializedContexts = new HashMap<>(stepExecutions.size());
 		for (StepExecution stepExecution : stepExecutions) {
 			Long executionId = stepExecution.getId();
 			ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -208,6 +210,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
+		Assert.state(serializer != null, "ExecutionContextSerializer is required");
 	}
 
 	/**
@@ -287,7 +290,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
     }
 
 	private String serializeContext(ExecutionContext ctx) {
-		Map<String, Object> m = new HashMap<String, Object>();
+		Map<String, Object> m = new HashMap<>();
 		for (Entry<String, Object> me : ctx.entrySet()) {
 			m.put(me.getKey(), me.getValue());
 		}

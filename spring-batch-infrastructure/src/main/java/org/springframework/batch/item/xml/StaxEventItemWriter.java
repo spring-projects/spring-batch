@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -454,14 +454,14 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 			// If the current XMLOutputFactory implementation is supplied by
 			// Woodstox >= 3.2.9 we want to disable its
 			// automatic end element feature (see:
-			// http://jira.codehaus.org/browse/WSTX-165) per
-			// http://jira.spring.io/browse/BATCH-761).
+			// https://jira.codehaus.org/browse/WSTX-165) per
+			// https://jira.spring.io/browse/BATCH-761).
 			outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
 		}
 		if (outputFactory.isPropertySupported("com.ctc.wstx.outputValidateStructure")) {
 			// On restart we don't write the root element so we have to disable
 			// structural validation (see:
-			// http://jira.spring.io/browse/BATCH-1681).
+			// https://jira.spring.io/browse/BATCH-1681).
 			outputFactory.setProperty("com.ctc.wstx.outputValidateStructure", Boolean.FALSE);
 		}
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,9 @@ package org.springframework.batch.core.repository.dao;
 import java.util.Collection;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.lang.Nullable;
 
 public interface StepExecutionDao {
 
@@ -61,7 +63,21 @@ public interface StepExecutionDao {
 	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
 	 */
+	@Nullable
 	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
+
+	/**
+	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance}
+	 * ordered by starting time and then id.
+	 *
+	 * @param jobInstance the parent {@link JobInstance}
+	 * @param stepName the name of the step
+	 * @return a {@link StepExecution}
+	 */
+	@Nullable
+	default StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
@@ -70,4 +86,15 @@ public interface StepExecutionDao {
 	 */
 	void addStepExecutions(JobExecution jobExecution);
 
+	/**
+	 * Counts all the {@link StepExecution} for a given step name.
+	 *
+	 * @param jobInstance the parent {@link JobInstance}
+	 * @param stepName the name of the step
+	 * @since 4.3
+	 * @return the count of {@link StepExecution}s for a given step
+	 */
+	default int countStepExecutions(JobInstance jobInstance, String stepName) {
+		throw new UnsupportedOperationException();
+	}
 }

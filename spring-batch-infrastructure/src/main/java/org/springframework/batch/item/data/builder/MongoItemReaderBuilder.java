@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *  
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.data.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ import org.springframework.util.StringUtils;
  * A builder implementation for the {@link MongoItemReader}
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
+ * @author Parikshit Dutta
  * @since 4.0
  * @see MongoItemReader
  */
@@ -40,7 +45,7 @@ public class MongoItemReaderBuilder<T> {
 
 	private Class<? extends T> targetType;
 
-	Map<String, Sort.Direction> sorts;
+	private Map<String, Sort.Direction> sorts;
 
 	private String hint;
 
@@ -48,7 +53,7 @@ public class MongoItemReaderBuilder<T> {
 
 	private String collection;
 
-	private List<Object> parameterValues;
+	private List<Object> parameterValues = new ArrayList<>();
 
 	protected int pageSize = 10;
 
@@ -175,6 +180,17 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Values to be substituted in for each of the parameters in the query.
+	 *
+	 * @param parameterValues values
+	 * @return The current instance of the builder
+	 * @see MongoItemReader#setParameterValues(List)
+	 */
+	public MongoItemReaderBuilder<T> parameterValues(Object... parameterValues) {
+		return parameterValues(Arrays.asList(parameterValues));
+	}
+
+	/**
 	 * JSON defining the fields to be returned from the matching documents by MongoDB.
 	 *
 	 * @param fields JSON string that identifies the fields to sort by.
@@ -242,7 +258,7 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Provide a Spring Data Mongo {@link Query}.  This will take precidence over a JSON
+	 * Provide a Spring Data Mongo {@link Query}.  This will take precedence over a JSON
 	 * configured query.
 	 *
 	 * @param query Query to execute
@@ -270,9 +286,6 @@ public class MongoItemReaderBuilder<T> {
 
 		if(StringUtils.hasText(this.jsonQuery)) {
 			Assert.notNull(this.sorts, "sorts map is required.");
-		}
-		else {
-			Assert.state(this.query.getLimit() != 0, "PageSize in Query object was ignored.");
 		}
 
 		MongoItemReader<T> reader = new MongoItemReader<>();

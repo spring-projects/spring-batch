@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,11 +23,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
+import org.springframework.batch.core.metrics.BatchMetrics;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -145,9 +149,15 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		@SuppressWarnings("unchecked")
 		UserData<O> data = (UserData<O>) inputs.getUserData();
 		if (data == null) {
-			data = new UserData<O>();
+			data = new UserData<>();
 			inputs.setUserData(data);
-			data.setOutputs(new Chunk<O>());
+			data.setOutputs(new Chunk<>());
+		}
+		else {
+			// BATCH-2663: re-initialize filter count when scanning the chunk
+			if (data.scanning()) {
+				data.filterCount = 0;
+			}
 		}
 	}
 
@@ -185,7 +195,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		UserData<O> data = (UserData<O>) inputs.getUserData();
 		Chunk<O> previous = data.getOutputs();
 
-		Chunk<O> next = new Chunk<O>(outputs.getItems(), previous.getSkips());
+		Chunk<O> next = new Chunk<>(outputs.getItems(), previous.getSkips());
 		next.setBusy(previous.isBusy());
 
 		// Remember for next time if there are skips accumulating
@@ -198,11 +208,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	@Override
 	protected Chunk<O> transform(final StepContribution contribution, Chunk<I> inputs) throws Exception {
 
-		Chunk<O> outputs = new Chunk<O>();
+		Chunk<O> outputs = new Chunk<>();
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final Chunk<O> cache = data.getOutputs();
-		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<O>(cache.getItems()).iterator();
+		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<>(cache.getItems()).iterator();
 		final AtomicInteger count = new AtomicInteger(0);
 
 		// final int scanLimit = processorTransactional && data.scanning() ? 1 :
@@ -216,6 +226,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				@Override
 				public O doWithRetry(RetryContext context) throws Exception {
+					Timer.Sample sample = BatchMetrics.createTimerSample();
+					String status = BatchMetrics.STATUS_SUCCESS;
 					O output = null;
 					try {
 						count.incrementAndGet();
@@ -233,6 +245,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						}
 					}
 					catch (Exception e) {
+						status = BatchMetrics.STATUS_FAILURE;
 						if (rollbackClassifier.classify(e)) {
 							// Default is to rollback unless the classifier
 							// allows us to continue
@@ -255,6 +268,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 									"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
 									e);
 						}
+					}
+					finally {
+						stopTimer(sample, contribution.getStepExecution(), "item.process", status, "Item processing");
 					}
 					if (output == null) {
 						// No need to re-process filtered items
@@ -317,7 +333,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			throws Exception {
 		@SuppressWarnings("unchecked")
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
-		final AtomicReference<RetryContext> contextHolder = new AtomicReference<RetryContext>();
+		final AtomicReference<RetryContext> contextHolder = new AtomicReference<>();
 
 		RetryCallback<Object, Exception> retryCallback = new RetryCallback<Object, Exception>() {
 			@Override
@@ -326,10 +342,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				if (!data.scanning()) {
 					chunkMonitor.setChunkSize(inputs.size());
+					Timer.Sample sample = BatchMetrics.createTimerSample();
+					String status = BatchMetrics.STATUS_SUCCESS;
 					try {
 						doWrite(outputs.getItems());
 					}
 					catch (Exception e) {
+						status = BatchMetrics.STATUS_FAILURE;
 						if (rollbackClassifier.classify(e)) {
 							throw e;
 						}
@@ -341,6 +360,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 						 */
 						throw new ForceRollbackForWriteSkipException(
 								"Force rollback on skippable exception so that skipped item can be located.", e);
+					}
+					finally {
+						stopTimer(sample, contribution.getStepExecution(), "chunk.write", status, "Chunk writing");
 					}
 					contribution.incrementWriteCount(outputs.size());
 				}
@@ -515,7 +537,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		if (keyGenerator == null) {
 			return inputs.getItems();
 		}
-		List<Object> keys = new ArrayList<Object>();
+		List<Object> keys = new ArrayList<>();
 		for (I item : inputs.getItems()) {
 			keys.add(keyGenerator.getKey(item));
 		}
@@ -573,6 +595,13 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 		Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
 		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
+
+		if (!inputs.getSkips().isEmpty() && inputs.getItems().size() != outputs.getItems().size()) {
+			if (outputIterator.hasNext()) {
+				outputIterator.remove();
+				return;
+			}
+		}
 
 		List<O> items = Collections.singletonList(outputIterator.next());
 		inputIterator.next();

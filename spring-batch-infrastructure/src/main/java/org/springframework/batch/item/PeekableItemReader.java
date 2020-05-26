@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.item;
+
+import org.springframework.lang.Nullable;
 
 /**
  * <p>
@@ -33,6 +35,7 @@ package org.springframework.batch.item;
  * </p>
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface PeekableItemReader<T> extends ItemReader<T> {
@@ -41,9 +44,10 @@ public interface PeekableItemReader<T> extends ItemReader<T> {
 	 * Get the next item that would be returned by {@link #read()}, without
 	 * affecting the result of {@link #read()}.
 	 * 
-	 * @return the next item
+	 * @return the next item or {@code null} if the data source is exhausted
 	 * @throws Exception if there is a problem
 	 */
+	@Nullable
 	T peek() throws Exception, UnexpectedInputException, ParseException;
 
 }

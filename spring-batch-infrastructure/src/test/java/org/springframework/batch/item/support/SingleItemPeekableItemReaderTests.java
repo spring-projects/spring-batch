@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
@@ -29,14 +30,14 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class SingleItemPeekableItemReaderTests {
 	
-	private SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<String>();
+	private SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>();
 	
 	/**
 	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
 	 */
 	@Test
 	public void testRead() throws Exception {
-		reader.setDelegate(new CountingListItemReader<String>(Arrays.asList("a", "b")));
+		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
 		assertEquals(null, reader.read());
@@ -47,7 +48,7 @@ public class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	public void testPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<String>(Arrays.asList("a", "b")));
+		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.peek());
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.read());
@@ -60,7 +61,7 @@ public class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	public void testCloseAndOpenNoPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<String>(Arrays.asList("a", "b")));
+		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b")));
 		assertEquals("a", reader.read());
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.update(executionContext);
@@ -74,7 +75,7 @@ public class SingleItemPeekableItemReaderTests {
 	 */
 	@Test
 	public void testCloseAndOpenWithPeek() throws Exception {
-		reader.setDelegate(new CountingListItemReader<String>(Arrays.asList("a", "b", "c")));
+		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.peek());
 		ExecutionContext executionContext = new ExecutionContext();
@@ -87,7 +88,7 @@ public class SingleItemPeekableItemReaderTests {
 	@Test
 	public void testCloseAndOpenWithPeekAndRead() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
-		reader.setDelegate(new CountingListItemReader<String>(Arrays.asList("a", "b", "c")));
+		reader.setDelegate(new CountingListItemReader<>(Arrays.asList("a", "b", "c")));
 		assertEquals("a", reader.read());
 		assertEquals("b", reader.peek());
 		reader.update(executionContext);
@@ -122,6 +123,7 @@ public class SingleItemPeekableItemReaderTests {
 			counter = 0;
 		}
 
+		@Nullable
 		@Override
 		protected T doRead() throws Exception {
 			if (counter>=list.size()) {

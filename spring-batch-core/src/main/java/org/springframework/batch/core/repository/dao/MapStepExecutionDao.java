@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +27,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
@@ -38,9 +40,9 @@ import org.springframework.util.SerializationUtils;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<Long, Map<Long,StepExecution>>();
+	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<>();
 
-	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<Long, StepExecution>();
+	private Map<Long, StepExecution> executionsByStepExecutionId = new ConcurrentHashMap<>();
 
 	private AtomicLong currentId = new AtomicLong();
 
@@ -74,7 +76,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = new ConcurrentHashMap<Long, StepExecution>();
+			executions = new ConcurrentHashMap<>();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 
@@ -113,8 +115,32 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	@Override
+	@Nullable
 	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		return executionsByStepExecutionId.get(stepExecutionId);
+	}
+
+	@Override
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+		StepExecution latest = null;
+		for (StepExecution stepExecution : executionsByStepExecutionId.values()) {
+			if (!stepExecution.getStepName().equals(stepName)
+					|| stepExecution.getJobExecution().getJobInstance().getInstanceId() != jobInstance.getInstanceId()) {
+				continue;
+			}
+			if (latest == null) {
+				latest = stepExecution;
+			}
+			if (latest.getStartTime().getTime() < stepExecution.getStartTime().getTime()) {
+				latest = stepExecution;
+			}
+			// Use step execution ID as the tie breaker if start time is identical
+			if (latest.getStartTime().getTime() == stepExecution.getStartTime().getTime() &&
+					latest.getId() < stepExecution.getId()) {
+				latest = stepExecution;
+			}
+		}
+		return latest;
 	}
 
 	@Override
@@ -123,7 +149,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		if (executions == null || executions.isEmpty()) {
 			return;
 		}
-		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
+		List<StepExecution> result = new ArrayList<>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
 
 			@Override
@@ -132,7 +158,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 		});
 
-		List<StepExecution> copy = new ArrayList<StepExecution>(result.size());
+		List<StepExecution> copy = new ArrayList<>(result.size());
 		for (StepExecution exec : result) {
 			copy.add(copy(exec));
 		}
@@ -145,5 +171,18 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		for (StepExecution stepExecution: stepExecutions) {
 			saveStepExecution(stepExecution);
 		}
+	}
+
+	@Override
+	public int countStepExecutions(JobInstance jobInstance, String stepName) {
+		int count = 0;
+
+		for (StepExecution stepExecution : executionsByStepExecutionId.values()) {
+			if (stepExecution.getStepName().equals(stepName) && stepExecution.getJobExecution().getJobInstance()
+					.getInstanceId() == jobInstance.getInstanceId()) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

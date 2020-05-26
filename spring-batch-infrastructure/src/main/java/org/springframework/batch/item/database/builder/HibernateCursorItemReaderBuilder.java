@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see HibernateCursorItemReader
  */
@@ -58,7 +59,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 
 	private String nativeQuery;
 
-	private Class nativeClass;
+	private Class<T> nativeClass;
 
 	private boolean saveState = true;
 
@@ -232,7 +233,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 		return this;
 	}
 
-	public HibernateCursorItemReaderBuilder<T> entityClass(Class nativeClass) {
+	public HibernateCursorItemReaderBuilder<T> entityClass(Class<T> nativeClass) {
 		this.nativeClass = nativeClass;
 
 		return this;
@@ -267,7 +268,7 @@ public class HibernateCursorItemReaderBuilder<T> {
 			reader.setQueryString(this.queryString);
 		}
 		else if(StringUtils.hasText(this.nativeQuery) && this.nativeClass != null) {
-			HibernateNativeQueryProvider provider = new HibernateNativeQueryProvider();
+			HibernateNativeQueryProvider<T> provider = new HibernateNativeQueryProvider<>();
 			provider.setSqlQuery(this.nativeQuery);
 			provider.setEntityClass(this.nativeClass);
 

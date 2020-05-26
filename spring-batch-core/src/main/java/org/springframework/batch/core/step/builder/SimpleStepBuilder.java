@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,6 +63,7 @@ import org.springframework.util.Assert;
  * @see FaultTolerantStepBuilder for a step that handles retry and skip of failed items
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @since 2.2
  */
@@ -156,7 +157,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	@Override
 	protected Tasklet createTasklet() {
 		Assert.state(reader != null, "ItemReader must be provided");
-		Assert.state(processor != null || writer != null, "ItemWriter or ItemProcessor must be provided");
+		Assert.state(writer != null, "ItemWriter must be provided");
 		RepeatOperations repeatOperations = createChunkOperations();
 		SimpleChunkProvider<I> chunkProvider = new SimpleChunkProvider<>(getReader(), repeatOperations);
 		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(getProcessor(), getWriter());
@@ -235,7 +236,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 
 	/**
 	 * A {@link Function} to be delegated to as an {@link ItemProcessor}.  If this is set,
-	 * it will take precidence over any {@code ItemProcessor} configured via
+	 * it will take precedence over any {@code ItemProcessor} configured via
 	 * {@link #processor(ItemProcessor)}.
 	 *
 	 * @param function the function to delegate item processing to

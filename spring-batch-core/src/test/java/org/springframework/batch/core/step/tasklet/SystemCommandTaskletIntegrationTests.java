@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -73,7 +73,7 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet = new SystemCommandTasklet();
 		tasklet.setEnvironmentParams(null); // inherit from parent process
 		tasklet.setWorkingDirectory(null); // inherit from parent process
-		tasklet.setSystemProcessExitCodeMapper(new TestExitCodeMapper());
+		tasklet.setSystemProcessExitCodeMapper(new SimpleSystemProcessExitCodeMapper());
 		tasklet.setTimeout(5000); // long enough timeout
 		tasklet.setTerminationCheckInterval(500);
 		tasklet.setCommand("invalid command, change value for successful execution");
@@ -136,8 +136,8 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testExecuteTimeout() throws Exception {
-		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 3000" :
+		String command = isRunningOnWindows() ?
+				"ping 127.0.0.1" :
 					"sleep 3";
 		tasklet.setCommand(command);
 		tasklet.setTimeout(10);
@@ -158,8 +158,8 @@ public class SystemCommandTaskletIntegrationTests {
 	 */
 	@Test
 	public void testInterruption() throws Exception {
-		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 5000" :
+		String command = isRunningOnWindows() ?
+				"ping 127.0.0.1" :
 					"sleep 5";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
@@ -269,8 +269,8 @@ public class SystemCommandTaskletIntegrationTests {
 
 		when(jobExplorer.getJobExecution(1L)).thenReturn(stepExecution.getJobExecution(), stepExecution.getJobExecution(), stoppedJobExecution);
 
-		String command = System.getProperty("os.name").toLowerCase().contains("win") ?
-				"ping 1.1.1.1 -n 1 -w 5000" :
+		String command = isRunningOnWindows() ?
+				"ping 127.0.0.1 -n 5" :
 					"sleep 15";
 		tasklet.setCommand(command);
 		tasklet.setTerminationCheckInterval(10);
@@ -281,7 +281,7 @@ public class SystemCommandTaskletIntegrationTests {
 		ChunkContext chunkContext = new ChunkContext(stepContext);
 		tasklet.execute(contribution, chunkContext);
 
-		assertEquals(contribution.getExitStatus().getExitCode(),ExitStatus.STOPPED.getExitCode());
+		assertEquals(ExitStatus.STOPPED.getExitCode(), contribution.getExitStatus().getExitCode());
 	}
 
 	private String getJavaCommand() {
@@ -294,29 +294,15 @@ public class SystemCommandTaskletIntegrationTests {
 		command.append(fileSeparator);
 		command.append("java");
 
-		if(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+		if(isRunningOnWindows()) {
 			command.append(".exe");
 		}
 
 		return command.toString();
 	}
 
-	/**
-	 * Exit code mapper containing mapping logic expected by the tests. 0 means
-	 * finished successfully, other value means failure.
-	 */
-	private static class TestExitCodeMapper implements SystemProcessExitCodeMapper {
-
-		@Override
-		public ExitStatus getExitStatus(int exitCode) {
-			if (exitCode == 0) {
-				return ExitStatus.COMPLETED;
-			}
-			else {
-				return ExitStatus.FAILED;
-			}
-		}
-
+	private boolean isRunningOnWindows() {
+		return System.getProperty("os.name").toLowerCase().contains("win");
 	}
 
 }

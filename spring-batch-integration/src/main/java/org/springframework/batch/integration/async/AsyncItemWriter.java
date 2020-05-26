@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2015 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,11 +55,11 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * of the {@link Future} results in an {@link ExecutionException}, that will be
 	 * unwrapped and the cause will be thrown.
 	 *
-	 * @param items {@link java.util.concurrent.Future}s to be upwrapped and passed to the delegate
+	 * @param items {@link java.util.concurrent.Future}s to be unwrapped and passed to the delegate
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
 	public void write(List<? extends Future<T>> items) throws Exception {
-		List<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<>();
 		for (Future<T> future : items) {
 			try {
 				T item = future.get();

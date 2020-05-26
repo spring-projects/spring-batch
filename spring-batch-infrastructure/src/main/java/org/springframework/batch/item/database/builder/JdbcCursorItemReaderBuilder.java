@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,10 +20,9 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.database.AbstractCursorItemReader;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.support.ListPreparedStatementSetter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.ArgumentTypePreparedStatementSetter;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.util.Assert;
@@ -34,6 +33,8 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Glenn Renfro
+ * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -247,7 +248,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 * @param args values to set on the reader query
 	 * @return this instance for method chaining
 	 */
-	public JdbcCursorItemReaderBuilder<T> queryArguments(Object[] args) {
+	public JdbcCursorItemReaderBuilder<T> queryArguments(Object... args) {
 		this.preparedStatementSetter = new ArgumentPreparedStatementSetter(args);
 
 		return this;
@@ -274,14 +275,10 @@ public class JdbcCursorItemReaderBuilder<T> {
 	 *
 	 * @param args values to set on the query
 	 * @return this instance for method chaining
-	 * @throws Exception from {@link InitializingBean#afterPropertiesSet()}
 	 */
-	public JdbcCursorItemReaderBuilder<T> queryArguments(List<?> args) throws Exception {
-		ListPreparedStatementSetter listPreparedStatementSetter = new ListPreparedStatementSetter(args);
-
-		listPreparedStatementSetter.afterPropertiesSet();
-
-		this.preparedStatementSetter = listPreparedStatementSetter;
+	public JdbcCursorItemReaderBuilder<T> queryArguments(List<?> args) {
+		Assert.notNull(args, "The list of arguments must not be null");
+		this.preparedStatementSetter = new ArgumentPreparedStatementSetter(args.toArray());
 
 		return this;
 	}
@@ -334,7 +331,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 	public JdbcCursorItemReader<T> build() {
 		if(this.saveState) {
 			Assert.hasText(this.name,
-					"A name is required when saveSate is set to true");
+					"A name is required when saveState is set to true");
 		}
 
 		Assert.hasText(this.sql, "A query is required");

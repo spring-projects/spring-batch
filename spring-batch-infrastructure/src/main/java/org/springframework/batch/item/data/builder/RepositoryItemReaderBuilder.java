@@ -1,11 +1,11 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,10 +36,11 @@ import org.springframework.util.StringUtils;
  * A builder implementation for the {@link RepositoryItemReader}.
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
+ * @author Drummond Dawson
  * @since 4.0
  * @see RepositoryItemReader
  */
-
 public class RepositoryItemReaderBuilder<T> {
 
 	private PagingAndSortingRepository<?, ?> repository;
@@ -52,7 +53,7 @@ public class RepositoryItemReaderBuilder<T> {
 
 	private String methodName;
 
-	private RepositoryMethodReference repositoryMethodReference;
+	private RepositoryMethodReference<?> repositoryMethodReference;
 
 	private boolean saveState = true;
 
@@ -131,6 +132,17 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Arguments to be passed to the data providing method.
+	 *
+	 * @param arguments the method arguments to be passed to the repository.
+	 * @return The current instance of the builder.
+	 * @see RepositoryItemReader#setArguments(List)
+	 */
+	public RepositoryItemReaderBuilder<T> arguments(Object... arguments) {
+		return arguments(Arrays.asList(arguments));
+	}
+
+	/**
 	 * Provides ordering of the results so that order is maintained between paged queries.
 	 *
 	 * @param sorts the fields to sort by and the directions.
@@ -201,7 +213,7 @@ public class RepositoryItemReaderBuilder<T> {
 	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
 	 *
 	 */
-	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference repositoryMethodReference) {
+	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference<?> repositoryMethodReference) {
 		this.repositoryMethodReference = repositoryMethodReference;
 
 		return this;
@@ -249,13 +261,13 @@ public class RepositoryItemReaderBuilder<T> {
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
-		private RepositoryMethodIterceptor repositoryInvocationHandler;
+		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private PagingAndSortingRepository<?, ?> repository;
 
 		public RepositoryMethodReference(PagingAndSortingRepository<?, ?> repository) {
 			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryMethodIterceptor();
+			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
 		}
 
 		/**
@@ -263,6 +275,7 @@ public class RepositoryItemReaderBuilder<T> {
 		 * information about the method.
 		 * @return T is a proxy of the object passed in in the constructor
 		 */
+		@SuppressWarnings("unchecked")
 		public T methodIs() {
 			Enhancer enhancer = new Enhancer();
 			enhancer.setSuperclass(this.repository.getClass());
@@ -283,7 +296,7 @@ public class RepositoryItemReaderBuilder<T> {
 		}
 	}
 
-	private static class RepositoryMethodIterceptor implements MethodInterceptor {
+	private static class RepositoryMethodInterceptor implements MethodInterceptor {
 		private String methodName;
 
 		private List<Object> arguments;

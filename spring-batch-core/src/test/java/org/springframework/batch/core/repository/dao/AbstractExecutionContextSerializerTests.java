@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
 package org.springframework.batch.core.repository.dao;
 
 import org.junit.Test;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
 import java.io.*;
@@ -34,12 +36,13 @@ import static org.hamcrest.Matchers.hasEntry;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Marten Deinum
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractExecutionContextSerializerTests {
 
     @Test
     public void testSerializeAMap() throws Exception {
-        Map<String, Object> m1 = new HashMap<String, Object>();
+        Map<String, Object> m1 = new HashMap<>();
         m1.put("object1", Long.valueOf(12345L));
         m1.put("object2", "OBJECT TWO");
         // Use a date after 1971 (otherwise daylight saving screws up)...
@@ -52,11 +55,84 @@ public abstract class AbstractExecutionContextSerializerTests {
     }
 
     @Test
+    public void testSerializeStringJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("name", new JobParameter("foo"));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeDateJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("birthDate", new JobParameter(new Date(123456790123L)));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeDoubleJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("weight", new JobParameter(80.5D));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeLongJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("age", new JobParameter(20L));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeNonIdentifyingJobParameter() throws Exception {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("name", new JobParameter("foo", false));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeJobParameters() throws Exception {
+        Map<String, JobParameter> jobParametersMap = new HashMap<>();
+        jobParametersMap.put("paramName", new JobParameter("paramValue"));
+
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("params", new JobParameters(jobParametersMap));
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
+    public void testSerializeEmptyJobParameters() throws IOException {
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("params", new JobParameters());
+
+        Map<String, Object> m2 = serializationRoundTrip(m1);
+
+        compareContexts(m1, m2);
+    }
+
+    @Test
     public void testComplexObject() throws Exception {
-        Map<String, Object> m1 = new HashMap<String, Object>();
+        Map<String, Object> m1 = new HashMap<>();
         ComplexObject o1 = new ComplexObject();
         o1.setName("02345");
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("object1", Long.valueOf(12345L));
         m.put("object2", "OBJECT TWO");
         o1.setMap(m);

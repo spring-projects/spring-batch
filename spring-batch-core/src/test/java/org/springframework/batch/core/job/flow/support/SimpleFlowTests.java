@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -122,7 +122,7 @@ public class SimpleFlowTests {
 		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
 				"step1"))));
 		flow.afterPropertiesSet();
-		final List<FlowExecution> list = new ArrayList<FlowExecution>();
+		final List<FlowExecution> list = new ArrayList<>();
 		executor = new JobFlowExecutorSupport() {
 			@Override
 			public void close(FlowExecution result) {
@@ -212,7 +212,7 @@ public class SimpleFlowTests {
 	}
 
 	protected List<StateTransition> collect(StateTransition... states) {
-		List<StateTransition> list = new ArrayList<StateTransition>();
+		List<StateTransition> list = new ArrayList<>();
 
 		for (StateTransition stateTransition : states) {
 			list.add(stateTransition);

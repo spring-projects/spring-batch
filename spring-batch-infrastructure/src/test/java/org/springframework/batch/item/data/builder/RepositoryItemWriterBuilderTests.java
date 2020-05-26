@@ -5,7 +5,7 @@
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -85,7 +85,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepsository() throws Exception {
+	public void testWriteItemsTestRepository() throws Exception {
 		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
 				.methodName("foo")
 				.repository(this.repository)
@@ -99,7 +99,7 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testWriteItemsTestRepsositoryMethodIs() throws Exception {
+	public void testWriteItemsTestRepositoryMethodIs() throws Exception {
 		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository>
 				repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
 				this.repository);

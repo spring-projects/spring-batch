@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,7 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -46,13 +47,15 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
+ * @author Nicolas Widart
  *
  */
 public class StepContext extends SynchronizedAttributeAccessor {
 
 	private StepExecution stepExecution;
 
-	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	private BatchPropertyContext propertyContext = null;
 
@@ -100,6 +103,19 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
+	 * Convenient accessor for current {@link JobInstance} identifier.
+	 *
+	 * @return the identifier of the enclosing {@link JobInstance}
+	 * associated with the current {@link StepExecution}
+	 */
+	public Long getJobInstanceId() {
+		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
+		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
+				"StepExecution does not have a JobInstance");
+		return stepExecution.getJobExecution().getJobInstance().getInstanceId();
+	}
+
+	/**
 	 * Convenient accessor for System properties to make it easy to access them
 	 * from placeholder expressions.
 	 *
@@ -113,7 +129,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the step {@link ExecutionContext}
 	 */
 	public Map<String, Object> getStepExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : stepExecution.getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -124,7 +140,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, Object> entry : stepExecution.getJobExecution().getExecutionContext().entrySet()) {
 			result.put(entry.getKey(), entry.getValue());
 		}
@@ -135,7 +151,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the {@link JobParameters}
 	 */
 	public Map<String, Object> getJobParameters() {
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		for (Entry<String, JobParameter> entry : stepExecution.getJobParameters().getParameters().entrySet()) {
 			result.put(entry.getKey(), entry.getValue().getValue());
 		}
@@ -144,7 +160,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Map<String, Object> getPartitionPlan() {
-		Map<String, Object> partitionPlanProperties = new HashMap<String, Object>();
+		Map<String, Object> partitionPlanProperties = new HashMap<>();
 
 		if(propertyContext != null) {
 			Map partitionProperties = propertyContext.getStepProperties(getStepName());
@@ -164,7 +180,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet<Runnable>();
+				set = new HashSet<>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -184,6 +200,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @see SynchronizedAttributeAccessor#removeAttribute(String)
 	 */
 	@Override
+	@Nullable
 	public Object removeAttribute(String name) {
 		unregisterDestructionCallbacks(name);
 		return super.removeAttribute(name);
@@ -196,7 +213,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 */
 	public void close() {
 
-		List<Exception> errors = new ArrayList<Exception>();
+		List<Exception> errors = new ArrayList<>();
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 

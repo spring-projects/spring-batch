@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -204,7 +204,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>GROUP BY</code> clause for a db specific @{@link PagingQueryProvider}.
-	 * This is only used if a PaginingQueryProvider is not provided.
+	 * This is only used if a PagingQueryProvider is not provided.
 	 *
 	 * @param groupClause the SQL clause
 	 * @return this instance for method chaining
@@ -218,7 +218,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * The SQL <code>SELECT</code> clause for a db specific {@link PagingQueryProvider}.
-	 * This is only used if a PagingQueyrProvider is not provided.
+	 * This is only used if a PagingQueryProvider is not provided.
 	 *
 	 * @param selectClause the SQL clause
 	 * @return this instance for method chaining
@@ -331,7 +331,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	private PagingQueryProvider determineQueryProvider(DataSource dataSource) {
 
 		try {
-			DatabaseType databaseType = DatabaseType.fromMetaData(this.dataSource);
+			DatabaseType databaseType = DatabaseType.fromMetaData(dataSource);
 
 			AbstractSqlPagingQueryProvider provider;
 
@@ -351,7 +351,8 @@ public class JdbcPagingItemReaderBuilder<T> {
 				case SYBASE: provider = new SybasePagingQueryProvider(); break;
 				case SQLITE: provider = new SqlitePagingQueryProvider(); break;
 				default:
-					throw new IllegalArgumentException("Unalbe to determine PaaginQueryProvider type");
+					throw new IllegalArgumentException("Unable to determine PagingQueryProvider type " +
+							"from database type: " + databaseType);
 			}
 
 			provider.setSelectClause(this.selectClause);

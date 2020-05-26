@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,7 +39,7 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
-	private Set<String> keys = new HashSet<String>();
+	private Set<String> keys = new HashSet<>();
 
 	private boolean useAllParentParameters = true;
 
@@ -57,7 +57,7 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	 * @param keys the keys to set
 	 */
 	public void setKeys(String[] keys) {
-		this.keys = new HashSet<String>(Arrays.asList(keys));
+		this.keys = new HashSet<>(Arrays.asList(keys));
 	}
 
 	/**

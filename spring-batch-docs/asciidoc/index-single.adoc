@@ -1,8 +1,12 @@
 :doctype: book
 :toc: left
 :toclevels: 4
+:sectnums:
+:onlyonetoggle: true
 
 include::header/index-header.adoc[]
+
+include::toggle.adoc[]
 
 include::spring-batch-intro.adoc[]
 
@@ -15,6 +19,8 @@ include::job.adoc[]
 include::step.adoc[]
 
 include::readersAndWriters.adoc[]
+
+include::processor.adoc[]
 
 include::scalability.adoc[]
 
@@ -29,6 +35,8 @@ include::common-patterns.adoc[]
 include::jsr-352.adoc[]
 
 include::spring-batch-integration.adoc[]
+
+include::monitoring-and-metrics.adoc[]
 
 include::appendix.adoc[]
 

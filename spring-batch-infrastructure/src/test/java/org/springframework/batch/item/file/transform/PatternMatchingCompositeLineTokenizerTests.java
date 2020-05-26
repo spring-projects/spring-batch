@@ -1,11 +1,11 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ben Hale
@@ -42,11 +43,11 @@ public class PatternMatchingCompositeLineTokenizerTests {
 
 	@Test
 	public void testEmptyKeyMatchesAnyLine() throws Exception {
-		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> map = new HashMap<>();
 		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
 		});
@@ -59,10 +60,10 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	@Test
 	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 
-		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
+		Map<String, LineTokenizer> map = new LinkedHashMap<>();
 		map.put("*", new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return null;
 			}
 		});
@@ -84,7 +85,7 @@ public class PatternMatchingCompositeLineTokenizerTests {
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
             @Override
-			public FieldSet tokenize(String line) {
+			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { line });
 			}
 		}));
