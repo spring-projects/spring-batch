@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
+ * @author Ankur Trapasiya
  * @since 4.0
  */
 public class JdbcCursorItemReaderBuilder<T> {
@@ -68,6 +69,8 @@ public class JdbcCursorItemReaderBuilder<T> {
 	private int maxItemCount = Integer.MAX_VALUE;
 
 	private int currentItemCount;
+
+	private boolean connectionAutoCommit;
 
 	/**
 	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
@@ -322,6 +325,20 @@ public class JdbcCursorItemReaderBuilder<T> {
 	}
 
 	/**
+	 * Set whether "autoCommit" should be overridden for the connection used by the cursor. If not set, defaults to
+	 * Connection / Datasource default configuration.
+	 *
+	 * @param connectionAutoCommit value to set on underlying JDBC connection
+	 * @return this instance for method chaining
+	 * @see JdbcCursorItemReader#setConnectionAutoCommit(boolean)
+	 */
+	public JdbcCursorItemReaderBuilder<T> connectionAutoCommit(boolean connectionAutoCommit) {
+		this.connectionAutoCommit = connectionAutoCommit;
+
+		return this;
+	}
+
+	/**
 	 * Validates configuration and builds a new reader instance.
 	 *
 	 * @return a fully constructed {@link JdbcCursorItemReader}
@@ -356,6 +373,7 @@ public class JdbcCursorItemReaderBuilder<T> {
 		reader.setQueryTimeout(this.queryTimeout);
 		reader.setUseSharedExtendedConnection(this.useSharedExtendedConnection);
 		reader.setVerifyCursorPosition(this.verifyCursorPosition);
+		reader.setConnectionAutoCommit(this.connectionAutoCommit);
 
 		return reader;
 	}

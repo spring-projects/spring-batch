@@ -302,6 +302,7 @@ public class JdbcCursorItemReaderBuilderTests {
 				.ignoreWarnings(true)
 				.driverSupportsAbsolute(true)
 				.useSharedExtendedConnection(true)
+				.connectionAutoCommit(true)
 				.beanRowMapper(Foo.class)
 				.build();
 
@@ -309,6 +310,7 @@ public class JdbcCursorItemReaderBuilderTests {
 		assertEquals(2, ReflectionTestUtils.getField(reader, "queryTimeout"));
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "ignoreWarnings"));
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "driverSupportsAbsolute"));
+		assertTrue((boolean) ReflectionTestUtils.getField(reader, "connectionAutoCommit"));
 	}
 
 	@Test
