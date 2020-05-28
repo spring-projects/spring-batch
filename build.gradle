@@ -50,7 +50,7 @@ allprojects {
 		springVersionDefault = '5.3.0-SNAPSHOT'
 		springVersion = project.hasProperty('springVersion') ? getProperty('springVersion') : springVersionDefault
 		springRetryVersion = '1.2.5.RELEASE'
-		springAmqpVersion = '2.3.0.BUILD-SNAPSHOT' // TODO update to 2.3.0-SNAPSHOT when available
+		springAmqpVersion = '2.3.0-SNAPSHOT'
 		springDataCommonsVersion = '2.4.0-SNAPSHOT'
 		springDataGemfireVersion = '2.4.0-SNAPSHOT'
 		springDataJpaVersion = '2.4.0-SNAPSHOT'
