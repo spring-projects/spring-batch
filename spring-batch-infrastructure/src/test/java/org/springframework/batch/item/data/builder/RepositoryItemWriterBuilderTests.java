@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  */
 public class RepositoryItemWriterBuilderTests {
 	@Mock
@@ -58,15 +59,18 @@ public class RepositoryItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testEmptyMethodName() throws Exception {
+	public void testEmptyMethodName() {
 		try {
-			new RepositoryItemWriterBuilder<String>().repository(this.repository).build();
+			new RepositoryItemWriterBuilder<String>()
+					.repository(this.repository)
+					.methodName("")
+					.build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
 		catch (IllegalArgumentException iae) {
 			assertEquals("IllegalArgumentException message did not match the expected result.",
-					"methodName is required.", iae.getMessage());
+					"methodName must not be empty.", iae.getMessage());
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package org.springframework.batch.item.data.builder;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
@@ -35,6 +38,8 @@ import org.springframework.util.Assert;
  * @see RepositoryItemWriter
  */
 public class RepositoryItemWriterBuilder<T> {
+
+	private static final Log logger = LogFactory.getLog(RepositoryItemWriterBuilder.class.getName());
 
 	private CrudRepository<T, ?> repository;
 
@@ -104,12 +109,16 @@ public class RepositoryItemWriterBuilder<T> {
 			this.repository = this.repositoryMethodReference.getRepository();
 		}
 
-		Assert.hasText(this.methodName, "methodName is required.");
 		Assert.notNull(this.repository, "repository is required.");
 
 		RepositoryItemWriter<T> writer = new RepositoryItemWriter<>();
-		writer.setMethodName(this.methodName);
 		writer.setRepository(this.repository);
+		if (this.methodName != null) {
+			Assert.hasText(this.methodName, "methodName must not be empty.");
+			writer.setMethodName(this.methodName);
+		} else {
+			logger.debug("No method name provided, CrudRepository.saveAll will be used.");
+		}
 		return writer;
 	}
 

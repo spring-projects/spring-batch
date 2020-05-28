@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
+ * By default, this writer will use {@link CrudRepository#saveAll(Iterable)}
+ * to save items, unless another method is selected with {@link #setMethodName(java.lang.String)}.
  * It depends on {@link org.springframework.data.repository.CrudRepository#saveAll(Iterable)}
  * method to store the items for the chunk.  Performance will be determined by that
  * implementation more than this writer.
@@ -107,6 +109,11 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Writing to the repository with " + items.size() + " items.");
 		}
+		
+		if (this.methodName == null) {
+			this.repository.saveAll(items);
+			return;
+		}
 
 		MethodInvoker invoker = createMethodInvoker(repository, methodName);
 
@@ -122,6 +129,12 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(repository != null, "A CrudRepository implementation is required");
+		if (this.methodName != null) {
+			Assert.hasText(this.methodName, "methodName must not be empty.");
+		}
+		else {
+			logger.debug("No method name provided, CrudRepository.saveAll will be used.");
+		}
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.item.data;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -56,6 +58,17 @@ public class RepositoryItemWriterTests {
 			fail();
 		} catch (IllegalStateException e) {
 		}
+
+		writer.setRepository(repository);
+		writer.setMethodName("");
+
+		try {
+			writer.afterPropertiesSet();
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			// expected
+			assertEquals("Wrong message for exception: " + e.getMessage(), "methodName must not be empty.", e.getMessage());
+		}
 	}
 
 	@Test
@@ -74,5 +87,16 @@ public class RepositoryItemWriterTests {
 		writer.write(items);
 
 		verify(repository).save("foo");
+		verify(repository, never()).saveAll(items);
+	}
+
+	@Test
+	public void testWriteItemsWithDefaultMethodName() throws Exception {
+		List<String> items = Collections.singletonList("foo");
+
+		writer.setMethodName(null);
+		writer.write(items);
+
+		verify(repository).saveAll(items);
 	}
 }
