@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,22 @@ package org.springframework.batch.item.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
+import org.bson.types.ObjectId;
+
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
+import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -42,6 +52,7 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Parikshit Dutta
  *
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -133,16 +144,28 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				}
 			}
 			else {
+				BulkOperations bulkOperations = null;
+
 				if(StringUtils.hasText(collection)) {
-					for (Object object : items) {
-						template.save(object, collection);
-					}
+					bulkOperations = template.bulkOps(BulkMode.ORDERED, collection);
 				}
 				else {
-					for (Object object : items) {
-						template.save(object);
-					}
+					bulkOperations = template.bulkOps(BulkMode.ORDERED, ClassUtils.getUserClass(items.get(0)));
 				}
+
+				for (Object object : items) {
+					Document document = new Document();
+
+					MongoConverter mongoConverter = template.getConverter();
+					mongoConverter.write(object, document);
+
+					Query query = new Query();
+					query.addCriteria(Criteria.where("_id").is((document.get("_id") != null)
+							? document.get("_id") : new ObjectId()));
+
+					bulkOperations.replaceOne(query, document, new FindAndReplaceOptions().upsert());
+				}
+				bulkOperations.execute();
 			}
 		}
 	}
