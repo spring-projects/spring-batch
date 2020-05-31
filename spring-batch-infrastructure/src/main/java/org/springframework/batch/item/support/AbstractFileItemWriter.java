@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
@@ -34,6 +33,8 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
+import org.springframework.batch.item.file.BufferedWriterFactory;
+import org.springframework.batch.item.file.DefaultBufferedWriterFactory;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
@@ -59,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  *
  * @since 4.1
  */
@@ -101,6 +103,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	private boolean transactional = DEFAULT_TRANSACTIONAL;
 
 	protected boolean append = false;
+
+	private BufferedWriterFactory bufferedWriterFactory = new DefaultBufferedWriterFactory();
 
 	/**
 	 * Flag to indicate that changes should be force-synced to disk on flush.
@@ -223,6 +227,18 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 */
 	public void setTransactional(boolean transactional) {
 		this.transactional = transactional;
+	}
+
+	/**
+	 * Factory for {@link BufferedWriter} and {@link TransactionAwareBufferedWriter} that will be used to write to
+	 * file in non-transactional and transactional (default behaviour) mode respectively.
+	 *
+	 * @param bufferedWriterFactory the bufferedWriterFactory to set
+	 *
+	 * @since 4.3
+	 */
+	public void setBufferedWriterFactory(BufferedWriterFactory bufferedWriterFactory) {
+		this.bufferedWriterFactory = bufferedWriterFactory;
 	}
 
 	/**
@@ -590,24 +606,11 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 			try {
 				final FileChannel channel = fileChannel;
 				if (transactional) {
-					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, () -> closeStream());
-
-					writer.setEncoding(encoding);
-					writer.setForceSync(forceSync);
-					return writer;
+					return bufferedWriterFactory.createTransactionAwareBufferedWriter(channel, encoding,
+							forceSync, () -> closeStream());
 				}
 				else {
-					Writer writer = new BufferedWriter(Channels.newWriter(fileChannel, encoding)) {
-						@Override
-						public void flush() throws IOException {
-							super.flush();
-							if (forceSync) {
-								channel.force(false);
-							}
-						}
-					};
-
-					return writer;
+					return bufferedWriterFactory.createBufferedWriter(channel, encoding, forceSync);
 				}
 			}
 			catch (UnsupportedCharsetException ucse) {
