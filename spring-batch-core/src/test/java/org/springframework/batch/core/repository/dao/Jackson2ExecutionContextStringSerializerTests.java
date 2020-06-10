@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2016 the original author or authors.
+ * Copyright 2008-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,24 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.Before;
+import org.junit.Test;
+
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Marten Deinum
+ * @author Michael Minella
  */
 public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
 
@@ -32,8 +45,99 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		serializer = serializerDeserializer;
 	}
 
+	@Test
+	public void mappedTypeTest() throws IOException {
+
+		Person person = new Person();
+		person.age = 28;
+		person.name = "Bob";
+		person.phone = new DomesticNumber();
+		person.phone.areaCode = 555;
+		person.phone.local = 1234567;
+
+		Jackson2ExecutionContextStringSerializer j = new Jackson2ExecutionContextStringSerializer();
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put("person", person);
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		j.serialize(context, os);
+
+		InputStream in = new ByteArrayInputStream(os.toByteArray());
+
+		try {
+			j.deserialize(in);
+		}
+		catch (Exception e) {
+			fail(String.format("An exception was thrown but should not have been: %s", e.getMessage()));
+		}
+	}
+
 	@Override
 	protected ExecutionContextSerializer getSerializer() {
 		return this.serializer;
 	}
+
+	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+	public static class Person {
+		public String name;
+		public int age;
+		@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+		public PhoneNumber phone;
+	}
+
+	public static abstract class PhoneNumber {
+		public int areaCode, local;
+	}
+
+	public static class InternationalNumber extends PhoneNumber {
+		public int countryCode;
+	}
+
+	public static class DomesticNumber extends PhoneNumber{}
+
+	@Test
+	public void unmappedTypeTest() throws IOException {
+
+		UnmappedPerson person = new UnmappedPerson();
+		person.age = 28;
+		person.name = "Bob";
+		person.phone = new UnmappedDomesticNumber();
+		person.phone.areaCode = 555;
+		person.phone.local = 1234567;
+
+		Jackson2ExecutionContextStringSerializer j = new Jackson2ExecutionContextStringSerializer();
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put("person", person);
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		j.serialize(context, os);
+
+		InputStream in = new ByteArrayInputStream(os.toByteArray());
+
+		try {
+			j.deserialize(in);
+			fail("An exception should have been thrown but wasn't");
+		}
+		catch (Exception e) {
+			return;
+		}
+	}
+
+	public static class UnmappedPerson {
+		public String name;
+		public int age;
+		public UnmappedPhoneNumber phone;
+	}
+
+	public static abstract class UnmappedPhoneNumber {
+		public int areaCode, local;
+	}
+
+	public static class UnmappedInternationalNumber extends UnmappedPhoneNumber {
+		public int countryCode;
+	}
+
+	public static class UnmappedDomesticNumber extends UnmappedPhoneNumber{}
 }
