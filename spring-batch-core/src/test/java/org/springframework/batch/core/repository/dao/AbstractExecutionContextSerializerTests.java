@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.junit.Test;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -175,6 +176,7 @@ public abstract class AbstractExecutionContextSerializerTests {
 
     protected abstract ExecutionContextSerializer getSerializer();
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
     public static class ComplexObject implements Serializable {
         private static final long serialVersionUID = 1L;
         private String name;
