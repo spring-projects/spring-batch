@@ -74,7 +74,7 @@ allprojects {
 		hibernateValidatorVersion = '6.0.20.Final'
 		javaxElVersion = '3.0.0'
 		hsqldbVersion = '2.5.0'
-		jackson2Version = '2.11.0'
+		jackson2Version = '2.10.4'
 		gsonVersion = '2.8.6'
 		javaMailVersion = '1.6.2'
 		javaxBatchApiVersion = '1.0'

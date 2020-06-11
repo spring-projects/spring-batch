@@ -107,7 +107,6 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
         this.objectMapper = new ObjectMapper();
         this.objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        this.objectMapper.configure(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES, true);
         this.objectMapper.setDefaultTyping(createTrustedDefaultTyping());
         this.objectMapper.registerModule(new JobParametersModule());
     }
