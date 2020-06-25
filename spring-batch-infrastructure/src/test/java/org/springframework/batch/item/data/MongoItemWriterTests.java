@@ -38,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 /**
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 @SuppressWarnings("serial")
 public class MongoItemWriterTests {
@@ -111,7 +113,7 @@ public class MongoItemWriterTests {
 
 		writer.write(items);
 
-		verify(template).bulkOps(any(), anyString());
+		verify(template).bulkOps(any(), eq("collection"));
 		verify(bulkOperations, times(2)).replaceOne(any(Query.class), any(Object.class), any());
 	}
 
@@ -163,7 +165,7 @@ public class MongoItemWriterTests {
 			return null;
 		});
 
-		verify(template).bulkOps(any(), anyString());
+		verify(template).bulkOps(any(), eq("collection"));
 		verify(bulkOperations, times(2)).replaceOne(any(Query.class), any(Object.class), any());
 	}
 

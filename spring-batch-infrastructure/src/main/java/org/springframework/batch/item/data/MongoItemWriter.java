@@ -53,10 +53,12 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
+	private static final String ID_KEY = "_id";
 	private MongoOperations template;
 	private final Object bufferKey;
 	private String collection;
@@ -130,44 +132,48 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 * @param items the list of items to be persisted.
 	 */
 	protected void doWrite(List<? extends T> items) {
-		if(! CollectionUtils.isEmpty(items)) {
-			if(delete) {
-				if(StringUtils.hasText(collection)) {
-					for (Object object : items) {
-						template.remove(object, collection);
-					}
-				}
-				else {
-					for (Object object : items) {
-						template.remove(object);
-					}
-				}
+		if (!CollectionUtils.isEmpty(items)) {
+			if (this.delete) {
+				delete(items);
 			}
 			else {
-				BulkOperations bulkOperations = null;
-
-				if(StringUtils.hasText(collection)) {
-					bulkOperations = template.bulkOps(BulkMode.ORDERED, collection);
-				}
-				else {
-					bulkOperations = template.bulkOps(BulkMode.ORDERED, ClassUtils.getUserClass(items.get(0)));
-				}
-
-				for (Object object : items) {
-					Document document = new Document();
-
-					MongoConverter mongoConverter = template.getConverter();
-					mongoConverter.write(object, document);
-
-					Query query = new Query();
-					query.addCriteria(Criteria.where("_id").is((document.get("_id") != null)
-							? document.get("_id") : new ObjectId()));
-
-					bulkOperations.replaceOne(query, document, new FindAndReplaceOptions().upsert());
-				}
-				bulkOperations.execute();
+				saveOrUpdate(items);
 			}
 		}
+	}
+
+	private void delete(List<? extends T> items) {
+		if (StringUtils.hasText(this.collection)) {
+			for (Object item : items) {
+				this.template.remove(item, this.collection);
+			}
+		}
+		else {
+			for (Object item : items) {
+				this.template.remove(item);
+			}
+		}
+	}
+
+	private void saveOrUpdate(List<? extends T> items) {
+		BulkOperations bulkOperations;
+		BulkMode bulkMode = BulkMode.ORDERED;
+		if (StringUtils.hasText(this.collection)) {
+			bulkOperations = this.template.bulkOps(bulkMode, this.collection);
+		}
+		else {
+			bulkOperations = this.template.bulkOps(bulkMode, ClassUtils.getUserClass(items.get(0)));
+		}
+		MongoConverter mongoConverter = this.template.getConverter();
+		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
+		for (Object item : items) {
+			Document document = new Document();
+			mongoConverter.write(item, document);
+			Object objectId = document.get(ID_KEY) != null ? document.get(ID_KEY) : new ObjectId();
+			Query query = new Query().addCriteria(Criteria.where(ID_KEY).is(objectId));
+			bulkOperations.replaceOne(query, document, upsert);
+		}
+		bulkOperations.execute();
 	}
 
 	private boolean transactionActive() {
