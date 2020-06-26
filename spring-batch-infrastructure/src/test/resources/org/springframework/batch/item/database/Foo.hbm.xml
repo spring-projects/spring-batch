@@ -15,4 +15,8 @@
 	<query name="allFoos">
 		from Foo 
 	</query>
+
+	<query name="foosStartingFrom2">
+		from Foo where value >= 2
+	</query>
 </hibernate-mapping>

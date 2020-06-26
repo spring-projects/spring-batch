@@ -52,6 +52,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class JpaPagingItemReaderBuilderTests {
 
@@ -173,7 +174,7 @@ public class JpaPagingItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testConfigurationQueryProvider() throws Exception {
+	public void testConfigurationNativeQueryProvider() throws Exception {
 
 		JpaNativeQueryProvider<Foo> provider = new JpaNativeQueryProvider<>();
 		provider.setEntityClass(Foo.class);

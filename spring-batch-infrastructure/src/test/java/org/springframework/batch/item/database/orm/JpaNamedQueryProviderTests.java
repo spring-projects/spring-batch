@@ -15,15 +15,26 @@
  */
 package org.springframework.batch.item.database.orm;
 
-import static org.junit.Assert.*;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.util.Assert;
 
 /**
  * Test for {@link JpaNamedQueryProvider}s.
  *
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class JpaNamedQueryProviderTests {
 
@@ -51,5 +62,26 @@ public class JpaNamedQueryProviderTests {
 		catch (Exception exception) {
 			assertEquals("Entity class cannot be NULL", exception.getMessage());
 		}
+	}
+
+	@Test
+	public void testNamedQueryCreation() throws Exception {
+		// given
+		String namedQuery = "allFoos";
+		TypedQuery<Foo> query = mock(TypedQuery.class);
+		EntityManager entityManager = Mockito.mock(EntityManager.class);
+		when(entityManager.createNamedQuery(namedQuery, Foo.class)).thenReturn(query);
+		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
+		jpaNamedQueryProvider.setEntityManager(entityManager);
+		jpaNamedQueryProvider.setEntityClass(Foo.class);
+		jpaNamedQueryProvider.setNamedQuery(namedQuery);
+		jpaNamedQueryProvider.afterPropertiesSet();
+
+		// when
+		Query result = jpaNamedQueryProvider.createQuery();
+
+		// then
+		Assert.notNull(result, "Result query must not be null");
+		verify(entityManager).createNamedQuery(namedQuery, Foo.class);
 	}
 }

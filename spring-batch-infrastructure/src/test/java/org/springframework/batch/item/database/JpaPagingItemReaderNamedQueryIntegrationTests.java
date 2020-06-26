@@ -17,41 +17,45 @@ package org.springframework.batch.item.database;
 
 import javax.persistence.EntityManagerFactory;
 
-import org.springframework.batch.item.ItemReader;
+import org.junit.runner.RunWith;
+
 import org.springframework.batch.item.database.orm.JpaNamedQueryProvider;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Integration Test for {@link JpaPagingItemReader} and {@link JpaNamedQueryProvider}.
  *
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
-public class JpaPagingItemReaderNamedQueryIntegrationTests
-		extends AbstractGenericDataSourceItemReaderIntegrationTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations={"JpaPagingItemReaderParameterTests-context.xml"})
+public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
 
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+	
 	@Override
-	protected ItemReader<Foo> createItemReader() throws Exception {
-		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-		factoryBean.setDataSource(dataSource);
-		factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-		factoryBean.setPersistenceUnitName("bar");
-		factoryBean.afterPropertiesSet();
+	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
-		EntityManagerFactory entityManagerFactory = factoryBean.getObject();
+		String namedQuery = "foosStartingFrom2";
 
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
+
+		//creating a named query provider as it would be created in configuration
 		JpaNamedQueryProvider<Foo> jpaNamedQueryProvider = new JpaNamedQueryProvider<>();
-		jpaNamedQueryProvider.setNamedQuery("allFoos");
+		jpaNamedQueryProvider.setNamedQuery(namedQuery);
 		jpaNamedQueryProvider.setEntityClass(Foo.class);
 		jpaNamedQueryProvider.afterPropertiesSet();
 
-		JpaPagingItemReader<Foo> inputSource = new JpaPagingItemReader<>();
-		inputSource.setEntityManagerFactory(entityManagerFactory);
-		inputSource.setQueryProvider(jpaNamedQueryProvider);
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
+		reader.setEntityManagerFactory(entityManagerFactory);
+		reader.setQueryProvider(jpaNamedQueryProvider);
+		reader.afterPropertiesSet();
+		reader.setSaveState(true);
 
-		return inputSource;
+		return reader;
 	}
 }

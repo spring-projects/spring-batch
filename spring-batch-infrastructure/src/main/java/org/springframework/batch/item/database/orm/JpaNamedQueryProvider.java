@@ -39,7 +39,7 @@ public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
 
 	@Override
 	public Query createQuery() {
-		return getEntityManager().createNamedQuery(namedQuery, entityClass);
+		return getEntityManager().createNamedQuery(this.namedQuery, this.entityClass);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(StringUtils.hasText(namedQuery), "Named query cannot be empty");
-		Assert.notNull(entityClass, "Entity class cannot be NULL");
+		Assert.isTrue(StringUtils.hasText(this.namedQuery), "Named query cannot be empty");
+		Assert.notNull(this.entityClass, "Entity class cannot be NULL");
 	}
 }
