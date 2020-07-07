@@ -140,12 +140,30 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 		return this.saveState;
 	}
 
+	/**
+	 * Setter for partition offsets. This mapping tells the reader the offset to start
+	 * reading from in each partition. This is optional, defaults to starting from
+	 * offset 0 in each partition. Passing an empty map makes the reader start
+	 * from the offset stored in Kafka for the consumer group ID.
+	 * 
+	 * <p><strong>In case of a restart, offsets stored in the execution context
+	 * will take precedence.</strong></p>
+	 * 
+	 * @param partitionOffsets mapping of starting offset in each partition
+	 */
+	public void setPartitionOffsets(Map<TopicPartition, Long> partitionOffsets) {
+		Assert.notNull(partitionOffsets, "partitionOffsets must not be null");
+		this.partitionOffsets = partitionOffsets;
+	}
+
 	@Override
 	public void open(ExecutionContext executionContext) {
 		this.kafkaConsumer = new KafkaConsumer<>(this.consumerProperties);
-		this.partitionOffsets = new HashMap<>();
-		for (TopicPartition topicPartition : this.topicPartitions) {
-			this.partitionOffsets.put(topicPartition, 0L);
+		if (this.partitionOffsets == null) {
+			this.partitionOffsets = new HashMap<>();
+			for (TopicPartition topicPartition : this.topicPartitions) {
+				this.partitionOffsets.put(topicPartition, 0L);
+			}
 		}
 		if (this.saveState && executionContext.containsKey(TOPIC_PARTITION_OFFSETS)) {
 			Map<TopicPartition, Long> offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSETS);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Before;
@@ -67,7 +68,9 @@ public class KafkaItemReaderTests {
 				new NewTopic("topic1", 1, (short) 1),
 				new NewTopic("topic2", 2, (short) 1),
 				new NewTopic("topic3", 1, (short) 1),
-				new NewTopic("topic4", 2, (short) 1)
+				new NewTopic("topic4", 2, (short) 1),
+				new NewTopic("topic5", 1, (short) 1),
+				new NewTopic("topic6", 1, (short) 1)
 		);
 	}
 
@@ -199,6 +202,89 @@ public class KafkaItemReaderTests {
 
 		item = this.reader.read();
 		assertThat(item, is("val1"));
+
+		item = this.reader.read();
+		assertThat(item, is("val2"));
+
+		item = this.reader.read();
+		assertThat(item, is("val3"));
+
+		item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
+	}
+
+	@Test
+	public void testReadFromSinglePartitionFromCustomOffset() {
+		this.template.setDefaultTopic("topic5");
+		this.template.sendDefault("val0"); // <-- offset 0
+		this.template.sendDefault("val1"); // <-- offset 1
+		this.template.sendDefault("val2"); // <-- offset 2
+		this.template.sendDefault("val3"); // <-- offset 3
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic5", 0);
+
+		// specify which offset to start from
+		Map<TopicPartition, Long> partitionOffsets = new HashMap<>();
+		partitionOffsets.put(new TopicPartition("topic5", 0), 2L);
+		this.reader.setPartitionOffsets(partitionOffsets);
+
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+
+		String item = this.reader.read();
+		assertThat(item, is("val2"));
+
+		item = this.reader.read();
+		assertThat(item, is("val3"));
+
+		item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
+	}
+
+	@Test
+	public void testReadFromSinglePartitionFromTheOffsetStoredInKafka() throws Exception {
+		// first run: read a topic from the beginning
+
+		this.template.setDefaultTopic("topic6");
+		this.template.sendDefault("val0"); // <-- offset 0
+		this.template.sendDefault("val1"); // <-- offset 1
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic6", 0);
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
+
+		String item = this.reader.read();
+		assertThat(item, is("val0"));
+
+		item = this.reader.read();
+		assertThat(item, is("val1"));
+
+		item = this.reader.read();
+		assertNull(item);
+
+		this.reader.close();
+
+		// The offset stored in Kafka should be equal to 2 at this point
+		OffsetAndMetadata currentOffset = KafkaTestUtils.getCurrentOffset(
+				embeddedKafka.getEmbeddedKafka().getBrokersAsString(),
+				"1", "topic6",
+				0);
+		assertEquals(2, currentOffset.offset());
+		
+		// second run (with same consumer group ID): new messages arrived since the last run.
+
+		this.template.sendDefault("val2"); // <-- offset 2
+		this.template.sendDefault("val3"); // <-- offset 3
+
+		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic6", 0);
+		// Passing an empty map means the reader should start from the offset stored in Kafka (offset 2 in this case)
+		this.reader.setPartitionOffsets(new HashMap<>());
+		this.reader.setPollTimeout(Duration.ofSeconds(1));
+		this.reader.open(new ExecutionContext());
 
 		item = this.reader.read();
 		assertThat(item, is("val2"));
