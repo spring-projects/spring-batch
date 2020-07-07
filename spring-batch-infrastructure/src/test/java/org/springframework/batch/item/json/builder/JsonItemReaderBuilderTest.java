@@ -60,17 +60,6 @@ public class JsonItemReaderBuilderTest {
 		try {
 			new JsonItemReaderBuilder<String>()
 					.jsonObjectReader(this.jsonObjectReader)
-					.build();
-			fail("A resource is required.");
-		}
-		catch (IllegalArgumentException iae) {
-			assertEquals("A resource is required.",
-					iae.getMessage());
-		}
-
-		try {
-			new JsonItemReaderBuilder<String>()
-					.jsonObjectReader(this.jsonObjectReader)
 					.resource(this.resource)
 					.build();
 			fail("A name is required when saveState is set to true.");
@@ -101,5 +90,25 @@ public class JsonItemReaderBuilderTest {
 		Assert.assertTrue((Boolean) getField(itemReader, "strict"));
 		Object executionContext = getField(itemReader, "executionContextUserSupport");
 		Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
+	}
+	@Test
+	public void shouldBuildJsonItemReaderWhenResourceIsNotProvided(){
+	    JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>()
+                .jsonObjectReader(this.jsonObjectReader)
+                .saveState(true)
+                .strict(true)
+                .name("jsonItemReader")
+                .maxItemCount(100)
+                .currentItemCount(50)
+                .build();
+
+			Assert.assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
+			Assert.assertEquals(100, getField(itemReader, "maxItemCount"));
+			Assert.assertEquals(50, getField(itemReader, "currentItemCount"));
+			Assert.assertTrue((Boolean) getField(itemReader, "saveState"));
+			Assert.assertTrue((Boolean) getField(itemReader, "strict"));
+			Object executionContext = getField(itemReader, "executionContextUserSupport");
+			Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
+
 	}
 }

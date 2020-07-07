@@ -140,12 +140,13 @@ public class JsonItemReaderBuilder<T> {
 	 */
 	public JsonItemReader<T> build() {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
-		Assert.notNull(this.resource, "A resource is required.");
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
 
-		JsonItemReader<T> reader = new JsonItemReader<>(this.resource, this.jsonObjectReader);
+		JsonItemReader<T> reader = new JsonItemReader<>();
+		reader.setResource(this.resource);
+		reader.setJsonObjectReader(this.jsonObjectReader);
 		reader.setName(this.name);
 		reader.setStrict(this.strict);
 		reader.setSaveState(this.saveState);
