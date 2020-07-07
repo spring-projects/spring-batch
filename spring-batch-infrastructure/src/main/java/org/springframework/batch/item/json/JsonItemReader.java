@@ -73,6 +73,9 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.jsonObjectReader = jsonObjectReader;
 		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
 	}
+	public JsonItemReader(){
+		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
+	}
 
 	/**
 	 * Set the {@link JsonObjectReader} to use to read and map Json fragments to domain objects.
