@@ -51,6 +51,10 @@ public class SimpleCompletionPolicy extends DefaultResultCompletionPolicy {
 		this.chunkSize = chunkSize;
 	}
 
+	public int getChunkSize() {
+		return chunkSize;
+	}
+
 	/**
 	 * Reset the counter.
 	 * 
