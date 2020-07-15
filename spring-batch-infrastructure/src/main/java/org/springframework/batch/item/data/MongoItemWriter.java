@@ -143,27 +143,22 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	private void delete(List<? extends T> items) {
-		if (StringUtils.hasText(this.collection)) {
-			for (Object item : items) {
-				this.template.remove(item, this.collection);
+		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, items.get(0));
+		MongoConverter mongoConverter = this.template.getConverter();
+		for (Object item : items) {
+			Document document = new Document();
+			mongoConverter.write(item, document);
+			Object objectId = document.get(ID_KEY);
+			if (objectId != null) {
+				Query query = new Query().addCriteria(Criteria.where(ID_KEY).is(objectId));
+				bulkOperations.remove(query);
 			}
 		}
-		else {
-			for (Object item : items) {
-				this.template.remove(item);
-			}
-		}
+		bulkOperations.execute();
 	}
 
 	private void saveOrUpdate(List<? extends T> items) {
-		BulkOperations bulkOperations;
-		BulkMode bulkMode = BulkMode.ORDERED;
-		if (StringUtils.hasText(this.collection)) {
-			bulkOperations = this.template.bulkOps(bulkMode, this.collection);
-		}
-		else {
-			bulkOperations = this.template.bulkOps(bulkMode, ClassUtils.getUserClass(items.get(0)));
-		}
+		BulkOperations bulkOperations = initBulkOperations(BulkMode.ORDERED, items.get(0));
 		MongoConverter mongoConverter = this.template.getConverter();
 		FindAndReplaceOptions upsert = new FindAndReplaceOptions().upsert();
 		for (Object item : items) {
@@ -174,6 +169,17 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			bulkOperations.replaceOne(query, document, upsert);
 		}
 		bulkOperations.execute();
+	}
+
+	private BulkOperations initBulkOperations(BulkMode bulkMode, Object item) {
+		BulkOperations bulkOperations;
+		if (StringUtils.hasText(this.collection)) {
+			bulkOperations = this.template.bulkOps(bulkMode, this.collection);
+		}
+		else {
+			bulkOperations = this.template.bulkOps(bulkMode, ClassUtils.getUserClass(item));
+		}
+		return bulkOperations;
 	}
 
 	private boolean transactionActive() {

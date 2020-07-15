@@ -23,12 +23,24 @@ import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import org.mockito.MockitoAnnotations;
 
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.convert.DbRefResolver;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
@@ -39,12 +51,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * @author Michael Minella
@@ -60,15 +66,19 @@ public class MongoItemWriterTests {
 	@Mock
 	private BulkOperations bulkOperations;
 	@Mock
-	private MongoConverter mongoConverter;
+	DbRefResolver dbRefResolver;
+
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		when(template.bulkOps(any(), anyString())).thenReturn(bulkOperations);
-		when(template.bulkOps(any(), any(Class.class))).thenReturn(bulkOperations);
-		when(template.getConverter()).thenReturn(mongoConverter);
+		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
+		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
+
+		MappingContext mappingContext = new MongoMappingContext();
+		MappingMongoConverter mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
+		when(this.template.getConverter()).thenReturn(mongoConverter);
 
 		writer = new MongoItemWriter<>();
 		writer.setTemplate(template);
@@ -91,9 +101,9 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteNoTransactionNoCollection() throws Exception {
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+		List<Item> items = new ArrayList<Item>() {{
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.write(items);
@@ -105,8 +115,8 @@ public class MongoItemWriterTests {
 	@Test
 	public void testWriteNoTransactionWithCollection() throws Exception {
 		List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.setCollection("collection");
@@ -128,8 +138,8 @@ public class MongoItemWriterTests {
 	@Test
 	public void testWriteTransactionNoCollection() throws Exception {
 		final List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
@@ -149,8 +159,8 @@ public class MongoItemWriterTests {
 	@Test
 	public void testWriteTransactionWithCollection() throws Exception {
 		final List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.setCollection("collection");
@@ -172,8 +182,8 @@ public class MongoItemWriterTests {
 	@Test
 	public void testWriteTransactionFails() throws Exception {
 		final List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.setCollection("collection");
@@ -204,8 +214,8 @@ public class MongoItemWriterTests {
 	@Test
 	public void testWriteTransactionReadOnly() throws Exception {
 		final List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.setCollection("collection");
@@ -230,33 +240,62 @@ public class MongoItemWriterTests {
 	}
 
 	@Test
-	public void testRemoveNoTransactionNoCollection() throws Exception {
+	public void testRemoveNoObjectIdNoCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item("Foo"));
+			add(new Item("Bar"));
 		}};
 
 		writer.write(items);
 
-		verify(template).remove(items.get(0));
-		verify(template).remove(items.get(1));
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, never()).remove(any(Query.class));
+	}
+
+	@Test
+	public void testRemoveNoObjectIdWithCollection() throws Exception {
+		writer.setDelete(true);
+		List<Object> items = new ArrayList<Object>() {{
+			add(new Item("Foo"));
+			add(new Item("Bar"));
+		}};
+
+		writer.setCollection("collection");
+		writer.write(items);
+
+		verify(template).bulkOps(any(), eq("collection"));
+		verify(bulkOperations, never()).remove(any(Query.class));
+	}
+
+	@Test
+	public void testRemoveNoTransactionNoCollection() throws Exception {
+		writer.setDelete(true);
+		List<Object> items = new ArrayList<Object>() {{
+			add(new Item(1));
+			add(new Item(2));
+		}};
+
+		writer.write(items);
+
+		verify(template).bulkOps(any(), any(Class.class));
+		verify(bulkOperations, times(2)).remove(any(Query.class));
 	}
 
 	@Test
 	public void testRemoveNoTransactionWithCollection() throws Exception {
 		writer.setDelete(true);
 		List<Object> items = new ArrayList<Object>() {{
-			add(new Object());
-			add(new Object());
+			add(new Item(1));
+			add(new Item(2));
 		}};
 
 		writer.setCollection("collection");
 
 		writer.write(items);
 
-		verify(template).remove(items.get(0), "collection");
-		verify(template).remove(items.get(1), "collection");
+		verify(template).bulkOps(any(),  eq("collection"));
+		verify(bulkOperations, times(2)).remove(any(Query.class));
 	}
 
 	// BATCH-2018, test code updated to pass BATCH-3713
@@ -310,5 +349,16 @@ public class MongoItemWriterTests {
 		for(int i=0; i< limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
 		}
+	}
+}
+
+class Item {
+	Integer id;
+	String name;
+	public Item(Integer id){
+		this.id = id;
+	}
+	public Item(String name) {
+		this.name = name;
 	}
 }
