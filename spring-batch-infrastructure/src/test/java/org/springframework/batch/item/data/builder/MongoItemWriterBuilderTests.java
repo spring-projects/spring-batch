@@ -127,15 +127,15 @@ public class MongoItemWriterBuilderTests {
 					iae.getMessage());
 		}
 	}
-}
 
-class Item {
-	Integer id;
-	String name;
-	public Item(Integer id){
-		this.id = id;
-	}
-	public Item(String name) {
-		this.name = name;
+	static class Item {
+		Integer id;
+		String name;
+		public Item(Integer id) {
+			this.id = id;
+		}
+		public Item(String name) {
+			this.name = name;
+		}
 	}
 }

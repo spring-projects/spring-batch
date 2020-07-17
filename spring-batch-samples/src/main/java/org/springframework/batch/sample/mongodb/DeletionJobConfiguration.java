@@ -30,60 +30,63 @@ import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
- *  This sample job will copy data from collection "person_in" into collection "person_out"
- *  using {@link MongoItemReader} and {@link MongoItemWriter}.
+ *  This job will remove document "foo3" from collection "person_out"
+ *  using {@link MongoItemWriter#setDelete(boolean)}.
  *
  *  @author Mahmoud Ben Hassine
  */
 @EnableBatchProcessing
-public class JobConfiguration {
+public class DeletionJobConfiguration {
 
 	private JobBuilderFactory jobBuilderFactory;
-
 	private StepBuilderFactory stepBuilderFactory;
 
-	public JobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+	public DeletionJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.stepBuilderFactory = stepBuilderFactory;
 	}
 
 	@Bean
-	public MongoItemReader<Person> mongoItemReader(MongoTemplate mongoTemplate) {
+	public MongoItemReader<Person> mongoPersonReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
 		return new MongoItemReaderBuilder<Person>()
 				.name("personItemReader")
-				.collection("person_in")
+				.collection("person_out")
 				.targetType(Person.class)
 				.template(mongoTemplate)
-				.jsonQuery("{}")
+				.query(new Query().addCriteria(where("name").is("foo3")))
 				.sorts(sortOptions)
 				.build();
 	}
 
 	@Bean
-	public MongoItemWriter<Person> mongoItemWriter(MongoTemplate mongoTemplate) {
+	public MongoItemWriter<Person> mongoPersonRemover(MongoTemplate mongoTemplate) {
 		return new MongoItemWriterBuilder<Person>()
 				.template(mongoTemplate)
+				.delete(true)
 				.collection("person_out")
 				.build();
 	}
 
 	@Bean
-	public Step step(MongoItemReader<Person> mongoItemReader, MongoItemWriter<Person> mongoItemWriter) {
+	public Step deletionStep(MongoItemReader<Person> mongoPersonReader, MongoItemWriter<Person> mongoPersonRemover) {
 		return this.stepBuilderFactory.get("step")
 				.<Person, Person>chunk(2)
-				.reader(mongoItemReader)
-				.writer(mongoItemWriter)
+				.reader(mongoPersonReader)
+				.writer(mongoPersonRemover)
 				.build();
 	}
 
 	@Bean
-	public Job job(Step step) {
-		return this.jobBuilderFactory.get("job")
-				.start(step)
+	public Job deletionJob(Step deletionStep) {
+		return this.jobBuilderFactory.get("deletionJob")
+				.start(deletionStep)
 				.build();
 	}
 

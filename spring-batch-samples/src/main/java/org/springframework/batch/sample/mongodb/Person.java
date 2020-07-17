@@ -16,7 +16,8 @@
 package org.springframework.batch.sample.mongodb;
 
 public class Person {
-    
+
+    private String id;
     private String name;
 
     public Person() {
@@ -24,6 +25,16 @@ public class Person {
 
     public Person(String name) {
         this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    // setter used for data binding if items to delete (with known IDs)
+    // are read from a flat file for example
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -37,7 +48,8 @@ public class Person {
     @Override
     public String toString() {
         return "Person{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

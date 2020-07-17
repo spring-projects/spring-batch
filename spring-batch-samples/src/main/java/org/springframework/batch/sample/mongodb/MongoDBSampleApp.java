@@ -40,7 +40,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class MongoDBSampleApp {
 
 	public static void main(String[] args) throws Exception {
-		Class<?>[] configurationClasses = {JobConfiguration.class, MongoDBConfiguration.class};
+		Class<?>[] configurationClasses = {
+				InsertionJobConfiguration.class,
+				DeletionJobConfiguration.class,
+				MongoDBConfiguration.class};
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		MongoTemplate mongoTemplate = context.getBean(MongoTemplate.class);
 
@@ -56,14 +59,25 @@ public class MongoDBSampleApp {
 				new Document("name", "foo4"))
 		);
 
-		// run the job
+		// run the insertion job
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
-		Job job = context.getBean(Job.class);
-		jobLauncher.run(job, new JobParameters());
+		Job insertionJob = context.getBean("insertionJob", Job.class);
+		jobLauncher.run(insertionJob, new JobParameters());
 
 		// check results
 		List<Person> persons = mongoTemplate.findAll(Person.class, "person_out");
 		System.out.println("Checking persons in person_out collection");
+		for (Person person : persons) {
+			System.out.println(person);
+		}
+
+		// run the deletion job
+		Job deletionJob = context.getBean("deletionJob", Job.class);
+		jobLauncher.run(deletionJob, new JobParameters());
+
+		// check results (foo3 should have been removed)
+		persons = mongoTemplate.findAll(Person.class, "person_out");
+		System.out.println("Checking persons in person_out collection after deleting foo3");
 		for (Person person : persons) {
 			System.out.println(person);
 		}
