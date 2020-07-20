@@ -57,7 +57,7 @@ allprojects {
 		springDataMongodbVersion = '3.1.0-SNAPSHOT'
 		springDataNeo4jVersion = '5.4.0-SNAPSHOT'
 		springIntegrationVersion = '5.4.0-SNAPSHOT'
-		springKafkaVersion = '2.5.4.BUILD-SNAPSHOT' // TODO update to 2.6.0-SNAPSHOT when available
+		springKafkaVersion = '2.6.0-SNAPSHOT'
 		springLdapVersion = '2.3.3.RELEASE'
 
 		activemqVersion = '5.15.12'
