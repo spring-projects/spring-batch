@@ -167,8 +167,8 @@ public class JobLauncherTestUtils {
 	}
 
     /**
-     * @return a new JobParametersBuilder object containing only a parameter for the
-     * current timestamp, to ensure that the job instance will be unique.
+     * @return a new JobParametersBuilder object containing only a parameter with a
+     * random number of type {@code long}, to ensure that the job instance will be unique.
      */
     public JobParametersBuilder getUniqueJobParametersBuilder() {
         return new JobParametersBuilder(this.getUniqueJobParameters());
