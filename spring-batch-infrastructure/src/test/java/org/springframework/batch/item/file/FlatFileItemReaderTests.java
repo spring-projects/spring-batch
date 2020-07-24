@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,6 +213,25 @@ public class FlatFileItemReaderTests {
 		assertEquals("testLine1testLine2", reader.read());
 		assertEquals(null, reader.read());
 
+	}
+
+	@Test
+	public void testCustomCommentDetectionLogic() throws Exception {
+		reader = new FlatFileItemReader<String>() {
+			@Override
+			protected boolean isComment(String line) {
+				return super.isComment(line) || line.endsWith("2");
+			}
+		};
+		reader.setResource(getInputResource("#testLine1\ntestLine2\n//testLine3\ntestLine4\n"));
+		reader.setComments(new String[] {"#", "//"});
+		reader.setLineMapper(new PassThroughLineMapper());
+		reader.open(executionContext);
+
+		assertEquals("testLine4", reader.read());
+		assertNull(reader.read());
+
+		reader.close();
 	}
 
 	@Test

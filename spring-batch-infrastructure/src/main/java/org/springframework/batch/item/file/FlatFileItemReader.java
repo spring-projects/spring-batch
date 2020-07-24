@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private int lineCount = 0;
 
-	private String[] comments = DEFAULT_COMMENT_PREFIXES;
+	protected String[] comments = DEFAULT_COMMENT_PREFIXES;
 
 	private boolean noInput = false;
 
@@ -229,7 +229,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		return line;
 	}
 
-	private boolean isComment(String line) {
+	protected boolean isComment(String line) {
 		for (String prefix : comments) {
 			if (line.startsWith(prefix)) {
 				return true;
