@@ -332,7 +332,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		}
 	}
 	
-	private boolean isFragmentRootElementName(QName name) {
+	protected boolean isFragmentRootElementName(QName name) {
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
 			if (fragmentRootElementName.getLocalPart().equals(name.getLocalPart())) {
 				if (!StringUtils.hasText(fragmentRootElementName.getNamespaceURI())
