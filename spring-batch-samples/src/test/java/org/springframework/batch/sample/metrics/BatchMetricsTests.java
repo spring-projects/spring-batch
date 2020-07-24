@@ -162,6 +162,7 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.job.active")
+					.tag("name", "job")
 					.longTaskTimer();
 		} catch (Exception e) {
 			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active" +
