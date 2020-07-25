@@ -21,6 +21,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.core.io.Resource;
@@ -34,9 +37,12 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  * @since 4.0
  */
 public class StaxEventItemReaderBuilder<T> {
+
+	protected Log logger = LogFactory.getLog(getClass());
 
 	private boolean strict = true;
 
@@ -215,9 +221,12 @@ public class StaxEventItemReaderBuilder<T> {
 	 * @return a new instance of the {@link StaxEventItemReader}
 	 */
 	public StaxEventItemReader<T> build() {
-		Assert.notNull(this.resource, "A resource is required.");
-
 		StaxEventItemReader<T> reader = new StaxEventItemReader<>();
+
+		if(this.resource == null) {
+			logger.debug("The resource is null.  This is only a valid scenario when " +
+					"injecting resource later as in when using the MultiResourceItemReader");
+		}
 
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");

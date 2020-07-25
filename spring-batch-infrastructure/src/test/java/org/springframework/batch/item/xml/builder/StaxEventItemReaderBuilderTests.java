@@ -35,11 +35,13 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public class StaxEventItemReaderBuilderTests {
 
@@ -58,13 +60,6 @@ public class StaxEventItemReaderBuilderTests {
 
 	@Test
 	public void testValidation() {
-		try {
-			new StaxEventItemReaderBuilder<Foo>().build();
-			fail("Validation of the missing resource failed");
-		}
-		catch (IllegalArgumentException ignore) {
-		}
-
 		try {
 			new StaxEventItemReaderBuilder<Foo>()
 					.resource(this.resource)
@@ -86,6 +81,16 @@ public class StaxEventItemReaderBuilderTests {
 		catch (IllegalArgumentException iae) {
 			assertEquals("At least one fragment root element is required", iae.getMessage());
 		}
+	}
+
+	@Test
+	public void testBuildWithoutProvidingResource() {
+		StaxEventItemReader<Foo> reader = new StaxEventItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.addFragmentRootElements("foo")
+				.build();
+
+		assertNotNull(reader);
 	}
 
 	@Test
