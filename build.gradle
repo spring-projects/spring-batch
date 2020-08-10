@@ -37,7 +37,6 @@ allprojects {
 	group = 'org.springframework.batch'
 
 	repositories {
-		maven { url 'https://repository.apache.org/content/groups/staging/' } // TODO to remove when kafka-clients 2.6.0 is promoted to central
 		maven { url 'https://repo.spring.io/libs-snapshot' }
 		maven { url 'https://repo.spring.io/libs-milestone' }
 		maven { url 'https://repo.spring.io/plugins-release' }
