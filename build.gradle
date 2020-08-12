@@ -55,7 +55,6 @@ allprojects {
 		springDataGemfireVersion = '2.4.0-SNAPSHOT'
 		springDataJpaVersion = '2.4.0-SNAPSHOT'
 		springDataMongodbVersion = '3.1.0-SNAPSHOT'
-		springDataNeo4jVersion = '5.4.0-SNAPSHOT'
 		springIntegrationVersion = '5.4.0-SNAPSHOT'
 		springKafkaVersion = '2.6.0-SNAPSHOT'
 		springLdapVersion = '2.3.3.RELEASE'
@@ -108,6 +107,7 @@ allprojects {
 		assertjVersion='3.16.1'
 		mongoDbDriverSyncVersion='4.0.4'
 		testcontainersVersion='1.14.3'
+		neo4jVersion='3.2.14'
 	}
 
 	apply plugin: 'idea'
@@ -372,10 +372,8 @@ project('spring-batch-infrastructure') {
 		optional "org.springframework:spring-tx:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
-		optional ("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion") {
-			exclude group: "org.springframework", module: "spring-aspects"
-		}
 		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
+		optional "org.neo4j:neo4j-ogm-core:$neo4jVersion"
 		compile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") { dep ->
 			optional dep
 			exclude group: 'stax', module: 'stax-api'
@@ -396,14 +394,6 @@ project('spring-batch-infrastructure') {
 		testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
 	}
 
-	if (project.hasProperty('platformVersion')) {
-		def dataNeo4jVersion = dependencyManagement.springIoTestRuntime.managedVersions['org.springframework.data:spring-data-neo4j']
-		if (dataNeo4jVersion?.startsWith('4.')) {
-			tasks.withType(Test).matching { it.name =~ "springIoJdk.Test" }.all {
-				exclude '**/Neo4jItemReaderTests.class'
-			}
-		}
-	}
 }
 
 project('spring-batch-docs') {
