@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package org.springframework.batch.item.kafka.builder;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -213,6 +215,9 @@ public class KafkaItemReaderBuilderTests {
 		Duration pollTimeout = Duration.ofSeconds(100);
 		String topic = "test";
 		List<Integer> partitions = Arrays.asList(0, 1);
+		Map<TopicPartition, Long> partitionOffsets = new HashMap<>();
+		partitionOffsets.put(new TopicPartition(topic, partitions.get(0)), 10L);
+		partitionOffsets.put(new TopicPartition(topic, partitions.get(1)), 15L);
 
 		// when
 		KafkaItemReader<String, String> reader = new KafkaItemReaderBuilder<String, String>()
@@ -220,6 +225,7 @@ public class KafkaItemReaderBuilderTests {
 				.consumerProperties(this.consumerProperties)
 				.topic(topic)
 				.partitions(partitions)
+				.partitionOffsets(partitionOffsets)
 				.pollTimeout(pollTimeout)
 				.saveState(saveState)
 				.build();
@@ -234,5 +240,9 @@ public class KafkaItemReaderBuilderTests {
 		assertEquals(partitions.get(0).intValue(), topicPartitions.get(0).partition());
 		assertEquals(topic, topicPartitions.get(1).topic());
 		assertEquals(partitions.get(1).intValue(), topicPartitions.get(1).partition());
+		Map<TopicPartition, Long> partitionOffsetsMap = (Map<TopicPartition, Long>) ReflectionTestUtils.getField(reader, "partitionOffsets");
+		assertEquals(2, partitionOffsetsMap.size());
+		assertEquals(new Long(10), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(0))));
+		assertEquals(new Long(15), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(1))));
 	}
 }

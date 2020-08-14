@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.TopicPartition;
 
 import org.springframework.batch.item.kafka.KafkaItemReader;
 import org.springframework.util.Assert;
@@ -42,6 +44,8 @@ public class KafkaItemReaderBuilder<K, V> {
 	private String topic;
 
 	private List<Integer> partitions = new ArrayList<>();
+
+	private Map<TopicPartition, Long> partitionOffsets;
 
 	private Duration pollTimeout = Duration.ofSeconds(30L);
 
@@ -105,6 +109,23 @@ public class KafkaItemReaderBuilder<K, V> {
 	}
 
 	/**
+	 * Setter for partition offsets. This mapping tells the reader the offset to start
+	 * reading from in each partition. This is optional, defaults to starting from
+	 * offset 0 in each partition. Passing an empty map makes the reader start
+	 * from the offset stored in Kafka for the consumer group ID.
+	 *
+	 * <p><strong>In case of a restart, offsets stored in the execution context
+	 * will take precedence.</strong></p>
+	 *
+	 * @param partitionOffsets mapping of starting offset in each partition
+	 * @return The current instance of the builder.
+	 */
+	public KafkaItemReaderBuilder<K, V> partitionOffsets(Map<TopicPartition, Long> partitionOffsets) {
+		this.partitionOffsets = partitionOffsets;
+		return this;
+	}
+
+	/**
 	 * A topic name to manually assign to the consumer.
 	 * @param topic name to assign to the consumer
 	 * @return The current instance of the builder.
@@ -148,6 +169,7 @@ public class KafkaItemReaderBuilder<K, V> {
 		reader.setPollTimeout(this.pollTimeout);
 		reader.setSaveState(this.saveState);
 		reader.setName(this.name);
+		reader.setPartitionOffsets(this.partitionOffsets);
 		return reader;
 	}
 }

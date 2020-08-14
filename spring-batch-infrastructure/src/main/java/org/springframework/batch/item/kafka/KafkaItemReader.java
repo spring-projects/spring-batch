@@ -152,7 +152,6 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 	 * @param partitionOffsets mapping of starting offset in each partition
 	 */
 	public void setPartitionOffsets(Map<TopicPartition, Long> partitionOffsets) {
-		Assert.notNull(partitionOffsets, "partitionOffsets must not be null");
 		this.partitionOffsets = partitionOffsets;
 	}
 
