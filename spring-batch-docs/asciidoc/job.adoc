@@ -1688,7 +1688,7 @@ For jobs defined in XML, an incrementer can be associated with `Job` through the
 
 [source, xml, role="xmlContent"]
 ----
-<job id="footballJob" incrementer="sampleIncrementer">
+<job id="footballJob" incrementer="SampleIncrementer">
     ...
 </job>
 ----
@@ -1702,7 +1702,7 @@ For jobs defined in Java, an incrementer can be associated with a 'Job' through 
 @Bean
 public Job footballJob() {
     return this.jobBuilderFactory.get("footballJob")
-    				 .incrementer(sampleIncrementer())
+    				 .incrementer(SampleIncrementer())
     				 ...
                      .build();
 }
@@ -1716,7 +1716,7 @@ An incrementer can
 
 [source, xml]
 ----
-<job id="footballJob" incrementer="sampleIncrementer">
+<job id="footballJob" incrementer="SampleIncrementer">
     ...
 </job>
 ----
@@ -1728,7 +1728,7 @@ The java config builders also provide facilities for the configuration of an inc
 @Bean
 public Job footballJob() {
     return this.jobBuilderFactory.get("footballJob")
-    				 .incrementer(sampleIncrementer())
+    				 .incrementer(SampleIncrementer())
     				 ...
                      .build();
 }
