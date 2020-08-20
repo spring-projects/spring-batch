@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ import org.springframework.util.StringUtils;
  * @author Peter Zozom
  * @author Robert Kasanicky
  * @author Michael Minella
- * 
+ * @author Parikshit Dutta
  */
 public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> implements
 ResourceAwareItemWriterItemStream<T>, InitializingBean {
@@ -84,6 +84,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	// default encoding
 	public static final String DEFAULT_XML_VERSION = "1.0";
+
+	// default standalone document declaration, value not set
+	public static final Boolean DEFAULT_STANDALONE_DOCUMENT = null;
 
 	// default root tag name
 	public static final String DEFAULT_ROOT_TAG_NAME = "root";
@@ -108,6 +111,9 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 
 	// XML version
 	private String version = DEFAULT_XML_VERSION;
+
+	// standalone header attribute
+	private Boolean standalone = DEFAULT_STANDALONE_DOCUMENT;
 
 	// name of the root tag
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
@@ -268,6 +274,29 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 */
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	/**
+	 * Get used standalone document declaration.
+	 *
+	 * @return the standalone document declaration used
+	 *
+	 * @since 4.3
+	 */
+	public Boolean getStandalone() {
+		return standalone;
+	}
+
+	/**
+	 * Set standalone document declaration to be used for output XML. If not set,
+	 * standalone document declaration will be omitted.
+	 *
+	 * @param standalone the XML standalone document declaration to be used
+	 *
+	 * @since 4.3
+	 */
+	public void setStandalone(Boolean standalone) {
+		this.standalone = standalone;
 	}
 
 	/**
@@ -606,7 +635,12 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		XMLEventFactory factory = createXmlEventFactory();
 
 		// write start document
-		writer.add(factory.createStartDocument(getEncoding(), getVersion()));
+		if (getStandalone()==null) {
+			writer.add(factory.createStartDocument(getEncoding(), getVersion()));
+		}
+		else {
+			writer.add(factory.createStartDocument(getEncoding(), getVersion(), getStandalone()));
+		}
 
 		// write root tag
 		writer.add(factory.createStartElement(getRootTagNamespacePrefix(), getRootTagNamespace(), getRootTagName()));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Michael Minella
+ * @author Parikshit Dutta
  */
 public class StaxEventItemWriterBuilderTests {
 
@@ -224,9 +225,85 @@ public class StaxEventItemWriterBuilderTests {
 				.build();
 	}
 
+	@Test
+	public void testStandaloneDeclarationInHeaderWhenNotSet() throws Exception {
+		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>()
+				.name("fooWriter")
+				.marshaller(marshaller)
+				.resource(this.resource)
+				.build();
+
+		staxEventItemWriter.afterPropertiesSet();
+
+		ExecutionContext executionContext = new ExecutionContext();
+		staxEventItemWriter.open(executionContext);
+		staxEventItemWriter.write(this.items);
+		staxEventItemWriter.close();
+
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		assertFalse(output.contains("standalone="));
+	}
+
+	@Test
+	public void testStandaloneDeclarationInHeaderWhenSetToTrue() throws Exception {
+		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>()
+				.name("fooWriter")
+				.marshaller(marshaller)
+				.resource(this.resource)
+				.standalone(true)
+				.build();
+
+		staxEventItemWriter.afterPropertiesSet();
+
+		ExecutionContext executionContext = new ExecutionContext();
+		staxEventItemWriter.open(executionContext);
+		staxEventItemWriter.write(this.items);
+		staxEventItemWriter.close();
+
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		assertTrue(output.contains("standalone='yes'"));
+	}
+
+	@Test
+	public void testStandaloneDeclarationInHeaderWhenSetToFalse() throws Exception {
+		StaxEventItemWriter<Foo> staxEventItemWriter = new StaxEventItemWriterBuilder<Foo>()
+				.name("fooWriter")
+				.marshaller(marshaller)
+				.resource(this.resource)
+				.standalone(false)
+				.build();
+
+		staxEventItemWriter.afterPropertiesSet();
+
+		ExecutionContext executionContext = new ExecutionContext();
+		staxEventItemWriter.open(executionContext);
+		staxEventItemWriter.write(this.items);
+		staxEventItemWriter.close();
+
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		assertTrue(output.contains("standalone='no'"));
+	}
+
 	private String getOutputFileContent(String encoding) throws IOException {
+		return getOutputFileContent(encoding, true);
+	}
+
+	/**
+	 * @param encoding the encoding
+	 * @param discardHeader the flag to strip XML header
+	 * @return output file content as String
+	 */
+	private String getOutputFileContent(String encoding, boolean discardHeader) throws IOException {
 		String value = FileUtils.readFileToString(resource.getFile(), encoding);
-		value = value.replace("<?xml version='1.0' encoding='" + encoding + "'?>", "");
+		if (discardHeader) {
+			// standalone is omitted if not explicitly set, meaning it will be 'yes'/'no' or no standalone attribute
+			if (value.contains("standalone")) {
+				boolean standalone = value.contains("standalone='yes'");
+				return value.replace("<?xml version='1.0' encoding='" + encoding + "' " +
+						(standalone ? "standalone='yes'" : "standalone='no'") + "?>", "");
+			}
+			return value.replace("<?xml version='1.0' encoding='" + encoding + "'?>", "");
+		}
 		return value;
 	}
 

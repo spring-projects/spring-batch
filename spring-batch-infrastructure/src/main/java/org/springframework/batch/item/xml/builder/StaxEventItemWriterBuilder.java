@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  * A builder for the {@link StaxEventItemWriter}.
  *
  * @author Michael Minella
+ * @author Parikshit Dutta
  * @since 4.0
  * @see StaxEventItemWriter
  */
@@ -49,6 +50,8 @@ public class StaxEventItemWriterBuilder<T> {
 	private String encoding = StaxEventItemWriter.DEFAULT_ENCODING;
 
 	private String version = StaxEventItemWriter.DEFAULT_XML_VERSION;
+
+	private Boolean standalone = StaxEventItemWriter.DEFAULT_STANDALONE_DOCUMENT;
 
 	private String rootTagName = StaxEventItemWriter.DEFAULT_ROOT_TAG_NAME;
 
@@ -188,10 +191,25 @@ public class StaxEventItemWriterBuilder<T> {
 	 *
 	 * @param version XML version
 	 * @return the current instance of the builder
-	 * @see StaxEventItemWriter#version
+	 * @see StaxEventItemWriter#setVersion(String)
 	 */
 	public StaxEventItemWriterBuilder<T> version(String version) {
 		this.version = version;
+
+		return this;
+	}
+
+	/**
+	 * Standalone document declaration for the output document. Defaults to null.
+	 *
+	 * @param standalone Boolean standalone document declaration
+	 * @return the current instance of the builder
+	 * @see StaxEventItemWriter#setStandalone(Boolean)
+	 *
+	 * @since 4.3
+	 */
+	public StaxEventItemWriterBuilder<T> standalone(Boolean standalone) {
+		this.standalone = standalone;
 
 		return this;
 	}
@@ -278,6 +296,7 @@ public class StaxEventItemWriterBuilder<T> {
 		writer.setTransactional(this.transactional);
 		writer.setVersion(this.version);
 		writer.setName(this.name);
+		writer.setStandalone(this.standalone);
 
 		return writer;
 	}
