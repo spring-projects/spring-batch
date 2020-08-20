@@ -94,7 +94,7 @@ allprojects {
 		servletApiVersion = '4.0.1'
 		sqlfireclientVersion = '1.0.3'
 		sqliteVersion = '3.32.3.2'
-		woodstoxVersion = '6.2.0'
+		woodstoxVersion = '6.2.1'
 		xmlunitVersion = '2.7.0'
 		xstreamVersion = '1.4.12'
 		jrubyVersion = '1.7.27'
