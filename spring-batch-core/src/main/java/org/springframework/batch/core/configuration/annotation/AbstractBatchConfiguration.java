@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.util.Collection;
+
+import javax.sql.DataSource;
+
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -22,6 +26,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.core.scope.StepScope;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +36,6 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
-
-import javax.sql.DataSource;
-import java.util.Collection;
 
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
@@ -45,23 +47,29 @@ import java.util.Collection;
  * @since 2.2
  * @see EnableBatchProcessing
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @Import(ScopeConfiguration.class)
-public abstract class AbstractBatchConfiguration implements ImportAware {
+public abstract class AbstractBatchConfiguration implements ImportAware, InitializingBean {
 
 	@Autowired(required = false)
 	private DataSource dataSource;
 
 	private BatchConfigurer configurer;
 
+	private JobRegistry jobRegistry = new MapJobRegistry();
+
+	private JobBuilderFactory jobBuilderFactory;
+
+	private StepBuilderFactory stepBuilderFactory;
+
 	@Bean
 	public JobBuilderFactory jobBuilders() throws Exception {
-		return new JobBuilderFactory(jobRepository());
+		return this.jobBuilderFactory;
 	}
 
 	@Bean
 	public StepBuilderFactory stepBuilders() throws Exception {
-		return new StepBuilderFactory(jobRepository(), transactionManager());
+		return this.stepBuilderFactory;
 	}
 
 	@Bean
@@ -75,7 +83,7 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
-		return new MapJobRegistry();
+		return this.jobRegistry;
 	}
 
 	@Bean
@@ -87,6 +95,12 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
 				EnableBatchProcessing.class.getName(), false));
 		Assert.notNull(enabled,
 				"@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName());
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.jobBuilderFactory = new JobBuilderFactory(jobRepository());
+		this.stepBuilderFactory = new StepBuilderFactory(jobRepository(), transactionManager());
 	}
 
 	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) throws Exception {
@@ -123,21 +137,28 @@ public abstract class AbstractBatchConfiguration implements ImportAware {
  * @author Dave Syer
  * 
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class ScopeConfiguration {
+
+	private static StepScope stepScope;
+
+	private static JobScope jobScope;
+
+	static {
+		jobScope = new JobScope();
+		jobScope.setAutoProxy(false);
+
+		stepScope = new StepScope();
+		stepScope.setAutoProxy(false);
+	}
 
 	@Bean
 	public static StepScope stepScope() {
-		StepScope stepScope = new StepScope();
-		stepScope.setAutoProxy(false);
 		return stepScope;
 	}
 
 	@Bean
 	public static JobScope jobScope() {
-		JobScope jobScope = new JobScope();
-		jobScope.setAutoProxy(false);
 		return jobScope;
 	}
-
 }

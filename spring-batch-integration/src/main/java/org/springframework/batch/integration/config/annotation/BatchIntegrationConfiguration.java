@@ -23,6 +23,7 @@ import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
 import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,14 +35,26 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @since 4.1
  * @author Mahmoud Ben Hassine
  */
-@Configuration
-public class BatchIntegrationConfiguration {
+@Configuration(proxyBeanMethods = false)
+public class BatchIntegrationConfiguration implements InitializingBean {
 
 	private JobExplorer jobExplorer;
 
 	private JobRepository jobRepository;
 
 	private PlatformTransactionManager transactionManager;
+
+	private RemoteChunkingMasterStepBuilderFactory remoteChunkingMasterStepBuilderFactory;
+
+	private RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory;
+
+	private RemoteChunkingWorkerBuilder remoteChunkingWorkerBuilder;
+
+	private RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory;
+
+	private RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory;
+
+	private RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory;
 
 	@Autowired
 	public BatchIntegrationConfiguration(
@@ -57,38 +70,47 @@ public class BatchIntegrationConfiguration {
 	@Deprecated
 	@Bean
 	public RemoteChunkingMasterStepBuilderFactory remoteChunkingMasterStepBuilderFactory() {
-		return new RemoteChunkingMasterStepBuilderFactory(this.jobRepository,
-				this.transactionManager);
+		return this.remoteChunkingMasterStepBuilderFactory;
 	}
 
 	@Bean
 	public RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory() {
-		return new RemoteChunkingManagerStepBuilderFactory(this.jobRepository,
-				this.transactionManager);
+		return this.remoteChunkingManagerStepBuilderFactory;
 	}
 
 	@Bean
 	public <I,O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
-		return new RemoteChunkingWorkerBuilder<>();
+		return remoteChunkingWorkerBuilder;
 	}
 
 	@Deprecated
 	@Bean
 	public RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory() {
-		return new RemotePartitioningMasterStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
+		return remotePartitioningMasterStepBuilderFactory;
 	}
 
 	@Bean
 	public RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory() {
-		return new RemotePartitioningManagerStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
+		return this.remotePartitioningManagerStepBuilderFactory;
 	}
 
 	@Bean
 	public RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory() {
-		return new RemotePartitioningWorkerStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
+		return this.remotePartitioningWorkerStepBuilderFactory;
 	}
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.remoteChunkingMasterStepBuilderFactory  = new RemoteChunkingMasterStepBuilderFactory(this.jobRepository,
+				this.transactionManager);
+		this.remoteChunkingManagerStepBuilderFactory = new RemoteChunkingManagerStepBuilderFactory(this.jobRepository,
+				this.transactionManager);
+		this.remoteChunkingWorkerBuilder = new RemoteChunkingWorkerBuilder<>();
+		this.remotePartitioningMasterStepBuilderFactory = new RemotePartitioningMasterStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
+		this.remotePartitioningManagerStepBuilderFactory = new RemotePartitioningManagerStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
+		this.remotePartitioningWorkerStepBuilderFactory = new RemotePartitioningWorkerStepBuilderFactory(this.jobRepository,
+				this.jobExplorer, this.transactionManager);
+	}
 }
