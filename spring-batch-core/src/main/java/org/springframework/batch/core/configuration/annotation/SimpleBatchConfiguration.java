@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.AbstractLazyCreationTargetSource;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -30,8 +33,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
  * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
  * available by implementing the {@link BatchConfigurer} interface. The main components are created as lazy proxies that
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 2.2
  * @see EnableBatchProcessing
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	@Autowired
