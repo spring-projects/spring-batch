@@ -311,6 +311,8 @@ project('spring-batch-infrastructure') {
 
 	dependencies {
 
+		testCompile enforcedPlatform("org.springframework:spring-framework-bom:$springVersion")
+
 		compile "org.springframework:spring-core:$springVersion"
 		compile "org.springframework.retry:spring-retry:$springRetryVersion"
 
