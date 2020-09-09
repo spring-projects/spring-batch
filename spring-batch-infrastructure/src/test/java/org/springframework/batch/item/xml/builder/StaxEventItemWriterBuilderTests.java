@@ -47,6 +47,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemWriterBuilderTests {
 
@@ -240,7 +241,7 @@ public class StaxEventItemWriterBuilderTests {
 		staxEventItemWriter.write(this.items);
 		staxEventItemWriter.close();
 
-		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding());
 		assertFalse(output.contains("standalone="));
 	}
 
@@ -260,7 +261,7 @@ public class StaxEventItemWriterBuilderTests {
 		staxEventItemWriter.write(this.items);
 		staxEventItemWriter.close();
 
-		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding());
 		assertTrue(output.contains("standalone='yes'"));
 	}
 
@@ -280,31 +281,16 @@ public class StaxEventItemWriterBuilderTests {
 		staxEventItemWriter.write(this.items);
 		staxEventItemWriter.close();
 
-		String output = getOutputFileContent(staxEventItemWriter.getEncoding(), false);
+		String output = getOutputFileContent(staxEventItemWriter.getEncoding());
 		assertTrue(output.contains("standalone='no'"));
-	}
-
-	private String getOutputFileContent(String encoding) throws IOException {
-		return getOutputFileContent(encoding, true);
 	}
 
 	/**
 	 * @param encoding the encoding
-	 * @param discardHeader the flag to strip XML header
 	 * @return output file content as String
 	 */
-	private String getOutputFileContent(String encoding, boolean discardHeader) throws IOException {
-		String value = FileUtils.readFileToString(resource.getFile(), encoding);
-		if (discardHeader) {
-			// standalone is omitted if not explicitly set, meaning it will be 'yes'/'no' or no standalone attribute
-			if (value.contains("standalone")) {
-				boolean standalone = value.contains("standalone='yes'");
-				return value.replace("<?xml version='1.0' encoding='" + encoding + "' " +
-						(standalone ? "standalone='yes'" : "standalone='no'") + "?>", "");
-			}
-			return value.replace("<?xml version='1.0' encoding='" + encoding + "'?>", "");
-		}
-		return value;
+	private String getOutputFileContent(String encoding) throws IOException {
+		return FileUtils.readFileToString(resource.getFile(), encoding);
 	}
 
 	@XmlRootElement(name="item", namespace="https://www.springframework.org/test")

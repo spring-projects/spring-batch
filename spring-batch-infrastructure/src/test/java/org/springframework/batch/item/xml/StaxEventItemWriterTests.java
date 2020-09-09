@@ -57,6 +57,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link StaxEventItemWriter}.
  *
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemWriterTests {
 
@@ -1024,13 +1025,7 @@ public class StaxEventItemWriterTests {
 	private String getOutputFileContent(String encoding, boolean discardHeader) throws IOException {
 		String value = FileUtils.readFileToString(resource.getFile(), encoding);
 		if (discardHeader) {
-			// standalone is omitted if not explicitly set, meaning it will be 'yes'/'no' or no standalone attribute
-			if (value.contains("standalone")) {
-				boolean standalone = value.contains("standalone='yes'");
-				return value.replace("<?xml version='1.0' encoding='" + encoding + "' " +
-						(standalone ? "standalone='yes'" : "standalone='no'") + "?>", "");
-			}
-			return value.replace("<?xml version='1.0' encoding='" + encoding + "'?>", "");
+			return value.replaceFirst("<\\?xml.*?\\?>", "");
 		}
 		return value;
 	}

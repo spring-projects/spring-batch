@@ -73,6 +73,7 @@ import org.springframework.util.StringUtils;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T> implements
 ResourceAwareItemWriterItemStream<T>, InitializingBean {
@@ -635,7 +636,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 		XMLEventFactory factory = createXmlEventFactory();
 
 		// write start document
-		if (getStandalone()==null) {
+		if (getStandalone() == null) {
 			writer.add(factory.createStartDocument(getEncoding(), getVersion()));
 		}
 		else {

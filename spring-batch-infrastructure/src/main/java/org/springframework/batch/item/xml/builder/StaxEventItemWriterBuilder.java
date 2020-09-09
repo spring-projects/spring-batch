@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see StaxEventItemWriter
  */
@@ -200,7 +201,7 @@ public class StaxEventItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Standalone document declaration for the output document. Defaults to null.
+	 * Standalone document declaration for the output document. Defaults to {@code null}.
 	 *
 	 * @param standalone Boolean standalone document declaration
 	 * @return the current instance of the builder
