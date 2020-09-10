@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.explore.support;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
@@ -27,6 +28,7 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.lang.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -165,6 +167,14 @@ public class SimpleJobExplorer implements JobExplorer {
 		return stepExecution;
 	}
 
+	@Override
+	public int getStepExecutionCount(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses) {
+		if (stepExecutionIds.isEmpty() || matchingBatchStatuses.isEmpty()) {
+			return 0;
+		}
+		return stepExecutionDao.countStepExecutions(stepExecutionIds, matchingBatchStatuses);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -219,6 +229,19 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
+	@Override
+	@Nullable
+	public Collection<StepExecution> getStepExecutions(Long jobExecutionId, Collection<Long> stepExecutionIds) {
+		JobExecution jobExecution = jobExecutionDao.getJobExecution(jobExecutionId);
+		if (jobExecution == null) {
+			return null;
+		}
+		getJobExecutionDependencies(jobExecution);
+		Collection<StepExecution> stepExecutions = stepExecutionDao.getStepExecutions(jobExecution, stepExecutionIds);
+		stepExecutions.forEach(this::getStepExecutionDependencies);
+		return stepExecutions;
 	}
 
 	/*

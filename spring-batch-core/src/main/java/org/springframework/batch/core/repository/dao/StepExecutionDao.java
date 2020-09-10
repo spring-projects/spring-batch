@@ -16,12 +16,13 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.Collection;
-
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
+
+import java.util.Collection;
 
 public interface StepExecutionDao {
 
@@ -86,6 +87,22 @@ public interface StepExecutionDao {
 	 */
 	void addStepExecutions(JobExecution jobExecution);
 
+	/**
+	 * Count {@link StepExecution} that match the ids and statuses of them - avoid loading them into memory
+	 * @param stepExecutionIds given step execution ids
+	 * @param matchingBatchStatuses
+	 * @return
+	 */
+    int countStepExecutions(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses);
+
+	/**
+	 * Get a collection of {@link StepExecution} matching job execution and step execution ids.
+	 * @param jobExecution the parent job execution
+	 * @param stepExecutionIds the step execution ids
+	 * @return collection of {@link StepExecution}
+	 */
+	@Nullable
+	Collection<StepExecution> getStepExecutions(JobExecution jobExecution, Collection<Long> stepExecutionIds);
 	/**
 	 * Counts all the {@link StepExecution} for a given step name.
 	 *

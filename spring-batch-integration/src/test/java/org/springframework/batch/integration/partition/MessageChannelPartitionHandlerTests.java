@@ -1,12 +1,6 @@
 package org.springframework.batch.integration.partition;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.concurrent.TimeoutException;
-
 import org.junit.Test;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -18,15 +12,16 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -154,8 +149,8 @@ public class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3, partition3, partition3, partition3, partition4);
-
+		when(jobExplorer.getStepExecutionCount(any(), any())).thenReturn(3, 2, 0);
+		when(jobExplorer.getStepExecutions(eq(5L), any())).thenReturn(Arrays.asList(partition1, partition2, partition4));
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setJobExplorer(jobExplorer);
@@ -198,7 +193,8 @@ public class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3);
+		when(jobExplorer.getStepExecutionCount(any(), any())).thenReturn(2);
+		when(jobExplorer.getStepExecutions(eq(5L), any())).thenReturn(Arrays.asList(partition1, partition2, partition3));
 
 		//set
 		messageChannelPartitionHandler.setMessagingOperations(operations);

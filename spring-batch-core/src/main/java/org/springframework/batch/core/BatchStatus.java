@@ -16,6 +16,9 @@
 
 package org.springframework.batch.core;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Enumeration representing the status of an Execution.
  * 
@@ -39,6 +42,8 @@ public enum BatchStatus {
 	 */
 	COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN;
 
+	public static final List<BatchStatus> RUNNING_STATUSES = Arrays.asList(STARTING, STARTED);
+
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		return status1.isGreaterThan(status2) ? status1 : status2;
 	}
@@ -49,7 +54,7 @@ public enum BatchStatus {
 	 * @return true if the status is STARTING, STARTED
 	 */
 	public boolean isRunning() {
-		return this == STARTING || this == STARTED;
+		return RUNNING_STATUSES.contains(this);
 	}
 
 	/**
