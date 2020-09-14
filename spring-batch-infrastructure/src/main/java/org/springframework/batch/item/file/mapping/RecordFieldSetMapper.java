@@ -25,9 +25,9 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
 /**
- * This is a {@link FieldSetMapper} that supports Java records mapping.
- * It uses the record's canonical constructor to map components with the
- * same name as tokens in the {@link FieldSet}.
+ * This is a {@link FieldSetMapper} that supports Java records mapping
+ * (requires JKD 14 or higher).  It uses the record's canonical constructor
+ * to map components with the same name as tokens in the {@link FieldSet}.
  * 
  * @param <T> type of mapped items
  * @author Mahmoud Ben Hassine
