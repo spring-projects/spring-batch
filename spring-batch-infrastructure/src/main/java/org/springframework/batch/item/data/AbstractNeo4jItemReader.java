@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,11 @@ import org.springframework.util.StringUtils;
  * </p>
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.07
+ * @deprecated Extend {@link Neo4jItemReader} instead.
  */
+@Deprecated
 public abstract class AbstractNeo4jItemReader<T> extends
 		AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
