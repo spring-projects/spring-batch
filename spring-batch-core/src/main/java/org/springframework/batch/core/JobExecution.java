@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -254,7 +254,11 @@ public class JobExecution extends Entity {
 	 * Signal the {@link JobExecution} to stop. Iterates through the associated
 	 * {@link StepExecution}s, calling {@link StepExecution#setTerminateOnly()}.
 	 *
+	 * @deprecated Use {@link org.springframework.batch.core.launch.JobOperator#stop(long)}
+	 * or {@link org.springframework.batch.core.launch.support.CommandLineJobRunner}
+	 * with the "-stop" option instead.
 	 */
+	@Deprecated
 	public void stop() {
 		for (StepExecution stepExecution : stepExecutions) {
 			stepExecution.setTerminateOnly();
