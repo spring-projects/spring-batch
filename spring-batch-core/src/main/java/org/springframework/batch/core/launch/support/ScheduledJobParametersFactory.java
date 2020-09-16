@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,11 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
+ * @deprecated as of v4.3 in favor of 
+ * {@link org.springframework.batch.core.converter.DefaultJobParametersConverter}
+ * and scheduled for removal in v5.0.
  */
+@Deprecated
 public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 	public static final String SCHEDULE_DATE_KEY = "schedule.date";
