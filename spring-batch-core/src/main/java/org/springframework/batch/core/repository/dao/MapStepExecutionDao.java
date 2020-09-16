@@ -37,7 +37,11 @@ import org.springframework.util.SerializationUtils;
 
 /**
  * In-memory implementation of {@link StepExecutionDao}.
+ * 
+ * @deprecated as of v4.3 in favor of using the {@link JdbcStepExecutionDao}
+ * with an in-memory database. Scheduled for removal in v5.0.
  */
+@Deprecated
 public class MapStepExecutionDao implements StepExecutionDao {
 
 	private Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = new ConcurrentHashMap<>();

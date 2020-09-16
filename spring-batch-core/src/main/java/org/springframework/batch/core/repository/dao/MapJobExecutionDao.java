@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,11 @@ import org.springframework.util.SerializationUtils;
 
 /**
  * In-memory implementation of {@link JobExecutionDao}.
+ * 
+ * @deprecated as of v4.3 in favor of using the {@link JdbcJobExecutionDao}
+ * with an in-memory database. Scheduled for removal in v5.0.
  */
+@Deprecated
 public class MapJobExecutionDao implements JobExecutionDao {
 
 	// JDK6 Make this into a ConcurrentSkipListMap: adds and removes tend to be very near the front or back

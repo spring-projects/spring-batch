@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,12 @@ import org.springframework.util.SerializationUtils;
  * @author Dave Syer
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * 
+ * @deprecated as of v4.3 in favor of using the {@link JdbcExecutionContextDao}
+ * with an in-memory database. Scheduled for removal in v5.0.
  */
 @SuppressWarnings("serial")
+@Deprecated
 public class MapExecutionContextDao implements ExecutionContextDao {
 
 	private final ConcurrentMap<ContextKey, ExecutionContext> contexts = TransactionAwareProxyFactory

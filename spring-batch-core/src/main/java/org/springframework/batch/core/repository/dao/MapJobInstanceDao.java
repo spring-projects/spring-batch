@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,11 @@ import org.springframework.util.Assert;
 
 /**
  * In-memory implementation of {@link JobInstanceDao}.
+ * 
+ * @deprecated as of v4.3 in favor of using the {@link JdbcJobInstanceDao}
+ * with an in-memory database. Scheduled for removal in v5.0.
  */
+@Deprecated
 public class MapJobInstanceDao implements JobInstanceDao {
 	private static final String STAR_WILDCARD = "\\*";
 	private static final String STAR_WILDCARD_PATTERN = ".*";

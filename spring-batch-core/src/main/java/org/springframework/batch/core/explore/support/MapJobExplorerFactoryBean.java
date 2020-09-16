@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,13 @@ import org.springframework.util.Assert;
  * {@link SimpleJobExplorer} using in-memory DAO implementations.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
+ * 
+ * @deprecated as of v4.3 in favor of using the {@link JobExplorerFactoryBean}
+ * with an in-memory database. Scheduled for removal in v5.0.
  */
+@Deprecated
 public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
 
 	private MapJobRepositoryFactoryBean repositoryFactory;
