@@ -45,6 +45,7 @@ import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.StaxUtils;
 
 /**
  * Item reader for reading XML input based on StAX.
@@ -81,7 +82,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private boolean strict = true;
 
-	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
+	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
 	private String encoding = DEFAULT_ENCODING;
 
@@ -269,7 +270,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 			try {
 				@SuppressWarnings("unchecked")
-				T mappedFragment = (T) unmarshaller.unmarshal(StaxUtils.getSource(fragmentReader));
+				T mappedFragment = (T) unmarshaller.unmarshal(StaxUtils.createStaxSource(fragmentReader));
 				item = mappedFragment;
 			}
 			finally {

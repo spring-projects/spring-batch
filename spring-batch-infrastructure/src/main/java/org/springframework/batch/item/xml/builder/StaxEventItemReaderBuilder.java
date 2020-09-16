@@ -22,11 +22,11 @@ import java.util.List;
 import javax.xml.stream.XMLInputFactory;
 
 import org.springframework.batch.item.xml.StaxEventItemReader;
-import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.StaxUtils;
 
 /**
  * A fluent builder for the {@link StaxEventItemReader}
@@ -54,7 +54,7 @@ public class StaxEventItemReaderBuilder<T> {
 
 	private int currentItemCount;
 
-	private XMLInputFactory xmlInputFactory = StaxUtils.createXmlInputFactory();
+	private XMLInputFactory xmlInputFactory = StaxUtils.createDefensiveInputFactory();
 
 	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 

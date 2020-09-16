@@ -59,6 +59,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.StaxUtils;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
@@ -578,7 +579,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * @return a result for writing to
 	 */
 	protected Result createStaxResult() {
-		return StaxUtils.getResult(eventWriter);
+		return StaxUtils.createStaxResult(eventWriter);
 	}
 
 	/**

@@ -31,6 +31,7 @@ import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.UnmarshallingFailureException;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.xml.StaxUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
@@ -356,7 +357,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragment() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(xml.getBytes());
-		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(resource.getInputStream());
 
 		final int EXPECTED_NUMBER_OF_FRAGMENTS = 2;
 		for (int i = 0; i < EXPECTED_NUMBER_OF_FRAGMENTS; i++) {
@@ -373,7 +374,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragmentOnEmpty() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(emptyXml.getBytes());
-		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(resource.getInputStream());
 
 		assertFalse(source.moveCursorToNextFragment(reader));
 	}
@@ -384,7 +385,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testMoveCursorToNextFragmentOnMissing() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(missingXml.getBytes());
-		XMLEventReader reader = StaxUtils.createXmlInputFactory().createXMLEventReader(resource.getInputStream());
+		XMLEventReader reader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(resource.getInputStream());
 		assertFalse(source.moveCursorToNextFragment(reader));
 	}
 

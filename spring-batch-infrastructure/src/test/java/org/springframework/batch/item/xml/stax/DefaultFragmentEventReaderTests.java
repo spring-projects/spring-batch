@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import javax.xml.stream.events.XMLEvent;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.xml.EventHelper;
-import org.springframework.batch.item.xml.StaxUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.xml.StaxUtils;
 
 /**
  * Tests for {@link DefaultFragmentEventReader}.
@@ -51,7 +51,7 @@ public class DefaultFragmentEventReaderTests extends TestCase {
     @Override
 	protected void setUp() throws Exception {
 		Resource input = new ByteArrayResource(xml.getBytes());
-		eventReader = StaxUtils.createXmlInputFactory().createXMLEventReader(
+		eventReader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(
 				input.getInputStream());
 		fragmentReader = new DefaultFragmentEventReader(eventReader);
 	}
