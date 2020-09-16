@@ -52,7 +52,7 @@ allprojects {
 		springRetryVersion = '1.3.0'
 		springAmqpVersion = '2.3.0-SNAPSHOT'
 		springDataCommonsVersion = '2.4.0-SNAPSHOT'
-		springDataGemfireVersion = '2.4.0-SNAPSHOT'
+		springDataGeodeVersion = '2.4.0-SNAPSHOT'
 		springDataJpaVersion = '2.4.0-SNAPSHOT'
 		springDataMongodbVersion = '3.1.0-SNAPSHOT'
 		springIntegrationVersion = '5.4.0-SNAPSHOT'
@@ -382,7 +382,7 @@ project('spring-batch-infrastructure') {
 		optional "org.springframework:spring-tx:$springVersion"
 		optional "org.springframework.data:spring-data-commons:$springDataCommonsVersion"
 		optional "org.springframework.data:spring-data-mongodb:$springDataMongodbVersion"
-		optional "org.springframework.data:spring-data-gemfire:$springDataGemfireVersion"
+		optional "org.springframework.data:spring-data-geode:$springDataGeodeVersion"
 		optional "org.neo4j:neo4j-ogm-core:$neo4jVersion"
 		compile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") { dep ->
 			optional dep
