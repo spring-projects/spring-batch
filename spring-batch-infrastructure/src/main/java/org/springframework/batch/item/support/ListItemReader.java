@@ -17,6 +17,7 @@
 package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.aop.support.AopUtils;
@@ -27,7 +28,8 @@ import org.springframework.lang.Nullable;
  * An {@link ItemReader} that pulls data from a list. Useful for testing.
  * 
  * @author Dave Syer
- * 
+ * @author jojoldu
+ *
  */
 public class ListItemReader<T> implements ItemReader<T> {
 
@@ -40,7 +42,7 @@ public class ListItemReader<T> implements ItemReader<T> {
 			this.list = list;
 		}
 		else {
-			this.list = new ArrayList<>(list);
+			this.list = new LinkedList<>(list);
 		}
 	}
 
