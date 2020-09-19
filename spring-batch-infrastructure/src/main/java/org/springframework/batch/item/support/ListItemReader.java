@@ -16,13 +16,12 @@
 
 package org.springframework.batch.item.support;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An {@link ItemReader} that pulls data from a list. Useful for testing.
