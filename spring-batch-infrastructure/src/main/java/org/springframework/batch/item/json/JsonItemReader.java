@@ -73,6 +73,10 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 		this.jsonObjectReader = jsonObjectReader;
 		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
 	}
+
+	/**
+	 * Create a new {@link JsonItemReader} instance.
+	 */
 	public JsonItemReader(){
 		setExecutionContextName(ClassUtils.getShortName(JsonItemReader.class));
 	}
@@ -108,6 +112,8 @@ public class JsonItemReader<T> extends AbstractItemCountingItemStreamItemReader<
 
 	@Override
 	protected void doOpen() throws Exception {
+		Assert.notNull(this.resource, "The resource must not be null.");
+		Assert.notNull(this.jsonObjectReader, "The json object reader must not be null.");
 		if (!this.resource.exists()) {
 			if (this.strict) {
 				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");

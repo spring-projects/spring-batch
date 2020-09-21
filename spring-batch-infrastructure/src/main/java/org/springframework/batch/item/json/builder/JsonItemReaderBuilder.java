@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package org.springframework.batch.item.json.builder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.JsonObjectReader;
 import org.springframework.core.io.Resource;
@@ -31,6 +34,8 @@ import org.springframework.util.StringUtils;
  * @since 4.1
  */
 public class JsonItemReaderBuilder<T> {
+
+	protected Log logger = LogFactory.getLog(getClass());
 
 	private JsonObjectReader<T> jsonObjectReader;
 
@@ -142,6 +147,11 @@ public class JsonItemReaderBuilder<T> {
 		Assert.notNull(this.jsonObjectReader, "A json object reader is required.");
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
+		}
+
+		if (this.resource == null) {
+			logger.debug("The resource is null. This is only a valid scenario when " +
+					"injecting it later as in when using the MultiResourceItemReader");
 		}
 
 		JsonItemReader<T> reader = new JsonItemReader<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,6 @@ public class JsonItemReaderBuilderTest {
 		try {
 			new JsonItemReaderBuilder<String>()
 					.jsonObjectReader(this.jsonObjectReader)
-					.resource(this.resource)
 					.build();
 			fail("A name is required when saveState is set to true.");
 		}
@@ -91,24 +90,24 @@ public class JsonItemReaderBuilderTest {
 		Object executionContext = getField(itemReader, "executionContextUserSupport");
 		Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
 	}
+
 	@Test
 	public void shouldBuildJsonItemReaderWhenResourceIsNotProvided(){
-	    JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>()
-                .jsonObjectReader(this.jsonObjectReader)
-                .saveState(true)
-                .strict(true)
-                .name("jsonItemReader")
-                .maxItemCount(100)
-                .currentItemCount(50)
-                .build();
+		JsonItemReader<String> itemReader = new JsonItemReaderBuilder<String>()
+				.jsonObjectReader(this.jsonObjectReader)
+				.saveState(true)
+				.strict(true)
+				.name("jsonItemReader")
+				.maxItemCount(100)
+				.currentItemCount(50)
+				.build();
 
-			Assert.assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
-			Assert.assertEquals(100, getField(itemReader, "maxItemCount"));
-			Assert.assertEquals(50, getField(itemReader, "currentItemCount"));
-			Assert.assertTrue((Boolean) getField(itemReader, "saveState"));
-			Assert.assertTrue((Boolean) getField(itemReader, "strict"));
-			Object executionContext = getField(itemReader, "executionContextUserSupport");
-			Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
-
+		Assert.assertEquals(this.jsonObjectReader, getField(itemReader, "jsonObjectReader"));
+		Assert.assertEquals(100, getField(itemReader, "maxItemCount"));
+		Assert.assertEquals(50, getField(itemReader, "currentItemCount"));
+		Assert.assertTrue((Boolean) getField(itemReader, "saveState"));
+		Assert.assertTrue((Boolean) getField(itemReader, "strict"));
+		Object executionContext = getField(itemReader, "executionContextUserSupport");
+		Assert.assertEquals("jsonItemReader", getField(executionContext, "name"));
 	}
 }
