@@ -69,3 +69,22 @@ public class MyTimedTasklet implements Tasklet {
 	}
 }
 ----
+
+[[disabling-metrics]]
+
+=== Disabling metrics
+
+Metrics collection is a concern similar to logging. Disabling logs is typically
+done by configuring the logging library and this is no different for metrics.
+There is no feature in Spring Batch to disable micrometer's metrics, this should
+be done on micrometer's side. Since Spring Batch stores metrics in the global
+registry of micrometer with the `spring.batch` prefix, it is possible to configure
+micrometer to ignore/deny batch metrics with the following snippet:
+
+[source, java]
+----
+Metrics.globalRegistry.config().meterFilter(MeterFilter.denyNameStartsWith("spring.batch"))
+----
+
+Please refer to micrometer's link:$$http://micrometer.io/docs/concepts#_meter_filters$$[reference documentation]
+for more details.
