@@ -231,12 +231,10 @@ public class StaxEventItemReaderBuilder<T> {
 		if (this.saveState) {
 			Assert.state(StringUtils.hasText(this.name), "A name is required when saveState is set to true.");
 		}
-		else {
-			reader.setName(this.name);
-		}
 
 		Assert.notEmpty(this.fragmentRootElements, "At least one fragment root element is required");
 
+		reader.setName(this.name);
 		reader.setSaveState(this.saveState);
 		reader.setResource(this.resource);
 		reader.setFragmentRootElementNames(
