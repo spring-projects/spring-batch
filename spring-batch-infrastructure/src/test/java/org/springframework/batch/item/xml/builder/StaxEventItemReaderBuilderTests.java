@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
  * @author Michael Minella
@@ -119,6 +120,9 @@ public class StaxEventItemReaderBuilderTests {
 		assertEquals("five", item.getSecond());
 		assertEquals("six", item.getThird());
 		assertEquals(2, executionContext.size());
+
+		Object executionContextUserSupport = getField(reader, "executionContextUserSupport");
+		assertEquals("fooReader", getField(executionContextUserSupport, "name"));
 	}
 
 	@Test(expected = ItemStreamException.class)
