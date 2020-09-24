@@ -992,6 +992,29 @@ The following example shows a date passed as a job parameter to a job defined in
 <bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay schedule.date(date)=2007/05/05
 ----
 
+[NOTE]
+====
+By default, the `CommandLineJobRunner` uses a `DefaultJobParametersConverter` which implicitly converts
+key/value pairs to identifying job parameters. However, it is possible to explicitly specify
+which job parameters are identifying and which are not by prefixing them with `+` or `-` respectively.
+
+In the following example, `schedule.date` is an identifying job parameter while `vendor.id` is not:
+
+[source, role="xmlContent"]
+----
+<bash$ java CommandLineJobRunner endOfDayJob.xml endOfDay \
+                                 +schedule.date(date)=2007/05/05 -vendor.id=123
+----
+
+[source, role="javaContent"]
+----
+<bash$ java CommandLineJobRunner io.spring.EndOfDayJobConfiguration endOfDay \
+                                 +schedule.date(date)=2007/05/05 -vendor.id=123
+----
+
+This behaviour can be overridden by using a custom `JobParametersConverter`.
+====
+
 ifdef::backend-html5[]
 [role="xmlContent"]
 In most cases, you would want to use a manifest to declare your main class in a jar, but,

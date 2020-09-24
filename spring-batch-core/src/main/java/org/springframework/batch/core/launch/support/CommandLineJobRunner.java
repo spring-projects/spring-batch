@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,6 +140,23 @@ import org.springframework.util.StringUtils;
  * testJob schedule.date=2008/01/24 vendor.id=3902483920
  * </code>
  * </p>
+ *
+ * <p>
+ * By default, the `CommandLineJobRunner` uses a {@link DefaultJobParametersConverter}
+ * which implicitly converts key/value pairs to identifying job parameters.
+ * However, it is possible to explicitly specify which job parameters are identifying
+ * and which are not by prefixing them with `+` or `-` respectively. In the following
+ * example, `schedule.date` is an identifying job parameter while `vendor.id` is not:
+ * </p>
+ * 
+ * <p>
+ * <code>
+ * java org.springframework.batch.core.launch.support.CommandLineJobRunner testJob.xml
+ * testJob +schedule.date=2008/01/24 -vendor.id=3902483920
+ * </code>
+ * </p>
+ *
+ * <p>This behaviour can be overridden by using a custom `JobParametersConverter`.</p>
  *
  * <p>
  * Once arguments have been successfully parsed, autowiring will be used to set
