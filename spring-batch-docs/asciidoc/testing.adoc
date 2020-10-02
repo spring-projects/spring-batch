@@ -30,8 +30,12 @@ JUnit facilities
 * `@ContextConfiguration(...)`: Indicates which resources to configure the
 `ApplicationContext` with.
 
+Starting from v4.1, it is also possible to inject Spring Batch test utilities
+like the `JobLauncherTestUtils` and `JobRepositoryTestUtils` in the test context
+using the `@SpringBatchTest` annotation.
+
 [role="javaContent"]
-The following Java example shows the two annotations in use:
+The following Java example shows the annotations in use:
 
 .Using Java Configuration
 [source, java, role="javaContent"]
@@ -43,7 +47,7 @@ public class SkipSampleFunctionalTests { ... }
 ----
 
 [role="xmlContent"]
-The following XML example shows the two annotations in use:
+The following XML example shows the annotations in use:
 
 .Using XML Configuration
 [source, java, role="xmlContent"]
@@ -215,6 +219,38 @@ factory method in the test case for a `StepExecution`, using that as the context
 test method, as if that execution were active in a `Step` at runtime. The factory method
 is detected by its signature (it must return a `StepExecution`). If a factory method is
 not provided, then a default `StepExecution` is created.
+
+Starting from v4.1, the `StepScopeTestExecutionListener` and
+`JobScopeTestExecutionListener` are imported as test execution listeners
+if the test class is annotated with `@SpringBatchTest`. The preceding test
+example can be configured as follows:
+
+[source, java]
+----
+@SpringBatchTest
+@RunWith(SpringRunner.class)
+@ContextConfiguration
+public class StepScopeTestExecutionListenerIntegrationTests {
+
+    // This component is defined step-scoped, so it cannot be injected unless
+    // a step is active...
+    @Autowired
+    private ItemReader<String> reader;
+
+    public StepExecution getStepExecution() {
+        StepExecution execution = MetaDataInstanceFactory.createStepExecution();
+        execution.getExecutionContext().putString("input.data", "foo,bar,spam");
+        return execution;
+    }
+
+    @Test
+    public void testReader() {
+        // The reader is initialized and bound to the input data
+        assertNotNull(reader.read());
+    }
+
+}
+----
 
 The listener approach is convenient if you want the duration of the step scope to be the
 execution of the test method. For a more flexible but more invasive approach, you can use
