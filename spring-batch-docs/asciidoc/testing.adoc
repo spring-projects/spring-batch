@@ -34,6 +34,16 @@ Starting from v4.1, it is also possible to inject Spring Batch test utilities
 like the `JobLauncherTestUtils` and `JobRepositoryTestUtils` in the test context
 using the `@SpringBatchTest` annotation.
 
+[NOTE]
+====
+It should be noted that `JobLauncherTestUtils` requires a `Job` bean and that
+`JobRepositoryTestUtils` requires a `DataSource` bean. Since `@SpringBatchTest`
+registers a `JobLauncherTestUtils` and a `JobRepositoryTestUtils` in the test
+context, it is expected that the test context contains a single autowire candidate
+for a `Job` and a `DataSource` (either a single bean definition or one that is
+annotated with `org.springframework.context.annotation.Primary`).
+====
+
 [role="javaContent"]
 The following Java example shows the annotations in use:
 

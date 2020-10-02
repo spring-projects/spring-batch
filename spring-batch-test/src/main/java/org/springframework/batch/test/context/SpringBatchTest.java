@@ -116,6 +116,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * 
  * }
  * </pre>
+ * 
+ * <p><strong>
+ * It should be noted that {@link JobLauncherTestUtils} requires a 
+ * {@link org.springframework.batch.core.Job} bean and that
+ * {@link JobRepositoryTestUtils} requires a {@link javax.sql.DataSource} bean.
+ * Since this annotation registers a {@link JobLauncherTestUtils} and a 
+ * {@link JobRepositoryTestUtils} in the test context, it is expected that the
+ * test context contains a single autowire candidate for a 
+ * {@link org.springframework.batch.core.Job} and a {@link javax.sql.DataSource}
+ * (either a single bean definition or one that is
+ * annotated with {@link org.springframework.context.annotation.Primary}).
+ * </strong></p>
+ * 
  * @author Mahmoud Ben Hassine
  * @since 4.1
  * @see JobLauncherTestUtils
