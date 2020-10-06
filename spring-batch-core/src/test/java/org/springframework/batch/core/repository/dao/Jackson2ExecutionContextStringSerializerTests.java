@@ -20,9 +20,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,6 +35,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Marten Deinum
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionContextSerializerTests {
 
@@ -71,6 +74,25 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		catch (Exception e) {
 			fail(String.format("An exception was thrown but should not have been: %s", e.getMessage()));
 		}
+	}
+
+	@Test
+	public void testAdditionalTrustedClass() throws IOException {
+		// given
+		Jackson2ExecutionContextStringSerializer serializer =
+				new Jackson2ExecutionContextStringSerializer("java.util.Locale");
+		Map<String, Object> context = new HashMap<>(1);
+		context.put("locale", Locale.getDefault());
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		Locale locale = (Locale) deserializedContext.get("locale");
+		Assert.assertNotNull(locale);
 	}
 
 	@Override
