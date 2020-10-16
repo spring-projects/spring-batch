@@ -59,7 +59,7 @@ allprojects {
 		springKafkaVersion = '2.6.2-SNAPSHOT'
 		springLdapVersion = '2.3.3.RELEASE'
 
-		activemqVersion = '5.16.0'
+		activemqVersion = '5.15.13'
 		apacheAvroVersion ='1.9.2'
 		aspectjVersion = '1.9.6'
 		commonsDdbcpVersion = '2.7.0'
