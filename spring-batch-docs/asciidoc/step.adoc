@@ -2468,3 +2468,11 @@ The following example includes a bean that explicitly defines the `JobScope`:
 ----
 <bean class="org.springframework.batch.core.scope.JobScope" />
 ----
+
+[NOTE]
+====
+There are some practical limitations of using job-scoped beans in multi-threaded
+or partitioned steps. Spring Batch does not control the threads spawned in these
+use cases, so it is not possible to set them up correctly to use such beans. Hence,
+it is not recommended to use job-scoped beans in multi-threaded or partitioned steps.
+====
