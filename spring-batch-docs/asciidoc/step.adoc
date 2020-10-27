@@ -2311,7 +2311,10 @@ public FlatFileItemReader flatFileItemReader(@Value("#{stepExecutionContext['inp
 [NOTE]
 ====
 Any bean that uses late-binding must be declared with scope="step". See
-<<step.adoc#step-scope,Step Scope>> for more information.
+<<step.adoc#step-scope,Step Scope>> for more information. It should be noted
+that a `Step` bean should not be step-scoped. If late-binding is needed in a step
+definition, the components of that step (ie tasklet, item reader/writer, etc)
+are the ones that should be scoped instead.
 ====
 
 [NOTE]
