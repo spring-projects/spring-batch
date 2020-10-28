@@ -6,12 +6,13 @@
 
 == What's New in Spring Batch 4.0
 
-The Spring Batch 4.0 release has three major themes:
+The Spring Batch 4.0 release has four major themes:
 
 
 * Java 8 Requirement
 * Dependencies Re-baseline
 * Builders for ItemReaders and ItemWriters
+* New serialization mechanism
 
 [[whatsNewJava]]
 
@@ -70,3 +71,17 @@ builders) are available:
 * `StaxEventItemReader` - `StaxEventItemReaderBuilder`
 * `StaxEventItemWriter` - `StaxEventItemWriterBuilder`
 * `SynchronizedItemStreamReader` - `SynchronizedItemStreamReaderBuilder`
+
+[[whatsNewSerialization]]
+=== New serialization mechanism
+
+Before Spring Batch 4, the default serialization mechanism for the `ExecutionContext`
+was based on the `XStream` library. In this release, the serialization mechanism
+has been changed to use `Jackson` by default.
+
+The new serialization format is _not_ compatible with the old serialization format.
+The old serialization mechanism based on `XStreamExecutionContextStringSerializer`
+is still available but is now deprecated and will be removed in a future version.
+If the old format needs to be used with Spring Batch 4, it should be configured by
+implementing a `BatchConfigurer` and overriding the configuration in the
+`JobRepositoryFactoryBean` and `JobExplorerFactoryBean`.
