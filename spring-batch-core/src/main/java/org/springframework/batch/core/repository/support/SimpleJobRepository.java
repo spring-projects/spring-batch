@@ -116,6 +116,10 @@ public class SimpleJobRepository implements JobRepository {
 
 			List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 
+			if (executions.isEmpty()) {
+				throw new IllegalStateException("Cannot find any job execution for job instance: " + jobInstance);
+			}
+
 			// check for running executions and find the last started
 			for (JobExecution execution : executions) {
 				if (execution.isRunning() || execution.isStopping()) {
