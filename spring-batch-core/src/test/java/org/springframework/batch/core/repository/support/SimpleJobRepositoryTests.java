@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -270,6 +271,14 @@ public class SimpleJobRepositoryTests {
 
 		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
 		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Arrays.asList(jobExecution));
+
+		jobRepository.createJobExecution("foo", new JobParameters());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testCreateJobExecutionInstanceWithoutExecutions() throws Exception {
+		when(jobInstanceDao.getJobInstance("foo", new JobParameters())).thenReturn(jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Collections.emptyList());
 
 		jobRepository.createJobExecution("foo", new JobParameters());
 	}
