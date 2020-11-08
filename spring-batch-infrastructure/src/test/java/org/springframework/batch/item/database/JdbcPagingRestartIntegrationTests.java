@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public class JdbcPagingRestartIntegrationTests {
 		List<Map<String, Object>> ids = jdbcTemplate
 				.queryForList("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC");
 		logger.debug("Ids: "+ids);
-		int startAfterValue = (new Long(ids.get(count - 1).get("ID").toString())).intValue();
+		int startAfterValue = Integer.parseInt(ids.get(count - 1).get("ID").toString());
 		logger.debug("Start after: " + startAfterValue);
 		Map<String, Object> startAfterValues = new LinkedHashMap<>();
 		startAfterValues.put("ID", startAfterValue);

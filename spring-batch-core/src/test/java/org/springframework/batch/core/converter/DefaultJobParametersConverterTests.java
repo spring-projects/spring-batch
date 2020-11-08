@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -254,7 +254,7 @@ public class DefaultJobParametersConverterTests {
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
-				.addString("job.key", "myKey").addLong("vendor.id", new Long(33243243)).addDouble("double.key", 1.23)
+				.addString("job.key", "myKey").addLong("vendor.id", 33243243L).addDouble("double.key", 1.23)
 				.toJobParameters();
 
 		Properties props = factory.getProperties(parameters);

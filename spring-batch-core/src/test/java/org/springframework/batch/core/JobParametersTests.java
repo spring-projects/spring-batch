@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,8 +86,8 @@ public class JobParametersTests {
 
 	@Test
 	public void testGetDouble() {
-		assertEquals(new Double(1.1), new Double(parameters.getDouble("double.key1")));
-		assertEquals(new Double(2.2), new Double(parameters.getDouble("double.key2")));
+		assertEquals(Double.valueOf(1.1d), parameters.getDouble("double.key1"));
+		assertEquals(Double.valueOf(2.2d), parameters.getDouble("double.key2"));
 	}
 
 	@Test

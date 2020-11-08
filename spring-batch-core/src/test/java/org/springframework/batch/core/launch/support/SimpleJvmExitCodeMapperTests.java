@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,15 +32,15 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	protected void setUp() throws Exception {
 		ecm = new SimpleJvmExitCodeMapper();
 		Map<String, Integer> ecmMap = new HashMap<>();
-		ecmMap.put("MY_CUSTOM_CODE", new Integer(3));
+		ecmMap.put("MY_CUSTOM_CODE", 3);
 		ecm.setMapping(ecmMap);
 
 		ecm2 = new SimpleJvmExitCodeMapper();
 		Map<String, Integer> ecm2Map = new HashMap<>();
-		ecm2Map.put(ExitStatus.COMPLETED.getExitCode(), new Integer(-1));
-		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
-		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(-3));
-		ecm2Map.put(ExitCodeMapper.NO_SUCH_JOB, new Integer(-3));
+		ecm2Map.put(ExitStatus.COMPLETED.getExitCode(), -1);
+		ecm2Map.put(ExitStatus.FAILED.getExitCode(), -2);
+		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, -3);
+		ecm2Map.put(ExitCodeMapper.NO_SUCH_JOB, -3);
 		ecm2.setMapping(ecm2Map);
 	}
 
