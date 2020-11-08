@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 				return 1;
 			}
 		});
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), "testJob"), new JobParameters());
+		JobExecution jobExecution = new JobExecution(new JobInstance(11L, "testJob"), new JobParameters());
 
 		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());

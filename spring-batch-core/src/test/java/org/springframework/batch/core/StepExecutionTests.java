@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.util.SerializationUtils;
  */
 public class StepExecutionTests {
 
-	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
+	private StepExecution execution = newStepExecution(new StepSupport("stepName"), 23L);
 
 	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
 
@@ -199,26 +199,26 @@ public class StepExecutionTests {
 	@Test
 	public void testEqualsWithSameIdentifier() throws Exception {
 		Step step = new StepSupport("stepName");
-		Entity stepExecution1 = newStepExecution(step, new Long(11));
-		Entity stepExecution2 = newStepExecution(step, new Long(11));
+		Entity stepExecution1 = newStepExecution(step, 11L);
+		Entity stepExecution2 = newStepExecution(step, 11L);
 		assertEquals(stepExecution1, stepExecution2);
 	}
 
 	@Test
 	public void testEqualsWithNull() throws Exception {
-		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), 11L);
 		assertFalse(stepExecution.equals(null));
 	}
 
 	@Test
 	public void testEqualsWithNullIdentifiers() throws Exception {
-		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), 11L);
 		assertFalse(stepExecution.equals(blankExecution));
 	}
 
 	@Test
 	public void testEqualsWithNullJob() throws Exception {
-		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
+		Entity stepExecution = newStepExecution(new StepSupport("stepName"), 11L);
 		assertFalse(stepExecution.equals(blankExecution));
 	}
 
@@ -229,16 +229,16 @@ public class StepExecutionTests {
 
 	@Test
 	public void testEqualsWithDifferent() throws Exception {
-		Entity stepExecution = newStepExecution(new StepSupport("foo"), new Long(13));
+		Entity stepExecution = newStepExecution(new StepSupport("foo"), 13L);
 		assertFalse(execution.equals(stepExecution));
 	}
 
 	@Test
 	public void testEqualsWithNullStepId() throws Exception {
 		Step step = new StepSupport("name");
-		execution = newStepExecution(step, new Long(31));
+		execution = newStepExecution(step, 31L);
 		assertEquals("name", execution.getStepName());
-		StepExecution stepExecution = newStepExecution(step, new Long(31));
+		StepExecution stepExecution = newStepExecution(step, 31L);
 		assertEquals(stepExecution.getJobExecutionId(), execution.getJobExecutionId());
 		assertTrue(execution.equals(stepExecution));
 	}

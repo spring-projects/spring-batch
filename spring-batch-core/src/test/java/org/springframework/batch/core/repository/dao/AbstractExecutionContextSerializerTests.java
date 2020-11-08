@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public abstract class AbstractExecutionContextSerializerTests {
         m1.put("object2", "OBJECT TWO");
         // Use a date after 1971 (otherwise daylight saving screws up)...
         m1.put("object3", new Date(123456790123L));
-        m1.put("object4", new Double(1234567.1234D));
+        m1.put("object4", 1234567.1234D);
 
         Map<String, Object> m2 = serializationRoundTrip(m1);
 

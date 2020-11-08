@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -285,9 +285,9 @@ public class SkipSampleFunctionalTests {
 		assertEquals(new BigDecimal("340.45"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 
 		Map<String, Object> step1Execution = getStepExecutionAsMap(jobExecution, "step1");
-		assertEquals(new Long(4), step1Execution.get("COMMIT_COUNT"));
-		assertEquals(new Long(8), step1Execution.get("READ_COUNT"));
-		assertEquals(new Long(7), step1Execution.get("WRITE_COUNT"));
+		assertEquals(Long.valueOf(4L), step1Execution.get("COMMIT_COUNT"));
+		assertEquals(Long.valueOf(8L), step1Execution.get("READ_COUNT"));
+		assertEquals(Long.valueOf(7L), step1Execution.get("WRITE_COUNT"));
 	}
 
 	private void validateLaunchWithoutSkips(JobExecution jobExecution) {

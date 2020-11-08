@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -242,7 +242,7 @@ public class KafkaItemReaderBuilderTests {
 		assertEquals(partitions.get(1).intValue(), topicPartitions.get(1).partition());
 		Map<TopicPartition, Long> partitionOffsetsMap = (Map<TopicPartition, Long>) ReflectionTestUtils.getField(reader, "partitionOffsets");
 		assertEquals(2, partitionOffsetsMap.size());
-		assertEquals(new Long(10), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(0))));
-		assertEquals(new Long(15), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(1))));
+		assertEquals(Long.valueOf(10L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(0))));
+		assertEquals(Long.valueOf(15L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(1))));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import junit.framework.TestCase;
  */
 public class EntityTests extends TestCase {
 
-	Entity entity = new Entity(new Long(11));
+	Entity entity = new Entity(11L);
 	
 	/**
 	 * Test method for {@link org.springframework.batch.core.Entity#hashCode()}.
@@ -54,7 +54,7 @@ public class EntityTests extends TestCase {
 	 */
 	public void testIncrementVersion() {
 		entity.incrementVersion();
-		assertEquals(new Integer(0), entity.getVersion());
+		assertEquals(Integer.valueOf(0), entity.getVersion());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class EntityTests extends TestCase {
 	public void testIncrementVersionTwice() {
 		entity.incrementVersion();
 		entity.incrementVersion();
-		assertEquals(new Integer(1), entity.getVersion());
+		assertEquals(Integer.valueOf(1), entity.getVersion());
 	}
 
 	/**

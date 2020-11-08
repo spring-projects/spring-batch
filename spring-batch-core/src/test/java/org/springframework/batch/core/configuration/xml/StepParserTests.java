@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class StepParserTests {
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
 		Object throttleLimit = ReflectionTestUtils.getField(factory, "throttleLimit");
-		assertEquals(new Integer(10), throttleLimit);
+		assertEquals(Integer.valueOf(10), throttleLimit);
 	}
 
 	@Test
