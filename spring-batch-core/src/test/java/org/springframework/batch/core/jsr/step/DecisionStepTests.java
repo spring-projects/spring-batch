@@ -17,46 +17,22 @@ package org.springframework.batch.core.jsr.step;
 
 import java.util.List;
 import java.util.Properties;
+
 import javax.batch.api.Decider;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
 
 public class DecisionStepTests extends AbstractJsrTestCase {
-
-	private static ApplicationContext baseContext;
-
-	private JobExplorer jobExplorer;
-
-	@Before
-	public void setUp() {
-		StepExecutionCountingDecider.previousStepCount = 0;
-
-		if(jobExplorer == null) {
-			baseContext = new GenericXmlApplicationContext("jsrBaseContext.xml");
-
-			baseContext.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-					AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-		}
-	}
-
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
-	}
 
 	@Test
 	public void testDecisionAsFirstStepOfJob() throws Exception {
