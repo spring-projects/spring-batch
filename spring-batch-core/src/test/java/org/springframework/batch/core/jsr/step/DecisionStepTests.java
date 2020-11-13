@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import javax.batch.runtime.StepExecution;
 import org.junit.Test;
 
 import org.springframework.batch.core.jsr.AbstractJsrTestCase;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.Assert;
 
 import static org.junit.Assert.assertEquals;
@@ -83,15 +82,6 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 	}
 
 	@Test
-	public void testDecisionAfterSplit() throws Exception {
-		JobExecution execution = runJob("DecisionStepTests-decisionAfterSplit-context", new Properties(), 10000L);
-		org.springframework.batch.core.JobExecution jobExecution = (org.springframework.batch.core.JobExecution) ReflectionTestUtils.getField(execution, "execution");
-		assertEquals(String.format("Received a %s because of %s", execution.getBatchStatus(), jobExecution.getExitStatus().getExitDescription()), BatchStatus.COMPLETED, execution.getBatchStatus());
-		assertEquals(4, BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId()).size());
-		assertEquals(2, StepExecutionCountingDecider.previousStepCount);
-	}
-
-	@Test
 	public void testDecisionRestart() throws Exception {
 		JobExecution execution = runJob("DecisionStepTests-restart-context", new Properties(), 10000L);
 		assertEquals(BatchStatus.STOPPED, execution.getBatchStatus());
@@ -127,17 +117,6 @@ public class DecisionStepTests extends AbstractJsrTestCase {
 			} else {
 				return "CONTINUE";
 			}
-		}
-	}
-
-	public static class StepExecutionCountingDecider implements Decider {
-
-		static int previousStepCount = 0;
-
-		@Override
-		public String decide(StepExecution[] executions) throws Exception {
-			previousStepCount = executions.length;
-			return "next";
 		}
 	}
 
