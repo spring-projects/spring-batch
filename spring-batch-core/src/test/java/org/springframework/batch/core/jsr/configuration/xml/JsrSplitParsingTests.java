@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-import javax.batch.api.AbstractBatchlet;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.StepExecution;
-import javax.batch.runtime.context.JobContext;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -42,16 +34,6 @@ public class JsrSplitParsingTests extends AbstractJsrTestCase {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
-
-	@Test
-	public void test() throws Exception {
-		javax.batch.runtime.JobExecution execution = runJob("JsrSplitParsingTests-context", null, 10000L);
-		assertEquals(javax.batch.runtime.BatchStatus.COMPLETED, execution.getBatchStatus());
-		assertEquals("COMPLETED", execution.getExitStatus());
-
-		List<StepExecution> stepExecutions = BatchRuntime.getJobOperator().getStepExecutions(execution.getExecutionId());
-		assertEquals(5, stepExecutions.size());
-	}
 
 	@Test
 	public void testOneFlowInSplit() {
@@ -86,15 +68,4 @@ public class JsrSplitParsingTests extends AbstractJsrTestCase {
 		context.close();
 	}
 
-	public static class ExitStatusSettingBatchlet extends AbstractBatchlet {
-
-		@Inject
-		JobContext jobContext;
-
-		@Override
-		public String process() throws Exception {
-			jobContext.setExitStatus("Should be ignored");
-			return null;
-		}
-	}
 }

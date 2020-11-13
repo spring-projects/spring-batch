@@ -25,7 +25,7 @@
 		</step>
 	</job>
 
-	<bean id="nextDecider" class="org.springframework.batch.core.jsr.step.DecisionStepTests$StepExecutionCountingDecider"/>
+	<bean id="nextDecider" class="org.springframework.batch.core.jsr.step.SplitTests$StepExecutionCountingDecider"/>
 
 	<bean id="doSomethingBatchlet" class="org.springframework.batch.core.jsr.step.batchlet.BatchletSupport"/>
 
