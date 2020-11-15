@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -38,6 +39,8 @@ import static org.mockito.Mockito.times;
 
 public class KafkaItemWriterTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
 
@@ -50,7 +53,6 @@ public class KafkaItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.openMocks(this);
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
 		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.data.MongoItemReader;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -44,6 +45,9 @@ import static org.mockito.Mockito.when;
  * @author Parikshit Dutta
  */
 public class MongoItemReaderBuilderTests {
+
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 	@Mock
 	private MongoOperations template;
 
@@ -53,7 +57,6 @@ public class MongoItemReaderBuilderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		this.sortOptions = new HashMap<>();
 		this.sortOptions.put("name", Sort.Direction.DESC);
 		this.queryContainer = ArgumentCaptor.forClass(Query.class);
