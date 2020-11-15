@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
@@ -31,8 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -60,6 +61,9 @@ import static org.mockito.ArgumentMatchers.eq;
 @SuppressWarnings("serial")
 public class MongoItemWriterTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	private MongoItemWriter<Object> writer;
 	@Mock
 	private MongoOperations template;
@@ -72,7 +76,6 @@ public class MongoItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
 		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 

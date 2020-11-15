@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 
@@ -38,6 +39,9 @@ import static org.mockito.Mockito.when;
  */
 public class CompositeItemProcessorBuilderTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private ItemProcessor<Object, Object> processor1;
 
@@ -48,8 +52,6 @@ public class CompositeItemProcessorBuilderTests {
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-
 		this.processors = new ArrayList<>();
 		this.processors.add(processor1);
 		this.processors.add(processor2);

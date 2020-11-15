@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@ import javax.persistence.EntityManagerFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -39,6 +40,9 @@ import static org.mockito.Mockito.verify;
  */
 public class JpaItemWriterBuilderTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private EntityManagerFactory entityManagerFactory;
 
@@ -47,7 +51,6 @@ public class JpaItemWriterBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		TransactionSynchronizationManager.bindResource(this.entityManagerFactory,
 				new EntityManagerHolder(this.entityManager));
 	}

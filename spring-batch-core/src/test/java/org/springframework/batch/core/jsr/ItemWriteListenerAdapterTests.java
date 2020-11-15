@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,17 @@ import javax.batch.api.chunk.listener.ItemWriteListener;
 import javax.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ItemWriteListenerAdapterTests {
+
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private ItemWriteListenerAdapter<String> adapter;
 	@Mock
@@ -39,7 +44,6 @@ public class ItemWriteListenerAdapterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		adapter = new ItemWriteListenerAdapter<>(delegate);
 	}
 

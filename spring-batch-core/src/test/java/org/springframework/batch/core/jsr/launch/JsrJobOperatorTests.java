@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,12 @@ import javax.batch.runtime.BatchStatus;
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -79,6 +80,9 @@ import static org.mockito.Mockito.when;
  */
 public class JsrJobOperatorTests extends AbstractJsrTestCase {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	private JobOperator jsrJobOperator;
 	@Mock
 	private JobExplorer jobExplorer;
@@ -90,7 +94,6 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Before
 	public void setup() throws Exception {
 
-		MockitoAnnotations.initMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
 		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter, new ResourcelessTransactionManager());
 	}

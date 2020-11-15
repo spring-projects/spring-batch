@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.adapter.DynamicMethodInvocationException;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,9 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("serial")
 public class RepositoryItemReaderTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	private RepositoryItemReader<Object> reader;
 	@Mock
 	private PagingAndSortingRepository<Object, Integer> repository;
@@ -60,7 +64,6 @@ public class RepositoryItemReaderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		sorts = Collections.singletonMap("id", Direction.ASC);
 		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);

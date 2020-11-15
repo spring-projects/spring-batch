@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,11 @@ import javax.batch.runtime.context.StepContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
@@ -44,6 +46,9 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 public class JsrStepContextFactoryBeanTests {
+
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private JsrStepContextFactoryBean factory;
 	@Mock
@@ -60,7 +65,6 @@ public class JsrStepContextFactoryBeanTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		factory = new JsrStepContextFactoryBean();
 		factory.setBatchPropertyContext(propertyContext);
 	}

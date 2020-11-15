@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.SpELItemKeyMapper;
 import org.springframework.data.gemfire.GemfireTemplate;
 import org.springframework.core.convert.converter.Converter;
@@ -33,13 +35,15 @@ import org.springframework.core.convert.converter.Converter;
 @SuppressWarnings("serial")
 public class GemfireItemWriterTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	private GemfireItemWriter<String, Foo> writer;
 	@Mock
 	private GemfireTemplate template;
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		writer = new GemfireItemWriter<>();
 		writer.setTemplate(template);
 		writer.setItemKeyMapper(new SpELItemKeyMapper<>("bar.val"));

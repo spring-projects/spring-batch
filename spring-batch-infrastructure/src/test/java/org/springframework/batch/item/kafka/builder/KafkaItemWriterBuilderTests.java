@@ -21,8 +21,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.kafka.KafkaItemWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -38,6 +38,9 @@ import static org.junit.Assert.assertTrue;
 public class KafkaItemWriterBuilderTests {
 
 	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
+	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
@@ -47,7 +50,6 @@ public class KafkaItemWriterBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 	}
 
