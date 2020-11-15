@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.item.xml;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -634,7 +634,7 @@ public class StaxEventItemReaderTests {
 			reader.read();
 			fail("Should fail when XML contains DTD");
 		} catch (Exception e) {
-			Assert.assertThat(e.getMessage(), Matchers.containsString("Undeclared general entity \"entityex\""));
+			MatcherAssert.assertThat(e.getMessage(), Matchers.containsString("Undeclared general entity \"entityex\""));
 		}
 	}
 

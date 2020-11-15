@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.StringUtils;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 
