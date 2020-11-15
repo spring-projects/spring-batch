@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -37,7 +37,9 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.core.query.Query;
 
 import static org.junit.Assert.assertEquals;
@@ -69,7 +71,7 @@ public class MongoItemWriterBuilderTests {
 		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
 		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
-		MappingContext mappingContext = new MongoMappingContext();
+		MappingContext<BasicMongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
 		when(this.template.getConverter()).thenReturn(mongoConverter);
 

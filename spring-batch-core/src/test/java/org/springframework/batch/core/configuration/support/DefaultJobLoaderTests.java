@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,11 +66,11 @@ public class DefaultJobLoaderTests {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ByteArrayResource(
 				JOB_XML.getBytes()));
 		jobLoader.load(factory);
-		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
-		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+		assertEquals(1, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(1, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
 		jobLoader.clear();
-		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
-		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+		assertEquals(0, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(0, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
 	}
 
 	@Test

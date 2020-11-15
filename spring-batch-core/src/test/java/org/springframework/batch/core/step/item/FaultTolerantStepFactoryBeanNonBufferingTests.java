@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
-	@SuppressWarnings("rawtypes")
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock(SkipListener.class);
