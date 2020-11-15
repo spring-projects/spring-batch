@@ -87,7 +87,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
-	@SuppressWarnings("rawtypes")
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = mock(SkipListener.class);

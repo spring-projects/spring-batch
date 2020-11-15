@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
+import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import org.springframework.batch.core.JobParameter;
@@ -209,7 +210,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
      * @param trustedClassNames array of fully qualified trusted class names
      */
     private static TypeResolverBuilder<? extends TypeResolverBuilder> createTrustedDefaultTyping(String[] trustedClassNames) {
-        TypeResolverBuilder<? extends TypeResolverBuilder>  result = new TrustedTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL, trustedClassNames);
+        TypeResolverBuilder<StdTypeResolverBuilder>  result = new TrustedTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL, trustedClassNames);
         result = result.init(JsonTypeInfo.Id.CLASS, null);
         result = result.inclusion(JsonTypeInfo.As.PROPERTY);
         return result;
@@ -253,7 +254,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
      * mappings.
      */
     static class TrustedTypeIdResolver implements TypeIdResolver {
-        private static final Set<String> TRUSTED_CLASS_NAMES = Collections.unmodifiableSet(new HashSet(Arrays.asList(
+        private static final Set<String> TRUSTED_CLASS_NAMES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                 "java.util.ArrayList",
                 "java.util.Arrays$ArrayList",
                 "java.util.LinkedList",

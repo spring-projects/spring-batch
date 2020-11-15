@@ -39,6 +39,8 @@ import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.core.query.Query;
 
 import static org.junit.Assert.assertEquals;
@@ -72,7 +74,7 @@ public class MongoItemWriterBuilderTests {
 		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
 		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
-		MappingContext mappingContext = new MongoMappingContext();
+		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
 		when(this.template.getConverter()).thenReturn(mongoConverter);
 

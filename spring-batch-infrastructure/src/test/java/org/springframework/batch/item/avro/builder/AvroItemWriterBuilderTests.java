@@ -114,7 +114,7 @@ public class AvroItemWriterBuilderTests extends AvroItemWriterTestSupport {
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldFailWitNoType() {
 
-		new AvroItemWriterBuilder()
+		new AvroItemWriterBuilder<>()
 				.resource(output)
 				.schema(schemaResource)
 				.build();

@@ -42,6 +42,8 @@ import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
@@ -79,7 +81,7 @@ public class MongoItemWriterTests {
 		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
 		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 
-		MappingContext mappingContext = new MongoMappingContext();
+		MappingContext<MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = new MongoMappingContext();
 		MappingMongoConverter mongoConverter = spy(new MappingMongoConverter(this.dbRefResolver, mappingContext));
 		when(this.template.getConverter()).thenReturn(mongoConverter);
 
@@ -305,7 +307,6 @@ public class MongoItemWriterTests {
 	@Test
 	public void testResourceKeyCollision() throws Exception {
 		final int limit = 5000;
-		@SuppressWarnings("unchecked")
 		List<MongoItemWriter<String>> writers = new ArrayList<>(limit);
 		final String[] documents = new String[limit];
 		final String[] results = new String[limit];
