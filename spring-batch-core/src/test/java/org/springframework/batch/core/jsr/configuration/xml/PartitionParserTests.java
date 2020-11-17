@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.batch.api.BatchProperty;
@@ -53,7 +54,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 
 	@Before
 	public void before() {
-		MyBatchlet.processed = 0;
+		MyBatchlet.processed = new AtomicInteger(0);
 		MyBatchlet.threadNames = Collections.synchronizedSet(new HashSet<>());
 		MyBatchlet.artifactNames = Collections.synchronizedSet(new HashSet<>());
 		PartitionCollector.artifactNames = Collections.synchronizedSet(new HashSet<>());
@@ -64,7 +65,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		BatchStatus curBatchStatus = runJob("partitionParserTestsBatchlet", new Properties(), TIMEOUT).getBatchStatus();
 
 		assertEquals(BatchStatus.COMPLETED, curBatchStatus);
-		assertEquals(10, MyBatchlet.processed);
+		assertEquals(10, MyBatchlet.processed.get());
 		assertEquals(10, MyBatchlet.threadNames.size());
 	}
 
@@ -88,7 +89,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		assertTrue(execution.getExitStatus().endsWith("BPSC_APSC"));
 		assertEquals(3, countMatches(execution.getExitStatus(), caPattern));
 		assertEquals(3, countMatches(execution.getExitStatus(), asPattern));
-		assertEquals(3, MyBatchlet.processed);
+		assertEquals(3, MyBatchlet.processed.get());
 		assertEquals(3, MyBatchlet.threadNames.size());
 	}
 
@@ -101,7 +102,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		assertTrue(execution.getExitStatus().endsWith("BPSC_APSC"));
 		assertEquals(3, countMatches(execution.getExitStatus(), caPattern));
 		assertEquals(3, countMatches(execution.getExitStatus(), asPattern));
-		assertEquals(3, MyBatchlet.processed);
+		assertEquals(3, MyBatchlet.processed.get());
 		assertEquals(3, MyBatchlet.threadNames.size());
 		assertEquals(MyBatchlet.artifactNames.iterator().next(), "batchlet");
 		assertEquals(PartitionMapper.name, "mapper");
@@ -120,7 +121,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		assertTrue(execution.getExitStatus().endsWith("BPSC_APSC"));
 		assertEquals(3, countMatches(execution.getExitStatus(), caPattern));
 		assertEquals(3, countMatches(execution.getExitStatus(), asPattern));
-		assertEquals(3, MyBatchlet.processed);
+		assertEquals(3, MyBatchlet.processed.get());
 		assertEquals(3, MyBatchlet.threadNames.size());
 
 		assertEquals(MyBatchlet.artifactNames.size(), 3);
@@ -145,7 +146,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		assertTrue(execution.getExitStatus().endsWith("BPSC_APSC"));
 		assertEquals(3, countMatches(execution.getExitStatus(), caPattern));
 		assertEquals(3, countMatches(execution.getExitStatus(), asPattern));
-		assertEquals(3, MyBatchlet.processed);
+		assertEquals(3, MyBatchlet.processed.get());
 		assertEquals(3, MyBatchlet.threadNames.size());
 
 		assertEquals(MyBatchlet.artifactNames.size(), 3);
@@ -292,7 +293,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 
 	public static class MyBatchlet implements Batchlet {
 
-		protected static int processed = 0;
+		protected static AtomicInteger processed = new AtomicInteger(0);;
 		protected static Set<String> threadNames = Collections.synchronizedSet(new HashSet<>());
 		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
@@ -310,7 +311,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		public String process() throws Exception {
 			artifactNames.add(artifactName);
 			threadNames.add(Thread.currentThread().getName());
-			processed++;
+			processed.incrementAndGet();
 
 			stepContext.setExitStatus("bad step exit status");
 			jobContext.setExitStatus("bad job exit status");
