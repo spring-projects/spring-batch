@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2019 the original author or authors.
+ * Copyright 2014-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,22 @@ package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemWriter;
@@ -39,6 +43,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.lang.Nullable;
 
 public class OptimisticLockingFailureTests {
+
+	private static final Set<BatchStatus> END_STATUSES =
+			EnumSet.of(BatchStatus.COMPLETED, BatchStatus.FAILED, BatchStatus.STOPPED);
+
 	@Test
 	public void testAsyncStopOfStartingJob() throws Exception {
 		ApplicationContext applicationContext =
@@ -46,17 +54,20 @@ public class OptimisticLockingFailureTests {
 		Job job = applicationContext.getBean(Job.class);
 		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
 		JobOperator jobOperator = applicationContext.getBean(JobOperator.class);
+		JobRepository jobRepository = applicationContext.getBean(JobRepository.class);
 
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder()
+		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("test", 1L)
-				.toJobParameters());
+				.toJobParameters();
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		Thread.sleep(1000);
 
 		jobOperator.stop(jobExecution.getId());
 
-		while(jobExecution.isRunning()) {
-			// wait for async launched job to complete execution
+		JobExecution lastJobExecution = jobRepository.getLastJobExecution("locking", jobParameters);
+		while (lastJobExecution != null && !END_STATUSES.contains(lastJobExecution.getStatus())) {
+			lastJobExecution = jobRepository.getLastJobExecution("locking", jobParameters);
 		}
 
 		int numStepExecutions = jobExecution.getStepExecutions().size();
@@ -70,14 +81,13 @@ public class OptimisticLockingFailureTests {
 		assertTrue("Step execution status should be STOPPED but got: " + stepExecutionStatus, stepExecutionStatus.equals(BatchStatus.STOPPED));
 		assertTrue("Job execution status should be STOPPED but got:" + jobExecutionStatus, jobExecutionStatus.equals(BatchStatus.STOPPED));
 
-		JobExecution restartJobExecution = jobLauncher.run(job, new JobParametersBuilder()
-				.addLong("test", 1L)
-				.toJobParameters());
+		JobExecution restartJobExecution = jobLauncher.run(job, jobParameters);
 
 		Thread.sleep(1000);
 
-		while(restartJobExecution.isRunning()) {
-			// wait for async launched job to complete execution
+		lastJobExecution = jobRepository.getLastJobExecution("locking", jobParameters);
+		while (lastJobExecution != null && !END_STATUSES.contains(lastJobExecution.getStatus())) {
+			lastJobExecution = jobRepository.getLastJobExecution("locking", jobParameters);
 		}
 
 		int restartNumStepExecutions = restartJobExecution.getStepExecutions().size();
