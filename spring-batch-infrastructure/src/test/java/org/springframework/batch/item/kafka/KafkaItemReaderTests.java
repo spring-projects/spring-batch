@@ -38,6 +38,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -186,12 +187,16 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartition() {
+	public void testReadFromSinglePartition() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic1");
-		this.template.sendDefault("val0");
-		this.template.sendDefault("val1");
-		this.template.sendDefault("val2");
-		this.template.sendDefault("val3");
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
+		futures.add(this.template.sendDefault("val0"));
+		futures.add(this.template.sendDefault("val1"));
+		futures.add(this.template.sendDefault("val2"));
+		futures.add(this.template.sendDefault("val3"));
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
+			future.get();
+		}
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic1", 0);
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
@@ -216,12 +221,16 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartitionFromCustomOffset() {
+	public void testReadFromSinglePartitionFromCustomOffset() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic5");
-		this.template.sendDefault("val0"); // <-- offset 0
-		this.template.sendDefault("val1"); // <-- offset 1
-		this.template.sendDefault("val2"); // <-- offset 2
-		this.template.sendDefault("val3"); // <-- offset 3
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
+		futures.add(this.template.sendDefault("val0")); // <-- offset 0
+		futures.add(this.template.sendDefault("val1")); // <-- offset 1
+		futures.add(this.template.sendDefault("val2")); // <-- offset 2
+		futures.add(this.template.sendDefault("val3")); // <-- offset 3
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
+			future.get();
+		}
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic5", 0);
 
@@ -250,9 +259,12 @@ public class KafkaItemReaderTests {
 		// first run: read a topic from the beginning
 
 		this.template.setDefaultTopic("topic6");
-		this.template.sendDefault("val0"); // <-- offset 0
-		this.template.sendDefault("val1"); // <-- offset 1
-
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
+		futures.add(this.template.sendDefault("val0")); // <-- offset 0
+		futures.add(this.template.sendDefault("val1")); // <-- offset 1
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
+			future.get();
+		}
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic6", 0);
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
 		this.reader.open(new ExecutionContext());
@@ -299,12 +311,16 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromMultiplePartitions() {
+	public void testReadFromMultiplePartitions() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic2");
-		this.template.sendDefault("val0");
-		this.template.sendDefault("val1");
-		this.template.sendDefault("val2");
-		this.template.sendDefault("val3");
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
+		futures.add(this.template.sendDefault("val0"));
+		futures.add(this.template.sendDefault("val1"));
+		futures.add(this.template.sendDefault("val2"));
+		futures.add(this.template.sendDefault("val3"));
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
+			future.get();
+		}
 
 		this.reader = new KafkaItemReader<>(this.consumerProperties, "topic2", 0, 1);
 		this.reader.setPollTimeout(Duration.ofSeconds(1));
@@ -323,14 +339,17 @@ public class KafkaItemReaderTests {
 	}
 
 	@Test
-	public void testReadFromSinglePartitionAfterRestart() {
+	public void testReadFromSinglePartitionAfterRestart() throws ExecutionException, InterruptedException {
 		this.template.setDefaultTopic("topic3");
-		this.template.sendDefault("val0");
-		this.template.sendDefault("val1");
-		this.template.sendDefault("val2");
-		this.template.sendDefault("val3");
-		this.template.sendDefault("val4");
-
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
+		futures.add(this.template.sendDefault("val0"));
+		futures.add(this.template.sendDefault("val1"));
+		futures.add(this.template.sendDefault("val2"));
+		futures.add(this.template.sendDefault("val3"));
+		futures.add(this.template.sendDefault("val4"));
+		for (ListenableFuture<SendResult<String, String>> future : futures) {
+			future.get();
+		}
 		ExecutionContext executionContext = new ExecutionContext();
 		Map<TopicPartition, Long> offsets = new HashMap<>();
 		offsets.put(new TopicPartition("topic3", 0), 1L);
