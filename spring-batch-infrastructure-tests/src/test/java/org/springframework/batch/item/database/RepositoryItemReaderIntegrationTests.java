@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -27,20 +28,18 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.sample.books.Author;
 import org.springframework.batch.item.sample.books.Book;
-import org.springframework.batch.item.sample.books.data.SimpleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "RepositoryItemReaderCommonTests-context.xml")
+@Transactional
 public class RepositoryItemReaderIntegrationTests {
 
     private static final String CONTEXT_KEY = "RepositoryItemReader.read.count";
-
-    @Autowired
-    private SimpleService service;
 
     @Autowired
     private RepositoryItemReader<Author> reader;
@@ -52,51 +51,59 @@ public class RepositoryItemReaderIntegrationTests {
 
     @Test
     public void testReadFromFirstPos() throws Exception {
-        service.openReader(new ExecutionContext());
+        reader.open(new ExecutionContext());
 
-        final List<Book> books = service.nextAuthorBooks();
+        Author author = reader.read();
 
-        assertEquals("Books list size", 2, books.size());
-        assertEquals("First book", "author 1 - book 1", books.get(0).getName());
-        assertEquals("Second book", "author 1 - book 2", books.get(1).getName());
+        assertNotNull(author);
+        final List<Book> books = author.getBooks();
+        assertEquals("Books list size must be = 2", 2, books.size());
+        assertEquals("First book must be author 1 - book 1", "author 1 - book 1", books.get(0).getName());
+        assertEquals("Second book must be author 1 - book 2", "author 1 - book 2", books.get(1).getName());
     }
 
     @Test
     public void testReadFromWithinPage() throws Exception {
         reader.setCurrentItemCount(1);
-        service.openReader(new ExecutionContext());
+        reader.open(new ExecutionContext());
 
-        final List<Book> books = service.nextAuthorBooks();
+        Author author = reader.read();
 
-        assertEquals("Books list size", 2, books.size());
-        assertEquals("First book", "author 2 - book 1", books.get(0).getName());
-        assertEquals("Second book", "author 2 - book 2", books.get(1).getName());
+        assertNotNull(author);
+        final List<Book> books = author.getBooks();
+        assertEquals("Books list size must be = 2", 2, books.size());
+        assertEquals("First book must be author 2 - book 1", "author 2 - book 1", books.get(0).getName());
+        assertEquals("Second book must be author 2 - book 2", "author 2 - book 2", books.get(1).getName());
     }
 
     @Test
     public void testReadFromNewPage() throws Exception {
         reader.setPageSize(2);
         reader.setCurrentItemCount(2); // 3rd item = 1rst of page 2
-        service.openReader(new ExecutionContext());
+        reader.open(new ExecutionContext());
 
-        final List<Book> books = service.nextAuthorBooks();
+        Author author = reader.read();
 
-        assertEquals("Books list size", 2, books.size());
-        assertEquals("First book", "author 3 - book 1", books.get(0).getName());
-        assertEquals("Second book", "author 3 - book 2", books.get(1).getName());
+        assertNotNull(author);
+        final List<Book> books = author.getBooks();
+        assertEquals("Books list size must be = 2", 2, books.size());
+        assertEquals("First book must be author 3 - book 1", "author 3 - book 1", books.get(0).getName());
+        assertEquals("Second book must be author 3 - book 2", "author 3 - book 2", books.get(1).getName());
     }
 
     @Test
     public void testReadFromWithinPage_Restart() throws Exception {
         final ExecutionContext executionContext = new ExecutionContext();
         executionContext.putInt(CONTEXT_KEY, 1);
-        service.openReader(executionContext);
+        reader.open(executionContext);
 
-        final List<Book> books = service.nextAuthorBooks();
+        Author author = reader.read();
 
-        assertEquals("Books list size", 2, books.size());
-        assertEquals("First book", "author 2 - book 1", books.get(0).getName());
-        assertEquals("Second book", "author 2 - book 2", books.get(1).getName());
+        assertNotNull(author);
+        final List<Book> books = author.getBooks();
+        assertEquals("Books list size must be = 2", 2, books.size());
+        assertEquals("First book must be author 2 - book 1", "author 2 - book 1", books.get(0).getName());
+        assertEquals("Second book must be author 2 - book 2", "author 2 - book 2", books.get(1).getName());
     }
 
     @Test
@@ -104,13 +111,15 @@ public class RepositoryItemReaderIntegrationTests {
         reader.setPageSize(2);
         final ExecutionContext executionContext = new ExecutionContext();
         executionContext.putInt(CONTEXT_KEY, 2);
-        service.openReader(executionContext);
+        reader.open(executionContext);
 
-        final List<Book> books = service.nextAuthorBooks();
+        Author author = reader.read();
 
-        assertEquals("Books list size", 2, books.size());
-        assertEquals("First book", "author 3 - book 1", books.get(0).getName());
-        assertEquals("Second book", "author 3 - book 2", books.get(1).getName());
+        assertNotNull(author);
+        final List<Book> books = author.getBooks();
+        assertEquals("Books list size must be = 2", 2, books.size());
+        assertEquals("First book must be author 3 - book 1", "author 3 - book 1", books.get(0).getName());
+        assertEquals("Second book must be author 3 - book 2", "author 3 - book 2", books.get(1).getName());
     }
     
 }
