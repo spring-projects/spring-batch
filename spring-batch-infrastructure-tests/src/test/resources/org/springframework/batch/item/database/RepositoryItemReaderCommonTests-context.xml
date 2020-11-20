@@ -49,8 +49,4 @@
 		</property>
 	</bean>
 
-	<bean id="myService" class="org.springframework.batch.item.sample.books.data.SimpleService">
-		<constructor-arg ref="authorRepositoryItemReader"/>
-	</bean>
-
 </beans>
