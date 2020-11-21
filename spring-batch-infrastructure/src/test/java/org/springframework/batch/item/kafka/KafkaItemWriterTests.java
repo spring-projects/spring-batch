@@ -103,6 +103,19 @@ public class KafkaItemWriterTests {
 		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
 	}
 
+	@Test
+	public void testKafkaTemplateCanBeReferencedFromSubclass() {
+		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<String, String>() {
+			@Override
+			protected void writeKeyValue(String key, String value) {
+				this.kafkaTemplate.sendDefault(key, value);
+			}
+		};
+		kafkaItemWriter.setKafkaTemplate(kafkaTemplate);
+		kafkaItemWriter.writeKeyValue("k", "v");
+		verify(kafkaTemplate).sendDefault("k", "v");
+	}
+
 	static class KafkaItemKeyMapper implements Converter<String, String> {
 
 		@Override

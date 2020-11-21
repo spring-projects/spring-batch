@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
-	private KafkaTemplate<K, T> kafkaTemplate;
+	protected KafkaTemplate<K, T> kafkaTemplate;
 
 	@Override
 	protected void writeKeyValue(K key, T value) {
