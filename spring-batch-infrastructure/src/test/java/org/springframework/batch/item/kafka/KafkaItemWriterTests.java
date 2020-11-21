@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import org.springframework.batch.item.kafka.builder.KafkaItemWriterBuilder;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -101,6 +102,19 @@ public class KafkaItemWriterTests {
 
 		verify(this.kafkaTemplate).sendDefault(items.get(0), null);
 		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
+	}
+
+	@Test
+	public void testKafkaTemplateCanBeReferencedFromSubclass() {
+		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<String, String>() {
+			@Override
+			protected void writeKeyValue(String key, String value) {
+				this.kafkaTemplate.flush();
+			}
+		};
+		kafkaItemWriter.setKafkaTemplate(kafkaTemplate);
+		kafkaItemWriter.writeKeyValue("k", "v");
+		verify(kafkaTemplate).flush();
 	}
 
 	static class KafkaItemKeyMapper implements Converter<String, String> {
