@@ -108,12 +108,12 @@ public class KafkaItemWriterTests {
 		KafkaItemWriter<String, String> kafkaItemWriter = new KafkaItemWriter<String, String>() {
 			@Override
 			protected void writeKeyValue(String key, String value) {
-				this.kafkaTemplate.flush();
+				this.kafkaTemplate.sendDefault(key, value);
 			}
 		};
 		kafkaItemWriter.setKafkaTemplate(kafkaTemplate);
 		kafkaItemWriter.writeKeyValue("k", "v");
-		verify(kafkaTemplate).flush();
+		verify(kafkaTemplate).sendDefault("k", "v");
 	}
 
 	static class KafkaItemKeyMapper implements Converter<String, String> {
