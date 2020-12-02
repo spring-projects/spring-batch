@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.List;
  *
  * @author Thomas Risberg
  * @author Juergen Hoeller
+ * @author Marten Deinum
  * @since 2.0
  */
 public class JdbcParameterUtils {
@@ -53,30 +54,29 @@ public class JdbcParameterUtils {
 			return 0;
 		}
 
-		char[] statement = sql.toCharArray();
 		boolean withinQuotes = false;
 		Map<String, StringBuilder> namedParameters = new HashMap<>();
 		char currentQuote = '-';
 		int parameterCount = 0;
 		int i = 0;
-		while (i < statement.length) {
+		while (i < sql.length()) {
 			if (withinQuotes) {
-				if (statement[i] == currentQuote) {
+				if (sql.charAt(i) == currentQuote) {
 					withinQuotes = false;
 					currentQuote = '-';
 				}
 			}
 			else {
-				if (statement[i] == '"' || statement[i] == '\'') {
+				if (sql.charAt(i) == '"' || sql.charAt(i) == '\'') {
 					withinQuotes = true;
-					currentQuote = statement[i];
+					currentQuote = sql.charAt(i);
 				}
 				else {
-					if (statement[i] == ':' || statement[i] == '&') {
+					if (sql.charAt(i) == ':' || sql.charAt(i) == '&') {
 						int j = i + 1;
 						StringBuilder parameter = new StringBuilder();
-						while (j < statement.length && parameterNameContinues(statement, j)) {
-							parameter.append(statement[j]);
+						while (j < sql.length() && parameterNameContinues(sql, j)) {
+							parameter.append(sql.charAt(j));
 							j++;
 						}
 						if (j - i > 1) {
@@ -88,7 +88,7 @@ public class JdbcParameterUtils {
 						}
 					}
 					else {
-						if (statement[i] == '?') {
+						if (sql.charAt(i) == '?') {
 							parameterCount++;
 						}
 					}
@@ -108,10 +108,11 @@ public class JdbcParameterUtils {
 	 * @param statement the SQL statement
 	 * @param pos the position within the statement
 	 */
-	private static boolean parameterNameContinues(char[] statement, int pos) {
-		return (statement[pos] != ' ' && statement[pos] != ',' && statement[pos] != ')' &&
-				statement[pos] != '"' && statement[pos] != '\'' && statement[pos] != '|' &&
-				statement[pos] != ';' && statement[pos] != '\n' && statement[pos] != '\r');
+	private static boolean parameterNameContinues(String statement, int pos) {
+		char character = statement.charAt(pos);
+		return (character != ' ' && character != ',' && character != ')' &&
+				character != '"' && character != '\'' && character != '|' &&
+				character != ';' && character != '\n' && character != '\r');
 	}
 
 }
