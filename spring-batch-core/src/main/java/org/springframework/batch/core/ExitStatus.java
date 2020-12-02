@@ -54,8 +54,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
 
 	/**
-	 * Convenient constant value representing job that did no processing (e.g.
-	 * because it was already complete).
+	 * Convenient constant value representing job that did no processing
+	 * (e.g. because it was already complete).
 	 */
 	public static final ExitStatus NOOP = new ExitStatus("NOOP");
 
