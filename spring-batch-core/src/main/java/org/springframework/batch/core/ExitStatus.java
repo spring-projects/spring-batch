@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
 
 	/**
-	 * Convenient constant value representing job that did no processing (e.g.
-	 * because it was already complete).
+	 * Convenient constant value representing job that did no processing
+	 * (e.g. because it was already complete).
 	 */
 	public static final ExitStatus NOOP = new ExitStatus("NOOP");
 
