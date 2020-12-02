@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 package org.springframework.batch.support;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +25,12 @@ import org.springframework.util.Assert;
 /**
  * @author Dave Syer
  * @author Dan Garrette
+ * @author Marten Deinum
  */
 public class PatternMatcher<S> {
 
-	private Map<String, S> map = new HashMap<>();
-	private List<String> sorted = new ArrayList<>();
+	private final Map<String, S> map;
+	private final List<String> sorted;
 
 	/**
 	 * Initialize a new {@link PatternMatcher} with a map of patterns to values
@@ -42,14 +41,7 @@ public class PatternMatcher<S> {
 		this.map = map;
 		// Sort keys to start with the most specific
 		sorted = new ArrayList<>(map.keySet());
-		Collections.sort(sorted, new Comparator<String>() {
-            @Override
-			public int compare(String o1, String o2) {
-				String s1 = o1; // .replace('?', '{');
-				String s2 = o2; // .replace('*', '}');
-				return s2.compareTo(s1);
-			}
-		});
+		sorted.sort(Comparator.reverseOrder());
 	}
 
 	/**
@@ -66,12 +58,10 @@ public class PatternMatcher<S> {
 	 * <code>false</code> otherwise.
 	 */
 	public static boolean match(String pattern, String str) {
-		char[] patArr = pattern.toCharArray();
-		char[] strArr = str.toCharArray();
 		int patIdxStart = 0;
-		int patIdxEnd = patArr.length - 1;
+		int patIdxEnd = pattern.length() - 1;
 		int strIdxStart = 0;
-		int strIdxEnd = strArr.length - 1;
+		int strIdxEnd = str.length() - 1;
 		char ch;
 
 		boolean containsStar = pattern.contains("*");
@@ -82,9 +72,9 @@ public class PatternMatcher<S> {
 				return false; // Pattern and string do not have the same size
 			}
 			for (int i = 0; i <= patIdxEnd; i++) {
-				ch = patArr[i];
+				ch = pattern.charAt(i);
 				if (ch != '?') {
-					if (ch != strArr[i]) {
+					if (ch != str.charAt(i)) {
 						return false;// Character mismatch
 					}
 				}
@@ -97,9 +87,9 @@ public class PatternMatcher<S> {
 		}
 
 		// Process characters before first star
-		while ((ch = patArr[patIdxStart]) != '*' && strIdxStart <= strIdxEnd) {
+		while ((ch = pattern.charAt(patIdxStart)) != '*' && strIdxStart <= strIdxEnd) {
 			if (ch != '?') {
-				if (ch != strArr[strIdxStart]) {
+				if (ch != str.charAt(strIdxStart)) {
 					return false;// Character mismatch
 				}
 			}
@@ -110,7 +100,7 @@ public class PatternMatcher<S> {
 			// All characters in the string are used. Check if only '*'s are
 			// left in the pattern. If so, we succeeded. Otherwise failure.
 			for (int i = patIdxStart; i <= patIdxEnd; i++) {
-				if (patArr[i] != '*') {
+				if (pattern.charAt(i) != '*') {
 					return false;
 				}
 			}
@@ -118,9 +108,9 @@ public class PatternMatcher<S> {
 		}
 
 		// Process characters after last star
-		while ((ch = patArr[patIdxEnd]) != '*' && strIdxStart <= strIdxEnd) {
+		while ((ch = pattern.charAt(patIdxEnd)) != '*' && strIdxStart <= strIdxEnd) {
 			if (ch != '?') {
-				if (ch != strArr[strIdxEnd]) {
+				if (ch != str.charAt(strIdxEnd)) {
 					return false;// Character mismatch
 				}
 			}
@@ -131,7 +121,7 @@ public class PatternMatcher<S> {
 			// All characters in the string are used. Check if only '*'s are
 			// left in the pattern. If so, we succeeded. Otherwise failure.
 			for (int i = patIdxStart; i <= patIdxEnd; i++) {
-				if (patArr[i] != '*') {
+				if (pattern.charAt(i) != '*') {
 					return false;
 				}
 			}
@@ -143,7 +133,7 @@ public class PatternMatcher<S> {
 		while (patIdxStart != patIdxEnd && strIdxStart <= strIdxEnd) {
 			int patIdxTmp = -1;
 			for (int i = patIdxStart + 1; i <= patIdxEnd; i++) {
-				if (patArr[i] == '*') {
+				if (pattern.charAt(i) == '*') {
 					patIdxTmp = i;
 					break;
 				}
@@ -160,9 +150,9 @@ public class PatternMatcher<S> {
 			int foundIdx = -1;
 			strLoop: for (int i = 0; i <= strLength - patLength; i++) {
 				for (int j = 0; j < patLength; j++) {
-					ch = patArr[patIdxStart + j + 1];
+					ch = pattern.charAt(patIdxStart + j + 1);
 					if (ch != '?') {
-						if (ch != strArr[strIdxStart + i + j]) {
+						if (ch != str.charAt(strIdxStart + i + j)) {
 							continue strLoop;
 						}
 					}
@@ -183,7 +173,7 @@ public class PatternMatcher<S> {
 		// All characters in the string are used. Check if only '*'s are left
 		// in the pattern. If so, we succeeded. Otherwise failure.
 		for (int i = patIdxStart; i <= patIdxEnd; i++) {
-			if (patArr[i] != '*') {
+			if (pattern.charAt(i) != '*') {
 				return false;
 			}
 		}
