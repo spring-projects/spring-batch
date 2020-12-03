@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class ConcurrentTransactionAwareProxyTests {
@@ -90,24 +91,6 @@ public class ConcurrentTransactionAwareProxyTests {
 	public void testConcurrentTransactionalAppendOnlyList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createAppendOnlyTransactionalList();
 		testList(list, false);
-	}
-
-	@Ignore("This fails too often and is a false negative")
-	@Test
-	public void testConcurrentTransactionalList() throws Exception {
-		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
-		try {
-			testList(list, true);
-			fail("Expected ExecutionException or AssertionError (but don't panic if it didn't happen: it probably just means we got lucky for a change)");
-		}
-		catch (ExecutionException e) {
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message: " + message, message.startsWith("Lost update"));
-		}
-		catch (AssertionError e) {
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.startsWith("Wrong number of results"));
-		}
 	}
 
 	@Test
