@@ -337,8 +337,10 @@ InitializingBean {
 			}
 
 		} catch (JobInterruptedException e) {
-			logger.info("Encountered interruption executing job: "
-					+ e.getMessage());
+			if (logger.isInfoEnabled()) {
+				logger.info("Encountered interruption executing job: "
+						+ e.getMessage());
+			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("Full exception", e);
 			}

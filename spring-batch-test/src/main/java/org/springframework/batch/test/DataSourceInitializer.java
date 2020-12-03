@@ -144,7 +144,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 						jdbcTemplate.execute(trimmedScript);
 					}
 					catch (DataAccessException e) {
-						if (this.ignoreFailedDrop && trimmedScript.toLowerCase().startsWith("drop")) {
+						if (this.ignoreFailedDrop && trimmedScript.toLowerCase().startsWith("drop") && logger.isDebugEnabled()) {
 							logger.debug("DROP script failed (ignoring): " + trimmedScript);
 						}
 						else {

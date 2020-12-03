@@ -189,8 +189,10 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 					name = this.step.getName();
 				}
 				catch (Exception e) {
-					logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
-							+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
+					if (logger.isInfoEnabled()) {
+						logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
+								+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
+					}
 				}
 			}
 			SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter();

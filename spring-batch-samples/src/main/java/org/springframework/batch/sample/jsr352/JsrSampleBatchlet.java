@@ -39,8 +39,9 @@ public class JsrSampleBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		LOG.info("Calling remote service at: " + remoteServiceURL);
-
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Calling remote service at: " + remoteServiceURL);
+		}
 		Thread.sleep(2000);
 
 		LOG.info("Remote service call complete");

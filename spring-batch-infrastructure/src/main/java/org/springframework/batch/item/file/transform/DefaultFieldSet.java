@@ -123,7 +123,7 @@ public class DefaultFieldSet implements FieldSet {
 		if (names == null) {
 			throw new IllegalStateException("Field names are not known");
 		}
-		return names.toArray(new String[names.size()]);
+		return names.toArray(new String[0]);
 	}
 
 	/*

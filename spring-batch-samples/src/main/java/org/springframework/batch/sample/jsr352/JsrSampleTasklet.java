@@ -44,7 +44,9 @@ public class JsrSampleTasklet implements Tasklet {
 	@Nullable
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-		LOG.info("Calling remote service at: " + remoteServiceURL);
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Calling remote service at: " + remoteServiceURL);
+		}
 
 		Thread.sleep(2000);
 

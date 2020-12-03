@@ -35,8 +35,9 @@ public class JsrSampleItemProcessor implements ItemProcessor {
 	public Object processItem(Object o) throws Exception {
 		String person = (String) o;
 
-		LOG.info("Transforming person: " + person + " to uppercase");
-
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Transforming person: " + person + " to uppercase");
+		}
 		return person.toUpperCase();
 	}
 }

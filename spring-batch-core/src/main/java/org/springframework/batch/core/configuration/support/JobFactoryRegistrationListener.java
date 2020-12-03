@@ -54,7 +54,9 @@ public class JobFactoryRegistrationListener {
 	 * @throws Exception if there is a problem
 	 */
 	public void bind(JobFactory jobFactory, Map<String, ?> params) throws Exception {
-		logger.info("Binding JobFactory: " + jobFactory.getJobName());
+		if (logger.isInfoEnabled()) {
+			logger.info("Binding JobFactory: " + jobFactory.getJobName());
+		}
 		jobRegistry.register(jobFactory);
 	}
 
@@ -66,7 +68,9 @@ public class JobFactoryRegistrationListener {
 	 * @throws Exception if there is a problem
 	 */
 	public void unbind(JobFactory jobFactory, Map<String, ?> params) throws Exception {
-		logger.info("Unbinding JobFactory: " + jobFactory.getJobName());
+		if (logger.isInfoEnabled()) {
+			logger.info("Unbinding JobFactory: " + jobFactory.getJobName());
+		}
 		jobRegistry.unregister(jobFactory.getJobName());
 	}
 

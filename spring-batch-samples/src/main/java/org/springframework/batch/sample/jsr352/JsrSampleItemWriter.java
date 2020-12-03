@@ -35,7 +35,9 @@ public class JsrSampleItemWriter extends AbstractItemWriter {
 	@Override
 	public void writeItems(List<Object> people) throws Exception {
 		for(Object person : people) {
-			LOG.info("Writing person: " + person);
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Writing person: " + person);
+			}
 		}
 	}
 }

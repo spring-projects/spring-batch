@@ -110,8 +110,9 @@ InitializingBean, DisposableBean {
 				id = keys.next();
 			}
 		}
-		logger.debug("Retrieved key from list: " + id);
-
+		if (logger.isDebugEnabled()) {
+			logger.debug("Retrieved key from list: " + id);
+		}
 		if (id == null) {
 			return null;
 		}

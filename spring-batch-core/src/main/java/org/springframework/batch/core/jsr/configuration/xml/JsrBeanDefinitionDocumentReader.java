@@ -182,7 +182,7 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 	}
 
 	private String resolveValue(String value) {
-		StringBuffer valueBuffer = new StringBuffer();
+		StringBuilder valueBuffer = new StringBuilder();
 		Matcher jobParameterMatcher = OPERATOR_PATTERN.matcher(value);
 
 		while (jobParameterMatcher.find()) {
@@ -200,7 +200,7 @@ public class JsrBeanDefinitionDocumentReader extends DefaultBeanDefinitionDocume
 
 				String resolvedProperty = properties.getProperty(extractedProperty, NULL);
 
-				if (NULL.equals(resolvedProperty)) {
+				if (NULL.equals(resolvedProperty) && LOG.isInfoEnabled()) {
 					LOG.info(propertyType + " with key of: " + extractedProperty + " could not be resolved. Possible configuration error?");
 				}
 

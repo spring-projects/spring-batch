@@ -48,8 +48,9 @@ public class JsrSampleItemReader extends AbstractItemReader {
 		if(people.iterator().hasNext()) {
 			person = people.iterator().next();
 			people.remove(person);
-
-			LOG.info("Read person: " + person);
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Read person: " + person);
+			}
 		}
 
 		return person;

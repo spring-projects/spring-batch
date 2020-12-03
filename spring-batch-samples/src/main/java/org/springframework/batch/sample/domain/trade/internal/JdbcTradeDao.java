@@ -55,7 +55,9 @@ public class JdbcTradeDao implements TradeDao {
     @Override
 	public void writeTrade(Trade trade) {
         Long id = incrementer.nextLongValue();
-        log.debug("Processing: " + trade);
+        if (log.isDebugEnabled()) {
+            log.debug("Processing: " + trade);
+        }
         jdbcTemplate.update(INSERT_TRADE_RECORD,
 				id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
 				trade.getCustomer());

@@ -68,8 +68,9 @@ public class OrderItemReader implements ItemReader<Order> {
 			process(fieldSetReader.read());
 		}
 
-		log.info("Mapped: " + order);
-
+		if (log.isInfoEnabled()) {
+			log.info("Mapped: " + order);
+		}
 		Order result = order;
 		order = null;
 
@@ -144,7 +145,9 @@ public class OrderItemReader implements ItemReader<Order> {
 			order.getLineItems().add(itemMapper.mapFieldSet(fieldSet));
 		}
 		else {
-			log.debug("Could not map LINE_ID=" + lineId);
+			if (log.isDebugEnabled()) {
+				log.debug("Could not map LINE_ID=" + lineId);
+			}
 		}
 	}
 

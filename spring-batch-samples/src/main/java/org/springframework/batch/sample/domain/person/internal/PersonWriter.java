@@ -28,6 +28,8 @@ public class PersonWriter implements ItemWriter<Person> {
  
     @Override
 	public void write(List<? extends Person> data) {
-        log.debug("Processing: " + data);
+        if (log.isDebugEnabled()) {
+            log.debug("Processing: " + data);
+        }
     }
 }

@@ -71,7 +71,9 @@ public class BatchParser extends AbstractBeanDefinitionParser {
 				if(!registry.containsBeanDefinition(beanName)) {
 					registry.registerBeanDefinition(beanName, beanDefinition);
 				} else {
-					logger.info("Ignoring batch.xml bean definition for " + beanName + " because another bean of the same name has been registered");
+					if (logger.isInfoEnabled()) {
+						logger.info("Ignoring batch.xml bean definition for " + beanName + " because another bean of the same name has been registered");
+					}
 				}
 			}
 		}

@@ -61,6 +61,8 @@ public class InfiniteLoopWriter extends StepExecutionListenerSupport implements 
 		}
 
 		stepExecution.setWriteCount(++count);
-		LOG.info("Executing infinite loop, at count=" + count);
+		if (logger.isInfoEnabled()) {
+			LOG.info("Executing infinite loop, at count=" + count);
+		}
 	}
 }

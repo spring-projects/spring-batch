@@ -181,7 +181,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (databaseType == null) {
 			databaseType = DatabaseType.fromMetaData(dataSource).name();
-			logger.info("No database type set, using meta data indicating: " + databaseType);
+			if (logger.isInfoEnabled()) {
+				logger.info("No database type set, using meta data indicating: " + databaseType);
+			}
 		}
 
 		if (lobHandler == null && databaseType.equalsIgnoreCase(DatabaseType.ORACLE.toString())) {
@@ -194,7 +196,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			serializer = defaultSerializer;
 		}
 
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
+		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), () -> "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 

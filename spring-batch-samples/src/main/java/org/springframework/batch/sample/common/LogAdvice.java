@@ -28,7 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class LogAdvice {
     private static Log log = LogFactory.getLog(LogAdvice.class);
 
-    public void doStronglyTypedLogging(Object item){
-    	log.info("Processed: " + item);
+    public void doStronglyTypedLogging(Object item) {
+        if (logger.isInfoEnabled()) {
+            log.info("Processed: " + item);
+        }
     }
 }

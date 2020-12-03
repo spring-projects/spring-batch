@@ -388,7 +388,9 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 			return completionPolicy;
 		}
 		if (chunkSize == 0) {
-			logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
+			if (logger.isInfoEnabled()) {
+				logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
+			}
 			chunkSize = DEFAULT_COMMIT_INTERVAL;
 		}
 		return new SimpleCompletionPolicy(chunkSize);

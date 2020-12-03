@@ -90,7 +90,9 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 		}
 
 		// add a simple record to the current collection
-		LOG.debug("Mapping: " + value);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Mapping: " + value);
+		}
 		holder.addRecord(value.getItem());
 		return true;
 	}

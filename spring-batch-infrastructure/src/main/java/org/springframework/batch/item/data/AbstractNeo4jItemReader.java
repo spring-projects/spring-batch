@@ -184,9 +184,7 @@ public abstract class AbstractNeo4jItemReader<T> extends
 
 		String resultingQuery = query.toString();
 
-		if (logger.isDebugEnabled()) {
-			logger.debug(resultingQuery);
-		}
+		logger.debug(resultingQuery);
 
 		return resultingQuery;
 	}

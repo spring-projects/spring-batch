@@ -66,7 +66,9 @@ public class JobLauncherDetails extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) {
 		Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 		String jobName = (String) jobDataMap.get(JOB_NAME);
-		log.info("Quartz trigger firing with Spring Batch jobName="+jobName);
+		if (log.isInfoEnabled()) {
+			log.info("Quartz trigger firing with Spring Batch jobName=" + jobName);
+		}
 		JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 		try {
 			jobLauncher.run(jobLocator.getJob(jobName), jobParameters);

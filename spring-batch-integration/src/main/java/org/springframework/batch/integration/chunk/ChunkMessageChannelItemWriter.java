@@ -193,7 +193,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
-		logger.info("Waiting for " + localState.getExpecting() + " results");
+		if (logger.isInfoEnabled()) {
+			logger.info("Waiting for " + localState.getExpecting() + " results");
+		}
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			try {
 				getNextResult();
