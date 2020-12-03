@@ -174,7 +174,6 @@ public class JdbcPagingQueryIntegrationTests {
 	}
 
 	@Test
-	@Ignore
 	public void testJumpToItem() throws Exception {
 
 		PagingQueryProvider queryProvider = getPagingQueryProvider();

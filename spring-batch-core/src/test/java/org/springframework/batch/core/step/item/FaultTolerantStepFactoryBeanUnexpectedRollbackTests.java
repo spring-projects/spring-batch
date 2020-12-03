@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -56,7 +55,6 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 	private DataSource dataSource;
 
 	@Test
-	@Ignore //FIXME
 	public void testTransactionException() throws Exception {
 
 		final SkipWriterStub<String> writer = new SkipWriterStub<>();

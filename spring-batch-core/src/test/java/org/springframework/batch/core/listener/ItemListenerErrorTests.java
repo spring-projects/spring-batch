@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors.
+ * Copyright 2015-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,6 +30,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -52,6 +52,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * BATCH-2322
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ItemListenerErrorTests.BatchConfiguration.class})
@@ -93,7 +94,6 @@ public class ItemListenerErrorTests {
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 	}
 
-	@Ignore
 	@Test
 	@DirtiesContext
 	public void testOnReadError() throws Exception {
@@ -101,7 +101,16 @@ public class ItemListenerErrorTests {
 		reader.setGoingToFail(true);
 
 		JobExecution execution = jobLauncher.run(job, new JobParameters());
-		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		StepExecution stepExecution = execution.getStepExecutions().iterator().next();
+		assertEquals(0, stepExecution.getReadCount());
+		assertEquals(50, stepExecution.getReadSkipCount());
+		List<Throwable> failureExceptions = stepExecution.getFailureExceptions();
+		assertEquals(1, failureExceptions.size());
+		Throwable failureException = failureExceptions.iterator().next();
+		assertEquals("Skip limit of '50' exceeded", failureException.getMessage());
+		assertEquals("Error in onReadError.", failureException.getCause().getMessage());
+		assertEquals("onReadError caused this Exception", failureException.getCause().getCause().getMessage());
 	}
 
 	@Test
