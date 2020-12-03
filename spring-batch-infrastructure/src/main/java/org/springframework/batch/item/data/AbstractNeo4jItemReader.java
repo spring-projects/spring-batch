@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ public abstract class AbstractNeo4jItemReader<T> extends
 	}
 
 	protected String generateLimitCypherQuery() {
-		StringBuilder query = new StringBuilder();
+		StringBuilder query = new StringBuilder(128);
 
 		query.append("START ").append(startStatement);
 		query.append(matchStatement != null ? " MATCH " + matchStatement : "");
