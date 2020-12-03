@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,9 @@ public class JobRegistryBackgroundJobRunner {
 			for (int j = 0; j < resources.length; j++) {
 
 				Resource path = resources[j];
-				logger.info("Registering Job definitions from " + Arrays.toString(resources));
+				if (logger.isInfoEnabled()) {
+					logger.info("Registering Job definitions from " + Arrays.toString(resources));
+				}
 
 				GenericApplicationContextFactory factory = new GenericApplicationContextFactory(path);
 				factory.setApplicationContext(parentContext);
@@ -199,8 +201,9 @@ public class JobRegistryBackgroundJobRunner {
 		final JobRegistryBackgroundJobRunner launcher = new JobRegistryBackgroundJobRunner(args[0]);
 		errors.clear();
 
-		logger.info("Starting job registry in parent context from XML at: [" + args[0] + "]");
-
+		if (logger.isInfoEnabled()) {
+			logger.info("Starting job registry in parent context from XML at: [" + args[0] + "]");
+		}
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -221,7 +224,9 @@ public class JobRegistryBackgroundJobRunner {
 
 		synchronized (errors) {
 			if (!errors.isEmpty()) {
-				logger.info(errors.size() + " errors detected on startup of parent context.  Rethrowing.");
+				if (logger.isInfoEnabled()) {
+					logger.info(errors.size() + " errors detected on startup of parent context.  Rethrowing.");
+				}
 				throw errors.get(0);
 			}
 		}
@@ -231,7 +236,9 @@ public class JobRegistryBackgroundJobRunner {
 		final String[] paths = new String[args.length - 1];
 		System.arraycopy(args, 1, paths, 0, paths.length);
 
-		logger.info("Parent context started.  Registering jobs from paths: " + Arrays.asList(paths));
+		if (logger.isInfoEnabled()) {
+			logger.info("Parent context started.  Registering jobs from paths: " + Arrays.asList(paths));
+		}
 		launcher.register(paths);
 
 		if (System.getProperty(EMBEDDED) != null) {

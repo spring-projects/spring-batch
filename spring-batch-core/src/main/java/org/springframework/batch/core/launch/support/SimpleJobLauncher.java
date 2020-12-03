@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,18 +142,24 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				@Override
 				public void run() {
 					try {
-						logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
-								+ "]");
+						if (logger.isInfoEnabled()) {
+							logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
+									+ "]");
+						}
 						job.execute(jobExecution);
-						Duration jobExecutionDuration = BatchMetrics.calculateDuration(jobExecution.getStartTime(), jobExecution.getEndTime());
-						logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-								+ "] and the following status: [" + jobExecution.getStatus() + "]"
-								+ (jobExecutionDuration == null ? "" : " in " + BatchMetrics.formatDuration(jobExecutionDuration)));
+						if (logger.isInfoEnabled()) {
+							Duration jobExecutionDuration = BatchMetrics.calculateDuration(jobExecution.getStartTime(), jobExecution.getEndTime());
+							logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
+									+ "] and the following status: [" + jobExecution.getStatus() + "]"
+									+ (jobExecutionDuration == null ? "" : " in " + BatchMetrics.formatDuration(jobExecutionDuration)));
+						}
 					}
 					catch (Throwable t) {
-						logger.info("Job: [" + job
-								+ "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
-								+ "]", t);
+						if (logger.isInfoEnabled()) {
+							logger.info("Job: [" + job
+									+ "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
+									+ "]", t);
+						}
 						rethrow(t);
 					}
 				}

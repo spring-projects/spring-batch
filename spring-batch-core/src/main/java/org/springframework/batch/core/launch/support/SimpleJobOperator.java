@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,15 +267,18 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException, NoSuchJobException, JobRestartException, JobParametersInvalidException {
 
-		logger.info("Checking status of job execution with id=" + executionId);
-
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking status of job execution with id=" + executionId);
+		}
 		JobExecution jobExecution = findExecutionById(executionId);
 
 		String jobName = jobExecution.getJobInstance().getJobName();
 		Job job = jobRegistry.getJob(jobName);
 		JobParameters parameters = jobExecution.getJobParameters();
 
-		logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
+		}
 		try {
 			return jobLauncher.run(job, parameters).getId();
 		}
@@ -295,8 +298,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException, JobParametersInvalidException {
-
-		logger.info("Checking status of job with name=" + jobName);
+		if (logger.isInfoEnabled()) {
+			logger.info("Checking status of job with name=" + jobName);
+		}
 
 		JobParameters jobParameters = jobParametersConverter.getJobParameters(PropertiesConverter
 				.stringToProperties(parameters));
@@ -308,8 +312,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		}
 
 		Job job = jobRegistry.getJob(jobName);
-
-		logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
+		}
 		try {
 			return jobLauncher.run(job, jobParameters).getId();
 		}
@@ -336,15 +341,17 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	@Override
 	public Long startNextInstance(String jobName) throws NoSuchJobException,
 	UnexpectedJobExecutionException, JobParametersInvalidException {
-
-		logger.info("Locating parameters for next instance of job with name=" + jobName);
+		if (logger.isInfoEnabled()) {
+			logger.info("Locating parameters for next instance of job with name=" + jobName);
+		}
 
 		Job job = jobRegistry.getJob(jobName);
 		JobParameters parameters = new JobParametersBuilder(jobExplorer)
 				.getNextJobParameters(job)
 				.toJobParameters();
-
-		logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Attempting to launch job with name=%s and parameters=%s", jobName, parameters));
+		}
 		try {
 			return jobLauncher.run(job, parameters).getId();
 		}
@@ -424,8 +431,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			throw new JobExecutionAlreadyRunningException(
 					"JobExecution is running or complete and therefore cannot be aborted");
 		}
-
-		logger.info("Aborting job execution: " + jobExecution);
+		if (logger.isInfoEnabled()) {
+			logger.info("Aborting job execution: " + jobExecution);
+		}
 		jobExecution.upgradeStatus(BatchStatus.ABANDONED);
 		jobExecution.setEndTime(new Date());
 		jobRepository.update(jobExecution);
