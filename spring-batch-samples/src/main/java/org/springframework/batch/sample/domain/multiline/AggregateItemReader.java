@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,9 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 		}
 
 		// add a simple record to the current collection
-		LOG.debug("Mapping: " + value);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Mapping: " + value);
+		}
 		holder.addRecord(value.getItem());
 		return true;
 	}

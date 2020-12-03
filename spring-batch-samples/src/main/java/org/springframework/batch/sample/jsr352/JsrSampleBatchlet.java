@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ public class JsrSampleBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		LOG.info("Calling remote service at: " + remoteServiceURL);
-
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Calling remote service at: " + remoteServiceURL);
+		}
 		Thread.sleep(2000);
 
 		LOG.info("Remote service call complete");

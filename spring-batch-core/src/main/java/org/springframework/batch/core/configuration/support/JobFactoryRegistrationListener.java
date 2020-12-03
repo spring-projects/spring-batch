@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,9 @@ public class JobFactoryRegistrationListener {
 	 * @throws Exception if there is a problem
 	 */
 	public void bind(JobFactory jobFactory, Map<String, ?> params) throws Exception {
-		logger.info("Binding JobFactory: " + jobFactory.getJobName());
+		if (logger.isInfoEnabled()) {
+			logger.info("Binding JobFactory: " + jobFactory.getJobName());
+		}
 		jobRegistry.register(jobFactory);
 	}
 
@@ -66,7 +68,9 @@ public class JobFactoryRegistrationListener {
 	 * @throws Exception if there is a problem
 	 */
 	public void unbind(JobFactory jobFactory, Map<String, ?> params) throws Exception {
-		logger.info("Unbinding JobFactory: " + jobFactory.getJobName());
+		if (logger.isInfoEnabled()) {
+			logger.info("Unbinding JobFactory: " + jobFactory.getJobName());
+		}
 		jobRegistry.unregister(jobFactory.getJobName());
 	}
 

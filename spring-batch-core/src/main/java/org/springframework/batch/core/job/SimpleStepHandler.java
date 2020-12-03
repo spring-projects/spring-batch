@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,9 +116,11 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 		if (stepExecutionPartOfExistingJobExecution(execution, lastStepExecution)) {
 			// If the last execution of this step was in the same job, it's
 			// probably intentional so we want to run it again...
-			logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. "
-					+ "If either step fails, both will be executed again on restart.", step.getName(), jobInstance
-					.getJobName()));
+			if (logger.isInfoEnabled()) {
+				logger.info(String.format("Duplicate step [%s] detected in execution of job=[%s]. "
+						+ "If either step fails, both will be executed again on restart.", step.getName(), jobInstance
+						.getJobName()));
+			}
 			lastStepExecution = null;
 		}
 		StepExecution currentStepExecution = lastStepExecution;
@@ -143,7 +145,9 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 
 			jobRepository.add(currentStepExecution);
 
-			logger.info("Executing step: [" + step.getName() + "]");
+			if (logger.isInfoEnabled()) {
+				logger.info("Executing step: [" + step.getName() + "]");
+			}
 			try {
 				step.execute(currentStepExecution);
 				currentStepExecution.getExecutionContext().put("batch.executed", true);
@@ -215,7 +219,9 @@ public class SimpleStepHandler implements StepHandler, InitializingBean {
 				|| stepStatus == BatchStatus.ABANDONED) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
-			logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
+			if (logger.isInfoEnabled()) {
+				logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
+			}
 			return false;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,8 +269,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
 			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(), stepExecution.getEndTime());
-			logger.info("Step: [" + stepExecution.getStepName() + "] executed in " + BatchMetrics.formatDuration(stepExecutionDuration));
-
+			if (logger.isInfoEnabled()) {
+				logger.info("Step: [" + stepExecution.getStepName() + "] executed in " + BatchMetrics.formatDuration(stepExecutionDuration));
+			}
 			try {
 				getJobRepository().update(stepExecution);
 			}

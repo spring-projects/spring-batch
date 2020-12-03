@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -337,8 +337,10 @@ InitializingBean {
 			}
 
 		} catch (JobInterruptedException e) {
-			logger.info("Encountered interruption executing job: "
-					+ e.getMessage());
+			if (logger.isInfoEnabled()) {
+				logger.info("Encountered interruption executing job: "
+						+ e.getMessage());
+			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("Full exception", e);
 			}
