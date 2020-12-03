@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		int count = 0;
 		int maxCount = maxWaitTimeouts;
 		Throwable failure = null;
-		logger.info("Waiting for " + localState.getExpecting() + " results");
+		if (logger.isInfoEnabled()) {
+			logger.info("Waiting for " + localState.getExpecting() + " results");
+		}
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
 			try {
 				getNextResult();

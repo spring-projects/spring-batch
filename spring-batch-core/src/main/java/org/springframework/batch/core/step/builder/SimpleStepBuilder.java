@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,7 +388,9 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 			return completionPolicy;
 		}
 		if (chunkSize == 0) {
-			logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
+			if (logger.isInfoEnabled()) {
+				logger.info("Setting commit interval to default value (" + DEFAULT_COMMIT_INTERVAL + ")");
+			}
 			chunkSize = DEFAULT_COMMIT_INTERVAL;
 		}
 		return new SimpleCompletionPolicy(chunkSize);

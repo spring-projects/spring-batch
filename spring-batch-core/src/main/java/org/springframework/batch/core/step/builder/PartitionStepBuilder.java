@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,8 +189,10 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 					name = this.step.getName();
 				}
 				catch (Exception e) {
-					logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
-							+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
+					if (logger.isInfoEnabled()) {
+						logger.info("Ignored exception from step asking for name and allowStartIfComplete flag. "
+								+ "Using default from enclosing PartitionStep (" + name + "," + allowStartIfComplete + ").");
+					}
 				}
 			}
 			SimpleStepExecutionSplitter splitter = new SimpleStepExecutionSplitter();

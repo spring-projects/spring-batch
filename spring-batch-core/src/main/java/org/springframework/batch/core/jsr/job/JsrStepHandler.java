@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,9 @@ public class JsrStepHandler extends SimpleStepHandler {
 
 				if(CollectionUtils.isEmpty(jobExecution.getStepExecutions()) && lastJobExecution.getStatus() == BatchStatus.STOPPED && StringUtils.hasText(restartStep)) {
 					if(!restartStep.equals(step.getName()) && !jobExecution.getExecutionContext().containsKey("batch.startedStep")) {
-						logger.info("Job was stopped and should restart at step " + restartStep + ".  The current step is " + step.getName());
+						if (logger.isInfoEnabled()) {
+							logger.info("Job was stopped and should restart at step " + restartStep + ".  The current step is " + step.getName());
+						}
 						return false;
 					} else {
 						// Indicates the starting point for execution evaluation per JSR-352
@@ -113,7 +115,9 @@ public class JsrStepHandler extends SimpleStepHandler {
 				|| stepStatus == BatchStatus.ABANDONED) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
-			logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
+			if (logger.isInfoEnabled()) {
+				logger.info("Step already complete or not restartable, so no action to execute: " + lastStepExecution);
+			}
 			return false;
 		}
 

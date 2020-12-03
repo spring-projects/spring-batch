@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,9 @@ public class JobLauncherDetails extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext context) {
 		Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 		String jobName = (String) jobDataMap.get(JOB_NAME);
-		log.info("Quartz trigger firing with Spring Batch jobName="+jobName);
+		if (log.isInfoEnabled()) {
+			log.info("Quartz trigger firing with Spring Batch jobName=" + jobName);
+		}
 		JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 		try {
 			jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
