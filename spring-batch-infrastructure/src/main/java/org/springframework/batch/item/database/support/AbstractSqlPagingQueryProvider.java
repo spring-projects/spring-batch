@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
 		Assert.notEmpty(sortKeys, "sortKey must be specified");
-		StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder(64);
 		sql.append("SELECT ").append(selectClause);
 		sql.append(" FROM ").append(fromClause);
 		if (whereClause != null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String topClause) {
-		StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder(128);
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
