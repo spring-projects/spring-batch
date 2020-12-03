@@ -190,7 +190,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
 		Assert.notEmpty(sortKeys, "sortKey must be specified");
-		StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder(64);
 		sql.append("SELECT ").append(selectClause);
 		sql.append(" FROM ").append(fromClause);
 		if (whereClause != null) {

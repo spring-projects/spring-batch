@@ -98,7 +98,7 @@ public class SqlPagingQueryUtils {
 	 */
 	public static String generateTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String topClause) {
-		StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder(128);
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);

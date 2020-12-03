@@ -172,7 +172,7 @@ public abstract class AbstractNeo4jItemReader<T> extends
 	}
 
 	protected String generateLimitCypherQuery() {
-		StringBuilder query = new StringBuilder();
+		StringBuilder query = new StringBuilder(128);
 
 		query.append("START ").append(startStatement);
 		query.append(matchStatement != null ? " MATCH " + matchStatement : "");
