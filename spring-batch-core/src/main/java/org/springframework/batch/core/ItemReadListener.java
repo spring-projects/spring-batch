@@ -44,7 +44,7 @@ public interface ItemReadListener<T> extends StepListener {
 	/**
 	 * Called if an error occurs while trying to read.
 	 * 
-	 * @param ex thrown from {@link ItemWriter}
+	 * @param ex thrown from {@link ItemReader}
 	 */
 	void onReadError(Exception ex);
 }
