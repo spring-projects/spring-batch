@@ -417,10 +417,6 @@ project('spring-batch-infrastructure') {
 
 }
 
-project('spring-batch-docs') {
-	description = 'Spring Batch Docs'
-}
-
 //Domain for batch job testing
 project('spring-batch-test') {
     description = 'Spring Batch Test'
@@ -591,7 +587,7 @@ task prepareAsciidocBuild(type: Sync) {
 		configurations.docs.collect { zipTree(it) }
 	}
 	// and doc sources
-	from "spring-batch-docs/asciidoc/"
+	from "src/asciidoc/"
 	// to a build directory of your choice
 	into "$buildDir/asciidoc/assemble"
 }
