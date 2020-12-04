@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "../JpaPagingItemReaderCommonTests-context.xml" })
+@ContextConfiguration(locations={"JpaPagingItemReaderCommonTests-context.xml"})
 public class JpaNativeQueryProviderIntegrationTests {
 
 	@Autowired

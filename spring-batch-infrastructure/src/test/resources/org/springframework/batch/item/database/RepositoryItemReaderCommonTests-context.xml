@@ -14,7 +14,6 @@
 	<!--  Initialise the database -->
 	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
 		<property name="dataSource" ref="dataSource"/>
-		<property name="initialize" value="true"/>
 		<property name="initScripts">
 			<list>
 				<value>classpath:org/springframework/batch/item/database/init-books-schema.sql</value>

@@ -169,7 +169,7 @@ public class SynchronousTests implements ApplicationContextAware {
 
 	@Transactional
 	@Test
-	public void testPartialRollback() throws Exception {
+	public void JpaNativeQueryProviderIntegrationTeststestPartialRollback() throws Exception {
 
 		// The JmsTemplate is used elsewhere outside a transaction, so
 		// we need to use one here that is transaction aware.

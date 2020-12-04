@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -57,10 +58,10 @@ public class Jaxb2NamespaceUnmarshallingTests {
 	public void testUnmarshal() throws Exception {
 		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller().unmarshal(
 				new StreamSource(new StringReader(TRADE_XML)));
-		assertEquals("XYZ0001", trade.getIsin());
-		assertEquals(5, trade.getQuantity());
-		assertEquals(new BigDecimal("11.39"), trade.getPrice());
-		assertEquals("Customer1", trade.getCustomer());
+		Assert.assertEquals("XYZ0001", trade.getIsin());
+		Assert.assertEquals(5, trade.getQuantity());
+		Assert.assertEquals(new BigDecimal("11.39"), trade.getPrice());
+		Assert.assertEquals("Customer1", trade.getCustomer());
 	}
 
 	@Test
@@ -91,22 +92,22 @@ public class Jaxb2NamespaceUnmarshallingTests {
 		assertEquals(3, results.size());
 
 		QualifiedTrade trade1 = results.get(0);
-		assertEquals("XYZ0001", trade1.getIsin());
-		assertEquals(5, trade1.getQuantity());
-		assertEquals(new BigDecimal("11.39"), trade1.getPrice());
-		assertEquals("Customer1", trade1.getCustomer());
+		Assert.assertEquals("XYZ0001", trade1.getIsin());
+		Assert.assertEquals(5, trade1.getQuantity());
+		Assert.assertEquals(new BigDecimal("11.39"), trade1.getPrice());
+		Assert.assertEquals("Customer1", trade1.getCustomer());
 
 		QualifiedTrade trade2 = results.get(1);
-		assertEquals("XYZ0002", trade2.getIsin());
-		assertEquals(2, trade2.getQuantity());
-		assertEquals(new BigDecimal("72.99"), trade2.getPrice());
-		assertEquals("Customer2", trade2.getCustomer());
+		Assert.assertEquals("XYZ0002", trade2.getIsin());
+		Assert.assertEquals(2, trade2.getQuantity());
+		Assert.assertEquals(new BigDecimal("72.99"), trade2.getPrice());
+		Assert.assertEquals("Customer2", trade2.getCustomer());
 
 		QualifiedTrade trade3 = results.get(2);
-		assertEquals("XYZ0003", trade3.getIsin());
-		assertEquals(9, trade3.getQuantity());
-		assertEquals(new BigDecimal("99.99"), trade3.getPrice());
-		assertEquals("Customer3", trade3.getCustomer());
+		Assert.assertEquals("XYZ0003", trade3.getIsin());
+		Assert.assertEquals(9, trade3.getQuantity());
+		Assert.assertEquals(new BigDecimal("99.99"), trade3.getPrice());
+		Assert.assertEquals("Customer3", trade3.getCustomer());
 	}
 
 	@After

@@ -17,7 +17,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="xincrementerParent" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer"
+	<bean id="incrementerParent" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer"
 		abstract="true">
 		<property name="dataSource" ref="dataSource" />
 		<property name="columnName" value="ID" />

@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"JpaPagingItemReaderParameterTests-context.xml"})
+@ContextConfiguration(locations={"JpaPagingItemReaderCommonTests-context.xml"})
 public class JpaPagingItemReaderNamedQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
 
 	@Autowired

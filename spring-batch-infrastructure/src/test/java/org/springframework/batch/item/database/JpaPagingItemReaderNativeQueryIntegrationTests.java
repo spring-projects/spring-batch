@@ -18,20 +18,31 @@ package org.springframework.batch.item.database;
 import java.util.Collections;
 
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.database.orm.JpaNativeQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
+import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @author Anatoly Polinsky
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"JpaPagingItemReaderParameterTests-context.xml"})
+@ContextConfiguration(classes = JpaPagingItemReaderNativeQueryIntegrationTests.JpaConfiguration.class)
 public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
     
     @Autowired
@@ -58,5 +69,40 @@ public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagi
         reader.setSaveState(true);
 
         return reader;
+    }
+
+    @Configuration
+    public static class JpaConfiguration {
+
+        @Bean
+        public DataSource dataSource() {
+            return new EmbeddedDatabaseBuilder()
+                    .setType(EmbeddedDatabaseType.HSQL)
+                    .addScript("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql")
+                    .build();
+        }
+
+        @Bean
+        public PersistenceUnitManager persistenceUnitManager() {
+            DefaultPersistenceUnitManager persistenceUnitManager = new DefaultPersistenceUnitManager();
+            persistenceUnitManager.setDefaultDataSource(dataSource());
+            persistenceUnitManager.afterPropertiesSet();
+            return persistenceUnitManager;
+        }
+
+        @Bean
+        public EntityManagerFactory entityManagerFactory() {
+            LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+            factoryBean.setDataSource(dataSource());
+            factoryBean.setPersistenceUnitManager(persistenceUnitManager());
+            factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+            factoryBean.afterPropertiesSet();
+            return factoryBean.getObject();
+        }
+
+        @Bean
+        public PlatformTransactionManager transactionManager() {
+            return new JpaTransactionManager(entityManagerFactory());
+        }
     }
 }

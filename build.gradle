@@ -342,6 +342,12 @@ project('spring-batch-infrastructure') {
 		testCompile "javax.xml.bind:jaxb-api:$jaxbApiVersion"
 		testCompile "org.springframework.kafka:spring-kafka-test:$springKafkaVersion"
 		testCompile "org.assertj:assertj-core:$assertjVersion"
+		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
+		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
+		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
+		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
+		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
+		testCompile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
 
 		testRuntime "com.sun.mail:javax.mail:$javaMailVersion"
 		testRuntime "org.codehaus.groovy:groovy-jsr223:$groovyVersion"
@@ -443,62 +449,6 @@ project('spring-batch-core-tests') {
         optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
         optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
-	}
-	test {
-		enabled = project.hasProperty('alltests')
-	}
-}
-
-project('spring-batch-infrastructure-tests') {
-	description = 'Spring Batch Infrastructure Tests'
-    project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	dependencies {
-		compile project(":spring-batch-infrastructure")
-		compile "javax.jms:javax.jms-api:$jmsVersion"
-		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
-		compile "org.springframework:spring-tx:$springVersion"
-		compile "org.springframework:spring-aop:$springVersion"
-
-		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
-		testCompile "commons-io:commons-io:$commonsIoVersion"
-		testCompile "org.apache.derby:derby:$derbyVersion"
-		testCompile "org.apache.activemq:activemq-broker:$activemqVersion"
-		testCompile "org.apache.activemq:activemq-kahadb-store:$activemqVersion"
-		testCompile "junit:junit:${junitVersion}"
-		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
-		testCompile "org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1"
-		testCompile "org.xmlunit:xmlunit-core:$xmlunitVersion"
-		testCompile "org.xmlunit:xmlunit-matchers:$xmlunitVersion"
-		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
-		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
-		testCompile "com.thoughtworks.xstream:xstream:$xstreamVersion"
-		testCompile("com.fasterxml.woodstox:woodstox-core:$woodstoxVersion") {
-			exclude group: 'stax', module: 'stax-api'
-		}
-		testCompile "org.apache.commons:commons-lang3:$commonsLangVersion"
-		testCompile("org.springframework:spring-oxm:$springVersion") {
-			exclude group: 'commons-lang', module: 'commons-lang'
-		}
-		testCompile "org.springframework.data:spring-data-jpa:$springDataJpaVersion"
-		testCompile "org.springframework:spring-jdbc:$springVersion"
-		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.mockito:mockito-core:$mockitoVersion"
-		testCompile "javax.xml.bind:jaxb-api:$jaxbApiVersion"
-
-		compile("org.hibernate:hibernate-core:$hibernateVersion") { dep ->
-			optional dep
-			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
-		}
-		compile("org.hibernate:hibernate-entitymanager:$hibernateVersion") { dep ->
-			optional dep
-			exclude group: 'org.jboss.spec.javax.transaction', module: 'jboss-transaction-api_1.1_spec'
-		}
-		optional "javax.transaction:javax.transaction-api:1.2"
-		optional "org.springframework:spring-orm:$springVersion"
-		optional "org.springframework:spring-jms:$springVersion"
-
-		runtime "mysql:mysql-connector-java:$mysqlVersion"
-		runtime "org.postgresql:postgresql:$postgresqlVersion"
 	}
 	test {
 		enabled = project.hasProperty('alltests')

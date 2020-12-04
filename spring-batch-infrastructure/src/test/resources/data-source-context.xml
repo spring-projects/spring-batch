@@ -5,7 +5,6 @@
 	<!--  Initialise the database before every test case: -->
 	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
 		<property name="dataSource" ref="dataSource"/>
-		<property name="initialize" value="${batch.data.source.init}"/>
 		<property name="initScripts">
 			<list>
 				<value>${batch.business.schema.script}</value>
