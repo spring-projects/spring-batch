@@ -299,10 +299,14 @@ project('spring-batch-core') {
 		testCompile "javax.inject:javax.inject:$javaxInjectVersion"
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
 		testCompile "com.h2database:h2:$h2databaseVersion"
+		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
 		testCompile "junit:junit:${junitVersion}"
 		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
+		testCompile "org.testcontainers:mysql:$testcontainersVersion"
+		testCompile "mysql:mysql-connector-java:$mysqlVersion"
+
 		optional "com.ibm.jbatch:com.ibm.jbatch-tck-spi:$jbatchTckSpi"
 		optional "com.thoughtworks.xstream:xstream:$xstreamVersion"
 		optional "org.aspectj:aspectjrt:$aspectjVersion"
@@ -415,44 +419,6 @@ project('spring-batch-infrastructure') {
 
 project('spring-batch-docs') {
 	description = 'Spring Batch Docs'
-}
-
-project('spring-batch-core-tests') {
-	description = 'Spring Batch Core Tests'
-    project.tasks.findByPath("artifactoryPublish")?.enabled = false
-	dependencies {
-		compile project(":spring-batch-core")
-		compile project(":spring-batch-infrastructure")
-		compile "org.apache.commons:commons-dbcp2:$commonsDdbcpVersion"
-		compile "org.springframework:spring-jdbc:$springVersion"
-		compile "org.springframework.retry:spring-retry:$springRetryVersion"
-		compile "org.springframework:spring-tx:$springVersion"
-		compile "org.springframework:spring-aop:$springVersion"
-
-		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
-		testCompile "commons-io:commons-io:$commonsIoVersion"
-		testCompile "org.apache.derby:derby:$derbyVersion"
-		testCompile "junit:junit:${junitVersion}"
-		testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
-		testCompile "org.apache.logging.log4j:log4j-api:$log4jVersion"
-		testCompile "org.apache.logging.log4j:log4j-core:$log4jVersion"
-		testCompile "org.springframework:spring-test:$springVersion"
-		testCompile "org.springframework:spring-jdbc:$springVersion"
-		testCompile "org.testcontainers:mysql:$testcontainersVersion"
-		testCompile "mysql:mysql-connector-java:$mysqlVersion"
-
-		runtime "org.postgresql:postgresql:$postgresqlVersion"
-		runtime "javax.batch:javax.batch-api:$javaxBatchApiVersion"
-
-		optional "org.aspectj:aspectjrt:$aspectjVersion"
-		optional "org.aspectj:aspectjweaver:$aspectjVersion"
-        optional "org.springframework.ldap:spring-ldap-core:$springLdapVersion"
-        optional "org.springframework.ldap:spring-ldap-core-tiger:$springLdapVersion"
-        optional "org.springframework.ldap:spring-ldap-ldif-core:$springLdapVersion"
-	}
-	test {
-		enabled = project.hasProperty('alltests')
-	}
 }
 
 //Domain for batch job testing

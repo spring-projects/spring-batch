@@ -1,1 +1,1 @@
-http\://www.springframework.org/schema/batch/test=org.springframework.batch.test.namespace.config.DummyNamespaceHandler
+http\://www.springframework.org/schema/batch/test=org.springframework.batch.core.test.namespace.config.DummyNamespaceHandler
