@@ -22,7 +22,6 @@ s3.properties
 .springBeans
 build
 .gradle
-pom.xml
 out
 
 /.gradletasknamecache
