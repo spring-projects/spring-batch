@@ -18,6 +18,7 @@
 		<module>spring-batch-test</module>
 		<module>spring-batch-integration</module>
 		<module>spring-batch-samples</module>
+		<module>spring-batch-jsr352-tck</module>
 	</modules>
 	
 	<organization>

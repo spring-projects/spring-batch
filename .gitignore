@@ -25,3 +25,4 @@ build
 out
 
 /.gradletasknamecache
+/spring-batch-jsr352-tck/jsr352-tck-1.0/results/
