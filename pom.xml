@@ -19,6 +19,7 @@
 		<module>spring-batch-integration</module>
 		<module>spring-batch-samples</module>
 		<module>spring-batch-jsr352-tck</module>
+		<module>spring-batch-docs</module>
 	</modules>
 	
 	<organization>
@@ -147,6 +148,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>${maven-javadoc-plugin.version}</version>
+				<configuration>
+					<excludePackageNames>
+						org.springframework.batch.sample.*
+					</excludePackageNames>
+					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
