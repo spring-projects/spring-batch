@@ -27,7 +27,7 @@
                 <executions>
                     <execution>
                         <id>unpack-resources</id>
-                        <phase>site</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
@@ -59,7 +59,7 @@
                 <executions>
                     <execution>
                         <id>generate-html</id>
-                        <phase>site</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -86,7 +86,7 @@
                     </execution>
                     <execution>
                         <id>generate-pdf</id>
-                        <phase>site</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -104,6 +104,29 @@
                                 <revnumber>${project.version}</revnumber>
                             </attributes>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/docs.xml</descriptor>
+                        <descriptor>src/assembly/schemas.xml</descriptor>
+                        <descriptor>src/assembly/dist.xml</descriptor>
+                    </descriptors>
+                    <finalName>spring-batch-${project.version}</finalName>
+                    <appendAssemblyId>true</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-docs</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
