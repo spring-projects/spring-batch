@@ -1,0 +1,33 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>schemas</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>../spring-batch-core/src/main/resources/org/springframework/batch/core/jsr/configuration/xml</directory>
+            <outputDirectory>batch</outputDirectory>
+            <includes>
+                <include>*.xsd</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../spring-batch-core/src/main/resources/org/springframework/batch/core/configuration/xml</directory>
+            <outputDirectory>batch</outputDirectory>
+            <includes>
+                <include>*.xsd</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../spring-batch-integration/src/main/resources/org/springframework/batch/integration/config/xml</directory>
+            <outputDirectory>batch/integration</outputDirectory>
+            <includes>
+                <include>*.xsd</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+</assembly>
