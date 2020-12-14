@@ -35,9 +35,7 @@ public class JacksonJsonFileItemWriterFunctionalTests extends JsonFileItemWriter
 	protected JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		JacksonJsonObjectMarshaller<Trade> jsonObjectMarshaller = new JacksonJsonObjectMarshaller<>();
-		jsonObjectMarshaller.setObjectMapper(objectMapper);
-		return jsonObjectMarshaller;
+		return new JacksonJsonObjectMarshaller<>(objectMapper);
 	}
 
 	@Override

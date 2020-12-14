@@ -34,9 +34,7 @@ public class GsonJsonFileItemWriterFunctionalTests extends JsonFileItemWriterFun
 	@Override
 	protected JsonObjectMarshaller<Trade> getJsonObjectMarshallerWithPrettyPrint() {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		GsonJsonObjectMarshaller<Trade> jsonObjectMarshaller = new GsonJsonObjectMarshaller<>();
-		jsonObjectMarshaller.setGson(gson);
-		return jsonObjectMarshaller;
+		return new GsonJsonObjectMarshaller<>(gson);
 	}
 
 	@Override

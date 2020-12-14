@@ -30,9 +30,18 @@ public class GsonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
 	private Gson gson = new Gson();
 
+	public GsonJsonObjectMarshaller() {
+		this.gson=new Gson();
+	}
+	
+	public GsonJsonObjectMarshaller(Gson gson) {
+		this.gson=gson;
+	}
+	
 	/**
 	 * Set the {@link Gson} object to use.
 	 * @param gson object to use
+	 * @see #GsonJsonObjectMarshaller(Gson)    
 	 */
 	public void setGson(Gson gson) {
 		this.gson = gson;
