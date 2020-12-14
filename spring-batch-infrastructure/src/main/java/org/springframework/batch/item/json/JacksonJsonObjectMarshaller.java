@@ -31,11 +31,20 @@ import org.springframework.batch.item.ItemStreamException;
  */
 public class JacksonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private ObjectMapper objectMapper;
+
+	public JacksonJsonObjectMarshaller() {
+		this.objectMapper = new ObjectMapper();
+	}
+
+	public JacksonJsonObjectMarshaller(ObjectMapper objectMapper) {
+		this.objectMapper=objectMapper;
+	}
 
 	/**
 	 * Set the {@link ObjectMapper} to use.
 	 * @param objectMapper to use
+	 * @see #JacksonJsonObjectMarshaller(ObjectMapper)
 	 */
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
