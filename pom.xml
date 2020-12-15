@@ -107,12 +107,15 @@
 		<jettison.version>1.2</jettison.version>
 
 		<!-- samples dependencies -->
-		<hibernate-entitymanager.version>5.4.24.Final
-		</hibernate-entitymanager.version>
+		<hibernate-entitymanager.version>5.4.24.Final</hibernate-entitymanager.version>
 		<spring-rabbit.version>2.3.1</spring-rabbit.version>
 		<quartz.version>2.3.2</quartz.version>
 		<prometheus_pushgateway.version>0.9.0</prometheus_pushgateway.version>
 		<groovy.version>2.5.13</groovy.version>
+		
+		<!-- documentation dependencies -->
+		<spring-doc-resources.version>0.2.5</spring-doc-resources.version>
+		<asciidoctorj-pdf.version>1.5.3</asciidoctorj-pdf.version>
 
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -124,6 +127,9 @@
 		<flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-deploy-plugin.version>2.7</maven-deploy-plugin.version>
+		<asciidoctor-maven-plugin.version>2.1.0</asciidoctor-maven-plugin.version>
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
 	</properties>
 
 	<build>
