@@ -58,7 +58,7 @@
 	</bean>
 
 	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" value="file:build/test-outputs/multilineOrderOutput.txt" />
+		<property name="resource" value="file:target/test-outputs/multilineOrderOutput.txt" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.sample.domain.order.internal.OrderLineAggregator">
 				<property name="aggregators" ref="outputAggregators"/>

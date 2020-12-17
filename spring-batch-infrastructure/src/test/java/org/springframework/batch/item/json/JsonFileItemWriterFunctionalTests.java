@@ -70,7 +70,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 
 	@Before
 	public void setUp() throws Exception {
-		Path outputFilePath = Paths.get("build", "trades.json");
+		Path outputFilePath = Paths.get("target", "trades.json");
 		Files.deleteIfExists(outputFilePath);
 		this.resource = new FileSystemResource(outputFilePath.toFile());
 		this.executionContext = new ExecutionContext();
@@ -283,7 +283,7 @@ public abstract class JsonFileItemWriterFunctionalTests {
 	 * If append=true a new output file should still be created on the first run (not restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("build/FlatFileItemWriterTests.out");
+		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
 		File outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
 

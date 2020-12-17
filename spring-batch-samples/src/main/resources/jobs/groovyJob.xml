@@ -35,7 +35,7 @@
 			void execute() {
 			def ant = new AntBuilder()
 			ant.unzip(src:"src/main/resources/data/groovyJob/input/files.zip",
-			dest:"build/groovyJob/staging")
+			dest:"target/groovyJob/staging")
 			}
 			}
 		</lang:inline-script>
@@ -46,9 +46,9 @@
 			class ZipTasklet {
 			void execute() {
 			def ant = new AntBuilder()
-			ant.mkdir(dir:"build/groovyJob/output")
-			ant.zip(destfile:"build/groovyJob/output/files.zip",
-			basedir:"build/groovyJob/staging", includes:"**")
+			ant.mkdir(dir:"target/groovyJob/output")
+			ant.zip(destfile:"target/groovyJob/output/files.zip",
+			basedir:"target/groovyJob/staging", includes:"**")
 			}
 			}
 		</lang:inline-script>

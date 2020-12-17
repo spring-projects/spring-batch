@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 		"/job-runner-context.xml" })
 public class MultiLineFunctionalTests {
 
-	private static final String OUTPUT_FILE = "build/test-outputs/multiLineOutput.txt";
+	private static final String OUTPUT_FILE = "target/test-outputs/multiLineOutput.txt";
 
 	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/multiLine.txt";
 

@@ -74,7 +74,7 @@
 
 	<bean id="fileItemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="name" value="fw1" />
-		<property name="resource" value="file:build/test-outputs/CustomerReport1.txt" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
@@ -82,7 +82,7 @@
 
 	<bean id="fileItemWriter2" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="name" value="fw2" />
-		<property name="resource" value="file:build/test-outputs/CustomerReport2.txt" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
 		<property name="lineAggregator">
 			<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>

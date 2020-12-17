@@ -61,6 +61,6 @@
 	</bean>
 
 	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg value="build/test-outputs/restartFileOutput.csv" />
+		<constructor-arg value="target/test-outputs/restartFileOutput.csv" />
 	</bean>
 </beans>

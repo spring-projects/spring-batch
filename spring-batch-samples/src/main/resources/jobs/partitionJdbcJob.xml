@@ -30,7 +30,7 @@
 	</step>
 
 	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" scope="step">
-		<property name="path" value="file:./build/output/jdbc/" />
+		<property name="path" value="file:./target/output/jdbc/" />
 	</bean>
 
 	<bean id="itemReader" scope="step" autowire-candidate="false" class="org.springframework.batch.item.database.JdbcPagingItemReader">
@@ -60,7 +60,7 @@
 	</bean>
 
 	<bean id="outputTestReader" class="org.springframework.batch.item.file.MultiResourceItemReader" scope="prototype">
-		<property name="resources" value="file:build/output/jdbc/*.csv" />
+		<property name="resources" value="file:target/output/jdbc/*.csv" />
 		<property name="delegate" ref="testItemReader" />
 	</bean>
 

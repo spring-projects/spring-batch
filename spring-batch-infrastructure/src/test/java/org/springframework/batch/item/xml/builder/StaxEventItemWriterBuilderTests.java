@@ -75,7 +75,7 @@ public class StaxEventItemWriterBuilderTests {
 
 	@Before
 	public void setUp() throws IOException {
-		File directory = new File("build/data");
+		File directory = new File("target/data");
 		directory.mkdirs();
 		this.resource = new FileSystemResource(
 				File.createTempFile("StaxEventItemWriterBuilderTests", ".xml", directory));
