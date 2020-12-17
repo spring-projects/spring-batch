@@ -29,6 +29,12 @@ If you want to perform a full build with all integration tests, then run:
 
     $ ./mvnw verify
 
+To generate the reference documentation, run:
+
+    $ ./mvnw site
+
+The reference documentation can be found in `spring-batch-docs/target`.
+
 ## Spring Tool Suite (STS)
 In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 

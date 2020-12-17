@@ -84,13 +84,13 @@
             <outputDirectory>docs/reference/pdf</outputDirectory>
         </file>
         <file>
-            <source>src/dist/license.txt</source>
+            <source>target/classes/license.txt</source>
         </file>
         <file>
-            <source>src/dist/notice.txt</source>
+            <source>target/classes/notice.txt</source>
         </file>
         <file>
-            <source>src/dist/readme.txt</source>
+            <source>target/classes/readme.txt</source>
         </file>
     </files>
 </assembly>
