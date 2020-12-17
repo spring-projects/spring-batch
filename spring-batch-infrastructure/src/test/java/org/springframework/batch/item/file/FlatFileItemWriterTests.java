@@ -527,7 +527,7 @@ public class FlatFileItemWriterTests {
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<>();
 		writer.setLineAggregator(new PassThroughLineAggregator<>());
-		FileSystemResource file = new FileSystemResource("build/no-such-file.foo");
+		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
@@ -838,7 +838,7 @@ public class FlatFileItemWriterTests {
 	 * If append=true a new output file should still be created on the first run (not restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("build/FlatFileItemWriterTests.out");
+		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
 		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
 

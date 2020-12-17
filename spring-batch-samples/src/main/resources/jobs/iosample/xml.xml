@@ -31,6 +31,6 @@
 	</bean>
 
 	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
-		<constructor-arg value="build/test-outputs/output.xml" />
+		<constructor-arg value="target/test-outputs/output.xml" />
 	</bean>
 </beans>

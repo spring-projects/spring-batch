@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 		"/job-runner-context.xml" })
 public class MultiRecordTypeFunctionalTests {
 
-	private static final String OUTPUT_FILE = "build/test-outputs/multiRecordTypeOutput.txt";
+	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
 
 	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/multiRecordType.txt";
 

@@ -28,7 +28,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean<DataSource> 
 
 	private static Log logger = LogFactory.getLog(DerbyDataSourceFactoryBean.class);
 
-	private String dataDirectory = "build/derby-home";
+	private String dataDirectory = "target/derby-home";
 
 	public void setDataDirectory(String dataDirectory) {
 		this.dataDirectory = dataDirectory;
@@ -42,7 +42,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean<DataSource> 
 		System.setProperty("derby.storage.pageCacheSize", "100");
 
 		final EmbeddedDataSource ds = new EmbeddedDataSource();
-		ds.setDatabaseName("build/derbydb");
+		ds.setDatabaseName("target/derbydb");
 		ds.setCreateDatabase("create");
 
 		logger.info("Created instance of " + ds.toString());

@@ -111,7 +111,7 @@ public class StaxEventItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		File directory = new File("build/data");
+		File directory = new File("target/data");
 		directory.mkdirs();
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml", directory));
 		writer = createItemWriter();

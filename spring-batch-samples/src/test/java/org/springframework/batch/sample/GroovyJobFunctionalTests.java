@@ -41,14 +41,14 @@ public class GroovyJobFunctionalTests {
 
 	@Before
 	public void removeOldData() throws IOException {
-		FileUtils.deleteDirectory(new File("build/groovyJob"));
+		FileUtils.deleteDirectory(new File("target/groovyJob"));
 	}
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		assertFalse(new File("build/groovyJob/output/files.zip").exists());
+		assertFalse(new File("target/groovyJob/output/files.zip").exists());
 		jobLauncherTestUtils.launchJob();
-		assertTrue(new File("build/groovyJob/output/files.zip").exists());
+		assertTrue(new File("target/groovyJob/output/files.zip").exists());
 	}
 
 }

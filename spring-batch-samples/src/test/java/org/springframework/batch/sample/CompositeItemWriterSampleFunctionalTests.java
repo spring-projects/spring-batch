@@ -66,8 +66,8 @@ public class CompositeItemWriterSampleFunctionalTests {
 
 		jobLauncherTestUtils.launchJob();
 
-		checkOutputFile("build/test-outputs/CustomerReport1.txt");
-		checkOutputFile("build/test-outputs/CustomerReport2.txt");
+		checkOutputFile("target/test-outputs/CustomerReport1.txt");
+		checkOutputFile("target/test-outputs/CustomerReport2.txt");
 		checkOutputTable(before);
 	}
 

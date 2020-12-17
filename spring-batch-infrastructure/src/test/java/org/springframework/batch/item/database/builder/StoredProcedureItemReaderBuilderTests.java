@@ -208,7 +208,7 @@ public class StoredProcedureItemReaderBuilderTests {
 		public DerbyDataSourceFactoryBean dataSource() {
 			DerbyDataSourceFactoryBean derbyDataSourceFactoryBean = new DerbyDataSourceFactoryBean();
 
-			derbyDataSourceFactoryBean.setDataDirectory("build/derby-home");
+			derbyDataSourceFactoryBean.setDataDirectory("target/derby-home");
 
 			return derbyDataSourceFactoryBean;
 		}
