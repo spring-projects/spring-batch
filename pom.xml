@@ -130,6 +130,9 @@
 		<asciidoctor-maven-plugin.version>2.1.0</asciidoctor-maven-plugin.version>
 		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
 		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
+		<maven-project-info-reports-plugin.version>3.1.1</maven-project-info-reports-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 	</properties>
 
 	<build>
@@ -244,6 +247,11 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven-site-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -414,4 +422,18 @@
 			</roles>
 		</developer>
 	</developers>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin.version}</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
 </project>

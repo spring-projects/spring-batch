@@ -1,4 +1,4 @@
-Spring Batch version ${version}
+Spring Batch version ${project.version}
 =====================================================================================
 
 To find out what has changed since earlier releases, see the 'Releases' section at

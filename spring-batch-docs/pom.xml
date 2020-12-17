@@ -20,7 +20,21 @@
     </dependencies>
     
     <build>
+        <resources>
+            <resource>
+                <directory>src/dist</directory>
+                <includes>
+                    <include>*.txt</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -28,7 +42,7 @@
                 <executions>
                     <execution>
                         <id>unpack-resources</id>
-                        <phase>generate-resources</phase>
+                        <phase>pre-site</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
@@ -60,7 +74,7 @@
                 <executions>
                     <execution>
                         <id>generate-html</id>
-                        <phase>verify</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -87,7 +101,7 @@
                     </execution>
                     <execution>
                         <id>generate-pdf</id>
-                        <phase>verify</phase>
+                        <phase>site</phase>
                         <goals>
                             <goal>process-asciidoc</goal>
                         </goals>
@@ -123,8 +137,8 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>generate-docs</id>
-                        <phase>verify</phase>
+                        <id>create-distribution</id>
+                        <phase>site</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
