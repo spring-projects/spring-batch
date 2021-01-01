@@ -17,29 +17,28 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.Document;
-import org.bson.codecs.DecoderContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.util.json.ParameterBindingDocumentCodec;
 import org.springframework.data.mongodb.util.json.ParameterBindingJsonReader;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import org.bson.Document;
+import org.bson.codecs.DecoderContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -51,16 +50,10 @@ import org.springframework.util.StringUtils;
  * If you set JSON String query {@link #setQuery(String)} then
  * it executes the JSON to retrieve the requested documents.
  * </p>
- * 
+ *
  * <p>
  * If you set Query object {@link #setQuery(Query)} then
  * it executes the Query to retrieve the requested documents.
- * </p>
- * 
- * <p>
- * The query is executed using paged requests specified in the
- * {@link #setPageSize(int)}.  Additional pages are requested as needed to
- * provide data when the {@link #read()} method is called.
  * </p>
  *
  * <p>
@@ -81,10 +74,10 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  */
-public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
-	
+public class MongoItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+
 	private static final Logger log = LoggerFactory.getLogger(MongoItemReader.class);
-	
+
 	private MongoOperations template;
 	private Query query;
 	private String queryString;
@@ -94,12 +87,13 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private String fields;
 	private String collection;
 	private List<Object> parameterValues = new ArrayList<>();
+	private CloseableIterator<? extends T> cursor = null;
 
 	public MongoItemReader() {
 		super();
 		setName(ClassUtils.getShortName(MongoItemReader.class));
 	}
-	
+
 	/**
 	 * A Mongo Query to be used.
 	 *
@@ -187,47 +181,6 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		this.hint = hint;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	protected Iterator<T> doPageRead() {
-		if (queryString != null) {
-			Pageable pageRequest = PageRequest.of(page, pageSize, sort);
-	
-			String populatedQuery = replacePlaceholders(queryString, parameterValues);
-	
-			Query mongoQuery;
-	
-			if(StringUtils.hasText(fields)) {
-				mongoQuery = new BasicQuery(populatedQuery, fields);
-			}
-			else {
-				mongoQuery = new BasicQuery(populatedQuery);
-			}
-	
-			mongoQuery.with(pageRequest);
-	
-			if(StringUtils.hasText(hint)) {
-				mongoQuery.withHint(hint);
-			}
-	
-			if(StringUtils.hasText(collection)) {
-				return (Iterator<T>) template.find(mongoQuery, type, collection).iterator();
-			} else {
-				return (Iterator<T>) template.find(mongoQuery, type).iterator();
-			}
-			
-		} else {
-			Pageable pageRequest = PageRequest.of(page, pageSize);
-			query.with(pageRequest);
-			
-			if(StringUtils.hasText(collection)) {
-				return (Iterator<T>) template.find(query, type, collection).iterator();
-			} else {
-				return (Iterator<T>) template.find(query, type).iterator();
-			}
-		}
-	}
-
 	/**
 	 * Checks mandatory properties
 	 *
@@ -238,7 +191,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		Assert.state(template != null, "An implementation of MongoOperations is required.");
 		Assert.state(type != null, "A type to convert the input into is required.");
 		Assert.state(queryString != null || query != null, "A query is required.");
-		
+
 		if (queryString != null) {
 			Assert.state(sort != null, "A sort is required.");
 		}
@@ -259,5 +212,51 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 		}
 
 		return Sort.by(sortValues);
+	}
+
+	@Override
+	protected T doRead() throws Exception {
+		return cursor.hasNext() ? cursor.next() : null;
+	}
+
+	@Override
+	protected void doOpen() throws Exception {
+		if (queryString != null) {
+			String populatedQuery = replacePlaceholders(queryString, parameterValues);
+
+			Query mongoQuery;
+
+			if (StringUtils.hasText(fields)) {
+				mongoQuery = new BasicQuery(populatedQuery, fields);
+			}
+			else {
+				mongoQuery = new BasicQuery(populatedQuery);
+			}
+
+			if (StringUtils.hasText(hint)) {
+				mongoQuery.withHint(hint);
+			}
+			mongoQuery.with(sort);
+			if (StringUtils.hasText(collection)) {
+				cursor = template.stream(mongoQuery, type, collection);
+			}
+			else {
+				cursor = template.stream(mongoQuery, type);
+			}
+
+		}
+		else {
+			if (StringUtils.hasText(collection)) {
+				cursor = template.stream(query, type, collection);
+			}
+			else {
+				cursor = template.stream(query, type);
+			}
+		}
+	}
+
+	@Override
+	protected void doClose() throws Exception {
+		cursor.close();
 	}
 }

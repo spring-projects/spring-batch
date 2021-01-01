@@ -55,8 +55,6 @@ public class MongoItemReaderBuilder<T> {
 
 	private List<Object> parameterValues = new ArrayList<>();
 
-	protected int pageSize = 10;
-
 	private boolean saveState = true;
 
 	private String name;
@@ -245,20 +243,7 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The number of items to be read with each page.
-	 *
-	 * @param pageSize the number of items
-	 * @return this instance for method chaining
-	 * @see MongoItemReader#setPageSize(int)
-	 */
-	public MongoItemReaderBuilder<T> pageSize(int pageSize) {
-		this.pageSize = pageSize;
-
-		return this;
-	}
-
-	/**
-	 * Provide a Spring Data Mongo {@link Query}.  This will take precedence over a JSON
+	 * Provide a Spring Data Mongo {@link Query}. This will take precedence over a JSON
 	 * configured query.
 	 *
 	 * @param query Query to execute
@@ -299,7 +284,6 @@ public class MongoItemReaderBuilder<T> {
 		reader.setParameterValues(this.parameterValues);
 		reader.setQuery(this.query);
 
-		reader.setPageSize(this.pageSize);
 		reader.setName(this.name);
 		reader.setSaveState(this.saveState);
 		reader.setCurrentItemCount(this.currentItemCount);

@@ -16,27 +16,26 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.data.MongoItemReader;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.util.CloseableIterator;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import org.springframework.batch.item.data.MongoItemReader;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Query;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Glenn Renfro
@@ -47,13 +46,16 @@ public class MongoItemReaderBuilderTests {
 	@Mock
 	private MongoOperations template;
 
+	@Mock
+	private CloseableIterator<String> emptyIterator;
+
 	private Map<String, Sort.Direction> sortOptions;
 
 	private ArgumentCaptor<Query> queryContainer;
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.sortOptions = new HashMap<>();
 		this.sortOptions.put("name", Sort.Direction.DESC);
 		this.queryContainer = ArgumentCaptor.forClass(Query.class);
@@ -63,13 +65,14 @@ public class MongoItemReaderBuilderTests {
 	public void testBasic() throws Exception {
 		MongoItemReader<String> reader = getBasicBuilder().build();
 
-		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.stream(this.queryContainer.capture(), eq(String.class))).thenReturn(emptyIterator);
+
+		reader.open(new ExecutionContext());
 
 		assertNull("reader should not return result", reader.read());
 
 		Query query = this.queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-		assertEquals(0, query.getSkip());
+
 		assertEquals("{}", query.getQueryObject().toJson());
 		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
@@ -80,7 +83,9 @@ public class MongoItemReaderBuilderTests {
 				.fields("{name : 1, age : 1, _id: 0}")
 				.build();
 
-		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.stream(this.queryContainer.capture(), eq(String.class))).thenReturn(emptyIterator);
+
+		reader.open(new ExecutionContext());
 
 		assertNull("reader should not return result", reader.read());
 
@@ -96,7 +101,9 @@ public class MongoItemReaderBuilderTests {
 				.hint("{ $natural : 1}")
 				.build();
 
-		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
+		when(template.stream(this.queryContainer.capture(), eq(String.class))).thenReturn(emptyIterator);
+
+		reader.open(new ExecutionContext());
 
 		assertNull("reader should not return result", reader.read());
 
@@ -114,8 +121,10 @@ public class MongoItemReaderBuilderTests {
 
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
-		when(this.template.find(this.queryContainer.capture(), eq(String.class), collectionContainer.capture()))
-				.thenReturn(new ArrayList<>());
+		when(template.stream(this.queryContainer.capture(), eq(String.class), collectionContainer.capture()))
+				.thenReturn(emptyIterator);
+
+		reader.open(new ExecutionContext());
 
 		assertNull("reader should not return result", reader.read());
 
@@ -135,8 +144,10 @@ public class MongoItemReaderBuilderTests {
 
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
-		when(this.template.find(this.queryContainer.capture(), eq(String.class), collectionContainer.capture()))
-				.thenReturn(new ArrayList<>());
+		when(template.stream(this.queryContainer.capture(), eq(String.class), collectionContainer.capture()))
+				.thenReturn(emptyIterator);
+
+		reader.open(new ExecutionContext());
 
 		assertNull("reader should not return result", reader.read());
 
@@ -147,47 +158,11 @@ public class MongoItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testWithoutQueryLimit() throws Exception {
-		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.query(new Query())
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50)
-				.build();
-
-		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
-
-		assertNull("reader should not return result", reader.read());
-
-		Query query = this.queryContainer.getValue();
-		assertEquals(50, query.getLimit());
-	}
-
-	@Test
-	public void testWithoutQueryLimitAndPageSize() throws Exception {
-		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.query(new Query())
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.build();
-
-		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
-
-		assertNull("reader should not return result", reader.read());
-
-		Query query = this.queryContainer.getValue();
-		assertEquals(10, query.getLimit());
-	}
-
-	@Test
 	public void testNullTemplate() {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class)
 				.jsonQuery("{ }")
 				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "template is required.");
+				.name("mongoReaderTest"), "template is required.");
 	}
 
 	@Test
@@ -195,8 +170,7 @@ public class MongoItemReaderBuilderTests {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
 				.jsonQuery("{ }")
 				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "targetType is required.");
+				.name("mongoReaderTest"), "targetType is required.");
 	}
 
 	@Test
@@ -204,8 +178,7 @@ public class MongoItemReaderBuilderTests {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
 				.targetType(String.class)
 				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "A query is required");
+				.name("mongoReaderTest"), "A query is required");
 	}
 
 	@Test
@@ -213,8 +186,7 @@ public class MongoItemReaderBuilderTests {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
 				.targetType(String.class)
 				.jsonQuery("{ }")
-				.name("mongoReaderTest")
-				.pageSize(50), "sorts map is required.");
+				.name("mongoReaderTest"), "sorts map is required.");
 	}
 
 	@Test
@@ -222,8 +194,7 @@ public class MongoItemReaderBuilderTests {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
 				.targetType(String.class)
 				.jsonQuery("{ }")
-				.sorts(this.sortOptions)
-				.pageSize(50), "A name is required when saveState is set to true");
+				.sorts(this.sortOptions), "A name is required when saveState is set to true");
 	}
 
 	private void validateExceptionMessage(MongoItemReaderBuilder<String> builder, String message) {
@@ -246,7 +217,6 @@ public class MongoItemReaderBuilderTests {
 				.targetType(String.class)
 				.jsonQuery("{ }")
 				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50);
+				.name("mongoReaderTest");
 	}
 }
