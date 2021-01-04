@@ -5,8 +5,8 @@
 buildscript {
 	repositories {
 		mavenCentral()
-		maven { url 'https://repo.spring.io/plugins-release' }
 		maven { url 'https://plugins.gradle.org/m2/' }
+		maven { url 'https://repo.spring.io/plugins-release' }
 	}
 	dependencies {
 		classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
