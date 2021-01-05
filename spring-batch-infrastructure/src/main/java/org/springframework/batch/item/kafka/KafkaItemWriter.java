@@ -19,7 +19,12 @@ package org.springframework.batch.item.kafka;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.KeyValueItemWriter;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.util.Assert;
+import org.springframework.util.concurrent.ListenableFuture;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -34,15 +39,24 @@ import org.springframework.util.Assert;
 public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	protected KafkaTemplate<K, T> kafkaTemplate;
+	private final List<ListenableFuture<SendResult<K, T>>> listenableFutures = new ArrayList<>();
 
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {
-			this.kafkaTemplate.sendDefault(key, null);
+			listenableFutures.add(this.kafkaTemplate.sendDefault(key, null));
 		}
 		else {
-			this.kafkaTemplate.sendDefault(key, value);
+			listenableFutures.add(this.kafkaTemplate.sendDefault(key, value));
 		}
+	}
+	@Override
+	protected void flush() throws Exception{
+		kafkaTemplate.flush();
+		for(ListenableFuture<SendResult<K,T>> future: listenableFutures){
+			future.get();
+		}
+		listenableFutures.clear();
 	}
 
 	@Override
