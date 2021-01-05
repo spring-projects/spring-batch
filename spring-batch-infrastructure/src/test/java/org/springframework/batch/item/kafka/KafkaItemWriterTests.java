@@ -25,16 +25,21 @@ import org.mockito.MockitoAnnotations;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class KafkaItemWriterTests {
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
+
+	@Mock
+	private ListenableFuture<SendResult<String, String>> future;
 
 	private KafkaItemKeyMapper itemKeyMapper;
 
@@ -42,8 +47,9 @@ public class KafkaItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
+		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
 		this.writer = new KafkaItemWriter<>();
 		this.writer.setKafkaTemplate(this.kafkaTemplate);
@@ -90,6 +96,8 @@ public class KafkaItemWriterTests {
 
 		verify(this.kafkaTemplate).sendDefault(items.get(0), items.get(0));
 		verify(this.kafkaTemplate).sendDefault(items.get(1), items.get(1));
+		verify(this.kafkaTemplate).flush();
+		verify(this.future, times(2)).get();
 	}
 
 	@Test
@@ -101,6 +109,8 @@ public class KafkaItemWriterTests {
 
 		verify(this.kafkaTemplate).sendDefault(items.get(0), null);
 		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
+		verify(this.kafkaTemplate).flush();
+		verify(this.future, times(2)).get();
 	}
 
 	@Test
