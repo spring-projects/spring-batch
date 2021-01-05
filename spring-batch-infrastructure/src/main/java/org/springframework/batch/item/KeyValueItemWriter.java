@@ -43,7 +43,9 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 			K key = itemKeyMapper.convert(item);
 			writeKeyValue(key, item);
 		}
+		flush();
 	}
+	protected void flush() throws Exception {}
 
 	/**
 	 * Subclasses implement this method to write each item to key value store
