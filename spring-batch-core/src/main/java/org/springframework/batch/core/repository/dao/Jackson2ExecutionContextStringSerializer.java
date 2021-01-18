@@ -240,6 +240,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
     static class TrustedTypeIdResolver implements TypeIdResolver {
         private static final Set<String> TRUSTED_CLASS_NAMES = Collections.unmodifiableSet(new HashSet(Arrays.asList(
                 "java.util.ArrayList",
+                "java.util.Arrays$ArrayList",
                 "java.util.LinkedList",
                 "java.util.Collections$EmptyList",
                 "java.util.Collections$EmptyMap",

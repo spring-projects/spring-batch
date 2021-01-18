@@ -19,10 +19,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -140,4 +143,23 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 	}
 
 	public static class UnmappedDomesticNumber extends UnmappedPhoneNumber{}
+
+	@Test
+	public void arrayAsListSerializationTest() throws IOException {
+
+		Jackson2ExecutionContextStringSerializer j = new Jackson2ExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>(1);
+		context.put("Arrays.asList", Arrays.asList("foo", "bar"));
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		j.serialize(context, os);
+
+		InputStream in = new ByteArrayInputStream(os.toByteArray());
+
+		context = j.deserialize(in);
+		
+		String[] expectedValue = { "foo", "bar" };
+		List<String> deserializedValue = (List<String>) context.get("Arrays.asList");
+		Assert.assertArrayEquals(expectedValue, deserializedValue.toArray(new String[0]));
+	}
 }
