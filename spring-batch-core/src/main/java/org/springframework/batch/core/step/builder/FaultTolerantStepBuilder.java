@@ -432,6 +432,14 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		}
 		return this;
 	}
+	
+	/**
+	 * Override parent method to prevent creation of a new FaultTolerantStepBuilder
+	 */
+	@Override
+	public FaultTolerantStepBuilder<I, O> faultTolerant() {
+		return this;
+	}
 
 	protected ChunkProvider<I> createChunkProvider() {
 
