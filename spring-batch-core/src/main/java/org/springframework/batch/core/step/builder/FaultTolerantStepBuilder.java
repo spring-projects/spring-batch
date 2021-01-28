@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -430,6 +430,14 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		else {
 			super.stream(stream);
 		}
+		return this;
+	}
+	
+	/**
+	 * Override parent method to prevent creation of a new FaultTolerantStepBuilder
+	 */
+	@Override
+	public FaultTolerantStepBuilder<I, O> faultTolerant() {
 		return this;
 	}
 
