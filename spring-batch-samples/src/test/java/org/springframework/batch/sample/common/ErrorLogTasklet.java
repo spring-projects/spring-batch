@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
@@ -52,7 +53,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	/**
 	 * @return
 	 */
-	private int getSkipCount() {
+	private long getSkipCount() {
 		if (stepExecution == null || stepName == null) {
 			return 0;
 		}

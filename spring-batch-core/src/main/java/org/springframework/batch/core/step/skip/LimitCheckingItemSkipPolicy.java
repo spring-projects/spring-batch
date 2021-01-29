@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,10 +49,11 @@ import org.springframework.classify.Classifier;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  */
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
-	private int skipLimit;
+	private long skipLimit;
 
 	private Classifier<Throwable, Boolean> skippableExceptionClassifier;
 
@@ -90,7 +91,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	 *
 	 * @param skipLimit the skip limit to set
 	 */
-	public void setSkipLimit(int skipLimit) {
+	public void setSkipLimit(long skipLimit) {
 		this.skipLimit = skipLimit;
 	}
 
@@ -124,7 +125,7 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	 * {@link SkipLimitExceededException} will be thrown.
 	 */
 	@Override
-	public boolean shouldSkip(Throwable t, int skipCount) {
+	public boolean shouldSkip(Throwable t, long skipCount) {
 		if (skippableExceptionClassifier.classify(t)) {
 			if (skipCount < skipLimit) {
 				return true;

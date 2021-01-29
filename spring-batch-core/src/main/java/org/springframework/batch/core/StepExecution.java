@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 @SuppressWarnings("serial")
@@ -44,19 +45,19 @@ public class StepExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile int readCount = 0;
+	private volatile long readCount = 0;
 
-	private volatile int writeCount = 0;
+	private volatile long writeCount = 0;
 
-	private volatile int commitCount = 0;
+	private volatile long commitCount = 0;
 
-	private volatile int rollbackCount = 0;
+	private volatile long rollbackCount = 0;
 
-	private volatile int readSkipCount = 0;
+	private volatile long readSkipCount = 0;
 
-	private volatile int processSkipCount = 0;
+	private volatile long processSkipCount = 0;
 
-	private volatile int writeSkipCount = 0;
+	private volatile long writeSkipCount = 0;
 
 	private volatile Date startTime = new Date(System.currentTimeMillis());
 
@@ -70,7 +71,7 @@ public class StepExecution extends Entity {
 
 	private volatile boolean terminateOnly;
 
-	private volatile int filterCount;
+	private volatile long filterCount;
 
 	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
@@ -140,7 +141,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @return the current number of commits
 	 */
-	public int getCommitCount() {
+	public long getCommitCount() {
 		return commitCount;
 	}
 
@@ -149,7 +150,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @param commitCount the current number of commits
 	 */
-	public void setCommitCount(int commitCount) {
+	public void setCommitCount(long commitCount) {
 		this.commitCount = commitCount;
 	}
 
@@ -176,7 +177,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @return the current number of items read for this execution
 	 */
-	public int getReadCount() {
+	public long getReadCount() {
 		return readCount;
 	}
 
@@ -185,7 +186,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @param readCount the current number of read items for this execution
 	 */
-	public void setReadCount(int readCount) {
+	public void setReadCount(long readCount) {
 		this.readCount = readCount;
 	}
 
@@ -194,7 +195,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @return the current number of items written for this execution
 	 */
-	public int getWriteCount() {
+	public long getWriteCount() {
 		return writeCount;
 	}
 
@@ -203,7 +204,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @param writeCount the current number of written items for this execution
 	 */
-	public void setWriteCount(int writeCount) {
+	public void setWriteCount(long writeCount) {
 		this.writeCount = writeCount;
 	}
 
@@ -212,7 +213,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @return the current number of rollbacks for this execution
 	 */
-	public int getRollbackCount() {
+	public long getRollbackCount() {
 		return rollbackCount;
 	}
 
@@ -221,7 +222,7 @@ public class StepExecution extends Entity {
 	 *
 	 * @return the current number of items filtered out of this execution
 	 */
-	public int getFilterCount() {
+	public long getFilterCount() {
 		return filterCount;
 	}
 
@@ -230,15 +231,15 @@ public class StepExecution extends Entity {
 	 * @param filterCount the number of items filtered out of this execution to
 	 * set
 	 */
-	public void setFilterCount(int filterCount) {
+	public void setFilterCount(long filterCount) {
 		this.filterCount = filterCount;
 	}
 
 	/**
 	 * Setter for number of rollbacks for this execution
-	 * @param rollbackCount int the number of rollbacks.
+	 * @param rollbackCount long the number of rollbacks.
 	 */
-	public void setRollbackCount(int rollbackCount) {
+	public void setRollbackCount(long rollbackCount) {
 		this.rollbackCount = rollbackCount;
 	}
 
@@ -383,7 +384,7 @@ public class StepExecution extends Entity {
 	/**
 	 * @return the total number of items skipped.
 	 */
-	public int getSkipCount() {
+	public long getSkipCount() {
 		return readSkipCount + processSkipCount + writeSkipCount;
 	}
 
@@ -410,48 +411,48 @@ public class StepExecution extends Entity {
 	/**
 	 * @return the number of records skipped on read
 	 */
-	public int getReadSkipCount() {
+	public long getReadSkipCount() {
 		return readSkipCount;
 	}
 
 	/**
 	 * @return the number of records skipped on write
 	 */
-	public int getWriteSkipCount() {
+	public long getWriteSkipCount() {
 		return writeSkipCount;
 	}
 
 	/**
 	 * Set the number of records skipped on read
 	 *
-	 * @param readSkipCount int containing read skip count to be used for the step execution.
+	 * @param readSkipCount long containing read skip count to be used for the step execution.
 	 */
-	public void setReadSkipCount(int readSkipCount) {
+	public void setReadSkipCount(long readSkipCount) {
 		this.readSkipCount = readSkipCount;
 	}
 
 	/**
 	 * Set the number of records skipped on write
 	 *
-	 * @param writeSkipCount int containing write skip count to be used for the step execution.
+	 * @param writeSkipCount long containing write skip count to be used for the step execution.
 	 */
-	public void setWriteSkipCount(int writeSkipCount) {
+	public void setWriteSkipCount(long writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
 	}
 
 	/**
 	 * @return the number of records skipped during processing
 	 */
-	public int getProcessSkipCount() {
+	public long getProcessSkipCount() {
 		return processSkipCount;
 	}
 
 	/**
 	 * Set the number of records skipped during processing.
 	 *
-	 * @param processSkipCount int containing process skip count to be used for the step execution.
+	 * @param processSkipCount long containing process skip count to be used for the step execution.
 	 */
-	public void setProcessSkipCount(int processSkipCount) {
+	public void setProcessSkipCount(long processSkipCount) {
 		this.processSkipCount = processSkipCount;
 	}
 

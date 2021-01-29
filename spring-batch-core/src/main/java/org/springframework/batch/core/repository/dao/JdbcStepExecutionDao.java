@@ -227,9 +227,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getWriteSkipCount(), stepExecution.getProcessSkipCount(),
 				stepExecution.getRollbackCount(), stepExecution.getLastUpdated() };
 		Integer[] parameterTypes = new Integer[] { Types.BIGINT, Types.INTEGER, Types.VARCHAR, Types.BIGINT,
-				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-				Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-				Types.INTEGER, Types.TIMESTAMP };
+				Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT,
+				Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.BIGINT,
+				Types.BIGINT, Types.TIMESTAMP };
 		parameters.add(0, Arrays.copyOf(parameterValues,parameterValues.length));
 		parameters.add(1, Arrays.copyOf(parameterTypes,parameterTypes.length));
 		return parameters;

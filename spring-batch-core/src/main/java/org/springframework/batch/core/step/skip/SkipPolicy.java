@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,6 @@ public interface SkipPolicy {
 	 * @throws SkipLimitExceededException if a limit is breached
 	 * @throws IllegalArgumentException if the exception is null
 	 */
-	boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException;
+	boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@ package org.springframework.batch.core.step.skip;
  * indicating that an item should not be skipped.
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  */
 public class NeverSkipItemSkipPolicy implements SkipPolicy{
 
 	@Override
-	public boolean shouldSkip(Throwable t, int skipCount) {
+	public boolean shouldSkip(Throwable t, long skipCount) {
 		return false;
 	}
 

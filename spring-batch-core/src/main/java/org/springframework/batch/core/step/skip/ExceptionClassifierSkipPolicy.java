@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.classify.SubclassClassifier;
  * decision, and then delegates to the classifier result.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @see SubclassClassifier
  */
@@ -66,7 +67,7 @@ public class ExceptionClassifierSkipPolicy implements SkipPolicy {
 	 * @throws SkipLimitExceededException if a limit is exceeded
 	 */
 	@Override
-	public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
+	public boolean shouldSkip(Throwable t, long skipCount) throws SkipLimitExceededException {
 		return classifier.classify(t).shouldSkip(t, skipCount);
 	}
 
