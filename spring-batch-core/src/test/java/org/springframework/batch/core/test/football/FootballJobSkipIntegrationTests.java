@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,10 +96,10 @@ public class FootballJobSkipIntegrationTests extends AbstractIntegrationTests {
 			if (stepExecution.getStepName().equals("playerload")) {
 				// The effect of the retries is to increase the number of
 				// rollbacks
-				int commitInterval = stepExecution.getReadCount() / (stepExecution.getCommitCount() - 1);
+				long commitInterval = stepExecution.getReadCount() / (stepExecution.getCommitCount() - 1);
 				// Account for the extra empty commit if the read count is
 				// commensurate with the commit interval
-				int effectiveCommitCount = stepExecution.getReadCount() % commitInterval == 0 ? stepExecution
+				long effectiveCommitCount = stepExecution.getReadCount() % commitInterval == 0 ? stepExecution
 						.getCommitCount() - 1 : stepExecution.getCommitCount();
 				long expectedRollbacks = Math.max(1, retryLimit) * effectiveCommitCount + stepExecution.getReadCount();
 				assertEquals(expectedRollbacks, stepExecution.getRollbackCount());

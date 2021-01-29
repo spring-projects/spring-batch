@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 	 * @param e the cause of the skip
 	 * @param skipCount the current skip count
 	 */
-	private boolean shouldSkip(SkipPolicy policy, Throwable e, int skipCount) {
+	private boolean shouldSkip(SkipPolicy policy, Throwable e, long skipCount) {
 		try {
 			return policy.shouldSkip(e, skipCount);
 		}
