@@ -14,7 +14,7 @@
 	</bean>
 
 	<bean id="dataSource" class="test.jdbc.datasource.DerbyDataSourceFactoryBean">
-		<property name="dataDirectory" value="build/derby-home"/>
+		<property name="dataDirectory" value="target/derby-home"/>
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

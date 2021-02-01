@@ -55,7 +55,7 @@ import org.springframework.util.DigestUtils;
 public class JsonSupportIntegrationTests {
 
 	private static final String INPUT_FILE_DIRECTORY = "src/test/resources/org/springframework/batch/item/json/";
-	private static final String OUTPUT_FILE_DIRECTORY = "build/";
+	private static final String OUTPUT_FILE_DIRECTORY = "target/";
 
 	@Before
 	public void setUp() throws Exception {

@@ -60,8 +60,8 @@ public class LastModifiedResourceComparatorTests {
 
 	@Test
 	public void testCompareNewWithOldAfterCopy() throws Exception {
-		File temp1 = new File("build/temp1.txt");
-		File temp2 = new File("build/temp2.txt");
+		File temp1 = new File("target/temp1.txt");
+		File temp2 = new File("target/temp2.txt");
 		if (temp1.exists()) temp1.delete();
 		if (temp2.exists()) temp2.delete();
 		temp1.getParentFile().mkdirs();

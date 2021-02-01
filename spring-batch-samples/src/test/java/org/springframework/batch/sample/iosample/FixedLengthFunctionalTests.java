@@ -33,7 +33,7 @@ public class FixedLengthFunctionalTests extends AbstractIoSampleTests {
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
 		JobParameters jobParameters = super.getUniqueJobParametersBuilder().addString("inputFile",
-				"file:./build/test-outputs/fixedLengthOutput.txt").toJobParameters();
+				"file:./target/test-outputs/fixedLengthOutput.txt").toJobParameters();
 		StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution(jobParameters);
 		StepSynchronizationManager.close();
 		StepSynchronizationManager.register(stepExecution);
@@ -43,7 +43,7 @@ public class FixedLengthFunctionalTests extends AbstractIoSampleTests {
 	protected JobParameters getUniqueJobParameters() {
 		return super.getUniqueJobParametersBuilder().addString("inputFile",
 				"data/iosample/input/fixedLength.txt").addString("outputFile",
-				"file:./build/test-outputs/fixedLengthOutput.txt").toJobParameters();
+				"file:./target/test-outputs/fixedLengthOutput.txt").toJobParameters();
 	}
 
 }

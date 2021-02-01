@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 		"/job-runner-context.xml" })
 public class MultilineOrderJobFunctionalTests {
 
-	private static final String ACTUAL = "build/test-outputs/multilineOrderOutput.txt";
+	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";
 	private static final String EXPECTED = "data/multilineOrderJob/result/multilineOrderOutput.txt";
 
 	@Autowired

@@ -35,7 +35,7 @@
 	<bean id="itemWriter" class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemWriter">
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
-				<property name="resource" value="file:build/test-outputs/multiLineOutput.txt" />
+				<property name="resource" value="file:target/test-outputs/multiLineOutput.txt" />
 				<property name="lineAggregator">
 					<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 				</property>

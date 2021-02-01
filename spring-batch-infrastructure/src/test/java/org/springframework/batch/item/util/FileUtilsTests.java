@@ -38,7 +38,7 @@ import static org.junit.Assert.fail;
  */
 public class FileUtilsTests {
 
-	private File file = new File("build/FileUtilsTests.tmp");
+	private File file = new File("target/FileUtilsTests.tmp");
 
 	/**
 	 * No restart + file should not be overwritten => file is created if it does

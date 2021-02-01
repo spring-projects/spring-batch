@@ -1,4 +1,4 @@
-# Spring Batch [![build status](https://build.spring.io/plugins/servlet/wittified/build-status/BATCH-GRAD)](https://build.spring.io/browse/BATCH-GRAD)
+# Spring Batch [![build status](https://build.spring.io/plugins/servlet/wittified/build-status/BATCH-MCI)](https://build.spring.io/browse/BATCH-MCI)
 
 Spring Batch is a lightweight, comprehensive batch framework designed to enable the development of robust batch applications vital for the daily operations of enterprise systems.  Spring Batch builds upon the productivity, POJO-based development approach, and general ease of use capabilities people have come to know from the [Spring Framework](https://github.com/spring-projects/spring-framework), while making it easy for developers to access and leverage more advanced enterprise services when necessary.
 
@@ -21,16 +21,22 @@ Clone the git repository using the URL on the Github home page:
 
 ## Command Line
 
-Gradle is the build tool used for Spring Batch. You can build the project via the command:
+Maven is the build tool used for Spring Batch. You can build the project via the command:
 
-    $ ./gradlew build
+    $ ./mvnw package
 
-If you want to perform a full build with all integration tests, ensure you have Docker installed then run:
+If you want to perform a full build with all integration tests, then run:
 
-    $ ./gradlew build -Palltests
+    $ ./mvnw verify
+
+To generate the reference documentation, run:
+
+    $ ./mvnw site
+
+The reference documentation can be found in `spring-batch-docs/target`.
 
 ## Spring Tool Suite (STS)
-In STS (or any Eclipse distro or other IDE with Gradle support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
+In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 
 # Getting Started Using Spring Boot
 This is the quickest way to get started with a new Spring Batch project.  You find the Getting Started Guide for Spring

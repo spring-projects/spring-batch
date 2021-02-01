@@ -542,7 +542,7 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testDirectoryResource() throws Exception {
 
-		FileSystemResource resource = new FileSystemResource("build/data");
+		FileSystemResource resource = new FileSystemResource("target/data");
 		resource.getFile().mkdirs();
 		assertTrue(resource.getFile().isDirectory());
 		source.setResource(resource);

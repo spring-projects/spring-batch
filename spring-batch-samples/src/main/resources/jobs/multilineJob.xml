@@ -23,7 +23,7 @@
 
 	<bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource"
-			value="file:build/test-outputs/20070122.testStream.multilineStep.txt" />
+			value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 		<property name="lineAggregator">
 			<bean
 				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />

@@ -28,7 +28,7 @@ public class OutputFileListenerTests {
 	@Test
 	public void testCreateOutputNameFromInput() {
 		listener.createOutputNameFromInput(stepExecution);
-		assertEquals("{outputFile=file:./build/output/foo.csv}", stepExecution.getExecutionContext().toString());
+		assertEquals("{outputFile=file:./target/output/foo.csv}", stepExecution.getExecutionContext().toString());
 	}
 
 	@Test

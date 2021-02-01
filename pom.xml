@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.batch</groupId>
+	<artifactId>spring-batch</artifactId>
+	<name>Spring Batch</name>
+	<description>Spring Batch is a lightweight, comprehensive batch framework
+		designed to enable the development of robust batch applications vital
+		for the daily operations of enterprise systems. Spring Batch is part of
+		the Spring Portfolio.</description>
+	<version>5.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<url>https://projects.spring.io/spring-batch</url>
+
+	<modules>
+		<module>spring-batch-infrastructure</module>
+		<module>spring-batch-core</module>
+		<module>spring-batch-test</module>
+		<module>spring-batch-integration</module>
+		<module>spring-batch-samples</module>
+		<module>spring-batch-jsr352-tck</module>
+		<module>spring-batch-docs</module>
+	</modules>
+	
+	<organization>
+		<name>Spring</name>
+		<url>https://spring.io</url>
+	</organization>
+	<scm>
+		<url>https://github.com/spring-projects/spring-batch</url>
+		<connection>git://github.com/spring-projects/spring-batch.git</connection>
+		<developerConnection>git@github.com:spring-projects/spring-batch.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/spring-projects/spring-batch/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Bamboo</system>
+		<url>https://build.spring.io/browse/BATCH</url>
+	</ciManagement>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<properties>
+		<!-- common properties -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+
+		<!-- production dependencies -->
+		<spring-framework.version>5.3.1</spring-framework.version>
+		<spring-retry.version>1.3.0</spring-retry.version>
+		<spring-integration.version>5.4.1</spring-integration.version>
+		<micrometer.version>1.6.1</micrometer.version>
+		<jackson.version>2.11.3</jackson.version>
+
+		<!-- optional production dependencies -->
+		<spring-data-geode.version>2.4.1</spring-data-geode.version>
+		<spring-data-commons.version>2.4.1</spring-data-commons.version>
+		<spring-data-jpa.version>2.4.1</spring-data-jpa.version>
+		<spring-data-mongodb.version>3.1.1</spring-data-mongodb.version>
+		<spring-kafka.version>2.6.3</spring-kafka.version>
+		<spring-amqp.version>2.3.1</spring-amqp.version>
+		<spring-ldap.version>2.3.3.RELEASE</spring-ldap.version>
+		<avro.version>1.9.2</avro.version>
+		<gson.version>2.8.6</gson.version>
+		<hibernate-core.version>5.4.23.Final</hibernate-core.version>
+		<javax.mail-api.version>1.6.2</javax.mail-api.version>
+		<javax.jms-api.version>2.0.1</javax.jms-api.version>
+		<javax.batch-api.version>1.0</javax.batch-api.version>
+		<validation-api.version>2.0.1.Final</validation-api.version>
+		<neo4j-ogm-core.version>3.2.17</neo4j-ogm-core.version>
+		<mongodb-driver-sync.version>4.1.1</mongodb-driver-sync.version>
+		<xstream.version>1.4.12</xstream.version>
+		<junit-jupiter.version>5.7.0</junit-jupiter.version>
+
+		<!-- test dependencies -->
+		<junit.version>4.13.1</junit.version>
+		<hamcrest.version>2.2</hamcrest.version>
+		<assertj.version>3.18.1</assertj.version>
+		<mockito.version>3.6.0</mockito.version>
+		<xmlunit.version>2.8.1</xmlunit.version>
+		<commons-io.version>2.8.0</commons-io.version>
+		<commons-dbcp2.version>2.8.0</commons-dbcp2.version>
+		<slf4j.version>1.7.30</slf4j.version>
+		<hsqldb.version>2.5.1</hsqldb.version>
+		<h2.version>1.4.200</h2.version>
+		<sqlite.version>3.32.3.2</sqlite.version>
+		<derby.version>10.14.2.0</derby.version>
+		<activemq.version>5.15.13</activemq.version>
+		<jaxb-api.version>2.3.1</jaxb-api.version>
+		<jaxb-core.version>2.3.0.1</jaxb-core.version>
+		<log4j.version>2.13.3</log4j.version>
+		<hibernate-validator.version>6.1.6.Final</hibernate-validator.version>
+		<javax.el.version>3.0.0</javax.el.version>
+		<woodstox-core.version>6.2.3</woodstox-core.version>
+		<aspectj.version>1.9.6</aspectj.version>
+		<mysql-connector-java.version>8.0.22</mysql-connector-java.version>
+		<testcontainers.version>1.14.3</testcontainers.version>
+		<com.ibm.jbatch-tck-spi.version>1.0</com.ibm.jbatch-tck-spi.version>
+		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+		<javax.inject.version>1</javax.inject.version>
+		<jettison.version>1.2</jettison.version>
+
+		<!-- samples dependencies -->
+		<hibernate-entitymanager.version>5.4.24.Final</hibernate-entitymanager.version>
+		<spring-rabbit.version>2.3.1</spring-rabbit.version>
+		<quartz.version>2.3.2</quartz.version>
+		<prometheus_pushgateway.version>0.9.0</prometheus_pushgateway.version>
+		<groovy.version>2.5.13</groovy.version>
+		
+		<!-- documentation dependencies -->
+		<spring-doc-resources.version>0.2.5</spring-doc-resources.version>
+		<asciidoctorj-pdf.version>1.5.3</asciidoctorj-pdf.version>
+
+		<!-- plugin versions -->
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+		<flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
+		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+		<asciidoctor-maven-plugin.version>2.1.0</asciidoctor-maven-plugin.version>
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
+		<maven-project-info-reports-plugin.version>3.1.1</maven-project-info-reports-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<argLine>${surefireArgLine}</argLine>
+					<excludes>
+						<exclude>**/*IntegrationTests.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven-failsafe-plugin.version}</version>
+				<configuration>
+					<includes>
+						<include>**/*IntegrationTests.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Implementation-Title>${project.artifactId}</Implementation-Title>
+							<Implementation-Version>${project.version}</Implementation-Version>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<configuration>
+					<excludePackageNames>
+						org.springframework.batch.sample.*
+					</excludePackageNames>
+					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>generate-aggregate-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>aggregate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>${flatten-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+						<configuration>
+							<updatePomFile>true</updatePomFile>
+							<flattenMode>ossrh</flattenMode>
+							<pomElements>
+								<distributionManagement>remove</distributionManagement>
+								<repositories>remove</repositories>
+								<scm>keep</scm>
+								<url>keep</url>
+								<organization>resolve</organization>
+							</pomElements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven-site-plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>test-coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco-maven-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>pre-unit-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<propertyName>surefireArgLine</propertyName>
+									<destFile>${project.build.directory}/jacoco.exec</destFile>
+								</configuration>
+							</execution>
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<dataFile>${project.build.directory}/jacoco.exec</dataFile>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>sign-artifacts</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<repositories>
+		<repository>
+			<id>maven-central</id>
+			<url>https://repo.maven.apache.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/libs-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>spring-releases</id>
+			<name>Spring Releases</name>
+			<url>https://repo.spring.io/libs-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-releases</id>
+			<name>Spring releases</name>
+			<url>https://repo.spring.io/plugins-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<developers>
+		<developer>
+			<id>dsyer</id>
+			<name>Dave Syer</name>
+			<email>dsyer@vmware.com</email>
+		</developer>
+		<developer>
+			<id>nebhale</id>
+			<name>Ben Hale</name>
+			<email>bhale@vmware.com</email>
+		</developer>
+		<developer>
+			<id>lward</id>
+			<name>Lucas Ward</name>
+		</developer>
+		<developer>
+			<id>robokaso</id>
+			<name>Robert Kasanicky</name>
+			<email>robokaso@gmail.com</email>
+		</developer>
+		<developer>
+			<id>trisberg</id>
+			<name>Thomas Risberg</name>
+			<email>trisberg@vmware.com</email>
+		</developer>
+		<developer>
+			<id>dhgarrette</id>
+			<name>Dan Garrette</name>
+			<email>dhgarrette@gmail.com</email>
+		</developer>
+		<developer>
+			<id>mminella</id>
+			<name>Michael Minella</name>
+			<email>mminella@vmware.com</email>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>chrisjs</id>
+			<name>Chris Schaefer</name>
+			<email>cschaefer@vmware.com</email>
+		</developer>
+		<developer>
+			<id>benas</id>
+			<name>Mahmoud Ben Hassine</name>
+			<email>mbenhassine@vmware.com</email>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin.version}</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>

@@ -61,6 +61,6 @@
 	</bean>
 	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String"
-			value="build/test-outputs/headerFooterOutput.txt" />
+			value="target/test-outputs/headerFooterOutput.txt" />
 	</bean>
 </beans>

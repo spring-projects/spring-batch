@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @PropertySource("classpath:remote-partitioning.properties")
 public abstract class RemotePartitioningJobFunctionalTests {
 
-	private static final String BROKER_DATA_DIRECTORY = "build/activemq-data";
+	private static final String BROKER_DATA_DIRECTORY = "target/activemq-data";
 
 	@Value("${broker.url}")
 	private String brokerUrl;

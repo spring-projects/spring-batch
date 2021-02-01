@@ -22,7 +22,8 @@ s3.properties
 .springBeans
 build
 .gradle
-pom.xml
 out
 
 /.gradletasknamecache
+/spring-batch-jsr352-tck/jsr352-tck-1.0/results/
+**/*.flattened-pom.xml

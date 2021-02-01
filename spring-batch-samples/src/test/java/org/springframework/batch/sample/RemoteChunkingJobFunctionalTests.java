@@ -46,7 +46,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @PropertySource("classpath:remote-chunking.properties")
 public class RemoteChunkingJobFunctionalTests {
 
-	private static final String BROKER_DATA_DIRECTORY = "build/activemq-data";
+	private static final String BROKER_DATA_DIRECTORY = "target/activemq-data";
 
 	@Value("${broker.url}")
 	private String brokerUrl;
