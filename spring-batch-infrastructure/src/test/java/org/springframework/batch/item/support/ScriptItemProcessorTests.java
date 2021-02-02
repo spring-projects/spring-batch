@@ -154,6 +154,8 @@ public class ScriptItemProcessorTests {
 
 	@Test
 	public void testItemBinding() throws Exception {
+		assumeTrue(languageExists("javascript"));
+
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setScriptSource("foo.contains('World');", "javascript");
 		scriptItemProcessor.setItemBindingVariableName("foo");
