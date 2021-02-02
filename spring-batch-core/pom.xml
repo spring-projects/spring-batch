@@ -63,6 +63,12 @@
 
 		<!-- optional production dependencies -->
 		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>${javax.annotation-api.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>${aspectj.version}</version>
@@ -179,15 +185,27 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.ibm.jbatch</groupId>
-			<artifactId>com.ibm.jbatch-tck-spi</artifactId>
-			<version>${com.ibm.jbatch-tck-spi.version}</version>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>${jaxb-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>${javax.annotation-api.version}</version>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>${jaxb-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>${jaxb-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm.jbatch</groupId>
+			<artifactId>com.ibm.jbatch-tck-spi</artifactId>
+			<version>${com.ibm.jbatch-tck-spi.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
