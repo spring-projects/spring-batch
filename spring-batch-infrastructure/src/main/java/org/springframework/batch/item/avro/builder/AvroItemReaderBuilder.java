@@ -100,6 +100,7 @@ public class AvroItemReaderBuilder<T> {
 	/**
 	 * Disable or enable reading an embedded Avro schema. True by default.
 	 * @param embeddedSchema set to false to if the input does not contain an Avro schema.
+	 * @return The current instance of the builder.   
 	 */
 	public AvroItemReaderBuilder<T> embeddedSchema(boolean embeddedSchema) {
 		this.embeddedSchema = embeddedSchema;

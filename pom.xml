@@ -198,6 +198,7 @@
 						org.springframework.batch.sample.*
 					</excludePackageNames>
 					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
+					<detectJavaApiLink>false</detectJavaApiLink>
 				</configuration>
 				<executions>
 					<execution>
