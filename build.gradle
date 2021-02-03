@@ -107,7 +107,7 @@ allprojects {
 		docResourcesVersion = '0.2.5'
 		assertjVersion='3.18.1'
 		mongoDbDriverSyncVersion='4.1.1'
-		testcontainersVersion='1.15.0'
+		testcontainersVersion='1.15.1'
 		neo4jVersion='3.2.18'
 	}
 
