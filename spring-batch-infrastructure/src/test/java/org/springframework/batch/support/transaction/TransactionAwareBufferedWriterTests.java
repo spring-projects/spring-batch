@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
  * @author Dave Syer
  * @author Michael Minella
  * @author Will Schipp
+ * @author Niels Ferguson
  * 
  */
 public class TransactionAwareBufferedWriterTests {
@@ -335,6 +336,27 @@ public class TransactionAwareBufferedWriterTests {
 		for(int i=0; i< limit; i++) {
 			assertEquals(String.valueOf(i), results[i]);
 		}				
+	}
+
+	//BATCH-3745
+	@Test
+	public void testWriteInTransactionWithOffset() throws IOException{
+		ArgumentCaptor<ByteBuffer> bb = ArgumentCaptor.forClass(ByteBuffer.class);
+		when(fileChannel.write(bb.capture())).thenReturn(3);
+
+		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
+
+			try {
+				writer.write("hamburger", 4, 3);
+			} catch (IOException e) {
+				throw new IllegalStateException("Unexpected IOException", e);
+			}
+			return null;
+		});
+
+		String s = getStringFromByteBuffer(bb.getValue());
+
+		assertEquals("urg", s);
 	}
 
 	private String getStringFromByteBuffer(ByteBuffer bb) {
