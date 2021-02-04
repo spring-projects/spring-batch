@@ -105,6 +105,7 @@
 		<com.ibm.jbatch-tck-spi.version>1.0</com.ibm.jbatch-tck-spi.version>
 		<javax.inject.version>1</javax.inject.version>
 		<jettison.version>1.2</jettison.version>
+		<jsonassert.version>1.5.0</jsonassert.version>
 
 		<!-- samples dependencies -->
 		<hibernate-entitymanager.version>5.4.24.Final</hibernate-entitymanager.version>
