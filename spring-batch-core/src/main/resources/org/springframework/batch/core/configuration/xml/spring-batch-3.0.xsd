@@ -479,7 +479,7 @@
 							The flow that will execute in this step.
 							]]></xsd:documentation>
 								<xsd:appinfo>
-									<tool:annotation kind="parent">
+									<tool:annotation kind="ref">
 										<tool:expected-type type="org.springframework.batch.core.job.flow.Flow" />
 									</tool:annotation>
 								</xsd:appinfo>
