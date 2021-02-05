@@ -46,7 +46,7 @@ Batch on Spring.io: [Creating a Batch Service](https://spring.io/guides/gs/batch
 
 It requires an internet connection for download, and access to a Maven repository (remote or local).
 
-* Download STS version 3.4.* (or better) from the [Spring website](https://spring.io/tools/sts/).  STS is a free Eclipse bundle with many features useful for Spring developers.
+* Download STS version 3.4.* (or better) from the [Spring website](https://spring.io/tools).  STS is a free Eclipse bundle with many features useful for Spring developers.
 * Go to `File->New->Spring Template Project` from the menu bar (in the Spring perspective).
 * The wizard has a drop down with a list of template projects.  One of them is a "Simple Spring Batch Project".  Select it and follow the wizard.
 * A project is created with all dependencies and a simple input/output job configuration.  It can be run using a unit test, or on the command line (see instructions in the pom.xml).
