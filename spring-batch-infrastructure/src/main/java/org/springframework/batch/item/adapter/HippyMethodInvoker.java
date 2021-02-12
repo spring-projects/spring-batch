@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,41 +36,35 @@ public class HippyMethodInvoker extends MethodInvoker {
 	protected Method findMatchingMethod() {
 		String targetMethod = getTargetMethod();
 		Object[] arguments = getArguments();
-		int argCount = arguments.length;
 
 		Method[] candidates = ReflectionUtils.getAllDeclaredMethods(getTargetClass());
 		int minTypeDiffWeight = Integer.MAX_VALUE;
 		Method matchingMethod = null;
 
 		Object[] transformedArguments = null;
-		int transformedArgumentCount = 0;
 
-		for (int i = 0; i < candidates.length; i++) {
-			Method candidate = candidates[i];
+		for (Method candidate : candidates) {
 			if (candidate.getName().equals(targetMethod)) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 				Object[] candidateArguments = new Object[paramTypes.length];
 				int assignedParameterCount = 0;
-				boolean assigned = paramTypes.length==0;
-				for (int j = 0; j < arguments.length; j++) {
-					for (int k = 0; k < paramTypes.length; k++) {
+				for (Object argument : arguments) {
+					for (int i = 0; i < paramTypes.length; i++) {
 						// Pick the first assignable of the right type that
 						// matches this slot and hasn't already been filled...
-						if (ClassUtils.isAssignableValue(paramTypes[k], arguments[j]) && candidateArguments[k] == null) {
-							candidateArguments[k] = arguments[j];
+						if (ClassUtils.isAssignableValue(paramTypes[i], argument) && candidateArguments[i] == null) {
+							candidateArguments[i] = argument;
 							assignedParameterCount++;
-							assigned = true;
 							break;
 						}
 					}
 				}
-				if (assigned && paramTypes.length <= argCount) {
+				if (paramTypes.length == assignedParameterCount) {
 					int typeDiffWeight = getTypeDifferenceWeight(paramTypes, candidateArguments);
 					if (typeDiffWeight < minTypeDiffWeight) {
 						minTypeDiffWeight = typeDiffWeight;
 						matchingMethod = candidate;
 						transformedArguments = candidateArguments;
-						transformedArgumentCount = assignedParameterCount;
 					}
 				}
 			}
@@ -78,11 +72,6 @@ public class HippyMethodInvoker extends MethodInvoker {
 
 		if (transformedArguments == null) {
 			throw new IllegalArgumentException("No matching arguments found for method: " + targetMethod);
-		}
-
-		if (transformedArgumentCount < transformedArguments.length) {
-			throw new IllegalArgumentException("Only " + transformedArgumentCount + " out of "
-					+ transformedArguments.length + " arguments could be assigned.");
 		}
 
 		setArguments(transformedArguments);
