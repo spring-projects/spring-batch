@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2012 the original author or authors.
+ * Copyright 2010-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class HippyMethodInvokerTests {
 		HippyMethodInvoker invoker = new HippyMethodInvoker();
 		invoker.setTargetMethod("duplicate");
 		invoker.setTargetObject(new PlainPojo());
-		invoker.setArguments(new Object[] { "2", "foo" });
+		invoker.setArguments("2", "foo");
 		invoker.prepare();
 		assertEquals("foo.2", invoker.invoke());
 	}
@@ -95,9 +95,36 @@ public class HippyMethodInvokerTests {
 		assertEquals(target.foo(arg), Set.class);
 
 		invoker.setTargetObject(target);
-		invoker.setArguments(new Object[] { arg });
+		invoker.setArguments(arg);
 		invoker.prepare();
 		assertEquals(invoker.invoke(), Set.class);
+
+	}
+
+	@Test
+	public void testOverloadedMethodWithTwoArgumentsAndOneExactMatch() throws Exception {
+
+		HippyMethodInvoker invoker = new HippyMethodInvoker();
+		invoker.setTargetMethod("foo");
+		@SuppressWarnings("unused")
+		class OverloadingPojo {
+			public Class<?> foo(String arg1, Number arg2) {
+				return Number.class;
+			}
+			public Class<?> foo(String arg1, List<?> arg2) {
+				return List.class;
+			}
+		}
+
+		String exactArg = "string";
+		Integer inexactArg = 0;
+		OverloadingPojo target = new OverloadingPojo();
+		assertEquals(target.foo(exactArg, inexactArg), Number.class);
+
+		invoker.setTargetObject(target);
+		invoker.setArguments(exactArg, inexactArg);
+		invoker.prepare();
+		assertEquals(invoker.invoke(), Number.class);
 
 	}
 
