@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2019 the original author or authors.
+ * Copyright 2015-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -63,9 +64,11 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ConcurrentTransactionTests.ConcurrentJobConfiguration.class)
+@Ignore // FIXME https://github.com/spring-projects/spring-batch/issues/3851
 public class ConcurrentTransactionTests {
 
 	@Autowired
