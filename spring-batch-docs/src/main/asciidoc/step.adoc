@@ -2453,7 +2453,7 @@ The following example shows an example of binding to job scope in XML:
 [role="javaContent"]
 The following example shows an example of binding to job scope in Java:
 
-.Java Configurtation
+.Java Configuration
 [source, java, role="javaContent"]
 ----
 @JobScope

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,32 +24,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.runner.RunWith;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import javax.sql.DataSource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
 public class DatasourceTests {
 
-	private JdbcTemplate jdbcTemplate;
-
 	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-	
-	@BeforeClass
-	public static void init() {
-		System.setProperty("batch.business.schema.script", "classpath:/org/springframework/batch/jms/init.sql");
-	}
-
-	@AfterClass
-	public static void cleanup() {
-		System.clearProperty("batch.business.schema.script");
-	}
+	private JdbcTemplate jdbcTemplate;
 
 	@Transactional @Test
 	public void testTemplate() throws Exception {

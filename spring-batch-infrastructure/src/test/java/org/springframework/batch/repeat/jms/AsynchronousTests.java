@@ -22,16 +22,13 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.sql.DataSource;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.batch.container.jms.BatchMessageListenerContainer;
-import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -39,7 +36,6 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.ClassUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -48,13 +44,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
-@Ignore //FIXME https://github.com/spring-projects/spring-batch/issues/3852
 public class AsynchronousTests {
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
-				"jms-context.xml") };
-	}
 
 	@Autowired
 	private BatchMessageListenerContainer container;
@@ -62,12 +52,8 @@ public class AsynchronousTests {
 	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	private JdbcTemplate jdbcTemplate;
-
 	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
+	private JdbcTemplate jdbcTemplate;
 
 	@Before
 	public void onSetUp() throws Exception {

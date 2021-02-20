@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -68,7 +67,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ConcurrentTransactionTests.ConcurrentJobConfiguration.class)
-@Ignore // FIXME https://github.com/spring-projects/spring-batch/issues/3851
 public class ConcurrentTransactionTests {
 
 	@Autowired
@@ -149,6 +147,7 @@ public class ConcurrentTransactionTests {
 			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
 			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
 			embeddedDatabaseFactory.setDatabasePopulator(databasePopulator);
+			embeddedDatabaseFactory.setGenerateUniqueDatabaseName(true);
 
 			return embeddedDatabaseFactory.getDatabase();
 		}
