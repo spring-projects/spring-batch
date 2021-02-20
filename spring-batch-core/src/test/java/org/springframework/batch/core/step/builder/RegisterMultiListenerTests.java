@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.lang.Nullable;
@@ -73,9 +72,6 @@ public class RegisterMultiListenerTests {
 
 	@Autowired
 	private CallChecker callChecker;
-
-	@Autowired
-	private EmbeddedDatabase dataSource;
 
 	private GenericApplicationContext context;
 
@@ -206,6 +202,7 @@ public class RegisterMultiListenerTests {
 			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
 			.setType(EmbeddedDatabaseType.HSQL)
+			.generateUniqueName(true)
 			.build());
 		}
 
@@ -236,6 +233,7 @@ public class RegisterMultiListenerTests {
 			.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
 			.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
 			.setType(EmbeddedDatabaseType.HSQL)
+			.generateUniqueName(true)
 			.build());
 		}
 

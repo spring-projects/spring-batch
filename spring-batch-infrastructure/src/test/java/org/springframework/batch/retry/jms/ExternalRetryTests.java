@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.jms;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
@@ -38,7 +37,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +46,6 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-@Ignore //FIXME https://github.com/spring-projects/spring-batch/issues/3852
 public class ExternalRetryTests {
 
 	@Autowired
@@ -58,15 +55,11 @@ public class ExternalRetryTests {
 
 	private ItemReader<String> provider;
 
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
-	}
 
 	@Before
 	public void onSetUp() throws Exception {
