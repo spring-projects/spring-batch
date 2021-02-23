@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import com.google.gson.Gson;
  */
 public class GsonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 
-	private Gson gson = new Gson();
+	private Gson gson;
 
 	public GsonJsonObjectMarshaller() {
-		this.gson=new Gson();
+		this(new Gson());
 	}
 	
 	public GsonJsonObjectMarshaller(Gson gson) {
-		this.gson=gson;
+		this.gson = gson;
 	}
 	
 	/**
