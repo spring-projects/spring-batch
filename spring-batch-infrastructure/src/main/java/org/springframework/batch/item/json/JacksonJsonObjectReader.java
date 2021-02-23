@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,13 +52,12 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 	 * @param itemType the target item type
 	 */
 	public JacksonJsonObjectReader(Class<? extends T> itemType) {
-		this.mapper=new ObjectMapper();
-		this.itemType = itemType;
+		this(new ObjectMapper(), itemType);
 	}
 
 	public JacksonJsonObjectReader(ObjectMapper mapper, Class<? extends T> itemType) {
-		this.mapper= mapper;
-		this.itemType=itemType;
+		this.mapper = mapper;
+		this.itemType = itemType;
 	}
 
 	/**
