@@ -720,14 +720,14 @@ public Job chunkJob() {
 ----
 
 The `ItemReader` reference points to the bean you want to use for reading data on the
-master. The `ItemWriter` reference points to a special `ItemWriter` (called
+manager. The `ItemWriter` reference points to a special `ItemWriter` (called
 `ChunkMessageChannelItemWriter`), as described above. The processor (if any) is left off
-the master configuration, as it is configured on the slave. You should check any
+the manager configuration, as it is configured on the worker. You should check any
 additional component properties, such  as throttle limits and so on, when implementing
 your use case.
 
 [role="xmlContent"]
-The following XML configuration  provides a basic master setup:
+The following XML configuration provides a basic manager setup:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -761,7 +761,7 @@ The following XML configuration  provides a basic master setup:
 ----
 
 [role="javaContent"]
-The following Java configuration  provides a basic master setup:
+The following Java configuration  provides a basic manager setup:
 
 .Java Configuration
 [source, java, role="javaContent"]
@@ -829,10 +829,10 @@ referenced by our job step, uses the
 `ChunkMessageChannelItemWriter` for writing chunks over the
 configured middleware.
 
-Now we can move on to the slave configuration.
+Now we can move on to the worker configuration, as shown in the following example:
 
 [role="xmlContent"]
-The following example shows the slave configuration in XML:
+The following example shows the worker configuration in XML:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -875,7 +875,7 @@ The following example shows the slave configuration in XML:
 ----
 
 [role="javaContent"]
-The following example shows the slave configuration in Java:
+The following example shows the worker configuration in Java:
 
 .Java Configuration
 [source, java, role="javaContent"]
