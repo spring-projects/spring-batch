@@ -40,7 +40,7 @@ submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
 _you should see only 'origin' - which is the fork you created for your own github account_
 4. `git remote add upstream git@github.com:spring-projects/spring-batch.git`
 5. `git remote show`
-_you should now see 'upstream' in addition to 'origin' where 'upstream' is the *spring-projects*repository from which releases are built_
+_you should now see 'upstream' in addition to 'origin' where 'upstream' is the *spring-projects* repository from which releases are built_
 6. `git fetch --all`
 7. `git branch -a`
 _you should see branches on origin as well as upstream, including 'master'_
