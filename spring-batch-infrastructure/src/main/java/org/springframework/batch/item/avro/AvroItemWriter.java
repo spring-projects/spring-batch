@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,14 +155,12 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	}
 
 	private static <T> DatumWriter<T> datumWriterForClass(Class<T> clazz) {
-		if (GenericRecord.class.isAssignableFrom(clazz)) {
-			return new GenericDatumWriter<>();
-
-		}
 		if (SpecificRecordBase.class.isAssignableFrom(clazz)){
 			return new SpecificDatumWriter<>(clazz);
 		}
-
+		if (GenericRecord.class.isAssignableFrom(clazz)) {
+			return new GenericDatumWriter<>();
+		}
 		return new ReflectDatumWriter<>(clazz);
 	}
 
