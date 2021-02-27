@@ -155,14 +155,12 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	}
 
 	private static <T> DatumWriter<T> datumWriterForClass(Class<T> clazz) {
-		if (GenericRecord.class.isAssignableFrom(clazz)) {
-			return new GenericDatumWriter<>();
-
-		}
 		if (SpecificRecordBase.class.isAssignableFrom(clazz)){
 			return new SpecificDatumWriter<>(clazz);
 		}
-
+		if (GenericRecord.class.isAssignableFrom(clazz)) {
+			return new GenericDatumWriter<>();
+		}
 		return new ReflectDatumWriter<>(clazz);
 	}
 
