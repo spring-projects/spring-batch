@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,20 +167,22 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 	@Test
 	public void arrayAsListSerializationTest() throws IOException {
-
-		Jackson2ExecutionContextStringSerializer j = new Jackson2ExecutionContextStringSerializer();
+		//given
+		List<String> list = Arrays.asList("foo", "bar");
+		String key = "Arrays.asList";
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
 		Map<String, Object> context = new HashMap<>(1);
-		context.put("Arrays.asList", Arrays.asList("foo", "bar"));
+		context.put(key, list);
 
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		j.serialize(context, os);
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
 
-		InputStream in = new ByteArrayInputStream(os.toByteArray());
-
-		context = j.deserialize(in);
-		
-		String[] expectedValue = { "foo", "bar" };
-		List<String> deserializedValue = (List<String>) context.get("Arrays.asList");
-		Assert.assertArrayEquals(expectedValue, deserializedValue.toArray(new String[0]));
+		// then
+		Object deserializedValue = deserializedContext.get(key);
+		Assert.assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
+		Assert.assertTrue(((List<String>)deserializedValue).containsAll(list));
 	}
 }
