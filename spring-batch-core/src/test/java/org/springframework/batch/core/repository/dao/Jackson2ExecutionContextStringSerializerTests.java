@@ -19,6 +19,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -163,5 +165,24 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		Object deserializedValue = deserializedContext.get(key);
 		Assert.assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
 		Assert.assertTrue(((List<String>)deserializedValue).containsAll(list));
+	}
+
+	@Test
+	public void testSqlTimestampSerialization() throws IOException {
+		//given
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
+		Map<String, Object> context = new HashMap<>(1);
+		Timestamp timestamp = new Timestamp(Instant.now().toEpochMilli());
+		context.put("timestamp", timestamp);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(context, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		Timestamp deserializedTimestamp = (Timestamp) deserializedContext.get("timestamp");
+		Assert.assertEquals(timestamp, deserializedTimestamp);
 	}
 }

@@ -258,6 +258,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
                 "java.time.LocalDate",
                 "java.time.LocalTime",
                 "java.time.LocalDateTime",
+                "java.sql.Timestamp",
                 "java.net.URL",
                 "java.util.TreeMap",
                 "java.util.HashMap",
