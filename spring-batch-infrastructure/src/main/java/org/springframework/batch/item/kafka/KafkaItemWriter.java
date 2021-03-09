@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,20 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	@Override
 	protected void writeKeyValue(K key, T value) {
 		if (this.delete) {
-			listenableFutures.add(this.kafkaTemplate.sendDefault(key, null));
+			this.listenableFutures.add(this.kafkaTemplate.sendDefault(key, null));
 		}
 		else {
-			listenableFutures.add(this.kafkaTemplate.sendDefault(key, value));
+			this.listenableFutures.add(this.kafkaTemplate.sendDefault(key, value));
 		}
 	}
+
 	@Override
 	protected void flush() throws Exception{
-		kafkaTemplate.flush();
-		for(ListenableFuture<SendResult<K,T>> future: listenableFutures){
+		this.kafkaTemplate.flush();
+		for(ListenableFuture<SendResult<K,T>> future: this.listenableFutures){
 			future.get();
 		}
-		listenableFutures.clear();
+		this.listenableFutures.clear();
 	}
 
 	@Override
