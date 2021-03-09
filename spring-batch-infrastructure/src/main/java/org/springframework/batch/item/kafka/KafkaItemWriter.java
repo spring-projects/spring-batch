@@ -25,6 +25,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -33,6 +34,7 @@ import java.util.List;
  * </p>
  *
  * @author Mathieu Ouellet
+ * @author Mahmoud Ben Hassine
  * @since 4.2
  *
  */
@@ -40,6 +42,7 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	protected KafkaTemplate<K, T> kafkaTemplate;
 	private final List<ListenableFuture<SendResult<K, T>>> listenableFutures = new ArrayList<>();
+	private long timeout = -1;
 
 	@Override
 	protected void writeKeyValue(K key, T value) {
@@ -55,7 +58,12 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	protected void flush() throws Exception{
 		this.kafkaTemplate.flush();
 		for(ListenableFuture<SendResult<K,T>> future: this.listenableFutures){
-			future.get();
+			if (this.timeout >= 0) {
+				future.get(this.timeout, TimeUnit.MILLISECONDS);
+			}
+			else {
+				future.get();
+			}
 		}
 		this.listenableFutures.clear();
 	}
@@ -73,4 +81,15 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	public void setKafkaTemplate(KafkaTemplate<K, T> kafkaTemplate) {
 		this.kafkaTemplate = kafkaTemplate;
 	}
+
+	/**
+	 * The time limit to wait when flushing items to Kafka.
+	 *
+	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
+	 * @since 4.3.2
+	 */
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
+	}
+
 }
