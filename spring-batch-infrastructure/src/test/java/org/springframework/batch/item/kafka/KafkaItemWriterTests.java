@@ -17,6 +17,7 @@ package org.springframework.batch.item.kafka;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class KafkaItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.openMocks(this);
+		MockitoAnnotations.initMocks(this);
 		when(this.kafkaTemplate.getDefaultTopic()).thenReturn("defaultTopic");
 		when(this.kafkaTemplate.sendDefault(any(), any())).thenReturn(this.future);
 		this.itemKeyMapper = new KafkaItemKeyMapper();
@@ -57,6 +58,7 @@ public class KafkaItemWriterTests {
 		this.writer.setKafkaTemplate(this.kafkaTemplate);
 		this.writer.setItemKeyMapper(this.itemKeyMapper);
 		this.writer.setDelete(false);
+		this.writer.setTimeout(10L);
 		this.writer.afterPropertiesSet();
 	}
 
@@ -99,7 +101,7 @@ public class KafkaItemWriterTests {
 		verify(this.kafkaTemplate).sendDefault(items.get(0), items.get(0));
 		verify(this.kafkaTemplate).sendDefault(items.get(1), items.get(1));
 		verify(this.kafkaTemplate).flush();
-		verify(this.future, times(2)).get();
+		verify(this.future, times(2)).get(10L, TimeUnit.MILLISECONDS);
 	}
 
 	@Test
@@ -112,7 +114,7 @@ public class KafkaItemWriterTests {
 		verify(this.kafkaTemplate).sendDefault(items.get(0), null);
 		verify(this.kafkaTemplate).sendDefault(items.get(1), null);
 		verify(this.kafkaTemplate).flush();
-		verify(this.future, times(2)).get();
+		verify(this.future, times(2)).get(10L, TimeUnit.MILLISECONDS);
 	}
 
 	@Test
