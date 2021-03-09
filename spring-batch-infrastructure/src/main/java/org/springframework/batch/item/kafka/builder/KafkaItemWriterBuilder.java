@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link KafkaItemWriter}
  *
  * @author Mathieu Ouellet
+ * @author Mahmoud Ben Hassine
  * @since 4.2
  */
 public class KafkaItemWriterBuilder<K, V> {
@@ -34,6 +35,8 @@ public class KafkaItemWriterBuilder<K, V> {
 	private Converter<V, K> itemKeyMapper;
 
 	private boolean delete;
+
+	private long timeout = -1;
 
 	/**
 	 * Establish the KafkaTemplate to be used by the KafkaItemWriter.
@@ -72,6 +75,19 @@ public class KafkaItemWriterBuilder<K, V> {
 	}
 
 	/**
+	 * The time limit to wait when flushing items to Kafka.
+	 *
+	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
+	 * @return The current instance of the builder.
+	 * @see KafkaItemWriter#setTimeout(long)
+	 * @since 4.3.2
+	 */
+	public KafkaItemWriterBuilder<K, V> timeout(long timeout) {
+		this.timeout = timeout;
+		return this;
+	}
+
+	/**
 	 * Validates and builds a {@link KafkaItemWriter}.
 	 * @return a {@link KafkaItemWriter}
 	 */
@@ -83,6 +99,7 @@ public class KafkaItemWriterBuilder<K, V> {
 		writer.setKafkaTemplate(this.kafkaTemplate);
 		writer.setItemKeyMapper(this.itemKeyMapper);
 		writer.setDelete(this.delete);
+		writer.setTimeout(this.timeout);
 		return writer;
 	}
 }
