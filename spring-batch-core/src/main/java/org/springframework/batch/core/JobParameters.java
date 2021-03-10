@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.springframework.lang.Nullable;
@@ -38,6 +39,7 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 1.0
  */
 @SuppressWarnings("serial")
@@ -269,8 +271,8 @@ public class JobParameters implements Serializable {
 		Properties props = new Properties();
 
 		for (Map.Entry<String, JobParameter> param : parameters.entrySet()) {
-			if(param.getValue() != null) {
-				props.put(param.getKey(), param.getValue().toString());
+			if (param.getValue() != null) {
+				props.put(param.getKey(), Objects.toString(param.getValue().toString(), ""));
 			}
 		}
 
