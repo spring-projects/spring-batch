@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,7 @@ import org.springframework.util.SerializationUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  */
 public class JobParametersTests {
@@ -227,5 +229,16 @@ public class JobParametersTests {
 	@Test
 	public void testDateReturnsNullWhenKeyDoesntExit(){
 		assertNull(new JobParameters().getDate("keythatdoesntexist"));
+	}
+
+	@Test
+	public void testToPropertiesWithNullValue() {
+		Map<String, JobParameter> parameterMap = new HashMap<>();
+		Long value = null;
+		parameterMap.put("nullkey", new JobParameter(value));
+		JobParameters jobParameters = new JobParameters(parameterMap);
+
+		Properties properties = jobParameters.toProperties();
+		assertEquals("", properties.get("nullkey"));
 	}
 }
