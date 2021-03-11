@@ -27,8 +27,7 @@ image::{batch-asciidoc}images/step.png[Step, scaledwidth="60%"]
 
 Spring Batch uses a 'Chunk-oriented' processing style within its most common
 implementation. Chunk oriented processing refers to reading the data one at a time and
-creating 'chunks' that are written out within a transaction boundary. One item is read in
-from an `ItemReader`, handed to an `ItemProcessor`, and aggregated. Once the number of
+creating 'chunks' that are written out within a transaction boundary. Once the number of
 items read equals the commit interval, the entire chunk is written out by the
 `ItemWriter`, and then the transaction is committed. The following image shows the
 process:
@@ -36,18 +35,52 @@ process:
 .Chunk-oriented Processing
 image::{batch-asciidoc}images/chunk-oriented-processing.png[Chunk Oriented Processing, scaledwidth="60%"]
 
-The following code shows the same concepts shown:
+The following pseudo code shows the same concepts in a simplified form:
 
 [source, java]
 ----
 List items = new Arraylist();
 for(int i = 0; i < commitInterval; i++){
-    Object item = itemReader.read()
-    Object processedItem = itemProcessor.process(item);
-    items.add(processedItem);
+    Object item = itemReader.read();
+    if (item != null) {
+        items.add(item);
+    }
 }
 itemWriter.write(items);
 ----
+
+A chunk-oriented step can also be configured with an optional `ItemProcessor`
+to process items before passing them to the `ItemWriter`. The following image
+shows the process when an `ItemProcessor` is registered in the step:
+
+.Chunk-oriented Processing with Item Processor
+image::{batch-asciidoc}images/chunk-oriented-processing-with-item-processor.png[Chunk Oriented Processing With Item Processor, scaledwidth="60%"]
+
+The following pseudo code shows how this is implemented in a simplified form:
+
+[source, java]
+----
+List items = new Arraylist();
+for(int i = 0; i < commitInterval; i++){
+    Object item = itemReader.read();
+    if (item != null) {
+        items.add(item);
+    }
+}
+
+List processedItems = new Arraylist();
+for(Object item: items){
+    Object processedItem = itemProcessor.process(item);
+    if (processedItem != null) {
+        processedItems.add(processedItem);
+    }
+}
+
+itemWriter.write(processedItems);
+----
+
+For more details about item processors and their use cases, please refer to the
+<<processor.adoc#itemProcessor,Item processing>> section.
 
 [[configuringAStep]]
 ==== Configuring a `Step`
