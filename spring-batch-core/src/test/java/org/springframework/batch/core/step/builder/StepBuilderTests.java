@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -59,7 +59,6 @@ import static org.junit.Assert.assertEquals;
  * @author Parikshit Dutta
  *
  */
-@SuppressWarnings("serial")
 public class StepBuilderTests {
 
 	@Test
@@ -181,15 +180,10 @@ public class StepBuilderTests {
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		List<String> items = new ArrayList<String>() {{
-			add("1");
-			add("2");
-			add("3");
-		}};
+		List<String> items = Arrays.asList("1", "2", "3");
 
 		ItemReader<String> reader = new ListItemReader<>(items);
 
-		@SuppressWarnings("unchecked")
 		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
 											 .repository(jobRepository)
 											 .transactionManager(transactionManager)
@@ -229,16 +223,11 @@ public class StepBuilderTests {
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		List<Long> items = new ArrayList<Long>() {{
-			add(1L);
-			add(2L);
-			add(3L);
-		}};
+		List<Long> items = Arrays.asList(1L, 2L, 3L);
 
 		ItemReader<Long> reader = new ListItemReader<>(items);
 
 		ListItemWriter<String> itemWriter = new ListItemWriter<>();
-
 		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
 				.repository(jobRepository)
 				.transactionManager(transactionManager)

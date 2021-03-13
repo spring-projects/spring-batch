@@ -16,6 +16,7 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -201,12 +202,9 @@ public class MongoItemReaderTests {
 		assertEquals("{ $natural : 1}", query.getHint());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithParameters() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
@@ -222,12 +220,9 @@ public class MongoItemReaderTests {
 		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithCollection() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		reader.setCollection("collection");

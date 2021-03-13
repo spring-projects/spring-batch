@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.batch.core.jsr.configuration.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -65,25 +66,19 @@ public class BatchPropertyContextTests {
 		stepArtifactProperties.setProperty("readerProperty1", "readerProperty1value");
 		stepArtifactProperties.setProperty("readerProperty2", "readerProperty2value");
 
-		this.stepArtifactProperties.put("step1", new HashMap<String, Properties>() {{
-			put("reader", stepArtifactProperties);
-		}});
+		this.stepArtifactProperties.put("step1", Collections.singletonMap("reader", stepArtifactProperties));
 
 		final Properties partitionProperties = new Properties();
 		partitionProperties.setProperty("writerProperty1", "writerProperty1valuePartition0");
 		partitionProperties.setProperty("writerProperty2", "writerProperty2valuePartition0");
 
-		this.partitionProperties.put("step2:partition0", new HashMap<String, Properties>() {{
-			put("writer", partitionProperties);
-		}});
+		this.partitionProperties.put("step2:partition0", Collections.singletonMap("writer", partitionProperties));
 
 		final Properties partitionStepProperties = new Properties();
 		partitionStepProperties.setProperty("writerProperty1Step", "writerProperty1");
 		partitionStepProperties.setProperty("writerProperty2Step", "writerProperty2");
 
-		this.partitionProperties.put("step2", new HashMap<String, Properties>() {{
-			put("writer", partitionStepProperties);
-		}});
+		this.partitionProperties.put("step2", Collections.singletonMap("writer", partitionStepProperties));
 	}
 
 	@Test

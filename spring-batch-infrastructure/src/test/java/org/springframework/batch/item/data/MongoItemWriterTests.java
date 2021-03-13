@@ -16,6 +16,7 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,7 +61,6 @@ import static org.mockito.ArgumentMatchers.eq;
  * @author Parikshit Dutta
  * @author Mahmoud Ben Hassine
  */
-@SuppressWarnings("serial")
 public class MongoItemWriterTests {
 
 	@Rule
@@ -106,10 +106,7 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteNoTransactionNoCollection() throws Exception {
-		List<Item> items = new ArrayList<Item>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		List<Item> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
 
@@ -119,10 +116,7 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteNoTransactionWithCollection() throws Exception {
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -142,10 +136,7 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteTransactionNoCollection() throws Exception {
-		final List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		new TransactionTemplate(transactionManager).execute((TransactionCallback<Void>) status -> {
 			try {
@@ -163,10 +154,7 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteTransactionWithCollection() throws Exception {
-		final List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -186,10 +174,7 @@ public class MongoItemWriterTests {
 
 	@Test
 	public void testWriteTransactionFails() throws Exception {
-		final List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -218,10 +203,7 @@ public class MongoItemWriterTests {
 	 */
 	@Test
 	public void testWriteTransactionReadOnly() throws Exception {
-		final List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		final List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 
@@ -247,10 +229,7 @@ public class MongoItemWriterTests {
 	@Test
 	public void testRemoveNoObjectIdNoCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.write(items);
 
@@ -261,10 +240,7 @@ public class MongoItemWriterTests {
 	@Test
 	public void testRemoveNoObjectIdWithCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Item("Foo"));
-			add(new Item("Bar"));
-		}};
+		List<Object> items = Arrays.asList(new Item("Foo"), new Item("Bar"));
 
 		writer.setCollection("collection");
 		writer.write(items);
@@ -276,10 +252,7 @@ public class MongoItemWriterTests {
 	@Test
 	public void testRemoveNoTransactionNoCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Item(1));
-			add(new Item(2));
-		}};
+		List<Object> items = Arrays.asList(new Item(1), new Item(2));
 
 		writer.write(items);
 
@@ -290,10 +263,7 @@ public class MongoItemWriterTests {
 	@Test
 	public void testRemoveNoTransactionWithCollection() throws Exception {
 		writer.setDelete(true);
-		List<Object> items = new ArrayList<Object>() {{
-			add(new Item(1));
-			add(new Item(2));
-		}};
+		List<Object> items = Arrays.asList(new Item(1), new Item(2));
 
 		writer.setCollection("collection");
 
