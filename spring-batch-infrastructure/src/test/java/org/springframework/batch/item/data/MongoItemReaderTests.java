@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -198,12 +199,9 @@ public class MongoItemReaderTests {
 		assertEquals("{ $natural : 1}", query.getHint());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithParameters() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
@@ -219,12 +217,9 @@ public class MongoItemReaderTests {
 		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithCollection() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		reader.setCollection("collection");

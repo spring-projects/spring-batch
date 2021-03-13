@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,15 +42,13 @@ public class CompositeItemProcessorTests {
 	private ItemProcessor<Object, Object> processor1;
 	private ItemProcessor<Object, Object> processor2;
 
-	@SuppressWarnings({ "unchecked", "serial" })
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		processor1 = mock(ItemProcessor.class);
 		processor2 = mock(ItemProcessor.class);
 
-		composite.setDelegates(new ArrayList<ItemProcessor<Object,Object>>() {{
-			add(processor1); add(processor2);
-		}});
+		composite.setDelegates(Arrays.asList(processor1, processor2));
 
 		composite.afterPropertiesSet();
 	}
@@ -76,14 +75,13 @@ public class CompositeItemProcessorTests {
 	 * Test that the CompositeItemProcessor can work with generic types for the ItemProcessor delegates.
 	 */
 	@Test
-	@SuppressWarnings({"unchecked", "serial"})
+	@SuppressWarnings("unchecked")
 	public void testItemProcessorGenerics() throws Exception {
 		CompositeItemProcessor<String, String> composite = new CompositeItemProcessor<>();
 		final ItemProcessor<String, Integer> processor1 = mock(ItemProcessor.class);
 		final ItemProcessor<Integer, String> processor2 = mock(ItemProcessor.class);
-		composite.setDelegates(new ArrayList<ItemProcessor<?,?>>() {{
-			add(processor1); add(processor2);
-		}});
+		composite.setDelegates(Arrays.asList(processor1, processor2));
+
 		composite.afterPropertiesSet();
 
 		when(processor1.process("input")).thenReturn(5);

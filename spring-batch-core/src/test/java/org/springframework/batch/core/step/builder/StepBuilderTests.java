@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.step.builder;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -58,7 +58,6 @@ import static org.junit.Assert.assertEquals;
  * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("serial")
 public class StepBuilderTests {
 
 	@Test
@@ -180,15 +179,10 @@ public class StepBuilderTests {
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		List<String> items = new ArrayList<String>() {{
-			add("1");
-			add("2");
-			add("3");
-		}};
+		List<String> items = Arrays.asList("1", "2", "3");
 
 		ItemReader<String> reader = new ListItemReader<>(items);
 
-		@SuppressWarnings("unchecked")
 		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
 											 .repository(jobRepository)
 											 .transactionManager(transactionManager)
@@ -219,16 +213,11 @@ public class StepBuilderTests {
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
-		List<Long> items = new ArrayList<Long>() {{
-			add(1L);
-			add(2L);
-			add(3L);
-		}};
+		List<Long> items = Arrays.asList(1L, 2L, 3L);
 
 		ItemReader<Long> reader = new ListItemReader<>(items);
 
 		ListItemWriter<String> itemWriter = new ListItemWriter<>();
-		@SuppressWarnings("unchecked")
 		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
 											 .repository(jobRepository)
 											 .transactionManager(transactionManager)
