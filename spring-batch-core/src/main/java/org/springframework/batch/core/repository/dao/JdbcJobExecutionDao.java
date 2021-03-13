@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -24,8 +25,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Date;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -63,6 +64,7 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
+ * @author Philippe Marschall
  */
 public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements JobExecutionDao, InitializingBean {
 
@@ -356,27 +358,34 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
 
-		for (Entry<String, JobParameter<?>> entry : jobParameters.getParameters().entrySet()) {
-			JobParameter jobParameter = entry.getValue();
-			insertParameter(executionId, jobParameter.getType(), entry.getKey(), jobParameter.getValue(),
-					jobParameter.isIdentifying());
+		if (jobParameters.isEmpty()) {
+			return;
 		}
+
+		getJdbcTemplate().batchUpdate(getQuery(CREATE_JOB_PARAMETERS), jobParameters.getParameters().entrySet(), 100,
+				(ps, entry) -> {
+					JobParameter jobParameter = entry.getValue();
+					insertParameter(ps, executionId, jobParameter.getType(), entry.getKey(), jobParameter.getValue(),
+							jobParameter.isIdentifying());
+				});
 	}
 
 	/**
 	 * Convenience method that inserts an individual records into the JobParameters table.
+	 * @throws SQLException if the driver throws an exception
 	 */
-	private <T> void insertParameter(Long executionId, Class<T> type, String key, T value, boolean identifying) {
-
-		Object[] args = new Object[0];
-		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR };
+	private <T> void insertParameter(PreparedStatement preparedStatement, Long executionId, Class<T> type, String key,
+			T value, boolean identifying) throws SQLException {
 
 		String identifyingFlag = identifying ? "Y" : "N";
 
 		String stringValue = this.conversionService.convert(value, String.class);
-		args = new Object[] { executionId, key, type.getName(), stringValue, identifyingFlag };
 
-		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
+		preparedStatement.setLong(1, executionId);
+		preparedStatement.setString(2, key);
+		preparedStatement.setString(3, type.getName());
+		preparedStatement.setString(4, stringValue);
+		preparedStatement.setString(5, identifyingFlag);
 	}
 
 	/**
