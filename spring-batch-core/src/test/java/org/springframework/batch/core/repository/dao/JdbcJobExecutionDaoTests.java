@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,33 @@
  */
 package org.springframework.batch.core.repository.dao;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
+import static org.junit.Assert.assertNull;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * @author Parikshit Dutta
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "sql-dao-test.xml" })
 public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
@@ -62,4 +80,35 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		return stepExecutionDao;
 	}
 
+	@Transactional
+	@Test
+	public void testSavedDateIsNullForNonDateTypeJobParams() {
+		final String FIND_DATE_PARAM_FROM_ID = "SELECT DATE_VAL " +
+				"from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = :JOB_EXECUTION_ID";
+
+		Map<String,JobParameter> parameters = new HashMap<>();
+		parameters.put("string-param", new JobParameter("value"));
+		parameters.put("long-param", new JobParameter(1L));
+		parameters.put("double-param", new JobParameter(1D));
+
+		JobExecution execution = new JobExecution(jobInstance, new JobParameters(parameters));
+		dao.saveJobExecution(execution);
+
+		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
+		JobExecution savedJobExecution = executions.get(0);
+
+		NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+
+		JdbcJobExecutionDao jdbcJobExecutionDao = (JdbcJobExecutionDao) jobExecutionDao;
+		String query = jdbcJobExecutionDao.getQuery(FIND_DATE_PARAM_FROM_ID);
+
+		SqlParameterSource namedParameters = new MapSqlParameterSource()
+				.addValue("JOB_EXECUTION_ID", savedJobExecution.getJobId());
+
+		List<Date> paramValues = namedParameterJdbcTemplate.queryForList(query, namedParameters, Date.class);
+		for (Date paramValue: paramValues) {
+			assertNull(paramValue);
+		}
+	}
 }

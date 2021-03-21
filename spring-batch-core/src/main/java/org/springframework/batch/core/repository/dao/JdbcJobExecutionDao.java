@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.batch.core.repository.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -344,13 +343,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		String identifyingFlag = identifying? "Y":"N";
 
 		if (type == ParameterType.STRING) {
-			args = new Object[] { executionId, key, type, value, new Timestamp(0L),
+			args = new Object[] { executionId, key, type, value, null,
 					0L, 0D, identifyingFlag};
 		} else if (type == ParameterType.LONG) {
-			args = new Object[] { executionId, key, type, "", new Timestamp(0L),
+			args = new Object[] { executionId, key, type, "", null,
 					value, new Double(0), identifyingFlag};
 		} else if (type == ParameterType.DOUBLE) {
-			args = new Object[] { executionId, key, type, "", new Timestamp(0L), 0L,
+			args = new Object[] { executionId, key, type, "", null, 0L,
 					value, identifyingFlag};
 		} else if (type == ParameterType.DATE) {
 			args = new Object[] { executionId, key, type, "", value, 0L, 0D, identifyingFlag};
