@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -28,7 +30,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -58,13 +59,14 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	@Test
 	public void testMultiThreadedTaskletExecutionWhenNoErrors() throws Exception {
 		// given
-		Class[] configurationClasses = {JobConfiguration.class, TransactionManagerConfiguration.class};
+		Class<?>[] configurationClasses = {JobConfiguration.class, TransactionManagerConfiguration.class};
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
+		JobParameters jobParameters = new JobParameters();
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);
@@ -77,13 +79,14 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	@Test
 	public void testMultiThreadedTaskletExecutionWhenCommitFails() throws Exception {
 		// given
-		Class[] configurationClasses = {JobConfiguration.class, CommitFailingTransactionManagerConfiguration.class};
+		Class<?>[] configurationClasses = {JobConfiguration.class, CommitFailingTransactionManagerConfiguration.class};
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
+		JobParameters jobParameters = new JobParameters();
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);
@@ -98,13 +101,14 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	@Test
 	public void testMultiThreadedTaskletExecutionWhenRollbackFails() throws Exception {
 		// given
-		Class[] configurationClasses = {JobConfiguration.class, RollbackFailingTransactionManagerConfiguration.class};
+		Class<?>[] configurationClasses = {JobConfiguration.class, RollbackFailingTransactionManagerConfiguration.class};
 		ApplicationContext context = new AnnotationConfigApplicationContext(configurationClasses);
 		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
 		Job job = context.getBean(Job.class);
+		JobParameters jobParameters = new JobParameters();
 
 		// when
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 
 		// then
 		assertNotNull(jobExecution);
@@ -130,7 +134,7 @@ public class MultiThreadedTaskletStepIntegrationTests {
 			return stepBuilderFactory.get("step")
 					.<Integer, Integer>chunk(3)
 					.reader(itemReader())
-					.writer(itemWriter())
+					.writer(items -> {})
 					.taskExecutor(taskExecutor())
 					.build();
 		}
@@ -160,8 +164,7 @@ public class MultiThreadedTaskletStepIntegrationTests {
 		@Bean
 		public ItemReader<Integer> itemReader() {
 			return new ItemReader<Integer>() {
-				private AtomicInteger atomicInteger = new AtomicInteger();
-
+				private final AtomicInteger atomicInteger = new AtomicInteger();
 				@Override
 				public synchronized Integer read() {
 					int value = atomicInteger.incrementAndGet();
@@ -170,11 +173,6 @@ public class MultiThreadedTaskletStepIntegrationTests {
 			};
 		}
 
-		@Bean
-		public ItemWriter<Integer> itemWriter() {
-			return items -> {
-			};
-		}
 	}
 
 	@Configuration
@@ -196,8 +194,13 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	public static class TransactionManagerConfiguration {
 
 		@Bean
-		public PlatformTransactionManager transactionManager(DataSource dataSource) {
-			return new DataSourceTransactionManager(dataSource);
+		public BatchConfigurer batchConfigurer(DataSource dataSource) {
+			return new DefaultBatchConfigurer(dataSource) {
+				@Override
+				public PlatformTransactionManager getTransactionManager() {
+					return new DataSourceTransactionManager(dataSource);
+				}
+			};
 		}
 
 	}
@@ -207,14 +210,19 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	public static class CommitFailingTransactionManagerConfiguration {
 
 		@Bean
-		public PlatformTransactionManager transactionManager(DataSource dataSource) {
-			return new DataSourceTransactionManager(dataSource) {
+		public BatchConfigurer batchConfigurer(DataSource dataSource) {
+			return new DefaultBatchConfigurer(dataSource) {
 				@Override
-				protected void doCommit(DefaultTransactionStatus status) {
-					super.doCommit(status);
-					if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
-						throw new RuntimeException("Planned commit exception!");
-					}
+				public PlatformTransactionManager getTransactionManager() {
+					return new DataSourceTransactionManager(dataSource) {
+						@Override
+						protected void doCommit(DefaultTransactionStatus status) {
+							super.doCommit(status);
+							if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
+								throw new RuntimeException("Planned commit exception!");
+							}
+						}
+					};
 				}
 			};
 		}
@@ -226,22 +234,27 @@ public class MultiThreadedTaskletStepIntegrationTests {
 	public static class RollbackFailingTransactionManagerConfiguration {
 
 		@Bean
-		public PlatformTransactionManager transactionManager(DataSource dataSource) {
-			return new DataSourceTransactionManager(dataSource) {
+		public BatchConfigurer batchConfigurer(DataSource dataSource) {
+			return new DefaultBatchConfigurer(dataSource) {
 				@Override
-				protected void doCommit(DefaultTransactionStatus status) {
-					super.doCommit(status);
-					if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
-						throw new RuntimeException("Planned commit exception!");
-					}
-				}
+				public PlatformTransactionManager getTransactionManager() {
+					return new DataSourceTransactionManager(dataSource) {
+						@Override
+						protected void doCommit(DefaultTransactionStatus status) {
+							super.doCommit(status);
+							if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
+								throw new RuntimeException("Planned commit exception!");
+							}
+						}
 
-				@Override
-				protected void doRollback(DefaultTransactionStatus status) {
-					super.doRollback(status);
-					if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
-						throw new RuntimeException("Planned rollback exception!");
-					}
+						@Override
+						protected void doRollback(DefaultTransactionStatus status) {
+							super.doRollback(status);
+							if (Thread.currentThread().getName().equals("spring-batch-worker-thread-2")) {
+								throw new RuntimeException("Planned rollback exception!");
+							}
+						}
+					};
 				}
 			};
 		}
