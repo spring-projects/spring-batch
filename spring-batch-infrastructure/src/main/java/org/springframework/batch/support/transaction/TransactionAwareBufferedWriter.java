@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.springframework.batch.item.WriteFailedException;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
@@ -95,7 +95,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 			TransactionSynchronizationManager.bindResource(bufferKey, new StringBuilder());
 
-			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCompletion(int status) {
 					clear();

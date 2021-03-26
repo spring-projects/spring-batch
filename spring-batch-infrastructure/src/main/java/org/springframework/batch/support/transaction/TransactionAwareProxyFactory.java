@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
@@ -194,7 +193,7 @@ public class TransactionAwareProxyFactory<T> {
 		return new TransactionAwareProxyFactory<>(new CopyOnWriteArrayList<>(list)).createInstance();
 	}
 
-	private class TargetSynchronization extends TransactionSynchronizationAdapter {
+	private class TargetSynchronization implements TransactionSynchronization {
 
 		private final T cache;
 
@@ -208,7 +207,6 @@ public class TransactionAwareProxyFactory<T> {
 
         @Override
 		public void afterCompletion(int status) {
-			super.afterCompletion(status);
 			if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				synchronized (target) {
 					commit(cache, target);

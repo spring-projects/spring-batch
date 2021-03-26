@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -37,12 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -93,19 +91,15 @@ public class ChunkOrientedStepIntegrationTests {
 	@Ignore
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c" }),
-				new ItemWriter<String>() {
-			@Override
-			public void write(List<? extends String> data) throws Exception {
-				TransactionSynchronizationManager
-				.registerSynchronization(new TransactionSynchronizationAdapter() {
+		step.setTasklet(new TestingChunkOrientedTasklet<>(
+				getReader(new String[]{"a", "b", "c"}),
+				data -> TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 					@Override
 					public void beforeCommit(boolean readOnly) {
 						throw new RuntimeException("Simulate commit failure");
 					}
-				});
-			}
-		}, chunkOperations));
+				}),
+				chunkOperations));
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(Collections
 				.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
