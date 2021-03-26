@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -36,121 +33,95 @@ public class ResourcelessTransactionManagerTests {
 	private int count = 0;
 
 	@Test
-	public void testCommit() throws Exception {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
-			public Void doInTransaction(TransactionStatus status) {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                    @Override
-					public void afterCompletion(int status) {
-						super.afterCompletion(status);
-						txStatus = status;
-					}
-				});
-				return null;
-			}
+	public void testCommit() {
+		new TransactionTemplate(transactionManager).execute(status -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
+				}
+			});
+			return null;
 		});
 		assertEquals(TransactionSynchronization.STATUS_COMMITTED, txStatus);
 	}
 
 	@Test
-	public void testCommitTwice() throws Exception {
+	public void testCommitTwice() {
 		testCommit();
 		txStatus = -1;
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
-			public Void doInTransaction(TransactionStatus status) {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                    @Override
-					public void afterCompletion(int status) {
-						super.afterCompletion(status);
-						txStatus = status;
-					}
-				});
-				return null;
-			}
+		new TransactionTemplate(transactionManager).execute(status -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
+				}
+			});
+			return null;
 		});
 		assertEquals(TransactionSynchronization.STATUS_COMMITTED, txStatus);
 	}
 
 	@Test
-	public void testCommitNested() throws Exception {
+	public void testCommitNested() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
-			public Void doInTransaction(TransactionStatus status) {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                    @Override
-					public void afterCompletion(int status) {
-						super.afterCompletion(status);
-						txStatus = status;
-						count++;
-					}
-				});
-				transactionTemplate.execute(new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						assertEquals(0, count);
-						count++;
-						return null;
-					}
-				});
-				assertEquals(1, count);
+		transactionTemplate.execute(outerStatus -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
+					count++;
+				}
+			});
+			transactionTemplate.execute(innerStatus -> {
+				assertEquals(0, count);
+				count++;
 				return null;
-			}
+			});
+			assertEquals(1, count);
+			return null;
 		});
 		assertEquals(TransactionSynchronization.STATUS_COMMITTED, txStatus);
 		assertEquals(2, count);
 	}
 
 	@Test
-	public void testCommitNestedTwice() throws Exception {
+	public void testCommitNestedTwice() {
 		testCommitNested();
 		count = 0;
 		txStatus = -1;
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.execute(new TransactionCallback<Void>() {
-            @Override
-			public Void doInTransaction(TransactionStatus status) {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                    @Override
-					public void afterCompletion(int status) {
-						super.afterCompletion(status);
-						txStatus = status;
-						count++;
-					}
-				});
-				transactionTemplate.execute(new TransactionCallback<Void>() {
-                    @Override
-					public Void doInTransaction(TransactionStatus status) {
-						assertEquals(0, count);
-						count++;
-						return null;
-					}
-				});
-				assertEquals(1, count);
+		transactionTemplate.execute(outerStatus -> {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCompletion(int status) {
+					txStatus = status;
+					count++;
+				}
+			});
+			transactionTemplate.execute(innerStatus -> {
+				assertEquals(0, count);
+				count++;
 				return null;
-			}
+			});
+			assertEquals(1, count);
+			return null;
 		});
 		assertEquals(TransactionSynchronization.STATUS_COMMITTED, txStatus);
 		assertEquals(2, count);
 	}
 
 	@Test
-	public void testRollback() throws Exception {
+	public void testRollback() {
 		try {
-			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-                @Override
-				public Void doInTransaction(TransactionStatus status) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			new TransactionTemplate(transactionManager).execute(status -> {
+					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                         @Override
 						public void afterCompletion(int status) {
-							super.afterCompletion(status);
 							txStatus = status;
 						}
 					});
 					throw new RuntimeException("Rollback!");
-				}
 			});
 			fail("Expected RuntimeException");
 		}
@@ -161,35 +132,27 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testRollbackNestedInner() throws Exception {
+	public void testRollbackNestedInner() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
-				public Void doInTransaction(TransactionStatus status) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                        @Override
-						public void afterCompletion(int status) {
-							super.afterCompletion(status);
-							txStatus = status;
-							count++;
-						}
-					});
-					transactionTemplate.execute(new TransactionCallback<Void>() {
-                        @Override
-						public Void doInTransaction(TransactionStatus status) {
-							assertEquals(0, count);
-							count++;
-							throw new RuntimeException("Rollback!");
-						}
-					});
-					assertEquals(1, count);
-					return null;
-				}
+			transactionTemplate.execute(outerStatus -> {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCompletion(int status) {
+						txStatus = status;
+						count++;
+					}
+				});
+				transactionTemplate.execute(innerStatus -> {
+					assertEquals(0, count);
+					count++;
+					throw new RuntimeException("Rollback!");
+				});
+				assertEquals(1, count);
+				return null;
 			});
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
@@ -197,35 +160,27 @@ public class ResourcelessTransactionManagerTests {
 	}
 
 	@Test
-	public void testRollbackNestedOuter() throws Exception {
+	public void testRollbackNestedOuter() {
 		final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 		try {
-			transactionTemplate.execute(new TransactionCallback<Void>() {
-                @Override
-				public Void doInTransaction(TransactionStatus status) {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                        @Override
-						public void afterCompletion(int status) {
-							super.afterCompletion(status);
-							txStatus = status;
-							count++;
-						}
-					});
-					transactionTemplate.execute(new TransactionCallback<Void>() {
-                        @Override
-						public Void doInTransaction(TransactionStatus status) {
-							assertEquals(0, count);
-							count++;
-							return null;
-						}
-					});
-					assertEquals(1, count);
-					throw new RuntimeException("Rollback!");
-				}
+			transactionTemplate.execute(outerStatus -> {
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCompletion(int status) {
+						txStatus = status;
+						count++;
+					}
+				});
+				transactionTemplate.execute(innerStatus -> {
+					assertEquals(0, count);
+					count++;
+					return null;
+				});
+				assertEquals(1, count);
+				throw new RuntimeException("Rollback!");
 			});
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
