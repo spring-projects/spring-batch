@@ -115,7 +115,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-		factory.setDataSource(this.dataSource);
+		factory.setDataSource(getDataSource());
 		factory.setTransactionManager(getTransactionManager());
 		factory.afterPropertiesSet();
 		return factory.getObject();
@@ -123,7 +123,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	protected JobExplorer createJobExplorer() throws Exception {
 		JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-		jobExplorerFactoryBean.setDataSource(this.dataSource);
+		jobExplorerFactoryBean.setDataSource(getDataSource());
 		jobExplorerFactoryBean.afterPropertiesSet();
 		return jobExplorerFactoryBean.getObject();
 	}
