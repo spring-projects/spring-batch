@@ -105,11 +105,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			"STEP_EXECUTION_ID=?";
 
 	private static final String COUNT_STEP_EXECUTIONS = "SELECT COUNT(*) " +
-			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
-			" where " +
-			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
-			"where JOB_INSTANCE_ID = ?)" +
-			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			" from %PREFIX%JOB_EXECUTION JE JOIN %PREFIX%STEP_EXECUTION SE " +
+			"      on SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"where JE.JOB_INSTANCE_ID = ?" +
 			"      and SE.STEP_NAME = ?";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
