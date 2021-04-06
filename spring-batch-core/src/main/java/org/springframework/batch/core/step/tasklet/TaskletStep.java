@@ -174,8 +174,8 @@ public class TaskletStep extends AbstractStep {
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setChunkListeners(ChunkListener[] listeners) {
-		for (ChunkListener listener : listeners) {
-			registerChunkListener(listener);
+		for (int i = 0; i < listeners.length; i++) {
+			registerChunkListener(listeners[i]);
 		}
 	}
 
@@ -191,8 +191,8 @@ public class TaskletStep extends AbstractStep {
 	 * @param streams an array of {@link ItemStream} objects.
 	 */
 	public void setStreams(ItemStream[] streams) {
-		for (ItemStream itemStream : streams) {
-			registerStream(itemStream);
+		for (int i = 0; i < streams.length; i++) {
+			registerStream(streams[i]);
 		}
 	}
 

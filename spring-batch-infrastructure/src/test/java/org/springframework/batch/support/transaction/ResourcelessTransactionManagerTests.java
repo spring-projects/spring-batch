@@ -152,7 +152,8 @@ public class ResourcelessTransactionManagerTests {
 				return null;
 			});
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
@@ -180,7 +181,8 @@ public class ResourcelessTransactionManagerTests {
 				throw new RuntimeException("Rollback!");
 			});
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Rollback!", e.getMessage());
 		}
 		assertEquals(TransactionSynchronization.STATUS_ROLLED_BACK, txStatus);
