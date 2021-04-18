@@ -77,7 +77,6 @@ public Job footballJob() {
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
-                     .end()
                      .build();
 }
 ----
@@ -113,7 +112,6 @@ public Job footballJob() {
                      .start(playerLoad())
                      .next(gameLoad())
                      .next(playerSummarization())
-                     .end()
                      .build();
 }
 ----

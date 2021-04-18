@@ -352,7 +352,6 @@ value of 10 as it would be defined in Java:
 public Job sampleJob() {
     return this.jobBuilderFactory.get("sampleJob")
                      .start(step1())
-                     .end()
                      .build();
 }
 
@@ -507,7 +506,6 @@ public Job footballJob() {
 				.start(playerLoad())
 				.next(gameLoad())
 				.next(playerSummarization())
-				.end()
 				.build();
 }
 
