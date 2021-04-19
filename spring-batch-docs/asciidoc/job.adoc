@@ -460,8 +460,8 @@ The core interface for this configuration is the `BatchConfigurer`.
 [source, java]
 ----
 @Bean
-public BatchConfigurer batchConfigurer() {
-	return new DefaultBatchConfigurer() {
+public BatchConfigurer batchConfigurer(DataSource dataSource) {
+	return new DefaultBatchConfigurer(dataSource) {
 		@Override
 		public PlatformTransactionManager getTransactionManager() {
 			return new MyTransactionManager();
