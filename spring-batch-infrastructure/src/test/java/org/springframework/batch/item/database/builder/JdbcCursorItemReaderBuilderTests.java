@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import static org.junit.Assert.fail;
  * @author Michael Minella
  * @author Drummond Dawson
  * @author Ankur Trapasiya
+ * @author Parikshit Dutta
  */
 public class JdbcCursorItemReaderBuilderTests {
 
@@ -312,6 +313,17 @@ public class JdbcCursorItemReaderBuilderTests {
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "ignoreWarnings"));
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "driverSupportsAbsolute"));
 		assertTrue((boolean) ReflectionTestUtils.getField(reader, "connectionAutoCommit"));
+	}
+
+	@Test
+	public void testVerifyCursorPositionDefaultToTrue() {
+		JdbcCursorItemReader<Foo> reader = new JdbcCursorItemReaderBuilder<Foo>()
+				.dataSource(this.dataSource)
+				.name("fooReader")
+				.sql("SELECT * FROM FOO ORDER BY FIRST")
+				.beanRowMapper(Foo.class)
+				.build();
+		assertTrue((boolean) ReflectionTestUtils.getField(reader, "verifyCursorPosition"));
 	}
 
 	@Test
