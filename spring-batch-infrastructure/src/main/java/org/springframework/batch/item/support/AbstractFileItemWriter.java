@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  *
  * @since 4.1
  */
@@ -271,6 +272,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		if (state != null) {
 			try {
 				if (footerCallback != null && state.outputBufferedWriter != null) {
+					state.outputBufferedWriter.write(lineSeparator);
 					footerCallback.writeFooter(state.outputBufferedWriter);
 					state.outputBufferedWriter.flush();
 				}
@@ -325,7 +327,6 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 			if (headerCallback != null) {
 				try {
 					headerCallback.writeHeader(outputState.outputBufferedWriter);
-					outputState.write(lineSeparator);
 				}
 				catch (IOException e) {
 					throw new ItemStreamException("Could not write headers.  The file may be corrupt.", e);
@@ -356,6 +357,15 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 			}
 
 			executionContext.putLong(getExecutionContextKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
+		}
+	}
+
+	protected boolean hasExistingItems() {
+		try {
+			return (state.position() > 0);
+		}
+		catch (IOException ioException) {
+			throw new ItemStreamException("ItemStream is not able to read offset position");
 		}
 	}
 
