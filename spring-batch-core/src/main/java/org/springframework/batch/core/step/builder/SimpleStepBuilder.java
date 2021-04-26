@@ -111,6 +111,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.reader = parent.reader;
 		this.writer = parent.writer;
 		this.processor = parent.processor;
+		this.itemProcessorFunction = parent.itemProcessorFunction;
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 	}
