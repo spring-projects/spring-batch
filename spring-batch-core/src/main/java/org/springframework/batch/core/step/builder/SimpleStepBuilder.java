@@ -64,6 +64,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  *
  * @since 2.2
  */
@@ -111,6 +112,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.reader = parent.reader;
 		this.writer = parent.writer;
 		this.processor = parent.processor;
+		this.itemProcessorFunction = parent.itemProcessorFunction;
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 	}
