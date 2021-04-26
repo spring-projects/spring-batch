@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import static org.junit.Assert.assertEquals;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  *
  */
 @SuppressWarnings("serial")
@@ -214,6 +215,15 @@ public class StepBuilderTests {
 
 	@Test
 	public void testFunctions() throws Exception {
+		assertStepFunctions(false);
+	}
+
+	@Test
+	public void testFunctionsWithFaultTolerantStep() throws Exception {
+		assertStepFunctions(true);
+	}
+
+	private void assertStepFunctions(boolean faultTolerantStep) throws Exception {
 		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
@@ -228,15 +238,19 @@ public class StepBuilderTests {
 		ItemReader<Long> reader = new ListItemReader<>(items);
 
 		ListItemWriter<String> itemWriter = new ListItemWriter<>();
-		@SuppressWarnings("unchecked")
+
 		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
-											 .repository(jobRepository)
-											 .transactionManager(transactionManager)
-											 .<Object, String>chunk(3)
-											 .reader(reader)
-											 .processor((Function<Object, String>) s -> s.toString())
-											 .writer(itemWriter)
-											 .listener(new AnnotationBasedStepExecutionListener());
+				.repository(jobRepository)
+				.transactionManager(transactionManager)
+				.<Object, String>chunk(3)
+				.reader(reader)
+				.processor((Function<Object, String>) s -> s.toString())
+				.writer(itemWriter)
+				.listener(new AnnotationBasedStepExecutionListener());
+
+		if (faultTolerantStep) {
+			builder = builder.faultTolerant();
+		}
 		builder.build().execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
