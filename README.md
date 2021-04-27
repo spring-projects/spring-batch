@@ -38,6 +38,27 @@ The reference documentation can be found in `spring-batch-docs/target`.
 ## Spring Tool Suite (STS)
 In STS (or any Eclipse distro or other IDE with Maven support), import the module directories as existing projects.  They should compile and the tests should run with no additional steps.
 
+## Using Docker
+
+If you want to build the project in a Docker container, you can proceed as follows:
+
+```
+$> docker run -it --mount type=bind,source="$(pwd)",target=/spring-batch maven:3-openjdk-8 bash
+#> cd spring-batch
+#> ./mvnw package
+```
+
+This will mount the source code that you cloned previously on the host inside the container.
+If you want to work on a copy of the source code inside the container (no side effects on the host),
+you can proceed as follows:
+
+```
+$> docker run -it maven:3-openjdk-8 bash
+#> git clone https://github.com/spring-projects/spring-batch.git
+#> cd spring-batch
+#> ./mvnw package
+```
+
 # Getting Started Using Spring Boot
 This is the quickest way to get started with a new Spring Batch project.  You find the Getting Started Guide for Spring
 Batch on Spring.io: [Creating a Batch Service](https://spring.io/guides/gs/batch-processing/)
