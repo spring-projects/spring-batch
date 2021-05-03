@@ -196,7 +196,6 @@ objects, throwing an exception if any other type is provided. Similarly, the
 public Job ioSampleJob() {
 	return this.jobBuilderFactory.get("ioSampleJOb")
 				.start(step1())
-				.end()
 				.build();
 }
 
@@ -299,7 +298,6 @@ Just as with the previous example, the composite processor can be configured int
 public Job ioSampleJob() {
 	return this.jobBuilderFactory.get("ioSampleJob")
 				.start(step1())
-				.end()
 				.build();
 }
 
@@ -438,7 +436,6 @@ the following example:
 public Job ioSampleJob() {
 	return this.jobBuilderFactory.get("ioSampleJob")
 				.start(step1())
-				.end()
 				.build();
 }
 
