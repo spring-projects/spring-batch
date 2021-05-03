@@ -178,7 +178,6 @@ The following example shows how to inject a delegate as a stream in XML:
 public Job ioSampleJob() {
 	return this.jobBuilderFactory.get("ioSampleJob")
 				.start(step1())
-				.end()
 				.build();
 }
 
