@@ -27,6 +27,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -57,8 +58,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration
 public class MySQLJdbcJobRepositoryIntegrationTests {
 
+	// TODO find the best way to externalize and manage image versions
+	// when implementing https://github.com/spring-projects/spring-batch/issues/3092
+	private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.24");
+
 	@ClassRule
-	public static MySQLContainer mysql = new MySQLContainer<>();
+	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
 	
 	@Autowired
 	private DataSource dataSource;
