@@ -24,7 +24,6 @@ import com.mysql.cj.jdbc.MysqlDataSource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.testcontainers.containers.MySQLContainer;
@@ -56,8 +55,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration
-@Ignore("Temporarily ignored until integration tests profile is created")
-public class MySQLJdbcJobRepositoryTests {
+public class MySQLJdbcJobRepositoryIntegrationTests {
 
 	@ClassRule
 	public static MySQLContainer mysql = new MySQLContainer<>();
