@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,11 +115,12 @@ public class MySQLJdbcJobRepositoryTests {
 	static class TestConfiguration {
 
 		@Bean
-		public DataSource dataSource() {
+		public DataSource dataSource() throws Exception {
 			MysqlDataSource datasource = new MysqlDataSource();
 			datasource.setURL(mysql.getJdbcUrl());
 			datasource.setUser(mysql.getUsername());
 			datasource.setPassword(mysql.getPassword());
+			datasource.setUseSSL(false);
 			return datasource;
 		}
 
