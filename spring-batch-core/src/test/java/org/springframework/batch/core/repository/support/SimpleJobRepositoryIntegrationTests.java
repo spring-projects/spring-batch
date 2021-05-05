@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import static org.junit.Assert.fail;
  *
  * @author Robert Kasanicky
  * @author Dimitrios Liapis
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
@@ -210,6 +211,25 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobExecution.addStepExecutions(Arrays.asList(stepExecution));
 		assertEquals(jobExecution, jobRepository.getLastJobExecution(job.getName(), jobParameters));
 		assertEquals(stepExecution, jobExecution.getStepExecutions().iterator().next());
+	}
+
+	/*
+	 * Create two job executions for the same job+parameters tuple. Should ignore
+	 * non-identifying job parameters when identifying the job instance.
+	 */
+	@Transactional
+	@Test
+	public void testReExecuteWithSameJobParameters() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder()
+				.addString("name", "foo", false)
+				.toJobParameters();
+		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		jobExecution1.setStatus(BatchStatus.COMPLETED);
+		jobExecution1.setEndTime(new Date());
+		jobRepository.update(jobExecution1);
+		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters);
+		assertNotNull(jobExecution1);
+		assertNotNull(jobExecution2);
 	}
 
 }
