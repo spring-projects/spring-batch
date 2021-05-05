@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -132,7 +133,9 @@ public class SimpleJobRepository implements JobRepository {
 							+ "The last execution ended with a failure that could not be rolled back, "
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
-				if (execution.getJobParameters().getParameters().size() > 0 && (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
+				Collection<JobParameter> allJobParameters = execution.getJobParameters().getParameters().values();
+				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying).count();
+				if (identifyingJobParametersCount > 0 && (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
 							+ ".  If you want to run this job again, change the parameters.");
