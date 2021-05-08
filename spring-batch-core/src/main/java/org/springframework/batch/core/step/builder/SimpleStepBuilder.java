@@ -64,6 +64,7 @@ import org.springframework.util.Assert;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Alexei Klenin
  *
  * @since 2.2
  */
@@ -265,7 +266,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
@@ -281,17 +281,13 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnProcessError.class));
 		itemListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnWriteError.class));
 
-		if(itemListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			itemListeners.add((StepListener) factory.getObject());
+		if (!itemListenerMethods.isEmpty()) {
+			StepListener stepListener = StepListenerFactoryBean.getListener(listener);
+			itemListeners.add(stepListener);
 		}
 
-		@SuppressWarnings("unchecked")
-		SimpleStepBuilder<I, O> result = this;
-		return result;
+		return this;
 	}
-
 
 	/**
 	 * Register an item reader listener.

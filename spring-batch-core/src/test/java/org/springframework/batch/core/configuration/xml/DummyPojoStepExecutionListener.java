@@ -15,15 +15,22 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 
 /**
  * @author Dave Syer
+ * @author Alexei Klenin
  * @since 2.1.2
  */
 public class DummyPojoStepExecutionListener extends AbstractTestComponent {
 
 	public void execute() {
 		executed = true;
+	}
+
+	@BeforeStep
+	public void beforeStep(StepExecution execution) {
 	}
 
 }

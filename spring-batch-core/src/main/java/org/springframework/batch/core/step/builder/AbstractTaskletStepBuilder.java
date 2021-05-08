@@ -23,6 +23,7 @@ import java.util.Set;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.annotation.AfterChunk;
 import org.springframework.batch.core.annotation.AfterChunkError;
 import org.springframework.batch.core.annotation.BeforeChunk;
@@ -47,6 +48,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Alexei Klenin
  *
  * @since 2.2
  *
@@ -159,10 +161,9 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunk.class));
 		chunkListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterChunkError.class));
 
-		if(chunkListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			this.listener((ChunkListener) factory.getObject());
+		if (!chunkListenerMethods.isEmpty()) {
+			StepListener stepListener = StepListenerFactoryBean.getListener(listener);
+			this.listener((ChunkListener) stepListener);
 		}
 
 		@SuppressWarnings("unchecked")

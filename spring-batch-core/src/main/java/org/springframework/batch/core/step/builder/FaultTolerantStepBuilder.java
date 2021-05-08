@@ -91,6 +91,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Alexei Klenin
  *
  * @since 2.2
  */
@@ -204,17 +205,13 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInProcess.class));
 		skipListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), OnSkipInWrite.class));
 
-		if(skipListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			skipListeners.add((SkipListener) factory.getObject());
+		if (!skipListenerMethods.isEmpty()) {
+			StepListener stepListener = StepListenerFactoryBean.getListener(listener);
+			skipListeners.add((SkipListener<I, O>) stepListener);
 		}
 
-		@SuppressWarnings("unchecked")
-		SimpleStepBuilder<I, O> result = this;
-		return result;
+		return this;
 	}
-
 
 	/**
 	 * Register a skip listener.

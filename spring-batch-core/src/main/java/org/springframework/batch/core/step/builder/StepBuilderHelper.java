@@ -17,8 +17,10 @@ package org.springframework.batch.core.step.builder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
@@ -40,6 +42,7 @@ import java.util.Set;
  * 
  * @author Dave Syer
  * @author Michael Minella
+ * @author Alexei Klenin
  *
  * @since 2.2
  */
@@ -91,14 +94,15 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 * @return this for fluent chaining
 	 */
 	public B listener(Object listener) {
+		StepListenerFactoryBean.assertListener(listener);
+
 		Set<Method> stepExecutionListenerMethods = new HashSet<>();
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
 
-		if(stepExecutionListenerMethods.size() > 0) {
-			StepListenerFactoryBean factory = new StepListenerFactoryBean();
-			factory.setDelegate(listener);
-			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());
+		if (!stepExecutionListenerMethods.isEmpty()) {
+			StepListener stepListener = StepListenerFactoryBean.getListener(listener);
+			properties.addStepExecutionListener((StepExecutionListener) stepListener);
 		}
 
 		@SuppressWarnings("unchecked")
