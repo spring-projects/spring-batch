@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Glenn Renfro
  */
 public class FlatFileItemReaderBuilderTests {
 
@@ -215,6 +218,42 @@ public class FlatFileItemReaderBuilderTests {
 		reader.open(new ExecutionContext());
 
 		assertNull(reader.read());
+	}
+
+	@Test
+	public void testDelimitedRelaxed() throws Exception {
+
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1 2 3"))
+				.delimited().delimiter(" ").strict(false).names("first", "second")
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertNull("3", item.getThird());
+	}
+
+	@Test
+	public void testDelimitedStrict(){
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>()
+				.name("fooReader")
+				.resource(getResource("1 2 3"))
+				.delimited().delimiter(" ").strict(true).names("first", "second")
+				.targetType(Foo.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+
+		Exception exception = assertThrows(RuntimeException.class, () -> {
+			reader.read();
+		});
+		String expectedMessage = "Parsing error at line: 1 in resource=[Byte array resource [resource loaded from byte array]], input=[1 2 3]";
+		String actualMessage = exception.getMessage();
+		assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test

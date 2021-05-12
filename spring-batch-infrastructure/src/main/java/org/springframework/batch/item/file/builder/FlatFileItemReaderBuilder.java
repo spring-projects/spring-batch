@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -634,6 +634,21 @@ public class FlatFileItemReaderBuilder<T> {
 		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
+		}
+
+		/**
+		 * If true (the default) then number of
+		 * tokens in line must match the number of tokens defined
+		 * (by {@link Range}, columns, etc.) in {@link LineTokenizer}.
+		 * If false then lines with less tokens will be tolerated and padded with
+		 * empty columns, and lines with more tokens will
+		 * simply be truncated.
+		 *
+		 * @param strict the strict flag to set
+		 */
+		public DelimitedBuilder  <T> strict(boolean strict) {
+			this.strict = strict;
+			return this;
 		}
 
 		/**
