@@ -533,7 +533,7 @@ public class FlatFileItemReaderBuilder<T> {
 
 		private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
 
-		private final boolean strict = true;
+		private boolean strict = true;
 
 		protected DelimitedBuilder(FlatFileItemReaderBuilder<T> parent) {
 			this.parent = parent;
@@ -607,6 +607,20 @@ public class FlatFileItemReaderBuilder<T> {
 		public FlatFileItemReaderBuilder<T> names(String... names) {
 			this.names.addAll(Arrays.asList(names));
 			return this.parent;
+		}
+
+		/**
+		 * If true (the default) then the number of tokens in line must match the number
+		 * of tokens defined (by {@link Range}, columns, etc.) in {@link LineTokenizer}.
+		 * If false then lines with less tokens will be tolerated and padded with empty
+		 * columns, and lines with more tokens will simply be truncated.
+		 *
+		 * @since 5.1
+		 * @param strict the strict flag to set
+		 */
+		public DelimitedBuilder<T> strict(boolean strict) {
+			this.strict = strict;
+			return this;
 		}
 
 		/**

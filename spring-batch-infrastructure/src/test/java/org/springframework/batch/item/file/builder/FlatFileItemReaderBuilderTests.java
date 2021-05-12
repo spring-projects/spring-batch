@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Glenn Renfro
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -213,6 +214,43 @@ class FlatFileItemReaderBuilderTests {
 		reader.open(new ExecutionContext());
 
 		assertNull(reader.read());
+	}
+
+	@Test
+	public void testDelimitedRelaxed() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1 2 3"))
+			.delimited()
+			.delimiter(" ")
+			.strict(false)
+			.names("first", "second")
+			.targetType(Foo.class)
+			.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertNull(item.getThird());
+	}
+
+	@Test
+	public void testDelimitedStrict() {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1 2 3"))
+			.delimited()
+			.delimiter(" ")
+			.strict(true)
+			.names("first", "second")
+			.targetType(Foo.class)
+			.build();
+
+		reader.open(new ExecutionContext());
+
+		Exception exception = assertThrows(RuntimeException.class, reader::read);
+		String expectedMessage = "Parsing error at line: 1 in resource=[Byte array resource [resource loaded from byte array]], input=[1 2 3]";
+		String actualMessage = exception.getMessage();
+		assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
