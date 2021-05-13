@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link FlatFileItemWriter}
@@ -415,6 +416,8 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private String delimiter = ",";
 
+		private String quote;
+
 		private FieldExtractor<T> fieldExtractor;
 
 		protected DelimitedBuilder(FlatFileItemWriterBuilder<T> parent) {
@@ -430,6 +433,18 @@ public class FlatFileItemWriterBuilder<T> {
 		 */
 		public DelimitedBuilder<T> delimiter(String delimiter) {
 			this.delimiter = delimiter;
+			return this;
+		}
+
+		/**
+		 * Define the quote for each delimited field.  Default is null (no quote).
+		 *
+		 * @param quote String used as a quote for the aggregate.
+		 * @return The instance of the builder for chaining.
+		 * @see DelimitedLineAggregator#setQuote(String)
+		 */
+		public DelimitedBuilder<T> quote(String quote) {
+			this.quote = quote;
 			return this;
 		}
 
@@ -465,6 +480,9 @@ public class FlatFileItemWriterBuilder<T> {
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
 			if (this.delimiter != null) {
 				delimitedLineAggregator.setDelimiter(this.delimiter);
+			}
+			if (StringUtils.hasText(this.quote)) {
+				delimitedLineAggregator.setQuote(this.quote);
 			}
 
 			if (this.fieldExtractor == null) {

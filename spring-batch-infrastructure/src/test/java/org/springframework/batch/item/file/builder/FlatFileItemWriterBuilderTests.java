@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import static org.junit.Assert.assertTrue;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Glenn Renfro
  */
 public class FlatFileItemWriterBuilderTests {
 
@@ -145,6 +146,35 @@ public class FlatFileItemWriterBuilderTests {
 		writer.close();
 
 		assertEquals("HEADER$123$456$FOOTER", readLine("UTF-16LE", output));
+	}
+
+	@Test
+	public void testDelimitedOutputWithEmptyDelimiterAndQuote() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.resource(output)
+				.lineSeparator("$")
+				.delimited()
+				.delimiter("")
+				.quote("%")
+				.names("first", "second", "third")
+				.encoding("UTF-16LE")
+				.headerCallback(writer1 -> writer1.append("HEADER"))
+				.footerCallback(writer12 -> writer12.append("FOOTER"))
+				.build();
+
+		ExecutionContext executionContext = new ExecutionContext();
+
+		writer.open(executionContext);
+
+		writer.write(Arrays.asList(new Foo(1, 2, "3"), new Foo(4, 5, "6")));
+
+		writer.close();
+
+		assertEquals("HEADER$%1%%2%%3%$%4%%5%%6%$FOOTER", readLine("UTF-16LE", output));
 	}
 
 	@Test

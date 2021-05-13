@@ -48,6 +48,30 @@ public class DelimitedLineAggregatorTests {
 	}
 
 	@Test
+	public void testSetDelimiterandQuote() {
+		aggregator.setDelimiter(";");
+		aggregator.setQuote("\"");
+		assertEquals("\"foo\";\"bar\"", aggregator.aggregate(new String[] { "foo", "bar" }));
+	}
+
+	@Test
+	public void testSetDelimiterandQuoteAndEmbeddedQuote() {
+		aggregator.setDelimiter(";");
+		aggregator.setQuote("\"");
+		assertEquals("\"fo\"\"\"o\";\"bar\"", aggregator.aggregate(new String[] { "fo\"o", "bar" }));
+		assertEquals("\"fo\"\"\"o\";\"bar\"\"\"\"", aggregator.aggregate(new String[] { "fo\"o", "bar\"" }));
+	}
+
+	@Test
+	public void testSetDelimiterandQuoteSingleItem() {
+		aggregator.setDelimiter(";");
+		aggregator.setQuote("\"");
+		assertEquals("\"foo\"", aggregator.aggregate(new String[] { "foo" }));
+		aggregator.setQuote("%");
+		assertEquals("%b%%%ar%", aggregator.aggregate(new String[] { "b%ar" }));
+	}
+
+	@Test
 	public void testAggregate() {
 		assertEquals("foo,bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
