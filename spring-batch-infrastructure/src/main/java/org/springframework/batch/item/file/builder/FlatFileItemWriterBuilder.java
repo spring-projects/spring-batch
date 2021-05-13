@@ -34,6 +34,7 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.RecordFieldExtractor;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * A builder implementation for the {@link FlatFileItemWriter}
@@ -424,6 +425,8 @@ public class FlatFileItemWriterBuilder<T> {
 
 		private String delimiter = ",";
 
+		private String quoteCharacter = "";
+
 		private FieldExtractor<T> fieldExtractor;
 
 		private Class<T> sourceType;
@@ -458,6 +461,17 @@ public class FlatFileItemWriterBuilder<T> {
 		}
 
 		/**
+		 * Define the quote character for each delimited field. Default is empty string.
+		 * @param quoteCharacter String used as a quote for the aggregate.
+		 * @return The instance of the builder for chaining.
+		 * @see DelimitedLineAggregator#setQuoteCharacter(String)
+		 */
+		public DelimitedBuilder<T> quoteCharacter(String quoteCharacter) {
+			this.quoteCharacter = quoteCharacter;
+			return this;
+		}
+
+		/**
 		 * Names of each of the fields within the fields that are returned in the order
 		 * they occur within the delimited file. These names will be used to create a
 		 * {@link BeanWrapperFieldExtractor} only if no explicit field extractor is set
@@ -488,6 +502,9 @@ public class FlatFileItemWriterBuilder<T> {
 			DelimitedLineAggregator<T> delimitedLineAggregator = new DelimitedLineAggregator<>();
 			if (this.delimiter != null) {
 				delimitedLineAggregator.setDelimiter(this.delimiter);
+			}
+			if (StringUtils.hasLength(this.quoteCharacter)) {
+				delimitedLineAggregator.setQuoteCharacter(this.quoteCharacter);
 			}
 
 			if (this.fieldExtractor == null) {
