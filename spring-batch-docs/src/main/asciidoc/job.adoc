@@ -1482,7 +1482,7 @@ can have "natural" names. So for example, you can create a set of XML configurat
 each having only one Job, but all having different definitions of an `ItemReader` with the
 same bean name, such as "reader". If all those files were imported into the same context,
 the reader definitions would clash and override one another, but with the automatic
-regsistrar this is avoided. This makes it easier to integrate jobs contributed from
+registrar this is avoided. This makes it easier to integrate jobs contributed from
 separate modules of an application.
 
 [role="xmlContent"]
