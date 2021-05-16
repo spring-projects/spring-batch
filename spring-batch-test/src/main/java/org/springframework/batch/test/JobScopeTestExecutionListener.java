@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,20 +106,6 @@ public class JobScopeTestExecutionListener implements TestExecutionListener {
 		if (testContext.hasAttribute(JOB_EXECUTION)) {
 			JobSynchronizationManager.close();
 		}
-	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void afterTestClass(TestContext testContext) throws Exception {
-	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void beforeTestClass(TestContext testContext) throws Exception {
 	}
 	
 	/**

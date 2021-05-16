@@ -109,20 +109,6 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 			StepSynchronizationManager.close();
 		}
 	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void afterTestClass(TestContext testContext) throws Exception {
-	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void beforeTestClass(TestContext testContext) throws Exception {
-	}
 	
 	/**
 	 * Discover a {@link StepExecution} as a field in the test case or create
