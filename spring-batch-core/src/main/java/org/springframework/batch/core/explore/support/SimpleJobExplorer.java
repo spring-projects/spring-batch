@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import java.util.Set;
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
+ * @author Glenn Renfro
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -242,6 +243,38 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public long getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException {
 		return jobInstanceDao.getJobInstanceCount(jobName);
+	}
+
+	/**
+	 * @return instance of {@link JobInstanceDao}.
+	 * @since 5.1
+	 */
+	protected JobInstanceDao getJobInstanceDao() {
+		return jobInstanceDao;
+	}
+
+	/**
+	 * @return instance of {@link JobExecutionDao}.
+	 * @since 5.1
+	 */
+	protected JobExecutionDao getJobExecutionDao() {
+		return jobExecutionDao;
+	}
+
+	/**
+	 * @return instance of {@link StepExecutionDao}.
+	 * @since 5.1
+	 */
+	protected StepExecutionDao getStepExecutionDao() {
+		return stepExecutionDao;
+	}
+
+	/**
+	 * @return instance of {@link ExecutionContextDao}.
+	 * @since 5.1
+	 */
+	protected ExecutionContextDao getEcDao() {
+		return ecDao;
 	}
 
 	/*
