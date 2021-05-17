@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
+
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
@@ -38,6 +40,7 @@ import static org.junit.Assert.assertTrue;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Glenn Renfro
  */
 public class FlatFileItemWriterBuilderTests {
 
@@ -264,6 +267,8 @@ public class FlatFileItemWriterBuilderTests {
 
 		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
+		String encoding = Charset.defaultCharset().name();
+
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
 				.resource(output)
@@ -276,13 +281,39 @@ public class FlatFileItemWriterBuilderTests {
 				.lineAggregator(new PassThroughLineAggregator<>())
 				.build();
 
+		validateBuilderFlags(writer, encoding);
+	}
+
+	@Test
+	public void testFlagsWithEncoding() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		String encoding = "UTF-8";
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.encoding(encoding)
+				.resource(output)
+				.shouldDeleteIfEmpty(true)
+				.shouldDeleteIfExists(false)
+				.saveState(false)
+				.forceSync(true)
+				.append(true)
+				.transactional(false)
+				.lineAggregator(new PassThroughLineAggregator<>())
+				.build();
+		validateBuilderFlags(writer, encoding);
+	}
+
+	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "saveState"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "append"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "transactional"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfEmpty"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfExists"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "forceSync"));
+		assertEquals( encoding, ReflectionTestUtils.getField(writer, "encoding"));
 	}
+
 
 	private String readLine(String encoding, Resource outputFile ) throws IOException {
 
