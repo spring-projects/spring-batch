@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -39,10 +40,14 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	protected LineAggregator<T> lineAggregator;
+
+	// default encoding for writing to flat files - set to charset of this Java virtual machine.
+	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
 	public FlatFileItemWriter() {
 		this.setExecutionContextName(ClassUtils.getShortName(FlatFileItemWriter.class));

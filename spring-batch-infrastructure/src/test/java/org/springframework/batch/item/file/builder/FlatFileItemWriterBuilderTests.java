@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -38,6 +39,7 @@ import static org.junit.Assert.assertTrue;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Glenn Renfro
  */
 public class FlatFileItemWriterBuilderTests {
 
@@ -275,13 +277,13 @@ public class FlatFileItemWriterBuilderTests {
 				.transactional(false)
 				.lineAggregator(new PassThroughLineAggregator<>())
 				.build();
-
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "saveState"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "append"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "transactional"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfEmpty"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfExists"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "forceSync"));
+		assertEquals( Charset.defaultCharset().name(), ReflectionTestUtils.getField(writer, "encoding"));
 	}
 
 	private String readLine(String encoding, Resource outputFile ) throws IOException {
