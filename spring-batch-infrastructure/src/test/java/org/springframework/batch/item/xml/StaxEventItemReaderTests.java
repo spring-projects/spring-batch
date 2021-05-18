@@ -47,6 +47,7 @@ import javax.xml.transform.Source;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -71,6 +72,7 @@ import static org.mockito.Mockito.when;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 class StaxEventItemReaderTests {
 
@@ -582,7 +584,9 @@ class StaxEventItemReaderTests {
 		source.setStrict(true);
 		source.afterPropertiesSet();
 
-		assertThrows(ItemStreamException.class, () -> source.open(executionContext));
+		ItemStreamException exception = assertThrows(ItemStreamException.class, () -> source.open(executionContext));
+		assertEquals("Input resource file:/non/existent/file must exist (reader is in 'strict' mode)",
+				exception.getCause().getMessage());
 
 	}
 
@@ -832,6 +836,11 @@ class StaxEventItemReaderTests {
 		@Override
 		public InputStream getInputStream() throws IOException {
 			return null;
+		}
+
+		@Override
+		public URL getURL() throws IOException {
+			return new URL("file:/non/existent/file");
 		}
 
 	}
