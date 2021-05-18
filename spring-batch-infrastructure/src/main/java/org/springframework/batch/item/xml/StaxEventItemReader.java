@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ import org.springframework.util.xml.StaxUtils;
  * 
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 ResourceAwareItemReaderItemStream<T>, InitializingBean {
@@ -223,14 +224,14 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 		noInput = true;
 		if (!resource.exists()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");
+				throw new IllegalStateException("Input resource " + resource.getURL() + " must exist (reader is in 'strict' mode)");
 			}
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
 		if (!resource.isReadable()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must be readable (reader is in 'strict' mode)");
+				throw new IllegalStateException("Input resource  " + resource.getURL() + " must be readable (reader is in 'strict' mode)");
 			}
 			logger.warn("Input resource is not readable " + resource.getDescription());
 			return;

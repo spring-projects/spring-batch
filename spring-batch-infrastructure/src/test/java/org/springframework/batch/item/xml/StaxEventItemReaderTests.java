@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2020 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Unmarshaller;
@@ -57,6 +58,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -64,6 +66,7 @@ import static org.junit.Assert.fail;
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public class StaxEventItemReaderTests {
 
@@ -108,6 +111,41 @@ public class StaxEventItemReaderTests {
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		source.afterPropertiesSet();
+	}
+
+	/**
+	 * Regular usage scenario. ItemReader should pass XML fragments to unmarshaller wrapped with StartDocument and
+	 * EndDocument events.
+	 */
+	@Test
+	public void testNoResource() throws Exception {
+		final String FILE_NOT_HERE = "file.not.here";
+		final String CLASSPATH_NOT_HERE = "classpath.not.here";
+
+		StaxEventItemReader<List<XMLEvent>> newSource = getBadResource(new FileSystemResource(new File(FILE_NOT_HERE)));
+		verifyStrictResult(newSource, FILE_NOT_HERE);
+		newSource = getBadResource(new ClassPathResource(CLASSPATH_NOT_HERE));
+		verifyStrictResult(newSource, CLASSPATH_NOT_HERE);
+	}
+
+	private void verifyStrictResult(StaxEventItemReader<List<XMLEvent>> newSource, String message) {
+		Exception exception = assertThrows(ItemStreamException.class, () -> {
+			newSource.open(executionContext);
+		});
+		String actualMessage = exception.getCause().getMessage();
+		assertTrue(actualMessage.contains(message));
+		newSource.close();
+	}
+	private StaxEventItemReader<List<XMLEvent>> getBadResource(Resource resource) throws Exception{
+		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<>();
+		newSource.setResource(resource);
+
+		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
+		newSource.setUnmarshaller(unmarshaller);
+		newSource.setSaveState(true);
+
+		newSource.afterPropertiesSet();
+		return newSource;
 	}
 
 	@Test
