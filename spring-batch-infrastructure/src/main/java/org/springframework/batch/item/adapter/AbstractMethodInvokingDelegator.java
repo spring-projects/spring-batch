@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
@@ -213,6 +214,20 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	protected Object[] getArguments() {
 		return arguments;
+	}
+
+	/**
+	 * @return the object on which the method will be invoked.
+	 */
+	protected Object getTargetObject() {
+		return targetObject;
+	}
+
+	/**
+	 * @return the name of the method to be invoked.
+	 */
+	protected String getTargetMethod() {
+		return targetMethod;
 	}
 
 	/**
