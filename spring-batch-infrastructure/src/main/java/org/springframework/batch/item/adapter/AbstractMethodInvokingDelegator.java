@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.springframework.util.MethodInvoker;
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 
@@ -197,6 +198,20 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	public void setTargetMethod(String targetMethod) {
 		this.targetMethod = targetMethod;
+	}
+
+	/**
+	 * @return the object that the method will be invoked.
+	 */
+	protected Object getTargetObject() {
+		return targetObject;
+	}
+
+	/**
+	 * @return the name of the method to be invoked.
+	 */
+	protected String getTargetMethod() {
+		return targetMethod;
 	}
 
 	/**
