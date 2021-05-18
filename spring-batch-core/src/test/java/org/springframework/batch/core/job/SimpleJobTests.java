@@ -412,29 +412,6 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testRestartWithNullParameter() throws Exception {
-
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", null).toJobParameters();
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		jobInstance = jobExecution.getJobInstance();
-
-		step1.setAllowStartIfComplete(true);
-		final RuntimeException exception = new RuntimeException("Foo!");
-		step2.setProcessException(exception);
-
-		job.execute(jobExecution);
-		Throwable e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
-
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		job.execute(jobExecution);
-		e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
-		assertTrue(step1.passedInStepContext.isEmpty());
-		assertFalse(step2.passedInStepContext.isEmpty());
-	}
-
-	@Test
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 

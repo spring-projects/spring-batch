@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,24 +63,6 @@ public abstract class AbstractJobInstanceDaoTests {
 		assertEquals(fooJob, fooInstance.getJobName());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
-		assertEquals(fooInstance, retrievedInstance);
-		assertEquals(fooJob, retrievedInstance.getJobName());
-	}
-
-	/*
-	 * Create and retrieve a job instance.
-	 */
-	@Transactional
-	@Test
-	public void testCreateAndRetrieveWithNullParameter() throws Exception {
-
-		JobParameters jobParameters = new JobParametersBuilder().addString("foo", null).toJobParameters();
-
-		JobInstance fooInstance = dao.createJobInstance(fooJob, jobParameters);
-		assertNotNull(fooInstance.getId());
-		assertEquals(fooJob, fooInstance.getJobName());
-
-		JobInstance retrievedInstance = dao.getJobInstance(fooJob, jobParameters);
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
 	}

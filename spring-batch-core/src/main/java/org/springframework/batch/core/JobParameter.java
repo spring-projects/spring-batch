@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package org.springframework.batch.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
+
 /**
  * Domain representation of a parameter to a batch job. Only the following types
  * can be parameters: String, Long, Date, and Double.  The identifying flag is
@@ -28,10 +31,10 @@ import java.util.Date;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  *
  */
-@SuppressWarnings("serial")
 public class JobParameter implements Serializable {
 
 	private final Object parameter;
@@ -42,51 +45,49 @@ public class JobParameter implements Serializable {
 
 	/**
 	 * Construct a new JobParameter as a String.
-	 * @param parameter {@link String} instance.
+	 * @param parameter {@link String} instance. Must not be {@code null}.
 	 * @param identifying true if JobParameter should be identifying.
 	 */
-	public JobParameter(String parameter, boolean identifying) {
-		this.parameter = parameter;
-		parameterType = ParameterType.STRING;
-		this.identifying = identifying;
+	public JobParameter(@NonNull String parameter, boolean identifying) {
+		this(parameter, identifying, ParameterType.STRING);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Long.
 	 *
-	 * @param parameter {@link Long} instance.
+	 * @param parameter {@link Long} instance. Must not be {@code null}.
 	 * @param identifying true if JobParameter should be identifying.
 	 */
-	public JobParameter(Long parameter, boolean identifying) {
-		this.parameter = parameter;
-		parameterType = ParameterType.LONG;
-		this.identifying = identifying;
+	public JobParameter(@NonNull Long parameter, boolean identifying) {
+		this(parameter, identifying, ParameterType.LONG);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Date.
 	 *
-	 * @param parameter {@link Date} instance.
+	 * @param parameter {@link Date} instance. Must not be {@code null}.
 	 * @param identifying true if JobParameter should be identifying.
 	 */
-	public JobParameter(Date parameter, boolean identifying) {
-		this.parameter = parameter;
-		parameterType = ParameterType.DATE;
-		this.identifying = identifying;
+	public JobParameter(@NonNull Date parameter, boolean identifying) {
+		this(parameter, identifying, ParameterType.DATE);
 	}
 
 	/**
 	 * Construct a new JobParameter as a Double.
 	 *
-	 * @param parameter {@link Double} instance.
+	 * @param parameter {@link Double} instance. Must not be {@code null}.
 	 * @param identifying true if JobParameter should be identifying.
 	 */
-	public JobParameter(Double parameter, boolean identifying) {
-		this.parameter = parameter;
-		parameterType = ParameterType.DOUBLE;
-		this.identifying = identifying;
+	public JobParameter(@NonNull Double parameter, boolean identifying) {
+		this(parameter, identifying, ParameterType.DOUBLE);
 	}
 
+	private JobParameter(Object parameter, boolean identifying, ParameterType parameterType) {
+		Assert.notNull(parameter, "parameter must not be null");
+		this.parameter = parameter;
+		this.parameterType = parameterType;
+		this.identifying = identifying;
+	}
 
 	/**
 	 * Construct a new JobParameter as a String.
@@ -94,9 +95,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter {@link String} instance.
 	 */
 	public JobParameter(String parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.STRING;
-		this.identifying = true;
+		this(parameter, true);
 	}
 
 	/**
@@ -105,9 +104,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter {@link Long} instance.
 	 */
 	public JobParameter(Long parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.LONG;
-		this.identifying = true;
+		this(parameter, true);
 	}
 
 	/**
@@ -116,9 +113,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter {@link Date} instance.
 	 */
 	public JobParameter(Date parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.DATE;
-		this.identifying = true;
+		this(parameter, true);
 	}
 
 	/**
@@ -127,9 +122,7 @@ public class JobParameter implements Serializable {
 	 * @param parameter {@link Double} instance.
 	 */
 	public JobParameter(Double parameter) {
-		this.parameter = parameter;
-		parameterType = ParameterType.DOUBLE;
-		this.identifying = true;
+		this(parameter, true);
 	}
 
 	public boolean isIdentifying() {
@@ -140,13 +133,7 @@ public class JobParameter implements Serializable {
 	 * @return the value contained within this JobParameter.
 	 */
 	public Object getValue() {
-
-		if (parameter != null && parameter.getClass().isInstance(Date.class)) {
-			return new Date(((Date) parameter).getTime());
-		}
-		else {
-			return parameter;
-		}
+		return parameter;
 	}
 
 	/**
@@ -158,7 +145,7 @@ public class JobParameter implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof JobParameter == false) {
+		if (!(obj instanceof JobParameter)) {
 			return false;
 		}
 
@@ -167,18 +154,17 @@ public class JobParameter implements Serializable {
 		}
 
 		JobParameter rhs = (JobParameter) obj;
-		return parameter==null ? rhs.parameter==null && parameterType==rhs.parameterType: parameter.equals(rhs.parameter);
+		return parameterType == rhs.parameterType && parameter.equals(rhs.parameter);
 	}
 
 	@Override
 	public String toString() {
-		return parameter == null ? null : (parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime()
-				: parameter.toString());
+		return  parameterType == ParameterType.DATE ? "" + ((Date) parameter).getTime() : parameter.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return 7 + 21 * (parameter == null ? parameterType.hashCode() : parameter.hashCode());
+		return 7 + 21 * parameter.hashCode();
 	}
 
 	/**

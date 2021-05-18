@@ -121,20 +121,6 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testNullRuntimeParameters(){
-		this.parametersBuilder.addDate("SCHEDULE_DATE", null);
-		this.parametersBuilder.addLong("LONG", null);
-		this.parametersBuilder.addString("STRING", null);
-		this.parametersBuilder.addDouble("DOUBLE", null);
-
-		JobParameters parameters = this.parametersBuilder.toJobParameters();
-		assertNull(parameters.getDate("SCHEDULE_DATE"));
-		assertNull(parameters.getLong("LONG"));
-		assertNull(parameters.getString("STRING"));
-		assertNull(parameters.getLong("DOUBLE"));
-	}
-
-	@Test
 	public void testCopy(){
 		this.parametersBuilder.addString("STRING", "string value");
 		this.parametersBuilder = new JobParametersBuilder(this.parametersBuilder.toJobParameters());

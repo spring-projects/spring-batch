@@ -75,12 +75,6 @@ public class JobParametersTests {
 	}
 
 	@Test
-	public void testGetNullString() {
-		parameters = new JobParameters(Collections.singletonMap("string.key1", new JobParameter((String) null, true)));
-		assertNull(parameters.getDate("string.key1"));
-	}
-
-	@Test
 	public void testGetLong() {
 		assertEquals(1L, parameters.getLong("long.key1").longValue());
 		assertEquals(2L, parameters.getLong("long.key2").longValue());
@@ -96,18 +90,6 @@ public class JobParametersTests {
 	public void testGetDate() {
 		assertEquals(date1, parameters.getDate("date.key1"));
 		assertEquals(date2, parameters.getDate("date.key2"));
-	}
-
-	@Test
-	public void testGetNullDate() {
-		parameters = new JobParameters(Collections.singletonMap("date.key1", new JobParameter((Date)null, true)));
-		assertNull(parameters.getDate("date.key1"));
-	}
-
-	@Test
-	public void testGetEmptyLong() {
-		parameters = new JobParameters(Collections.singletonMap("long1", new JobParameter((Long)null, true)));
-		assertNull(parameters.getLong("long1"));
 	}
 
 	@Test
@@ -231,14 +213,4 @@ public class JobParametersTests {
 		assertNull(new JobParameters().getDate("keythatdoesntexist"));
 	}
 
-	@Test
-	public void testToPropertiesWithNullValue() {
-		Map<String, JobParameter> parameterMap = new HashMap<>();
-		Long value = null;
-		parameterMap.put("nullkey", new JobParameter(value));
-		JobParameters jobParameters = new JobParameters(parameterMap);
-
-		Properties properties = jobParameters.toProperties();
-		assertEquals("", properties.get("nullkey"));
-	}
 }

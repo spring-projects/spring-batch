@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,9 @@ public class JobParameterTests {
 		assertEquals("test", jobParameter.getValue());
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testNullStringParameter(){
 		jobParameter = new JobParameter((String)null, true);
-		assertEquals(null, jobParameter.getValue());
 	}
 
 	@Test
@@ -62,10 +61,9 @@ public class JobParameterTests {
 		assertEquals(new Date(0L), jobParameter.getValue());
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testNullDateParameter(){
 		jobParameter = new JobParameter((Date)null, true);
-		assertEquals(null, jobParameter.getValue());
 	}
 
 	@Test
@@ -86,27 +84,6 @@ public class JobParameterTests {
 	public void testHashcode(){
 		jobParameter = new JobParameter("test", true);
 		JobParameter testParameter = new JobParameter("test", true);
-		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
-	}
-
-	@Test
-	public void testEqualsWithNull(){
-		jobParameter = new JobParameter((String)null, true);
-		JobParameter testParameter = new JobParameter((String)null, true);
-		assertTrue(jobParameter.equals(testParameter));
-	}
-
-	@Test
-	public void testEqualsWithNullAndDifferentType(){
-		jobParameter = new JobParameter((String)null, true);
-		JobParameter testParameter = new JobParameter((Date)null, true);
-		assertFalse(jobParameter.equals(testParameter));
-	}
-
-	@Test
-	public void testHashcodeWithNull(){
-		jobParameter = new JobParameter((String)null, true);
-		JobParameter testParameter = new JobParameter((String)null, true);
 		assertEquals(testParameter.hashCode(), jobParameter.hashCode());
 	}
 
