@@ -28,5 +28,10 @@
 			<destName>spring-batch-reference.pdf</destName>
 			<outputDirectory>reference/pdf</outputDirectory>
 		</file>
+		<file>
+			<source>target/asciidoc/index-single.epub</source>
+			<destName>spring-batch-reference.epub</destName>
+			<outputDirectory>reference/epub</outputDirectory>
+		</file>
 	</files>
 </assembly>
