@@ -33,6 +33,8 @@ To generate the reference documentation, run:
 
     $ ./mvnw site
 
+NOTE: Generate the project before generating the reference documentation. The reference documentation build picks up content from the project build.
+
 The reference documentation can be found in `spring-batch-docs/target`.
 
 ## Spring Tool Suite (STS)
