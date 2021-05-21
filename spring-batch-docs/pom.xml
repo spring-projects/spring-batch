@@ -18,7 +18,7 @@
             <type>zip</type>
         </dependency>
     </dependencies>
-    
+
     <build>
         <resources>
             <resource>
@@ -65,6 +65,11 @@
                         <groupId>org.asciidoctor</groupId>
                         <artifactId>asciidoctorj-pdf</artifactId>
                         <version>${asciidoctorj-pdf.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctorj-epub3</artifactId>
+                        <version>${asciidoctorj-epub.version}</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -120,6 +125,27 @@
                             </attributes>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-epub</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>epub3</backend>
+                            <doctype>book</doctype>
+                            <attributes>
+                                <icons>font</icons>
+                                <pagenums />
+                                <sectnums />
+                                <sectanchors />
+                                <toc />
+                                <source-highlighter>coderay</source-highlighter>
+                                <project-version>${project.version}</project-version>
+                                <revnumber>${project.version}</revnumber>
+                            </attributes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -155,7 +181,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <repositories>
         <repository>
             <id>spring-releases</id>
