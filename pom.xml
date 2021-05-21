@@ -21,7 +21,7 @@
 		<module>spring-batch-jsr352-tck</module>
 		<module>spring-batch-docs</module>
 	</modules>
-	
+
 	<organization>
 		<name>Spring</name>
 		<url>https://spring.io</url>
@@ -113,10 +113,11 @@
 		<quartz.version>2.3.2</quartz.version>
 		<prometheus_pushgateway.version>0.10.0</prometheus_pushgateway.version>
 		<groovy.version>2.5.14</groovy.version>
-		
+
 		<!-- documentation dependencies -->
 		<spring-doc-resources.version>0.2.5</spring-doc-resources.version>
 		<asciidoctorj-pdf.version>1.5.4</asciidoctorj-pdf.version>
+		<asciidoctorj-epub.version>1.5.1</asciidoctorj-epub.version>
 
 		<!-- plugin versions -->
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -276,7 +277,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>test-coverage</id>
@@ -334,7 +335,7 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 	<repositories>
 		<repository>
 			<id>maven-central</id>
@@ -385,7 +386,7 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	
+
 	<developers>
 		<developer>
 			<id>dsyer</id>
