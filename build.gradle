@@ -802,6 +802,7 @@ task docsZip(type: Zip) {
 		classifier = 'docs'
 		description = "Builds -${classifier} archive containing api and reference " +
 			"for deployment at static.springframework.org/spring-batch/reference."
+		duplicatesStrategy = 'fail'
 
 		from('src/dist') {
 			include 'changelog.txt'
@@ -811,13 +812,13 @@ task docsZip(type: Zip) {
 			into 'api'
 		}
 
-		from (asciidoctorPdf) {
+		from (asciidoctorPdf.outputDir) {
 			include "index-single.pdf"
 			rename  'index-single.pdf', 'spring-batch-reference.pdf'
 			into 'reference/pdf'
 		}
 
-		from (asciidoctor) {
+		from (asciidoctor.outputDir) {
 			include "*.html"
 			include "css/**"
 			include "js/**"
