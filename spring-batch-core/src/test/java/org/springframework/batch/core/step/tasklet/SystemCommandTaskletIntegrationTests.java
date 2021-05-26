@@ -85,6 +85,20 @@ class SystemCommandTaskletIntegrationTests {
 	}
 
 	/*
+	 * Power usage scenario - successful execution of system command.
+	 */
+	@Test
+	public void testExecuteWithSeparateArgument() throws Exception {
+		tasklet.setCommand(getJavaCommand(), "--version");
+		tasklet.afterPropertiesSet();
+
+		log.info("Executing command: " + getJavaCommand() + " --version");
+		RepeatStatus exitStatus = tasklet.execute(stepExecution.createStepContribution(), null);
+
+		assertEquals(RepeatStatus.FINISHED, exitStatus);
+	}
+
+	/*
 	 * Regular usage scenario - successful execution of system command.
 	 */
 	@Test

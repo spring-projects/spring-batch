@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set, so that
  * the batch job does not hang forever if the external process hangs.
  *
- * Tasklet periodically checks for termination status (i.e. {@link #setCommand(String)}
+ * Tasklet periodically checks for termination status (i.e. {@link #setCommand(String...)}
  * finished its execution or {@link #setTimeout(long)} expired or job was interrupted).
  * The check interval is given by {@link #setTerminationCheckInterval(long)}.
  *
@@ -66,7 +66,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	private CommandRunner commandRunner = new JvmCommandRunner();
 
-	private String command;
+	private String[] cmdArray;
 
 	private String[] environmentParams = null;
 
@@ -102,8 +102,14 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 			@Override
 			public Integer call() throws Exception {
-				Process process = commandRunner.exec(command, environmentParams, workingDirectory);
-				return process.waitFor();
+				if (cmdArray.length == 1) {
+					String command = cmdArray[0];
+					Process process = commandRunner.exec(command, environmentParams, workingDirectory);
+					return process.waitFor();
+				} else {
+					Process process = Runtime.getRuntime().exec(cmdArray, environmentParams, workingDirectory);
+					return process.waitFor();
+				}
 			}
 
 		});
@@ -134,6 +140,7 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 			}
 			else if (execution.isTerminateOnly()) {
 				systemCommandTask.cancel(interruptOnCancel);
+				String command = String.join(" ", cmdArray);
 				throw new JobInterruptedException("Job interrupted while executing system command '" + command + "'");
 			}
 			else if (stopped) {
@@ -155,10 +162,17 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	}
 
 	/**
-	 * @param command command to be executed in a separate system process
+	 * @param command command to be executed in a separate system process. Either a single command can be supplied
+	 *                to be tokenized with a space delimiter, or the command and its arguments are supplied as multiple
+	 *                strings that are not tokenized.
+	 * <p>
+	 * <p>Possible calls to setCommand:
+     *
+	 * <pre> {@code setCommand("myCommand myArg1 myArg2");}</pre>
+	 * <pre> {@code setCommand("myCommand", "myArg1", "myArg2 'args for myArg2'");}</pre>
 	 */
-	public void setCommand(String command) {
-		this.command = command;
+	public void setCommand(String... command) {
+		this.cmdArray = command ;
 	}
 
 	/**
@@ -187,7 +201,10 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(commandRunner, "CommandRunner must be set");
-		Assert.hasLength(command, "'command' property value is required");
+		Assert.notNull(cmdArray, "'cmdArray' property value is required with at least 1 element");
+		Assert.notEmpty(cmdArray, "'cmdArray' property value is required with at least 1 element");
+		Assert.noNullElements(cmdArray, "'cmdArray' property value is required with at least 1 element");
+		Assert.hasLength(cmdArray[0], "'cmdArray' property value is required with at least 1 element");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
 		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
 		Assert.notNull(taskExecutor, "taskExecutor is required");
