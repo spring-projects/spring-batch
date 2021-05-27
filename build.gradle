@@ -404,6 +404,7 @@ project('spring-batch-infrastructure') {
 
 project('spring-batch-docs') {
 	description = 'Spring Batch Docs'
+	project.tasks.findByPath("artifactoryPublish")?.enabled = false
 }
 
 project('spring-batch-core-tests') {
