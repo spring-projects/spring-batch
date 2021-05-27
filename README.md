@@ -29,9 +29,13 @@ If you want to perform a full build with all integration tests, then run:
 
     $ ./mvnw verify
 
-To generate the reference documentation, run:
+To generate the reference documentation, run the following commands:
 
-    $ ./mvnw site
+```
+$ ./mvnw javadoc:aggregate
+$ cd spring-batch-docs
+$ ../mvnw site
+```
 
 The reference documentation can be found in `spring-batch-docs/target`.
 
