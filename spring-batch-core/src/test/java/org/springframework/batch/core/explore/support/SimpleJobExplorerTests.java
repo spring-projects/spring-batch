@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.core.explore.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,7 +45,7 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 public class SimpleJobExplorerTests {
 
@@ -156,6 +158,14 @@ public class SimpleJobExplorerTests {
 	public void testGetJobInstance() throws Exception {
 		jobInstanceDao.getJobInstance(111L);
 		jobExplorer.getJobInstance(111L);
+	}
+
+	@Test
+	public void testGetJobInstanceWithNameAndParameters() throws Exception {
+		when(jobInstanceDao.getJobInstance("job", new JobParameters())).thenReturn(jobInstance);
+		JobInstance jobInstance = jobExplorer.getJobInstance("job", new JobParameters());
+		verify(jobInstanceDao).getJobInstance(anyString(), any(JobParameters.class));
+		assertEquals(jobInstance, jobInstance);
 	}
 
 	@Test

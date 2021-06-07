@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import java.util.Collection;
  * @author David Turanski
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public interface JobRepository {
 
@@ -177,6 +178,16 @@ public interface JobRepository {
 	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
 	 */
 	void updateExecutionContext(JobExecution jobExecution);
+
+	/**
+	 * @param jobName {@link String} the name of the jobInstance
+	 * @param jobParameters {@link JobParameters} parameters identifying the {@link JobInstance}
+	 * @return the {@link JobInstance} with name and parameters, or null
+	 *
+	 * @since 5.0
+	 */
+	@Nullable
+	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.
