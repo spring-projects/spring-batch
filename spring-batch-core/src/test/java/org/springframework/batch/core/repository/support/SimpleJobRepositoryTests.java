@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +62,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Dimitrios Liapis
  * @author Baris Cubukcuoglu
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  *
  */
 class SimpleJobRepositoryTests {
@@ -329,4 +332,12 @@ class SimpleJobRepositoryTests {
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
+
+	@Test
+	public void testGetJobInstanceWithNameAndParameters() throws Exception {
+		when(jobInstanceDao.getJobInstance("job", new JobParameters())).thenReturn(jobInstance);
+		JobInstance jobInstance = jobRepository.getJobInstance("job", new JobParameters());
+		verify(jobInstanceDao).getJobInstance(anyString(), any(JobParameters.class));
+		assertEquals(jobInstance, jobInstance);
+	}
 }

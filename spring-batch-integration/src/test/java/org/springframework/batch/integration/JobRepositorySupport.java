@@ -30,7 +30,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 public class JobRepositorySupport implements JobRepository {
 
@@ -48,6 +48,14 @@ public class JobRepositorySupport implements JobRepository {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.JobRepository#getJobInstance(java.lang.String,
+	 * org.springframework.batch.core.JobParameters)
+	 */
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return null;
+	}
+
+	/* (non-Javadoc)
 	 *
 	 * @see
 	 * org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.

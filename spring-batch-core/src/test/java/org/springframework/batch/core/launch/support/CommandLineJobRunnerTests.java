@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 class CommandLineJobRunnerTests {
 
@@ -512,6 +512,12 @@ class CommandLineJobRunnerTests {
 		@Nullable
 		@Override
 		public JobInstance getJobInstance(@Nullable Long instanceId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Nullable
+		@Override
+		public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 			throw new UnsupportedOperationException();
 		}
 

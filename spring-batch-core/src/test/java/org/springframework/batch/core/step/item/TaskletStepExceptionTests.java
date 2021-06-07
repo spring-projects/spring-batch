@@ -62,7 +62,7 @@ import static org.springframework.batch.core.BatchStatus.UNKNOWN;
  * @author Dave Syer
  * @author David Turanski
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 class TaskletStepExceptionTests {
 
@@ -517,6 +517,12 @@ class TaskletStepExceptionTests {
 		@Override
 		public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 				throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+			return null;
+		}
+
+		@Nullable
+		@Override
+		public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 			return null;
 		}
 

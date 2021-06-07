@@ -18,6 +18,7 @@ package org.springframework.batch.core.explore.support;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
@@ -38,6 +39,8 @@ import java.util.Set;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
+ *
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -183,6 +186,19 @@ public class SimpleJobExplorer implements JobExplorer {
 	@Override
 	public JobInstance getJobInstance(@Nullable Long instanceId) {
 		return jobInstanceDao.getJobInstance(instanceId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.explore.JobExplorer#getJobInstance(java
+	 * .lang.String, org.springframework.batch.core.JobParameters)
+	 */
+	@Nullable
+	@Override
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return jobInstanceDao.getJobInstance(jobName, jobParameters);
 	}
 
 	/*

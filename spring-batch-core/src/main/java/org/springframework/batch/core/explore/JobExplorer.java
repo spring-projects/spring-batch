@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.item.ExecutionContext;
@@ -34,6 +35,7 @@ import org.springframework.lang.Nullable;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  * @since 2.0
  */
 public interface JobExplorer {
@@ -91,6 +93,16 @@ public interface JobExplorer {
 	 */
 	@Nullable
 	JobInstance getJobInstance(@Nullable Long instanceId);
+
+	/**
+	 * @param jobName {@link String} name for the jobInstance.
+	 * @param jobParameters {@link JobParameters} parameters for the jobInstance.
+	 * @return the {@link JobInstance} with this name and parameters, or null
+	 *
+	 * @since 5.0
+	 */
+	@Nullable
+	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Retrieve job executions by their job instance. The corresponding step executions

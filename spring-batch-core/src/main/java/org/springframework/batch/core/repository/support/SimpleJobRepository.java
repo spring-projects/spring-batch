@@ -53,6 +53,8 @@ import java.util.List;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
+ * @author Parikshit Dutta
+ *
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -242,6 +244,11 @@ public class SimpleJobRepository implements JobRepository {
 	@Override
 	public void updateExecutionContext(JobExecution jobExecution) {
 		ecDao.updateExecutionContext(jobExecution);
+	}
+
+	@Override
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return jobInstanceDao.getJobInstance(jobName, jobParameters);
 	}
 
 	@Override

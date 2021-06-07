@@ -32,6 +32,8 @@ import org.springframework.lang.Nullable;
  * @author Dan Garrette
  * @author David Turanski
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
+ *
  * @since 2.0.1
  */
 public class DummyJobRepository implements JobRepository, BeanNameAware {
@@ -54,6 +56,12 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	@Override
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

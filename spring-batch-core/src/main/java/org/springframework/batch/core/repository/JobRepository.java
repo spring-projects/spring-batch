@@ -46,6 +46,7 @@ import java.util.List;
  * @author David Turanski
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public interface JobRepository {
 
@@ -185,6 +186,16 @@ public interface JobRepository {
 	 * @param jobExecution {@link JobExecution} instance to be used to update the context.
 	 */
 	void updateExecutionContext(JobExecution jobExecution);
+
+	/**
+	 * @param jobName {@link String} the name of the jobInstance
+	 * @param jobParameters {@link JobParameters} parameters identifying the {@link JobInstance}
+	 * @return the {@link JobInstance} with name and parameters, or null
+	 *
+	 * @since 5.0
+	 */
+	@Nullable
+	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * @param jobInstance {@link JobInstance} instance containing the step executions.

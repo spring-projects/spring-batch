@@ -28,7 +28,7 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author David Turanski
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 public class JobRepositorySupport implements JobRepository {
 
@@ -64,6 +64,12 @@ public class JobRepositorySupport implements JobRepository {
 	 * springframework.batch.container.common.domain.Job)
 	 */
 	public void update(JobInstance job) {
+	}
+
+	@Nullable
+	@Override
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
+		return null;
 	}
 
 	@Nullable
