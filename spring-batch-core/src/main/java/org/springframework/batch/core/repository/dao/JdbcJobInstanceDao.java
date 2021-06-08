@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ import org.springframework.util.StringUtils;
  * @author Michael Minella
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements
 JobInstanceDao, InitializingBean {
@@ -301,8 +302,23 @@ JobInstanceDao, InitializingBean {
 	 *
 	 * @param jobIncrementer
 	 *            the {@link DataFieldMaxValueIncrementer}
+	 *
+	 * @deprecated as of v5.0 in favor of using the {@link setJobInstanceIncrementer}
 	 */
+	@Deprecated
 	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
+		this.jobIncrementer = jobIncrementer;
+	}
+
+	/**
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
+	 * generating primary keys for {@link JobInstance} instances.
+	 *
+	 * @param jobIncrementer the {@link DataFieldMaxValueIncrementer}
+	 *
+	 * @since 5.0
+	 */
+	public void setJobInstanceIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
 		this.jobIncrementer = jobIncrementer;
 	}
 
