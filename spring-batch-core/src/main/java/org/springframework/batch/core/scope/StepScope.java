@@ -64,7 +64,7 @@ import org.springframework.beans.factory.config.Scope;
  */
 public class StepScope extends BatchScopeSupport {
 
-	private static final String TARGET_NAME_PREFIX = "stepScopedTarget.";
+	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
 
 	private Log logger = LogFactory.getLog(getClass());
 

@@ -16,6 +16,10 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.Callable;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,10 +42,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.lang.Nullable;
-
-import java.util.concurrent.Callable;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Dave Syer
@@ -100,6 +100,19 @@ public class StepScopeConfigurationTests {
 		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
 		assertEquals("STEP", value.call());
 		value = (SimpleHolder) context.getBean("javaValue");
+		assertEquals("STEP", value.call());
+	}
+
+	/**
+	 * @see org.springframework.batch.core.configuration.xml.CoreNamespaceUtils#autoregisterBeansForNamespace
+	 */
+	@Test
+	public void testStepScopeUsingNamespaceAutoregisterBeans() throws Exception {
+		init(StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans.class);
+
+		ISimpleHolder value = (ISimpleHolder) context.getBean("xmlValue");
+		assertEquals("STEP", value.call());
+		value = (ISimpleHolder) context.getBean("javaValue");
 		assertEquals("STEP", value.call());
 	}
 
@@ -187,7 +200,11 @@ public class StepScopeConfigurationTests {
 		}
 	}
 
-	public static class SimpleHolder {
+	public static interface ISimpleHolder {
+		String call() throws Exception;
+	}
+
+	public static class SimpleHolder implements ISimpleHolder {
 		private final String value;
 
 		protected SimpleHolder() {
@@ -226,6 +243,18 @@ public class StepScopeConfigurationTests {
 		@StepScope
 		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}")
 										 final String value) {
+			return new SimpleHolder(value);
+		}
+
+	}
+
+	@Configuration
+	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans-context.xml")
+	public static class StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans {
+
+		@Bean
+		@StepScope
+		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
