@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 public interface ChunkListener extends StepListener {
 
@@ -36,14 +36,14 @@ public interface ChunkListener extends StepListener {
 	 *
 	 * @param context The current {@link ChunkContext}
 	 */
-	void beforeChunk(ChunkContext context);
+	default void beforeChunk(ChunkContext context) {}
 
 	/**
 	 * Callback after the chunk is executed, outside the transaction.
 	 *
 	 * @param context The current {@link ChunkContext}
 	 */
-	void afterChunk(ChunkContext context);
+	default void afterChunk(ChunkContext context) {}
 
 	/**
 	 * Callback after a chunk has been marked for rollback.  It is invoked
@@ -57,5 +57,5 @@ public interface ChunkListener extends StepListener {
 	 * @param context the chunk context containing the exception that caused
 	 * the underlying rollback.
 	 */
-	void afterChunkError(ChunkContext context);
+	default void afterChunkError(ChunkContext context) {}
 }
