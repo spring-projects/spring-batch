@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author Parikshit Dutta
  */
 public interface StepExecutionListener extends StepListener {
 
@@ -33,7 +33,8 @@ public interface StepExecutionListener extends StepListener {
 	 *
 	 * @param stepExecution instance of {@link StepExecution}.
 	 */
-	void beforeStep(StepExecution stepExecution);
+	default void beforeStep(StepExecution stepExecution) {
+	}
 
 	/**
 	 * Give a listener a chance to modify the exit status from a step. The value
@@ -49,5 +50,7 @@ public interface StepExecutionListener extends StepListener {
 	 * {@code null} to leave the old value unchanged.
 	 */
 	@Nullable
-	ExitStatus afterStep(StepExecution stepExecution);
+	default ExitStatus afterStep(StepExecution stepExecution) {
+		return null;
+	}
 }

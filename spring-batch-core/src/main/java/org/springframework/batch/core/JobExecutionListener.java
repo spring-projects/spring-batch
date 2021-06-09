@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.springframework.batch.core;
  * instances themselves are not used by more than one thread.
  *
  * @author Dave Syer
- *
+ * @author Parikshit Dutta
  */
 public interface JobExecutionListener {
 
@@ -31,7 +31,8 @@ public interface JobExecutionListener {
 	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
-	void beforeJob(JobExecution jobExecution);
+	default void beforeJob(JobExecution jobExecution) {
+	}
 
 	/**
 	 * Callback after completion of a job. Called after both both successful and
@@ -40,6 +41,7 @@ public interface JobExecutionListener {
 	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
-	void afterJob(JobExecution jobExecution);
+	default void afterJob(JobExecution jobExecution) {
+	}
 
 }
