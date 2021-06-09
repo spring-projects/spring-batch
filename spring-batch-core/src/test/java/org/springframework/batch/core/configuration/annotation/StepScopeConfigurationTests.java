@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,19 @@ public class StepScopeConfigurationTests {
 		assertEquals("STEP", value.call());
 	}
 
+	/**
+	 * @see org.springframework.batch.core.configuration.xml.CoreNamespaceUtils#autoregisterBeansForNamespace
+	 */
+	@Test
+	public void testStepScopeUsingNamespaceAutoregisterBeans() throws Exception {
+		init(StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans.class);
+
+		ISimpleHolder value = (ISimpleHolder) context.getBean("xmlValue");
+		assertEquals("STEP", value.call());
+		value = (ISimpleHolder) context.getBean("javaValue");
+		assertEquals("STEP", value.call());
+	}
+
 	@Test
 	public void testStepScopeWithProxyTargetClassInjected() throws Exception {
 		init(StepScopeConfigurationInjectingProxy.class);
@@ -187,7 +200,14 @@ public class StepScopeConfigurationTests {
 		}
 	}
 
-	public static class SimpleHolder {
+	public static interface ISimpleHolder {
+
+		String call() throws Exception;
+
+	}
+
+	public static class SimpleHolder implements ISimpleHolder {
+
 		private final String value;
 
 		protected SimpleHolder() {
@@ -221,6 +241,18 @@ public class StepScopeConfigurationTests {
 	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsXmlImportUsingNamespace-context.xml")
 	@EnableBatchProcessing
 	public static class StepScopeConfigurationXmlImportUsingNamespace {
+
+		@Bean
+		@StepScope
+		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}") final String value) {
+			return new SimpleHolder(value);
+		}
+
+	}
+
+	@Configuration
+	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans-context.xml")
+	public static class StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans {
 
 		@Bean
 		@StepScope
