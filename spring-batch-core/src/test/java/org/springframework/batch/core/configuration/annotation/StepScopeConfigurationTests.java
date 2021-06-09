@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package org.springframework.batch.core.configuration.annotation;
 
+import java.util.concurrent.Callable;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -37,8 +40,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.lang.Nullable;
-
-import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -98,6 +99,19 @@ public class StepScopeConfigurationTests {
 		SimpleHolder value = (SimpleHolder) context.getBean("xmlValue");
 		assertEquals("STEP", value.call());
 		value = (SimpleHolder) context.getBean("javaValue");
+		assertEquals("STEP", value.call());
+	}
+
+	/**
+	 * @see org.springframework.batch.core.configuration.xml.CoreNamespaceUtils#autoregisterBeansForNamespace
+	 */
+	@Test
+	public void testStepScopeUsingNamespaceAutoregisterBeans() throws Exception {
+		init(StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans.class);
+
+		ISimpleHolder value = (ISimpleHolder) context.getBean("xmlValue");
+		assertEquals("STEP", value.call());
+		value = (ISimpleHolder) context.getBean("javaValue");
 		assertEquals("STEP", value.call());
 	}
 
@@ -198,7 +212,13 @@ public class StepScopeConfigurationTests {
 
 	}
 
-	public static class SimpleHolder {
+	public static interface ISimpleHolder {
+
+		String call() throws Exception;
+
+	}
+
+	public static class SimpleHolder implements ISimpleHolder {
 
 		private final String value;
 
@@ -234,6 +254,18 @@ public class StepScopeConfigurationTests {
 	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsXmlImportUsingNamespace-context.xml")
 	@EnableBatchProcessing
 	public static class StepScopeConfigurationXmlImportUsingNamespace {
+
+		@Bean
+		@StepScope
+		protected SimpleHolder javaValue(@Value("#{stepExecution.stepName}") final String value) {
+			return new SimpleHolder(value);
+		}
+
+	}
+
+	@Configuration
+	@ImportResource("org/springframework/batch/core/configuration/annotation/StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans-context.xml")
+	public static class StepScopeConfigurationTestsUsingNamespaceAutoregisterBeans {
 
 		@Bean
 		@StepScope
