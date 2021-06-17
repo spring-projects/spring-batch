@@ -97,7 +97,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
 		Object isNamespaceStep = BeanDefinitionUtils
 				.getAttribute(beanName, "isNamespaceStep", beanFactory);
-		if (isNamespaceStep != null && (Boolean) isNamespaceStep == true) {
+		if (isNamespaceStep != null && (Boolean) isNamespaceStep) {
 			((AbstractBeanDefinition) bd).setBeanClass(StepParserStepFactoryBean.class);
 		}
 	}

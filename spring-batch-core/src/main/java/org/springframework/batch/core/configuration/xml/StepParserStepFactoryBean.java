@@ -361,7 +361,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 			builder.processorNonTransactional();
 		}
 
-		if (readerTransactionalQueue!=null && readerTransactionalQueue==true) {
+		if (readerTransactionalQueue != null && readerTransactionalQueue) {
 			builder.readerIsTransactionalQueue();
 		}
 
