@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import test.jdbc.datasource.DataSourceInitializer;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
@@ -32,6 +33,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.xml.DummyStep;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -41,6 +43,7 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -54,6 +57,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test for the BATCH-2034 issue.
@@ -63,6 +67,7 @@ import static org.junit.Assert.assertEquals;
  * from the spring-batch-integration project.
  *  
  * @author Sergey Shcherbakov
+ * @author Mahmoud Ben Hassine
  */
 @ContextConfiguration(classes={SimpleJobExplorerIntegrationTests.Config.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -127,6 +132,13 @@ public class SimpleJobExplorerIntegrationTests {
 			});
 			return dataSourceInitializer;
 		}
+
+		@Bean
+		public Job job(JobBuilderFactory jobBuilderFactory) {
+			return jobBuilderFactory.get("job")
+					.start(dummyStep())
+					.build();
+		}
 	}
 
 	@Autowired
@@ -137,6 +149,12 @@ public class SimpleJobExplorerIntegrationTests {
 
 	@Autowired
 	private FlowStep flowStep;
+
+	@Autowired
+	private JobLauncher jobLauncher;
+
+	@Autowired
+	private Job job;
 	
 	@Test
 	public void testGetStepExecution() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobInterruptedException, UnexpectedJobExecutionException {
@@ -153,4 +171,13 @@ public class SimpleJobExplorerIntegrationTests {
 		assertEquals(BatchStatus.COMPLETED, jobExplorerStepExecution.getStatus());
 	}
 
+	@Test
+	public void getLastJobExecutionShouldFetchStepExecutions() throws Exception {
+		this.jobLauncher.run(this.job, new JobParameters());
+		JobInstance lastJobInstance = this.jobExplorer.getLastJobInstance("job");
+		JobExecution lastJobExecution = this.jobExplorer.getLastJobExecution(lastJobInstance);
+		assertEquals(1, lastJobExecution.getStepExecutions().size());
+		StepExecution stepExecution = lastJobExecution.getStepExecutions().iterator().next();
+		assertNotNull(stepExecution.getExecutionContext());
+	}
 }
