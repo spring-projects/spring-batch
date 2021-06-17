@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,14 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 	@Nullable
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		return jobExecutionDao.getLastJobExecution(jobInstance);
+		JobExecution lastJobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
+		if (lastJobExecution != null) {
+			getJobExecutionDependencies(lastJobExecution);
+			for (StepExecution stepExecution : lastJobExecution.getStepExecutions()) {
+				getStepExecutionDependencies(stepExecution);
+			}
+		}
+		return lastJobExecution;
 	}
 
 	/*
