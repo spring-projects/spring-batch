@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2022 the original author or authors.
+ * Copyright 2008-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -210,6 +211,25 @@ class Jackson2ExecutionContextStringSerializerTests extends AbstractExecutionCon
 		// then
 		Timestamp deserializedTimestamp = (Timestamp) deserializedContext.get("timestamp");
 		assertEquals(timestamp, deserializedTimestamp);
+	}
+
+	@Test
+	void testJavaTimeLocalDateSerialization() throws IOException {
+		// given
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
+		Map<String, Object> map = new HashMap<>();
+		LocalDate now = LocalDate.now();
+		map.put("now", now);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(map, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		LocalDate deserializedNow = (LocalDate) deserializedContext.get("now");
+		assertEquals(now, deserializedNow);
 	}
 
 }
