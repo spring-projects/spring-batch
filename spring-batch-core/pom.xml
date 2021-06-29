@@ -51,6 +51,11 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
 		    <groupId>javax.batch</groupId>
 		    <artifactId>javax.batch-api</artifactId>
 			<version>${javax.batch-api.version}</version>

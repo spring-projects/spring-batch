@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +29,14 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -205,5 +208,24 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		// then
 		Timestamp deserializedTimestamp = (Timestamp) deserializedContext.get("timestamp");
 		Assert.assertEquals(timestamp, deserializedTimestamp);
+	}
+
+	@Test
+	public void shouldBeSerializedTheJavaLocalDate() throws IOException {
+		// given
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
+		Map<String, Object> map = new HashMap<>();
+		LocalDate now = LocalDate.now();
+		map.put("now", now);
+
+		// when
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize(map, outputStream);
+		InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+		Map<String, Object> deserializedContext = serializer.deserialize(inputStream);
+
+		// then
+		LocalDate deserializedNow = (LocalDate) deserializedContext.get("now");
+		assertEquals(now, deserializedNow);
 	}
 }

@@ -50,6 +50,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -119,6 +120,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
         this.objectMapper.configure(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES, true);
         this.objectMapper.setDefaultTyping(createTrustedDefaultTyping(trustedClassNames));
         this.objectMapper.registerModule(new JobParametersModule());
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
