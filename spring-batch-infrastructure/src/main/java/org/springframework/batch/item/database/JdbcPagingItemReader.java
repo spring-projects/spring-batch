@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.springframework.batch.item.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +179,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
 		if (results == null) {
 			results = new CopyOnWriteArrayList<>();
@@ -190,7 +189,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		PagingRowMapper rowCallback = new PagingRowMapper();
 
-		List<?> query;
+		List<T> query;
 
 		if (getPage() == 0) {
 			if (logger.isDebugEnabled()) {
@@ -202,8 +201,8 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 							getParameterMap(parameterValues, null), rowCallback);
 				}
 				else {
-					query = getJdbcTemplate().query(firstPageSql,
-							getParameterList(parameterValues, null).toArray(), rowCallback);
+					query = getJdbcTemplate().query(firstPageSql, rowCallback,
+							getParameterList(parameterValues, null).toArray());
 				}
 			}
 			else {
@@ -211,7 +210,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			}
 
 		}
-		else {
+		else if (startAfterValues != null) {
 			previousStartAfterValues = startAfterValues;
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
@@ -221,13 +220,15 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 						getParameterMap(parameterValues, startAfterValues), rowCallback);
 			}
 			else {
-				query = getJdbcTemplate().query(remainingPagesSql,
-						getParameterList(parameterValues, startAfterValues).toArray(), rowCallback);
+				query = getJdbcTemplate().query(remainingPagesSql, rowCallback,
+						getParameterList(parameterValues, startAfterValues).toArray());
 			}
 		}
+		else {
+			query = Collections.emptyList();
+		}
 
-		Collection<T> result = (Collection<T>) query;
-		results.addAll(result);
+		results.addAll(query);
 	}
 
 	@Override

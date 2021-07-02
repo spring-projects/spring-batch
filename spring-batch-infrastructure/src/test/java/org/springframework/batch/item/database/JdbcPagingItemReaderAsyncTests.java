@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,8 @@ public class JdbcPagingItemReaderAsyncTests {
 	@Before
 	public void init() {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		maxId = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
+		Integer maxIdResult = jdbcTemplate.queryForObject("SELECT MAX(ID) from T_FOOS", Integer.class);
+		maxId = maxIdResult == null ? 0 : maxIdResult;
 		for (int i = maxId + 1; i <= ITEM_COUNT; i++) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME,VALUE) values (?, ?, ?)", i, "foo" + i, i);
 		}
