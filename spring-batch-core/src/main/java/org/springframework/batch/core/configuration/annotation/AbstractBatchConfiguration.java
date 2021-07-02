@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.JobScope;
-import org.springframework.batch.core.scope.StepScope;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -129,36 +127,4 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		return this.configurer;
 	}
 
-}
-
-/**
- * Extract job/step scope configuration into a separate unit.
- * 
- * @author Dave Syer
- * 
- */
-@Configuration(proxyBeanMethods = false)
-class ScopeConfiguration {
-
-	private static StepScope stepScope;
-
-	private static JobScope jobScope;
-
-	static {
-		jobScope = new JobScope();
-		jobScope.setAutoProxy(false);
-
-		stepScope = new StepScope();
-		stepScope.setAutoProxy(false);
-	}
-
-	@Bean
-	public static StepScope stepScope() {
-		return stepScope;
-	}
-
-	@Bean
-	public static JobScope jobScope() {
-		return jobScope;
-	}
 }
