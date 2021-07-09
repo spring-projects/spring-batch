@@ -18,11 +18,8 @@ package org.springframework.batch.item.json;
 
 import java.math.BigDecimal;
 
-import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -32,15 +29,14 @@ import org.springframework.batch.item.json.domain.Trade;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 
-import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 public abstract class JsonItemReaderFunctionalTests {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	protected abstract JsonObjectReader<Trade> getJsonObjectReader();
 
@@ -104,22 +100,24 @@ public abstract class JsonItemReaderFunctionalTests {
 
 	@Test
 	public void testInvalidResourceFormat() {
-		this.expectedException.expect(ItemStreamException.class);
-		this.expectedException.expectMessage("Failed to initialize the reader");
-		this.expectedException.expectCause(instanceOf(IllegalStateException.class));
+		// given
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
 				.jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("{}, {}".getBytes()))
 				.name("tradeJsonItemReader")
 				.build();
 
-		itemReader.open(new ExecutionContext());
+		// when
+		final Exception expectedException = assertThrows(ItemStreamException.class, () -> itemReader.open(new ExecutionContext()));
+
+		// then
+		assertEquals("Failed to initialize the reader", expectedException.getMessage());
+		assertTrue(expectedException.getCause() instanceof IllegalStateException);
 	}
 
 	@Test
-	public void testInvalidResourceContent() throws Exception {
-		this.expectedException.expect(ParseException.class);
-		this.expectedException.expectCause(Matchers.instanceOf(getJsonParsingException()));
+	public void testInvalidResourceContent() {
+		// given
 		JsonItemReader<Trade> itemReader = new JsonItemReaderBuilder<Trade>()
 				.jsonObjectReader(getJsonObjectReader())
 				.resource(new ByteArrayResource("[{]".getBytes()))
@@ -127,6 +125,11 @@ public abstract class JsonItemReaderFunctionalTests {
 				.build();
 		itemReader.open(new ExecutionContext());
 
-		itemReader.read();
+		// when
+		final Exception expectedException = assertThrows(ParseException.class, itemReader::read);
+
+
+		// then
+		assertTrue(getJsonParsingException().isInstance(expectedException.getCause()));
 	}
 }

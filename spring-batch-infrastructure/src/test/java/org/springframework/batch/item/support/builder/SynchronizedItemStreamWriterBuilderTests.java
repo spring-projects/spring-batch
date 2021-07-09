@@ -19,6 +19,9 @@ import org.junit.Test;
 import org.springframework.batch.item.support.AbstractSynchronizedItemStreamWriterTests;
 import org.springframework.batch.item.support.SynchronizedItemStreamWriter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  *
  * @author Dimitrios Liapis
@@ -36,8 +39,13 @@ public class SynchronizedItemStreamWriterBuilderTests extends AbstractSynchroniz
 
 	@Test
 	public void testBuilderDelegateIsNotNull() {
-		expectedException.expect(IllegalArgumentException.class);
-		expectedException.expectMessage("A delegate item writer is required");
-		new SynchronizedItemStreamWriterBuilder<>().build();
+		// given
+		final SynchronizedItemStreamWriterBuilder<Object> builder = new SynchronizedItemStreamWriterBuilder<>();
+
+		// when
+		final Exception expectedException = assertThrows(IllegalArgumentException.class, builder::build);
+
+		// then
+		assertEquals("A delegate item writer is required", expectedException.getMessage());
 	}
 }

@@ -24,7 +24,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -42,9 +41,6 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Mock
 	protected ItemStreamWriter<Object> delegate;

@@ -17,7 +17,7 @@ package org.springframework.batch.item.data;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +129,7 @@ public class GemfireItemWriterTests {
 	@Test
 	public void testWriteNoTransactionNoItems() throws Exception {
 		writer.write(null);
-		verifyZeroInteractions(template);
+		verifyNoInteractions(template);
 	}
 
 	static class Foo {

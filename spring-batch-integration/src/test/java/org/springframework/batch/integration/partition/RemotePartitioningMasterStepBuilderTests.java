@@ -17,9 +17,7 @@
 package org.springframework.batch.integration.partition;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
@@ -37,6 +35,7 @@ import org.springframework.integration.core.MessagingTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
@@ -46,75 +45,72 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
 @ContextConfiguration(classes = {RemotePartitioningMasterStepBuilderTests.BatchConfiguration.class})
 public class RemotePartitioningMasterStepBuilderTests {
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-
 	@Autowired
 	private JobRepository jobRepository;
 
 	@Test
 	public void inputChannelMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("inputChannel must not be null");
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").inputChannel(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.inputChannel(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("inputChannel must not be null");
 	}
 
 	@Test
 	public void outputChannelMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("outputChannel must not be null");
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").outputChannel(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.outputChannel(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("outputChannel must not be null");
 	}
 
 	@Test
 	public void messagingTemplateMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("messagingTemplate must not be null");
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").messagingTemplate(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.messagingTemplate(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("messagingTemplate must not be null");
 	}
 
 	@Test
 	public void jobExplorerMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("jobExplorer must not be null");
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").jobExplorer(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.jobExplorer(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("jobExplorer must not be null");
 	}
 
 	@Test
 	public void pollIntervalMustBeGreaterThanZero() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The poll interval must be greater than zero");
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").pollInterval(-1);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.pollInterval(-1));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("The poll interval must be greater than zero");
 	}
 
 	@Test
@@ -124,32 +120,30 @@ public class RemotePartitioningMasterStepBuilderTests {
 				.outputChannel(new DirectChannel())
 				.messagingTemplate(new MessagingTemplate());
 
-		this.expectedException.expect(IllegalStateException.class);
-		this.expectedException.expectMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
-
 		// when
-		Step step = builder.build();
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class,
+				builder::build);
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 	}
 
 	@Test
 	public void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
 		// given
 		PartitionHandler partitionHandler = Mockito.mock(PartitionHandler.class);
-		this.expectedException.expect(UnsupportedOperationException.class);
-		this.expectedException.expectMessage("When configuring a master step " +
+		final RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step");
+
+		// when
+		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class,
+				() -> builder.partitionHandler(partitionHandler));
+
+		// then
+		assertThat(expectedException).hasMessage("When configuring a master step " +
 				"for remote partitioning using the RemotePartitioningMasterStepBuilder, " +
 				"the partition handler will be automatically set to an instance " +
 				"of MessageChannelPartitionHandler. The partition handler must " +
 				"not be provided in this case.");
-
-		// when
-		new RemotePartitioningMasterStepBuilder("step").partitionHandler(partitionHandler);
-
-		// then
-		// expected exception
 	}
 
 	@Test

@@ -27,10 +27,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
 import org.mockito.junit.MockitoJUnit;
@@ -130,8 +130,8 @@ public class MongoItemWriterTests {
 	public void testWriteNoTransactionNoItems() throws Exception {
 		writer.write(null);
 
-		verifyZeroInteractions(template);
-		verifyZeroInteractions(bulkOperations);
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
 	}
 
 	@Test
@@ -193,8 +193,8 @@ public class MongoItemWriterTests {
 			fail("Unexpected exception was thrown");
 		}
 
-		verifyZeroInteractions(template);
-		verifyZeroInteractions(bulkOperations);
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
 	}
 
 	/**
@@ -222,8 +222,8 @@ public class MongoItemWriterTests {
 			fail("Unexpected exception was thrown");
 		}
 
-		verifyZeroInteractions(template);
-		verifyZeroInteractions(bulkOperations);
+		verifyNoInteractions(template);
+		verifyNoInteractions(bulkOperations);
 	}
 
 	@Test

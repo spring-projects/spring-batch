@@ -16,10 +16,10 @@
 
 package org.springframework.batch.item.kafka.builder;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -28,6 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,9 +40,6 @@ public class KafkaItemWriterBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -55,18 +53,26 @@ public class KafkaItemWriterBuilderTests {
 
 	@Test
 	public void testNullKafkaTemplate() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("kafkaTemplate is required.");
+		// given
+		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>().itemKeyMapper(this.itemKeyMapper);
 
-		new KafkaItemWriterBuilder<String, String>().itemKeyMapper(this.itemKeyMapper).build();
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+
+		// then
+		assertThat(expectedException).hasMessage("kafkaTemplate is required.");
 	}
 
 	@Test
 	public void testNullItemKeyMapper() {
-		this.thrown.expect(IllegalArgumentException.class);
-		this.thrown.expectMessage("itemKeyMapper is required.");
+		// given
+		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>().kafkaTemplate(this.kafkaTemplate);
 
-		new KafkaItemWriterBuilder<String, String>().kafkaTemplate(this.kafkaTemplate).build();
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+
+		// then
+		assertThat(expectedException).hasMessage("itemKeyMapper is required.");
 	}
 
 	@Test
