@@ -65,7 +65,7 @@ public class MongoItemWriterBuilderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		when(this.template.bulkOps(any(), anyString())).thenReturn(this.bulkOperations);
 		when(this.template.bulkOps(any(), any(Class.class))).thenReturn(this.bulkOperations);
 

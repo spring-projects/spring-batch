@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class RepositoryItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		writer = new RepositoryItemWriter<>();
 		writer.setMethodName("save");
 		writer.setRepository(repository);
@@ -77,7 +77,7 @@ public class RepositoryItemWriterTests {
 
 		writer.write(new ArrayList<>());
 
-		verifyZeroInteractions(repository);
+		verifyNoInteractions(repository);
 	}
 
 	@Test

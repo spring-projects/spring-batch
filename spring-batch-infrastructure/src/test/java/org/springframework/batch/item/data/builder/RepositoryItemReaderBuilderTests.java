@@ -62,7 +62,7 @@ public class RepositoryItemReaderBuilderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.sorts = new HashMap<>();
 		this.sorts.put("id", Sort.Direction.ASC);
 		this.pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);

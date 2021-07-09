@@ -46,7 +46,7 @@ public class GemfireItemWriterBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.items = Arrays.asList(new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val1")),
 				new GemfireItemWriterBuilderTests.Foo(new GemfireItemWriterBuilderTests.Bar("val2")));
 		this.itemKeyMapper = new SpELItemKeyMapper<>("bar.val");

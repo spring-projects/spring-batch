@@ -56,7 +56,7 @@ public class StaxEventItemReaderBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test

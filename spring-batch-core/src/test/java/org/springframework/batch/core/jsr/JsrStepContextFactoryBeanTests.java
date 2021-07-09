@@ -60,7 +60,7 @@ public class JsrStepContextFactoryBeanTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		factory = new JsrStepContextFactoryBean();
 		factory.setBatchPropertyContext(propertyContext);
 	}

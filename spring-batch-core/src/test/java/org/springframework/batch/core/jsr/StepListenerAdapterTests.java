@@ -40,7 +40,7 @@ public class StepListenerAdapterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 
 		adapter = new StepListenerAdapter(delegate);
 	}

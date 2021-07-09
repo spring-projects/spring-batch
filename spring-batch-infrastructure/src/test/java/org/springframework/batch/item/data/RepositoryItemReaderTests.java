@@ -60,7 +60,7 @@ public class RepositoryItemReaderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		sorts = Collections.singletonMap("id", Direction.ASC);
 		reader = new RepositoryItemReader<>();
 		reader.setRepository(repository);

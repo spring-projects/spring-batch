@@ -42,7 +42,7 @@ public class JsrJobContextTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 
 		Properties properties = new Properties();
 		properties.put("jobLevelProperty1", "jobLevelValue1");

@@ -16,9 +16,7 @@
 package org.springframework.batch.core.jsr.configuration.xml;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -31,9 +29,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class JsrSplitParsingTests extends AbstractJsrTestCase {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void testOneFlowInSplit() {

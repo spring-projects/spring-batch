@@ -47,7 +47,7 @@ public class HibernateItemWriterBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
 	}
 

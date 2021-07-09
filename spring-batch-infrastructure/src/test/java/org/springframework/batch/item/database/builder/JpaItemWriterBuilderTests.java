@@ -47,7 +47,7 @@ public class JpaItemWriterBuilderTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		TransactionSynchronizationManager.bindResource(this.entityManagerFactory,
 				new EntityManagerHolder(this.entityManager));
 	}

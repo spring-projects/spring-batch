@@ -90,7 +90,7 @@ public class JsrJobOperatorTests extends AbstractJsrTestCase {
 	@Before
 	public void setup() throws Exception {
 
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		parameterConverter = new JobParametersConverterSupport();
 		jsrJobOperator = new JsrJobOperator(jobExplorer, jobRepository, parameterConverter, new ResourcelessTransactionManager());
 	}

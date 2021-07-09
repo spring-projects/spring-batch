@@ -51,7 +51,7 @@ public class MongoItemReaderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		reader = new MongoItemReader<>();
 
 		sortOptions = new HashMap<>();

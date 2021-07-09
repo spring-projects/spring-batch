@@ -26,10 +26,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -66,9 +65,6 @@ import org.springframework.lang.Nullable;
  */
 public class SimpleStepFactoryBeanTests {
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-
 	private List<Exception> listened = new ArrayList<>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -99,25 +95,29 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testMandatoryReader() throws Exception {
+	public void testMandatoryReader() {
+		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemWriter(writer);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemReader must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemReader must be provided", expectedException.getMessage());
 	}
 
 	@Test
-	public void testMandatoryWriter() throws Exception {
+	public void testMandatoryWriter() {
+		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemReader(reader);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemWriter must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemWriter must be provided", expectedException.getMessage());
 	}
 
 	@Test

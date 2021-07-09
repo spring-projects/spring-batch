@@ -28,7 +28,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class Neo4jItemWriterTests {
@@ -42,7 +42,7 @@ public class Neo4jItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class Neo4jItemWriterTests {
 
 		writer.write(null);
 
-		verifyZeroInteractions(this.session);
+		verifyNoInteractions(this.session);
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class Neo4jItemWriterTests {
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(null);
 
-		verifyZeroInteractions(this.session);
+		verifyNoInteractions(this.session);
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class Neo4jItemWriterTests {
 		when(this.sessionFactory.openSession()).thenReturn(this.session);
 		writer.write(new ArrayList<>());
 
-		verifyZeroInteractions(this.session);
+		verifyNoInteractions(this.session);
 	}
 
 	@Test

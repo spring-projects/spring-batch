@@ -48,7 +48,7 @@ public class CompositeItemProcessorBuilderTests {
 
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 
 		this.processors = new ArrayList<>();
 		this.processors.add(processor1);

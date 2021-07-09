@@ -39,7 +39,7 @@ public class ChunkListenerAdapterTests {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		adapter = new ChunkListenerAdapter(delegate);
 	}
 

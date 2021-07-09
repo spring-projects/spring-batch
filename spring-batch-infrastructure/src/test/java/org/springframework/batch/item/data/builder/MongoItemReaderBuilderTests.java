@@ -53,7 +53,7 @@ public class MongoItemReaderBuilderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.sortOptions = new HashMap<>();
 		this.sortOptions.put("name", Sort.Direction.DESC);
 		this.queryContainer = ArgumentCaptor.forClass(Query.class);
