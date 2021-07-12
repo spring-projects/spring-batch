@@ -359,18 +359,18 @@ InitializingBean {
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
 
+				try {
+					listener.afterJob(execution);
+				} catch (Exception e) {
+					logger.error("Exception encountered in afterJob callback", e);
+				}
+
 				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
 						Tag.of("name", execution.getJobInstance().getJobName()),
 						Tag.of("status", execution.getExitStatus().getExitCode())
 				));
 				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
-
-				try {
-					listener.afterJob(execution);
-				} catch (Exception e) {
-					logger.error("Exception encountered in afterJob callback", e);
-				}
 
 				jobRepository.update(execution);
 			} finally {
