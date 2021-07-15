@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import org.springframework.jdbc.support.incrementer.Db2LuwMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.Db2MainframeMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HanaSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
@@ -62,6 +63,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.isSupportedIncrementerType("sqlserver"));
 		assertTrue(factory.isSupportedIncrementerType("sybase"));
 		assertTrue(factory.isSupportedIncrementerType("sqlite"));
+		assertTrue(factory.isSupportedIncrementerType("hana"));
 	}
 	
 	public void testUnsupportedDatabaseType(){
@@ -127,6 +129,10 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 
 	public void testSqlite(){
 		assertTrue(factory.getIncrementer("sqlite", "NAME") instanceof SqliteMaxValueIncrementer);
+	}
+	
+	public void testHana(){
+		assertTrue(factory.getIncrementer("hana", "NAME") instanceof HanaSequenceMaxValueIncrementer);
 	}
 
 }

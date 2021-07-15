@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ public enum DatabaseType {
 	POSTGRES("PostgreSQL"),
 	SYBASE("Sybase"),
 	H2("H2"),
-	SQLITE("SQLite");
+	SQLITE("SQLite"),
+	HANA("HDB");
 
 	private static final Map<String, DatabaseType> nameMap;
 

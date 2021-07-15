@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.springframework.batch.support.DatabaseType.DB2ZOS;
 import static org.springframework.batch.support.DatabaseType.DB2AS400;
 import static org.springframework.batch.support.DatabaseType.DERBY;
 import static org.springframework.batch.support.DatabaseType.H2;
+import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.HSQL;
 import static org.springframework.batch.support.DatabaseType.MYSQL;
 import static org.springframework.batch.support.DatabaseType.ORACLE;
@@ -78,6 +79,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean<PagingQuer
 		providers.put(DERBY,new DerbyPagingQueryProvider());
 		providers.put(HSQL,new HsqlPagingQueryProvider());
 		providers.put(H2,new H2PagingQueryProvider());
+		providers.put(HANA,new HanaPagingQueryProvider());
 		providers.put(MYSQL,new MySqlPagingQueryProvider());
 		providers.put(ORACLE,new OraclePagingQueryProvider());
 		providers.put(POSTGRES,new PostgresPagingQueryProvider());
