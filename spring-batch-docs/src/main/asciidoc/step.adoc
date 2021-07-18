@@ -160,15 +160,15 @@ an in-line `<step/>` (one defined within a `<job/>`), it is an attribute on the 
 element. For a standalone `<step/>`, it is defined as an attribute of the <tasklet/>.
 
 [role="javaContent"]
-* `repository`: The The Java-specific name of the `JobRepository` that periodically stores
+* `repository`: The Java-specific name of the `JobRepository` that periodically stores
 the `StepExecution` and `ExecutionContext` during processing (just before committing).
 
 [role="xmlContent"]
-* `commit-interval`: The XML-specific name of the the number of items to be processed
+* `commit-interval`: The XML-specific name of the number of items to be processed
 before the transaction is committed.
 
 [role="javaContent"]
-* `chunk`: The XML-specific name of the dependency that indicates that this is an
+* `chunk`: The Java-specific name of the dependency that indicates that this is an
 item-based step and the number of items to be processed before the transaction is
 committed.
 
@@ -1042,7 +1042,7 @@ public Step step1() {
 
 An `ItemReader`, `ItemWriter` or `ItemProcessor` that itself implements one of the
 `StepListener` interfaces is registered automatically with the `Step` if using the
-namespace `<step>` element or one of the the `*StepFactoryBean` factories. This only
+namespace `<step>` element or one of the `*StepFactoryBean` factories. This only
 applies to components directly injected into the `Step`. If the listener is nested inside
 another component, it needs to be explicitly registered (as described previously under
 <<registeringItemStreams>>).
