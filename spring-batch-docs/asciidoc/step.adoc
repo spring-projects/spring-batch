@@ -973,7 +973,7 @@ public Step step1() {
 
 An `ItemReader`, `ItemWriter` or `ItemProcessor` that itself implements one of the
 `StepListener` interfaces is registered automatically with the `Step` if using the
-namespace `<step>` element or one of the the `*StepFactoryBean` factories. This only
+namespace `<step>` element or one of the `*StepFactoryBean` factories. This only
 applies to components directly injected into the `Step`. If the listener is nested inside
 another component, it needs to be explicitly registered (as described previously under
 <<registeringItemStreams>>).
