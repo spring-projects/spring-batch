@@ -129,7 +129,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 		}
 		catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing query", getSql(), se);
+			throw translateSqlException("Executing query", getSql(), se);
 		}
 
 	}
