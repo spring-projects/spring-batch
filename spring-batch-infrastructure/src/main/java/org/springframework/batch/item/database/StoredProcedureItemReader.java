@@ -227,7 +227,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		}
 		catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing stored procedure", getSql(), se);
+			throw translateSqlException("Executing stored procedure", getSql(), se);
 		}
 
 	}
