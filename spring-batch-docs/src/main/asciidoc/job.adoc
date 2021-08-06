@@ -996,7 +996,7 @@ after these are considered to be job parameters, are turned into a JobParameters
 and must be in the format of 'name=value'.
 
 [role="xmlContent"]
-The following example shows a date passed as a job parameter to a job defied in XML:
+The following example shows a date passed as a job parameter to a job defined in XML:
 
 [source, role="xmlContent"]
 ----
