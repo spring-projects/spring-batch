@@ -21,15 +21,13 @@ Clone the git repository using the URL on the Github home page:
 
 ## Command Line
 
-Maven is the build tool used for Spring Batch. You can build the project with the following command:
+Maven is the build tool used for Spring Batch. You can build the project via the command:
 
     $ ./mvnw package
 
 If you want to perform a full build with all integration tests, then run:
 
     $ ./mvnw verify
-
-Please note that some integration tests are based on Docker, so please make sure to have Docker up and running before running a full build.
 
 To generate the reference documentation, run the following commands:
 
