@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.springframework.batch.sample.domain.order.internal.validator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -140,7 +141,7 @@ public class OrderValidator implements Validator {
 
 			//discount coefficient = (100.00 - discountPerc) / 100.00
 			BigDecimal coef = BD_100.subtract(lineItem.getDiscountPerc())
-					.divide(BD_100, 4, BigDecimal.ROUND_HALF_UP);
+					.divide(BD_100, 4, RoundingMode.HALF_UP);
 
 			//discountedPrice = (price * coefficient) - discountAmount
 			//at least one of discountPerc and discountAmount is 0 - this is validated by ValidateDiscountsFunction
@@ -154,7 +155,7 @@ public class OrderValidator implements Validator {
 			//total price = singleItemPrice * quantity
 			BigDecimal quantity = new BigDecimal(lineItem.getQuantity());
 			BigDecimal totalPrice = singleItemPrice.multiply(quantity)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 
 			//calculatedPrice should equal to item.totalPrice
 			if (totalPrice.compareTo(lineItem.getTotalPrice()) != 0) {
