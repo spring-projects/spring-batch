@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,12 +85,9 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void inputChannelMustNotBeNull() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.inputChannel(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").inputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("inputChannel must not be null");
@@ -98,12 +95,9 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void outputChannelMustNotBeNull() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.outputChannel(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").outputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("outputChannel must not be null");
@@ -111,12 +105,9 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void messagingTemplateMustNotBeNull() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.messagingTemplate(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").messagingTemplate(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("messagingTemplate must not be null");
@@ -124,12 +115,9 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void maxWaitTimeoutsMustBeGreaterThanZero() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.maxWaitTimeouts(-1);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").maxWaitTimeouts(-1).build());
 
 		// then
 		assertThat(expectedException).hasMessage("maxWaitTimeouts must be greater than zero");
@@ -137,12 +125,9 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void throttleLimitMustNotBeGreaterThanZero() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.throttleLimit(-1L);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step").throttleLimit(-1L).build());
 
 		// then
 		assertThat(expectedException).hasMessage("throttleLimit must be greater than zero");
@@ -177,17 +162,16 @@ public class RemoteChunkingManagerStepBuilderTest {
 
 	@Test
 	public void testUnsupportedOperationExceptionWhenSpecifyingAnItemWriter() {
-		// given
-		final RemoteChunkingManagerStepBuilder<String, String> builder = new RemoteChunkingManagerStepBuilder<String, String>("step")
-				.reader(this.itemReader)
-				.writer(items -> { })
-				.repository(this.jobRepository)
-				.transactionManager(this.transactionManager)
-				.inputChannel(this.inputChannel)
-				.outputChannel(this.outputChannel);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class,
+				() -> new RemoteChunkingManagerStepBuilder<String, String>("step")
+						.reader(this.itemReader)
+						.writer(items -> { })
+						.repository(this.jobRepository)
+						.transactionManager(this.transactionManager)
+						.inputChannel(this.inputChannel)
+						.outputChannel(this.outputChannel)
+						.build());
 
 		// then
 		assertThat(expectedException).hasMessage("When configuring a manager " +

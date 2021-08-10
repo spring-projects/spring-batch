@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,9 @@ public class RemoteChunkingWorkerBuilderTest {
 
 	@Test
 	public void itemProcessorMustNotBeNull() {
-		// given
-		final RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemProcessor(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingWorkerBuilder<String, String>().itemProcessor(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("itemProcessor must not be null");
@@ -49,12 +46,9 @@ public class RemoteChunkingWorkerBuilderTest {
 
 	@Test
 	public void itemWriterMustNotBeNull() {
-		// given
-		final RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.itemWriter(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingWorkerBuilder<String, String>().itemWriter(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("itemWriter must not be null");
@@ -62,12 +56,9 @@ public class RemoteChunkingWorkerBuilderTest {
 
 	@Test
 	public void inputChannelMustNotBeNull() {
-		// given
-		final RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.inputChannel(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingWorkerBuilder<String, String>().inputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("inputChannel must not be null");
@@ -75,12 +66,9 @@ public class RemoteChunkingWorkerBuilderTest {
 
 	@Test
 	public void outputChannelMustNotBeNull() {
-		// given
-		final RemoteChunkingWorkerBuilder<String, String> builder = new RemoteChunkingWorkerBuilder<String, String>()
-				.outputChannel(null);
-
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> new RemoteChunkingWorkerBuilder<String, String>().outputChannel(null).build());
 
 		// then
 		assertThat(expectedException).hasMessage("outputChannel must not be null");
