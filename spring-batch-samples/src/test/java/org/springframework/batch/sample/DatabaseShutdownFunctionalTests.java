@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
- * then it's stopped using {@link JobExecution#stop()}.  
+ * then it's stopped using {@link JobOperator#stop(long)}}.
  * 
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)

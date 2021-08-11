@@ -297,7 +297,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
+		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), handler, jobName);
 
 		return result;
 	}
@@ -386,7 +386,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			}
 		};
 
-		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), new Object[] { executionId }, handler);
+		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), handler, executionId);
 
 		return new JobParameters(map);
 	}

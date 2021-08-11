@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 		};
 
 		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ?",
-				new Object[] {key}, fooMapper).get(0);
+				fooMapper, key).get(0);
 
 	}
 }

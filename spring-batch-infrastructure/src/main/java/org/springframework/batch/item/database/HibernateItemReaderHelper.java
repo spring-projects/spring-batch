@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ package org.springframework.batch.item.database;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -41,7 +40,6 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  *
  */
-@SuppressWarnings("rawtypes")
 public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -120,7 +118,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 * @return a forward-only {@link ScrollableResults}
 	 */
 	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
-		Query query = createQuery();
+		Query<? extends T> query = createQuery();
 		if (parameterValues != null) {
 			query.setProperties(parameterValues);
 		}
@@ -132,7 +130,8 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 *
 	 * @return a Hibernate Query
 	 */
-	public Query createQuery() {
+	@SuppressWarnings("unchecked") // Hibernate APIs do not use a typed Query
+	public Query<? extends T> createQuery() {
 
 		if (useStatelessSession) {
 			if (statelessSession == null) {
@@ -219,13 +218,11 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 		clear();
 
-		Query query = createQuery();
+		Query<? extends T> query = createQuery();
 		if (parameterValues != null) {
 			query.setProperties(parameterValues);
 		}
-		@SuppressWarnings("unchecked")
-		List<T> result = query.setFetchSize(fetchSize).setFirstResult(page * pageSize).setMaxResults(pageSize).list();
-		return result;
+		return query.setFetchSize(fetchSize).setFirstResult(page * pageSize).setMaxResults(pageSize).list();
 
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -283,7 +283,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			// Avoid concurrent modifications...
 			if (count == 0) {
 				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_STEP_EXECUTION),
-						new Object[] { stepExecution.getId() }, Integer.class);
+						Integer.class, stepExecution.getId());
 				throw new OptimisticLockingFailureException("Attempt to update step execution id="
 						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
 						+ "), where current version is " + currentVersion);
@@ -358,7 +358,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	@Override
 	public int countStepExecutions(JobInstance jobInstance, String stepName) {
-		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), new Object[] { jobInstance.getInstanceId(), stepName }, Integer.class);
+		return getJdbcTemplate().queryForObject(getQuery(COUNT_STEP_EXECUTIONS), Integer.class, jobInstance.getInstanceId(), stepName);
 	}
 
 	private static class StepExecutionRowMapper implements RowMapper<StepExecution> {
