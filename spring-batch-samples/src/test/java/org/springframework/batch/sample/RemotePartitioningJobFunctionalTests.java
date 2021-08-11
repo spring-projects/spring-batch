@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.sample;
 
+import javax.sql.DataSource;
+
 import org.apache.activemq.broker.BrokerService;
 import org.junit.After;
 import org.junit.Assert;
@@ -29,8 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -50,9 +52,10 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	@Autowired
 	protected JobLauncherTestUtils jobLauncherTestUtils;
 
-	private BrokerService brokerService;
+	@Autowired
+	private DataSource dataSource;
 
-	private EmbeddedDatabase embeddedDatabase;
+	private BrokerService brokerService;
 
 	private AnnotationConfigApplicationContext workerApplicationContext;
 
@@ -64,11 +67,10 @@ public abstract class RemotePartitioningJobFunctionalTests {
 		this.brokerService.addConnector(this.brokerUrl);
 		this.brokerService.setDataDirectory(BROKER_DATA_DIRECTORY);
 		this.brokerService.start();
-		this.embeddedDatabase = new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
-				.build();
+		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-hsqldb.sql"));
+		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-hsqldb.sql"));
+		databasePopulator.execute(this.dataSource);
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(getWorkerConfigurationClass());
 	}
 
@@ -86,7 +88,6 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	public void tearDown() throws Exception {
 		this.workerApplicationContext.close();
 		this.brokerService.stop();
-		this.embeddedDatabase.shutdown();
 	}
 
 }
