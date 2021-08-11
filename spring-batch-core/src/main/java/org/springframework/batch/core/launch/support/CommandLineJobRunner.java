@@ -185,7 +185,6 @@ public class CommandLineJobRunner {
 
 	private JobLocator jobLocator;
 
-	// Package private for unit test
 	private static SystemExiter systemExiter = new JvmSystemExiter();
 
 	private static String message = "";

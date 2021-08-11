@@ -43,6 +43,9 @@ import org.springframework.util.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -181,6 +184,34 @@ public class SystemCommandTaskletIntegrationTests {
 	}
 
 	/*
+	 * Command Runner is required to be set.
+	 */
+	@Test
+	public void testCommandRunnerNotSet() throws Exception {
+		SystemCommandTasklet.presetCommandRunner(null);
+		try {
+			tasklet.afterPropertiesSet();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		} finally {
+			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
+		}
+
+		tasklet.setCommandRunner(null);
+		try {
+			tasklet.afterPropertiesSet();
+			fail();
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+		} finally {
+			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
+		}
+	}
+
+	/*
 	 * Command property value is required to be set.
 	 */
 	@Test
@@ -306,6 +337,54 @@ public class SystemCommandTaskletIntegrationTests {
 
 	private boolean isRunningOnWindows() {
 		return System.getProperty("os.name").toLowerCase().contains("win");
+	}
+
+	@Test
+	public void testExecuteWithSuccessfulCommandRunnerMockExecution() throws Exception {
+		try {
+			StepContribution stepContribution = stepExecution.createStepContribution();
+			CommandRunner commandRunner = mock(CommandRunner.class);
+			Process process = mock(Process.class);
+			String command = "invalid command";
+
+			when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
+			when(process.waitFor()).thenReturn(0);
+
+			SystemCommandTasklet.presetCommandRunner(commandRunner);
+			tasklet.setCommand(command);
+			tasklet.afterPropertiesSet();
+
+			RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
+
+			assertEquals(RepeatStatus.FINISHED, exitStatus);
+			assertEquals(ExitStatus.COMPLETED, stepContribution.getExitStatus());
+		} finally {
+			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
+		}
+	}
+
+	@Test
+	public void testExecuteWithFailedCommandRunnerMockExecution() throws Exception {
+		try {
+			StepContribution stepContribution = stepExecution.createStepContribution();
+			CommandRunner commandRunner = mock(CommandRunner.class);
+			Process process = mock(Process.class);
+			String command = "invalid command";
+
+			when(commandRunner.exec(eq(command), any(), any())).thenReturn(process);
+			when(process.waitFor()).thenReturn(1);
+
+			SystemCommandTasklet.presetCommandRunner(commandRunner);
+			tasklet.setCommand(command);
+			tasklet.afterPropertiesSet();
+
+			RepeatStatus exitStatus = tasklet.execute(stepContribution, null);
+
+			assertEquals(RepeatStatus.FINISHED, exitStatus);
+			assertEquals(ExitStatus.FAILED, stepContribution.getExitStatus());
+		} finally {
+			SystemCommandTasklet.presetCommandRunner(new JvmCommandRunner());
+		}
 	}
 
 }

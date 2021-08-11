@@ -64,6 +64,8 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
 
+	private static CommandRunner commandRunner = new JvmCommandRunner();
+
 	private String command;
 
 	private String[] environmentParams = null;
@@ -100,7 +102,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 			@Override
 			public Integer call() throws Exception {
-				Process process = Runtime.getRuntime().exec(command, environmentParams, workingDirectory);
+				Process process = commandRunner.exec(command, environmentParams, workingDirectory);
 				return process.waitFor();
 			}
 
@@ -143,6 +145,26 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	}
 
 	/**
+	 * Static setter for the {@link CommandRunner} so it can be adjusted before
+	 * dependency injection. Typically overridden by
+	 * {@link #setCommandRunner(CommandRunner)}.
+	 *
+	 * @param commandRunner {@link CommandRunner} instance to be used by SystemCommandTasklet instance.
+	 */
+	public static void presetCommandRunner(CommandRunner commandRunner) {
+		SystemCommandTasklet.commandRunner = commandRunner;
+	}
+
+	/**
+	 * Injection setter for the {@link CommandRunner}.
+	 *
+	 * @param commandRunner {@link CommandRunner} instance to be used by SystemCommandTasklet instance.
+	 */
+	public void setCommandRunner(CommandRunner commandRunner) {
+		SystemCommandTasklet.commandRunner = commandRunner;
+	}
+
+	/**
 	 * @param command command to be executed in a separate system process
 	 */
 	public void setCommand(String command) {
@@ -174,6 +196,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(commandRunner, "CommandRunner must be set");
 		Assert.hasLength(command, "'command' property value is required");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
 		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
