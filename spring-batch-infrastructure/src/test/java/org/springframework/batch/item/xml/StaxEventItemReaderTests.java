@@ -111,7 +111,7 @@ public class StaxEventItemReaderTests {
 	}
 
 	@Test
-	public void testAfterPropertesSetException() throws Exception {
+	public void testAfterPropertiesSetException() throws Exception {
 
 		source = createNewInputSource();
 		source.setFragmentRootElementName("");
