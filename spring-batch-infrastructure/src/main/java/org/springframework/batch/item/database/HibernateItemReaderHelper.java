@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 
@@ -29,7 +28,6 @@ import org.hibernate.StatelessSession;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -196,9 +194,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 			statelessSession = null;
 		}
 		if (statefulSession != null) {
-
-			Method close = ReflectionUtils.findMethod(Session.class, "close");
-			ReflectionUtils.invokeMethod(close, statefulSession);
+			statefulSession.close();
 			statefulSession = null;
 		}
 	}
