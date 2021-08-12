@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2018 the original author or authors.
+ * Copyright 2009-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> {
 
+	private static final String COUNT_KEY = "COUNT";
+
 	private Resource[] resources = new Resource[0];
 
 	private AtomicInteger counter = new AtomicInteger(0);
@@ -85,13 +87,13 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
     @Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
                 super.open(executionContext);
-		counter.set(executionContext.getInt(getExecutionContextKey("COUNT"), 0));
+		counter.set(executionContext.getInt(getExecutionContextKey(COUNT_KEY), 0));
 	}
 
     @Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
                 super.update(executionContext);
-		executionContext.putInt(getExecutionContextKey("COUNT"), counter.get());
+		executionContext.putInt(getExecutionContextKey(COUNT_KEY), counter.get());
 	}
 
 }
