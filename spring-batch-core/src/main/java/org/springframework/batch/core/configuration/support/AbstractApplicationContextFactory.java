@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -72,7 +71,6 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 		this.resources = resource;
 		beanFactoryPostProcessorClasses = new ArrayList<>();
-		beanFactoryPostProcessorClasses.add(PropertyPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(PropertySourcesPlaceholderConfigurer.class);
 		beanFactoryPostProcessorClasses.add(CustomEditorConfigurer.class);
 		beanPostProcessorExcludeClasses = new ArrayList<>();
@@ -106,7 +104,7 @@ public abstract class AbstractApplicationContextFactory implements ApplicationCo
 
 	/**
 	 * Determines which bean factory post processors (like property placeholders) should be copied from the parent
-	 * context. Defaults to {@link PropertyPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
+	 * context. Defaults to {@link PropertySourcesPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
 	 *
 	 * @param beanFactoryPostProcessorClasses array of post processor types to be copied
 	 */

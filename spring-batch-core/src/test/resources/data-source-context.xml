@@ -35,10 +35,9 @@
 		<property name="keyName" value="ENVIRONMENT"/>
 	</bean>
 
-	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+	<bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
 		depends-on="environment">
 		<property name="location" value="classpath:batch-${ENVIRONMENT}.properties" />
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>

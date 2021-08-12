@@ -45,7 +45,7 @@
 		<int:queue/>
 	</int:channel>
 
-	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+	<bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
 		  p:location="classpath:batch-${ENVIRONMENT:hsql}.properties"/>
 
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"

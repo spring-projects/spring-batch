@@ -103,7 +103,7 @@
 		</property>
 	</bean>
 
-	<bean id="footballProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="footballProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="properties">
 			<value>
 				games.file.name=games-small.csv
@@ -111,7 +111,6 @@
 				job.commit.interval=2
 			</value>
 		</property>
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>

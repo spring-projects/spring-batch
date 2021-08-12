@@ -10,7 +10,7 @@
 		<property name="name" value="${bar}" />
 	</bean>
 
-	<bean id="unique" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="unique" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="properties" value="bar=spam" />
 		<property name="order" value="0"/>
 	</bean>

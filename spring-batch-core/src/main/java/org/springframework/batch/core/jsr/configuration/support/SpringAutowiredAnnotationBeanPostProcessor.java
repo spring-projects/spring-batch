@@ -260,8 +260,8 @@ class SpringAutowiredAnnotationBeanPostProcessor implements SmartInstantiationAw
     }
 
     @Override
-    public PropertyValues postProcessPropertyValues(
-            PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
+    public PropertyValues postProcessProperties(
+            PropertyValues pvs, Object bean, String beanName) throws BeansException {
 
         InjectionMetadata metadata = findAutowiringMetadata(bean.getClass());
         try {
