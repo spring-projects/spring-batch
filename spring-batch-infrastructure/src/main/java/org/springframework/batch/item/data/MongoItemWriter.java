@@ -61,8 +61,8 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	private static final String ID_KEY = "_id";
 	private MongoOperations template;
 	private final Object bufferKey;
-	private String collection;
-	private boolean delete = false;
+	protected String collection;
+	protected boolean delete = false;
 
 	public MongoItemWriter() {
 		super();
@@ -218,5 +218,13 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(template != null, "A MongoOperations implementation is required.");
+	}
+
+	public String getCollection() {
+		return collection;
+	}
+
+	public boolean isDelete() {
+		return delete;
 	}
 }
