@@ -122,6 +122,15 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
+	 * Get the operating {@link Mode} of the item writer.
+	 * @return the operating mode
+	 * @since 5.1
+	 */
+	public Mode getMode() {
+		return mode;
+	}
+
+	/**
 	 * Set the {@link MongoOperations} to be used to save items to be written.
 	 * @param template the template implementation to be used.
 	 */
@@ -144,6 +153,15 @@ public class MongoItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	public void setCollection(String collection) {
 		this.collection = collection;
+	}
+
+	/**
+	 * Get the Mongo collection name.
+	 * @return the collection name
+	 * @since 5.1
+	 */
+	public String getCollection() {
+		return collection;
 	}
 
 	/**
