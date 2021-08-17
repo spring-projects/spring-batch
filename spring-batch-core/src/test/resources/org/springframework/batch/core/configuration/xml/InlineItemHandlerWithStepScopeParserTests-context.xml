@@ -6,7 +6,7 @@
 			 xsi:schemaLocation="http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd
 	http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<jdbc:embedded-database id="dataSource"/>
+	<jdbc:embedded-database id="dataSource" generate-name="true"/>
 
 	<jdbc:initialize-database>
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>

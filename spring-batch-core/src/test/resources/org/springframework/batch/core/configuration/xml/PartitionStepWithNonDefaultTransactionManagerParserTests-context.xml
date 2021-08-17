@@ -17,7 +17,7 @@
 
 	<bean id="partitioner" class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 
-	<jdbc:embedded-database id="dataSource"/>
+	<jdbc:embedded-database id="dataSource" generate-name="true"/>
 
 	<jdbc:initialize-database>
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>

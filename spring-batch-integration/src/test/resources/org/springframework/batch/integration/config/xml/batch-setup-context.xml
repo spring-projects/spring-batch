@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/jdbc https://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd">
 
-	<jdbc:embedded-database id="dataSource" type="HSQL"/>
+	<jdbc:embedded-database id="dataSource" generate-name="true" type="HSQL"/>
 
 	<jdbc:initialize-database data-source="dataSource">
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>

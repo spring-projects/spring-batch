@@ -74,7 +74,7 @@
 		</decision>
 	</job>
 
-	<jdbc:embedded-database id="dataSource"/>
+	<jdbc:embedded-database id="dataSource" generate-name="true"/>
 
 	<jdbc:initialize-database>
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>

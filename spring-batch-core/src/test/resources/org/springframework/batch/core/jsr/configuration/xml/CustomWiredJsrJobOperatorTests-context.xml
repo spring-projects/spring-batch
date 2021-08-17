@@ -4,7 +4,7 @@
 	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<jdbc:embedded-database id="dataSource"/>
+	<jdbc:embedded-database id="dataSource" generate-name="true"/>
 
 	<jdbc:initialize-database>
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>
