@@ -1,19 +1,9 @@
 package org.springframework.batch.integration.partition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -36,6 +26,15 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+
+import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * A {@link PartitionHandler} that uses {@link MessageChannel} instances to send instructions to remote workers and
@@ -236,49 +235,31 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		}
 	}
 
-	private Collection<StepExecution> pollReplies(final StepExecution masterStepExecution, final Set<StepExecution> split) throws Exception {
-		final Collection<StepExecution> result = new ArrayList<>(split.size());
+    private Collection<StepExecution> pollReplies(final StepExecution masterStepExecution, final Set<StepExecution> split) throws Exception {
+        Collection<Long> ids = split.stream().map(Entity::getId).collect(Collectors.toList());
 
-		Callable<Collection<StepExecution>> callback = new Callable<Collection<StepExecution>>() {
-			@Override
-			public Collection<StepExecution> call() throws Exception {
+        Callable<Collection<StepExecution>> callback = () -> {
 
-				for(Iterator<StepExecution> stepExecutionIterator = split.iterator(); stepExecutionIterator.hasNext(); ) {
-					StepExecution curStepExecution = stepExecutionIterator.next();
-
-					if(!result.contains(curStepExecution)) {
-						StepExecution partitionStepExecution =
-								jobExplorer.getStepExecution(masterStepExecution.getJobExecutionId(), curStepExecution.getId());
-
-						if(!partitionStepExecution.getStatus().isRunning()) {
-							result.add(partitionStepExecution);
-						}
-					}
-				}
-
+			int runningStepExecutions = jobExplorer.getStepExecutionCount(ids, BatchStatus.RUNNING_STATUSES);
+			if(runningStepExecutions > 0 && split.size() > 0) {
 				if(logger.isDebugEnabled()) {
-					logger.debug(String.format("Currently waiting on %s partitions to finish", split.size()));
+					logger.debug(String.format("Currently waiting on %s out of %s partitions to finish", runningStepExecutions, split.size()));
 				}
-
-				if(result.size() == split.size()) {
-					return result;
-				}
-				else {
-					return null;
-				}
+				return null;
+			} else {
+				return jobExplorer.getStepExecutions(masterStepExecution.getJobExecutionId(), ids);
 			}
 		};
 
-		Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
-		Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
+        Poller<Collection<StepExecution>> poller = new DirectPoller<>(pollInterval);
+        Future<Collection<StepExecution>> resultsFuture = poller.poll(callback);
 
-		if(timeout >= 0) {
-			return resultsFuture.get(timeout, TimeUnit.MILLISECONDS);
-		}
-		else {
-			return resultsFuture.get();
-		}
-	}
+        if(timeout >= 0) {
+            return resultsFuture.get(timeout, TimeUnit.MILLISECONDS);
+        } else {
+            return resultsFuture.get();
+        }
+    }
 
 	private Collection<StepExecution> receiveReplies(PollableChannel currentReplyChannel) {
 		@SuppressWarnings("unchecked")

@@ -15,28 +15,10 @@
  */
 package org.springframework.batch.core.launch.support;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -48,6 +30,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -539,6 +525,11 @@ public class CommandLineJobRunnerTests {
 		}
 
 		@Override
+		public int getStepExecutionCount(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public List<String> getJobNames() {
 			throw new UnsupportedOperationException();
 		}
@@ -566,6 +557,10 @@ public class CommandLineJobRunnerTests {
 			}
 		}
 
+		@Override
+		public Collection<StepExecution> getStepExecutions(Long jobExecutionId, Collection<Long> stepExecutionIds) {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public static class StubJobParametersConverter implements JobParametersConverter {

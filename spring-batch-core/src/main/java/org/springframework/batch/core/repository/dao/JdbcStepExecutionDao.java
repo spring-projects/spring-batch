@@ -16,25 +16,9 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -42,6 +26,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import java.sql.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * JDBC implementation of {@link StepExecutionDao}.<br>
@@ -113,6 +102,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			"where JOB_INSTANCE_ID = ?)" +
 			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
 			"      and SE.STEP_NAME = ?";
+
+	// need to replace the %STEP_EXECUTION_IDS% with a known number of ?s
+	private static final String GET_STEP_EXECUTIONS_BY_IDS = GET_RAW_STEP_EXECUTIONS + " and STEP_EXECUTION_ID IN (%STEP_EXECUTION_IDS%)";
+
+	// need to replace the %STEP_EXECUTION_IDS% and %STEP_STATUSES% with a known number of ?s
+	private static final String COUNT_STEP_EXECUTIONS_MATCHING_IDS_AND_STATUSES = "SELECT COUNT(*) " +
+			"from %PREFIX%STEP_EXECUTION SE " +
+			"where SE.STEP_EXECUTION_ID IN (%STEP_EXECUTION_IDS%) " +
+			"and SE.STATUS IN (%STEP_STATUSES%)";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -351,9 +349,28 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	}
 
 	@Override
+    public Collection<StepExecution> getStepExecutions(JobExecution jobExecution, Collection<Long> stepExecutionIds) {
+		String sql = createParameterizedQuery(GET_STEP_EXECUTIONS_BY_IDS, "%STEP_EXECUTION_IDS%", stepExecutionIds);
+        return getJdbcTemplate().query(getQuery(sql),
+                                       new StepExecutionRowMapper(jobExecution),
+                                       Stream.concat(Stream.of(jobExecution.getId()), stepExecutionIds.stream()).toArray());
+    }
+
+	@Override
 	public void addStepExecutions(JobExecution jobExecution) {
 		getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS), new StepExecutionRowMapper(jobExecution),
 				jobExecution.getId());
+	}
+
+	@Override
+	public int countStepExecutions(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses) {
+		String sql = createParameterizedQuery(COUNT_STEP_EXECUTIONS_MATCHING_IDS_AND_STATUSES, "%STEP_EXECUTION_IDS%", stepExecutionIds);
+		sql = createParameterizedQuery(sql, "%STEP_STATUSES%", matchingBatchStatuses);
+		Object[] args = Stream.concat(stepExecutionIds.stream(),
+									  matchingBatchStatuses.stream().map(BatchStatus::name)).toArray();
+		return getJdbcTemplate().queryForObject(getQuery(sql),
+                                                Integer.class,
+                                                args);
 	}
 
 	@Override
@@ -391,4 +408,17 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	}
 
+	/**
+	 * Replaces a given placeholder with a number of parameters (i.e. "?").
+	 *
+	 * @param sqlTemplate given sql template
+	 * @param placeholder placeholder that is being used for parameters
+	 * @param parameters collection of parameters with variable size
+	 *
+	 * @return sql query replaced with a number of parameters
+	 */
+	private static String createParameterizedQuery(String sqlTemplate, String placeholder, Collection<?> parameters) {
+		String params = parameters.stream().map(p -> "?").collect(Collectors.joining(", "));
+		return sqlTemplate.replace(placeholder, params);
+	}
 }

@@ -15,25 +15,18 @@
  */
 package org.springframework.batch.core.repository.dao;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.springframework.batch.core.Entity;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * In-memory implementation of {@link StepExecutionDao}.
@@ -188,5 +181,24 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 		}
 		return count;
+	}
+
+	@Override
+	public int countStepExecutions(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses) {
+		int count = 0;
+
+		for (Long id: stepExecutionIds) {
+			if (executionsByStepExecutionId.containsKey(id) && matchingBatchStatuses.contains(executionsByStepExecutionId.get(id).getStatus())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	@Override
+	public Collection<StepExecution> getStepExecutions(JobExecution jobExecution, Collection<Long> stepExecutionIds) {
+		return executionsByStepExecutionId.values().stream()
+				.filter(se -> stepExecutionIds.contains(se.getId()) && se.getJobExecutionId().equals(jobExecution.getId()))
+				.collect(Collectors.toList());
 	}
 }

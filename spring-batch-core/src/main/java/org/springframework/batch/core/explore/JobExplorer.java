@@ -15,15 +15,17 @@
  */
 package org.springframework.batch.core.explore;
 
-import java.util.List;
-import java.util.Set;
-
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Entry point for browsing executions of running or historical jobs and steps.
@@ -88,6 +90,14 @@ public interface JobExplorer {
 	 */
 	@Nullable
 	StepExecution getStepExecution(@Nullable Long jobExecutionId, @Nullable Long stepExecutionId);
+
+	/**
+	 * Retrieve number of step executions that match the step execution ids and the batch statuses
+	 * @param stepExecutionIds given step execution ids
+	 * @param matchingBatchStatuses given batch statuses to match against
+	 * @return number of {@link StepExecution} matching the criteria
+	 */
+	int getStepExecutionCount(Collection<Long> stepExecutionIds, Collection<BatchStatus> matchingBatchStatuses);
 
 	/**
 	 * @param instanceId {@link Long} id for the jobInstance to obtain.
@@ -164,4 +174,11 @@ public interface JobExplorer {
 	 */
 	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;
 
+	/**
+	 * Find step executions in bulk
+	 * @param jobExecutionId given job execution id
+	 * @param stepExecutionIds given step execution ids
+	 * @return collection of {@link StepExecution}
+	 */
+	Collection<StepExecution> getStepExecutions(Long jobExecutionId, Collection<Long> stepExecutionIds);
 }
