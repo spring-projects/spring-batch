@@ -19,10 +19,6 @@
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
 
-	<bean id="mapJobRepository"
-		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"
-		lazy-init="true" autowire-candidate="false" />
-
 	<bean id="jobOperator"
 		class="org.springframework.batch.core.launch.support.SimpleJobOperator"
 		p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer"

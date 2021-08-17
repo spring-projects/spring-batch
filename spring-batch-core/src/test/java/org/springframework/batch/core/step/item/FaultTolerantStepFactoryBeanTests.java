@@ -45,7 +45,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -63,8 +63,10 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -108,10 +110,17 @@ public class FaultTolerantStepFactoryBeanTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql")
+				.generateUniqueName(true)
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+
 		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
-		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setTransactionManager(transactionManager);
 		factory.setCommitInterval(2);
 
 		reader.clear();
@@ -127,9 +136,12 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory
 		.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
-		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.afterPropertiesSet();
-		repository = repositoryFactory.getObject();
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.setMaxVarCharLength(10000);
+		repositoryFactoryBean.afterPropertiesSet();
+		repository = repositoryFactoryBean.getObject();
 		factory.setJobRepository(repository);
 
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());

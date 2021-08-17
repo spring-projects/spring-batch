@@ -55,6 +55,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -65,6 +66,7 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 /**
  * @author Thomas Risberg
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  */
 public class StepParserTests {
 
@@ -297,7 +299,7 @@ public class StepParserTests {
 	public void testTransactionManagerDefaults() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof ResourcelessTransactionManager);
+		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof DataSourceTransactionManager);
 
 		assertDummyTransactionManager("specifiedTxMgrStep", "dummyTxMgr", ctx);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,9 +85,6 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	@Autowired
 	private JobRepository jobRepository;
 
-	@Autowired
-	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
-
 	private ApplicationContext applicationContext;
 
 	private List<String> savedStepNames = new ArrayList<>();
@@ -101,7 +97,6 @@ public class PartitionStepParserTests implements ApplicationContextAware {
 	@Before
 	public void setUp() {
 		nameStoringTasklet.setStepNamesList(savedStepNames);
-		mapJobRepositoryFactoryBean.clear();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.batch.core.BatchStatus;
@@ -41,12 +42,15 @@ import org.springframework.batch.core.configuration.xml.DummyItemReader;
 import org.springframework.batch.core.configuration.xml.DummyItemWriter;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.item.support.ListItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -61,9 +65,24 @@ import static org.junit.Assert.assertEquals;
  */
 public class StepBuilderTests {
 
+	private JobRepository jobRepository;
+
+	@Before
+	public void setUp() throws Exception {
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(transactionManager);
+		factory.afterPropertiesSet();
+		this.jobRepository = factory.getObject();
+	}
+
 	@Test
 	public void test() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution(
 				"step");
 		jobRepository.add(execution);
@@ -76,7 +95,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testListeners() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -98,7 +116,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -115,7 +132,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -134,7 +150,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -154,7 +169,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -175,7 +189,6 @@ public class StepBuilderTests {
 
 	@Test
 	public void testItemListeners() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -218,7 +231,6 @@ public class StepBuilderTests {
 	}
 
 	private void assertStepFunctions(boolean faultTolerantStep) throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
 		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();

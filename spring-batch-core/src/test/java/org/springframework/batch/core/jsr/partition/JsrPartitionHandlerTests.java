@@ -27,9 +27,12 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.jsr.step.batchlet.BatchletSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.util.StopWatch;
 
 import javax.batch.api.BatchProperty;
@@ -56,7 +59,7 @@ import static org.junit.Assert.fail;
 public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 
 	private JsrPartitionHandler handler;
-	private JobRepository repository = new JobRepositorySupport();
+	private JobRepository repository;
 	private StepExecution stepExecution;
 	private AtomicInteger count;
 	private BatchPropertyContext propertyContext;
@@ -82,7 +85,15 @@ public class JsrPartitionHandlerTests extends AbstractJsrTestCase {
 		});
 		propertyContext = new BatchPropertyContext();
 		handler.setPropertyContext(propertyContext);
-		repository = new MapJobRepositoryFactoryBean().getObject();
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
+		factory.afterPropertiesSet();
+		repository = factory.getObject();
 		handler.setJobRepository(repository);
 		MyPartitionReducer.reset();
 		CountingPartitionCollector.reset();

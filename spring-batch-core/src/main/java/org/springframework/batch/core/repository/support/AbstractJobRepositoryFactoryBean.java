@@ -44,7 +44,6 @@ import org.springframework.util.Assert;
  * object implementations.
  *
  * @see JobRepositoryFactoryBean
- * @see MapJobRepositoryFactoryBean
  *
  * @author Ben Hale
  * @author Lucas Ward
@@ -153,18 +152,6 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
-	}
-
-	/**
-	 * Convenience method for clients to grab the {@link JobRepository} without
-	 * a cast.
-	 * @return the {@link JobRepository} from {@link #getObject()}
-	 * @throws Exception if the repository could not be created
-	 * @deprecated use {@link #getObject()} instead
-	 */
-	@Deprecated
-	public JobRepository getJobRepository() throws Exception {
-		return getObject();
 	}
 
 	private void initializeProxy() throws Exception {

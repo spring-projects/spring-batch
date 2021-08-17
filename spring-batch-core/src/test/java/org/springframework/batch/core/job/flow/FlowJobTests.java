@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.job.flow.support.DefaultStateTransitionComparator;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
@@ -38,9 +40,11 @@ import org.springframework.batch.core.jsr.partition.JsrPartitionHandler;
 import org.springframework.batch.core.jsr.step.PartitionStep;
 import org.springframework.batch.core.jsr.partition.JsrStepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.JobExecutionDao;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
@@ -56,6 +60,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class FlowJobTests {
@@ -66,18 +71,28 @@ public class FlowJobTests {
 
 	private JobRepository jobRepository;
 
-	private boolean fail = false;
+	private JobExplorer jobExplorer;
 
-	private JobExecutionDao jobExecutionDao;
+	private boolean fail = false;
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
 		factory.afterPropertiesSet();
-		jobExecutionDao = factory.getJobExecutionDao();
-		jobRepository = factory.getObject();
-		job.setJobRepository(jobRepository);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		this.jobRepository = factory.getObject();
+		job.setJobRepository(this.jobRepository);
+		this.jobExecution = this.jobRepository.createJobExecution("job", new JobParameters());
+
+		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
+		explorerFactoryBean.setDataSource(embeddedDatabase);
+		explorerFactoryBean.afterPropertiesSet();
+		this.jobExplorer = explorerFactoryBean.getObject();
 	}
 
 	@Test
@@ -743,9 +758,8 @@ public class FlowJobTests {
 	}
 
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		// because map dao stores in memory, it can be checked directly
-		JobInstance jobInstance = jobExecution.getJobInstance();
-		JobExecution other = jobExecutionDao.findJobExecutions(jobInstance).get(0);
+		JobInstance jobInstance = this.jobExecution.getJobInstance();
+		JobExecution other = this.jobExplorer.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), other.getJobId());
 		assertEquals(status, other.getStatus());
 		if (exitStatus != null) {

@@ -716,56 +716,6 @@ Given the preceding changes, every query to the meta-data tables is prefixed wit
 Only the table prefix is configurable. The table and column names are not.
 ====
 
-[[inMemoryRepository]]
-==== In-Memory Repository
-
-There are scenarios in which you may not want to persist your domain objects to the
-database. One reason may be speed; storing domain objects at each commit point takes extra
-time. Another reason may be that you just don't need to persist status for a particular
-job. For this reason, Spring batch provides an in-memory `Map` version of the job
-repository.
-
-[role="xmlContent"]
-The following example shows the inclusion of `MapJobRepositoryFactoryBean` in XML:
-
-.XML Configuration
-[source, xml, role="xmlContent"]
-----
-<bean id="jobRepository"
-  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-    <property name="transactionManager" ref="transactionManager"/>
-</bean>
-----
-
-[role="javaContent"]
-The following example shows the inclusion of `MapJobRepositoryFactoryBean` in Java:
-
-.Java Configuration
-[source, java, role="javaContent"]
-----
-// This would reside in your BatchConfigurer implementation
-@Override
-protected JobRepository createJobRepository() throws Exception {
-    MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-    factory.setTransactionManager(transactionManager);
-    return factory.getObject();
-}
-
-----
-
-Note that the in-memory repository is volatile and so does not allow restart between JVM
-instances. It also cannot guarantee that two job instances with the same parameters are
-launched simultaneously, and is not suitable for use in a multi-threaded Job, or a locally
-partitioned `Step`. So use the database version of the repository wherever you need those
-features.
-
-However it does require a transaction manager to be defined because there are rollback
-semantics within the repository, and because the business logic might still be
-transactional (such as RDBMS access). For testing purposes many people find the
-`ResourcelessTransactionManager` useful.
-
-
-
 [[nonStandardDatabaseTypesInRepository]]
 ==== Non-standard Database Types in a Repository
 

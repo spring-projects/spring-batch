@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
 /**
@@ -106,6 +108,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
 	public static class TestConfiguration {
 
 		@Autowired
@@ -147,6 +150,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
 	public static class AnotherConfiguration {
 
 		@Autowired
@@ -173,10 +177,15 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
 	public static class TestConfigurer extends DefaultBatchConfigurer {
 
 		@Autowired
 		private SimpleBatchConfiguration jobs;
+
+		public TestConfigurer(DataSource dataSource) {
+			super(dataSource);
+		}
 
 		@Bean
 		public Job testConfigurerJob() throws Exception {
@@ -201,6 +210,7 @@ public class JobBuilderConfigurationTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
 	public static class BeansConfigurer {
 
 		@Autowired
@@ -233,6 +243,18 @@ public class JobBuilderConfigurationTests {
 			return new DefaultBatchConfigurer(dataSource);
 		}
 
+	}
+
+	@Configuration
+	static class DataSourceConfiguration {
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder()
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
+					.build();
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,23 +45,32 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HsqlSequenceMaxValueIncrementer;
 
 /**
- * Tests for DefaultJobLifecycle. MapJobDao and MapStepExecutionDao are used
- * instead of a mock repository to test that status is being stored correctly.
+ * Tests for DefaultJobLifecycle.
  *
  * @author Lucas Ward
  * @author Will Schipp
@@ -71,13 +80,7 @@ public class SimpleJobTests {
 
 	private JobRepository jobRepository;
 
-	private JobInstanceDao jobInstanceDao;
-
-	private JobExecutionDao jobExecutionDao;
-
-	private StepExecutionDao stepExecutionDao;
-
-	private ExecutionContextDao ecDao;
+	private JobExplorer jobExplorer;
 
 	private List<Serializable> list = new ArrayList<>();
 
@@ -100,11 +103,21 @@ public class SimpleJobTests {
 	@Before
 	public void setUp() throws Exception {
 
-		jobInstanceDao = new MapJobInstanceDao();
-		jobExecutionDao = new MapJobExecutionDao();
-		stepExecutionDao = new MapStepExecutionDao();
-		ecDao = new MapExecutionContextDao();
-		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.afterPropertiesSet();
+		this.jobRepository = repositoryFactoryBean.getObject();
+		JobExplorerFactoryBean explorerFactoryBean = new JobExplorerFactoryBean();
+		explorerFactoryBean.setDataSource(embeddedDatabase);
+		explorerFactoryBean.afterPropertiesSet();
+		this.jobExplorer = explorerFactoryBean.getObject();
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
@@ -528,9 +541,8 @@ public class SimpleJobTests {
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(jobInstance, jobInstanceDao.getJobInstance(job.getName(), jobParameters));
-		// because map DAO stores in memory, it can be checked directly
-		JobExecution jobExecution = jobExecutionDao.findJobExecutions(jobInstance).get(0);
+		assertEquals(jobInstance, this.jobRepository.getLastJobExecution(job.getName(), jobParameters).getJobInstance());
+		JobExecution jobExecution = this.jobExplorer.getJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {

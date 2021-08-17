@@ -20,10 +20,6 @@
 		p:isolationLevelForCreate = "${batch.isolationlevel}"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" p:lobHandler-ref="lobHandler"/>
 
-	<bean id="mapJobRepository"
-		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"
-		lazy-init="true" autowire-candidate="false" />
-
 	<bean id="jobOperator"
 		class="org.springframework.batch.core.launch.support.SimpleJobOperator"
 		p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer"

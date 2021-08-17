@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
 @Import(ScopeConfiguration.class)
 public abstract class AbstractBatchConfiguration implements ImportAware, InitializingBean {
 
-	@Autowired(required = false)
+	@Autowired
 	private DataSource dataSource;
 
 	private BatchConfigurer configurer;
@@ -103,22 +103,15 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		this.stepBuilderFactory = new StepBuilderFactory(jobRepository(), transactionManager());
 	}
 
-	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) throws Exception {
+	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) {
 		if (this.configurer != null) {
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			if (dataSource == null) {
-				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer();
-				configurer.initialize();
-				this.configurer = configurer;
-				return configurer;
-			} else {
-				DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
-				configurer.initialize();
-				this.configurer = configurer;
-				return configurer;
-			}
+			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(this.dataSource);
+			configurer.initialize();
+			this.configurer = configurer;
+			return configurer;
 		}
 		if (configurers.size() > 1) {
 			throw new IllegalStateException(
