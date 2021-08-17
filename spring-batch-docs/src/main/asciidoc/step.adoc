@@ -1373,7 +1373,7 @@ order to set up various resources or after processing has completed to cleanup t
 resources. In the case of a job that works heavily with files, it is often necessary to
 delete certain files locally after they have been uploaded successfully to another
 location. The following example (taken from the
-https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring
+https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples[Spring
 Batch samples project]) is a `Tasklet` implementation with just such a responsibility:
 
 [source, java]
