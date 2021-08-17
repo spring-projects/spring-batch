@@ -102,7 +102,6 @@ public class SimpleJobTests {
 
 	@Before
 	public void setUp() throws Exception {
-
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
@@ -395,17 +394,6 @@ public class SimpleJobTests {
 	}
 
 	@Test
-	public void testNotExecutedIfAlreadyStopped() throws Exception {
-		jobExecution.stop();
-		job.execute(jobExecution);
-
-		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
-		ExitStatus exitStatus = jobExecution.getExitStatus();
-		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
-	}
-
-	@Test
 	public void testRestart() throws Exception {
 		step1.setAllowStartIfComplete(true);
 		final RuntimeException exception = new RuntimeException("Foo!");
@@ -491,31 +479,6 @@ public class SimpleJobTests {
 		assertSame(exception, e);
 		assertFalse(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
-	}
-
-	@Test
-	public void testInterruptJob() throws Exception {
-
-		step1 = new StubStep("interruptStep", jobRepository) {
-
-			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-			UnexpectedJobExecutionException {
-				stepExecution.getJobExecution().stop();
-				super.execute(stepExecution);
-			}
-
-		};
-
-		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
-		job.execute(jobExecution);
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		assertTrue("Wrong exception " + expected, expected instanceof JobInterruptedException);
-		assertEquals("JobExecution interrupted.", expected.getMessage());
-
-		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
 	}
 
 	@Test

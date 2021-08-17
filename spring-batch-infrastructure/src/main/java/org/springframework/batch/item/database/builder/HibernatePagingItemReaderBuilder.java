@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,22 +215,6 @@ public class HibernatePagingItemReaderBuilder<T> {
 		this.sessionFactory = sessionFactory;
 
 		return this;
-	}
-
-	/**
-	 * Indicator for whether to use a {@link org.hibernate.StatelessSession}
-	 * (<code>true</code>) or a {@link org.hibernate.Session} (<code>false</code>).
-	 *
-	 * @param useStatelessSession Defaults to false
-	 * @return this instance for method chaining
-	 * @see HibernatePagingItemReader#setUseStatelessSession(boolean)
-	 * @deprecated This method is deprecated in favor of
-	 * {@link HibernatePagingItemReaderBuilder#useStatelessSession} and will be
-	 * removed in a future version.
-	 */
-	@Deprecated
-	public HibernatePagingItemReaderBuilder<T> useSatelessSession(boolean useStatelessSession) {
-		return useStatelessSession(useStatelessSession);
 	}
 
 	/**

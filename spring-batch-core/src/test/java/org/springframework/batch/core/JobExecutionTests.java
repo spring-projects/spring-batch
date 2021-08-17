@@ -74,19 +74,6 @@ public class JobExecutionTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
-	 */
-	@Test
-	public void testIsRunningWithStoppedExecution() {
-		execution.setStartTime(new Date());
-		assertTrue(execution.isRunning());
-		execution.stop();
-		assertTrue(execution.isRunning());
-		assertTrue(execution.isStopping());
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStartTime()}.
 	 */
 	@Test
@@ -204,14 +191,6 @@ public class JobExecutionTests {
 		assertEquals(1, execution.getStepExecutions().size());
 		new StepExecution("step", execution, 2L);
 		assertEquals(2, execution.getStepExecutions().size());
-	}
-
-	@Test
-	public void testStop() throws Exception {
-		StepExecution stepExecution = execution.createStepExecution("step");
-		assertFalse(stepExecution.isTerminateOnly());
-		execution.stop();
-		assertTrue(stepExecution.isTerminateOnly());
 	}
 
 	@Test

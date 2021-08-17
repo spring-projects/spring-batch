@@ -73,27 +73,6 @@ public class JobParameters implements Serializable {
 	/**
 	 * Typesafe Getter for the Long represented by the provided key.  If the
 	 * key does not exist, the default value will be returned.
-	 * 
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
-	 * @deprecated Use {@link JobParameters#getLong(java.lang.String, java.lang.Long)}
-	 * instead. This method will be removed in a future release.
-	 */
-	@Deprecated
-	public Long getLong(String key, long defaultValue){
-		if(parameters.containsKey(key)){
-			return getLong(key);
-		}
-		else{
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Typesafe Getter for the Long represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
 	 *
 	 * @param key to return the value for
 	 * @param defaultValue to return if the value doesn't exist
@@ -154,27 +133,6 @@ public class JobParameters implements Serializable {
 		}
 		Double value = (Double)parameters.get(key).getValue();
 		return value==null ? null : value.doubleValue();
-	}
-
-	/**
-	 * Typesafe Getter for the Double represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
-	 * 
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
-	 * @deprecated Use {@link JobParameters#getDouble(java.lang.String, java.lang.Double)}
-	 * instead. This method will be removed in a future release.
-	 */
-	@Deprecated
-	public Double getDouble(String key, double defaultValue){
-		if(parameters.containsKey(key)){
-			return getDouble(key);
-		}
-		else{
-			return defaultValue;
-		}
 	}
 
 	/**

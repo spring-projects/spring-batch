@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
  * Utility methods for files used in batch processing.
  * 
  * @author Peter Zozom
+ * @author Mahmoud Ben Hassine
  */
 public final class FileUtils {
 
@@ -87,28 +88,6 @@ public final class FileUtils {
 		if (!file.canWrite()) {
 			throw new ItemStreamException("File is not writable: [" + file.getAbsolutePath() + "]");
 		}
-	}
-
-	/**
-	 * Set up output file for batch processing. This method implements common logic for handling output files when
-	 * starting or restarting file I/O. When starting output file processing, creates/overwrites new file. When
-	 * restarting output file processing, checks whether file is writable.
-	 *
-	 * @param file file to be set up
-	 * @param restarted true signals that we are restarting output file processing
-	 * @param overwriteOutputFile If set to true, output file will be overwritten (this flag is ignored when processing
-	 * is restart)
-	 *
-	 * @throws IllegalArgumentException when file is null
-	 * @throws ItemStreamException when starting output file processing, file exists and flag "overwriteOutputFile" is
-	 * set to false
-	 * @throws ItemStreamException when unable to create file or file is not writable
-	 *
-	 * @deprecated use the version with explicit append parameter instead. Here append=false is assumed.
-	 */
-	@Deprecated
-	public static void setUpOutputFile(File file, boolean restarted, boolean overwriteOutputFile) {
-		setUpOutputFile(file, restarted, false, overwriteOutputFile);
 	}
 
 	/**

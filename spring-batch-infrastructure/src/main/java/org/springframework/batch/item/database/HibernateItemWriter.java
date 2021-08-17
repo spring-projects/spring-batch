@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2017 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Thomas Risberg
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
@@ -127,42 +128,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 						+ " entities found in session.");
 			}
 		}
-	}
-
-	/**
-	 * Do perform the actual write operation using {@link HibernateOperations}.
-	 * This can be overridden in a subclass if necessary.
-	 *
-	 * @param hibernateTemplate
-	 *            the HibernateTemplate to use for the operation
-	 * @param items
-	 *            the list of items to use for the write
-	 * @deprecated As of 2.2 in favor of using Hibernate's session management APIs directly
-	 */
-	@Deprecated
-	protected void doWrite(HibernateOperations hibernateTemplate,
-			List<? extends T> items) {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Writing to Hibernate with " + items.size()
-					+ " items.");
-		}
-
-		if (!items.isEmpty()) {
-			long saveOrUpdateCount = 0;
-			for (T item : items) {
-				if (!hibernateTemplate.contains(item)) {
-					hibernateTemplate.saveOrUpdate(item);
-					saveOrUpdateCount++;
-				}
-			}
-			if (logger.isDebugEnabled()) {
-				logger.debug(saveOrUpdateCount + " entities saved/updated.");
-				logger.debug((items.size() - saveOrUpdateCount)
-						+ " entities found in session.");
-			}
-		}
-
 	}
 
 }
