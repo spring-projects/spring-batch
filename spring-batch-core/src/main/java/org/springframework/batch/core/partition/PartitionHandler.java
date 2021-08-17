@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.item.ExecutionContext;
  * caller.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public interface PartitionHandler {
@@ -38,12 +39,12 @@ public interface PartitionHandler {
 	 * Main entry point for {@link PartitionHandler} interface. The splitter
 	 * creates all the executions that need to be farmed out, along with their
 	 * input parameters (in the form of their {@link ExecutionContext}). The
-	 * master step execution is used to identify the partition and group
+	 * manager step execution is used to identify the partition and group
 	 * together the results logically.
 	 * 
 	 * @param stepSplitter a strategy for generating a collection of
 	 * {@link StepExecution} instances
-	 * @param stepExecution the master step execution for the whole partition
+	 * @param stepExecution the manager step execution for the whole partition
 	 * @return a collection of completed {@link StepExecution} instances
 	 * @throws Exception if anything goes wrong. This allows implementations to
 	 * be liberal and rely on the caller to translate an exception into a step

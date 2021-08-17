@@ -81,7 +81,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 
 		// then
 		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		Assert.assertEquals(4, jobExecution.getStepExecutions().size()); // master + 3 workers
+		Assert.assertEquals(4, jobExecution.getStepExecutions().size()); // manager + 3 workers
 	}
 
 	@After

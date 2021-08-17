@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ import org.springframework.integration.jms.dsl.Jms;
  * It uses the {@link RemoteChunkingWorkerBuilder} to configure an
  * {@link IntegrationFlow} in order to:
  * <ul>
- *     <li>receive requests from the master</li>
+ *     <li>receive requests from the manager</li>
  *     <li>process chunks with the configured item processor and writer</li>
- *     <li>send replies to the master</li>
+ *     <li>send replies to the manager</li>
  * </ul>
  *
  * @author Mahmoud Ben Hassine
@@ -67,7 +67,7 @@ public class WorkerConfiguration {
 	}
 
 	/*
-	 * Configure inbound flow (requests coming from the master)
+	 * Configure inbound flow (requests coming from the manager)
 	 */
 	@Bean
 	public DirectChannel requests() {
@@ -83,7 +83,7 @@ public class WorkerConfiguration {
 	}
 
 	/*
-	 * Configure outbound flow (replies going to the master)
+	 * Configure outbound flow (replies going to the manager)
 	 */
 	@Bean
 	public DirectChannel replies() {

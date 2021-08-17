@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	private MessageChannel outputChannel;
 
 	/**
-	 * Set the {@link ItemProcessor} to use to process items sent by the master
+	 * Set the {@link ItemProcessor} to use to process items sent by the manager
 	 * step.
 	 *
 	 * @param itemProcessor to use
@@ -66,7 +66,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	}
 
 	/**
-	 * Set the {@link ItemWriter} to use to write items sent by the master step.
+	 * Set the {@link ItemWriter} to use to write items sent by the manager step.
 	 *
 	 * @param itemWriter to use
 	 * @return this builder instance for fluent chaining
@@ -78,7 +78,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	}
 
 	/**
-	 * Set the input channel on which items sent by the master are received.
+	 * Set the input channel on which items sent by the manager are received.
 	 *
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
@@ -90,7 +90,7 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	}
 
 	/**
-	 * Set the output channel on which replies will be sent to the master step.
+	 * Set the output channel on which replies will be sent to the manager step.
 	 *
 	 * @param outputChannel the output channel
 	 * @return this builder instance for fluent chaining

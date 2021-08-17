@@ -46,8 +46,8 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemotePartitioningMasterStepBuilderTests.BatchConfiguration.class})
-public class RemotePartitioningMasterStepBuilderTests {
+@ContextConfiguration(classes = {RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class})
+public class RemotePartitioningManagerStepBuilderTests {
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -151,7 +151,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 	}
 
 	@Test
-	public void testMasterStepCreationWhenPollingRepository() {
+	public void testManagerStepCreationWhenPollingRepository() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -162,7 +162,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("masterStep")
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
 				.repository(jobRepository)
 				.outputChannel(outputChannel)
 				.partitioner("workerStep", partitioner)
@@ -196,7 +196,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 	}
 
 	@Test
-	public void testMasterStepCreationWhenAggregatingReplies() {
+	public void testManagerStepCreationWhenAggregatingReplies() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -205,7 +205,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("masterStep")
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
 				.repository(jobRepository)
 				.outputChannel(outputChannel)
 				.partitioner("workerStep", partitioner)

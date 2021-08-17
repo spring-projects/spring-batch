@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Will Schipp
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  */
 public class MessageChannelPartitionHandlerTests {
@@ -59,11 +60,11 @@ public class MessageChannelPartitionHandlerTests {
 		//execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
-		StepExecution masterStepExecution = mock(StepExecution.class);
+		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 
 		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 		//verify
 		assertTrue(executions.isEmpty());
 	}
@@ -74,7 +75,7 @@ public class MessageChannelPartitionHandlerTests {
 		//execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
-		StepExecution masterStepExecution = mock(StepExecution.class);
+		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
@@ -88,7 +89,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
 		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 		//verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
@@ -100,7 +101,7 @@ public class MessageChannelPartitionHandlerTests {
 		//execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
-		StepExecution masterStepExecution = mock(StepExecution.class);
+		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
@@ -116,7 +117,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
 
 		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 		//verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
@@ -129,7 +130,7 @@ public class MessageChannelPartitionHandlerTests {
 		//execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
-		StepExecution masterStepExecution = mock(StepExecution.class);
+		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
@@ -142,7 +143,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
 		//execute
-		messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
-		StepExecution masterStepExecution = new StepExecution("step1", jobExecution, 1L);
+		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		JobExplorer jobExplorer = mock(JobExplorer.class);
@@ -179,7 +180,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.afterPropertiesSet();
 
 		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 		//verify
 		assertNotNull(executions);
 		assertEquals(3, executions.size());
@@ -197,7 +198,7 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
 		//mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
-		StepExecution masterStepExecution = new StepExecution("step1", jobExecution, 1L);
+		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		JobExplorer jobExplorer = mock(JobExplorer.class);
@@ -223,6 +224,6 @@ public class MessageChannelPartitionHandlerTests {
 		messageChannelPartitionHandler.afterPropertiesSet();
 
 		//execute
-		messageChannelPartitionHandler.handle(stepExecutionSplitter, masterStepExecution);
+		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 	}
 }

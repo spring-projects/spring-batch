@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,15 +50,15 @@ import org.springframework.util.Assert;
  * creates an {@link IntegrationFlow} that:
  *
  * <ul>
- *     <li>listens to {@link StepExecutionRequest}s coming from the master
+ *     <li>listens to {@link StepExecutionRequest}s coming from the manager
  *     on the input channel</li>
  *     <li>invokes the {@link StepExecutionRequestHandler} to execute the worker
  *     step for each incoming request. The worker step is located using the provided
  *     {@link StepLocator}. If no {@link StepLocator} is provided, a {@link BeanFactoryStepLocator}
  *     configured with the current {@link BeanFactory} will be used
- *     <li>replies to the master on the output channel (when the master step is
+ *     <li>replies to the manager on the output channel (when the manager step is
  *     configured to aggregate replies from workers). If no output channel
- *     is provided, a {@link NullChannel} will be used (assuming the master side
+ *     is provided, a {@link NullChannel} will be used (assuming the manager side
  *     is configured to poll the job repository for workers status)</li>
  * </ul>
  *
@@ -85,7 +85,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	}
 
 	/**
-	 * Set the input channel on which step execution requests sent by the master
+	 * Set the input channel on which step execution requests sent by the manager
 	 * are received.
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
@@ -97,7 +97,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 	}
 
 	/**
-	 * Set the output channel on which replies will be sent to the master step.
+	 * Set the output channel on which replies will be sent to the manager step.
 	 * @param outputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 */
@@ -235,7 +235,7 @@ public class RemotePartitioningWorkerStepBuilder extends StepBuilder {
 		if (this.outputChannel == null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("The output channel is set to a NullChannel. " +
-						"The master step must poll the job repository for workers status.");
+						"The manager step must poll the job repository for workers status.");
 			}
 			this.outputChannel = new NullChannel();
 		}

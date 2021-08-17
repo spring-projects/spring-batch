@@ -43,7 +43,7 @@
 	</bean>
 
 	<job id="job1" xmlns="http://www.springframework.org/schema/batch">
-		<step id="step1-master">
+		<step id="step1-manager">
 			<partition handler="partitionHandler" partitioner="partitioner" />
 		</step>
 	</job>

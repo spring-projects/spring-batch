@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 @ContextConfiguration(locations="launch-context.xml")
@@ -58,12 +59,12 @@ public class VanillaIntegrationTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		int beforeMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int beforeManager = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:manager'", Integer.class);
 		int beforePartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
 		assertNotNull(jobLauncher.run(job, new JobParameters()));
-		int afterMaster = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:master'", Integer.class);
+		int afterManager = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:manager'", Integer.class);
 		int afterPartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
-		assertEquals(1, afterMaster-beforeMaster);
+		assertEquals(1, afterManager-beforeManager);
 		// Should be same as grid size in step splitter
 		assertEquals(2, afterPartition-beforePartition);
 	}

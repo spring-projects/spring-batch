@@ -6,7 +6,7 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		 https://www.springframework.org/schema/beans/spring-beans.xsd
 		 http://www.springframework.org/schema/batch-integration
-		 https://www.springframework.org/schema/batch-integration/spring-batch-integration-3.1.xsd">
+		 https://www.springframework.org/schema/batch-integration/spring-batch-integration.xsd">
 
-	<batch-int:remote-chunking-master id="itemWriter" step="process" reply-channel="replies"/>
+	<batch-int:remote-chunking-manager id="itemWriter" step="process" reply-channel="replies"/>
 </beans>

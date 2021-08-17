@@ -443,7 +443,7 @@ breaking up the record set into views. These views are used by each instance of 
 application during its processing. The breakup is done by grouping the data.
 
 With this option, each instance of a batch application has to be configured to hit a
-particular view (instead of the master table). Also, with the addition of new data
+particular view (instead of the main table). Also, with the addition of new data
 values, this new group of data has to be included into a view. There is no dynamic
 configuration capability, as a change in the number of instances results in a change to
 the views.
