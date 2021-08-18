@@ -52,10 +52,10 @@
 		<java.version>1.8</java.version>
 
 		<!-- production dependencies -->
-		<spring-framework.version>5.3.9-SNAPSHOT</spring-framework.version>
-		<spring-retry.version>1.3.0</spring-retry.version>
-		<spring-integration.version>5.5.2-SNAPSHOT</spring-integration.version>
-		<micrometer.version>1.7.2-SNAPSHOT</micrometer.version>
+		<spring-framework.version>5.3.10-SNAPSHOT</spring-framework.version>
+		<spring-retry.version>1.3.1</spring-retry.version>
+		<spring-integration.version>5.5.4-SNAPSHOT</spring-integration.version>
+		<micrometer.version>1.7.4-SNAPSHOT</micrometer.version>
 		<jackson.version>2.12.3</jackson.version>
 
 		<!-- optional production dependencies -->
@@ -63,7 +63,7 @@
 		<spring-data-commons.version>2.6.0-SNAPSHOT</spring-data-commons.version>
 		<spring-data-jpa.version>2.6.0-SNAPSHOT</spring-data-jpa.version>
 		<spring-data-mongodb.version>3.3.0-SNAPSHOT</spring-data-mongodb.version>
-		<spring-kafka.version>2.7.4-SNAPSHOT</spring-kafka.version>
+		<spring-kafka.version>2.7.7-SNAPSHOT</spring-kafka.version>
 		<spring-amqp.version>2.4.0-SNAPSHOT</spring-amqp.version>
 		<spring-ldap.version>2.3.5.BUILD-SNAPSHOT</spring-ldap.version>
 		<avro.version>1.9.2</avro.version>
@@ -114,7 +114,7 @@
 
 		<!-- samples dependencies -->
 		<hibernate-entitymanager.version>5.4.30.Final</hibernate-entitymanager.version>
-		<spring-rabbit.version>2.3.6</spring-rabbit.version>
+		<spring-rabbit.version>2.4.0-SNAPSHOT</spring-rabbit.version>
 		<quartz.version>2.3.2</quartz.version>
 		<prometheus_pushgateway.version>0.10.0</prometheus_pushgateway.version>
 		<groovy.version>2.5.14</groovy.version>
