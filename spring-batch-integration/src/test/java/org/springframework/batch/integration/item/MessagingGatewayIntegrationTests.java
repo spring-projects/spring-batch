@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ public class MessagingGatewayIntegrationTests {
 
 	/**
 	 * This is just used to trap the messages sent by the ItemWriter and make an
-	 * assertion about them in the the test case. In a real application this
+	 * assertion about them in the test case. In a real application this
 	 * would be the output stage and/or business processing.
 	 * 
 	 * @author Dave Syer
