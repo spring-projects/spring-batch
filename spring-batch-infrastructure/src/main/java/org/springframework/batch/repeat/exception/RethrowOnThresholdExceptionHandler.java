@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	private boolean useParent = false;
 
 	/**
-	 * Flag to indicate the the exception counters should be shared between
+	 * Flag to indicate the exception counters should be shared between
 	 * sibling contexts in a nested batch. Default is false.
 	 * 
 	 * @param useParent true if the parent context should be used to store the
