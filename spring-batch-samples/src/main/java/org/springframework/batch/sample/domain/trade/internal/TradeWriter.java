@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 	}
 
 	/**
-	 * Public setter for the the customers on which failure should occur.
+	 * Public setter for the customers on which failure should occur.
 	 * 
 	 * @param failingCustomers The customers to fail on
 	 */

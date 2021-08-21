@@ -69,7 +69,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler, Initializi
 	}
 
 	/**
-	 * Flag to indicate the the exception counters should be shared between
+	 * Flag to indicate the exception counters should be shared between
 	 * sibling contexts in a nested batch (i.e. inner loop). Default is false.
 	 * Set this flag to true if you want to count exceptions for the whole
 	 * (outer) loop in a typical container.

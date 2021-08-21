@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.core;
 
 
 /**
- * Exception to indicate the the job has been interrupted. The exception state
+ * Exception to indicate the job has been interrupted. The exception state
  * indicated is not normally recoverable by batch application clients, but
  * internally it is useful to force a check. The exception will often be wrapped
  * in a runtime exception (usually {@link UnexpectedJobExecutionException} before
