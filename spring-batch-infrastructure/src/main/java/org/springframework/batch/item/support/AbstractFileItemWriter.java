@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Remi Kaeffer
  *
  * @since 4.1
  */
@@ -489,7 +490,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				}
 			}
 			catch (IOException ioe) {
-				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+				throw new ItemStreamException("Unable to close the ItemWriter", ioe);
 			}
 			finally {
 				if (!transactional) {
@@ -505,7 +506,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				}
 			}
 			catch (IOException ioe) {
-				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+				throw new ItemStreamException("Unable to close the ItemWriter", ioe);
 			}
 			finally {
 				try {
@@ -514,7 +515,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 					}
 				}
 				catch (IOException ioe) {
-					throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
+					throw new ItemStreamException("Unable to close the ItemWriter", ioe);
 				}
 			}
 		}

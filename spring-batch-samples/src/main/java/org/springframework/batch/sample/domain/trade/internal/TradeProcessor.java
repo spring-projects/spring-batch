@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class TradeProcessor implements ItemProcessor<Trade, Trade> {
 	private Trade failedItem = null;
 
 	/**
-	 * Public setter for the the index on which failure should occur.
+	 * Public setter for the index on which failure should occur.
 	 * 
 	 * @param failure the failure to set
 	 */

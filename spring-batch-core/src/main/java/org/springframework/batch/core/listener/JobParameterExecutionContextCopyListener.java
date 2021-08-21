@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class JobParameterExecutionContextCopyListener extends StepExecutionListe
 
 	/**
 	 * Copy attributes from the {@link JobParameters} to the {@link Step}
-	 * {@link ExecutionContext}, if not already present. The the key is already
+	 * {@link ExecutionContext}, if not already present. The key is already
 	 * present we assume that a restart is in operation and the previous value
 	 * is needed. If the provided keys are empty defaults to copy all keys in
 	 * the {@link JobParameters}.
