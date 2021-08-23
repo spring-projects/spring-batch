@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/integration https://www.springframework.org/schema/integration/spring-integration.xsd
 		http://www.springframework.org/schema/integration/jms https://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/integration/jdbc https://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
