@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -377,7 +377,7 @@ public class KafkaItemReaderTests {
 
 	@Test
 	public void testReadFromMultiplePartitionsAfterRestart() throws ExecutionException, InterruptedException {
-		List<ListenableFuture> futures = new ArrayList<>();
+		List<ListenableFuture<SendResult<String, String>>> futures = new ArrayList<>();
 		futures.add(this.template.send("topic4", 0, null, "val0"));
 		futures.add(this.template.send("topic4", 0, null, "val2"));
 		futures.add(this.template.send("topic4", 0, null, "val4"));
@@ -387,7 +387,7 @@ public class KafkaItemReaderTests {
 		futures.add(this.template.send("topic4", 1, null, "val5"));
 		futures.add(this.template.send("topic4", 1, null, "val7"));
 
-		for (ListenableFuture future : futures) {
+		for (ListenableFuture<?> future : futures) {
 			future.get();
 		}
 

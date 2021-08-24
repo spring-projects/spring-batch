@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package org.springframework.batch.item.json.builder;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.JsonObjectReader;
 import org.springframework.core.io.Resource;
@@ -35,15 +35,13 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  */
 public class JsonItemReaderBuilderTest {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private Resource resource;
 	@Mock
 	private JsonObjectReader<String> jsonObjectReader;
-
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-	}
 
 	@Test
 	public void testValidation() {

@@ -11,7 +11,7 @@
 
 	<bean id="job1" parent="simpleJob">
 		<property name="steps">
-			<bean name="step1:master"
+			<bean name="step1:manager"
 				class="org.springframework.batch.core.partition.support.PartitionStep">
 				<property name="partitionHandler">
 					<bean

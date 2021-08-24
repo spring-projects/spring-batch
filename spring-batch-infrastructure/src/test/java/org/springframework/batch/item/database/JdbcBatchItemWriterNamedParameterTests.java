@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.springframework.batch.item.database;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.BaseMatcher;
@@ -131,7 +130,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		writer.write(Collections.singletonList(new Foo("bar")));
 	}
 
-	@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
 	public void testWriteAndFlushMap() throws Exception {
 		JdbcBatchItemWriter<Map<String, Object>> mapWriter = new JdbcBatchItemWriter<>();
@@ -145,14 +144,13 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(eq(sql),
 				captor.capture()))
 				.thenReturn(new int[] {1});
-		mapWriter.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
+		mapWriter.write(Collections.singletonList(Collections.singletonMap("foo", "bar")));
 
 		assertEquals(1, captor.getValue().length);
 		Map<String, Object> results = captor.getValue()[0];
 		assertEquals("bar", results.get("foo"));
 	}
 
-	@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 	@Test
 	public void testWriteAndFlushMapWithItemSqlParameterSourceProvider() throws Exception {
 		JdbcBatchItemWriter<Map<String, Object>> mapWriter = new JdbcBatchItemWriter<>();
@@ -172,7 +170,7 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		when(namedParameterJdbcOperations.batchUpdate(any(String.class),
 				captor.capture()))
 				.thenReturn(new int[] {1});
-		mapWriter.write(Collections.singletonList(new HashMap<String, Object>() {{put("foo", "bar");}}));
+		mapWriter.write(Collections.singletonList(Collections.singletonMap("foo", "bar")));
 
 		assertEquals(1, captor.getValue().length);
 		SqlParameterSource results = captor.getValue()[0];

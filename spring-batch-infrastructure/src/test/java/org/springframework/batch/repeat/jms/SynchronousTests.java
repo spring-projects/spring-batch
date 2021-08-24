@@ -25,9 +25,7 @@ import java.util.List;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import javax.sql.DataSource;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,7 +53,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
 @DirtiesContext
-@Ignore //FIXME https://github.com/spring-projects/spring-batch/issues/3852
 public class SynchronousTests implements ApplicationContextAware {
 
 	@Autowired
@@ -67,6 +64,7 @@ public class SynchronousTests implements ApplicationContextAware {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	private ApplicationContext applicationContext;
@@ -76,11 +74,6 @@ public class SynchronousTests implements ApplicationContextAware {
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
-	}
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@BeforeTransaction

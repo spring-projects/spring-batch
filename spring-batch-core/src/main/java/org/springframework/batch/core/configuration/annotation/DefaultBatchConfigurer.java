@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,20 @@ package org.springframework.batch.core.configuration.annotation;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
-import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.Assert;
 
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
-	private static final Log logger = LogFactory.getLog(DefaultBatchConfigurer.class);
 
 	private DataSource dataSource;
 	private PlatformTransactionManager transactionManager;
@@ -47,28 +40,39 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobExplorer jobExplorer;
 
 	/**
-	 * Sets the dataSource.  If the {@link DataSource} has been set once, all future
-	 * values are passed are ignored (to prevent {@code}@Autowired{@code} from overwriting
-	 * the value).
+	 * Sets the dataSource.
 	 *
-	 * @param dataSource The data source to use
+	 * @param dataSource The data source to use. Must not be {@code null}.
 	 */
-	@Autowired(required = false)
 	public void setDataSource(DataSource dataSource) {
-		if(this.dataSource == null) {
-			this.dataSource = dataSource;
-		}
-
-		if(getTransactionManager() == null) {
-			logger.warn("No transaction manager was provided, using a DataSourceTransactionManager");
-			this.transactionManager = new DataSourceTransactionManager(this.dataSource);
-		}
+		Assert.notNull(dataSource, "DataSource must not be null");
+		this.dataSource = dataSource;
 	}
 
-	protected DefaultBatchConfigurer() {}
+	public DataSource getDataSource() {
+		return this.dataSource;
+	}
 
+	/**
+	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This constructor
+	 * will configure a default {@link DataSourceTransactionManager}.
+	 *
+	 * @param dataSource to use for the job repository and job explorer
+	 */
 	public DefaultBatchConfigurer(DataSource dataSource) {
-		setDataSource(dataSource);
+		this(dataSource, new DataSourceTransactionManager(dataSource));
+	}
+
+	/**
+	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource and transaction manager.
+	 * @param dataSource to use for the job repository and job explorer
+	 * @param transactionManager to use for the job repository
+	 */
+	public DefaultBatchConfigurer(DataSource dataSource, PlatformTransactionManager transactionManager) {
+		Assert.notNull(dataSource, "DataSource must not be null");
+		Assert.notNull(transactionManager, "transactionManager must not be null");
+		this.dataSource = dataSource;
+		this.transactionManager = transactionManager;
 	}
 
 	@Override
@@ -94,26 +98,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	@PostConstruct
 	public void initialize() {
 		try {
-			if(dataSource == null) {
-				logger.warn("No datasource was provided...using a Map based JobRepository");
-
-				if(getTransactionManager() == null) {
-					logger.warn("No transaction manager was provided, using a ResourcelessTransactionManager");
-					this.transactionManager = new ResourcelessTransactionManager();
-				}
-
-				MapJobRepositoryFactoryBean jobRepositoryFactory = new MapJobRepositoryFactoryBean(getTransactionManager());
-				jobRepositoryFactory.afterPropertiesSet();
-				this.jobRepository = jobRepositoryFactory.getObject();
-
-				MapJobExplorerFactoryBean jobExplorerFactory = new MapJobExplorerFactoryBean(jobRepositoryFactory);
-				jobExplorerFactory.afterPropertiesSet();
-				this.jobExplorer = jobExplorerFactory.getObject();
-			} else {
-				this.jobRepository = createJobRepository();
-				this.jobExplorer = createJobExplorer();
-			}
-
+			this.jobRepository = createJobRepository();
+			this.jobExplorer = createJobExplorer();
 			this.jobLauncher = createJobLauncher();
 		} catch (Exception e) {
 			throw new BatchConfigurationException(e);
@@ -122,14 +108,14 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	protected JobLauncher createJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-		jobLauncher.setJobRepository(jobRepository);
+		jobLauncher.setJobRepository(this.jobRepository);
 		jobLauncher.afterPropertiesSet();
 		return jobLauncher;
 	}
 
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-		factory.setDataSource(dataSource);
+		factory.setDataSource(this.dataSource);
 		factory.setTransactionManager(getTransactionManager());
 		factory.afterPropertiesSet();
 		return factory.getObject();

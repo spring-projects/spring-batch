@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,7 +235,7 @@ JobInstanceDao, InitializingBean {
 		};
 
 		List<JobInstance> result = getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_BY_NAME),
-				new Object[] { jobName }, extractor);
+				extractor, jobName);
 
 		return result;
 	}
@@ -252,8 +252,8 @@ JobInstanceDao, InitializingBean {
 		try {
 			return getJdbcTemplate().queryForObject(
 					getQuery(FIND_LAST_JOB_INSTANCE_BY_JOB_NAME),
-					new Object[] { jobName, jobName },
-					new JobInstanceRowMapper());
+					new JobInstanceRowMapper(),
+					jobName, jobName);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -358,7 +358,7 @@ JobInstanceDao, InitializingBean {
 		
 		@SuppressWarnings("unchecked")
 		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().query(getQuery(FIND_LAST_JOBS_LIKE_NAME),
-				new Object[] { jobName }, extractor);
+				extractor, jobName);
 
 		return result;
 	}

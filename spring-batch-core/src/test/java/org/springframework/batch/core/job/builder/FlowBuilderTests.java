@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.JobFlowExecutor;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
 
 import static org.junit.Assert.assertEquals;
@@ -38,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class FlowBuilderTests {
@@ -45,7 +46,7 @@ public class FlowBuilderTests {
 	@Test
 	public void test() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("flow");
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		JobRepository jobRepository = new JobRepositorySupport();
 		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
 		builder.start(new StepSupport("step") {
 			@Override
@@ -58,7 +59,7 @@ public class FlowBuilderTests {
 	@Test
 	public void testTransitionOrdering() throws Exception {
 		FlowBuilder<Flow> builder = new FlowBuilder<>("transitionsFlow");
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		JobRepository jobRepository = new JobRepositorySupport();
 		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
 
 		StepSupport stepA = new StepSupport("stepA") {

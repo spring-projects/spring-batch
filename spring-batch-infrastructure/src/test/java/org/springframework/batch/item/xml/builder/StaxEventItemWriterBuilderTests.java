@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,13 +65,6 @@ public class StaxEventItemWriterBuilderTests {
 			"<ns2:item xmlns:ns2=\"https://www.springframework.org/test\"><first>7</first>" +
 			"<second>eight</second><third>nine</third></ns2:item>\uFEFF</ns:group>\uFEFF" +
 			"</foobarred>";
-
-	private static final String SIMPLE_OUTPUT = "<root><ns2:item xmlns:ns2=\"https://www.springframework.org/test\">" +
-			"<first>1</first><second>two</second><third>three</third></ns2:item>" +
-			"<ns2:item xmlns:ns2=\"https://www.springframework.org/test\"><first>4</first>" +
-			"<second>five</second><third>six</third></ns2:item>" +
-			"<ns2:item xmlns:ns2=\"https://www.springframework.org/test\"><first>7</first>" +
-			"<second>eight</second><third>nine</third></ns2:item></root>";
 
 	@Before
 	public void setUp() throws IOException {

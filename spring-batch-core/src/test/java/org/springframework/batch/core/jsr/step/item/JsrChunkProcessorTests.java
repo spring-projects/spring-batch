@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,15 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
 public class JsrChunkProcessorTests {
@@ -71,7 +74,15 @@ public class JsrChunkProcessorTests {
 
 		builder = new JsrSimpleStepBuilder<>(new StepBuilder("step1"));
 		builder.setBatchPropertyContext(new BatchPropertyContext());
-		repository = new MapJobRepositoryFactoryBean().getObject();
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
+		factory.afterPropertiesSet();
+		repository = factory.getObject();
 		builder.repository(repository);
 		builder.transactionManager(new ResourcelessTransactionManager());
 		stepExecution = null;

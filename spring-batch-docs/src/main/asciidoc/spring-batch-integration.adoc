@@ -1032,7 +1032,7 @@ public class RemoteChunkingJobConfiguration {
 ----
 
 You can find a complete example of a remote chunking job
-link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-chunking-sample$$[here].
+link:$$https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples#remote-chunking-sample$$[here].
 
 [[remote-partitioning]]
 
@@ -1282,7 +1282,7 @@ Java:
 ----
 
 You can find a complete example of a remote partitioning job
-link:$$https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples#remote-partitioning-sample$$[here].
+link:$$https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples#remote-partitioning-sample$$[here].
 
 The `@EnableBatchIntegration` annotation that can be used to simplify a remote
  partitioning setup. This annotation provides two beans useful for remote partitioning:

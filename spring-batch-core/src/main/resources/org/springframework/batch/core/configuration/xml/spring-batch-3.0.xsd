@@ -544,7 +544,7 @@
 		<xsd:attribute name="aggregator">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-					Reference to a StepExecutionAggregator that will be used to merge the partition results back into the master StepExecution]]>
+					Reference to a StepExecutionAggregator that will be used to merge the partition results back into the manager StepExecution]]>
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">

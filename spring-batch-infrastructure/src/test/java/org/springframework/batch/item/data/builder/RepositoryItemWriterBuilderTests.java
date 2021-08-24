@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.data.repository.CrudRepository;
 
@@ -37,13 +37,11 @@ import static org.mockito.Mockito.verify;
  * @author Mahmoud Ben Hassine
  */
 public class RepositoryItemWriterBuilderTests {
+
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 	@Mock
 	private TestRepository repository;
-
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
-	}
 
 	@Test
 	public void testNullRepository() throws Exception {

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-                http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch-2.2.xsd">
+                http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
     
     <job id="pattern.replay" xmlns="http://www.springframework.org/schema/batch">
         <step id="pattern.replay.1" next="pattern.replay.2">
@@ -22,11 +23,18 @@
     <bean id="tasklet2" class="org.springframework.batch.core.step.RestartLoopTests$DefaultTasklet"/>
     <bean id="tasklet3" class="org.springframework.batch.core.step.RestartLoopTests$DefaultTasklet"/>
 
-    <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
+    <jdbc:embedded-database id="dataSource" generate-name="true"/>
 
-    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-        <property name="transactionManager" ref="transactionManager"/>
+    <jdbc:initialize-database>
+        <jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+        <jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
+    </jdbc:initialize-database>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
+
+    <batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
 
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="jobRepository"/>

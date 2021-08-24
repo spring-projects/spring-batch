@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,6 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
  */
 public class StepScopeTestExecutionListener implements TestExecutionListener {
 	private static final String STEP_EXECUTION = StepScopeTestExecutionListener.class.getName() + ".STEP_EXECUTION";
-	private static final String SET_ATTRIBUTE_METHOD_NAME = "setAttribute";
-	private static final String HAS_ATTRIBUTE_METHOD_NAME = "hasAttribute";
-	private static final String GET_ATTRIBUTE_METHOD_NAME = "getAttribute";
-	private static final String GET_TEST_INSTANCE_METHOD = "getTestInstance";
 
 	/**
 	 * Set up a {@link StepExecution} as a test context attribute.
@@ -82,8 +78,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 		StepExecution stepExecution = getStepExecution(testContext);
 
 		if (stepExecution != null) {
-			Method method = TestContext.class.getMethod(SET_ATTRIBUTE_METHOD_NAME, String.class, Object.class);
-			ReflectionUtils.invokeMethod(method, testContext, STEP_EXECUTION, stepExecution);
+			testContext.setAttribute(STEP_EXECUTION, stepExecution);
 		}
 	}
 
@@ -94,12 +89,9 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 */
 	@Override
 	public void beforeTestMethod(TestContext testContext) throws Exception {
-		Method hasAttributeMethod = TestContext.class.getMethod(HAS_ATTRIBUTE_METHOD_NAME, String.class);
-		Boolean hasAttribute = (Boolean) ReflectionUtils.invokeMethod(hasAttributeMethod, testContext, STEP_EXECUTION);
 
-		if (hasAttribute) {
-			Method method = TestContext.class.getMethod(GET_ATTRIBUTE_METHOD_NAME, String.class);
-			StepExecution stepExecution = (StepExecution) ReflectionUtils.invokeMethod(method, testContext, STEP_EXECUTION);
+		if (testContext.hasAttribute(STEP_EXECUTION)) {
+			StepExecution stepExecution = (StepExecution) testContext.getAttribute(STEP_EXECUTION);
 
 			StepSynchronizationManager.register(stepExecution);
 		}
@@ -112,26 +104,10 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 */
 	@Override
 	public void afterTestMethod(TestContext testContext) throws Exception {
-		Method method = TestContext.class.getMethod(HAS_ATTRIBUTE_METHOD_NAME, String.class);
-		Boolean hasAttribute = (Boolean) ReflectionUtils.invokeMethod(method, testContext, STEP_EXECUTION);
 
-		if (hasAttribute) {
+		if (testContext.hasAttribute(STEP_EXECUTION)) {
 			StepSynchronizationManager.close();
 		}
-	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void afterTestClass(TestContext testContext) throws Exception {
-	}
-
-	/*
-	 * Support for Spring 3.0 (empty).
-	 */
-	@Override
-	public void beforeTestClass(TestContext testContext) throws Exception {
 	}
 	
 	/**
@@ -142,14 +118,7 @@ public class StepScopeTestExecutionListener implements TestExecutionListener {
 	 * @return a {@link StepExecution}
 	 */
 	protected StepExecution getStepExecution(TestContext testContext) {
-		Object target;
-
-		try {
-			Method method = TestContext.class.getMethod(GET_TEST_INSTANCE_METHOD);
-			target = ReflectionUtils.invokeMethod(method, testContext);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalStateException("No such method " + GET_TEST_INSTANCE_METHOD + " on provided TestContext", e);
-		}
+		Object target = testContext.getTestInstance();
 
 		ExtractorMethodCallback method = new ExtractorMethodCallback(StepExecution.class, "getStepExecution");
 		ReflectionUtils.doWithMethods(target.getClass(), method);

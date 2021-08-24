@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -43,10 +42,13 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.listener.StepListenerSupport;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.AbstractStep;
@@ -59,6 +61,12 @@ import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HsqlSequenceMaxValueIncrementer;
 import org.springframework.lang.Nullable;
 
 /**
@@ -66,13 +74,9 @@ import org.springframework.lang.Nullable;
  */
 public class SimpleStepFactoryBeanTests {
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-
 	private List<Exception> listened = new ArrayList<>();
 
-	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-			new MapStepExecutionDao(), new MapExecutionContextDao());
+	private JobRepository repository;
 
 	private List<String> written = new ArrayList<>();
 
@@ -89,6 +93,18 @@ public class SimpleStepFactoryBeanTests {
 
 	@Before
 	public void setUp() throws Exception {
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.afterPropertiesSet();
+		repository = repositoryFactoryBean.getObject();
+
 		job.setJobRepository(repository);
 		job.setBeanName("simpleJob");
 	}
@@ -99,25 +115,29 @@ public class SimpleStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testMandatoryReader() throws Exception {
+	public void testMandatoryReader() {
+		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemWriter(writer);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemReader must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemReader must be provided", expectedException.getMessage());
 	}
 
 	@Test
-	public void testMandatoryWriter() throws Exception {
+	public void testMandatoryWriter() {
+		// given
 		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<>();
 		factory.setItemReader(reader);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemWriter must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemWriter must be provided", expectedException.getMessage());
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,11 +66,11 @@ public class DefaultJobLoaderTests {
 		GenericApplicationContextFactory factory = new GenericApplicationContextFactory(new ByteArrayResource(
 				JOB_XML.getBytes()));
 		jobLoader.load(factory);
-		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
-		assertEquals(1, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+		assertEquals(1, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(1, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
 		jobLoader.clear();
-		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
-		assertEquals(0, ((Map) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
+		assertEquals(0, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contexts")).size());
+		assertEquals(0, ((Map<?, ?>) ReflectionTestUtils.getField(jobLoader, "contextToJobNames")).size());
 	}
 
 	@Test
@@ -223,13 +223,13 @@ public class DefaultJobLoaderTests {
     private static final String BASIC_JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$BasicStubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd'><bean class='%s$BasicStubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     private static final String JOB_XML = String
             .format(
                     "<beans xmlns='http://www.springframework.org/schema/beans' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd'><bean class='%s$StubJob'/></beans>",
+                            + "xsi:schemaLocation='http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd'><bean class='%s$StubJob'/></beans>",
                     DefaultJobLoaderTests.class.getName());
 
     public static class BasicStubJob implements Job {

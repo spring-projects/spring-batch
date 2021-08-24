@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,33 +98,6 @@ public class MultiResourceItemReaderIntegrationTests {
 		assertEquals("7", tested.read());
 		assertEquals("8", tested.read());
 		assertEquals(null, tested.read());
-
-		tested.close();
-	}
-
-	@Test
-	public void testGetCurrentResource() throws Exception {
-
-		tested.open(ctx);
-
-		assertEquals("1", tested.read());
-		assertSame(r1, tested.getCurrentResource());
-		assertEquals("2", tested.read());
-		assertSame(r1, tested.getCurrentResource());
-		assertEquals("3", tested.read());
-		assertSame(r1, tested.getCurrentResource());
-		assertEquals("4", tested.read());
-		assertSame(r2, tested.getCurrentResource());
-		assertEquals("5", tested.read());
-		assertSame(r2, tested.getCurrentResource());
-		assertEquals("6", tested.read());
-		assertSame(r4, tested.getCurrentResource());
-		assertEquals("7", tested.read());
-		assertSame(r5, tested.getCurrentResource());
-		assertEquals("8", tested.read());
-		assertSame(r5, tested.getCurrentResource());
-		assertEquals(null, tested.read());
-		assertSame(null, tested.getCurrentResource());
 
 		tested.close();
 	}
@@ -430,13 +403,6 @@ public class MultiResourceItemReaderIntegrationTests {
 
 		// Now check the next read gets the next resource
 		assertEquals("4", tested.read());
-
-	}
-
-	@Test
-	public void testGetCurrentResourceBeforeRead() throws Exception {
-		tested.open(ctx);
-		assertNull("There is no 'current' resource before read is called", tested.getCurrentResource());
 
 	}
 

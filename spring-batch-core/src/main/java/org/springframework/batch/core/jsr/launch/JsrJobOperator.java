@@ -117,7 +117,7 @@ import org.springframework.util.Assert;
  *
  * 	&lt;bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/&gt;
  *
- * 	&lt;bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"&gt;
+ * 	&lt;bean id="placeholderProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"&gt;
  * 		...
  * 	&lt;/bean&gt;
  * &lt;/beans&gt;

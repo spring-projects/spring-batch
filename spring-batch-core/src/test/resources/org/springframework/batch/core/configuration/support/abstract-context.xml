@@ -22,7 +22,7 @@
 		<property name="values" value="1,4" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="properties" value="foo=bar" />
 		<property name="order" value="1"/>
 	</bean>

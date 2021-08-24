@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(new Long(10) ,runId);
+		Assert.assertEquals(Long.valueOf(10L) ,runId);
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 		// then
 		Long runId = nextParameters.getLong("run.id");
 		String foo = nextParameters.getString("foo");
-		Assert.assertEquals(new Long(10) ,runId);
+		Assert.assertEquals(Long.valueOf(10L) ,runId);
 		Assert.assertEquals("bar" ,foo);
 	}
 
@@ -108,6 +108,6 @@ public class DataFieldMaxValueJobParametersIncrementerTests {
 
 		// then
 		Long runId = nextParameters.getLong("run.id");
-		Assert.assertEquals(new Long(10) ,runId);
+		Assert.assertEquals(Long.valueOf(10L) ,runId);
 	}
 }

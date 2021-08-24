@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,7 +297,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
+		getJdbcTemplate().query(getQuery(GET_RUNNING_EXECUTIONS), handler, jobName);
 
 		return result;
 	}
@@ -348,7 +348,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 					0L, 0D, identifyingFlag};
 		} else if (type == ParameterType.LONG) {
 			args = new Object[] { executionId, key, type, "", new Timestamp(0L),
-					value, new Double(0), identifyingFlag};
+					value, 0.0d, identifyingFlag};
 		} else if (type == ParameterType.DOUBLE) {
 			args = new Object[] { executionId, key, type, "", new Timestamp(0L), 0L,
 					value, identifyingFlag};
@@ -386,7 +386,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			}
 		};
 
-		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), new Object[] { executionId }, handler);
+		getJdbcTemplate().query(getQuery(FIND_PARAMS_FROM_ID), handler, executionId);
 
 		return new JobParameters(map);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.Collection;
  * load using a {@link PartitionHandler}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class PartitionStep extends AbstractStep {
@@ -87,14 +88,14 @@ public class PartitionStep extends AbstractStep {
 
 	/**
 	 * Delegate execution to the {@link PartitionHandler} provided. The
-	 * {@link StepExecution} passed in here becomes the parent or master
+	 * {@link StepExecution} passed in here becomes the parent or manager
 	 * execution for the partition, summarising the status on exit of the
 	 * logical grouping of work carried out by the {@link PartitionHandler}. The
 	 * individual step executions and their input parameters (through
 	 * {@link ExecutionContext}) for the partition elements are provided by the
 	 * {@link StepExecutionSplitter}.
 	 *
-	 * @param stepExecution the master step execution for the partition
+	 * @param stepExecution the manager step execution for the partition
 	 *
 	 * @see Step#execute(StepExecution)
 	 */

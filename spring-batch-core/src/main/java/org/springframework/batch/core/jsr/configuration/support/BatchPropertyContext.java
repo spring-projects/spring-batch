@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,7 +218,6 @@ public class BatchPropertyContext {
 	 *
 	 * @param properties the step artifact {@link Properties} to add
 	 */
-	@SuppressWarnings("serial")
 	public void setStepArtifactProperties(Map<String, Map<String, Properties>> properties) {
 		Assert.notNull(properties, "Step artifact properties cannot be null");
 
@@ -232,12 +231,10 @@ public class BatchPropertyContext {
 				Map<String, Properties> artifactProperties = stepArtifactProperties.get(stepName);
 
 				if (artifactProperties == null) {
-					stepArtifactProperties.put(stepName, new HashMap<String, Properties>() {{
-						put(artifactName, props);
-					}});
-				} else {
-					artifactProperties.put(artifactName, props);
+					artifactProperties = new HashMap<>();
+					stepArtifactProperties.put(stepName, artifactProperties);
 				}
+				artifactProperties.put(artifactName, props);
 			}
 		}
 	}

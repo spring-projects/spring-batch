@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -44,6 +46,9 @@ import static org.mockito.Mockito.when;
  */
 public class MongoItemReaderTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	private MongoItemReader<String> reader;
 	@Mock
 	private MongoOperations template;
@@ -51,7 +56,6 @@ public class MongoItemReaderTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		reader = new MongoItemReader<>();
 
 		sortOptions = new HashMap<>();
@@ -198,12 +202,9 @@ public class MongoItemReaderTests {
 		assertEquals("{ $natural : 1}", query.getHint());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithParameters() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		ArgumentCaptor<Query> queryContainer = ArgumentCaptor.forClass(Query.class);
@@ -219,12 +220,9 @@ public class MongoItemReaderTests {
 		assertEquals("{\"name\": -1}", query.getSortObject().toJson());
 	}
 
-	@SuppressWarnings("serial")
 	@Test
 	public void testQueryWithCollection() {
-		reader.setParameterValues(new ArrayList<Object>(){{
-			add("foo");
-		}});
+		reader.setParameterValues(Collections.singletonList("foo"));
 
 		reader.setQuery("{ name : ?0 }");
 		reader.setCollection("collection");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.mapping;
 
 import java.beans.PropertyEditor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -245,9 +246,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 			return (T) beanFactory.getBean(name);
 		}
 		try {
-			return type.newInstance();
+			return type.getDeclaredConstructor().newInstance();
 		}
-		catch (InstantiationException | IllegalAccessException e) {
+		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			ReflectionUtils.handleReflectionException(e);
 		}
 		// should not happen
@@ -369,10 +370,10 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		Object nestedValue = wrapper.getPropertyValue(nestedName);
 		if (nestedValue == null) {
 			try {
-				nestedValue = wrapper.getPropertyType(nestedName).newInstance();
+				nestedValue = wrapper.getPropertyType(nestedName).getDeclaredConstructor().newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException | IllegalAccessException e) {
+			catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}

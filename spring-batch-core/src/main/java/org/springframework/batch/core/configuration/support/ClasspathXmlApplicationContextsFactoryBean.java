@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.Resource;
 
 /**
@@ -34,6 +34,7 @@ import org.springframework.core.io.Resource;
  * components from a set of {@link Resource resources}.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<ApplicationContextFactory[]>, ApplicationContextAware {
@@ -76,7 +77,7 @@ public class ClasspathXmlApplicationContextsFactoryBean implements FactoryBean<A
 	/**
 	 * Determines which bean factory post processors (like property
 	 * placeholders) should be copied from the parent context. Defaults to
-	 * {@link PropertyPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
+	 * {@link PropertySourcesPlaceholderConfigurer} and {@link CustomEditorConfigurer}.
 	 *
 	 * @param beanFactoryPostProcessorClasses post processor types to be copied
 	 */

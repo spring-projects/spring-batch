@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd">
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:batch="http://www.springframework.org/schema/batch"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
+	<batch:job-repository id="jobRepository" table-prefix="BATCH_"/>
+
+	<jdbc:embedded-database id="dataSource" generate-name="true"/>
+
+	<jdbc:initialize-database>
+		<jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
+	</jdbc:initialize-database>
 
 	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/>
 

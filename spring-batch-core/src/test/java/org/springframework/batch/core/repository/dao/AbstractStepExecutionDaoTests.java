@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,11 +295,11 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		exec2.setId(exec1.getId());
 
 		exec2.incrementVersion();
-		assertEquals(new Integer(0), exec1.getVersion());
+		assertEquals(Integer.valueOf(0), exec1.getVersion());
 		assertEquals(exec1.getVersion(), exec2.getVersion());
 
 		dao.updateStepExecution(exec1);
-		assertEquals(new Integer(1), exec1.getVersion());
+		assertEquals(Integer.valueOf(1), exec1.getVersion());
 
 		try {
 			dao.updateStepExecution(exec2);

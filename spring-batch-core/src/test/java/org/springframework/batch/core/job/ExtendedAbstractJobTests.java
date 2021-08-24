@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,11 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 
 import java.util.Collection;
@@ -52,7 +55,14 @@ public class ExtendedAbstractJobTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
+		factory.afterPropertiesSet();
 		jobRepository = factory.getObject();
 		job = new StubJob("job", jobRepository);
 	}
@@ -166,13 +176,10 @@ public class ExtendedAbstractJobTests {
 			}
 		}
 
-		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
-		factory.afterPropertiesSet();
-		JobRepository repository = factory.getObject();
-		job.setJobRepository(repository);
+		job.setJobRepository(this.jobRepository);
 		job.setRestartable(true);
 
-		JobExecution execution = repository.createJobExecution("testHandleStepJob", new JobParameters());
+		JobExecution execution = this.jobRepository.createJobExecution("testHandleStepJob", new JobParameters());
 		job.handleStep(new StubStep(), execution);
 
 		assertEquals(StubStep.value, execution.getExecutionContext().get(StubStep.key));
@@ -180,9 +187,9 @@ public class ExtendedAbstractJobTests {
 		// simulate restart and check the job execution context's content survives
 		execution.setEndTime(new Date());
 		execution.setStatus(BatchStatus.FAILED);
-		repository.update(execution);
+		this.jobRepository.update(execution);
 
-		JobExecution restarted = repository.createJobExecution("testHandleStepJob", new JobParameters());
+		JobExecution restarted = this.jobRepository.createJobExecution("testHandleStepJob", new JobParameters());
 		assertEquals(StubStep.value, restarted.getExecutionContext().get(StubStep.key));
 	}
 

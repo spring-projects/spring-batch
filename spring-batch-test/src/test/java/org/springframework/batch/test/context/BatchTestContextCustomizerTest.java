@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,20 @@
 package org.springframework.batch.test.context;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.MergedContextConfiguration;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 /**
  * @author Mahmoud Ben Hassine
  */
 public class BatchTestContextCustomizerTest {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	private BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
 
@@ -54,13 +52,12 @@ public class BatchTestContextCustomizerTest {
 		// given
 		ConfigurableApplicationContext context = Mockito.mock(ConfigurableApplicationContext.class);
 		MergedContextConfiguration mergedConfig = Mockito.mock(MergedContextConfiguration.class);
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The bean factory must be an instance of BeanDefinitionRegistry");
 
 		// when
-		this.contextCustomizer.customizeContext(context, mergedConfig);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> this.contextCustomizer.customizeContext(context, mergedConfig));
 
 		// then
-		// expected exception
+		assertThat(expectedException.getMessage(), containsString("The bean factory must be an instance of BeanDefinitionRegistry"));
 	}
 }

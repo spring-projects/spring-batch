@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
 import org.junit.Test;
@@ -43,6 +45,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -277,6 +281,7 @@ public class BatchMetricsTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSoourceConfiguration.class)
 	static class MyJobConfiguration {
 
 		private JobBuilderFactory jobBuilderFactory;
@@ -321,6 +326,18 @@ public class BatchMetricsTests {
 					.start(step1())
 					.next(step2())
 					.next(step3())
+					.build();
+		}
+	}
+
+	@Configuration
+	static class DataSoourceConfiguration {
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder()
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
 					.build();
 		}
 	}

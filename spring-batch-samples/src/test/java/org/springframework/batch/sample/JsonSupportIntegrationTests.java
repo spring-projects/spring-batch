@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import javax.sql.DataSource;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +49,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -85,6 +88,7 @@ public class JsonSupportIntegrationTests {
 		public JsonFileItemWriter<Trade> itemWriter() {
 			return new JsonFileItemWriterBuilder<Trade>()
 					.resource(new FileSystemResource(OUTPUT_FILE_DIRECTORY + "trades.json"))
+					.lineSeparator("\n")
 					.jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
 					.name("tradesJsonFileItemWriter")
 					.build();
@@ -103,6 +107,15 @@ public class JsonSupportIntegrationTests {
 		public Job job() {
 			return jobs.get("job")
 					.start(step())
+					.build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder()
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
 					.build();
 		}
 	}

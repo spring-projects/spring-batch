@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	private T readFromDelegate() throws Exception {
 		T item = delegate.read();
 		if(item instanceof ResourceAware){
-			((ResourceAware) item).setResource(getCurrentResource());
+			((ResourceAware) item).setResource(resources[currentResource]);
 		}
 		return item;
 	}
@@ -245,22 +245,6 @@ public class MultiResourceItemReader<T> extends AbstractItemStreamItemReader<T> 
 	public void setResources(Resource[] resources) {
 		Assert.notNull(resources, "The resources must not be null");
 		this.resources = Arrays.asList(resources).toArray(new Resource[resources.length]);
-	}
-
-	/**
-	 * Getter for the current resource.
-	 * @return the current resource or {@code null} if all resources have been
-	 * processed or the first resource has not been assigned yet.
-	 * 
-	 * @deprecated In favor of using {@link ResourceAware} instead.
-	 */
-	@Nullable
-	@Deprecated
-	public Resource getCurrentResource() {
-		if (currentResource >= resources.length || currentResource < 0) {
-			return null;
-		}
-		return resources[currentResource];
 	}
 
 }

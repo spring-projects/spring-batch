@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,20 @@
  */
 package org.springframework.batch.item.support;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemStreamWriter;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamWriter;
 
 /**
  * Common parent class for {@link SynchronizedItemStreamWriterTests} and
@@ -40,7 +40,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public abstract class AbstractSynchronizedItemStreamWriterTests {
 
 	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	@Mock
 	protected ItemStreamWriter<Object> delegate;
@@ -53,7 +53,6 @@ public abstract class AbstractSynchronizedItemStreamWriterTests {
 
 	@Before
 	public void init() {
-		initMocks(this);
 		synchronizedItemStreamWriter = createNewSynchronizedItemStreamWriter();
 	}
 

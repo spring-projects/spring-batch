@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * Convenient factory bean for a chunk handler that also converts an existing chunk-oriented step into a remote chunk
- * master. The idea is to lift the existing chunk processor out of a Step that works locally, and replace it with a one
+ * manager. The idea is to lift the existing chunk processor out of a Step that works locally, and replace it with a one
  * that writes chunks into a message channel. The existing step hands its business chunk processing responsibility over
  * to the handler produced by the factory, which then needs to be set up as a worker on the other end of the channel the
  * chunks are being sent to. Once this chunk handler is installed the application is playing the role of both the manager
@@ -58,7 +58,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	private StepContributionSource stepContributionSource;
 
 	/**
-	 * The local step that is to be converted to a remote chunk master.
+	 * The local step that is to be converted to a remote chunk manager.
 	 * 
 	 * @param step the step to set
 	 */
@@ -161,7 +161,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Replace the chunk processor in the tasklet provided with one that can act as a master in the Remote Chunking
+	 * Replace the chunk processor in the tasklet provided with one that can act as a manager in the Remote Chunking
 	 * pattern.
 	 * 
 	 * @param tasklet a ChunkOrientedTasklet

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.fail;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public abstract class AbstractJobParserTests {
@@ -45,14 +45,10 @@ public abstract class AbstractJobParserTests {
 	private JobRepository jobRepository;
 
 	@Autowired
-	private MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean;
-
-	@Autowired
 	protected ArrayList<String> stepNamesList = new ArrayList<>();
 
 	@Before
 	public void setUp() {
-		mapJobRepositoryFactoryBean.clear();
 		stepNamesList.clear();
 	}
 

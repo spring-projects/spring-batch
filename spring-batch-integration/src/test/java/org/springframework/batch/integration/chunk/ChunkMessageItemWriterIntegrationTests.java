@@ -1,3 +1,18 @@
+/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.integration.chunk;
 
 import java.util.Arrays;
@@ -19,11 +34,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.factory.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
@@ -32,6 +45,12 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HsqlSequenceMaxValueIncrementer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.PollableChannel;
@@ -59,17 +78,24 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	private final SimpleStepFactoryBean<Object, Object> factory = new SimpleStepFactoryBean<>();
 
-	private SimpleJobRepository jobRepository;
+	private JobRepository jobRepository;
 
 	private static long jobCounter;
 
 	@Before
-	public void setUp() {
-
-		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-				new MapStepExecutionDao(), new MapExecutionContextDao());
+	public void setUp() throws Exception {
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.afterPropertiesSet();
+		jobRepository = repositoryFactoryBean.getObject();
 		factory.setJobRepository(jobRepository);
-		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setTransactionManager(transactionManager);
 		factory.setBeanName("step");
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);

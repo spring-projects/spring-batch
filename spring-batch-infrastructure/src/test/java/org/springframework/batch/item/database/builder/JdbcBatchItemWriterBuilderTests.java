@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -263,7 +263,7 @@ public class JdbcBatchItemWriterBuilderTests {
 
 		assertEquals(1, (int) template.queryForObject(
 				"select count(*) from foo where first = ? and second = ? and third = ?",
-				new Object[] {i, i1, nine}, Integer.class));
+				Integer.class, i, i1, nine));
 	}
 
 	public static class Foo {
@@ -313,7 +313,9 @@ public class JdbcBatchItemWriterBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseFactory().getDatabase();
+			return new EmbeddedDatabaseBuilder()
+					.generateUniqueName(true)
+					.build();
 		}
 
 		@Bean

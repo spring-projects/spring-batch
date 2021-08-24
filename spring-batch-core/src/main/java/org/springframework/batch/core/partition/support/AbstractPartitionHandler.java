@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
  *
  * @author Sebastien Gerard
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractPartitionHandler implements PartitionHandler {
 
@@ -40,14 +41,14 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	 * Executes the specified {@link StepExecution} instances and returns an updated
 	 * view of them. Throws an {@link Exception} if anything goes wrong.
 	 *
-	 * @param masterStepExecution the whole partition execution
+	 * @param managerStepExecution the whole partition execution
 	 * @param partitionStepExecutions the {@link StepExecution} instances to execute
 	 * @return an updated view of these completed {@link StepExecution} instances
 	 * @throws Exception if anything goes wrong. This allows implementations to
 	 * be liberal and rely on the caller to translate an exception into a step
 	 * failure as necessary.
 	 */
-	protected abstract Set<StepExecution> doHandle(StepExecution masterStepExecution,
+	protected abstract Set<StepExecution> doHandle(StepExecution managerStepExecution,
 			Set<StepExecution> partitionStepExecutions) throws Exception;
 
 	/**
@@ -55,10 +56,10 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	 */
 	@Override
 	public Collection<StepExecution> handle(final StepExecutionSplitter stepSplitter,
-			final StepExecution masterStepExecution) throws Exception {
-		final Set<StepExecution> stepExecutions = stepSplitter.split(masterStepExecution, gridSize);
+			final StepExecution managerStepExecution) throws Exception {
+		final Set<StepExecution> stepExecutions = stepSplitter.split(managerStepExecution, gridSize);
 
-		return doHandle(masterStepExecution, stepExecutions);
+		return doHandle(managerStepExecution, stepExecutions);
 	}
 
 	/**

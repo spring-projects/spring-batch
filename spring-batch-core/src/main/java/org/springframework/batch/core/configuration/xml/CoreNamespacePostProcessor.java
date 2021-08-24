@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
 		Object isNamespaceStep = BeanDefinitionUtils
 				.getAttribute(beanName, "isNamespaceStep", beanFactory);
-		if (isNamespaceStep != null && (Boolean) isNamespaceStep == true) {
+		if (isNamespaceStep != null && (Boolean) isNamespaceStep) {
 			((AbstractBeanDefinition) bd).setBeanClass(StepParserStepFactoryBean.class);
 		}
 	}

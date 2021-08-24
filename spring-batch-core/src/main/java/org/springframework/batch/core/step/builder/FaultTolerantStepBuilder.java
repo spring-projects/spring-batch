@@ -195,7 +195,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 * @return this for fluent chaining
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
 

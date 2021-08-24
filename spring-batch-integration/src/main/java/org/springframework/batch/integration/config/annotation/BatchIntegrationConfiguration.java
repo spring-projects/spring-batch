@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@ package org.springframework.batch.integration.config.annotation;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
-import org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,13 +42,9 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 
 	private PlatformTransactionManager transactionManager;
 
-	private RemoteChunkingMasterStepBuilderFactory remoteChunkingMasterStepBuilderFactory;
-
 	private RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory;
 
 	private RemoteChunkingWorkerBuilder remoteChunkingWorkerBuilder;
-
-	private RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory;
 
 	private RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory;
 
@@ -67,12 +61,6 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 		this.transactionManager = transactionManager;
 	}
 
-	@Deprecated
-	@Bean
-	public RemoteChunkingMasterStepBuilderFactory remoteChunkingMasterStepBuilderFactory() {
-		return this.remoteChunkingMasterStepBuilderFactory;
-	}
-
 	@Bean
 	public RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory() {
 		return this.remoteChunkingManagerStepBuilderFactory;
@@ -81,12 +69,6 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 	@Bean
 	public <I,O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
 		return remoteChunkingWorkerBuilder;
-	}
-
-	@Deprecated
-	@Bean
-	public RemotePartitioningMasterStepBuilderFactory remotePartitioningMasterStepBuilderFactory() {
-		return remotePartitioningMasterStepBuilderFactory;
 	}
 
 	@Bean
@@ -101,13 +83,9 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.remoteChunkingMasterStepBuilderFactory  = new RemoteChunkingMasterStepBuilderFactory(this.jobRepository,
-				this.transactionManager);
 		this.remoteChunkingManagerStepBuilderFactory = new RemoteChunkingManagerStepBuilderFactory(this.jobRepository,
 				this.transactionManager);
 		this.remoteChunkingWorkerBuilder = new RemoteChunkingWorkerBuilder<>();
-		this.remotePartitioningMasterStepBuilderFactory = new RemotePartitioningMasterStepBuilderFactory(this.jobRepository,
-				this.jobExplorer, this.transactionManager);
 		this.remotePartitioningManagerStepBuilderFactory = new RemotePartitioningManagerStepBuilderFactory(this.jobRepository,
 				this.jobExplorer, this.transactionManager);
 		this.remotePartitioningWorkerStepBuilderFactory = new RemotePartitioningWorkerStepBuilderFactory(this.jobRepository,

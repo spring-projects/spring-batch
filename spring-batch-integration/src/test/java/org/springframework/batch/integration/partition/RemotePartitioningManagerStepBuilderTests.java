@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package org.springframework.batch.integration.partition;
 
+import javax.sql.DataSource;
+
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
@@ -30,24 +30,24 @@ import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.core.partition.support.StepExecutionAggregator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemotePartitioningMasterStepBuilderTests.BatchConfiguration.class})
-public class RemotePartitioningMasterStepBuilderTests {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+@ContextConfiguration(classes = {RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class})
+public class RemotePartitioningManagerStepBuilderTests {
 
 	@Autowired
 	private JobRepository jobRepository;
@@ -55,105 +55,103 @@ public class RemotePartitioningMasterStepBuilderTests {
 	@Test
 	public void inputChannelMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("inputChannel must not be null");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").inputChannel(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.inputChannel(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("inputChannel must not be null");
 	}
 
 	@Test
 	public void outputChannelMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("outputChannel must not be null");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").outputChannel(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.outputChannel(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("outputChannel must not be null");
 	}
 
 	@Test
 	public void messagingTemplateMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("messagingTemplate must not be null");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").messagingTemplate(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.messagingTemplate(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("messagingTemplate must not be null");
 	}
 
 	@Test
 	public void jobExplorerMustNotBeNull() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("jobExplorer must not be null");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").jobExplorer(null);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.jobExplorer(null));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("jobExplorer must not be null");
 	}
 
 	@Test
 	public void pollIntervalMustBeGreaterThanZero() {
 		// given
-		this.expectedException.expect(IllegalArgumentException.class);
-		this.expectedException.expectMessage("The poll interval must be greater than zero");
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
 
 		// when
-		new RemotePartitioningMasterStepBuilder("step").pollInterval(-1);
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.pollInterval(-1));
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("The poll interval must be greater than zero");
 	}
 
 	@Test
 	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
-		RemotePartitioningMasterStepBuilder builder = new RemotePartitioningMasterStepBuilder("step")
+		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step")
 				.outputChannel(new DirectChannel())
 				.messagingTemplate(new MessagingTemplate());
 
-		this.expectedException.expect(IllegalStateException.class);
-		this.expectedException.expectMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
-
 		// when
-		Step step = builder.build();
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class,
+				builder::build);
 
 		// then
-		// expected exception
+		assertThat(expectedException).hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 	}
 
 	@Test
 	public void testUnsupportedOperationExceptionWhenSpecifyingPartitionHandler() {
 		// given
 		PartitionHandler partitionHandler = Mockito.mock(PartitionHandler.class);
-		this.expectedException.expect(UnsupportedOperationException.class);
-		this.expectedException.expectMessage("When configuring a master step " +
-				"for remote partitioning using the RemotePartitioningMasterStepBuilder, " +
+		final RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step");
+
+		// when
+		final Exception expectedException = Assert.assertThrows(UnsupportedOperationException.class,
+				() -> builder.partitionHandler(partitionHandler));
+
+		// then
+		assertThat(expectedException).hasMessage("When configuring a manager step " +
+				"for remote partitioning using the RemotePartitioningManagerStepBuilder, " +
 				"the partition handler will be automatically set to an instance " +
 				"of MessageChannelPartitionHandler. The partition handler must " +
 				"not be provided in this case.");
-
-		// when
-		new RemotePartitioningMasterStepBuilder("step").partitionHandler(partitionHandler);
-
-		// then
-		// expected exception
 	}
 
 	@Test
-	public void testMasterStepCreationWhenPollingRepository() {
+	public void testManagerStepCreationWhenPollingRepository() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -164,7 +162,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("masterStep")
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
 				.repository(jobRepository)
 				.outputChannel(outputChannel)
 				.partitioner("workerStep", partitioner)
@@ -198,7 +196,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 	}
 
 	@Test
-	public void testMasterStepCreationWhenAggregatingReplies() {
+	public void testManagerStepCreationWhenAggregatingReplies() {
 		// given
 		int gridSize = 5;
 		int startLimit = 3;
@@ -207,7 +205,7 @@ public class RemotePartitioningMasterStepBuilderTests {
 		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
 
 		// when
-		Step step = new RemotePartitioningMasterStepBuilder("masterStep")
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
 				.repository(jobRepository)
 				.outputChannel(outputChannel)
 				.partitioner("workerStep", partitioner)
@@ -243,6 +241,15 @@ public class RemotePartitioningMasterStepBuilderTests {
 	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfiguration {
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder()
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
+					.build();
+		}
 
 	}
 }

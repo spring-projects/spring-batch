@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,13 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
-import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
-import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
+import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
+import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
@@ -53,9 +56,16 @@ import org.springframework.batch.item.support.AbstractItemCountingItemStreamItem
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.HsqlSequenceMaxValueIncrementer;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.policy.MapRetryContextCache;
 import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
@@ -64,6 +74,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class FaultTolerantStepFactoryBeanRetryTests {
@@ -85,9 +96,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	boolean fail = false;
 
-	private SimpleJobRepository repository = new SimpleJobRepository(
-			new MapJobInstanceDao(), new MapJobExecutionDao(),
-			new MapStepExecutionDao(), new MapExecutionContextDao());
+	private JobRepository repository;
 
 	JobExecution jobExecution;
 
@@ -102,6 +111,18 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Before
 	public void setUp() throws Exception {
 
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.generateUniqueName(true)
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.afterPropertiesSet();
+		repository = repositoryFactoryBean.getObject();
+
 		factory = new FaultTolerantStepFactoryBean<>();
 		factory.setBeanName("step");
 
@@ -109,7 +130,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 				new ArrayList<>()));
 		factory.setItemWriter(writer);
 		factory.setJobRepository(repository);
-		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setTransactionManager(transactionManager);
 		factory.setRetryableExceptionClasses(getExceptionMap(Exception.class));
 		factory.setCommitInterval(1); // trivial by default
 

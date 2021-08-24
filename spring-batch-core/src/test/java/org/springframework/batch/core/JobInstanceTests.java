@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.util.SerializationUtils;
  */
 public class JobInstanceTests {
 
-	private JobInstance instance = new JobInstance(new Long(11), "job");
+	private JobInstance instance = new JobInstance(11L, "job");
 
 	/**
 	 * Test method for
@@ -35,7 +35,7 @@ public class JobInstanceTests {
 	 */
 	@Test
 	public void testGetName() {
-		instance = new JobInstance(new Long(1), "foo");
+		instance = new JobInstance(1L, "foo");
 		assertEquals("foo", instance.getJobName());
 	}
 
@@ -59,7 +59,7 @@ public class JobInstanceTests {
 
 	@Test
 	public void testSerialization() {
-		instance = new JobInstance(new Long(1), "jobName");
+		instance = new JobInstance(1L, "jobName");
 
 		byte[] serialized = SerializationUtils.serialize(instance);
 

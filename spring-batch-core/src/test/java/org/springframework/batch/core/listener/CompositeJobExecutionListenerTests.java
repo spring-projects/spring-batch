@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 				list.add("foo");
 			}
 		});
-		listener.beforeJob(new JobExecution(new JobInstance(new Long(11L), "testOpenJob"), null));
+		listener.beforeJob(new JobExecution(new JobInstance(11L, "testOpenJob"), null));
 		assertEquals(1, list.size());
 	}
 

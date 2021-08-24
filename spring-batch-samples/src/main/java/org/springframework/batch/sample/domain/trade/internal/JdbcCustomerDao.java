@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,16 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerDao;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
@@ -46,20 +44,14 @@ public class JdbcCustomerDao extends JdbcDaoSupport implements CustomerDao{
 	@Override
 	public CustomerCredit getCustomerByName(String name) {
 		
-		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME, new Object[]{name}, 
-				
-				new RowMapper<CustomerCredit>(){
-
-			@Override
-			public CustomerCredit mapRow(ResultSet rs, int rowNum) throws SQLException {
-				CustomerCredit customer = new CustomerCredit();
-				customer.setName(rs.getString("NAME"));
-				customer.setId(rs.getInt("ID"));
-				customer.setCredit(rs.getBigDecimal("CREDIT"));
-				return customer;
-			}
-			
-		});
+		List<CustomerCredit> customers = getJdbcTemplate().query(GET_CUSTOMER_BY_NAME,
+				(rs, rowNum) -> {
+					CustomerCredit customer = new CustomerCredit();
+					customer.setName(rs.getString("NAME"));
+					customer.setId(rs.getInt("ID"));
+					customer.setCredit(rs.getBigDecimal("CREDIT"));
+					return customer;
+				}, name);
 	
 		if(customers.size() == 0){
 			return null;

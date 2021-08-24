@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -296,7 +296,7 @@ public class AbstractDelegatorTests {
 
 		@SuppressWarnings("unused")
 		public void processNameValuePair(String name, String value) {
-			processedFooNameValuePairs.add(new Foo(name, new Integer(value)));
+			processedFooNameValuePairs.add(new Foo(name, Integer.parseInt(value)));
 		}
 
 		public List<Foo> getProcessedFooNameValuePairs() {

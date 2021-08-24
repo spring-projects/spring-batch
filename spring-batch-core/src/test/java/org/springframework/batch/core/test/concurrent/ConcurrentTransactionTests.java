@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,11 +45,13 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.embedded.ConnectionProperties;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseConfigurer;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -68,7 +69,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ConcurrentTransactionTests.ConcurrentJobConfiguration.class)
-@Ignore // FIXME https://github.com/spring-projects/spring-batch/issues/3851
 public class ConcurrentTransactionTests {
 
 	@Autowired
@@ -88,6 +88,7 @@ public class ConcurrentTransactionTests {
 
 	@Configuration
 	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
 	public static class ConcurrentJobConfiguration extends DefaultBatchConfigurer {
 
 		@Autowired
@@ -96,61 +97,13 @@ public class ConcurrentTransactionTests {
 		@Autowired
 		private StepBuilderFactory stepBuilderFactory;
 
+		public ConcurrentJobConfiguration(DataSource dataSource) {
+			super(dataSource);
+		}
+
 		@Bean
 		public TaskExecutor taskExecutor() {
 			return new SimpleAsyncTaskExecutor();
-		}
-
-		/**
-		 * This datasource configuration configures the HSQLDB instance using MVCC.  When
-		 * configured using the default behavior, transaction serialization errors are
-		 * thrown (default configuration example below).
-		 *
-		 * 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
-		 * 				 addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
-		 * 				 addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
-		 * 				 build());
-
-		 * @return
-		 */
-		@Bean
-		DataSource dataSource() {
-			ResourceLoader defaultResourceLoader = new DefaultResourceLoader();
-			EmbeddedDatabaseFactory embeddedDatabaseFactory = new EmbeddedDatabaseFactory();
-			embeddedDatabaseFactory.setDatabaseConfigurer(new EmbeddedDatabaseConfigurer() {
-
-				@Override
-				@SuppressWarnings("unchecked")
-				public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
-					try {
-						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver", this.getClass().getClassLoader()));
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
-					properties.setUrl("jdbc:hsqldb:mem:" + databaseName + ";hsqldb.tx=mvcc");
-					properties.setUsername("sa");
-					properties.setPassword("");
-				}
-
-				@Override
-				public void shutdown(DataSource dataSource, String databaseName) {
-					try {
-						Connection connection = dataSource.getConnection();
-						Statement stmt = connection.createStatement();
-						stmt.execute("SHUTDOWN");
-					}
-					catch (SQLException ex) {
-					}
-				}
-			});
-
-			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
-			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
-			embeddedDatabaseFactory.setDatabasePopulator(databasePopulator);
-
-			return embeddedDatabaseFactory.getDatabase();
 		}
 
 		@Bean
@@ -217,11 +170,67 @@ public class ConcurrentTransactionTests {
 		@Override
 		protected JobRepository createJobRepository() throws Exception {
 			JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-			factory.setDataSource(dataSource());
+			factory.setDataSource(getDataSource());
 			factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
 			factory.setTransactionManager(getTransactionManager());
 			factory.afterPropertiesSet();
 			return  factory.getObject();
+		}
+	}
+
+	@Configuration
+	static class DataSourceConfiguration {
+		/**
+		 * This datasource configuration configures the HSQLDB instance using MVCC.  When
+		 * configured using the default behavior, transaction serialization errors are
+		 * thrown (default configuration example below).
+		 *
+		 * 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
+		 * 				 addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
+		 * 				 addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
+		 * 				 build());
+
+		 * @return
+		 */
+		@Bean
+		DataSource dataSource() {
+			ResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+			EmbeddedDatabaseFactory embeddedDatabaseFactory = new EmbeddedDatabaseFactory();
+			embeddedDatabaseFactory.setDatabaseConfigurer(new EmbeddedDatabaseConfigurer() {
+
+				@Override
+				@SuppressWarnings("unchecked")
+				public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
+					try {
+						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver", this.getClass().getClassLoader()));
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+					properties.setUrl("jdbc:hsqldb:mem:" + databaseName + ";hsqldb.tx=mvcc");
+					properties.setUsername("sa");
+					properties.setPassword("");
+				}
+
+				@Override
+				public void shutdown(DataSource dataSource, String databaseName) {
+					try {
+						Connection connection = dataSource.getConnection();
+						Statement stmt = connection.createStatement();
+						stmt.execute("SHUTDOWN");
+					}
+					catch (SQLException ex) {
+					}
+				}
+			});
+
+			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
+			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
+			embeddedDatabaseFactory.setDatabasePopulator(databasePopulator);
+			embeddedDatabaseFactory.setGenerateUniqueDatabaseName(true);
+
+			return embeddedDatabaseFactory.getDatabase();
 		}
 	}
 }

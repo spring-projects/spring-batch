@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -35,24 +36,9 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public class TransactionManagerConfigurationWithBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
-	@Test
-	public void testConfigurationWithNoDataSourceAndNoTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
-		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
-
-		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
-		Assert.assertTrue(platformTransactionManager instanceof ResourcelessTransactionManager);
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), platformTransactionManager);
-	}
-
-	@Test
-	public void testConfigurationWithNoDataSourceAndTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndTransactionManager.class);
-		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
-
-		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
-		Assert.assertSame(transactionManager, platformTransactionManager);
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), transactionManager);
+	@Test(expected = UnsatisfiedDependencyException.class)
+	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
+		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
 	}
 
 	@Test
@@ -79,29 +65,6 @@ public class TransactionManagerConfigurationWithBatchConfigurerTests extends Tra
 
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithNoDataSourceAndNoTransactionManager {
-		@Bean
-		public BatchConfigurer batchConfigurer() {
-			return new DefaultBatchConfigurer();
-		}
-	}
-
-	@EnableBatchProcessing
-	public static class BatchConfigurationWithNoDataSourceAndTransactionManager {
-
-		@Bean
-		public PlatformTransactionManager transactionManager() {
-			return transactionManager;
-		}
-
-		@Bean
-		public BatchConfigurer batchConfigurer() {
-			return new DefaultBatchConfigurer() {
-				@Override
-				public PlatformTransactionManager getTransactionManager() {
-					return transactionManager();
-				}
-			};
-		}
 
 	}
 

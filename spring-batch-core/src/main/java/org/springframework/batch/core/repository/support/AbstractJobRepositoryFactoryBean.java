@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository.support;
 
+import java.util.Properties;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
@@ -30,6 +32,8 @@ import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -40,11 +44,11 @@ import org.springframework.util.Assert;
  * object implementations.
  *
  * @see JobRepositoryFactoryBean
- * @see MapJobRepositoryFactoryBean
  *
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<JobRepository>, InitializingBean {
 
@@ -150,25 +154,16 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 		return transactionManager;
 	}
 
-	/**
-	 * Convenience method for clients to grab the {@link JobRepository} without
-	 * a cast.
-	 * @return the {@link JobRepository} from {@link #getObject()}
-	 * @throws Exception if the repository could not be created
-	 * @deprecated use {@link #getObject()} instead
-	 */
-	@Deprecated
-	public JobRepository getJobRepository() throws Exception {
-		return getObject();
-	}
-
 	private void initializeProxy() throws Exception {
 		if (proxyFactory == null) {
 			proxyFactory = new ProxyFactory();
-			TransactionInterceptor advice = new TransactionInterceptor(transactionManager,
-					PropertiesConverter.stringToProperties("create*=PROPAGATION_REQUIRES_NEW,"
-							+ isolationLevelForCreate + "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW,"
-							+ isolationLevelForCreate + "\n*=PROPAGATION_REQUIRED"));
+			Properties transactionAttributes = new Properties();
+			transactionAttributes.setProperty("create*", "PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
+			transactionAttributes.setProperty("getLastJobExecution*", "PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate);
+			transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+			NameMatchTransactionAttributeSource transactionAttributeSource = new NameMatchTransactionAttributeSource();
+			transactionAttributeSource.setProperties(transactionAttributes);
+			TransactionInterceptor advice = new TransactionInterceptor((TransactionManager) transactionManager, transactionAttributeSource);
 			if (validateTransactionState) {
 				DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new MethodInterceptor() {
 					@Override

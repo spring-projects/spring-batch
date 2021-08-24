@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.sql.DatabaseMetaData;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,17 +100,17 @@ public enum DatabaseType {
 	 */
 	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
 		String databaseProductName =
-				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString();
+				JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductName);
 		if (StringUtils.hasText(databaseProductName) && databaseProductName.startsWith("DB2")) {
 			String databaseProductVersion =
-					JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
+					JdbcUtils.extractDatabaseMetaData(dataSource, DatabaseMetaData::getDatabaseProductVersion);
 			if (databaseProductVersion.startsWith("ARI")) {
 				databaseProductName = "DB2VSE";
 			}
 			else if (databaseProductVersion.startsWith("DSN")) {
 				databaseProductName = "DB2ZOS";
 			}
-			else if (databaseProductName.indexOf("AS") != -1 && (databaseProductVersion.startsWith("QSQ") ||
+			else if (databaseProductName.contains("AS") && (databaseProductVersion.startsWith("QSQ") ||
 					databaseProductVersion.substring(databaseProductVersion.indexOf('V')).matches("V\\dR\\d[mM]\\d"))) {
 				databaseProductName = "DB2AS400";
 			}

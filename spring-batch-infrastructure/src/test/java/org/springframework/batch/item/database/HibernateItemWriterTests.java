@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
  * @author Thomas Risberg
  * @author Michael Minella
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
 public class HibernateItemWriterTests {
 
@@ -83,7 +84,6 @@ public class HibernateItemWriterTests {
 		writer.afterPropertiesSet();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushSunnyDayHibernate3() throws Exception {
 		this.writer.setSessionFactory(this.factory);
@@ -98,7 +98,6 @@ public class HibernateItemWriterTests {
 
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testWriteAndFlushWithFailureHibernate3() throws Exception {
 		this.writer.setSessionFactory(this.factory);

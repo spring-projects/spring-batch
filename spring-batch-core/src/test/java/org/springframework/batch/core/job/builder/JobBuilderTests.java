@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.springframework.batch.core.job.builder;
+
+import javax.sql.DataSource;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +36,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 import static org.junit.Assert.assertEquals;
 
@@ -72,6 +75,15 @@ public class JobBuilderTests {
 					.start(steps.get("step")
 							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 							.build())
+					.build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder()
+					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+					.generateUniqueName(true)
 					.build();
 		}
 	}

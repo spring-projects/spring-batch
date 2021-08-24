@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,11 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
@@ -220,6 +222,14 @@ implements InitializingBean {
 		return exceptionTranslator;
 	}
 
+	protected DataAccessException translateSqlException(String task, String sql, SQLException ex) {
+		DataAccessException dae = getExceptionTranslator().translate(task, sql, ex);
+		if (dae != null) {
+			return dae;
+		}
+		return new UncategorizedSQLException(task, sql, ex);
+	}
+
 	/**
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
@@ -262,7 +272,7 @@ implements InitializingBean {
 			}
 		}
 		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempted to move ResultSet to last committed row", getSql(), se);
+			throw translateSqlException("Attempted to move ResultSet to last committed row", getSql(), se);
 		}
 	}
 
@@ -415,16 +425,6 @@ implements InitializingBean {
 
 	/**
 	 * Clean up resources.
-	 * @throws Exception If unable to clean up resources
-	 * @deprecated This method is deprecated in favor of
-	 * {@link AbstractCursorItemReader#cleanupOnClose(java.sql.Connection)} and
-	 * will be removed in a future release
-	 */
-	@Deprecated
-	protected abstract void cleanupOnClose()  throws Exception;
-
-	/**
-	 * Clean up resources.
 	 * @param connection to the database
 	 * @throws Exception If unable to clean up resources
 	 */
@@ -470,7 +470,7 @@ implements InitializingBean {
 		}
 		catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing query", getSql(), se);
+			throw translateSqlException("Executing query", getSql(), se);
 		}
 	}
 
@@ -497,7 +497,7 @@ implements InitializingBean {
 			return item;
 		}
 		catch (SQLException se) {
-			throw getExceptionTranslator().translate("Attempt to process next row failed", getSql(), se);
+			throw translateSqlException("Attempt to process next row failed", getSql(), se);
 		}
 	}
 

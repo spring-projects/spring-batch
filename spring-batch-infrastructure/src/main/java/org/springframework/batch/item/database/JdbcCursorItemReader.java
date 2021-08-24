@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 		}
 		catch (SQLException se) {
 			close();
-			throw getExceptionTranslator().translate("Executing query", getSql(), se);
+			throw translateSqlException("Executing query", getSql(), se);
 		}
 
 	}
@@ -140,18 +140,6 @@ public class JdbcCursorItemReader<T> extends AbstractCursorItemReader<T> {
 	@Override
 	protected T readCursor(ResultSet rs, int currentRow) throws SQLException {
 		return rowMapper.mapRow(rs, currentRow);
-	}
-
-	/**
-	 * Close the cursor and database connection.
-	 * @deprecated This method is deprecated in favor of
-	 * {@link JdbcCursorItemReader#cleanupOnClose(java.sql.Connection)} and will
-	 * be removed in a future release
-	 */
-	@Override
-	@Deprecated
-	protected void cleanupOnClose() throws Exception {
-		JdbcUtils.closeStatement(this.preparedStatement);
 	}
 
 	/**

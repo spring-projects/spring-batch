@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,13 +27,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.data.repository.CrudRepository;
 
 public class RepositoryItemWriterTests {
 
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule().silent();
 	@Mock
 	private CrudRepository<String, Serializable> repository;
 
@@ -41,7 +45,6 @@ public class RepositoryItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
 		writer = new RepositoryItemWriter<>();
 		writer.setMethodName("save");
 		writer.setRepository(repository);
@@ -77,7 +80,7 @@ public class RepositoryItemWriterTests {
 
 		writer.write(new ArrayList<>());
 
-		verifyZeroInteractions(repository);
+		verifyNoInteractions(repository);
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
+
+	private static final String CHARSET_NAME = "ISO-8859-1";
 
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
 
@@ -300,7 +302,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		try {
 			serializer.serialize(m, out);
-			results = new String(out.toByteArray(), "ISO-8859-1");
+			results = new String(out.toByteArray(), CHARSET_NAME);
 		}
 		catch (IOException ioe) {
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
@@ -321,7 +323,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 			Map<String, Object> map;
 			try {
-				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes("ISO-8859-1"));
+				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes(CHARSET_NAME));
 				map = serializer.deserialize(in);
 			}
 			catch (IOException ioe) {

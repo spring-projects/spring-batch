@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 package org.springframework.batch.core.configuration.annotation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.Callable;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -56,9 +56,6 @@ public class JobScopeConfigurationTests {
 	private ConfigurableApplicationContext context;
 
 	private JobExecution jobExecution;
-
-	@Rule
-	public ExpectedException expected = ExpectedException.none();
 
 	@Test
 	public void testXmlJobScopeWithProxyTargetClass() throws Exception {
@@ -116,20 +113,22 @@ public class JobScopeConfigurationTests {
 	public void testIntentionallyBlowUpOnMissingContextWithProxyTargetClass() throws Exception {
 		init(JobScopeConfigurationRequiringProxyTargetClass.class);
 		JobSynchronizationManager.release();
-		expected.expect(BeanCreationException.class);
-		expected.expectMessage("job scope");
-		SimpleHolder value = context.getBean(SimpleHolder.class);
-		assertEquals("JOB", value.call());
+		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+			SimpleHolder value = context.getBean(SimpleHolder.class);
+			assertEquals("JOB", value.call());
+		});
+		assertTrue(expectedException.getMessage().contains("job scope"));
 	}
 
 	@Test
 	public void testIntentionallyBlowupWithForcedInterface() throws Exception {
 		init(JobScopeConfigurationForcingInterfaceProxy.class);
 		JobSynchronizationManager.release();
-		expected.expect(BeanCreationException.class);
-		expected.expectMessage("job scope");
-		SimpleHolder value = context.getBean(SimpleHolder.class);
-		assertEquals("JOB", value.call());
+		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+			SimpleHolder value = context.getBean(SimpleHolder.class);
+			assertEquals("JOB", value.call());
+		});
+		assertTrue(expectedException.getMessage().contains("job scope"));
 	}
 
 	@Test
@@ -144,11 +143,12 @@ public class JobScopeConfigurationTests {
 	public void testIntentionallyBlowUpOnMissingContextWithInterface() throws Exception {
 		init(JobScopeConfigurationWithDefaults.class);
 		JobSynchronizationManager.release();
-		expected.expect(BeanCreationException.class);
-		expected.expectMessage("job scope");
-		@SuppressWarnings("unchecked")
-		Callable<String> value = context.getBean(Callable.class);
-		assertEquals("JOB", value.call());
+		final Exception expectedException = Assert.assertThrows(BeanCreationException.class, () -> {
+			@SuppressWarnings("unchecked")
+			Callable<String> value = context.getBean(Callable.class);
+			assertEquals("JOB", value.call());
+		});
+		assertTrue(expectedException.getMessage().contains("job scope"));
 	}
 
 	public void init(Class<?>... config) throws Exception {

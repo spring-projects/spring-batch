@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-import org.junit.rules.ExpectedException;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -46,7 +45,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -64,8 +63,10 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.AbstractItemStreamItemReader;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -79,9 +80,6 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@link FaultTolerantStepFactoryBean}.
  */
 public class FaultTolerantStepFactoryBeanTests {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -112,10 +110,17 @@ public class FaultTolerantStepFactoryBeanTests {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb-extended.sql")
+				.generateUniqueName(true)
+				.build();
+		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
+
 		factory = new FaultTolerantStepFactoryBean<>();
 
 		factory.setBeanName("stepName");
-		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setTransactionManager(transactionManager);
 		factory.setCommitInterval(2);
 
 		reader.clear();
@@ -131,9 +136,12 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory
 		.setSkippableExceptionClasses(getExceptionMap(SkippableException.class, SkippableRuntimeException.class));
 
-		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.afterPropertiesSet();
-		repository = repositoryFactory.getObject();
+		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
+		repositoryFactoryBean.setDataSource(embeddedDatabase);
+		repositoryFactoryBean.setTransactionManager(transactionManager);
+		repositoryFactoryBean.setMaxVarCharLength(10000);
+		repositoryFactoryBean.afterPropertiesSet();
+		repository = repositoryFactoryBean.getObject();
 		factory.setJobRepository(repository);
 
 		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
@@ -142,25 +150,29 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testMandatoryReader() throws Exception {
+	public void testMandatoryReader() {
+		// given
 		factory = new FaultTolerantStepFactoryBean<>();
 		factory.setItemWriter(writer);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemReader must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemReader must be provided", expectedException.getMessage());
 	}
 
 	@Test
 	public void testMandatoryWriter() throws Exception {
+		// given
 		factory = new FaultTolerantStepFactoryBean<>();
 		factory.setItemReader(reader);
 
-		expectedException.expect(IllegalStateException.class);
-		expectedException.expectMessage("ItemWriter must be provided");
+		// when
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, factory::getObject);
 
-		factory.getObject();
+		// then
+		assertEquals("ItemWriter must be provided", expectedException.getMessage());
 	}
 
 	/**

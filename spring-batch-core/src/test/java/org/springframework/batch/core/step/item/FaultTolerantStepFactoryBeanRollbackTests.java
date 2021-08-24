@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.FatalStepExecutionException;
 import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
@@ -46,6 +46,9 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
@@ -53,9 +56,9 @@ import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.StringUtils;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.BatchStatus.FAILED;
 
@@ -106,8 +109,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		factory.setSkippableExceptionClasses(getExceptionMap(Exception.class));
 
-		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
-		repositoryFactory.setTransactionManager(transactionManager);
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
+		repositoryFactory.setDataSource(embeddedDatabase);
+		repositoryFactory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
 		repositoryFactory.afterPropertiesSet();
 		repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);

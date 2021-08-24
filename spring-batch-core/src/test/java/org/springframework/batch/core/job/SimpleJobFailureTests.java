@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,18 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 /**
  * Test suite for various failure scenarios during job processing.
  * 
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class SimpleJobFailureTests {
@@ -47,7 +51,15 @@ public class SimpleJobFailureTests {
 
 	@Before
 	public void init() throws Exception {
-		JobRepository jobRepository = new MapJobRepositoryFactoryBean().getObject();
+		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
+				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
+				.build();
+		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
+		factory.setDataSource(embeddedDatabase);
+		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
+		factory.afterPropertiesSet();
+		JobRepository jobRepository = factory.getObject();
 		job.setJobRepository(jobRepository);
 		execution = jobRepository.createJobExecution("job", new JobParameters());
 	}

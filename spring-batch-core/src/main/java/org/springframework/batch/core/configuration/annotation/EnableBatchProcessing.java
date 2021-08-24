@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * If a user does not provide a {@link javax.sql.DataSource} within the context, a Map based
- * {@link org.springframework.batch.core.repository.JobRepository} will be used. If multiple
- * {@link javax.sql.DataSource}s are defined in the context, the one annotated with
+ * If multiple {@link javax.sql.DataSource}s are defined in the context, the one annotated with
  * {@link org.springframework.context.annotation.Primary} will be used (Note that if none
  * of them is annotated with {@link org.springframework.context.annotation.Primary}, the one
  * named <code>dataSource</code> will be used if any, otherwise a {@link UnsatisfiedDependencyException}
@@ -111,14 +109,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * job repository and transaction manager into every step</li>
  * </ul>
  *
- * The transaction manager provided by this annotation will be of type:
- *
- * <ul>
- *     <li>{@link org.springframework.batch.support.transaction.ResourcelessTransactionManager}
- *     if no {@link javax.sql.DataSource} is provided within the context</li>
- *     <li>{@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
- *     if a {@link javax.sql.DataSource} is provided within the context</li>
- * </ul>
+ * The transaction manager provided by this annotation will be of type {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
+ * configured with the {@link javax.sql.DataSource} provided within the context.
  *
  * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should be provided. For example:
  *

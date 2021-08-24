@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2018 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.SimpleJob;
@@ -34,6 +32,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -58,9 +57,6 @@ public class JobParametersBuilderTests {
 	private List<JobExecution> jobExecutionList;
 
 	private Date date = new Date(System.currentTimeMillis());
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Before
 	public void initialize() {
@@ -96,9 +92,9 @@ public class JobParametersBuilderTests {
 	@Test
 	public void testNonIdentifyingParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date, false);
-		this.parametersBuilder.addLong("LONG", new Long(1), false);
+		this.parametersBuilder.addLong("LONG", 1L, false);
 		this.parametersBuilder.addString("STRING", "string value", false);
-		this.parametersBuilder.addDouble("DOUBLE", new Double(1), false);
+		this.parametersBuilder.addDouble("DOUBLE", 1.0d, false);
 
 		JobParameters parameters = this.parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
@@ -114,9 +110,9 @@ public class JobParametersBuilderTests {
 	@Test
 	public void testToJobRuntimeParameters(){
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
-		this.parametersBuilder.addLong("LONG", new Long(1));
+		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
-		this.parametersBuilder.addDouble("DOUBLE", new Double(1));
+		this.parametersBuilder.addDouble("DOUBLE", 1.0d);
 		JobParameters parameters = this.parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
 		assertEquals(1L, parameters.getLong("LONG").longValue());
@@ -149,7 +145,7 @@ public class JobParametersBuilderTests {
 	@Test
 	public void testOrderedTypes(){
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
-		this.parametersBuilder.addLong("LONG", new Long(1));
+		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
 		Iterator<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet().iterator();
 		assertEquals("SCHEDULE_DATE", parameters.next());
@@ -204,10 +200,10 @@ public class JobParametersBuilderTests {
 
 	@Test
 	public void testGetNextJobParametersNoIncrementer(){
-		expectedException.expect(IllegalArgumentException.class);
-		expectedException.expectMessage("No job parameters incrementer found for job=simpleJob");
 		initializeForNextJobParameters();
-		this.parametersBuilder.getNextJobParameters(this.job);
+		final Exception expectedException = assertThrows(IllegalArgumentException.class,
+				() -> this.parametersBuilder.getNextJobParameters(this.job));
+		assertEquals("No job parameters incrementer found for job=simpleJob", expectedException.getMessage());
 	}
 
 	@Test
@@ -231,7 +227,7 @@ public class JobParametersBuilderTests {
 		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
-		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", new Long(1), false);
+		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", 1L, false);
 		this.parametersBuilder.getNextJobParameters(this.job);
 		baseJobParametersVerify(this.parametersBuilder.toJobParameters(), 5);
 	}
@@ -255,7 +251,7 @@ public class JobParametersBuilderTests {
 
 	private void initializeForNextJobParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
-		this.parametersBuilder.addLong("LONG", new Long(1));
+		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
 	}
 

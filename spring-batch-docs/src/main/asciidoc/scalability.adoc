@@ -129,7 +129,7 @@ usable in a multi-threaded `Step`. In particular, most of the off-the-shelf read
 writers from Spring Batch are not designed for multi-threaded use. It is, however,
 possible to work with stateless or thread safe readers and writers, and there is a sample
 (called `parallelJob`) in the
-https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples[Spring
+https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples[Spring
 Batch Samples] that shows the use of a process indicator (see
 <<readersAndWriters.adoc#process-indicator,Preventing State Persistence>>) to keep track
 of items that have been processed in a database input table.
@@ -330,7 +330,7 @@ attribute prevents the task executor from being saturated with requests from a s
 step.
 
 There is a simple example that can be copied and extended in the unit test suite for
-https://github.com/spring-projects/spring-batch/tree/master/spring-batch-samples/src/main/resources/jobs[Spring
+https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples/src/main/resources/jobs[Spring
 Batch Samples] (see `partition*Job.xml` configuration).
 
 Spring Batch creates step executions for the partitions called "step1:partition0", and so

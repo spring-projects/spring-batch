@@ -17,11 +17,9 @@
 package org.springframework.batch.retry.jms;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.jms.JmsItemReader;
-import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
@@ -37,9 +35,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.ClassUtils;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +46,6 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-@Ignore //FIXME https://github.com/spring-projects/spring-batch/issues/3852
 public class SynchronousTests {
 
 	@Autowired
@@ -61,17 +56,8 @@ public class SynchronousTests {
 
 	private RetryTemplate retryTemplate;
 
-	private JdbcTemplate jdbcTemplate;
-
 	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
-				"jms-context.xml") };
-	}
+	private JdbcTemplate jdbcTemplate;
 
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
