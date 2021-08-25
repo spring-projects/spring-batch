@@ -86,12 +86,6 @@
 			<version>${spring-framework.version}</version>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>${xstream.version}</version>
-			<optional>true</optional>
-		</dependency>
 
 		<!-- test dependencies -->
 		<dependency>
@@ -272,12 +266,6 @@
 			<groupId>javax.inject</groupId>
 			<artifactId>javax.inject</artifactId>
 			<version>${javax.inject.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jettison</groupId>
-			<artifactId>jettison</artifactId>
-			<version>${jettison.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
