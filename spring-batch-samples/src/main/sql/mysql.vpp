@@ -1,3 +1,0 @@
-#macro (sequence $name $value)CREATE TABLE ${name} (ID BIGINT NOT NULL) engine=InnoDB;
-INSERT INTO ${name} values(${value});
-#end

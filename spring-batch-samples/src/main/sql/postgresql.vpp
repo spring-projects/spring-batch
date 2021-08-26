@@ -1,2 +1,0 @@
-#macro (sequence $name $value)CREATE SEQUENCE ${name};
-#end

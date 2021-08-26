@@ -1,5 +1,0 @@
-#macro (sequence $name $value)CREATE TABLE ${name} (
-	ID BIGINT IDENTITY
-);
-INSERT INTO ${name} (ID) values (${value});
-#end
