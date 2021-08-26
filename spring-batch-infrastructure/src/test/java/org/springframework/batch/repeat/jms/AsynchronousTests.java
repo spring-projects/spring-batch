@@ -36,6 +36,7 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -63,7 +64,7 @@ public class AsynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 
 		// Queue is now drained...
 		assertNull(foo);
@@ -90,7 +91,7 @@ public class AsynchronousTests {
 	private volatile List<String> list = new ArrayList<>();
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -122,7 +123,7 @@ public class AsynchronousTests {
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
 		assertEquals(null, foo);
 
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(2, count);
 
 	}
@@ -169,7 +170,7 @@ public class AsynchronousTests {
 			msgs.add(text);
 		}
 
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		assertTrue("Foo not on queue", msgs.contains("foo"));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  * @Since 2.1
  */
@@ -67,7 +69,7 @@ public class MailJobFunctionalTests {
 
 	private static final Object[] USER8 = new Object[] { 8, "Martin Van Buren", email };
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -92,7 +94,7 @@ public class MailJobFunctionalTests {
 
 	@After
 	public void after() throws Exception {
-		jdbcTemplate.update("drop table USERS");
+		JdbcTestUtils.dropTables(jdbcTemplate, "USERS");
 	}
 
 	@Test

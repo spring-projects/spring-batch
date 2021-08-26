@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
@@ -75,8 +76,8 @@ public class RestartIntegrationTests {
 		ExampleItemReader.fail = true;
 		JobParameters jobParameters = new JobParametersBuilder().addString("restart", "yes").toJobParameters();
 
-		int beforeManager = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:manager'", Integer.class);
-		int beforePartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
+		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
+		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
 
 		ExampleItemWriter.clear();
 		JobExecution execution = jobLauncher.run(job, jobParameters);
@@ -89,8 +90,8 @@ public class RestartIntegrationTests {
 		// Only 4 because the others were processed in the first attempt
 		assertEquals(4, ExampleItemWriter.getItems().size());
 
-		int afterManager = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME='step1:manager'", Integer.class);
-		int afterPartition = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STEP_EXECUTION where STEP_NAME like 'step1:partition%'", Integer.class);
+		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
+		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
 
 		// Two attempts
 		assertEquals(2, afterManager-beforeManager);

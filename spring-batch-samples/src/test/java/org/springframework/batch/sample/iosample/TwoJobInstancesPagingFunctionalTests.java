@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,11 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -51,7 +53,7 @@ public class TwoJobInstancesPagingFunctionalTests {
 	@Autowired
 	private Job job;
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -60,11 +62,11 @@ public class TwoJobInstancesPagingFunctionalTests {
 
 	@Test
 	public void testLaunchJobTwice() throws Exception {
-		int first = jdbcTemplate.queryForObject("select count(0) from CUSTOMER where credit>1000", Integer.class);
+		int first = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "CUSTOMER", "credit>1000");
 		JobExecution jobExecution = launcher.run(this.job, getJobParameters(1000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(first, jobExecution.getStepExecutions().iterator().next().getWriteCount());
-		int second = jdbcTemplate.queryForObject("select count(0) from CUSTOMER where credit>1000000", Integer.class);
+		int second = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "CUSTOMER", "credit>1000000");
 		assertNotSame("The number of records above the threshold did not change", first, second);
 		jobExecution = launcher.run(this.job, getJobParameters(1000000.));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2014 the original author or authors.
+ * Copyright 2007-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.orm.hibernate5.HibernateJdbcException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -53,13 +54,13 @@ import org.springframework.transaction.support.TransactionTemplate;
  * expected value.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/hibernate-context.xml", "/jobs/hibernateJob.xml",
 		"/job-runner-context.xml" })
 public class HibernateFailureJobFunctionalTests {
 	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
-	private static final String DELETE_CUSTOMERS = "DELETE FROM CUSTOMER";
 	private static final String ALL_CUSTOMERS = "select * from CUSTOMER order by ID";
 	private static final String CREDIT_COLUMN = "CREDIT";
 	private static String[] customers = { "INSERT INTO CUSTOMER (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
@@ -71,7 +72,7 @@ public class HibernateFailureJobFunctionalTests {
 
 	@Autowired
 	private HibernateCreditDao writer;
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	private PlatformTransactionManager transactionManager;
 	private List<BigDecimal> creditsBeforeUpdate;
 
@@ -108,7 +109,7 @@ public class HibernateFailureJobFunctionalTests {
 			throw e;
 		}
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from CUSTOMER", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "CUSTOMER");
 		assertEquals(4, after);
 
 		validatePostConditions();
@@ -141,7 +142,7 @@ public class HibernateFailureJobFunctionalTests {
 
 			@Override
 			public Void doInTransaction(TransactionStatus status) {
-                jdbcTemplate.update(DELETE_CUSTOMERS);
+				JdbcTestUtils.deleteFromTables(jdbcTemplate, "CUSTOMER");
 				for (String customer : customers) {
 					jdbcTemplate.update(customer);
 				}

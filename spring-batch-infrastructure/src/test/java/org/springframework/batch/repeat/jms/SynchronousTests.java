@@ -45,6 +45,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
@@ -84,13 +85,13 @@ public class SynchronousTests implements ApplicationContextAware {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -110,7 +111,7 @@ public class SynchronousTests implements ApplicationContextAware {
 			}
 		});
 
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(2, count);
 
 		assertTrue(list.contains("foo"));
@@ -154,7 +155,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion rolled back...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session. The rollback should have restored
@@ -221,7 +222,7 @@ public class SynchronousTests implements ApplicationContextAware {
 		}
 
 		// The database portion committed...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(2, count);
 
 		// ...but the JMS session rolled back, so the message is still there

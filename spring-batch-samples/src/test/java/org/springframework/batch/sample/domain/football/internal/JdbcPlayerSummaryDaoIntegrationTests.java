@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,12 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -41,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class JdbcPlayerSummaryDaoIntegrationTests {
 	private JdbcPlayerSummaryDao playerSummaryDao;
 	private PlayerSummary summary;
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
@@ -66,7 +68,7 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {
-        jdbcTemplate.execute("delete from PLAYER_SUMMARY");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY");
 	}
 
 	@Test

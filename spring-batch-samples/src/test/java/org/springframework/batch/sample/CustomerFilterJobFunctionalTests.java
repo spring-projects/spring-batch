@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
@@ -46,7 +47,7 @@ public class CustomerFilterJobFunctionalTests {
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 	private List<Customer> customers;
 	private int activeRow = 0;
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
@@ -59,8 +60,8 @@ public class CustomerFilterJobFunctionalTests {
 
 	@Before
 	public void onSetUp() throws Exception {
-        jdbcTemplate.update("delete from TRADE");
-        jdbcTemplate.update("delete from CUSTOMER where ID > 4");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
         jdbcTemplate.update("update CUSTOMER set credit=100000");
 
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
@@ -72,8 +73,8 @@ public class CustomerFilterJobFunctionalTests {
 
 	@After
 	public void tearDown() throws Exception {
-        jdbcTemplate.update("delete from TRADE");
-        jdbcTemplate.update("delete from CUSTOMER where ID > 4");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 	}
 
 	@Test

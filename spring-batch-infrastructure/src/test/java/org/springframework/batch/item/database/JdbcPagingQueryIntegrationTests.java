@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.1
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -74,7 +75,6 @@ public class JdbcPagingQueryIntegrationTests {
 		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
 		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
-//		jdbcTemplate.update("DELETE from T_FOOS");
 		for(int i = 0; i < names.length; i++) {
 			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
 			maxId++;
@@ -85,7 +85,6 @@ public class JdbcPagingQueryIntegrationTests {
 	@After
 	public void destroy() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
-//		jdbcTemplate.update("DELETE from T_FOOS");
 	}
 
 	@Test

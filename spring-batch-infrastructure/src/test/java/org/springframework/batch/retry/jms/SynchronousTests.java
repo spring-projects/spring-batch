@@ -30,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +62,7 @@ public class SynchronousTests {
 
 	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "foo");
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
@@ -81,11 +82,11 @@ public class SynchronousTests {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -140,7 +141,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -193,7 +194,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -252,7 +253,7 @@ public class SynchronousTests {
 				}
 
 				// The nested database transaction has committed...
-				int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+				int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 				assertEquals(1, count);
 
 				// force rollback...
@@ -267,7 +268,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
@@ -316,7 +317,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
@@ -375,7 +376,7 @@ public class SynchronousTests {
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.runner.RunWith;
 import org.junit.Test;
@@ -36,8 +37,8 @@ public class DatasourceTests {
 	@Transactional @Test
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
-		jdbcTemplate.execute("delete from T_BARS");
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,7 +50,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 			+ "Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]"
 			+ "Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -61,8 +62,8 @@ public class CompositeItemWriterSampleFunctionalTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-        jdbcTemplate.update("DELETE from TRADE");
-		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE", Integer.class);
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils.launchJob();
 
@@ -83,7 +84,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 			}
 		};
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		assertEquals(before + 5, after);
 

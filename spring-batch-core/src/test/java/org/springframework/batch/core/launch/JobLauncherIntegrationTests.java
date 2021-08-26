@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2014 the original author or authors.
+ * Copyright 2009-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,13 +54,13 @@ public class JobLauncherIntegrationTests {
 	@Test
 	public void testLaunchAndRelaunch() throws Exception {
 
-		int before = jdbcTemplate.queryForObject("select count(*) from BATCH_JOB_INSTANCE", Integer.class);
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 
 		JobExecution jobExecution = launch(true,0);
 		launch(false, jobExecution.getId());
 		launch(false, jobExecution.getId());
 
-		int after = jdbcTemplate.queryForObject("select count(*) from BATCH_JOB_INSTANCE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 		assertEquals(before+1, after);
 
 	}

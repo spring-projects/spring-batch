@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 the original author or authors.
+ * Copyright 2010-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,7 +251,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		public void clear() {
 			written.clear();
-			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='written'");
+			JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "ERROR_LOG", "STEP_NAME='written'");
 		}
 
 		@Override
@@ -304,7 +304,7 @@ public class FaultTolerantStepFactoryBeanRollbackIntegrationTests {
 
 		public void clear() {
 			processed.clear();
-			jdbcTemplate.update("DELETE FROM ERROR_LOG where STEP_NAME='processed'");
+			JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "ERROR_LOG", "STEP_NAME='processed'");
 		}
 
 		@Nullable

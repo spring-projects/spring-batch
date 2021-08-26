@@ -70,7 +70,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
 public class SkipSampleFunctionalTests {
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobExplorer jobExplorer;
@@ -89,12 +89,11 @@ public class SkipSampleFunctionalTests {
 
 	@Before
 	public void setUp() {
-        jdbcTemplate.update("DELETE from TRADE");
-        jdbcTemplate.update("DELETE from CUSTOMER");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE", "CUSTOMER");
 		for (int i = 1; i < 10; i++) {
             jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue() + ", 0, 'customer" + i + "', 100000)");
 		}
-        jdbcTemplate.update("DELETE from ERROR_LOG");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "ERROR_LOG");
 	}
 
 	/**
@@ -263,18 +262,18 @@ public class SkipSampleFunctionalTests {
 	private void validateLaunchWithSkips(JobExecution jobExecution) {
 		// Step1: 9 input records, 1 skipped in read, 1 skipped in write =>
 		// 7 written to output
-		assertEquals(7, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "TRADE"));
+		assertEquals(7, JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE"));
 
 		// Step2: 7 input records, 1 skipped on process, 1 on write => 5 written
 		// to output
 		// System.err.println(jdbcTemplate.queryForList("SELECT * FROM TRADE"));
-		assertEquals(5, jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE where VERSION=?", Integer.class, 1).intValue());
+		assertEquals(5, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "TRADE", "VERSION=1"));
 
 		// 1 record skipped in processing second step
 		assertEquals(1, SkipCheckingListener.getProcessSkips());
 
 		// Both steps contained skips
-		assertEquals(2, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "ERROR_LOG"));
+		assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 		assertEquals("2 records were skipped!", jdbcTemplate.queryForObject(
 				"SELECT MESSAGE from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", String.class, "skipJob", "step1"));
@@ -293,13 +292,13 @@ public class SkipSampleFunctionalTests {
 	private void validateLaunchWithoutSkips(JobExecution jobExecution) {
 
 		// Step1: 5 input records => 5 written to output
-		assertEquals(5, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "TRADE"));
+		assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE"));
 
 		// Step2: 5 input records => 5 written to output
-		assertEquals(5, jdbcTemplate.queryForObject("SELECT COUNT(*) from TRADE where VERSION=?", Integer.class, 1).intValue());
+		assertEquals(5, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "TRADE", "VERSION=1"));
 
 		// Neither step contained skips
-		assertEquals(0, JdbcTestUtils.countRowsInTable((JdbcTemplate) jdbcTemplate, "ERROR_LOG"));
+		assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, "ERROR_LOG"));
 
 		assertEquals(new BigDecimal("270.75"), jobExecution.getExecutionContext().get(TradeWriter.TOTAL_AMOUNT_KEY));
 

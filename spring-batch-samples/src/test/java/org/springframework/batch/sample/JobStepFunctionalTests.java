@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,20 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * Sample using a step to launch a job.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class JobStepFunctionalTests {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -50,13 +52,13 @@ public class JobStepFunctionalTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-        jdbcTemplate.update("DELETE FROM TRADE");
+        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils.launchJob(new DefaultJobParametersConverter()
 				.getJobParameters(PropertiesConverter
 						.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 		assertEquals(5, after);
 	}
 }

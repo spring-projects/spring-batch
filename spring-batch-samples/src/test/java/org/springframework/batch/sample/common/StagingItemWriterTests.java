@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,13 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class StagingItemWriterTests {
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private StagingItemWriter<String> writer;
@@ -58,9 +59,9 @@ public class StagingItemWriterTests {
 	@Transactional
 	@Test
 	public void testProcessInsertsNewItem() throws Exception {
-		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		writer.write(Collections.singletonList("FOO"));
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) from BATCH_STAGING", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}
 }

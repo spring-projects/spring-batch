@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -84,7 +85,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");;
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -96,7 +97,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		execution.getExecutionContext().put("foo", "bar");
 		repository.updateExecutionContext(execution);
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_EXECUTION_CONTEXT", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 		JobExecution last = repository.getLastJobExecution(job.getName(), new JobParameters());
@@ -126,7 +127,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 		assertNotNull(execution);
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before + 1, after);
 
@@ -147,7 +148,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		repository.update(execution);
 		execution.setStatus(BatchStatus.FAILED);
 
-		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 		assertEquals(1, before);
 
 		long t0 = System.currentTimeMillis();
@@ -160,7 +161,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		}
 		long t1 = System.currentTimeMillis();
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
 		assertNotNull(execution.getId());
 		assertEquals(before, after);
 

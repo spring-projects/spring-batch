@@ -39,6 +39,7 @@ import org.springframework.retry.support.DefaultRetryState;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -73,7 +74,7 @@ public class ExternalRetryInBatchTests {
 	@Before
 	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReader<String>() {
@@ -91,11 +92,11 @@ public class ExternalRetryInBatchTests {
 	@After
 	public void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.execute("delete from T_BARS");
+		 JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 	}
 
@@ -189,7 +190,7 @@ public class ExternalRetryInBatchTests {
 		assertEquals(2, recovered.size());
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForObject("select count(*) from T_BARS", Integer.class);
+		int count = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_BARS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

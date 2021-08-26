@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * @author Luke Taylor
+ * @author Mahmoud Ben Hassine
  */
 public class SqliteMaxValueIncrementerTests {
 	static String dbFile;
@@ -59,6 +61,6 @@ public class SqliteMaxValueIncrementerTests {
 		assertEquals(1, mvi.getNextKey());
 		assertEquals(2, mvi.getNextKey());
 		assertEquals(3, mvi.getNextKey());
-		assertEquals(1, template.queryForObject("select count(*) from max_value", Integer.class).intValue());
+		assertEquals(1, JdbcTestUtils.countRowsInTable(template, "max_value"));
 	}
 }

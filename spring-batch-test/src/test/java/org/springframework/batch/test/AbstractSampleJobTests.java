@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * This is an abstract test class.
@@ -61,7 +62,7 @@ public abstract class AbstractSampleJobTests {
 
 	@After
 	public void tearDown() {
-		this.jdbcTemplate.update("drop table TESTS");
+		JdbcTestUtils.dropTables(this.jdbcTemplate, "TESTS");
 	}
 
 	@Test

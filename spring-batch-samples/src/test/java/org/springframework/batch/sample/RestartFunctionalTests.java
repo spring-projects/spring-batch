@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,18 +33,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * Simple restart scenario.
  *
  * @author Robert Kasanicky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/restartSample.xml",
 		"/job-runner-context.xml" })
 public class RestartFunctionalTests {
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
@@ -56,7 +58,7 @@ public class RestartFunctionalTests {
 
 	@BeforeTransaction
 	public void onTearDown() throws Exception {
-        jdbcTemplate.update("DELETE FROM TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 	}
 
 	/**
@@ -70,7 +72,7 @@ public class RestartFunctionalTests {
 	 */
 	@Test
 	public void testLaunchJob() throws Exception {
-		int before = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
+		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
@@ -83,14 +85,14 @@ public class RestartFunctionalTests {
 			throw new RuntimeException(ex);
 		}
 
-		int medium = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
+		int medium = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		int after = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TRADE", Integer.class);
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		assertEquals(before + 5, after);
 	}
