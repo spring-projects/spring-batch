@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.PollableChannel;
@@ -348,6 +349,11 @@ public class RemoteChunkingManagerStepBuilderTests {
 					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 					.generateUniqueName(true)
 					.build();
+		}
+
+		@Bean
+		public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+			return new DataSourceTransactionManager(dataSource);
 		}
 
 	}

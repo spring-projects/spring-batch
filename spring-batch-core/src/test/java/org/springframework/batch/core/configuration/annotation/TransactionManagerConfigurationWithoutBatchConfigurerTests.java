@@ -49,13 +49,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
 		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndNoTransactionManager.class);
-		Assert.assertTrue(applicationContext.containsBean("transactionManager"));
-		PlatformTransactionManager platformTransactionManager = applicationContext.getBean(PlatformTransactionManager.class);
-		Object targetObject = AopTestUtils.getTargetObject(platformTransactionManager);
-		Assert.assertTrue(targetObject instanceof DataSourceTransactionManager);
-		DataSourceTransactionManager dataSourceTransactionManager = (DataSourceTransactionManager) targetObject;
+		PlatformTransactionManager platformTransactionManager = getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class));
+		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
+		DataSourceTransactionManager dataSourceTransactionManager = (DataSourceTransactionManager) platformTransactionManager;
 		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), dataSourceTransactionManager);
 	}
 
 	@Test
