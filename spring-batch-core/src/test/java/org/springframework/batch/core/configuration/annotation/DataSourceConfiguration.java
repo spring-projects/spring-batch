@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -47,6 +48,11 @@ public class DataSourceConfiguration {
 		return new EmbeddedDatabaseBuilder()
 				.generateUniqueName(true)
 				.build();
+	}
+
+	@Bean
+	public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+		return new DataSourceTransactionManager(dataSource);
 	}
 
 }

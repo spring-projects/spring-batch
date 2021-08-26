@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * available by implementing the {@link BatchConfigurer} interface.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.2
  * @see EnableBatchProcessing
  */
@@ -61,7 +62,6 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 	}
 
 	@Override
-	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return getConfigurer(configurers).getTransactionManager();
 	}

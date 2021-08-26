@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 /**
@@ -39,6 +40,11 @@ public class DataSourceConfiguration {
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
 				.generateUniqueName(true)
 				.build();
+	}
+
+	@Bean
+	public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+		return new DataSourceTransactionManager(dataSource);
 	}
 
 }

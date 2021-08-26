@@ -86,7 +86,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		return this.jobRegistry;
 	}
 
-	@Bean
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
 
 	@Override

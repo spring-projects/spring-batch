@@ -102,7 +102,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
  * <li>a {@link JobRegistry} (bean name "jobRegistry")</li>
  * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer")</li>
- * <li>a {@link PlatformTransactionManager} (bean name "transactionManager")</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the
  * job repository into every job, as in the examples above</li>
  * <li>a {@link StepBuilderFactory} (bean name "stepBuilders") as a convenience to prevent you from having to inject the
