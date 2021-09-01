@@ -17,6 +17,7 @@
 package org.springframework.batch.core;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -233,7 +234,7 @@ public class JobParameters implements Serializable {
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map<String, JobParameter> getParameters(){
-		return new LinkedHashMap<>(parameters);
+		return Collections.unmodifiableMap(parameters);
 	}
 
 	/**
