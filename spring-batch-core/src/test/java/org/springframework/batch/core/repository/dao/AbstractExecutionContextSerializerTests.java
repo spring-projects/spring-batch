@@ -166,9 +166,7 @@ public abstract class AbstractExecutionContextSerializerTests {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         getSerializer().serialize(m1, out);
 
-        String s = new String(out.toByteArray(), "ISO-8859-1");
-
-        InputStream in = new ByteArrayInputStream(s.getBytes("ISO-8859-1"));
+        InputStream in = new ByteArrayInputStream(out.toByteArray());
         Map<String, Object> m2 = getSerializer().deserialize(in);
         return m2;
     }
