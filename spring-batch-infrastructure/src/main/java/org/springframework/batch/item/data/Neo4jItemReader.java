@@ -59,7 +59,11 @@ import org.springframework.util.StringUtils;
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ *
+ * @deprecated since 5.0 in favor of the item reader from
+ * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  */
+@Deprecated
 public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());

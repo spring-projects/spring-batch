@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2021 the original author or authors.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,9 +26,14 @@ import org.springframework.util.Assert;
  * A builder implementation for the {@link Neo4jItemWriter}
  *
  * @author Glenn Renfro
+ * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see Neo4jItemWriter
+ *
+ * @deprecated since 5.0 in favor of the item writer builder from
+ * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  */
+@Deprecated
 public class Neo4jItemWriterBuilder<T> {
 
 	private boolean delete = false;
