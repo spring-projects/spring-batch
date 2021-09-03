@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.batch.item.json.builder;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 import org.junit.Before;
@@ -36,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 public class JsonFileItemWriterBuilderTest {
 
@@ -100,7 +102,45 @@ public class JsonFileItemWriterBuilderTest {
 				.transactional(transactional)
 				.build();
 
-		// then
+		//then
+		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);
+	}
+
+	@Test
+	public void testJsonFileItemWriterCreationDefaultEncoding() {
+		// given
+		boolean append = true;
+		boolean forceSync = true;
+		boolean transactional = true;
+		boolean shouldDeleteIfEmpty = true;
+		boolean shouldDeleteIfExists = true;
+		String encoding = Charset.defaultCharset().name();
+		String lineSeparator = "#";
+		FlatFileHeaderCallback headerCallback = Mockito.mock(FlatFileHeaderCallback.class);
+		FlatFileFooterCallback footerCallback = Mockito.mock(FlatFileFooterCallback.class);
+
+		// when
+		JsonFileItemWriter<String> writer = new JsonFileItemWriterBuilder<String>()
+				.name("jsonFileItemWriter")
+				.resource(this.resource)
+				.jsonObjectMarshaller(this.jsonObjectMarshaller)
+				.append(append)
+				.forceSync(forceSync)
+				.headerCallback(headerCallback)
+				.footerCallback(footerCallback)
+				.lineSeparator(lineSeparator)
+				.shouldDeleteIfEmpty(shouldDeleteIfEmpty)
+				.shouldDeleteIfExists(shouldDeleteIfExists)
+				.transactional(transactional)
+				.build();
+
+		//then
+		validateBuilderFlags(writer, encoding, lineSeparator, headerCallback, footerCallback);
+	}
+
+	private void validateBuilderFlags(JsonFileItemWriter<String> writer, String encoding,
+			String lineSeparator, FlatFileHeaderCallback headerCallback,
+			FlatFileFooterCallback footerCallback) {
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "saveState"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "append"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "transactional"));

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
+
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
@@ -266,6 +267,8 @@ public class FlatFileItemWriterBuilderTests {
 
 		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
+		String encoding = Charset.defaultCharset().name();
+
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
 				.resource(output)
@@ -277,14 +280,40 @@ public class FlatFileItemWriterBuilderTests {
 				.transactional(false)
 				.lineAggregator(new PassThroughLineAggregator<>())
 				.build();
+
+		validateBuilderFlags(writer, encoding);
+	}
+
+	@Test
+	public void testFlagsWithEncoding() throws Exception {
+
+		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		String encoding = "UTF-8";
+		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
+				.name("foo")
+				.encoding(encoding)
+				.resource(output)
+				.shouldDeleteIfEmpty(true)
+				.shouldDeleteIfExists(false)
+				.saveState(false)
+				.forceSync(true)
+				.append(true)
+				.transactional(false)
+				.lineAggregator(new PassThroughLineAggregator<>())
+				.build();
+		validateBuilderFlags(writer, encoding);
+	}
+
+	private void validateBuilderFlags(FlatFileItemWriter<Foo> writer, String encoding) {
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "saveState"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "append"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "transactional"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfEmpty"));
 		assertFalse((Boolean) ReflectionTestUtils.getField(writer, "shouldDeleteIfExists"));
 		assertTrue((Boolean) ReflectionTestUtils.getField(writer, "forceSync"));
-		assertEquals( Charset.defaultCharset().name(), ReflectionTestUtils.getField(writer, "encoding"));
+		assertEquals( encoding, ReflectionTestUtils.getField(writer, "encoding"));
 	}
+
 
 	private String readLine(String encoding, Resource outputFile ) throws IOException {
 

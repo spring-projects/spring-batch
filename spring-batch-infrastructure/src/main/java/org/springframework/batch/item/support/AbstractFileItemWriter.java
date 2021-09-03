@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
@@ -59,6 +60,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  *
  * @since 4.1
  */
@@ -71,8 +73,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	public static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
-	// default encoding for writing to output files - set to UTF-8.
-	public static final String DEFAULT_CHARSET = "UTF-8";
+	// default encoding for writing to flat files - set to charset of this Java virtual machine.
+	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 
