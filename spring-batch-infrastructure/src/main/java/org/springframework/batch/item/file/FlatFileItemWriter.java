@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -39,6 +40,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Parikshit Dutta
  */
 public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
@@ -74,8 +76,16 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	@Override
 	public String doWrite(List<? extends T> items) {
 		StringBuilder lines = new StringBuilder();
-		for (T item : items) {
-			lines.append(this.lineAggregator.aggregate(item)).append(this.lineSeparator);
+		Iterator<? extends T> iterator = items.iterator();
+		if (hasExistingItems() && iterator.hasNext()) {
+			lines.append(lineSeparator);
+		}
+		while (iterator.hasNext()) {
+			T item = iterator.next();
+			lines.append(this.lineAggregator.aggregate(item));
+			if (iterator.hasNext()) {
+				lines.append(lineSeparator);
+			}
 		}
 		return lines.toString();
 	}
