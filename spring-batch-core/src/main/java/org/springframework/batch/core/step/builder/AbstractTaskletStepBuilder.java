@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @param <B> the type of builder represented
  */
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends
-StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
+StepBuilderHelper<B> {
 
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
 
@@ -139,9 +139,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param listener the listener to register
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> listener(ChunkListener listener) {
+	public B listener(ChunkListener listener) {
 		chunkListeners.add(listener);
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -176,9 +178,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param stream the stream to register
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> stream(ItemStream stream) {
+	public B stream(ItemStream stream) {
 		streams.add(stream);
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -188,9 +192,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param taskExecutor the task executor to register
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> taskExecutor(TaskExecutor taskExecutor) {
+	public B taskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -201,9 +207,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param throttleLimit maximum number of concurrent tasklet executions allowed
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> throttleLimit(int throttleLimit) {
+	public B throttleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -212,9 +220,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param exceptionHandler the exception handler
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> exceptionHandler(ExceptionHandler exceptionHandler) {
+	public B exceptionHandler(ExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -224,9 +234,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param repeatTemplate a repeat template with rules for iterating
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> stepOperations(RepeatOperations repeatTemplate) {
+	public B stepOperations(RepeatOperations repeatTemplate) {
 		this.stepOperations = repeatTemplate;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**
@@ -236,9 +248,11 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 	 * @param transactionAttribute a transaction attribute set
 	 * @return this for fluent chaining
 	 */
-	public AbstractTaskletStepBuilder<B> transactionAttribute(TransactionAttribute transactionAttribute) {
+	public B transactionAttribute(TransactionAttribute transactionAttribute) {
 		this.transactionAttribute = transactionAttribute;
-		return this;
+		@SuppressWarnings("unchecked")
+		B result = (B) this;
+		return result;
 	}
 
 	/**

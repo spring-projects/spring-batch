@@ -206,9 +206,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 			skipListeners.add((SkipListener) factory.getObject());
 		}
 
-		@SuppressWarnings("unchecked")
-		SimpleStepBuilder<I, O> result = this;
-		return result;
+		return this;
 	}
 
 
@@ -230,7 +228,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	@Override
-	public AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> transactionAttribute(
+	public SimpleStepBuilder<I, O> transactionAttribute(
 			TransactionAttribute transactionAttribute) {
 		return super.transactionAttribute(getTransactionAttribute(transactionAttribute));
 	}
@@ -408,7 +406,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	}
 
 	@Override
-	public AbstractTaskletStepBuilder<SimpleStepBuilder<I, O>> stream(ItemStream stream) {
+	public SimpleStepBuilder<I, O> stream(ItemStream stream) {
 		if (stream instanceof ItemReader<?>) {
 			if (!streamIsReader) {
 				streamIsReader = true;
