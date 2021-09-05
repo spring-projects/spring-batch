@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,11 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 			throw new StepBuilderException(e);
 		}
 		return step;
+	}
+
+	@Override
+	protected FlowStepBuilder self() {
+		return this;
 	}
 
 }
