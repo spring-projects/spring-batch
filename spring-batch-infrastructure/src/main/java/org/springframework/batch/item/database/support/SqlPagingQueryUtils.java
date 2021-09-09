@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SqlPagingQueryUtils {
@@ -67,9 +68,36 @@ public class SqlPagingQueryUtils {
 	 * opposed to the first page (false)
 	 * @param limitClause the implementation specific limit clause to be used
 	 * @return the generated query
+	 * @deprecated in favor of {@link #generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider, java.lang.String)}
 	 */
+	@Deprecated
 	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
 			String limitClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * ");
+		sql.append(" FROM (");
+		sql.append("SELECT ").append(provider.getSelectClause());
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		buildGroupByClause(provider, sql);
+		sql.append(") AS MAIN_QRY ");
+		sql.append("WHERE ");
+		buildSortConditions(provider, sql);
+		sql.append(" ORDER BY ").append(buildSortClause(provider));
+		sql.append(" " + limitClause);
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a LIMIT clause
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the
+	 * implementation specifics
+	 * @param limitClause the implementation specific limit clause to be used
+	 * @return the generated query
+	 */
+	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, String limitClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * ");
 		sql.append(" FROM (");
