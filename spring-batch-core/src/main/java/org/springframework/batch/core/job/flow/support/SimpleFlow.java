@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class SimpleFlow implements Flow, InitializingBean {
@@ -257,10 +258,6 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		return continued;
-	}
-
-	private boolean stateNameEndsWithStepName(State state, StepExecution stepExecution) {
-		return !(stepExecution == null || state == null) && !state.getName().endsWith(stepExecution.getStepName());
 	}
 
 	/**
