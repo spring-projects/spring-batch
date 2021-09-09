@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.micrometer.core.instrument.Tag;
@@ -213,7 +212,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		final UserData<O> data = (UserData<O>) inputs.getUserData();
 		final Chunk<O> cache = data.getOutputs();
 		final Iterator<O> cacheIterator = cache.isEmpty() ? null : new ArrayList<>(cache.getItems()).iterator();
-		final AtomicInteger count = new AtomicInteger(0);
 
 		// final int scanLimit = processorTransactional && data.scanning() ? 1 :
 		// 0;
@@ -230,7 +228,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					String status = BatchMetrics.STATUS_SUCCESS;
 					O output = null;
 					try {
-						count.incrementAndGet();
 						O cached = (cacheIterator != null && cacheIterator.hasNext()) ? cacheIterator.next() : null;
 						if (cached != null && !processorTransactional) {
 							output = cached;
