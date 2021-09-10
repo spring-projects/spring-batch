@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			"SE.WRITE_SKIP_COUNT, SE.PROCESS_SKIP_COUNT, SE.ROLLBACK_COUNT, SE.LAST_UPDATED, SE.VERSION," +
 			" JE.JOB_EXECUTION_ID, JE.START_TIME, JE.END_TIME, JE.STATUS, JE.EXIT_CODE, JE.EXIT_MESSAGE, " +
 			"JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION" +
-			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
-			" where " +
-			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
-			"where JOB_INSTANCE_ID = ?)" +
-			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			" from %PREFIX%JOB_EXECUTION JE join %PREFIX%STEP_EXECUTION SE" +
+			"      on SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"where JE.JOB_INSTANCE_ID = ?" +
 			"      and SE.STEP_NAME = ?" +
 			" order by SE.START_TIME desc, SE.STEP_EXECUTION_ID desc";
 
