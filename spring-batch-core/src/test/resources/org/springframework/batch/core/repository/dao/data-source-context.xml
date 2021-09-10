@@ -31,9 +31,6 @@
 	<bean id="jobExecutionIncrementer" parent="incrementerParent">
 		<property name="incrementerName" value="BATCH_JOB_EXECUTION_SEQ" />
 	</bean>
-	<bean id="stepIncrementer" parent="incrementerParent">
-		<property name="incrementerName" value="BATCH_STEP_SEQ" />
-	</bean>
 	<bean id="stepExecutionIncrementer" parent="incrementerParent">
 		<property name="incrementerName" value="BATCH_STEP_EXECUTION_SEQ" />
 	</bean>
