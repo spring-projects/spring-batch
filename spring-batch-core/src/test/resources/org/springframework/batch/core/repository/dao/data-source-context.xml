@@ -25,7 +25,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="columnName" value="ID" />
 	</bean>
-	<bean id="jobIncrementer" parent="incrementerParent">
+	<bean id="jobInstanceIncrementer" parent="incrementerParent">
 		<property name="incrementerName" value="BATCH_JOB_SEQ" />
 	</bean>
 	<bean id="jobExecutionIncrementer" parent="incrementerParent">

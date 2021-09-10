@@ -18,7 +18,7 @@
 
 	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
-		<property name="jobIncrementer" ref="jobIncrementer" />
+		<property name="jobInstanceIncrementer" ref="jobInstanceIncrementer" />
 	</bean>
 
 	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcJobExecutionDao">

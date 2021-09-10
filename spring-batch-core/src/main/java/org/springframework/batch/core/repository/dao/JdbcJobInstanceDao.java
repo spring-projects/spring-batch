@@ -88,13 +88,13 @@ JobInstanceDao, InitializingBean {
 
 	private static final String FIND_LAST_JOBS_LIKE_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME like ? order by JOB_INSTANCE_ID desc";
 
-	private DataFieldMaxValueIncrementer jobIncrementer;
+	private DataFieldMaxValueIncrementer jobInstanceIncrementer;
 
 	private JobKeyGenerator<JobParameters> jobKeyGenerator = new DefaultJobKeyGenerator();
 
 	/**
-	 * In this JDBC implementation a job id is obtained by asking the
-	 * jobIncrementer (which is likely a sequence) for the next long value, and
+	 * In this JDBC implementation a job instance id is obtained by asking the
+	 * jobInstanceIncrementer (which is likely a sequence) for the next long value, and
 	 * then passing the Id and parameter values into an INSERT statement.
 	 *
 	 * @see JobInstanceDao#createJobInstance(String, JobParameters)
@@ -111,12 +111,12 @@ JobInstanceDao, InitializingBean {
 		Assert.state(getJobInstance(jobName, jobParameters) == null,
 				"JobInstance must not already exist");
 
-		Long jobId = jobIncrementer.nextLongValue();
+		Long jobInstanceId = jobInstanceIncrementer.nextLongValue();
 
-		JobInstance jobInstance = new JobInstance(jobId, jobName);
+		JobInstance jobInstance = new JobInstance(jobInstanceId, jobName);
 		jobInstance.incrementVersion();
 
-		Object[] parameters = new Object[] { jobId, jobName,
+		Object[] parameters = new Object[] { jobInstanceId, jobName,
 				jobKeyGenerator.generateKey(jobParameters), jobInstance.getVersion() };
 		getJdbcTemplate().update(
 				getQuery(CREATE_JOB_INSTANCE),
@@ -307,25 +307,25 @@ JobInstanceDao, InitializingBean {
 	 */
 	@Deprecated
 	public void setJobIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
-		this.jobIncrementer = jobIncrementer;
+		this.setJobInstanceIncrementer(jobIncrementer);
 	}
 
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobInstance} instances.
 	 *
-	 * @param jobIncrementer the {@link DataFieldMaxValueIncrementer}
+	 * @param jobInstanceIncrementer the {@link DataFieldMaxValueIncrementer}
 	 *
 	 * @since 5.0
 	 */
-	public void setJobInstanceIncrementer(DataFieldMaxValueIncrementer jobIncrementer) {
-		this.jobIncrementer = jobIncrementer;
+	public void setJobInstanceIncrementer(DataFieldMaxValueIncrementer jobInstanceIncrementer) {
+		this.jobInstanceIncrementer = jobInstanceIncrementer;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobIncrementer, "JobIncrementer is required");
+		Assert.notNull(jobInstanceIncrementer, "jobInstanceIncrementer is required");
 	}
 
 	/**

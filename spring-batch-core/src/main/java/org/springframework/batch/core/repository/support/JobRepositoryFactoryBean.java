@@ -58,6 +58,7 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
@@ -211,7 +212,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcOperations);
-		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
+		dao.setJobInstanceIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
