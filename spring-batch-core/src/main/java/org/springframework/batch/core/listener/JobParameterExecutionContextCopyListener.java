@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -30,9 +31,10 @@ import org.springframework.batch.item.ExecutionContext;
  * {@link ExecutionContext} that should be copied.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class JobParameterExecutionContextCopyListener extends StepExecutionListenerSupport {
+public class JobParameterExecutionContextCopyListener implements StepExecutionListener {
 
 	private Collection<String> keys = null;
 

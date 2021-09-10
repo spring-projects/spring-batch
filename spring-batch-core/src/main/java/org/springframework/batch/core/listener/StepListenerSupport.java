@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,125 +36,7 @@ import org.springframework.lang.Nullable;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
-ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S>, SkipListener<T, S> {
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)
-	 */
-	@Nullable
-	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
-	 */
-	@Override
-	public void beforeStep(StepExecution stepExecution) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#afterChunk(ChunkContext context)
-	 */
-	@Override
-	public void afterChunk(ChunkContext context) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ChunkListener#beforeChunk(ChunkContext context)
-	 */
-	@Override
-	public void beforeChunk(ChunkContext context) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
-	 */
-	@Override
-	public void afterRead(T item) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemReadListener#beforeRead()
-	 */
-	@Override
-	public void beforeRead() {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemReadListener#onReadError(java.lang.Exception)
-	 */
-	@Override
-	public void onReadError(Exception ex) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.util.List)
-	 */
-	@Override
-	public void afterWrite(List<? extends S> items) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.util.List)
-	 */
-	@Override
-	public void beforeWrite(List<? extends S> items) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception, java.util.List)
-	 */
-	@Override
-	public void onWriteError(Exception exception, List<? extends S> items) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public void afterProcess(T item, @Nullable S result) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemProcessListener#beforeProcess(java.lang.Object)
-	 */
-	@Override
-	public void beforeProcess(T item) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object, java.lang.Exception)
-	 */
-	@Override
-	public void onProcessError(T item, Exception e) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInProcess(java.lang.Object, java.lang.Throwable)
-	 */
-	@Override
-	public void onSkipInProcess(T item, Throwable t) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
-	 */
-	@Override
-	public void onSkipInRead(Throwable t) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
-	 */
-	@Override
-	public void onSkipInWrite(S item, Throwable t) {
-	}
-
-	@Override
-	public void afterChunkError(ChunkContext context) {
-	}
+public class StepListenerSupport<T,S> extends ItemListenerSupport<T, S>
+	implements StepExecutionListener, ChunkListener, SkipListener<T, S> {
 
 }

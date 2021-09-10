@@ -22,7 +22,7 @@
 			<tasklet ref="dummyTasklet">
 				<listeners>
 					<listener>
-						<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 					</listener>
 					<listener ref="toplevel2" />
 				</listeners>
@@ -49,7 +49,7 @@
 	</job>
 
 	<step-listener id="toplevel1">
-		<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+		<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 	</step-listener>
 	<step-listener id="toplevel2">
 		<beans:bean class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener" />

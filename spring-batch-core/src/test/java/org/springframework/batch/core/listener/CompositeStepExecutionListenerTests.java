@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeStepExecutionListenerTests extends TestCase {
@@ -44,7 +45,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	public void testSetListeners() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
-		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+		listener.setListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -52,7 +53,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 				list.add("fail");
 				return ExitStatus.FAILED;
 			}
-		}, new StepExecutionListenerSupport() {
+		}, new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -72,7 +73,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	public void testSetListener() {
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = new StepExecution("s1", jobExecution);
-		listener.register(new StepExecutionListenerSupport() {
+		listener.register(new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -90,7 +91,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testOpen() {
-		listener.register(new StepExecutionListenerSupport() {
+		listener.register(new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");

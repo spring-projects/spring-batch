@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.core.configuration.xml;
 
-package org.springframework.batch.core.step;
-
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.lang.Nullable;
 
 /**
- * Fails the step if no items have been processed ( item count is 0).
- *
- * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-public class NoWorkFoundStepExecutionListener implements StepExecutionListener {
-
-	@Nullable
-	@Override
-	public ExitStatus afterStep(StepExecution stepExecution) {
-		if (stepExecution.getReadCount() == 0) {
-			return ExitStatus.FAILED;
-		}
-		return null;
-	}
-
+public class DummyStepExecutionListener implements StepExecutionListener {
 }

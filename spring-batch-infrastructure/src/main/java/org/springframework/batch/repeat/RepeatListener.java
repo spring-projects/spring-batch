@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package org.springframework.batch.repeat;
  * framework provides callbacks at key points in the processing.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface RepeatListener {
@@ -32,7 +33,8 @@ public interface RepeatListener {
 	 * 
 	 * @param context the current batch context.
 	 */
-	void before(RepeatContext context);
+	default void before(RepeatContext context) {
+	}
 
 	/**
 	 * Called by the framework after each item has been processed, unless the
@@ -42,7 +44,8 @@ public interface RepeatListener {
 	 * @param context the current batch context
 	 * @param result the result of the callback
 	 */
-	void after(RepeatContext context, RepeatStatus result);
+	default void after(RepeatContext context, RepeatStatus result) {
+	}
 
 	/**
 	 * Called once at the start of a complete batch, before any items are
@@ -54,7 +57,8 @@ public interface RepeatListener {
 	 * 
 	 * @param context the current batch context
 	 */
-	void open(RepeatContext context);
+	default void open(RepeatContext context) {
+	}
 
 	/**
 	 * Called when a repeat callback fails by throwing an exception. There will
@@ -67,7 +71,8 @@ public interface RepeatListener {
 	 * @param context the current batch context
 	 * @param e the error that was encountered in an item callback.
 	 */
-	void onError(RepeatContext context, Throwable e);
+	default void onError(RepeatContext context, Throwable e) {
+	}
 
 	/**
 	 * Called once at the end of a complete batch, after normal or abnormal
@@ -76,5 +81,6 @@ public interface RepeatListener {
 	 * 
 	 * @param context the current batch context.
 	 */
-	void close(RepeatContext context);
+	default void close(RepeatContext context) {
+	}
 }

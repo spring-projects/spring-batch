@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 the original author or authors.
+ * Copyright 2008-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
@@ -62,6 +61,7 @@ import static org.springframework.batch.core.BatchStatus.UNKNOWN;
  * @author Lucas Ward
  * @author Dave Syer
  * @author David Turanski
+ * @author Mahmoud Ben Hassine
  *
  */
 public class TaskletStepExceptionTests {
@@ -139,7 +139,7 @@ public class TaskletStepExceptionTests {
 	public void testBeforeStepFailure() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
-		taskletStep.setStepExecutionListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() {
+		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
 				throw exception;
@@ -155,7 +155,7 @@ public class TaskletStepExceptionTests {
 	public void testAfterStepFailureWhenTaskletSucceeds() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
-		taskletStep.setStepExecutionListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() {
+		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -184,7 +184,7 @@ public class TaskletStepExceptionTests {
 	public void testAfterStepFailureWhenTaskletFails() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
-		taskletStep.setStepExecutionListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() {
+		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -480,7 +480,7 @@ public class TaskletStepExceptionTests {
 		}
 	}
 
-	private static class InterruptionListener extends StepExecutionListenerSupport {
+	private static class InterruptionListener implements StepExecutionListener {
 
 		@Override
 		public void beforeStep(StepExecution stepExecution) {

@@ -11,7 +11,7 @@
 			<tasklet ref="dummyTasklet" />
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 				</listener>
 			</listeners>
 		</step>
@@ -19,7 +19,7 @@
 			<tasklet ref="dummyTasklet" />
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.ChunkListenerSupport" />
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyChunkListener" />
 				</listener>
 			</listeners>
 		</step>
@@ -27,13 +27,13 @@
 			<tasklet ref="dummyTasklet">
 				<listeners>
 					<listener>
-						<beans:bean class="org.springframework.batch.core.listener.ChunkListenerSupport" />
+						<beans:bean class="org.springframework.batch.core.configuration.xml.DummyChunkListener" />
 					</listener>
 				</listeners>
 			</tasklet>
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 				</listener>
 			</listeners>
 		</step>
@@ -49,7 +49,7 @@
 			</tasklet>
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 				</listener>
 			</listeners>
 		</step>

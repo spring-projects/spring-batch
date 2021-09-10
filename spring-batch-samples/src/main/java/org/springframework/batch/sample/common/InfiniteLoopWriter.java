@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -30,9 +30,10 @@ import org.springframework.batch.item.ItemWriter;
  * jobs.
  * 
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * 
  */
-public class InfiniteLoopWriter extends StepExecutionListenerSupport implements ItemWriter<Object> {
+public class InfiniteLoopWriter implements StepExecutionListener, ItemWriter<Object> {
 	private static final Log LOG = LogFactory.getLog(InfiniteLoopWriter.class);
 
 	private StepExecution stepExecution;

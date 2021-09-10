@@ -230,7 +230,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testRunNormallyWithListener() throws Exception {
-		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void beforeJob(JobExecution jobExecution) {
 				list.add("before");
@@ -310,7 +310,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testFailedWithListener() throws Exception {
-		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
+		job.setJobExecutionListeners(new JobExecutionListener[] { new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("afterJob");

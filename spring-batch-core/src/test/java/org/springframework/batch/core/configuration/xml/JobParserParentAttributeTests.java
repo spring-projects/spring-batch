@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * @author Dan Garrette
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @ContextConfiguration
@@ -80,7 +81,7 @@ public class JobParserParentAttributeTests {
 			if (l instanceof DummyAnnotationJobExecutionListener) {
 				a = true;
 			}
-			else if (l instanceof JobExecutionListenerSupport) {
+			else if (l instanceof DummyJobExecutionListener) {
 				b = true;
 			}
 		}
@@ -94,7 +95,7 @@ public class JobParserParentAttributeTests {
 		assertEquals(1, job2Listeners.size());
 		boolean c = false;
 		for (Object l : job2Listeners) {
-			if (l instanceof JobExecutionListenerSupport) {
+			if (l instanceof DummyJobExecutionListener) {
 				c = true;
 			}
 		}
@@ -111,7 +112,7 @@ public class JobParserParentAttributeTests {
 			if (l instanceof DummyAnnotationJobExecutionListener) {
 				a = true;
 			}
-			else if (l instanceof JobExecutionListenerSupport) {
+			else if (l instanceof DummyJobExecutionListener) {
 				b = true;
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.ChunkListenerSupport;
 import org.springframework.batch.core.listener.ItemListenerSupport;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +37,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @ContextConfiguration
@@ -52,7 +52,7 @@ public class StepListenerInStepParserTests {
 		Step step = (Step) beanFactory.getBean("s1");
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
+		assertTrue(list.get(0) instanceof DummyStepExecutionListener );
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class StepListenerInStepParserTests {
 		Step step = (Step) beanFactory.getBean("s2");
 		List<?> list = getListeners(step);
 		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof ChunkListenerSupport);
+		assertTrue(list.get(0) instanceof DummyChunkListener);
 	}
 
 	@Test
@@ -69,8 +69,8 @@ public class StepListenerInStepParserTests {
 		Step step = (Step) beanFactory.getBean("s3");
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
-		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
-		assertTrue(list.get(1) instanceof ChunkListenerSupport);
+		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
+		assertTrue(list.get(1) instanceof DummyChunkListener);
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class StepListenerInStepParserTests {
 		Step step = (Step) beanFactory.getBean("s4");
 		List<?> list = getListeners(step);
 		assertEquals(2, list.size());
-		assertTrue(list.get(0) instanceof StepExecutionListenerSupport);
+		assertTrue(list.get(0) instanceof DummyStepExecutionListener);
 		assertTrue(list.get(1) instanceof ItemListenerSupport);
 	}
 

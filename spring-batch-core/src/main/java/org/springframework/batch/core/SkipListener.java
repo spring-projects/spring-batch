@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ package org.springframework.batch.core;
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface SkipListener<T,S> extends StepListener {
@@ -37,7 +38,8 @@ public interface SkipListener<T,S> extends StepListener {
 	 * 
 	 * @param t cause of the failure
 	 */
-	void onSkipInRead(Throwable t);
+	default void onSkipInRead(Throwable t) {
+	}
 
 	/**
 	 * This item failed on write with the given exception, and a skip was called
@@ -46,7 +48,8 @@ public interface SkipListener<T,S> extends StepListener {
 	 * @param item the failed item
 	 * @param t the cause of the failure
 	 */
-	void onSkipInWrite(S item, Throwable t);
+	default void onSkipInWrite(S item, Throwable t) {
+	}
 
 	/**
 	 * This item failed on processing with the given exception, and a skip was called
@@ -55,6 +58,7 @@ public interface SkipListener<T,S> extends StepListener {
 	 * @param item the failed item
 	 * @param t the cause of the failure
 	 */
-	void onSkipInProcess(T item, Throwable t);
+	default void onSkipInProcess(T item, Throwable t) {
+	}
 
 }

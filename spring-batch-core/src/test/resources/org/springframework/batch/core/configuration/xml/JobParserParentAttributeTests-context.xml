@@ -14,7 +14,7 @@
 		<listeners merge="true">
 			<listener>
 				<beans:bean
-					class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+					class="org.springframework.batch.core.configuration.xml.DummyJobExecutionListener" />
 			</listener>
 		</listeners>
 	</job>
@@ -27,7 +27,7 @@
 		<listeners>
 			<listener>
 				<beans:bean
-					class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+					class="org.springframework.batch.core.configuration.xml.DummyJobExecutionListener" />
 			</listener>
 		</listeners>
 	</job>
@@ -88,7 +88,7 @@
 			<beans:list>
 				<job-listener>
 					<beans:bean
-						class="org.springframework.batch.core.listener.JobExecutionListenerSupport" />
+						class="org.springframework.batch.core.configuration.xml.DummyJobExecutionListener" />
 				</job-listener>
 			</beans:list>
 		</beans:property>

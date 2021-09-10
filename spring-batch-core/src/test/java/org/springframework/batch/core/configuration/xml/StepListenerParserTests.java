@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008 the original author or authors.
+ * Copyright 2002-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.ItemListenerSupport;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,6 +37,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 @ContextConfiguration
@@ -69,7 +69,7 @@ public class StepListenerParserTests {
 			if (listener instanceof DummyAnnotationStepExecutionListener) {
 				a = true;
 			}
-			else if (listener instanceof StepExecutionListenerSupport) {
+			else if (listener instanceof DummyStepExecutionListener) {
 				b = true;
 			}
 			else if (listener instanceof CompositeStepExecutionListener) {
@@ -93,7 +93,7 @@ public class StepListenerParserTests {
 			if (listener instanceof DummyAnnotationStepExecutionListener) {
 				a = true;
 			}
-			else if (listener instanceof StepExecutionListenerSupport) {
+			else if (listener instanceof DummyStepExecutionListener) {
 				b = true;
 			}
 		}

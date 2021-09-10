@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -59,8 +59,9 @@ import org.springframework.util.Assert;
  *
  * @author Robert Kasanicky
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  */
-public class SystemCommandTasklet extends StepExecutionListenerSupport implements StoppableTasklet, InitializingBean {
+public class SystemCommandTasklet implements StepExecutionListener, StoppableTasklet, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
 

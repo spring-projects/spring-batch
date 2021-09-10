@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,9 +38,10 @@ import org.springframework.util.Assert;
  * promotion will only occur for steps with an exit code of "COMPLETED".
  *
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class ExecutionContextPromotionListener extends StepExecutionListenerSupport implements InitializingBean {
+public class ExecutionContextPromotionListener implements StepExecutionListener, InitializingBean {
 
 	private String[] keys = null;
 

@@ -34,7 +34,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
@@ -170,16 +169,16 @@ public class StepParserTests {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		// Inline Step
-		assertTrue(getListener("s1", ctx) instanceof StepExecutionListenerSupport);
+		assertTrue(getListener("s1", ctx) instanceof DummyStepExecutionListener);
 
 		// Standalone Step
-		assertTrue(getListener("s2", ctx) instanceof StepExecutionListenerSupport);
+		assertTrue(getListener("s2", ctx) instanceof DummyStepExecutionListener);
 
 		// Inline With Tasklet Attribute Step
-		assertTrue(getListener("s3", ctx) instanceof StepExecutionListenerSupport);
+		assertTrue(getListener("s3", ctx) instanceof DummyStepExecutionListener);
 
 		// Standalone With Tasklet Attribute Step
-		assertTrue(getListener("s4", ctx) instanceof StepExecutionListenerSupport);
+		assertTrue(getListener("s4", ctx) instanceof DummyStepExecutionListener);
 	}
 
 	@Test
@@ -442,7 +441,7 @@ public class StepParserTests {
 		List<Class<? extends ItemStream>> streams = Arrays.asList(CompositeItemStream.class, TestReader.class);
 		List<Class<? extends RetryListener>> retryListeners = Arrays.asList(RetryListenerSupport.class,
 				DummyRetryListener.class);
-		List<Class<? extends StepExecutionListener>> stepListeners = Arrays.asList(StepExecutionListenerSupport.class,
+		List<Class<? extends StepExecutionListener>> stepListeners = Arrays.asList(DummyStepExecutionListener.class,
 				CompositeStepExecutionListener.class);
 		List<Class<? extends SkippableRuntimeException>> noRollback = Arrays.asList(FatalRuntimeException.class,
 				SkippableRuntimeException.class);

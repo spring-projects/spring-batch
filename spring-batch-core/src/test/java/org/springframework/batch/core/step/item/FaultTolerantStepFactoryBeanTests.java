@@ -543,7 +543,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		final List<Throwable> listenerCalls = new ArrayList<>();
 
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				listenerCalls.add(t);
@@ -578,7 +578,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				throw new RuntimeException("oops");
@@ -613,7 +613,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				throw new RuntimeException("oops");

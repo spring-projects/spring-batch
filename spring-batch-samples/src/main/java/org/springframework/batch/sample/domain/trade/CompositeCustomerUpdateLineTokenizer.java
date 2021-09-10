@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.springframework.batch.sample.domain.trade;
 
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.lang.Nullable;
@@ -29,9 +29,10 @@ import org.springframework.lang.Nullable;
  * will delegate accordingly.
  * 
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerSupport implements LineTokenizer {
+public class CompositeCustomerUpdateLineTokenizer implements StepExecutionListener, LineTokenizer {
 
 	private LineTokenizer customerTokenizer;
 	private LineTokenizer footerTokenizer;

@@ -30,7 +30,8 @@ public interface ItemReadListener<T> extends StepListener {
 	/**
 	 * Called before {@link ItemReader#read()}
 	 */
-	void beforeRead();
+	default void beforeRead() {
+	}
 	
 	/**
 	 * Called after {@link ItemReader#read()}.
@@ -39,12 +40,14 @@ public interface ItemReadListener<T> extends StepListener {
 	 * 
 	 * @param item returned from read()
 	 */
-	void afterRead(T item);
+	default void afterRead(T item) {
+	}
 	
 	/**
 	 * Called if an error occurs while trying to read.
 	 * 
 	 * @param ex thrown from {@link ItemReader}
 	 */
-	void onReadError(Exception ex);
+	default void onReadError(Exception ex) {
+	}
 }

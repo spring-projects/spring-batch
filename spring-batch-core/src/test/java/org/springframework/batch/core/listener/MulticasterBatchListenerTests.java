@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.annotation.AfterChunk;
@@ -401,11 +402,10 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInRead() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
-				super.onSkipInRead(t);
 			}
 		});
 		multicast.onSkipInRead(new RuntimeException("foo"));
@@ -419,7 +419,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInReadFails() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
@@ -445,11 +445,10 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWrite() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
-				super.onSkipInWrite(item, t);
 			}
 		});
 		multicast.onSkipInWrite(null, new RuntimeException("foo"));
@@ -463,7 +462,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWriteFails() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
@@ -489,11 +488,10 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInProcess() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
 				count++;
-				super.onSkipInWrite(item, t);
 			}
 		});
 		multicast.onSkipInProcess(null, new RuntimeException("foo"));
@@ -507,7 +505,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInProcessFails() {
-		multicast.register(new SkipListenerSupport<Object,Object>() {
+		multicast.register(new SkipListener<Object,Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
 				count++;

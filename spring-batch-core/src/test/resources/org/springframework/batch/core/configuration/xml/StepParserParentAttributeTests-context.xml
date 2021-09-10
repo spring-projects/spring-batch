@@ -86,7 +86,7 @@
 			<transaction-attributes timeout="10"/>
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener" />
 				</listener>
 			</listeners>
 		</tasklet>
@@ -168,7 +168,7 @@
 			</chunk>
 			<listeners>
 				<listener>
-					<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+					<beans:bean class="org.springframework.batch.core.configuration.xml.DummyStepExecutionListener"/>
 				</listener>
 			</listeners>
 			<no-rollback-exception-classes>

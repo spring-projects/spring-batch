@@ -39,7 +39,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
@@ -326,7 +325,7 @@ public class TaskletStepTests {
 		};
 
 		step.setTasklet(new TestingChunkOrientedTasklet<>(itemReader, itemWriter));
-		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
+		step.registerStepExecutionListener(new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -497,7 +496,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testDirectlyInjectedListener() throws Exception {
-		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
+		step.registerStepExecutionListener(new StepExecutionListener() {
 			@Override
 			public void beforeStep(StepExecution stepExecution) {
 				list.add("foo");
@@ -542,7 +541,7 @@ public class TaskletStepTests {
 
 		final ExitStatus customStatus = new ExitStatus("COMPLETED_CUSTOM");
 
-		step.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
+		step.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -566,7 +565,7 @@ public class TaskletStepTests {
 
 	@Test
 	public void testDirectlyInjectedListenerOnError() throws Exception {
-		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
+		step.registerStepExecutionListener(new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -877,7 +876,7 @@ public class TaskletStepTests {
 	 */
 	@Test
 	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
-		StepExecutionListener listener = new StepExecutionListenerSupport() {
+		StepExecutionListener listener = new StepExecutionListener() {
 			@Nullable
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {

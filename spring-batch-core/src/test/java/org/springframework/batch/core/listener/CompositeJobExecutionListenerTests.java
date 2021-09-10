@@ -22,10 +22,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class CompositeJobExecutionListenerTests extends TestCase {
@@ -39,12 +41,12 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#setListeners(List)}
 	 */
 	public void testSetListeners() {
-		listener.setListeners(Arrays.asList(new JobExecutionListenerSupport() {
+		listener.setListeners(Arrays.asList(new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
 			}
-		}, new JobExecutionListenerSupport() {
+		}, new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("continue");
@@ -60,7 +62,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testSetListener() {
-		listener.register(new JobExecutionListenerSupport() {
+		listener.register(new JobExecutionListener() {
 			@Override
 			public void afterJob(JobExecution jobExecution) {
 				list.add("fail");
@@ -76,7 +78,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 	 * .
 	 */
 	public void testOpen() {
-		listener.register(new JobExecutionListenerSupport() {
+		listener.register(new JobExecutionListener() {
 			@Override
 			public void beforeJob(JobExecution stepExecution) {
 				list.add("foo");

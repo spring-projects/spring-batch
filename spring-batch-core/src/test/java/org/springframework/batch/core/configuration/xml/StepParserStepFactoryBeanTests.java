@@ -23,10 +23,10 @@ import org.junit.Test;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.FlowStep;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.PartitionStep;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
@@ -54,6 +54,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dan Garrette
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class StepParserStepFactoryBeanTests {
@@ -108,7 +109,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStartLimit(5);
 		fb.setTasklet(new DummyTasklet());
 		fb.setTransactionManager(new ResourcelessTransactionManager());
-		fb.setListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepExecutionListener[] { new StepExecutionListener() {} });
 		fb.setIsolation(Isolation.DEFAULT);
 		fb.setTransactionTimeout(-1);
 		fb.setPropagation(Propagation.REQUIRED);
@@ -140,7 +141,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener() {} });
 		fb.setIsolation(Isolation.DEFAULT);
 		fb.setTransactionTimeout(-1);
 		fb.setPropagation(Propagation.REQUIRED);
@@ -166,7 +167,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener() {} });
 		fb.setIsolation(Isolation.DEFAULT);
 		fb.setTransactionTimeout(-1);
 		fb.setPropagation(Propagation.REQUIRED);
@@ -200,7 +201,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener() {} });
 		fb.setIsolation(Isolation.DEFAULT);
 		fb.setTransactionTimeout(-1);
 		fb.setPropagation(Propagation.REQUIRED);
@@ -226,7 +227,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener(){} });
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setTaskExecutor(new SyncTaskExecutor());
 		fb.setItemReader(new DummyItemReader());
@@ -264,7 +265,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener(){} });
 		fb.setTaskExecutor(new SyncTaskExecutor());
 
 		SimplePartitioner partitioner = new SimplePartitioner();
@@ -284,7 +285,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener(){} });
 		fb.setTaskExecutor(new SyncTaskExecutor());
 
 		SimplePartitioner partitioner = new SimplePartitioner();
@@ -307,7 +308,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
 		fb.setStartLimit(5);
-		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
+		fb.setListeners(new StepListener[] { new StepExecutionListener(){} });
 		fb.setTaskExecutor(new SyncTaskExecutor());
 
 		fb.setFlow(new SimpleFlow("foo"));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class CompositeRepeatListenerTests extends TestCase {
@@ -39,12 +40,12 @@ public class CompositeRepeatListenerTests extends TestCase {
 	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.
 	 */
 	public void testSetListeners() {
-		listener.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		listener.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void open(RepeatContext context) {
 				list.add("fail");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void open(RepeatContext context) {
 				list.add("continue");
@@ -59,7 +60,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	 * {@link CompositeRepeatListener#register(RepeatListener)}.
 	 */
 	public void testSetListener() {
-		listener.register(new RepeatListenerSupport() {
+		listener.register(new RepeatListener() {
             @Override
 			public void before(RepeatContext context) {
 				list.add("fail");
@@ -70,7 +71,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	}
 
 	public void testClose() {
-		listener.register(new RepeatListenerSupport() {
+		listener.register(new RepeatListener() {
             @Override
 			public void close(RepeatContext context) {
 				list.add("foo");
@@ -81,7 +82,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	}
 
 	public void testOnError() {
-		listener.register(new RepeatListenerSupport() {
+		listener.register(new RepeatListener() {
             @Override
 			public void onError(RepeatContext context, Throwable e) {
 				list.add(e);

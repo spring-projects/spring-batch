@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testBeforeInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void before(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void before(RepeatContext context) {
 				calls.add("2");
@@ -65,7 +65,7 @@ public class RepeatListenerTests extends TestCase {
 	public void testBeforeInterceptorCanVeto() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.registerListener(new RepeatListenerSupport() {
+		template.registerListener(new RepeatListener() {
             @Override
 			public void before(RepeatContext context) {
 				calls.add("1");
@@ -87,12 +87,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testAfterInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("2");
@@ -114,12 +114,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testOpenInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void open(RepeatContext context) {
 				calls.add("2");
@@ -140,7 +140,7 @@ public class RepeatListenerTests extends TestCase {
 	public void testSingleOpenInterceptor() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.registerListener(new RepeatListenerSupport() {
+		template.registerListener(new RepeatListener() {
             @Override
 			public void open(RepeatContext context) {
 				calls.add("1");
@@ -161,12 +161,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testCloseInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void close(RepeatContext context) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void close(RepeatContext context) {
 				calls.add("2");
@@ -189,12 +189,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
@@ -219,12 +219,12 @@ public class RepeatListenerTests extends TestCase {
 	public void testOnErrorInterceptorsPrecedence() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
@@ -252,12 +252,12 @@ public class RepeatListenerTests extends TestCase {
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		final List<Object> calls = new ArrayList<>();
 		final List<Object> fails = new ArrayList<>();
-		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
+		template.setListeners(new RepeatListener[] { new RepeatListener() {
             @Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
-		}, new RepeatListenerSupport() {
+		}, new RepeatListener() {
             @Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");

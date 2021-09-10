@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.batch.item.ItemWriter;
  *</p>
  *
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface ItemWriteListener<S> extends StepListener {
@@ -47,7 +48,8 @@ public interface ItemWriteListener<S> extends StepListener {
 	 *
 	 * @param items to be written
 	 */
-	void beforeWrite(List<? extends S> items);
+	default void beforeWrite(List<? extends S> items) {
+	}
 
 	/**
 	 * Called after {@link ItemWriter#write(java.util.List)} This will be
@@ -56,7 +58,8 @@ public interface ItemWriteListener<S> extends StepListener {
 	 *
 	 * @param items written items
 	 */
-	void afterWrite(List<? extends S> items);
+	default void afterWrite(List<? extends S> items) {
+	}
 
 	/**
 	 * Called if an error occurs while trying to write. Will be called inside a
@@ -67,5 +70,6 @@ public interface ItemWriteListener<S> extends StepListener {
 	 * @param exception thrown from {@link ItemWriter}
 	 * @param items attempted to be written.
 	 */
-	void onWriteError(Exception exception, List<? extends S> items);
+	default void onWriteError(Exception exception, List<? extends S> items) {
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,12 @@ import org.springframework.batch.core.SkipListener;
  * Basic no-op implementations of all {@link SkipListener} implementations.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
+ *
+ * @deprecated as of v5.0 in favor of the default methods in {@link SkipListener}.
  *
  */
+@Deprecated
 public class SkipListenerSupport<T,S> implements SkipListener<T,S> {
 
 	/* (non-Javadoc)

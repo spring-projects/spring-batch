@@ -33,6 +33,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
@@ -452,7 +453,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Test
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
@@ -517,7 +518,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			throws Exception {
 
 		factory.setCommitInterval(3);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
+		factory.setListeners(new StepListener[] { new SkipListener<String, String>() {
 			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
