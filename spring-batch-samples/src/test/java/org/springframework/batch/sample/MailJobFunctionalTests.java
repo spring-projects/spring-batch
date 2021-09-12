@@ -32,7 +32,6 @@ import org.springframework.batch.sample.domain.mail.internal.TestMailErrorHandle
 import org.springframework.batch.sample.domain.mail.internal.TestMailSender;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;

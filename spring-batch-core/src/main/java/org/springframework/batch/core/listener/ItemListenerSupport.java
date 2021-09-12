@@ -15,12 +15,9 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.List;
-
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.lang.Nullable;
 
 /**
  * Basic no-op implementation of the {@link ItemReadListener},

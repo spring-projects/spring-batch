@@ -16,7 +16,6 @@
 package org.springframework.batch.core;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 
 /**
  * Listener interface around the reading of an item.

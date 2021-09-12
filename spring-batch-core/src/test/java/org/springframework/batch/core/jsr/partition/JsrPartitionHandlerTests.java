@@ -28,7 +28,6 @@ import org.springframework.batch.core.jsr.configuration.support.BatchPropertyCon
 import org.springframework.batch.core.jsr.step.batchlet.BatchletSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;

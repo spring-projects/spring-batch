@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.batch.core.configuration.BatchConfigurationException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;

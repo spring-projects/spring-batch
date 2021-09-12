@@ -25,7 +25,6 @@ import org.hibernate.context.spi.CurrentSessionContext;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.orm.hibernate5.HibernateOperations;
 import org.springframework.util.Assert;
 
 /**

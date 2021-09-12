@@ -23,8 +23,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import javax.sql.DataSource;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
