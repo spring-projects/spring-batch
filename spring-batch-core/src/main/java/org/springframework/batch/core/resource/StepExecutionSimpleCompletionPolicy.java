@@ -69,7 +69,7 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	 * key name, the intValue of this parameter is used. If not an exception
 	 * will be thrown.
 	 *
-	 * @see org.springframework.batch.core.listener.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
+	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
