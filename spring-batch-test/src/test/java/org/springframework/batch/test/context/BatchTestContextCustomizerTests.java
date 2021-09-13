@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class BatchTestContextCustomizerTest {
+public class BatchTestContextCustomizerTests {
 
 	private BatchTestContextCustomizer contextCustomizer = new BatchTestContextCustomizer();
 

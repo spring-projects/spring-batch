@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class RemoteChunkingWorkerBuilderTest {
+public class RemoteChunkingWorkerBuilderTests {
 
 	private ItemProcessor<String, String> itemProcessor = new PassThroughItemProcessor<>();
 	private ItemWriter<String> itemWriter = items -> { };

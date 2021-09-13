@@ -33,7 +33,7 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JsonItemReaderBuilderTest {
+public class JsonItemReaderBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();

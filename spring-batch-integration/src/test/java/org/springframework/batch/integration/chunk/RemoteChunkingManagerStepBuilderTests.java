@@ -75,8 +75,8 @@ import static org.mockito.Mockito.when;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemoteChunkingManagerStepBuilderTest.BatchConfiguration.class})
-public class RemoteChunkingManagerStepBuilderTest {
+@ContextConfiguration(classes = {RemoteChunkingManagerStepBuilderTests.BatchConfiguration.class})
+public class RemoteChunkingManagerStepBuilderTests {
 
 	@Autowired
 	private JobRepository jobRepository;

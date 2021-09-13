@@ -46,5 +46,5 @@
 	<beans:bean id="processor" class="org.springframework.batch.item.support.ScriptItemProcessor"
 				p:script="org/springframework/batch/core/step/item/processor-test-simple.js"/>
 
-	<beans:bean id="writer" class="org.springframework.batch.core.step.item.ScriptItemProcessorTest$TestItemWriter"/>
+	<beans:bean id="writer" class="org.springframework.batch.core.step.item.ScriptItemProcessorTests$TestItemWriter"/>
 </beans:beans>

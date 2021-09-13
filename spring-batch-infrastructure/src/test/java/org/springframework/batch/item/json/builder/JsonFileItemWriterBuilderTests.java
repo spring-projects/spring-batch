@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  */
-public class JsonFileItemWriterBuilderTest {
+public class JsonFileItemWriterBuilderTests {
 
 	private Resource resource;
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
