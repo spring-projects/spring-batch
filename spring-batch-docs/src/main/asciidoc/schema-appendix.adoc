@@ -319,7 +319,7 @@ belongs. There may be more than one row associated with a given execution.
 * `SHORT_CONTEXT`: A string version of the `SERIALIZED_CONTEXT`.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
 
-> If you did create database table, but can't create table follow try something like below
+> If you did create mysql database table, but can't create table follow try something like below!
 ----
 CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
   JOB_EXECUTION_ID BIGINT PRIMARY KEY,
@@ -358,6 +358,17 @@ The following list describes each column:
 belongs. There may be more than one row associated to a given execution.
 * `SHORT_CONTEXT`: A string version of the `SERIALIZED_CONTEXT`.
 * `SERIALIZED_CONTEXT`: The entire context, serialized.
+
+> If you did create mysql database table, but can't create table follow try something like below!
+----
+CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+  STEP_EXECUTION_ID BIGINT PRIMARY KEY,
+  SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+  SERIALIZED_CONTEXT BLOB,
+  constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+  references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+) ;
+----
 
 [[metaDataArchiving]]
 === Archiving
