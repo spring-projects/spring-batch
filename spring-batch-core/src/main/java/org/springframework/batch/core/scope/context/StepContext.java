@@ -129,22 +129,14 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the step {@link ExecutionContext}
 	 */
 	public Map<String, Object> getStepExecutionContext() {
-		Map<String, Object> result = new HashMap<>();
-		for (Entry<String, Object> entry : stepExecution.getExecutionContext().entrySet()) {
-			result.put(entry.getKey(), entry.getValue());
-		}
-		return Collections.unmodifiableMap(result);
+		return stepExecution.getExecutionContext().toMap();
 	}
 
 	/**
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<>();
-		for (Entry<String, Object> entry : stepExecution.getJobExecution().getExecutionContext().entrySet()) {
-			result.put(entry.getKey(), entry.getValue());
-		}
-		return Collections.unmodifiableMap(result);
+		return stepExecution.getJobExecution().getExecutionContext().toMap();
 	}
 
 	/**

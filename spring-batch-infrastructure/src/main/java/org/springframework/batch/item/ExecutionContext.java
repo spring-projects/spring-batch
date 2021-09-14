@@ -17,6 +17,7 @@
 package org.springframework.batch.item;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -71,9 +72,7 @@ public class ExecutionContext implements Serializable {
 		if (executionContext == null) {
 			return;
 		}
-		for (Entry<String, Object> entry : executionContext.entrySet()) {
-			this.map.put(entry.getKey(), entry.getValue());
-		}
+		this.map.putAll(executionContext.toMap());
 	}
 
 	/**
@@ -313,11 +312,21 @@ public class ExecutionContext implements Serializable {
 	/**
 	 * Returns the entry set containing the contents of this context.
 	 *
-	 * @return A set representing the contents of the context
+	 * @return An unmodifiable set representing the contents of the context
 	 * @see java.util.Map#entrySet()
 	 */
 	public Set<Entry<String, Object>> entrySet() {
-		return this.map.entrySet();
+		return Collections.unmodifiableSet(this.map.entrySet());
+	}
+
+	/**
+	 * Returns the internal map as read-only.
+	 *
+	 * @return An unmodifiable map containing all contents.
+	 * @see java.util.Map
+	 */
+	public Map<String, Object> toMap() {
+		return Collections.unmodifiableMap(this.map);
 	}
 
 	/**
