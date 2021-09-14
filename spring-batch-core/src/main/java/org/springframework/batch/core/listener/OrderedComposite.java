@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class OrderedComposite<S> {
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> iterator() {
-		return new ArrayList<>(list).iterator();
+		return Collections.unmodifiableList(list).iterator();
 	}
 
 	/**
