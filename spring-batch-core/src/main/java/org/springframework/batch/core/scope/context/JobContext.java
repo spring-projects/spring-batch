@@ -82,11 +82,7 @@ public class JobContext extends SynchronizedAttributeAccessor {
 	 * @return a map containing the items from the job {@link ExecutionContext}
 	 */
 	public Map<String, Object> getJobExecutionContext() {
-		Map<String, Object> result = new HashMap<>();
-		for (Entry<String, Object> entry : jobExecution.getExecutionContext().entrySet()) {
-			result.put(entry.getKey(), entry.getValue());
-		}
-		return Collections.unmodifiableMap(result);
+		return jobExecution.getExecutionContext().toMap();
 	}
 
 	/**
