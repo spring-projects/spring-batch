@@ -83,7 +83,7 @@ class OrderedComposite<S> {
 	 * @return an iterator over the list of items
 	 */
 	public Iterator<S> iterator() {
-		return new ArrayList<>(list).iterator();
+		return Collections.unmodifiableList(list).iterator();
 	}
 
 	/**
