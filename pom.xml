@@ -49,7 +49,7 @@
 	<properties>
 		<!-- common properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 
 		<!-- production dependencies -->
 		<spring-framework.version>5.3.10-SNAPSHOT</spring-framework.version>
@@ -149,8 +149,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>
