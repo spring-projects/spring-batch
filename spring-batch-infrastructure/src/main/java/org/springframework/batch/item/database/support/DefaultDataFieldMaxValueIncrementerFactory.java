@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  * @author Lucas Ward
  * @author Michael Minella
  * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  * @see DatabaseType
  */
 public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
@@ -113,7 +114,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new SqliteMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		else if (databaseType == SQLSERVER) {
-			return new SqlServerMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			return new SqlServerSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == SYBASE) {
 			return new SybaseMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
