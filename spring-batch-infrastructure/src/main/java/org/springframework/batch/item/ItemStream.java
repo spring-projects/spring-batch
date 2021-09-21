@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ package org.springframework.batch.item;
  * <p>
  * Marker interface defining a contract for periodically storing state and restoring from that state should an error
  * occur.
- * <p>
+ * </p>
  * 
  * @author Dave Syer
  * @author Lucas Ward
+ * @author Mahmoud Ben Hassine
  * 
  */
 public interface ItemStream {
