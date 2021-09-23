@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.batch.core.jsr;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.Metric;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.Metric;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
@@ -32,9 +32,10 @@ import org.springframework.util.ClassUtils;
  * data.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
-public class JsrStepExecution implements javax.batch.runtime.StepExecution{
+public class JsrStepExecution implements jakarta.batch.runtime.StepExecution{
 
 	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private final org.springframework.batch.core.StepExecution stepExecution;
@@ -52,7 +53,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getStepExecutionId()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getStepExecutionId()
 	 */
 	@Override
 	public long getStepExecutionId() {
@@ -60,7 +61,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getStepName()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getStepName()
 	 */
 	@Override
 	public String getStepName() {
@@ -68,7 +69,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getBatchStatus()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getBatchStatus()
 	 */
 	@Override
 	public BatchStatus getBatchStatus() {
@@ -76,7 +77,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getStartTime()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getStartTime()
 	 */
 	@Override
 	public Date getStartTime() {
@@ -84,7 +85,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getEndTime()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getEndTime()
 	 */
 	@Override
 	public Date getEndTime() {
@@ -92,7 +93,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getExitStatus()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getExitStatus()
 	 */
 	@Override
 	public String getExitStatus() {
@@ -106,7 +107,7 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getPersistentUserData()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getPersistentUserData()
 	 */
 	@Override
 	public Serializable getPersistentUserData() {
@@ -114,20 +115,20 @@ public class JsrStepExecution implements javax.batch.runtime.StepExecution{
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.JsrStepExecution#getMetrics()
+	 * @see jakarta.batch.runtime.JsrStepExecution#getMetrics()
 	 */
 	@Override
 	public Metric[] getMetrics() {
 		Metric[] metrics = new Metric[8];
 
-		metrics[0] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.COMMIT_COUNT, stepExecution.getCommitCount());
-		metrics[1] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.FILTER_COUNT, stepExecution.getFilterCount());
-		metrics[2] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.PROCESS_SKIP_COUNT, stepExecution.getProcessSkipCount());
-		metrics[3] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.READ_COUNT, stepExecution.getReadCount());
-		metrics[4] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.READ_SKIP_COUNT, stepExecution.getReadSkipCount());
-		metrics[5] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.ROLLBACK_COUNT, stepExecution.getRollbackCount());
-		metrics[6] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.WRITE_COUNT, stepExecution.getWriteCount());
-		metrics[7] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT, stepExecution.getWriteSkipCount());
+		metrics[0] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.COMMIT_COUNT, stepExecution.getCommitCount());
+		metrics[1] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.FILTER_COUNT, stepExecution.getFilterCount());
+		metrics[2] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.PROCESS_SKIP_COUNT, stepExecution.getProcessSkipCount());
+		metrics[3] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.READ_COUNT, stepExecution.getReadCount());
+		metrics[4] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.READ_SKIP_COUNT, stepExecution.getReadSkipCount());
+		metrics[5] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.ROLLBACK_COUNT, stepExecution.getRollbackCount());
+		metrics[6] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.WRITE_COUNT, stepExecution.getWriteCount());
+		metrics[7] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT, stepExecution.getWriteSkipCount());
 
 		return metrics;
 	}

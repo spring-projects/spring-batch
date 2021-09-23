@@ -20,8 +20,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.batch.api.listener.StepListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.listener.StepListener;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
 import org.junit.Rule;

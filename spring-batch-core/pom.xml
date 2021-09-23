@@ -51,9 +51,9 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>javax.batch</groupId>
-		    <artifactId>javax.batch-api</artifactId>
-			<version>${javax.batch-api.version}</version>
+		    <groupId>jakarta.batch</groupId>
+		    <artifactId>jakarta.batch-api</artifactId>
+			<version>${jakarta.batch-api.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>
@@ -63,9 +63,9 @@
 
 		<!-- optional production dependencies -->
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>${javax.annotation-api.version}</version>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>${jakarta.annotation-api.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -239,9 +239,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>${jaxb-api.version}</version>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>${jakarta.xml.bind-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -263,9 +263,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-			<version>${javax.inject.version}</version>
+			<groupId>jakarta.inject</groupId>
+			<artifactId>jakarta.inject-api</artifactId>
+			<version>${jakarta.inject-api.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

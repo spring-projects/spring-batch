@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.springframework.batch.core.jsr.configuration.xml;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.api.chunk.ItemReader;
-import javax.batch.api.chunk.ItemWriter;
-import javax.batch.api.chunk.listener.RetryProcessListener;
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.api.chunk.listener.RetryWriteListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.chunk.ItemProcessor;
+import jakarta.batch.api.chunk.ItemReader;
+import jakarta.batch.api.chunk.ItemWriter;
+import jakarta.batch.api.chunk.listener.RetryProcessListener;
+import jakarta.batch.api.chunk.listener.RetryReadListener;
+import jakarta.batch.api.chunk.listener.RetryWriteListener;
+import jakarta.batch.operations.BatchRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
@@ -47,6 +47,7 @@ import static org.junit.Assert.assertTrue;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class RetryListenerTests {

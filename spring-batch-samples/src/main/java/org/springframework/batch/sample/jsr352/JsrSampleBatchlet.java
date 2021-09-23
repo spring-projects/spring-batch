@@ -18,13 +18,13 @@ package org.springframework.batch.sample.jsr352;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.batch.api.AbstractBatchlet;
-import javax.batch.api.BatchProperty;
-import javax.inject.Inject;
+import jakarta.batch.api.AbstractBatchlet;
+import jakarta.batch.api.BatchProperty;
+import jakarta.inject.Inject;
 
 /**
  * <p>
- * Sample {@link javax.batch.api.Batchlet} implementation.
+ * Sample {@link jakarta.batch.api.Batchlet} implementation.
  * </p>
  *
  * @since 3.0

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.batch.api.partition.PartitionAnalyzer;
-import javax.batch.api.partition.PartitionCollector;
-import javax.batch.api.partition.PartitionMapper;
-import javax.batch.api.partition.PartitionPlan;
+import jakarta.batch.api.partition.PartitionAnalyzer;
+import jakarta.batch.api.partition.PartitionCollector;
+import jakarta.batch.api.partition.PartitionMapper;
+import jakarta.batch.api.partition.PartitionPlan;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
@@ -443,7 +443,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#getPartitionProperties()
+		 * @see jakarta.batch.api.partition.PartitionPlan#getPartitionProperties()
 		 */
 		@Override
 		public Properties[] getPartitionProperties() {
@@ -451,7 +451,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#getPartitions()
+		 * @see jakarta.batch.api.partition.PartitionPlan#getPartitions()
 		 */
 		@Override
 		public int getPartitions() {
@@ -459,7 +459,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#getThreads()
+		 * @see jakarta.batch.api.partition.PartitionPlan#getThreads()
 		 */
 		@Override
 		public int getThreads() {
@@ -467,7 +467,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#setPartitions(int)
+		 * @see jakarta.batch.api.partition.PartitionPlan#setPartitions(int)
 		 */
 		@Override
 		public void setPartitions(int count) {
@@ -475,7 +475,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#setPartitionsOverride(boolean)
+		 * @see jakarta.batch.api.partition.PartitionPlan#setPartitionsOverride(boolean)
 		 */
 		@Override
 		public void setPartitionsOverride(boolean override) {
@@ -483,7 +483,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#getPartitionsOverride()
+		 * @see jakarta.batch.api.partition.PartitionPlan#getPartitionsOverride()
 		 */
 		@Override
 		public boolean getPartitionsOverride() {
@@ -491,7 +491,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#setThreads(int)
+		 * @see jakarta.batch.api.partition.PartitionPlan#setThreads(int)
 		 */
 		@Override
 		public void setThreads(int count) {
@@ -499,7 +499,7 @@ public class JsrPartitionHandler implements PartitionHandler, InitializingBean {
 		}
 
 		/* (non-Javadoc)
-		 * @see javax.batch.api.partition.PartitionPlan#setPartitionProperties(java.util.Properties[])
+		 * @see jakarta.batch.api.partition.PartitionPlan#setPartitionProperties(java.util.Properties[])
 		 */
 		@Override
 		public void setPartitionProperties(Properties[] props) {

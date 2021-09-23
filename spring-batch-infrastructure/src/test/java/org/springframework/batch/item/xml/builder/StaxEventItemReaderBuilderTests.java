@@ -18,7 +18,7 @@ package org.springframework.batch.item.xml.builder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLInputFactory;
 
 import org.junit.Rule;

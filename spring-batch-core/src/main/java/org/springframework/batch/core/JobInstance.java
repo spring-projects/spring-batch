@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * @see Job
  * @see JobParameters
  * @see JobExecution
- * @see javax.batch.runtime.JobInstance
+ * @see jakarta.batch.runtime.JobInstance
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  *
  */
 @SuppressWarnings("serial")
-public class JobInstance extends Entity implements javax.batch.runtime.JobInstance{
+public class JobInstance extends Entity implements jakarta.batch.runtime.JobInstance{
 
 	private final String jobName;
 

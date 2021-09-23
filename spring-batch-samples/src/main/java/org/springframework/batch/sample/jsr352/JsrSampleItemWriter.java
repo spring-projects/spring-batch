@@ -18,12 +18,12 @@ package org.springframework.batch.sample.jsr352;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.batch.api.chunk.AbstractItemWriter;
+import jakarta.batch.api.chunk.AbstractItemWriter;
 import java.util.List;
 
 /**
  * <p>
- * Sample {@link javax.batch.api.chunk.ItemWriter} implementation.
+ * Sample {@link jakarta.batch.api.chunk.ItemWriter} implementation.
  * </p>
  *
  * @since 3.0

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.batch.api.Decider;
+import jakarta.batch.api.Decider;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
@@ -31,10 +31,11 @@ import org.springframework.batch.item.ExecutionContext;
 /**
  * Implements a {@link Step} to follow the rules for a decision state
  * as defined by JSR-352.  Currently does not support the JSR requirement
- * to provide all of the last {@link javax.batch.runtime.StepExecution}s from
+ * to provide all of the last {@link jakarta.batch.runtime.StepExecution}s from
  * a split.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class DecisionStep extends AbstractStep {
@@ -52,7 +53,7 @@ public class DecisionStep extends AbstractStep {
 	@Override
 	protected void doExecute(StepExecution stepExecution) throws Exception {
 		ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-		List<javax.batch.runtime.StepExecution> stepExecutions = new ArrayList<>();
+		List<jakarta.batch.runtime.StepExecution> stepExecutions = new ArrayList<>();
 
 		if(executionContext.containsKey("batch.lastSteps")) {
 			List<String> stepNames = (List<String>) executionContext.get("batch.lastSteps");
@@ -78,7 +79,7 @@ public class DecisionStep extends AbstractStep {
 		}
 
 		try {
-			ExitStatus exitStatus = new ExitStatus(decider.decide(stepExecutions.toArray(new javax.batch.runtime.StepExecution[0])));
+			ExitStatus exitStatus = new ExitStatus(decider.decide(stepExecutions.toArray(new jakarta.batch.runtime.StepExecution[0])));
 
 			stepExecution.getJobExecution().setExitStatus(exitStatus);
 			stepExecution.setExitStatus(exitStatus);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
@@ -65,7 +65,7 @@ import org.springframework.util.ClassUtils;
  *
  * <p>
  * The reader must be configured with an
- * {@link javax.persistence.EntityManagerFactory}. All entity access is
+ * {@link jakarta.persistence.EntityManagerFactory}. All entity access is
  * performed within a new transaction, independent of any existing Spring
  * managed transactions.
  * </p>
@@ -81,6 +81,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {

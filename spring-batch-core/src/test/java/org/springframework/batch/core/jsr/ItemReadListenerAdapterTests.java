@@ -18,8 +18,8 @@ package org.springframework.batch.core.jsr;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-import javax.batch.api.chunk.listener.ItemReadListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.chunk.listener.ItemReadListener;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
 import org.junit.Rule;

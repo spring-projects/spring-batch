@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.springframework.batch.core.jsr;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.BatchStatus;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -26,7 +26,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class to provide the {@link javax.batch.runtime.context.JobContext} functionality
+ * Wrapper class to provide the {@link jakarta.batch.runtime.context.JobContext} functionality
  * as specified in JSR-352.  Wrapper delegates to the underlying {@link JobExecution} to
  * obtain the related contextual information.
  *
@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 3.0
  */
-public class JsrJobContext implements javax.batch.runtime.context.JobContext {
+public class JsrJobContext implements jakarta.batch.runtime.context.JobContext {
 	private Object transientUserData;
 	private Properties properties;
 	private JobExecution jobExecution;
@@ -51,7 +51,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getJobName()
+	 * @see jakarta.batch.runtime.context.JobContext#getJobName()
 	 */
 	@Override
 	public String getJobName() {
@@ -59,7 +59,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getTransientUserData()
+	 * @see jakarta.batch.runtime.context.JobContext#getTransientUserData()
 	 */
 	@Override
 	public Object getTransientUserData() {
@@ -67,7 +67,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#setTransientUserData(java.lang.Object)
+	 * @see jakarta.batch.runtime.context.JobContext#setTransientUserData(java.lang.Object)
 	 */
 	@Override
 	public void setTransientUserData(Object data) {
@@ -75,7 +75,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getInstanceId()
+	 * @see jakarta.batch.runtime.context.JobContext#getInstanceId()
 	 */
 	@Override
 	public long getInstanceId() {
@@ -83,7 +83,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getExecutionId()
+	 * @see jakarta.batch.runtime.context.JobContext#getExecutionId()
 	 */
 	@Override
 	public long getExecutionId() {
@@ -91,7 +91,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getProperties()
+	 * @see jakarta.batch.runtime.context.JobContext#getProperties()
 	 */
 	@Override
 	public Properties getProperties() {
@@ -99,7 +99,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getBatchStatus()
+	 * @see jakarta.batch.runtime.context.JobContext#getBatchStatus()
 	 */
 	@Override
 	public BatchStatus getBatchStatus() {
@@ -107,7 +107,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#getExitStatus()
+	 * @see jakarta.batch.runtime.context.JobContext#getExitStatus()
 	 */
 	@Override
 	@Nullable
@@ -116,7 +116,7 @@ public class JsrJobContext implements javax.batch.runtime.context.JobContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.JobContext#setExitStatus(java.lang.String)
+	 * @see jakarta.batch.runtime.context.JobContext#setExitStatus(java.lang.String)
 	 */
 	@Override
 	public void setExitStatus(String status) {

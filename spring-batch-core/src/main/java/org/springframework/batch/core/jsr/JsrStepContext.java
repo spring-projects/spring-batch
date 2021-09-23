@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.Metric;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.Metric;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
@@ -30,15 +30,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Wrapper class to provide the {@link javax.batch.runtime.context.StepContext} functionality
+ * Wrapper class to provide the {@link jakarta.batch.runtime.context.StepContext} functionality
  * as specified in JSR-352.  Wrapper delegates to the underlying {@link StepExecution} to
  * obtain the related contextual information.
  *
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
-public class JsrStepContext implements javax.batch.runtime.context.StepContext {
+public class JsrStepContext implements jakarta.batch.runtime.context.StepContext {
 	private final static String PERSISTENT_USER_DATA_KEY = "batch_jsr_persistentUserData";
 	private StepExecution stepExecution;
 	private Object transientUserData;
@@ -54,7 +55,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getStepName()
+	 * @see jakarta.batch.runtime.context.StepContext#getStepName()
 	 */
 	@Override
 	public String getStepName() {
@@ -62,7 +63,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getTransientUserData()
+	 * @see jakarta.batch.runtime.context.StepContext#getTransientUserData()
 	 */
 	@Override
 	public Object getTransientUserData() {
@@ -70,7 +71,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#setTransientUserData(java.lang.Object)
+	 * @see jakarta.batch.runtime.context.StepContext#setTransientUserData(java.lang.Object)
 	 */
 	@Override
 	public void setTransientUserData(Object data) {
@@ -78,7 +79,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getStepExecutionId()
+	 * @see jakarta.batch.runtime.context.StepContext#getStepExecutionId()
 	 */
 	@Override
 	public long getStepExecutionId() {
@@ -86,7 +87,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getProperties()
+	 * @see jakarta.batch.runtime.context.StepContext#getProperties()
 	 */
 	@Override
 	public Properties getProperties() {
@@ -94,7 +95,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getPersistentUserData()
+	 * @see jakarta.batch.runtime.context.StepContext#getPersistentUserData()
 	 */
 	@Override
 	public Serializable getPersistentUserData() {
@@ -102,7 +103,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#setPersistentUserData(java.io.Serializable)
+	 * @see jakarta.batch.runtime.context.StepContext#setPersistentUserData(java.io.Serializable)
 	 */
 	@Override
 	public void setPersistentUserData(Serializable data) {
@@ -110,7 +111,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getBatchStatus()
+	 * @see jakarta.batch.runtime.context.StepContext#getBatchStatus()
 	 */
 	@Override
 	public BatchStatus getBatchStatus() {
@@ -118,7 +119,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getExitStatus()
+	 * @see jakarta.batch.runtime.context.StepContext#getExitStatus()
 	 */
 	@Override
 	public String getExitStatus() {
@@ -126,7 +127,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#setExitStatus(java.lang.String)
+	 * @see jakarta.batch.runtime.context.StepContext#setExitStatus(java.lang.String)
 	 */
 	@Override
 	public void setExitStatus(String status) {
@@ -142,7 +143,7 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	 * instead of {@link Exception}, it will be wrapped in an {@link Exception} and
 	 * then returned.
 	 *
-	 * @see javax.batch.runtime.context.StepContext#getException()
+	 * @see jakarta.batch.runtime.context.StepContext#getException()
 	 */
 	@Override
 	public Exception getException() {
@@ -161,20 +162,20 @@ public class JsrStepContext implements javax.batch.runtime.context.StepContext {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.context.StepContext#getMetrics()
+	 * @see jakarta.batch.runtime.context.StepContext#getMetrics()
 	 */
 	@Override
 	public Metric[] getMetrics() {
 		Metric[] metrics = new Metric[8];
 
-		metrics[0] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.COMMIT_COUNT, stepExecution.getCommitCount());
-		metrics[1] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.FILTER_COUNT, stepExecution.getFilterCount());
-		metrics[2] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.PROCESS_SKIP_COUNT, stepExecution.getProcessSkipCount());
-		metrics[3] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.READ_COUNT, stepExecution.getReadCount());
-		metrics[4] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.READ_SKIP_COUNT, stepExecution.getReadSkipCount());
-		metrics[5] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.ROLLBACK_COUNT, stepExecution.getRollbackCount());
-		metrics[6] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.WRITE_COUNT, stepExecution.getWriteCount());
-		metrics[7] = new SimpleMetric(javax.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT, stepExecution.getWriteSkipCount());
+		metrics[0] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.COMMIT_COUNT, stepExecution.getCommitCount());
+		metrics[1] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.FILTER_COUNT, stepExecution.getFilterCount());
+		metrics[2] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.PROCESS_SKIP_COUNT, stepExecution.getProcessSkipCount());
+		metrics[3] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.READ_COUNT, stepExecution.getReadCount());
+		metrics[4] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.READ_SKIP_COUNT, stepExecution.getReadSkipCount());
+		metrics[5] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.ROLLBACK_COUNT, stepExecution.getRollbackCount());
+		metrics[6] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.WRITE_COUNT, stepExecution.getWriteCount());
+		metrics[7] = new SimpleMetric(jakarta.batch.runtime.Metric.MetricType.WRITE_SKIP_COUNT, stepExecution.getWriteSkipCount());
 
 		return metrics;
 	}

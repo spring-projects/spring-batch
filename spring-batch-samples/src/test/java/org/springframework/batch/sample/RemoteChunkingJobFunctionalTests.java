@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.sample;
 
-import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,22 +51,23 @@ public class RemoteChunkingJobFunctionalTests {
 
 	private static final String BROKER_DATA_DIRECTORY = "target/activemq-data";
 
-	@Value("${broker.url}")
-	private String brokerUrl;
-
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
-	private BrokerService brokerService;
+	private static EmbeddedActiveMQ brokerService;
 
 	private AnnotationConfigApplicationContext workerApplicationContext;
 
 	@Before
 	public void setUp() throws Exception {
-		this.brokerService = new BrokerService();
-		this.brokerService.addConnector(this.brokerUrl);
-		this.brokerService.setDataDirectory(BROKER_DATA_DIRECTORY);
-		this.brokerService.start();
+		Configuration configuration =
+				new ConfigurationImpl()
+						.addAcceptorConfiguration("jms", "tcp://localhost:61616")
+						.setPersistenceEnabled(false)
+						.setSecurityEnabled(false)
+						.setJMXManagementEnabled(false)
+						.setJournalDatasync(false);
+		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
 	}
 

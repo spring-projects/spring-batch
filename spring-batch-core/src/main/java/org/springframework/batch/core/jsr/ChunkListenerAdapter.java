@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -23,20 +23,21 @@ import org.springframework.batch.core.step.tasklet.UncheckedTransactionException
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class to adapt the {@link javax.batch.api.chunk.listener.ChunkListener} to
+ * Wrapper class to adapt the {@link jakarta.batch.api.chunk.listener.ChunkListener} to
  * a {@link ChunkListener}.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class ChunkListenerAdapter implements ChunkListener {
 
-	private final javax.batch.api.chunk.listener.ChunkListener delegate;
+	private final jakarta.batch.api.chunk.listener.ChunkListener delegate;
 
 	/**
 	 * @param delegate to be called within the step chunk lifecycle
 	 */
-	public ChunkListenerAdapter(javax.batch.api.chunk.listener.ChunkListener delegate) {
+	public ChunkListenerAdapter(jakarta.batch.api.chunk.listener.ChunkListener delegate) {
 		Assert.notNull(delegate, "A ChunkListener is required");
 		this.delegate = delegate;
 	}

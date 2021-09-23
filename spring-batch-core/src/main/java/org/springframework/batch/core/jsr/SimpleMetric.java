@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.batch.runtime.Metric;
+import jakarta.batch.runtime.Metric;
 
 import org.springframework.util.Assert;
 
@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
  * Simple implementation of the {@link Metric} interface as required by JSR-352.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class SimpleMetric implements Metric {
@@ -45,7 +46,7 @@ public class SimpleMetric implements Metric {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.Metric#getType()
+	 * @see jakarta.batch.runtime.Metric#getType()
 	 */
 	@Override
 	public MetricType getType() {
@@ -53,7 +54,7 @@ public class SimpleMetric implements Metric {
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.runtime.Metric#getValue()
+	 * @see jakarta.batch.runtime.Metric#getValue()
 	 */
 	@Override
 	public long getValue() {

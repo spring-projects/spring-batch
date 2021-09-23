@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +42,7 @@ import org.springframework.util.ReflectionUtils;
 /**
  * @author Dave Syer
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  * 
  * @since 2.1
  * 

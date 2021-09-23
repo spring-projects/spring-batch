@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 /**
  * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template
@@ -37,6 +37,7 @@ import javax.jms.Message;
  * singleton behavior).
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {

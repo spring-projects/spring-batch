@@ -98,7 +98,7 @@ class SpringAutowiredAnnotationBeanPostProcessor implements SmartInstantiationAw
     /**
      * Create a new AutowiredAnnotationBeanPostProcessor
      * for Spring's standard {@link org.springframework.beans.factory.annotation.Autowired} annotation.
-     * <p>Also supports JSR-330's {@link javax.inject.Inject} annotation, if available.
+     * <p>Also supports JSR-330's {@link jakarta.inject.Inject} annotation, if available.
      */
     @SuppressWarnings("unchecked")
     public SpringAutowiredAnnotationBeanPostProcessor() {
@@ -106,8 +106,8 @@ class SpringAutowiredAnnotationBeanPostProcessor implements SmartInstantiationAw
         this.autowiredAnnotationTypes.add(Value.class);
         ClassLoader cl = SpringAutowiredAnnotationBeanPostProcessor.class.getClassLoader();
         try {
-            this.autowiredAnnotationTypes.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
-            logger.info("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
+            this.autowiredAnnotationTypes.add((Class<? extends Annotation>) cl.loadClass("jakarta.inject.Inject"));
+            logger.info("JSR-330 'jakarta.inject.Inject' annotation found and supported for autowiring");
         }
         catch (ClassNotFoundException ex) {
             // JSR-330 API not available - simply skip.

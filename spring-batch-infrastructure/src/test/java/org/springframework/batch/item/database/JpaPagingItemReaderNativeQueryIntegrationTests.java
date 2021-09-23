@@ -17,7 +17,7 @@ package org.springframework.batch.item.database;
 
 import java.util.Collections;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.junit.runner.RunWith;
@@ -40,6 +40,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 /**
  * @author Anatoly Polinsky
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = JpaPagingItemReaderNativeQueryIntegrationTests.JpaConfiguration.class)

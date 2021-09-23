@@ -18,7 +18,7 @@ package org.springframework.batch.jsr.item;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import javax.batch.api.chunk.ItemProcessor;
+import jakarta.batch.api.chunk.ItemProcessor;
 
 import org.junit.Before;
 import org.junit.Rule;

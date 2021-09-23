@@ -17,7 +17,8 @@ package org.springframework.batch.sample.remotechunking;
 
 import java.util.Arrays;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import jakarta.jms.JMSException;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -64,10 +65,9 @@ public class ManagerConfiguration {
 	private RemoteChunkingManagerStepBuilderFactory managerStepBuilderFactory;
 
 	@Bean
-	public ActiveMQConnectionFactory connectionFactory() {
+	public ActiveMQConnectionFactory connectionFactory() throws JMSException {
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		connectionFactory.setBrokerURL(this.brokerUrl);
-		connectionFactory.setTrustAllPackages(true);
 		return connectionFactory;
 	}
 

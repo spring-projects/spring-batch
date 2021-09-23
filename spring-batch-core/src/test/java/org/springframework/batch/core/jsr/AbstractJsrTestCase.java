@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
-import javax.batch.runtime.Metric;
-import javax.batch.runtime.StepExecution;
+import jakarta.batch.operations.JobOperator;
+import jakarta.batch.runtime.BatchRuntime;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.JobExecution;
+import jakarta.batch.runtime.Metric;
+import jakarta.batch.runtime.StepExecution;
 
 /**
  * @author mminella
+ * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJsrTestCase {
 
@@ -38,15 +39,15 @@ public abstract class AbstractJsrTestCase {
 	}
 
 	/**
-	 * Executes a job and waits for it's status to be any of {@link javax.batch.runtime.BatchStatus#STOPPED},
-	 * {@link javax.batch.runtime.BatchStatus#COMPLETED}, or {@link javax.batch.runtime.BatchStatus#FAILED}.  If the job does not
+	 * Executes a job and waits for it's status to be any of {@link jakarta.batch.runtime.BatchStatus#STOPPED},
+	 * {@link jakarta.batch.runtime.BatchStatus#COMPLETED}, or {@link jakarta.batch.runtime.BatchStatus#FAILED}.  If the job does not
 	 * reach one of those statuses within the given timeout, a {@link java.util.concurrent.TimeoutException} is
 	 * thrown.
 	 *
 	 * @param jobName Name of the job to run
 	 * @param properties Properties to pass the job
 	 * @param timeout length of time to wait for a job to finish
-	 * @return the {@link javax.batch.runtime.JobExecution} for the final state of the job
+	 * @return the {@link jakarta.batch.runtime.JobExecution} for the final state of the job
 	 * @throws java.util.concurrent.TimeoutException if the timeout occurs
 	 */
 	public static JobExecution runJob(String jobName, Properties properties, long timeout) throws TimeoutException {

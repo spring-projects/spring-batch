@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,27 @@ package org.springframework.batch.core.jsr;
 
 import java.util.List;
 
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class to adapt the {@link javax.batch.api.chunk.listener.ItemWriteListener} to
+ * Wrapper class to adapt the {@link jakarta.batch.api.chunk.listener.ItemWriteListener} to
  * a {@link ItemWriteListener}.
  * 
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  *
  * @param <S> type to be written by the associated {@link ItemWriter}
  * @since 3.0
  */
 public class ItemWriteListenerAdapter<S> implements ItemWriteListener<S> {
 
-	private javax.batch.api.chunk.listener.ItemWriteListener delegate;
+	private jakarta.batch.api.chunk.listener.ItemWriteListener delegate;
 
-	public ItemWriteListenerAdapter(javax.batch.api.chunk.listener.ItemWriteListener delegate) {
+	public ItemWriteListenerAdapter(jakarta.batch.api.chunk.listener.ItemWriteListener delegate) {
 		Assert.notNull(delegate, "An ItemWriteListener is required");
 		this.delegate = delegate;
 	}

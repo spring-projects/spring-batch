@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.springframework.batch.core.jsr.step;
 
 import java.util.Collection;
 
-import javax.batch.api.partition.PartitionReducer;
-import javax.batch.api.partition.PartitionReducer.PartitionStatus;
+import jakarta.batch.api.partition.PartitionReducer;
+import jakarta.batch.api.partition.PartitionReducer.PartitionStatus;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecutionException;

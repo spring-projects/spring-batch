@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.springframework.batch.jsr.item;
 
 import java.io.Serializable;
 
-import javax.batch.api.chunk.ItemReader;
-import javax.batch.api.chunk.ItemWriter;
+import jakarta.batch.api.chunk.ItemReader;
+import jakarta.batch.api.chunk.ItemWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +37,7 @@ import org.springframework.util.SerializationUtils;
  * {@link ItemReader#checkpointInfo()} or {@link ItemWriter#checkpointInfo()} calls.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public abstract class CheckpointSupport extends ItemStreamSupport{

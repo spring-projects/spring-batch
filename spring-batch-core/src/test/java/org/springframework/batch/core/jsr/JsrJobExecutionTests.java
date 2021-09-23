@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class JsrJobExecutionTests {
 
 	@Test
 	public void testGetBasicValues() {
-		assertEquals(javax.batch.runtime.BatchStatus.FAILED, adapter.getBatchStatus());
+		assertEquals(jakarta.batch.runtime.BatchStatus.FAILED, adapter.getBatchStatus());
 		assertEquals(new Date(0), adapter.getCreateTime());
 		assertEquals(new Date(999999999L), adapter.getEndTime());
 		assertEquals(5L, adapter.getExecutionId());

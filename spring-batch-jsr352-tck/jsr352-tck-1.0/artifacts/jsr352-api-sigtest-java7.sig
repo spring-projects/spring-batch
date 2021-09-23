@@ -105,202 +105,202 @@ CLSS public abstract interface !annotation java.lang.annotation.Target
 intf java.lang.annotation.Annotation
 meth public abstract java.lang.annotation.ElementType[] value()
 
-CLSS public abstract javax.batch.api.AbstractBatchlet
+CLSS public abstract jakarta.batch.api.AbstractBatchlet
 cons public <init>()
-intf javax.batch.api.Batchlet
+intf jakarta.batch.api.Batchlet
 meth public abstract java.lang.String process() throws java.lang.Exception
 meth public void stop() throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract interface !annotation javax.batch.api.BatchProperty
+CLSS public abstract interface !annotation jakarta.batch.api.BatchProperty
  anno 0 java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy value=RUNTIME)
  anno 0 java.lang.annotation.Target(java.lang.annotation.ElementType[] value=[FIELD, METHOD, PARAMETER])
  anno 0 javax.inject.Qualifier()
 intf java.lang.annotation.Annotation
 meth public abstract !hasdefault java.lang.String name()
 
-CLSS public abstract interface javax.batch.api.Batchlet
+CLSS public abstract interface jakarta.batch.api.Batchlet
 meth public abstract java.lang.String process() throws java.lang.Exception
 meth public abstract void stop() throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.Decider
-meth public abstract java.lang.String decide(javax.batch.runtime.StepExecution[]) throws java.lang.Exception
+CLSS public abstract interface jakarta.batch.api.Decider
+meth public abstract java.lang.String decide(jakarta.batch.runtime.StepExecution[]) throws java.lang.Exception
 
-CLSS public abstract javax.batch.api.chunk.AbstractCheckpointAlgorithm
+CLSS public abstract jakarta.batch.api.chunk.AbstractCheckpointAlgorithm
 cons public <init>()
-intf javax.batch.api.chunk.CheckpointAlgorithm
+intf jakarta.batch.api.chunk.CheckpointAlgorithm
 meth public abstract boolean isReadyToCheckpoint() throws java.lang.Exception
 meth public int checkpointTimeout() throws java.lang.Exception
 meth public void beginCheckpoint() throws java.lang.Exception
 meth public void endCheckpoint() throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.chunk.AbstractItemReader
+CLSS public abstract jakarta.batch.api.chunk.AbstractItemReader
 cons public <init>()
-intf javax.batch.api.chunk.ItemReader
+intf jakarta.batch.api.chunk.ItemReader
 meth public abstract java.lang.Object readItem() throws java.lang.Exception
 meth public java.io.Serializable checkpointInfo() throws java.lang.Exception
 meth public void close() throws java.lang.Exception
 meth public void open(java.io.Serializable) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.chunk.AbstractItemWriter
+CLSS public abstract jakarta.batch.api.chunk.AbstractItemWriter
 cons public <init>()
-intf javax.batch.api.chunk.ItemWriter
+intf jakarta.batch.api.chunk.ItemWriter
 meth public abstract void writeItems(java.util.List<java.lang.Object>) throws java.lang.Exception
 meth public java.io.Serializable checkpointInfo() throws java.lang.Exception
 meth public void close() throws java.lang.Exception
 meth public void open(java.io.Serializable) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract interface javax.batch.api.chunk.CheckpointAlgorithm
+CLSS public abstract interface jakarta.batch.api.chunk.CheckpointAlgorithm
 meth public abstract boolean isReadyToCheckpoint() throws java.lang.Exception
 meth public abstract int checkpointTimeout() throws java.lang.Exception
 meth public abstract void beginCheckpoint() throws java.lang.Exception
 meth public abstract void endCheckpoint() throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.ItemProcessor
+CLSS public abstract interface jakarta.batch.api.chunk.ItemProcessor
 meth public abstract java.lang.Object processItem(java.lang.Object) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.ItemReader
+CLSS public abstract interface jakarta.batch.api.chunk.ItemReader
 meth public abstract java.io.Serializable checkpointInfo() throws java.lang.Exception
 meth public abstract java.lang.Object readItem() throws java.lang.Exception
 meth public abstract void close() throws java.lang.Exception
 meth public abstract void open(java.io.Serializable) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.ItemWriter
+CLSS public abstract interface jakarta.batch.api.chunk.ItemWriter
 meth public abstract java.io.Serializable checkpointInfo() throws java.lang.Exception
 meth public abstract void close() throws java.lang.Exception
 meth public abstract void open(java.io.Serializable) throws java.lang.Exception
 meth public abstract void writeItems(java.util.List<java.lang.Object>) throws java.lang.Exception
 
-CLSS public abstract javax.batch.api.chunk.listener.AbstractChunkListener
+CLSS public abstract jakarta.batch.api.chunk.listener.AbstractChunkListener
 cons public <init>()
-intf javax.batch.api.chunk.listener.ChunkListener
+intf jakarta.batch.api.chunk.listener.ChunkListener
 meth public void afterChunk() throws java.lang.Exception
 meth public void beforeChunk() throws java.lang.Exception
 meth public void onError(java.lang.Exception) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.chunk.listener.AbstractItemProcessListener
+CLSS public abstract jakarta.batch.api.chunk.listener.AbstractItemProcessListener
 cons public <init>()
-intf javax.batch.api.chunk.listener.ItemProcessListener
+intf jakarta.batch.api.chunk.listener.ItemProcessListener
 meth public void afterProcess(java.lang.Object,java.lang.Object) throws java.lang.Exception
 meth public void beforeProcess(java.lang.Object) throws java.lang.Exception
 meth public void onProcessError(java.lang.Object,java.lang.Exception) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.chunk.listener.AbstractItemReadListener
+CLSS public abstract jakarta.batch.api.chunk.listener.AbstractItemReadListener
 cons public <init>()
-intf javax.batch.api.chunk.listener.ItemReadListener
+intf jakarta.batch.api.chunk.listener.ItemReadListener
 meth public void afterRead(java.lang.Object) throws java.lang.Exception
 meth public void beforeRead() throws java.lang.Exception
 meth public void onReadError(java.lang.Exception) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.chunk.listener.AbstractItemWriteListener
+CLSS public abstract jakarta.batch.api.chunk.listener.AbstractItemWriteListener
 cons public <init>()
-intf javax.batch.api.chunk.listener.ItemWriteListener
+intf jakarta.batch.api.chunk.listener.ItemWriteListener
 meth public void afterWrite(java.util.List<java.lang.Object>) throws java.lang.Exception
 meth public void beforeWrite(java.util.List<java.lang.Object>) throws java.lang.Exception
 meth public void onWriteError(java.util.List<java.lang.Object>,java.lang.Exception) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract interface javax.batch.api.chunk.listener.ChunkListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.ChunkListener
 meth public abstract void afterChunk() throws java.lang.Exception
 meth public abstract void beforeChunk() throws java.lang.Exception
 meth public abstract void onError(java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.ItemProcessListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.ItemProcessListener
 meth public abstract void afterProcess(java.lang.Object,java.lang.Object) throws java.lang.Exception
 meth public abstract void beforeProcess(java.lang.Object) throws java.lang.Exception
 meth public abstract void onProcessError(java.lang.Object,java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.ItemReadListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.ItemReadListener
 meth public abstract void afterRead(java.lang.Object) throws java.lang.Exception
 meth public abstract void beforeRead() throws java.lang.Exception
 meth public abstract void onReadError(java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.ItemWriteListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.ItemWriteListener
 meth public abstract void afterWrite(java.util.List<java.lang.Object>) throws java.lang.Exception
 meth public abstract void beforeWrite(java.util.List<java.lang.Object>) throws java.lang.Exception
 meth public abstract void onWriteError(java.util.List<java.lang.Object>,java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.RetryProcessListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.RetryProcessListener
 meth public abstract void onRetryProcessException(java.lang.Object,java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.RetryReadListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.RetryReadListener
 meth public abstract void onRetryReadException(java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.RetryWriteListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.RetryWriteListener
 meth public abstract void onRetryWriteException(java.util.List<java.lang.Object>,java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.SkipProcessListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.SkipProcessListener
 meth public abstract void onSkipProcessItem(java.lang.Object,java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.SkipReadListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.SkipReadListener
 meth public abstract void onSkipReadItem(java.lang.Exception) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.chunk.listener.SkipWriteListener
+CLSS public abstract interface jakarta.batch.api.chunk.listener.SkipWriteListener
 meth public abstract void onSkipWriteItem(java.util.List<java.lang.Object>,java.lang.Exception) throws java.lang.Exception
 
-CLSS abstract interface javax.batch.api.chunk.listener.package-info
+CLSS abstract interface jakarta.batch.api.chunk.listener.package-info
 
-CLSS abstract interface javax.batch.api.chunk.package-info
+CLSS abstract interface jakarta.batch.api.chunk.package-info
 
-CLSS public abstract javax.batch.api.listener.AbstractJobListener
+CLSS public abstract jakarta.batch.api.listener.AbstractJobListener
 cons public <init>()
-intf javax.batch.api.listener.JobListener
+intf jakarta.batch.api.listener.JobListener
 meth public void afterJob() throws java.lang.Exception
 meth public void beforeJob() throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.listener.AbstractStepListener
+CLSS public abstract jakarta.batch.api.listener.AbstractStepListener
 cons public <init>()
-intf javax.batch.api.listener.StepListener
+intf jakarta.batch.api.listener.StepListener
 meth public void afterStep() throws java.lang.Exception
 meth public void beforeStep() throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract interface javax.batch.api.listener.JobListener
+CLSS public abstract interface jakarta.batch.api.listener.JobListener
 meth public abstract void afterJob() throws java.lang.Exception
 meth public abstract void beforeJob() throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.listener.StepListener
+CLSS public abstract interface jakarta.batch.api.listener.StepListener
 meth public abstract void afterStep() throws java.lang.Exception
 meth public abstract void beforeStep() throws java.lang.Exception
 
-CLSS abstract interface javax.batch.api.listener.package-info
+CLSS abstract interface jakarta.batch.api.listener.package-info
 
-CLSS abstract interface javax.batch.api.package-info
+CLSS abstract interface jakarta.batch.api.package-info
 
-CLSS public abstract javax.batch.api.partition.AbstractPartitionAnalyzer
+CLSS public abstract jakarta.batch.api.partition.AbstractPartitionAnalyzer
 cons public <init>()
-intf javax.batch.api.partition.PartitionAnalyzer
+intf jakarta.batch.api.partition.PartitionAnalyzer
 meth public void analyzeCollectorData(java.io.Serializable) throws java.lang.Exception
-meth public void analyzeStatus(javax.batch.runtime.BatchStatus,java.lang.String) throws java.lang.Exception
+meth public void analyzeStatus(jakarta.batch.runtime.BatchStatus,java.lang.String) throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract javax.batch.api.partition.AbstractPartitionReducer
+CLSS public abstract jakarta.batch.api.partition.AbstractPartitionReducer
 cons public <init>()
-intf javax.batch.api.partition.PartitionReducer
-meth public void afterPartitionedStepCompletion(javax.batch.api.partition.PartitionReducer$PartitionStatus) throws java.lang.Exception
+intf jakarta.batch.api.partition.PartitionReducer
+meth public void afterPartitionedStepCompletion(jakarta.batch.api.partition.PartitionReducer$PartitionStatus) throws java.lang.Exception
 meth public void beforePartitionedStepCompletion() throws java.lang.Exception
 meth public void beginPartitionedStep() throws java.lang.Exception
 meth public void rollbackPartitionedStep() throws java.lang.Exception
 supr java.lang.Object
 
-CLSS public abstract interface javax.batch.api.partition.PartitionAnalyzer
+CLSS public abstract interface jakarta.batch.api.partition.PartitionAnalyzer
 meth public abstract void analyzeCollectorData(java.io.Serializable) throws java.lang.Exception
-meth public abstract void analyzeStatus(javax.batch.runtime.BatchStatus,java.lang.String) throws java.lang.Exception
+meth public abstract void analyzeStatus(jakarta.batch.runtime.BatchStatus,java.lang.String) throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.partition.PartitionCollector
+CLSS public abstract interface jakarta.batch.api.partition.PartitionCollector
 meth public abstract java.io.Serializable collectPartitionData() throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.partition.PartitionMapper
-meth public abstract javax.batch.api.partition.PartitionPlan mapPartitions() throws java.lang.Exception
+CLSS public abstract interface jakarta.batch.api.partition.PartitionMapper
+meth public abstract jakarta.batch.api.partition.PartitionPlan mapPartitions() throws java.lang.Exception
 
-CLSS public abstract interface javax.batch.api.partition.PartitionPlan
+CLSS public abstract interface jakarta.batch.api.partition.PartitionPlan
 meth public abstract boolean getPartitionsOverride()
 meth public abstract int getPartitions()
 meth public abstract int getThreads()
@@ -310,9 +310,9 @@ meth public abstract void setPartitions(int)
 meth public abstract void setPartitionsOverride(boolean)
 meth public abstract void setThreads(int)
 
-CLSS public javax.batch.api.partition.PartitionPlanImpl
+CLSS public jakarta.batch.api.partition.PartitionPlanImpl
 cons public <init>()
-intf javax.batch.api.partition.PartitionPlan
+intf jakarta.batch.api.partition.PartitionPlan
 meth public boolean getPartitionsOverride()
 meth public int getPartitions()
 meth public int getThreads()
@@ -324,24 +324,24 @@ meth public void setThreads(int)
 supr java.lang.Object
 hfds override,partitionProperties,partitions,threads
 
-CLSS public abstract interface javax.batch.api.partition.PartitionReducer
+CLSS public abstract interface jakarta.batch.api.partition.PartitionReducer
 innr public final static !enum PartitionStatus
-meth public abstract void afterPartitionedStepCompletion(javax.batch.api.partition.PartitionReducer$PartitionStatus) throws java.lang.Exception
+meth public abstract void afterPartitionedStepCompletion(jakarta.batch.api.partition.PartitionReducer$PartitionStatus) throws java.lang.Exception
 meth public abstract void beforePartitionedStepCompletion() throws java.lang.Exception
 meth public abstract void beginPartitionedStep() throws java.lang.Exception
 meth public abstract void rollbackPartitionedStep() throws java.lang.Exception
 
-CLSS public final static !enum javax.batch.api.partition.PartitionReducer$PartitionStatus
- outer javax.batch.api.partition.PartitionReducer
-fld public final static javax.batch.api.partition.PartitionReducer$PartitionStatus COMMIT
-fld public final static javax.batch.api.partition.PartitionReducer$PartitionStatus ROLLBACK
-meth public static javax.batch.api.partition.PartitionReducer$PartitionStatus valueOf(java.lang.String)
-meth public static javax.batch.api.partition.PartitionReducer$PartitionStatus[] values()
-supr java.lang.Enum<javax.batch.api.partition.PartitionReducer$PartitionStatus>
+CLSS public final static !enum jakarta.batch.api.partition.PartitionReducer$PartitionStatus
+ outer jakarta.batch.api.partition.PartitionReducer
+fld public final static jakarta.batch.api.partition.PartitionReducer$PartitionStatus COMMIT
+fld public final static jakarta.batch.api.partition.PartitionReducer$PartitionStatus ROLLBACK
+meth public static jakarta.batch.api.partition.PartitionReducer$PartitionStatus valueOf(java.lang.String)
+meth public static jakarta.batch.api.partition.PartitionReducer$PartitionStatus[] values()
+supr java.lang.Enum<jakarta.batch.api.partition.PartitionReducer$PartitionStatus>
 
-CLSS abstract interface javax.batch.api.partition.package-info
+CLSS abstract interface jakarta.batch.api.partition.package-info
 
-CLSS public javax.batch.operations.BatchRuntimeException
+CLSS public jakarta.batch.operations.BatchRuntimeException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
@@ -349,122 +349,122 @@ cons public <init>(java.lang.Throwable)
 supr java.lang.RuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobExecutionAlreadyCompleteException
+CLSS public jakarta.batch.operations.JobExecutionAlreadyCompleteException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobExecutionIsRunningException
+CLSS public jakarta.batch.operations.JobExecutionIsRunningException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobExecutionNotMostRecentException
+CLSS public jakarta.batch.operations.JobExecutionNotMostRecentException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobExecutionNotRunningException
+CLSS public jakarta.batch.operations.JobExecutionNotRunningException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public abstract interface javax.batch.operations.JobOperator
+CLSS public abstract interface jakarta.batch.operations.JobOperator
 meth public abstract int getJobInstanceCount(java.lang.String)
 meth public abstract java.util.List<java.lang.Long> getRunningExecutions(java.lang.String)
-meth public abstract java.util.List<javax.batch.runtime.JobExecution> getJobExecutions(javax.batch.runtime.JobInstance)
-meth public abstract java.util.List<javax.batch.runtime.JobInstance> getJobInstances(java.lang.String,int,int)
-meth public abstract java.util.List<javax.batch.runtime.StepExecution> getStepExecutions(long)
+meth public abstract java.util.List<jakarta.batch.runtime.JobExecution> getJobExecutions(jakarta.batch.runtime.JobInstance)
+meth public abstract java.util.List<jakarta.batch.runtime.JobInstance> getJobInstances(java.lang.String,int,int)
+meth public abstract java.util.List<jakarta.batch.runtime.StepExecution> getStepExecutions(long)
 meth public abstract java.util.Properties getParameters(long)
 meth public abstract java.util.Set<java.lang.String> getJobNames()
-meth public abstract javax.batch.runtime.JobExecution getJobExecution(long)
-meth public abstract javax.batch.runtime.JobInstance getJobInstance(long)
+meth public abstract jakarta.batch.runtime.JobExecution getJobExecution(long)
+meth public abstract jakarta.batch.runtime.JobInstance getJobInstance(long)
 meth public abstract long restart(long,java.util.Properties)
 meth public abstract long start(java.lang.String,java.util.Properties)
 meth public abstract void abandon(long)
 meth public abstract void stop(long)
 
-CLSS public javax.batch.operations.JobRestartException
+CLSS public jakarta.batch.operations.JobRestartException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobSecurityException
+CLSS public jakarta.batch.operations.JobSecurityException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.JobStartException
+CLSS public jakarta.batch.operations.JobStartException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.NoSuchJobException
+CLSS public jakarta.batch.operations.NoSuchJobException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.NoSuchJobExecutionException
+CLSS public jakarta.batch.operations.NoSuchJobExecutionException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS public javax.batch.operations.NoSuchJobInstanceException
+CLSS public jakarta.batch.operations.NoSuchJobInstanceException
 cons public <init>()
 cons public <init>(java.lang.String)
 cons public <init>(java.lang.String,java.lang.Throwable)
 cons public <init>(java.lang.Throwable)
-supr javax.batch.operations.BatchRuntimeException
+supr jakarta.batch.operations.BatchRuntimeException
 hfds serialVersionUID
 
-CLSS abstract interface javax.batch.operations.package-info
+CLSS abstract interface jakarta.batch.operations.package-info
 
-CLSS public javax.batch.runtime.BatchRuntime
+CLSS public jakarta.batch.runtime.BatchRuntime
 cons public <init>()
-meth public static javax.batch.operations.JobOperator getJobOperator()
+meth public static jakarta.batch.operations.JobOperator getJobOperator()
 supr java.lang.Object
 hfds logger,sourceClass
 
-CLSS public final !enum javax.batch.runtime.BatchStatus
-fld public final static javax.batch.runtime.BatchStatus ABANDONED
-fld public final static javax.batch.runtime.BatchStatus COMPLETED
-fld public final static javax.batch.runtime.BatchStatus FAILED
-fld public final static javax.batch.runtime.BatchStatus STARTED
-fld public final static javax.batch.runtime.BatchStatus STARTING
-fld public final static javax.batch.runtime.BatchStatus STOPPED
-fld public final static javax.batch.runtime.BatchStatus STOPPING
-meth public static javax.batch.runtime.BatchStatus valueOf(java.lang.String)
-meth public static javax.batch.runtime.BatchStatus[] values()
-supr java.lang.Enum<javax.batch.runtime.BatchStatus>
+CLSS public final !enum jakarta.batch.runtime.BatchStatus
+fld public final static jakarta.batch.runtime.BatchStatus ABANDONED
+fld public final static jakarta.batch.runtime.BatchStatus COMPLETED
+fld public final static jakarta.batch.runtime.BatchStatus FAILED
+fld public final static jakarta.batch.runtime.BatchStatus STARTED
+fld public final static jakarta.batch.runtime.BatchStatus STARTING
+fld public final static jakarta.batch.runtime.BatchStatus STOPPED
+fld public final static jakarta.batch.runtime.BatchStatus STOPPING
+meth public static jakarta.batch.runtime.BatchStatus valueOf(java.lang.String)
+meth public static jakarta.batch.runtime.BatchStatus[] values()
+supr java.lang.Enum<jakarta.batch.runtime.BatchStatus>
 
-CLSS public abstract interface javax.batch.runtime.JobExecution
+CLSS public abstract interface jakarta.batch.runtime.JobExecution
 meth public abstract java.lang.String getExitStatus()
 meth public abstract java.lang.String getJobName()
 meth public abstract java.util.Date getCreateTime()
@@ -472,70 +472,70 @@ meth public abstract java.util.Date getEndTime()
 meth public abstract java.util.Date getLastUpdatedTime()
 meth public abstract java.util.Date getStartTime()
 meth public abstract java.util.Properties getJobParameters()
-meth public abstract javax.batch.runtime.BatchStatus getBatchStatus()
+meth public abstract jakarta.batch.runtime.BatchStatus getBatchStatus()
 meth public abstract long getExecutionId()
 
-CLSS public abstract interface javax.batch.runtime.JobInstance
+CLSS public abstract interface jakarta.batch.runtime.JobInstance
 meth public abstract java.lang.String getJobName()
 meth public abstract long getInstanceId()
 
-CLSS public abstract interface javax.batch.runtime.Metric
+CLSS public abstract interface jakarta.batch.runtime.Metric
 innr public final static !enum MetricType
-meth public abstract javax.batch.runtime.Metric$MetricType getType()
+meth public abstract jakarta.batch.runtime.Metric$MetricType getType()
 meth public abstract long getValue()
 
-CLSS public final static !enum javax.batch.runtime.Metric$MetricType
- outer javax.batch.runtime.Metric
-fld public final static javax.batch.runtime.Metric$MetricType COMMIT_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType FILTER_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType PROCESS_SKIP_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType READ_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType READ_SKIP_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType ROLLBACK_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType WRITE_COUNT
-fld public final static javax.batch.runtime.Metric$MetricType WRITE_SKIP_COUNT
-meth public static javax.batch.runtime.Metric$MetricType valueOf(java.lang.String)
-meth public static javax.batch.runtime.Metric$MetricType[] values()
-supr java.lang.Enum<javax.batch.runtime.Metric$MetricType>
+CLSS public final static !enum jakarta.batch.runtime.Metric$MetricType
+ outer jakarta.batch.runtime.Metric
+fld public final static jakarta.batch.runtime.Metric$MetricType COMMIT_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType FILTER_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType PROCESS_SKIP_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType READ_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType READ_SKIP_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType ROLLBACK_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType WRITE_COUNT
+fld public final static jakarta.batch.runtime.Metric$MetricType WRITE_SKIP_COUNT
+meth public static jakarta.batch.runtime.Metric$MetricType valueOf(java.lang.String)
+meth public static jakarta.batch.runtime.Metric$MetricType[] values()
+supr java.lang.Enum<jakarta.batch.runtime.Metric$MetricType>
 
-CLSS public abstract interface javax.batch.runtime.StepExecution
+CLSS public abstract interface jakarta.batch.runtime.StepExecution
 meth public abstract java.io.Serializable getPersistentUserData()
 meth public abstract java.lang.String getExitStatus()
 meth public abstract java.lang.String getStepName()
 meth public abstract java.util.Date getEndTime()
 meth public abstract java.util.Date getStartTime()
-meth public abstract javax.batch.runtime.BatchStatus getBatchStatus()
-meth public abstract javax.batch.runtime.Metric[] getMetrics()
+meth public abstract jakarta.batch.runtime.BatchStatus getBatchStatus()
+meth public abstract jakarta.batch.runtime.Metric[] getMetrics()
 meth public abstract long getStepExecutionId()
 
-CLSS public abstract interface javax.batch.runtime.context.JobContext
+CLSS public abstract interface jakarta.batch.runtime.context.JobContext
 meth public abstract java.lang.Object getTransientUserData()
 meth public abstract java.lang.String getExitStatus()
 meth public abstract java.lang.String getJobName()
 meth public abstract java.util.Properties getProperties()
-meth public abstract javax.batch.runtime.BatchStatus getBatchStatus()
+meth public abstract jakarta.batch.runtime.BatchStatus getBatchStatus()
 meth public abstract long getExecutionId()
 meth public abstract long getInstanceId()
 meth public abstract void setExitStatus(java.lang.String)
 meth public abstract void setTransientUserData(java.lang.Object)
 
-CLSS public abstract interface javax.batch.runtime.context.StepContext
+CLSS public abstract interface jakarta.batch.runtime.context.StepContext
 meth public abstract java.io.Serializable getPersistentUserData()
 meth public abstract java.lang.Exception getException()
 meth public abstract java.lang.Object getTransientUserData()
 meth public abstract java.lang.String getExitStatus()
 meth public abstract java.lang.String getStepName()
 meth public abstract java.util.Properties getProperties()
-meth public abstract javax.batch.runtime.BatchStatus getBatchStatus()
-meth public abstract javax.batch.runtime.Metric[] getMetrics()
+meth public abstract jakarta.batch.runtime.BatchStatus getBatchStatus()
+meth public abstract jakarta.batch.runtime.Metric[] getMetrics()
 meth public abstract long getStepExecutionId()
 meth public abstract void setExitStatus(java.lang.String)
 meth public abstract void setPersistentUserData(java.io.Serializable)
 meth public abstract void setTransientUserData(java.lang.Object)
 
-CLSS abstract interface javax.batch.runtime.context.package-info
+CLSS abstract interface jakarta.batch.runtime.context.package-info
 
-CLSS abstract interface javax.batch.runtime.package-info
+CLSS abstract interface jakarta.batch.runtime.package-info
 
 CLSS public abstract interface !annotation javax.inject.Qualifier
  anno 0 java.lang.annotation.Documented()

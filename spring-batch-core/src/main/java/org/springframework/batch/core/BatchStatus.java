@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,21 +113,21 @@ public enum BatchStatus {
 	 * 
 	 * @return JSR-352 equivalent to the current status
 	 */
-	public javax.batch.runtime.BatchStatus getBatchStatus() {
+	public jakarta.batch.runtime.BatchStatus getBatchStatus() {
 		if(this == ABANDONED) {
-			return javax.batch.runtime.BatchStatus.ABANDONED;
+			return jakarta.batch.runtime.BatchStatus.ABANDONED;
 		} else if(this == COMPLETED) {
-			return javax.batch.runtime.BatchStatus.COMPLETED;
+			return jakarta.batch.runtime.BatchStatus.COMPLETED;
 		} else if(this == STARTED) {
-			return javax.batch.runtime.BatchStatus.STARTED;
+			return jakarta.batch.runtime.BatchStatus.STARTED;
 		} else if(this == STARTING) {
-			return javax.batch.runtime.BatchStatus.STARTING;
+			return jakarta.batch.runtime.BatchStatus.STARTING;
 		} else if(this == STOPPED) {
-			return javax.batch.runtime.BatchStatus.STOPPED;
+			return jakarta.batch.runtime.BatchStatus.STOPPED;
 		} else if(this == STOPPING) {
-			return javax.batch.runtime.BatchStatus.STOPPING;
+			return jakarta.batch.runtime.BatchStatus.STOPPING;
 		} else {
-			return javax.batch.runtime.BatchStatus.FAILED;
+			return jakarta.batch.runtime.BatchStatus.FAILED;
 		}
 	}
 

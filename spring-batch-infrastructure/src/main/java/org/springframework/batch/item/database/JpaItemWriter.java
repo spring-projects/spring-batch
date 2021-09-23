@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.util.Assert;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import java.util.List;
 
 /**
@@ -36,13 +36,14 @@ import java.util.List;
  * It is required that {@link #write(List)} is called inside a transaction.<br>
  *
  * The reader must be configured with an
- * {@link javax.persistence.EntityManagerFactory} that is capable of
+ * {@link jakarta.persistence.EntityManagerFactory} that is capable of
  * participating in Spring managed transactions.
  *
  * The writer is thread-safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
  *
  * @author Thomas Risberg
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {

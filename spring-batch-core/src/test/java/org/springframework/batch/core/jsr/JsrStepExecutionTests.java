@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Date;
 
-import javax.batch.runtime.Metric;
+import jakarta.batch.runtime.Metric;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.springframework.util.ClassUtils;
 public class JsrStepExecutionTests {
 
 	private StepExecution stepExecution;
-	private javax.batch.runtime.StepExecution jsrStepExecution;
+	private jakarta.batch.runtime.StepExecution jsrStepExecution;
 	//The API that sets the persisted user data is on the JsrStepContext so the key within the ExecutionContext is JsrStepContext
 	private ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport(ClassUtils.getShortName(JsrStepContext.class));
 
@@ -79,7 +79,7 @@ public class JsrStepExecutionTests {
 	public void testBaseValues() {
 		assertEquals(5L, jsrStepExecution.getStepExecutionId());
 		assertEquals("testStep", jsrStepExecution.getStepName());
-		assertEquals(javax.batch.runtime.BatchStatus.STARTED, jsrStepExecution.getBatchStatus());
+		assertEquals(jakarta.batch.runtime.BatchStatus.STARTED, jsrStepExecution.getBatchStatus());
 		assertEquals(new Date(0), jsrStepExecution.getStartTime());
 		assertEquals(new Date(10000000), jsrStepExecution.getEndTime());
 		assertEquals("customExitStatus", jsrStepExecution.getExitStatus());

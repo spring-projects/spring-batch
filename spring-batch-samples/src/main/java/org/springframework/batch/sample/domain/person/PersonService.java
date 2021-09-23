@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,11 @@ import org.springframework.batch.sample.domain.order.Address;
 /**
  * Custom class that contains logic that would normally be be contained in
  * {@link org.springframework.batch.item.ItemReader} and
- * {@link javax.batch.api.chunk.ItemWriter}.
+ * {@link jakarta.batch.api.chunk.ItemWriter}.
  * 
  * @author tomas.slanina
  * @author Robert Kasanicky
+ * @author Mahmoud Ben Hassine
  */
 public class PersonService {
 	private static final int GENERATION_LIMIT = 10;

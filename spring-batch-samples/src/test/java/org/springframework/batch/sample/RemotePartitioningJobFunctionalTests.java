@@ -17,7 +17,9 @@ package org.springframework.batch.sample;
 
 import javax.sql.DataSource;
 
-import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.artemis.core.config.Configuration;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,7 +57,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	@Autowired
 	private DataSource dataSource;
 
-	private BrokerService brokerService;
+	private EmbeddedActiveMQ brokerService;
 
 	private AnnotationConfigApplicationContext workerApplicationContext;
 
@@ -63,10 +65,14 @@ public abstract class RemotePartitioningJobFunctionalTests {
 
 	@Before
 	public void setUp() throws Exception {
-		this.brokerService = new BrokerService();
-		this.brokerService.addConnector(this.brokerUrl);
-		this.brokerService.setDataDirectory(BROKER_DATA_DIRECTORY);
-		this.brokerService.start();
+		Configuration configuration =
+				new ConfigurationImpl()
+						.addAcceptorConfiguration("jms", "tcp://localhost:61617")
+						.setPersistenceEnabled(false)
+						.setSecurityEnabled(false)
+						.setJMXManagementEnabled(false)
+						.setJournalDatasync(false);
+		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-hsqldb.sql"));
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-hsqldb.sql"));

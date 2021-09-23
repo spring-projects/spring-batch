@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.lang.Nullable;
 
-import javax.batch.api.chunk.listener.SkipProcessListener;
-import javax.batch.api.chunk.listener.SkipReadListener;
-import javax.batch.api.chunk.listener.SkipWriteListener;
-import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.Metric;
-import javax.batch.runtime.StepExecution;
+import jakarta.batch.api.chunk.listener.SkipProcessListener;
+import jakarta.batch.api.chunk.listener.SkipReadListener;
+import jakarta.batch.api.chunk.listener.SkipWriteListener;
+import jakarta.batch.operations.JobOperator;
+import jakarta.batch.runtime.BatchRuntime;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.Metric;
+import jakarta.batch.runtime.StepExecution;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -40,7 +40,7 @@ public class ItemSkipParsingTests extends AbstractJsrTestCase {
 
 	@Test
 	public void test() throws Exception {
-		javax.batch.runtime.JobExecution execution = runJob("ItemSkipParsingTests-context", new Properties(), 10000l);
+		jakarta.batch.runtime.JobExecution execution = runJob("ItemSkipParsingTests-context", new Properties(), 10000l);
 		JobOperator jobOperator = BatchRuntime.getJobOperator();
 
 		assertEquals(BatchStatus.FAILED, execution.getBatchStatus());

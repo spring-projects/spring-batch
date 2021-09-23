@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import javax.batch.api.Batchlet;
-import javax.batch.api.chunk.CheckpointAlgorithm;
-import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.api.chunk.ItemReader;
-import javax.batch.api.chunk.ItemWriter;
-import javax.batch.api.partition.PartitionReducer;
+import jakarta.batch.api.Batchlet;
+import jakarta.batch.api.chunk.CheckpointAlgorithm;
+import jakarta.batch.api.chunk.ItemProcessor;
+import jakarta.batch.api.chunk.ItemReader;
+import jakarta.batch.api.chunk.ItemWriter;
+import jakarta.batch.api.partition.PartitionReducer;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.xml.StepParserStepFactoryBean;
@@ -55,6 +55,7 @@ import org.springframework.util.Assert;
  *
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
@@ -198,7 +199,7 @@ public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
 			super.setTasklet(new BatchletAdapter((Batchlet) tasklet));
 		} else {
 			throw new IllegalArgumentException("The field tasklet must reference an implementation of " +
-					"either org.springframework.batch.core.step.tasklet.Tasklet or javax.batch.api.Batchlet");
+					"either org.springframework.batch.core.step.tasklet.Tasklet or jakarta.batch.api.Batchlet");
 		}
 	}
 
@@ -217,7 +218,7 @@ public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
 			super.setItemReader(new ItemReaderAdapter<>((ItemReader) itemReader));
 		} else {
 			throw new IllegalArgumentException("The definition of an item reader must implement either " +
-					"org.springframework.batch.item.ItemReader or javax.batch.api.chunk.ItemReader");
+					"org.springframework.batch.item.ItemReader or jakarta.batch.api.chunk.ItemReader");
 		}
 	}
 
@@ -236,7 +237,7 @@ public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
 			super.setItemProcessor(new ItemProcessorAdapter<>((ItemProcessor) itemProcessor));
 		} else {
 			throw new IllegalArgumentException("The definition of an item processor must implement either " +
-					"org.springframework.batch.item.ItemProcessor or javax.batch.api.chunk.ItemProcessor");
+					"org.springframework.batch.item.ItemProcessor or jakarta.batch.api.chunk.ItemProcessor");
 		}
 	}
 
@@ -255,7 +256,7 @@ public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
 			super.setItemWriter(new ItemWriterAdapter<>((ItemWriter) itemWriter));
 		} else {
 			throw new IllegalArgumentException("The definition of an item writer must implement either " +
-					"org.springframework.batch.item.ItemWriter or javax.batch.api.chunk.ItemWriter");
+					"org.springframework.batch.item.ItemWriter or jakarta.batch.api.chunk.ItemWriter");
 		}
 	}
 
@@ -273,7 +274,7 @@ public class StepFactoryBean<I, O> extends StepParserStepFactoryBean<I, O> {
 			super.setChunkCompletionPolicy(new CheckpointAlgorithmAdapter((CheckpointAlgorithm) chunkCompletionPolicy));
 		} else {
 			throw new IllegalArgumentException("The definition of a chunk completion policy must implement either " +
-					"org.springframework.batch.repeat.CompletionPolicy or javax.batch.api.chunk.CheckpointAlgorithm");
+					"org.springframework.batch.repeat.CompletionPolicy or jakarta.batch.api.chunk.CheckpointAlgorithm");
 		}
 	}
 

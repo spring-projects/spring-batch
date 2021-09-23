@@ -21,8 +21,8 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.batch.api.chunk.listener.ItemWriteListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.chunk.listener.ItemWriteListener;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
 import org.junit.Rule;

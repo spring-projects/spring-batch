@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.jsr.configuration.xml;
 
-import javax.batch.api.Decider;
+import jakarta.batch.api.Decider;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.jsr.step.DecisionStep;
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
  * {@link FactoryBean} for creating a {@link DecisionStep}.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class DecisionStepFactoryBean implements FactoryBean<Step>, InitializingBean {

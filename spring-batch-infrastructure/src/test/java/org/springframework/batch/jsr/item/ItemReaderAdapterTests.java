@@ -18,7 +18,7 @@ package org.springframework.batch.jsr.item;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import javax.batch.api.chunk.ItemReader;
+import jakarta.batch.api.chunk.ItemReader;
 
 import org.junit.Before;
 import org.junit.Rule;

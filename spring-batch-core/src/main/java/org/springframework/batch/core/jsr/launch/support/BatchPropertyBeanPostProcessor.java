@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.batch.api.BatchProperty;
+import jakarta.batch.api.BatchProperty;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +50,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Chris Schaefer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 @SuppressWarnings("unchecked")
@@ -65,9 +66,9 @@ public class BatchPropertyBeanPostProcessor implements BeanPostProcessor, BeanFa
 		ClassLoader cl = BatchPropertyBeanPostProcessor.class.getClassLoader();
 
 		try {
-			REQUIRED_ANNOTATIONS.add((Class<? extends Annotation>) cl.loadClass("javax.inject.Inject"));
+			REQUIRED_ANNOTATIONS.add((Class<? extends Annotation>) cl.loadClass("jakarta.inject.Inject"));
 		} catch (ClassNotFoundException ex) {
-			LOGGER.warn("javax.inject.Inject not found - @BatchProperty marked fields will not be processed.");
+			LOGGER.warn("jakarta.inject.Inject not found - @BatchProperty marked fields will not be processed.");
 		}
 
 		REQUIRED_ANNOTATIONS.add(BatchProperty.class);

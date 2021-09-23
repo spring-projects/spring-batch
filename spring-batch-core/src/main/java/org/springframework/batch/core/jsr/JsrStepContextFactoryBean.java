@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.springframework.batch.core.jsr;
 
 import java.util.Properties;
 
-import javax.batch.runtime.context.StepContext;
+import jakarta.batch.runtime.context.StepContext;
 
 import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
@@ -28,18 +28,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 /**
- * {@link FactoryBean} implementation used to create {@link javax.batch.runtime.context.StepContext}
+ * {@link FactoryBean} implementation used to create {@link jakarta.batch.runtime.context.StepContext}
  * instances within the step scope.
  *
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrStepContextFactoryBean implements FactoryBean<StepContext>, InitializingBean {
 	@Autowired
 	private BatchPropertyContext batchPropertyContext;
 
-	private static final ThreadLocal<javax.batch.runtime.context.StepContext> contextHolder = new ThreadLocal<>();
+	private static final ThreadLocal<jakarta.batch.runtime.context.StepContext> contextHolder = new ThreadLocal<>();
 
 	protected void setBatchPropertyContext(BatchPropertyContext batchPropertyContext) {
 		this.batchPropertyContext = batchPropertyContext;
@@ -53,7 +54,7 @@ public class JsrStepContextFactoryBean implements FactoryBean<StepContext>, Init
 		return getCurrent();
 	}
 
-	private javax.batch.runtime.context.StepContext getCurrent() {
+	private jakarta.batch.runtime.context.StepContext getCurrent() {
 		org.springframework.batch.core.StepExecution curStepExecution = null;
 
 		if(StepSynchronizationManager.getContext() != null) {

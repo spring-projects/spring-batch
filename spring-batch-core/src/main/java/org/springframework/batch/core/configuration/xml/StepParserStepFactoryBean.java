@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.batch.api.chunk.listener.RetryProcessListener;
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.api.chunk.listener.RetryWriteListener;
-import javax.batch.api.chunk.listener.SkipProcessListener;
-import javax.batch.api.chunk.listener.SkipReadListener;
-import javax.batch.api.chunk.listener.SkipWriteListener;
-import javax.batch.api.partition.PartitionCollector;
+import jakarta.batch.api.chunk.listener.RetryProcessListener;
+import jakarta.batch.api.chunk.listener.RetryReadListener;
+import jakarta.batch.api.chunk.listener.RetryWriteListener;
+import jakarta.batch.api.chunk.listener.SkipProcessListener;
+import jakarta.batch.api.chunk.listener.SkipReadListener;
+import jakarta.batch.api.chunk.listener.SkipWriteListener;
+import jakarta.batch.api.partition.PartitionCollector;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -242,14 +242,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	private StepExecutionAggregator stepExecutionAggregator;
 
 	/**
-	 * @param queue The {@link Queue} that is used for communication between {@link javax.batch.api.partition.PartitionCollector} and {@link javax.batch.api.partition.PartitionAnalyzer}
+	 * @param queue The {@link Queue} that is used for communication between {@link jakarta.batch.api.partition.PartitionCollector} and {@link jakarta.batch.api.partition.PartitionAnalyzer}
 	 */
 	public void setPartitionQueue(Queue<Serializable> queue) {
 		this.partitionQueue = queue;
 	}
 
 	/**
-	 * Used to coordinate access to the partition queue between the {@link javax.batch.api.partition.PartitionCollector} and {@link javax.batch.api.partition.AbstractPartitionAnalyzer}
+	 * Used to coordinate access to the partition queue between the {@link jakarta.batch.api.partition.PartitionCollector} and {@link jakarta.batch.api.partition.AbstractPartitionAnalyzer}
 	 *
 	 * @param lock a lock that will be locked around accessing the partition queue
 	 */
@@ -312,8 +312,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		for (Object listener : stepExecutionListeners) {
 			if(listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
-			} else if(listener instanceof javax.batch.api.listener.StepListener) {
-				builder.listener(new StepListenerAdapter((javax.batch.api.listener.StepListener) listener));
+			} else if(listener instanceof jakarta.batch.api.listener.StepListener) {
+				builder.listener(new StepListenerAdapter((jakarta.batch.api.listener.StepListener) listener));
 			}
 		}
 	}
@@ -833,40 +833,40 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				StepExecutionListener stepExecutionListener = (StepExecutionListener) listener;
 				stepExecutionListeners.add(stepExecutionListener);
 			}
-			if(listener instanceof javax.batch.api.listener.StepListener) {
-				StepExecutionListener stepExecutionListener = new StepListenerAdapter((javax.batch.api.listener.StepListener) listener);
+			if(listener instanceof jakarta.batch.api.listener.StepListener) {
+				StepExecutionListener stepExecutionListener = new StepListenerAdapter((jakarta.batch.api.listener.StepListener) listener);
 				stepExecutionListeners.add(stepExecutionListener);
 			}
 			if (listener instanceof ChunkListener) {
 				ChunkListener chunkListener = (ChunkListener) listener;
 				chunkListeners.add(chunkListener);
 			}
-			if(listener instanceof javax.batch.api.chunk.listener.ChunkListener) {
-				ChunkListener chunkListener = new ChunkListenerAdapter((javax.batch.api.chunk.listener.ChunkListener) listener);
+			if(listener instanceof jakarta.batch.api.chunk.listener.ChunkListener) {
+				ChunkListener chunkListener = new ChunkListenerAdapter((jakarta.batch.api.chunk.listener.ChunkListener) listener);
 				chunkListeners.add(chunkListener);
 			}
 			if (listener instanceof ItemReadListener) {
 				ItemReadListener<I> readListener = (ItemReadListener<I>) listener;
 				readListeners.add(readListener);
 			}
-			if(listener instanceof javax.batch.api.chunk.listener.ItemReadListener) {
-				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<>((javax.batch.api.chunk.listener.ItemReadListener) listener);
+			if(listener instanceof jakarta.batch.api.chunk.listener.ItemReadListener) {
+				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemReadListener) listener);
 				readListeners.add(itemListener);
 			}
 			if (listener instanceof ItemWriteListener) {
 				ItemWriteListener<O> writeListener = (ItemWriteListener<O>) listener;
 				writeListeners.add(writeListener);
 			}
-			if(listener instanceof javax.batch.api.chunk.listener.ItemWriteListener) {
-				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<>((javax.batch.api.chunk.listener.ItemWriteListener) listener);
+			if(listener instanceof jakarta.batch.api.chunk.listener.ItemWriteListener) {
+				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemWriteListener) listener);
 				writeListeners.add(itemListener);
 			}
 			if (listener instanceof ItemProcessListener) {
 				ItemProcessListener<I, O> processListener = (ItemProcessListener<I, O>) listener;
 				processListeners.add(processListener);
 			}
-			if(listener instanceof javax.batch.api.chunk.listener.ItemProcessListener) {
-				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<>((javax.batch.api.chunk.listener.ItemProcessListener) listener);
+			if(listener instanceof jakarta.batch.api.chunk.listener.ItemProcessListener) {
+				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemProcessListener) listener);
 				processListeners.add(itemListener);
 			}
 			if(listener instanceof RetryReadListener) {

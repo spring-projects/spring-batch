@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package org.springframework.batch.sample.remotepartitioning;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import jakarta.jms.JMSException;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +35,9 @@ public class BrokerConfiguration {
 	private String brokerUrl;
 
 	@Bean
-	public ActiveMQConnectionFactory connectionFactory() {
+	public ActiveMQConnectionFactory connectionFactory() throws JMSException {
 		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		connectionFactory.setBrokerURL(this.brokerUrl);
-		connectionFactory.setTrustAllPackages(true);
 		return connectionFactory;
 	}
 

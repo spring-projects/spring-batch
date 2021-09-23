@@ -19,8 +19,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.batch.api.chunk.listener.ChunkListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.chunk.listener.ChunkListener;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.junit.Before;
 import org.junit.Rule;

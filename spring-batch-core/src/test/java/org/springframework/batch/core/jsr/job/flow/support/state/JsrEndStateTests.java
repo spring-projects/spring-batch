@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.springframework.batch.core.jsr.job.flow.support.state;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.batch.api.AbstractBatchlet;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
+import jakarta.batch.api.AbstractBatchlet;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.JobExecution;
 
 import org.junit.Test;
 
@@ -29,6 +29,7 @@ import org.springframework.batch.core.jsr.AbstractJsrTestCase;
  * Tests for the JSR-352 version of {@link JsrEndState}
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class JsrEndStateTests extends AbstractJsrTestCase {
 

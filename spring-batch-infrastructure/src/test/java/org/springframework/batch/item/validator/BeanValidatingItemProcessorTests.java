@@ -16,7 +16,7 @@
 
 package org.springframework.batch.item.validator;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 import org.junit.Assert;
 import org.junit.Test;

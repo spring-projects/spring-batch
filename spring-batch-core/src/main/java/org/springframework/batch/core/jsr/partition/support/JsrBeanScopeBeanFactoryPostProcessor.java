@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 
-import javax.batch.api.partition.PartitionAnalyzer;
-import javax.batch.api.partition.PartitionMapper;
-import javax.batch.api.partition.PartitionReducer;
+import jakarta.batch.api.partition.PartitionAnalyzer;
+import jakarta.batch.api.partition.PartitionMapper;
+import jakarta.batch.api.partition.PartitionReducer;
 
 /**
  * In order for property resolution to occur correctly within the scope of a JSR-352
@@ -36,6 +36,7 @@ import javax.batch.api.partition.PartitionReducer;
  * lazy initialization (equivalent to lazy-init="true").
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrBeanScopeBeanFactoryPostProcessor implements BeanFactoryPostProcessor {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.batch.api.chunk.listener.RetryReadListener;
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.api.chunk.listener.RetryReadListener;
+import jakarta.batch.operations.BatchRuntimeException;
 
 /**
  * <p>
@@ -24,6 +24,7 @@ import javax.batch.operations.BatchRuntimeException;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class RetryReadListenerAdapter implements RetryListener, RetryReadListener {

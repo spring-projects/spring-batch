@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class for {@link javax.batch.api.chunk.listener.ItemProcessListener}
+ * Wrapper class for {@link jakarta.batch.api.chunk.listener.ItemProcessListener}
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -33,12 +33,12 @@ import org.springframework.util.Assert;
  */
 public class ItemProcessListenerAdapter<T,S> implements ItemProcessListener<T, S> {
 
-	private javax.batch.api.chunk.listener.ItemProcessListener delegate;
+	private jakarta.batch.api.chunk.listener.ItemProcessListener delegate;
 
 	/**
 	 * @param delegate to be called within the batch lifecycle
 	 */
-	public ItemProcessListenerAdapter(javax.batch.api.chunk.listener.ItemProcessListener delegate) {
+	public ItemProcessListenerAdapter(jakarta.batch.api.chunk.listener.ItemProcessListener delegate) {
 		Assert.notNull(delegate, "An ItemProcessListener is required");
 		this.delegate = delegate;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.batch.api.listener.JobListener;
+import jakarta.batch.api.listener.JobListener;
 
 import org.springframework.batch.core.listener.ListenerMetaData;
 
@@ -28,6 +28,7 @@ import org.springframework.batch.core.listener.ListenerMetaData;
  * of methods, their interfaces, annotation, and expected arguments.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public enum JsrJobListenerMetaData implements ListenerMetaData {

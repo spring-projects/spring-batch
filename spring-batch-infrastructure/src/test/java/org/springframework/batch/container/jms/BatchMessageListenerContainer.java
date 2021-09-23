@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import org.springframework.jms.connection.TransactionAwareConnectionFactoryProxy
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.Session;
 
 /**
  * Message listener container adapted for intercepting the message reception
@@ -49,6 +49,7 @@ import javax.jms.Session;
  * the JMS session from synchronizing with the database transaction.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class BatchMessageListenerContainer extends DefaultMessageListenerContainer {
@@ -121,7 +122,7 @@ public class BatchMessageListenerContainer extends DefaultMessageListenerContain
 	/**
 	 * Override base class method to wrap call in advice if provided.
 	 * @see org.springframework.jms.listener.AbstractPollingMessageListenerContainer#receiveAndExecute(Object,
-	 * javax.jms.Session, javax.jms.MessageConsumer)
+	 * jakarta.jms.Session, jakarta.jms.MessageConsumer)
 	 */
 	@Override
 	protected boolean receiveAndExecute(final Object invoker, final Session session, final MessageConsumer consumer)

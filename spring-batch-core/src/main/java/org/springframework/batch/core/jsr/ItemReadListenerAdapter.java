@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2018-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.jsr;
 
-import javax.batch.operations.BatchRuntimeException;
+import jakarta.batch.operations.BatchRuntimeException;
 
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.util.Assert;
 
 /**
- * Wrapper class to adapt the {@link javax.batch.api.chunk.listener.ItemReadListener} to
+ * Wrapper class to adapt the {@link jakarta.batch.api.chunk.listener.ItemReadListener} to
  * a {@link ItemReadListener}.
  * 
  * @author Michael Minella
@@ -33,9 +33,9 @@ import org.springframework.util.Assert;
  */
 public class ItemReadListenerAdapter<T> implements ItemReadListener<T> {
 
-	private javax.batch.api.chunk.listener.ItemReadListener delegate;
+	private jakarta.batch.api.chunk.listener.ItemReadListener delegate;
 
-	public ItemReadListenerAdapter(javax.batch.api.chunk.listener.ItemReadListener delegate) {
+	public ItemReadListenerAdapter(jakarta.batch.api.chunk.listener.ItemReadListener delegate) {
 		Assert.notNull(delegate, "An ItemReadListener is required");
 		this.delegate = delegate;
 	}

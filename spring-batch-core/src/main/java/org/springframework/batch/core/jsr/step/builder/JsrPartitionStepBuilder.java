@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.jsr.step.builder;
 
-import javax.batch.api.partition.PartitionReducer;
+import jakarta.batch.api.partition.PartitionReducer;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.jsr.step.PartitionStep;
@@ -31,6 +31,7 @@ import org.springframework.core.task.SyncTaskExecutor;
  * so that JSR-352 specific semantics are honored.
  *
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class JsrPartitionStepBuilder extends PartitionStepBuilder {

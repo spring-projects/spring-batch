@@ -25,7 +25,7 @@ both have readers, processors, writers, and listeners.  However, their interacti
 For example, the `org.springframework.batch.core.SkipListener#onSkipInWrite(S item, Throwable t)`
 within Spring Batch receives two parameters: the item that was skipped and the Exception that caused the
 skip.  The JSR-352 version of the same method
-(`javax.batch.api.chunk.listener.SkipWriteListener#onSkipWriteItem(List&lt;Object&gt; items, Exception ex)`)
+(`jakarta.batch.api.chunk.listener.SkipWriteListener#onSkipWriteItem(List&lt;Object&gt; items, Exception ex)`)
 also receives two parameters.  However the first one is a `List` of all the items
 within the current chunk with the second being the `Exception` that caused the skip.
 Because of these differences, it is important to note that there are two paths to execute a job within
@@ -197,7 +197,7 @@ batch job in XML:
                               http://xmlns.jcp.org/xml/ns/javaee
                               https://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd">
 
-    <!-- javax.batch.api.Batchlet implementation -->
+    <!-- jakarta.batch.api.Batchlet implementation -->
     <bean id="fooBatchlet" class="io.spring.FooBatchlet">
             <property name="prop" value="bar"/>
     </bean>
@@ -293,7 +293,7 @@ configuration in the JSL. Batch properties are configured at each level in the f
 are required by the spec). As defined by JSR-352, fields for properties must be String typed. Any type
 conversion is up to the implementing developer to perform.
 
-An `javax.batch.api.chunk.ItemReader` artifact could be configured with a
+An `jakarta.batch.api.chunk.ItemReader` artifact could be configured with a
 properties block such as the one described above and accessed as such:
 
 
@@ -344,9 +344,9 @@ used, which are separated by a ';'.
 
 JSR-352 provides the same two basic processing models that Spring Batch does:
 
-* Item based processing - Using an `javax.batch.api.chunk.ItemReader`, an optional
-`javax.batch.api.chunk.ItemProcessor`, and an `javax.batch.api.chunk.ItemWriter`.
-* Task based processing - Using a `javax.batch.api.Batchlet`
+* Item based processing - Using an `jakarta.batch.api.chunk.ItemReader`, an optional
+`jakarta.batch.api.chunk.ItemProcessor`, and an `jakarta.batch.api.chunk.ItemWriter`.
+* Task based processing - Using a `jakarta.batch.api.Batchlet`
 implementation.  This processing model is the same as the
 `org.springframework.batch.core.step.tasklet.Tasklet` based processing
 currently available.
@@ -384,7 +384,7 @@ then regardless of what the `item-count` is configured to be.
 JSR-352 calls the process around the commit interval within a step "checkpointing".
 Item-based checkpointing is one approach as mentioned above. However, this is not robust
 enough in many cases. Because of this, the spec allows for the implementation of a custom
-checkpointing algorithm by implementing the `javax.batch.api.chunk.CheckpointAlgorithm`
+checkpointing algorithm by implementing the `jakarta.batch.api.chunk.CheckpointAlgorithm`
 interface. This functionality is functionally the same as Spring Batch's custom completion
 policy.  To use an implementation of `CheckpointAlgorithm`, configure your step with the
 custom `checkpoint-policy` as shown below where `fooCheckpointer` refers to an
@@ -410,9 +410,9 @@ implementation of `CheckpointAlgorithm`.
 === Running a job
 
 The entrance to executing a JSR-352 based job is through the
-`javax.batch.operations.JobOperator`. Spring Batch provides its own implementation of
+`jakarta.batch.operations.JobOperator`. Spring Batch provides its own implementation of
 this interface (`org.springframework.batch.core.jsr.launch.JsrJobOperator`).  This
-implementation is loaded via the `javax.batch.runtime.BatchRuntime`.  Launching a
+implementation is loaded via the `jakarta.batch.runtime.BatchRuntime`.  Launching a
 JSR-352 based batch job is implemented as follows:
 
 
@@ -455,8 +455,8 @@ restart a job, a call to
 === Contexts
 
 JSR-352 defines two context objects that are used to interact with the meta-data of a job or step from
-within a batch artifact: `javax.batch.runtime.context.JobContext` and
-`javax.batch.runtime.context.StepContext`.  Both of these are available in any step
+within a batch artifact: `jakarta.batch.runtime.context.JobContext` and
+`jakarta.batch.runtime.context.StepContext`.  Both of these are available in any step
 level artifact (`Batchlet`, `ItemReader`, etc) with the
 `JobContext` being available to job level artifacts as well
 (`JobListener` for example).
@@ -563,14 +563,14 @@ it's own set of properties as provided by the JSL or the
 
 * `PartitionPlan` - With Spring Batch's partitioning, an
 `ExecutionContext` is provided for each partition.  With JSR-352, a
-single `javax.batch.api.partition.PartitionPlan` is provided with an
+single `jakarta.batch.api.partition.PartitionPlan` is provided with an
 array of `Properties` providing the meta-data for each partition.
 
 
 
 * `PartitionMapper` - JSR-352 provides two ways to generate partition
 meta-data.  One is via the JSL (partition properties).  The second is via an implementation
-of the `javax.batch.api.partition.PartitionMapper` interface.
+of the `jakarta.batch.api.partition.PartitionMapper` interface.
 Functionally, this interface is similar to the
 `org.springframework.batch.core.partition.support.Partitioner`
 interface provided by Spring Batch in that it provides a way to programmatically generate
@@ -598,12 +598,12 @@ errors occur and to dynamically set the exit status.  These components include t
 
 |===============
 |__Artifact Interface__|__Description__
-|`javax.batch.api.partition.PartitionCollector`|Provides a way for worker steps to send information back to the
+|`jakarta.batch.api.partition.PartitionCollector`|Provides a way for worker steps to send information back to the
 manager.  There is one instance per worker thread.
-|`javax.batch.api.partition.PartitionAnalyzer`|End point that receives the information collected by the
+|`jakarta.batch.api.partition.PartitionAnalyzer`|End point that receives the information collected by the
 `PartitionCollector` as well as the resulting
 statuses from a completed partition.
-|`javax.batch.api.partition.PartitionReducer`|Provides the ability to provide compensating logic for a partitioned
+|`jakarta.batch.api.partition.PartitionReducer`|Provides the ability to provide compensating logic for a partitioned
 step.
 
 |===============

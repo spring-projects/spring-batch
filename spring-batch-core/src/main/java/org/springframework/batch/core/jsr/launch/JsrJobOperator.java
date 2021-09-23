@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,22 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import javax.batch.operations.BatchRuntimeException;
-import javax.batch.operations.JobExecutionAlreadyCompleteException;
-import javax.batch.operations.JobExecutionIsRunningException;
-import javax.batch.operations.JobExecutionNotMostRecentException;
-import javax.batch.operations.JobExecutionNotRunningException;
-import javax.batch.operations.JobOperator;
-import javax.batch.operations.JobRestartException;
-import javax.batch.operations.JobSecurityException;
-import javax.batch.operations.JobStartException;
-import javax.batch.operations.NoSuchJobException;
-import javax.batch.operations.NoSuchJobExecutionException;
-import javax.batch.operations.NoSuchJobInstanceException;
-import javax.batch.runtime.BatchRuntime;
-import javax.batch.runtime.JobExecution;
-import javax.batch.runtime.JobInstance;
-import javax.batch.runtime.StepExecution;
+import jakarta.batch.operations.BatchRuntimeException;
+import jakarta.batch.operations.JobExecutionAlreadyCompleteException;
+import jakarta.batch.operations.JobExecutionIsRunningException;
+import jakarta.batch.operations.JobExecutionNotMostRecentException;
+import jakarta.batch.operations.JobExecutionNotRunningException;
+import jakarta.batch.operations.JobOperator;
+import jakarta.batch.operations.JobRestartException;
+import jakarta.batch.operations.JobSecurityException;
+import jakarta.batch.operations.JobStartException;
+import jakarta.batch.operations.NoSuchJobException;
+import jakarta.batch.operations.NoSuchJobExecutionException;
+import jakarta.batch.operations.NoSuchJobInstanceException;
+import jakarta.batch.runtime.BatchRuntime;
+import jakarta.batch.runtime.JobExecution;
+import jakarta.batch.runtime.JobInstance;
+import jakarta.batch.runtime.StepExecution;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -240,7 +240,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#abandon(long)
+	 * @see jakarta.batch.operations.JobOperator#abandon(long)
 	 */
 	@Override
 	public void abandon(long jobExecutionId) throws NoSuchJobExecutionException,
@@ -260,7 +260,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobExecution(long)
+	 * @see jakarta.batch.operations.JobOperator#getJobExecution(long)
 	 */
 	@Override
 	public JobExecution getJobExecution(long executionId)
@@ -275,7 +275,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobExecutions(javax.batch.runtime.JobInstance)
+	 * @see jakarta.batch.operations.JobOperator#getJobExecutions(jakarta.batch.runtime.JobInstance)
 	 */
 	@Override
 	public List<JobExecution> getJobExecutions(JobInstance jobInstance)
@@ -300,7 +300,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobInstance(long)
+	 * @see jakarta.batch.operations.JobOperator#getJobInstance(long)
 	 */
 	@Override
 	public JobInstance getJobInstance(long executionId)
@@ -315,7 +315,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobInstanceCount(java.lang.String)
+	 * @see jakarta.batch.operations.JobOperator#getJobInstanceCount(java.lang.String)
 	 */
 	@Override
 	public int getJobInstanceCount(String jobName) throws NoSuchJobException,
@@ -334,7 +334,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobInstances(java.lang.String, int, int)
+	 * @see jakarta.batch.operations.JobOperator#getJobInstances(java.lang.String, int, int)
 	 */
 	@Override
 	public List<JobInstance> getJobInstances(String jobName, int start, int count)
@@ -349,7 +349,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getJobNames()
+	 * @see jakarta.batch.operations.JobOperator#getJobNames()
 	 */
 	@Override
 	public Set<String> getJobNames() throws JobSecurityException {
@@ -357,7 +357,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getParameters(long)
+	 * @see jakarta.batch.operations.JobOperator#getParameters(long)
 	 */
 	@Override
 	public Properties getParameters(long executionId)
@@ -375,7 +375,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getRunningExecutions(java.lang.String)
+	 * @see jakarta.batch.operations.JobOperator#getRunningExecutions(java.lang.String)
 	 */
 	@Override
 	public List<Long> getRunningExecutions(String name)
@@ -396,7 +396,7 @@ public class JsrJobOperator implements JobOperator, ApplicationContextAware, Ini
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.batch.operations.JobOperator#getStepExecutions(long)
+	 * @see jakarta.batch.operations.JobOperator#getStepExecutions(long)
 	 */
 	@Override
 	public List<StepExecution> getStepExecutions(long executionId)

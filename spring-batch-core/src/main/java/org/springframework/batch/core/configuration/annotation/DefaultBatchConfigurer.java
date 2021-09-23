@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.configuration.BatchConfigurationException;

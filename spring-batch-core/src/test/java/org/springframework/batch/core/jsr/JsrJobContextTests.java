@@ -111,7 +111,7 @@ public class JsrJobContextTests {
 	public void testGetBatchStatus() {
 		when(execution.getStatus()).thenReturn(BatchStatus.COMPLETED);
 
-		assertEquals(javax.batch.runtime.BatchStatus.COMPLETED, context.getBatchStatus());
+		assertEquals(jakarta.batch.runtime.BatchStatus.COMPLETED, context.getBatchStatus());
 	}
 
 	@Test

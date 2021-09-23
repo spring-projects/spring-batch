@@ -10,27 +10,13 @@
 		<property name="sessionTransacted" value="true" />
 	</bean>
 
-	<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="brokerService">
-		<property name="brokerURL" value="vm://localhost"/>
-		<property name="trustAllPackages" value="true"/>
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory" depends-on="brokerService">
+		<constructor-arg name="brokerURL" value="vm://0"/>
 	</bean>
 
-	<bean id="brokerService" class="org.apache.activemq.broker.BrokerService" init-method="start"
-		destroy-method="stop">
-		<property name="brokerName" value="localhost" />
-		<property name="useJmx" value="true"/>
-		<property name="transportConnectorURIs">
-			<list>
-				<value>vm://localhost</value>
-			</list>
-		</property>
-		<property name="persistenceAdapter">
-			<bean class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
-			<!-- bean class="org.apache.activemq.store.jdbc.JDBCPersistenceAdapter">
-				<property name="dataSource" ref="dataSource"/>
-				<property name="createTablesOnStartup" value="true" />
-			</bean-->
-		</property>
+	<bean id="brokerService" class="org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ"
+		  init-method="start" destroy-method="stop">
+		<property name="configResourcePath" value="broker.xml"/>
 	</bean>
 
 </beans>

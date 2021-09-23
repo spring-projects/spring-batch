@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.core.jsr.step.listener;
 
-import javax.batch.api.BatchProperty;
-import javax.batch.api.listener.StepListener;
-import javax.batch.runtime.context.JobContext;
-import javax.inject.Inject;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.api.listener.StepListener;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.inject.Inject;
 
 /**
  * <p>
@@ -27,6 +27,7 @@ import javax.inject.Inject;
  * </p>
  *
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @since 3.0
  */
 public class ExitStatusSettingStepListener implements StepListener {

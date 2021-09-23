@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,17 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.batch.api.BatchProperty;
-import javax.batch.api.Batchlet;
-import javax.batch.api.chunk.AbstractItemReader;
-import javax.batch.api.chunk.AbstractItemWriter;
-import javax.batch.api.partition.PartitionPlan;
-import javax.batch.api.partition.PartitionPlanImpl;
-import javax.batch.runtime.BatchStatus;
-import javax.batch.runtime.JobExecution;
-import javax.batch.runtime.context.JobContext;
-import javax.batch.runtime.context.StepContext;
-import javax.inject.Inject;
+import jakarta.batch.api.BatchProperty;
+import jakarta.batch.api.Batchlet;
+import jakarta.batch.api.chunk.AbstractItemReader;
+import jakarta.batch.api.chunk.AbstractItemWriter;
+import jakarta.batch.api.partition.PartitionPlan;
+import jakarta.batch.api.partition.PartitionPlanImpl;
+import jakarta.batch.runtime.BatchStatus;
+import jakarta.batch.runtime.JobExecution;
+import jakarta.batch.runtime.context.JobContext;
+import jakarta.batch.runtime.context.StepContext;
+import jakarta.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -174,7 +174,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		return count;
 	}
 
-	public static class PartitionReducer implements javax.batch.api.partition.PartitionReducer {
+	public static class PartitionReducer implements jakarta.batch.api.partition.PartitionReducer {
 
 		public static String name;
 
@@ -208,7 +208,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		}
 	}
 
-	public static class PartitionAnalyzer implements javax.batch.api.partition.PartitionAnalyzer {
+	public static class PartitionAnalyzer implements jakarta.batch.api.partition.PartitionAnalyzer {
 
 		public static String name;
 
@@ -235,7 +235,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		}
 	}
 
-	public static class PartitionCollector implements javax.batch.api.partition.PartitionCollector {
+	public static class PartitionCollector implements jakarta.batch.api.partition.PartitionCollector {
 
 		protected static Set<String> artifactNames = Collections.synchronizedSet(new HashSet<>());
 
@@ -250,7 +250,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		}
 	}
 
-	public static class PropertyPartitionMapper implements javax.batch.api.partition.PartitionMapper {
+	public static class PropertyPartitionMapper implements jakarta.batch.api.partition.PartitionMapper {
 
 		@Override
 		public PartitionPlan mapPartitions() throws Exception {
@@ -271,7 +271,7 @@ public class PartitionParserTests extends AbstractJsrTestCase {
 		}
 	}
 
-	public static class PartitionMapper implements javax.batch.api.partition.PartitionMapper {
+	public static class PartitionMapper implements jakarta.batch.api.partition.PartitionMapper {
 
 		public static String name;
 
