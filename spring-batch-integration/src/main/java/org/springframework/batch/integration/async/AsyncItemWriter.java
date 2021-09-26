@@ -65,7 +65,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 				T item = future.get();
 
 				if(item != null) {
-					list.add(future.get());
+					list.add(item);
 				}
 			}
 			catch (ExecutionException e) {
