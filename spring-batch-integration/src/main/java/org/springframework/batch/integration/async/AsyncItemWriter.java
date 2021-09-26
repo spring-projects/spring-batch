@@ -59,30 +59,30 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	 * @throws Exception The exception returned by the Future if one was thrown
 	 */
 	public void write(List<? extends Future<T>> items) throws Exception {
-		List<T> list = new ArrayList<>();
-		for (Future<T> future : items) {
-			try {
-				T item = future.get();
+		if (!items.isEmpty()) {
+			List<T> list = new ArrayList<>();
+			for (Future<T> future : items) {
+				try {
+					T item = future.get();
 
-				if(item != null) {
-					list.add(item);
+					if (item != null) {
+						list.add(item);
+					}
+				} catch (ExecutionException e) {
+					Throwable cause = e.getCause();
+
+					if (cause instanceof Exception) {
+						logger.debug("An exception was thrown while processing an item", e);
+
+						throw (Exception) cause;
+					} else {
+						throw e;
+					}
 				}
 			}
-			catch (ExecutionException e) {
-				Throwable cause = e.getCause();
 
-				if(cause instanceof Exception) {
-					logger.debug("An exception was thrown while processing an item", e);
-
-					throw (Exception) cause;
-				}
-				else {
-					throw e;
-				}
-			}
+			delegate.write(list);
 		}
-		
-		delegate.write(list);
 	}
 
 	@Override
