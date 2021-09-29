@@ -17,7 +17,9 @@ package org.springframework.batch.core.test.step;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +43,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -260,6 +263,28 @@ public class FaultTolerantStepIntegrationTests {
 		assertEquals(2, stepExecution.getCommitCount());
 	}
 
+	@Test
+	public void testUseBothRetryLimitAndRetryPolicy() throws Exception {
+		// Given
+		@SuppressWarnings("unchecked")
+		Step step = stepBuilder
+				.retryLimit(2)
+				.retry(IllegalArgumentException.class)
+				.retryPolicy(new SimpleRetryPolicy(3, getExceptionMap(IllegalArgumentException.class)))
+				.skipPolicy(skipPolicy)
+				.build();
+
+		// When
+		StepExecution stepExecution = execute(step);
+
+		// Then
+		assertEquals(TOTAL_ITEMS, stepExecution.getReadCount());
+		// filter count is expected to be counted on each retry attempt
+		assertEquals(30, stepExecution.getFilterCount());
+		assertEquals(19, stepExecution.getWriteCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+	}
+
 	private List<Integer> createItems() {
 		List<Integer> items = new ArrayList<>(TOTAL_ITEMS);
 		for (int i = 1; i <= TOTAL_ITEMS; i++) {
@@ -276,7 +301,16 @@ public class FaultTolerantStepIntegrationTests {
 		step.execute(stepExecution);
 		return stepExecution;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	private Map<Class<? extends Throwable>, Boolean> getExceptionMap(Class<? extends Throwable>... args) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
+		for (Class<? extends Throwable> arg : args) {
+			map.put(arg, true);
+		}
+		return map;
+	}
+
 	private class SkipIllegalArgumentExceptionSkipPolicy implements SkipPolicy {
 		
 		@Override

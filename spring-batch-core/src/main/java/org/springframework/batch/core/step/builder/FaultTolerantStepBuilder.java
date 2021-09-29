@@ -91,6 +91,7 @@ import org.springframework.util.Assert;
  * @author Chris Schaefer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  * @since 2.2
  */
@@ -594,22 +595,14 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	protected BatchRetryTemplate createRetryOperations() {
 
 		RetryPolicy retryPolicy = this.retryPolicy;
-		SimpleRetryPolicy simpleRetryPolicy = null;
-
-		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(
-				retryableExceptionClasses);
-		map.put(ForceRollbackForWriteSkipException.class, true);
-		simpleRetryPolicy = new SimpleRetryPolicy(retryLimit, map);
-
 		if (retryPolicy == null) {
 			Assert.state(!(retryableExceptionClasses.isEmpty() && retryLimit > 0),
 					"If a retry limit is provided then retryable exceptions must also be specified");
-			retryPolicy = simpleRetryPolicy;
-		}
-		else if ((!retryableExceptionClasses.isEmpty() && retryLimit > 0)) {
-			CompositeRetryPolicy compositeRetryPolicy = new CompositeRetryPolicy();
-			compositeRetryPolicy.setPolicies(new RetryPolicy[] { retryPolicy, simpleRetryPolicy });
-			retryPolicy = compositeRetryPolicy;
+
+			Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(
+					retryableExceptionClasses);
+			map.put(ForceRollbackForWriteSkipException.class, true);
+			retryPolicy = new SimpleRetryPolicy(retryLimit, map);
 		}
 
 		RetryPolicy retryPolicyWrapper = getFatalExceptionAwareProxy(retryPolicy);
