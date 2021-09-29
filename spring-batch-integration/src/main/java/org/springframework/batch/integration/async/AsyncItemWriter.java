@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2022 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,13 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 				T item = future.get();
 
 				if (item != null) {
-					list.add(future.get());
+					list.add(item);
 				}
 			}
 			catch (ExecutionException e) {
 				Throwable cause = e.getCause();
 
-				if (cause != null && cause instanceof Exception) {
+				if (cause instanceof Exception) {
 					logger.debug("An exception was thrown while processing an item", e);
 
 					throw (Exception) cause;
