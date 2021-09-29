@@ -81,8 +81,10 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 				}
 			}
 		}
-		
-		delegate.write(list);
+
+		if (!list.isEmpty()) {
+			delegate.write(list);
+		}
 	}
 
 	@Override
