@@ -1822,5 +1822,4 @@ or should be considered aborted (change its status to
 `FAILED` or `ABANDONED`). This is
 a business decision, and there is no way to automate it. Change the
 status to `FAILED` only if it is not restartable or if
-you know the restart data is valid. Spring Batch
-Admin `JobService` includes a utility to abort a job execution.
+you know the restart data is valid.
