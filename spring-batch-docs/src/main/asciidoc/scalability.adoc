@@ -245,7 +245,7 @@ expensive than the reading of items (as is often the case in practice).
 The manager is an implementation of a Spring Batch `Step` with the `ItemWriter` replaced
 by a generic version that knows how to send chunks of items to the middleware as
 messages. The workers are standard listeners for whatever middleware is being used (for
-example, with JMS, they would be `MesssageListener` implementations), and their role is
+example, with JMS, they would be `MessageListener` implementations), and their role is
 to process the chunks of items using a standard `ItemWriter` or `ItemProcessor` plus
 `ItemWriter`, through the `ChunkProcessor` interface. One of the advantages of using this
 pattern is that the reader, processor, and writer components are off-the-shelf (the same

@@ -108,7 +108,7 @@ alternate paths for processing: the normal case, as denoted by `PROCESS` (5), an
 recovery path, as denoted in a separate block by `RECOVER` (6).  The two alternate paths
 are completely distinct. Only one is ever taken in normal circumstances.
 
-In special cases (such as a special `TranscationValidException` type), the retry policy
+In special cases (such as a special `TransactionValidException` type), the retry policy
 might be able to determine that the `RECOVER` (6) path can be taken on the last attempt
 after `PROCESS` (5) has just failed, instead of waiting for the item to be re-presented.
 This is not the default behavior, because it requires detailed knowledge of what has
@@ -267,7 +267,7 @@ JTA, but it is the only one that consistently works.
 Consequently, the `NESTED` pattern is best if the retry block contains any database
 access.
 
-[[specialTransactionOrthonogonal]]
+[[specialTransactionOrthogonal]]
 === Special Case: Transactions with Orthogonal Resources
 
 Default propagation is always OK for simple cases where there are no nested database

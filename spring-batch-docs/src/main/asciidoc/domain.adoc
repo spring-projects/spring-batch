@@ -63,7 +63,7 @@ global to all steps, such as restartability. The job configuration contains:
 
 ifdef::backend-html5[]
 [role="javaContent"]
-For those who use Java configuration, Spring Batch provices a default implementation of
+For those who use Java configuration, Spring Batch provides a default implementation of
 the Job interface in the form of the `SimpleJob` class, which creates some standard
 functionality on top of `Job`. When using java based configuration, a collection of
 builders is made available for the instantiation of a `Job`, as shown in the following
