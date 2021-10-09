@@ -2079,7 +2079,7 @@ elsewhere in XML:
 The following example shows how to declare a flow as a reference to a flow defined
 elsewhere in Java:
 
-.Java Confguration
+.Java Configuration
 [source, java, role="javaContent"]
 ----
 @Bean
