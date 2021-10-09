@@ -52,7 +52,7 @@ Item::
   terms, this might be a line in a file, a row in a database table, or a particular
   element in an XML file.
 
-Logicial Unit of Work (LUW)::
+Logical Unit of Work (LUW)::
   A batch job iterates through a driving query (or other input source, such as a file) to
   perform the set of work that the job must accomplish. Each iteration of work performed
   is a unit of work.
