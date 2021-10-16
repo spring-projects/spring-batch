@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,9 +82,9 @@ import org.springframework.util.StringUtils;
  * @author Parikshit Dutta
  */
 public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> implements InitializingBean {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(MongoItemReader.class);
-	
+
 	private MongoOperations template;
 	private Query query;
 	private String queryString;
@@ -168,6 +168,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * @param sorts map of properties and direction to sort each.
 	 */
 	public void setSort(Map<String, Sort.Direction> sorts) {
+		Assert.notNull(sorts, "Sorts must not be null");
 		this.sort = convertToSort(sorts);
 	}
 
@@ -252,7 +253,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<>();
+		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
 			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));

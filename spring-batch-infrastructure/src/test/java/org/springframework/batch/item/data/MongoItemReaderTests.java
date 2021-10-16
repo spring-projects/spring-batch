@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -378,5 +379,16 @@ public class MongoItemReaderTests {
 		assertEquals(10, actualQuery.getLimit());
 		assertEquals(0, actualQuery.getSkip());
 		assertEquals("collection", stringContainer.getValue());
+	}
+
+	@Test
+	public void testSortThrowsExceptionWhenInvokedWithNull() {
+		// given
+		reader = new MongoItemReader<>();
+
+		// when + then
+		assertThatIllegalArgumentException()
+						.isThrownBy(() -> reader.setSort(null))
+						.withMessage("Sorts must not be null");
 	}
 }
