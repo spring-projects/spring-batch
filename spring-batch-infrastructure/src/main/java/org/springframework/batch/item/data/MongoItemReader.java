@@ -164,6 +164,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 * @param sorts map of properties and direction to sort each.
 	 */
 	public void setSort(Map<String, Sort.Direction> sorts) {
+		Assert.notNull(sorts, "Sorts must not be null");
 		this.sort = convertToSort(sorts);
 	}
 
@@ -248,7 +249,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	private Sort convertToSort(Map<String, Sort.Direction> sorts) {
-		List<Sort.Order> sortValues = new ArrayList<>();
+		List<Sort.Order> sortValues = new ArrayList<>(sorts.size());
 
 		for (Map.Entry<String, Sort.Direction> curSort : sorts.entrySet()) {
 			sortValues.add(new Sort.Order(curSort.getValue(), curSort.getKey()));
