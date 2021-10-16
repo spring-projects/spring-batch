@@ -17,6 +17,7 @@
 package org.springframework.batch.item.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class MongoItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private String hint;
 	private String fields;
 	private String collection;
-	private List<Object> parameterValues = new ArrayList<>();
+	private List<Object> parameterValues = Collections.emptyList();
 
 	public MongoItemReader() {
 		super();

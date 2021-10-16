@@ -16,8 +16,8 @@
 
 package org.springframework.batch.item.data.builder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class MongoItemReaderBuilder<T> {
 
 	private String collection;
 
-	private List<Object> parameterValues = new ArrayList<>();
+	private List<Object> parameterValues = Collections.emptyList();
 
 	protected int pageSize = 10;
 
