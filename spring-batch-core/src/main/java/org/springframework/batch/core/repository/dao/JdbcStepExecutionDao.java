@@ -97,9 +97,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			"JE.CREATE_TIME, JE.LAST_UPDATED, JE.VERSION" +
 			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
 			" where " +
-			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
-			"where JOB_INSTANCE_ID = ?)" +
-			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID" +
+			"      and JE.JOB_INSTANCE_ID = ?" +
 			"      and SE.STEP_NAME = ?" +
 			" order by SE.START_TIME desc, SE.STEP_EXECUTION_ID desc";
 
@@ -109,9 +108,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String COUNT_STEP_EXECUTIONS = "SELECT COUNT(*) " +
 			" from %PREFIX%JOB_EXECUTION JE, %PREFIX%STEP_EXECUTION SE" +
 			" where " +
-			"      SE.JOB_EXECUTION_ID in (SELECT JOB_EXECUTION_ID from %PREFIX%JOB_EXECUTION " +
-			"where JOB_INSTANCE_ID = ?)" +
-			"      and SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      SE.JOB_EXECUTION_ID = JE.JOB_EXECUTION_ID " +
+			"      and JOB_INSTANCE_ID = ?" +
 			"      and SE.STEP_NAME = ?";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
