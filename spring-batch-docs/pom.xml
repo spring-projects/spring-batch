@@ -87,6 +87,7 @@
                             <backend>html5</backend>
                             <doctype>book</doctype>
                             <attributes>
+                                <docinfodir>${project.build.directory}/asciidoc</docinfodir>
                                 <docinfo>shared</docinfo>
                                 <stylesdir>css/</stylesdir>
                                 <stylesheet>spring.css</stylesheet>
