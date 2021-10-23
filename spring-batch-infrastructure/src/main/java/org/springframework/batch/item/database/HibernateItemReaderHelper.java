@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.hibernate.StatelessSession;
 import org.springframework.batch.item.database.orm.HibernateQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -39,7 +40,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
+ * @author June Young. Park
  */
 @SuppressWarnings("rawtypes")
 public class HibernateItemReaderHelper<T> implements InitializingBean {
@@ -88,7 +89,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(statefulSession == null && statelessSession == null,
-				"The useStatelessSession flag can only be set before a session is initialized.");
+			"The useStatelessSession flag can only be set before a session is initialized.");
 		this.useStatelessSession = useStatelessSession;
 	}
 
@@ -107,7 +108,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		if (queryProvider == null) {
 			Assert.notNull(sessionFactory, "session factory must be set");
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
-					"queryString or queryName must be set");
+				"queryString or queryName must be set");
 		}
 	}
 
@@ -121,7 +122,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	 */
 	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
 		Query query = createQuery();
-		if (parameterValues != null) {
+		if (!CollectionUtils.isEmpty(parameterValues)) {
 			query.setProperties(parameterValues);
 		}
 		return query.setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
@@ -220,7 +221,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		clear();
 
 		Query query = createQuery();
-		if (parameterValues != null) {
+		if (!CollectionUtils.isEmpty(parameterValues)) {
 			query.setProperties(parameterValues);
 		}
 		@SuppressWarnings("unchecked")
