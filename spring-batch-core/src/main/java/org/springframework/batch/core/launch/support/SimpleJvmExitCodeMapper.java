@@ -35,10 +35,16 @@ import org.springframework.batch.core.ExitStatus;
 
 public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
+	/**
+	 * The {@link Log} used by the class.
+ 	 */
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private Map<String, Integer> mapping;
 
+	/**
+	 * Default constructor.
+	 */
 	public SimpleJvmExitCodeMapper() {
 		mapping = new HashMap<>();
 		mapping.put(ExitStatus.COMPLETED.getExitCode(), JVM_EXITCODE_COMPLETED);
@@ -47,6 +53,9 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 		mapping.put(ExitCodeMapper.NO_SUCH_JOB, JVM_EXITCODE_JOB_ERROR);
 	}
 
+	/**
+ 	 * @return {@link Map} with the exit status mapping.
+	 */
 	public Map<String, Integer> getMapping() {
 		return mapping;
 	}

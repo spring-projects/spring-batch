@@ -65,6 +65,10 @@ public class JobExecution extends Entity {
 
 	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
+	/**
+	 * Constructor that sets the state of the instance to the {@link JobExecution} parameter.
+	 * @param original {@link JobExecution} to be copied.
+	 */
 	public JobExecution(JobExecution original) {
 		this.jobParameters = original.getJobParameters();
 		this.jobInstance = original.getJobInstance();
@@ -105,38 +109,71 @@ public class JobExecution extends Entity {
 		this(job, null, jobParameters);
 	}
 
+	/**
+	 * Constructor that accepts the current job execution id and {@link JobParameters}.
+	 * @param id the job execution id.
+	 * @param jobParameters {@link JobParameters} for the {@link JobExecution}.
+	 */
 	public JobExecution(Long id, JobParameters jobParameters) {
 		this(null, id, jobParameters);
 	}
 
+	/**
+	 * Constructor that accepts the current job execution id.
+	 * @param id the job execution id.
+	 */
 	public JobExecution(Long id) {
 		this(null, id, null);
 	}
 
+	/**
+	 * @return the current {@link JobParameters}.
+	 */
 	public JobParameters getJobParameters() {
 		return this.jobParameters;
 	}
 
+	/**
+	 * @return the current end time.
+	 */
 	public Date getEndTime() {
 		return endTime;
 	}
 
+	/**
+	 * Set the {@link JobInstance} used by the job execution.
+	 * @param jobInstance the {@link JobInstance} used by the job execution.
+	 */
 	public void setJobInstance(JobInstance jobInstance) {
 		this.jobInstance = jobInstance;
 	}
 
+	/**
+	 * Set the end time.
+	 * @param endTime the {@link Date} to be used for the end time.
+	 */
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
+	/**
+	 * @return the current start time.
+	 */
 	public Date getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * Set the start time.
+	 * @param startTime the {@link Date} to be used for the start time.
+	 */
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
+	/**
+	 * @return the current {@link BatchStatus}.
+	 */
 	public BatchStatus getStatus() {
 		return status;
 	}
@@ -297,6 +334,10 @@ public class JobExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
+	/**
+	 * Retrieve a list of exceptions.
+	 * @return {@link List} of {@link Throwable}s.
+	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}

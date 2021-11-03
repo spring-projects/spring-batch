@@ -222,6 +222,12 @@ implements InitializingBean {
 		return exceptionTranslator;
 	}
 
+	/**
+	 * Translates the Exception to a {@link DataAccessException} for the specified.
+	 * exception.  If it can not be translated it will throw an {@link UncategorizedSQLException}.
+	 *
+	 * @return the {@link DataAccessException} created from the SQLException.
+	 */
 	protected DataAccessException translateSqlException(String task, String sql, SQLException ex) {
 		DataAccessException dae = getExceptionTranslator().translate(task, sql, ex);
 		if (dae != null) {
@@ -474,6 +480,10 @@ implements InitializingBean {
 		}
 	}
 
+	/**
+	 * Open the cursor for the {@link Connection}.
+	 * @param con The {@link Connection} the datastore.
+	 */
 	protected abstract void openCursor(Connection con);
 
 	/**

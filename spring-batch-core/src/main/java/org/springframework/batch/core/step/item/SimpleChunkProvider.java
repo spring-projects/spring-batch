@@ -46,14 +46,26 @@ import org.springframework.lang.Nullable;
  */
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
+	/**
+	 * The {@link Log} for the simple chunk provider.
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+
+	/**
+	 * The {@link ItemReader} for the simple chunk provider.
+	 */
 	protected final ItemReader<? extends I> itemReader;
 
 	private final MulticasterBatchListener<I, ?> listener = new MulticasterBatchListener<>();
 
 	private final RepeatOperations repeatOperations;
 
+	/**
+	 * Constructor for {@link SimpleChunkProvider}.
+	 * @param itemReader the {@link ItemReader} for the simple chunk provider.
+	 * @param repeatOperations the {@link RepeatOperations} for the simple chunk provider
+	 */
 	public SimpleChunkProvider(ItemReader<? extends I> itemReader, RepeatOperations repeatOperations) {
 		this.itemReader = itemReader;
 		this.repeatOperations = repeatOperations;

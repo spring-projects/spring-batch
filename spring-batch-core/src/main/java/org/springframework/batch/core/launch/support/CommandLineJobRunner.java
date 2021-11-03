@@ -177,6 +177,9 @@ import org.springframework.util.StringUtils;
  */
 public class CommandLineJobRunner {
 
+	/**
+	 * Logger to be used for the {@link CommandLineJobRunner}.
+	 */
 	protected static final Log logger = LogFactory.getLog(CommandLineJobRunner.class);
 
 	private ExitCodeMapper exitCodeMapper = new SimpleJvmExitCodeMapper();

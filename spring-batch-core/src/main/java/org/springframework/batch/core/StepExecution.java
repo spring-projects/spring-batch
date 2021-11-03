@@ -473,10 +473,17 @@ public class StepExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
+	/**
+	 * @return {@link List} of {@link Throwable}s.
+	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
 
+	/**
+	 * Add {@link Throwable} to failure exceptions.
+	 * @param throwable {@link Throwable} to add to failure exceptions.
+	 */
 	public void addFailureException(Throwable throwable) {
 		this.failureExceptions.add(throwable);
 	}
@@ -533,6 +540,9 @@ public class StepExecution extends Entity {
 		return String.format(getSummary() + ", exitDescription=%s", exitStatus.getExitDescription());
 	}
 
+	/**
+	 * @return String containing summary of the step execution.
+	 */
 	public String getSummary() {
 		return super.toString()
 				+ String.format(

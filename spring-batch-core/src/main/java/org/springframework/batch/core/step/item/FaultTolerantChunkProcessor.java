@@ -135,6 +135,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		this.processorTransactional = processorTransactional;
 	}
 
+	/**
+	 * Constructor that establishes {@link ItemProcessor}, {@link ItemWriter} and, {@link BatchRetryTemplate}.
+	 * @param itemProcessor the {@link ItemProcessor} for the {@link FaultTolerantChunkProcessor}.
+	 * @param itemWriter the {@link ItemWriter} for the {@link FaultTolerantChunkProcessor}.
+	 * @param batchRetryTemplate the {@link BatchRetryTemplate} for the {@link FaultTolerantChunkProcessor}.
+	 */
 	public FaultTolerantChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor,
 			ItemWriter<? super O> itemWriter, BatchRetryTemplate batchRetryTemplate) {
 		super(itemProcessor, itemWriter);

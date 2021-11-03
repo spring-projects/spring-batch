@@ -127,6 +127,10 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		this.exitMessageLength = exitMessageLength;
 	}
 
+	/**
+	 * Public setter for the {@link DataFieldMaxValueIncrementer}.
+	 * @param stepExecutionIncrementer the {@link DataFieldMaxValueIncrementer} to be associated with the DAO.
+	 */
 	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
 		this.stepExecutionIncrementer = stepExecutionIncrementer;
 	}

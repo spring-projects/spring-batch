@@ -24,14 +24,27 @@ package org.springframework.batch.core.job.builder;
 @SuppressWarnings("serial")
 public class FlowBuilderException extends RuntimeException {
 
+	/**
+	 * Constructor that accepts a message and the cause.
+	 * @param msg {@link String} containing the message for the {@link Exception}.
+	 * @param e the cause of the exception.
+	 */
 	public FlowBuilderException(String msg, Exception e) {
 		super(msg, e);
 	}
 
+	/**
+	 * Constructor that accepts the cause of the {@link Exception}.
+	 * @param e the cause of the exception.
+	 */
 	public FlowBuilderException(Exception e) {
 		super(e);
 	}
 
+	/**
+	 * Constructor that accepts a message for this {@link Exception}.
+	 * @param msg {@link String} containing the message for the {@link Exception}.
+	 */
 	public FlowBuilderException(String msg) {
 		super(msg);
 	}

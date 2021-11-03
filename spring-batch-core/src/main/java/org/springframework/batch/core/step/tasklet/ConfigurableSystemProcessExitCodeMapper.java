@@ -31,6 +31,9 @@ import org.springframework.util.Assert;
  */
 public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExitCodeMapper {
 
+	/**
+	 * The key to use if the injected map does not contain the exit code.
+	 */
 	public static final String ELSE_KEY = "else";
 
 	private Map<Object, ExitStatus> mappings;

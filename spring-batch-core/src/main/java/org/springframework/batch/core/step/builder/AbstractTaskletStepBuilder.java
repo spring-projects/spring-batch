@@ -55,6 +55,9 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public abstract class AbstractTaskletStepBuilder<B extends AbstractTaskletStepBuilder<B>> extends
 StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 
+	/**
+	 * {@link Set} of {@link ChunkListener}s to be used by the builder.
+	 */
 	protected Set<ChunkListener> chunkListeners = new LinkedHashSet<>();
 
 	private RepeatOperations stepOperations;
@@ -69,10 +72,17 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 
 	private TaskExecutor taskExecutor;
 
+	/**
+	 * @param parent {@link StepBuilderHelper} to be used by the builder.
+	 */
 	public AbstractTaskletStepBuilder(StepBuilderHelper<?> parent) {
 		super(parent);
 	}
 
+	/**
+	 * Creates new {@link Tasklet}.
+	 * @return {@link Tasklet}.
+	 */
 	protected abstract Tasklet createTasklet();
 
 	/**
@@ -269,18 +279,30 @@ StepBuilderHelper<AbstractTaskletStepBuilder<B>> {
 		return concurrent;
 	}
 
+	/**
+	 * @return {@link TaskExecutor} used by the builder.
+	 */
 	protected TaskExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
 
+	/**
+	 * @return  throttleLimit used by the builder
+	 */
 	protected int getThrottleLimit() {
 		return throttleLimit;
 	}
 
+	/**
+	 * @return {@link TransactionAttribute} used by the builder.
+	 */
 	protected TransactionAttribute getTransactionAttribute() {
 		return transactionAttribute;
 	}
 
+	/**
+	 * @return {@link Set} of {@link ItemStream}s.
+	 */
 	protected Set<ItemStream> getStreams() {
 		return this.streams;
 	}

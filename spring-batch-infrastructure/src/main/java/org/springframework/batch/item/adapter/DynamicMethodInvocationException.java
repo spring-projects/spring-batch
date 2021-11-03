@@ -32,10 +32,19 @@ public class DynamicMethodInvocationException extends RuntimeException {
 	// generated value
 	private static final long serialVersionUID = -6056786139731564040L;
 
+	/**
+	 * Constructor that sets the cause for the exception.
+	 * @param cause the cause of the exception.
+	 */
 	public DynamicMethodInvocationException(Throwable cause) {
 		super(cause);
 	}
 
+	/**
+	 * Constructor that sets the cause and message for the exception.
+	 * @param cause the cause of the exception.
+	 * @param message the message for the exception.
+	 */
 	public DynamicMethodInvocationException(String message, Throwable cause) {
 		super(message, cause);
 	}

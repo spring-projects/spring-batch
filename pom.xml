@@ -203,6 +203,8 @@
 					</excludePackageNames>
 					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
 					<detectJavaApiLink>false</detectJavaApiLink>
+					<doclint>all,-missing</doclint>
+					<quiet>true</quiet>
 				</configuration>
 				<executions>
 					<execution>

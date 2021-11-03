@@ -24,7 +24,10 @@ import java.util.Collection;
  *
  */
 public interface FlowHolder {
-	
+
+	/**
+	 * @return The {@link Collection} of {@link Flow}s associated with implementation.
+	 */
 	Collection<Flow> getFlows();
 
 }

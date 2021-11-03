@@ -125,6 +125,9 @@ public class JobParameter implements Serializable {
 		this(parameter, true);
 	}
 
+	/**
+	 * @return true if the job parameter is identifying.
+	 */
 	public boolean isIdentifying() {
 		return identifying;
 	}
@@ -168,10 +171,25 @@ public class JobParameter implements Serializable {
 	}
 
 	/**
-	 * Enumeration representing the type of a JobParameter.
+	 * Enumeration representing the type of JobParameter.
 	 */
 	public enum ParameterType {
 
-		STRING, DATE, LONG, DOUBLE;
+		/**
+		 * String parameter type.
+		 */
+		STRING,
+		/**
+		 * Date parameter type.
+		 */
+		DATE,
+		/**
+		 * Long parameter type.
+		 */
+		LONG,
+		/**
+		 * Double parameter type.
+		 */
+		DOUBLE;
 	}
 }

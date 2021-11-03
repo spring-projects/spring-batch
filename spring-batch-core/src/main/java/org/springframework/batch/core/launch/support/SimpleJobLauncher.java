@@ -68,6 +68,9 @@ import org.springframework.util.Assert;
  */
 public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 
+	/**
+	 * {@link Log} used by the class.
+	 */
 	protected static final Log logger = LogFactory.getLog(SimpleJobLauncher.class);
 
 	private JobRepository jobRepository;

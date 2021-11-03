@@ -45,10 +45,17 @@ import org.springframework.batch.support.ReflectionUtils;
  */
 public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
+	/**
+	 * {@link Log} used by the builder helper.
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private final CommonJobProperties properties;
 
+	/**
+	 * Constructor for {@link JobBuilderHelper} that initializes the name property.
+	 * @param name name to be used by the builder helper.
+	 */
 	public JobBuilderHelper(String name) {
 		this.properties = new CommonJobProperties();
 		properties.name = name;
@@ -149,18 +156,31 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * @return name used by the ubilder.
+	 */
 	protected String getName() {
 		return properties.name;
 	}
 
+	/**
+	 * @return {@link JobRepository} used by the builder helper.
+	 */
 	protected JobRepository getJobRepository() {
 		return properties.jobRepository;
 	}
 
+	/**
+	 * @return restartable flag used by the builder helper.
+	 */
 	protected boolean isRestartable() {
 		return properties.restartable;
 	}
 
+	/**
+	 * Sets the {@link JobParametersIncrementer}, {@link JobParametersIncrementer}, {@link JobExecutionListener}s and restartable flag for the job.
+	 * @param target {@link Job} to be updated.
+	 */
 	protected void enhance(Job target) {
 
 		if (target instanceof AbstractJob) {
@@ -191,6 +211,9 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 	}
 
+	/**
+	 * Properties used in creating {@link Job}s.
+	 */
 	public static class CommonJobProperties {
 
 		private Set<JobExecutionListener> jobExecutionListeners = new LinkedHashSet<>();
@@ -203,9 +226,16 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 
 		private JobParametersValidator jobParametersValidator;
 
+		/**
+		 * Default constructor for {@link CommonJobProperties}.
+		 */
 		public CommonJobProperties() {
 		}
 
+		/**
+		 * Constructor that sets the properties used by the builder helper.
+		 * @param properties the {@link CommonJobProperties} used by the builder helper.
+		 */
 		public CommonJobProperties(CommonJobProperties properties) {
 			this.name = properties.name;
 			this.restartable = properties.restartable;
@@ -215,54 +245,100 @@ public abstract class JobBuilderHelper<B extends JobBuilderHelper<B>> {
 			this.jobParametersValidator = properties.jobParametersValidator;
 		}
 
+		/**
+		 * @return the {@link JobParametersIncrementer} used by the builder helper.
+		 */
 		public JobParametersIncrementer getJobParametersIncrementer() {
 			return jobParametersIncrementer;
 		}
 
+		/**
+		 * Set the {@link JobParametersIncrementer} to be used by the builder helper.
+		 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to be used by the builder helper.
+		 */
 		public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 			this.jobParametersIncrementer = jobParametersIncrementer;
 		}
 
+		/**
+		 * @return the {@link JobParametersValidator} used by the validator
+		 */
 		public JobParametersValidator getJobParametersValidator() {
 			return jobParametersValidator;
 		}
 
+		/**
+		 * Set the {@link JobParametersValidator} to be used by the builder helper.
+		 * @param jobParametersValidator the {@link JobParametersValidator} to be used by the builder helper.
+		 */
 		public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 			this.jobParametersValidator = jobParametersValidator;
 		}
 
+		/**
+		 * @return current {@link JobRepository} used by the builder helper.
+		 */
 		public JobRepository getJobRepository() {
 			return jobRepository;
 		}
 
+		/**
+		 * Set the {@link JobRepository} to be used by the builder helper.
+		 * @param jobRepository the {@link JobRepository} to be used by the builder helper.
+		 */
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
 		}
 
+		/**
+		 * @return the name used by the builder helper.
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * Set the name of job created by builder.
+		 * @param name the name to use.
+		 */
 		public void setName(String name) {
 			this.name = name;
 		}
 
+		/**
+		 * @return {@link List} of {@link JobExecutionListener}s.
+		 */
 		public List<JobExecutionListener> getJobExecutionListeners() {
 			return new ArrayList<>(jobExecutionListeners);
 		}
 
+		/**
+		 * Add {@link List} of {@link JobExecutionListener}s to the list of listeners for  {@link Job}.
+		 * @param jobExecutionListeners {@link List} of {@link JobExecutionListener}s to be used by the builder helper.
+		 */
 		public void addStepExecutionListeners(List<JobExecutionListener> jobExecutionListeners) {
 			this.jobExecutionListeners.addAll(jobExecutionListeners);
 		}
 
+		/**
+		 * Add {@link JobExecutionListener} to the list of listeners for  {@link Job}.
+		 * @param jobExecutionListener the {@link JobExecutionListener} to be used by the builder helper.
+		 */
 		public void addJobExecutionListener(JobExecutionListener jobExecutionListener) {
 			this.jobExecutionListeners.add(jobExecutionListener);
 		}
 
+		/**
+		 * @return true if restartable else false.
+		 */
 		public boolean getRestartable() {
 			return restartable;
 		}
 
+		/**
+		 * Set the value for restartable.
+		 * @param restartable true if to be restartable else false.
+		 */
 		public void setRestartable(boolean restartable) {
 			this.restartable = restartable;
 		}

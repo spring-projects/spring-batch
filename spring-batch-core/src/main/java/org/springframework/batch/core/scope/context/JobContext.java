@@ -54,6 +54,10 @@ public class JobContext extends SynchronizedAttributeAccessor {
 
 	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
+	/**
+	 * Constructor for Job Context
+	 * @param jobExecution a {@link JobExecution} instance.
+	 */
 	public JobContext(JobExecution jobExecution) {
 		super();
 		Assert.notNull(jobExecution, "A JobContext must have a non-null JobExecution");

@@ -26,6 +26,12 @@ import org.springframework.batch.core.JobExecutionException;
  */
 public interface JobLaunchRequestHandler {
 
+	/**
+	 * Launches the job based on the request.
+	 * @param request {@link JobLaunchRequest} containing the information on the job to be launched
+	 * @return the {@link JobExecution} associated with this job launch.
+	 * @throws JobExecutionException
+	 */
 	JobExecution launch(JobLaunchRequest request) throws JobExecutionException;
 
 }

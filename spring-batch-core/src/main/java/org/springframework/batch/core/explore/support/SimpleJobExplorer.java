@@ -25,6 +25,7 @@ import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -62,6 +63,13 @@ public class SimpleJobExplorer implements JobExplorer {
 	SimpleJobExplorer() {
 	}
 
+	/**
+	 * Constructor to initialize the job {@link SimpleJobExplorer}.
+	 * @param jobInstanceDao {@link JobInstanceDao} to be used by the repository.
+	 * @param jobExecutionDao {@link JobExecutionDao} to be used by the repository.
+	 * @param stepExecutionDao {@link StepExecutionDao} to be used by the repository.
+	 * @param ecDao {@link ExecutionContextDao} to be used by the repository.
+	 */
 	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
 			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();

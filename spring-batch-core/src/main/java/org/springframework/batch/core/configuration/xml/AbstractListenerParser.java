@@ -132,8 +132,14 @@ public abstract class AbstractListenerParser {
 		return methodNameAttributes;
 	}
 
+	/**
+	 * @return {@link Class}.
+	 */
 	protected abstract Class<? extends AbstractListenerFactoryBean<?>> getBeanClass();
 
+	/**
+	 * @return an array of {@link ListenerMetaData}.
+	 */
 	protected abstract ListenerMetaData[] getMetaDataValues();
 
 }

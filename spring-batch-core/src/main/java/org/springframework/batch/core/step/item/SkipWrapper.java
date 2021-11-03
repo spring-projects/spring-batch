@@ -45,7 +45,11 @@ public class SkipWrapper<T> {
 		this(null, e);
 	}
 
-
+	/**
+	 * Constructor for {@link SkipWrapper}.
+	 * @param item the item being wrapped.
+	 * @param e instance of {@link Throwable}  that being wrapped.
+	 */
 	public SkipWrapper(T item, @Nullable Throwable e) {
 		this.item = item;
 		this.exception = e;

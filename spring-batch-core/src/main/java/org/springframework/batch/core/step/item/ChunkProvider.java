@@ -27,8 +27,19 @@ import org.springframework.batch.core.StepContribution;
  */
 public interface ChunkProvider<T> {
 
+	/**
+	 * Retrieve Chunk from {@link StepContribution}
+	 * @param contribution the {@link StepContribution}
+	 * @return {@link Chunk}
+	 * @throws Exception thrown if error occurs.
+	 */
 	Chunk<T> provide(StepContribution contribution) throws Exception;
-	
+
+	/**
+	 * Provide any post processing.
+	 * @param contribution contribution the {@link StepContribution}
+	 * @param chunk The {@link Chunk} to be processed.
+	 */
 	void postProcess(StepContribution contribution, Chunk<T> chunk);
 	
 }

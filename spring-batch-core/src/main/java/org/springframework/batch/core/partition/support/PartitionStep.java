@@ -114,10 +114,16 @@ public class PartitionStep extends AbstractStep {
 		}
 	}
 
+	/**
+	 * @return {@link StepExecutionSplitter} for the partition step.
+	 */
 	protected StepExecutionSplitter getStepExecutionSplitter() {
 		return stepExecutionSplitter;
 	}
 
+	/**
+ 	 * @return {@link PartitionHandler} for the partition step.
+	 */
 	protected PartitionHandler getPartitionHandler() {
 		return partitionHandler;
 	}

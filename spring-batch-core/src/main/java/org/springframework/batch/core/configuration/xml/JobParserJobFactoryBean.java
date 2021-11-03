@@ -51,6 +51,10 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	private Flow flow;
 
+	/**
+	 * Constructor for the factory bean that initializes the name.
+	 * @param name the name to be used by the factory bean.
+	 */
 	public JobParserJobFactoryBean(String name) {
 		this.name = name;
 	}
@@ -88,30 +92,57 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 		return flowJob;
 	}
 
+	/**
+	 * Set the restartable flag for the factory bean.
+	 * @param restartable the restartable flag to be used by the factory bean.
+	 */
 	public void setRestartable(Boolean restartable) {
 		this.restartable = restartable;
 	}
 
+	/**
+	 * Set the {@link JobRepository} for the factory bean.
+	 * @param jobRepository the {@link JobRepository} to be used by the factory bean.
+	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
+	/**
+	 * Set the {@link JobParametersValidator} for the factory bean.
+	 * @param jobParametersValidator the {@link JobParametersValidator} to be used by the factory bean.
+	 */
 	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
 	}
 
+	/**
+ 	 * @return the {@link JobRepository} used by the factory bean.
+	 */
 	public JobRepository getJobRepository() {
 		return this.jobRepository;
 	}
 
+	/**
+	 * Set the {@link JobExecutionListener}s for the factory bean.
+	 * @param jobExecutionListeners the {@link JobExecutionListener} array to be used by the factory bean.
+	 */
 	public void setJobExecutionListeners(JobExecutionListener[] jobExecutionListeners) {
 		this.jobExecutionListeners = jobExecutionListeners;
 	}
 
+	/**
+	 * Set the {@link JobParametersIncrementer} for the factory bean.
+	 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to be used by the factory bean.
+	 */
 	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
+	/**
+	 * Set the flow for the factory bean.
+	 * @param flow the {@link Flow} to be used by the factory bean.
+	 */
 	public void setFlow(Flow flow) {
 		this.flow = flow;
 	}

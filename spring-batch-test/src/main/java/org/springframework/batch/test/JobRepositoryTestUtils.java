@@ -98,6 +98,10 @@ public class JobRepositoryTestUtils extends AbstractJdbcBatchMetadataDao impleme
 		setDataSource(dataSource);
 	}
 
+	/**
+	 * Establish the {@link DataSource} to use for the utility.
+	 * @param dataSource the {@link DataSource} to use for the utility.
+	 */
 	@Autowired
 	public final void setDataSource(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);

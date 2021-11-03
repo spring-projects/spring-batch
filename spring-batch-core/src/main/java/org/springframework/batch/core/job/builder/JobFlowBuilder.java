@@ -28,23 +28,42 @@ public class JobFlowBuilder extends FlowBuilder<FlowJobBuilder> {
 
 	private FlowJobBuilder parent;
 
+	/**
+	 * Constructor for {@link JobFlowBuilder}
+	 * @param parent Parent {@link FlowJobBuilder} for the  builder.
+	 */
 	public JobFlowBuilder(FlowJobBuilder parent) {
 		super(parent.getName());
 		this.parent = parent;
 	}
 
+	/**
+	 * Constructor for {@link JobFlowBuilder}
+	 * @param parent Parent {@link FlowJobBuilder} for the builder.
+	 * @param step {@link Step} to be used by builder.
+	 */
 	public JobFlowBuilder(FlowJobBuilder parent, Step step) {
 		super(parent.getName());
 		this.parent = parent;
 		start(step);
 	}
 
+	/**
+	 * Constructor for {@link JobFlowBuilder}
+	 * @param parent Parent {@link FlowJobBuilder} for the  builder.
+	 * @param decider {@link JobExecutionDecider} to be used by builder.
+	 */
 	public JobFlowBuilder(FlowJobBuilder parent, JobExecutionDecider decider) {
 		super(parent.getName());
 		this.parent = parent;
 		start(decider);
 	}
 
+	/**
+	 * Constructor for {@link JobFlowBuilder}
+	 * @param parent Parent {@link FlowJobBuilder} for the builder.
+	 * @param flow {@link Flow} to be used by builder.
+	 */
 	public JobFlowBuilder(FlowJobBuilder parent, Flow flow) {
 		super(parent.getName());
 		this.parent = parent;

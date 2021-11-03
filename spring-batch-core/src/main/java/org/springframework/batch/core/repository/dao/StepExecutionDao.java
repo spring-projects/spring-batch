@@ -23,6 +23,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
+/**
+ * Data Access Object for step executions.
+ */
 public interface StepExecutionDao {
 
 	/**

@@ -90,6 +90,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 
 	private StepListener[] listeners = new StepListener[0];
 
+	/**
+	 * {@link Log} to be used by the class.
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	private int commitInterval = 0;
@@ -323,6 +326,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		return step;
 	}
 
+	/**
+	 * Creates instance of {@link SimpleStepBuilder}.
+	 * @param name The name to be associated with the {@link SimpleStepBuilder}.
+	 * @return new instance of {@link SimpleStepBuilder}.
+	 */
 	protected SimpleStepBuilder<T, S> createBuilder(String name) {
 		return new SimpleStepBuilder<>(new StepBuilder(name));
 	}
@@ -446,6 +454,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean<Step>, BeanNameA
 		this.throttleLimit = throttleLimit;
 	}
 
+	/**
+	 * Applies the configurations from the factory to the builder.
+	 * @param builder to be configured.
+	 */
 	protected void applyConfiguration(SimpleStepBuilder<T, S> builder) {
 
 		builder.reader(itemReader);

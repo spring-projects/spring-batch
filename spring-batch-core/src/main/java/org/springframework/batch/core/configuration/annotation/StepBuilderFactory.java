@@ -32,6 +32,11 @@ public class StepBuilderFactory {
 
 	private PlatformTransactionManager transactionManager;
 
+	/**
+	 * Constructor for {@link StepBuilderFactory}.
+	 * @param jobRepository {@link JobRepository} to be used by the builder factory.
+	 * @param transactionManager {@link PlatformTransactionManager} to be used by the builder factory.
+	 */
 	public StepBuilderFactory(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		this.jobRepository = jobRepository;
 		this.transactionManager = transactionManager;

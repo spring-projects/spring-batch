@@ -193,6 +193,9 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 			this.state = state;
 		}
 
+		/**
+		 * @return The {@link State} being used by the factory bean.
+		 */
 		public State getState() {
 			return this.state;
 		}

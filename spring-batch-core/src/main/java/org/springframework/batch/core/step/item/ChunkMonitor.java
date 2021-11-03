@@ -39,11 +39,25 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private boolean streamsRegistered = false;
 
+	/**
+	 * Establishes the chunk size and offset for the data.
+	 */
 	public static class ChunkMonitorData {
+		/**
+		 * The offset location in the data.
+		 */
 		public int offset;
 
+		/**
+		 * The size of the chunk.
+		 */
 		public int chunkSize;
 
+		/**
+		 * Constructor that initialzies the offset and chunk size.
+		 * @param offset The offset for the data.
+		 * @param chunkSize The chunkSize to be processed.
+		 */
 		public ChunkMonitorData(int offset, int chunkSize) {
 			this.offset = offset;
 			this.chunkSize = chunkSize;
@@ -58,6 +72,9 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private ItemReader<?> reader;
 
+	/**
+	 * Constructor for the {@link ChunkMonitor}.
+	 */
 	public ChunkMonitor() {
 		this.setExecutionContextName(ChunkMonitor.class.getName());
 	}
@@ -77,6 +94,9 @@ public class ChunkMonitor extends ItemStreamSupport {
 		this.reader = reader;
 	}
 
+	/**
+	 * Increment offset for the data.   If offset is > or equal to the chunk size the offset is set to 0.
+	 */
 	public void incrementOffset() {
 		ChunkMonitorData data = getData();
 		data.offset ++;
@@ -85,14 +105,24 @@ public class ChunkMonitor extends ItemStreamSupport {
 		}
 	}
 
+	/**
+	 * @return the current data offset.
+	 */
 	public int getOffset() {
 		return getData().offset;
 	}
 
+	/**
+	 * Sets the offset for the data to zero.
+	 */
 	public void resetOffset() {
 		getData().offset = 0;
 	}
 
+	/**
+	 * Sets the chunk size.
+	 * @param chunkSize the desired chunk size.
+	 */
 	public void setChunkSize(int chunkSize) {
 		getData().chunkSize = chunkSize;
 		resetOffset();

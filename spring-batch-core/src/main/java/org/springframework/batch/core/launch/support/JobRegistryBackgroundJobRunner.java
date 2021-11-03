@@ -75,6 +75,9 @@ public class JobRegistryBackgroundJobRunner {
 
 	private ApplicationContext parentContext = null;
 
+	/**
+	 * Boolean flag to denote testing state.
+	 */
 	public static boolean testing = false;
 
 	final private String parentContextPath;

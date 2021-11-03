@@ -29,6 +29,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  */
 public interface ChunkListener extends StepListener {
 
+	/**
+	 * The key for retrieving the rollback exception.
+	 */
 	static final String ROLLBACK_EXCEPTION_KEY = "sb_rollback_exception";
 
 	/**

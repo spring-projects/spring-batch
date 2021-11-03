@@ -40,6 +40,9 @@ import org.springframework.batch.core.step.StepLocator;
  */
 public class FlowJob extends AbstractJob {
 
+	/**
+	 * The {@link Flow} that is associated with the {@link Job}
+	 */
 	protected Flow flow;
 
 	private Map<String, Step> stepMap = new ConcurrentHashMap<>();

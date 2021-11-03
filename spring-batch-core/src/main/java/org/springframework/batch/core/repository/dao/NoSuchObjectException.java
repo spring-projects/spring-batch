@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import org.springframework.batch.core.JobParameter;
+
 /**
  * This exception identifies that a batch domain object is invalid, which
  * is generally caused by an invalid ID. (An ID which doesn't exist in the database).
@@ -27,7 +29,10 @@ package org.springframework.batch.core.repository.dao;
 public class NoSuchObjectException extends RuntimeException {
 
 	private static final long serialVersionUID = 4399621765157283111L;
-
+	/**
+	 * Constructor that sets the message for the exception.
+	 * @param message {@link String} message for the {@link Exception}.
+	 */
 	public NoSuchObjectException(String message){
 		super(message);
 	}

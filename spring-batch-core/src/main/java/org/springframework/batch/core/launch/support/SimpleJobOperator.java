@@ -129,12 +129,16 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	/**
 	 * Public setter for the {@link JobExplorer}.
-	 * @param jobExplorer the {@link JobExplorer} to set
+	 * @param jobExplorer the {@link JobExplorer} to set.
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
 	}
 
+	/**
+	 * Public setter for the {@link JobRepository}.
+	 * @param jobRepository the {@link JobRepository} to set.
+	 */
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}

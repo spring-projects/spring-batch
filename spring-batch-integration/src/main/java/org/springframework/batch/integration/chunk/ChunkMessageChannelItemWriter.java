@@ -30,6 +30,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.integration.partition.StepExecutionRequest;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -41,6 +42,10 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.Assert;
 
+/**
+ * Used by remote chunking to capture the results of the processor and write the chunks to a queue.
+ * @param <T> the type of the items to be written.
+ */
 public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, ItemWriter<T>,
 		ItemStream, StepContributionSource {
 
@@ -84,10 +89,18 @@ public class ChunkMessageChannelItemWriter<T> implements StepExecutionListener, 
 		this.throttleLimit = throttleLimit;
 	}
 
+	/**
+	 * A pre-configured gateway for sending and receiving messages to the remote workers.
+	 *
+	 * @param messagingGateway the {@link org.springframework.integration.core.MessagingTemplate} to set
+	 */
 	public void setMessagingOperations(MessagingTemplate messagingGateway) {
 		this.messagingGateway = messagingGateway;
 	}
 
+	/**
+	 * @param replyChannel the pollable channel to be used as the reply channel.
+	 */
 	public void setReplyChannel(PollableChannel replyChannel) {
 		this.replyChannel = replyChannel;
 	}

@@ -45,10 +45,20 @@ import java.util.Set;
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
+	/**
+	 * {@link Log} to be used by the class.
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * The set of properties to be used when creating new {@link Step}s.
+	 */
 	protected final CommonStepProperties properties;
 
+	/**
+	 * Constructor for the {@link StepBuilderHelper}.
+ 	 * @param name to be by the {@link StepBuilderHelper} when creating new {@link Step}s.
+	 */
 	public StepBuilderHelper(String name) {
 		this.properties = new CommonStepProperties();
 		properties.name = name;
@@ -63,6 +73,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		this.properties = new CommonStepProperties(parent.properties);
 	}
 
+	/**
+	 * Set the {@link JobRepository} for the builder helper.
+	 * @param jobRepository the {@link JobRepository} to use.
+	 * @return this for fluent chaining.
+	 */
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
 		@SuppressWarnings("unchecked")
@@ -70,6 +85,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * Set the {@link PlatformTransactionManager} for the builder helper.
+	 * @param transactionManager the {@link PlatformTransactionManager} to use.
+	 * @return this for fluent chaining.
+	 */
 	public B transactionManager(PlatformTransactionManager transactionManager) {
 		properties.transactionManager = transactionManager;
 		@SuppressWarnings("unchecked")
@@ -77,6 +97,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * Set the startLimit for the builder helper.
+	 * @param startLimit the start limit to use.
+	 * @return this for fluent chaining.
+	 */
 	public B startLimit(int startLimit) {
 		properties.startLimit = startLimit;
 		@SuppressWarnings("unchecked")
@@ -88,7 +113,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	 * Registers objects using the annotation based listener configuration.
 	 *
 	 * @param listener the object that has a method configured with listener annotation
-	 * @return this for fluent chaining
+	 * @return this for fluent chaining.
 	 */
 	public B listener(Object listener) {
 		Set<Method> stepExecutionListenerMethods = new HashSet<>();
@@ -106,6 +131,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * Set the {@link StepExecutionListener} for the builder helper.
+	 * @param listener the {@link StepExecutionListener} to use.
+	 * @return this for fluent chaining.
+	 */
 	public B listener(StepExecutionListener listener) {
 		properties.addStepExecutionListener(listener);
 		@SuppressWarnings("unchecked")
@@ -113,6 +143,11 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * Sets the allowStartIfComplete state.
+	 * @param allowStartIfComplete value to set the allowStartIfComplete.
+	 * @return this for fluent chaining.
+	 */
 	public B allowStartIfComplete(boolean allowStartIfComplete) {
 		properties.allowStartIfComplete = allowStartIfComplete;
 		@SuppressWarnings("unchecked")
@@ -120,22 +155,38 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		return result;
 	}
 
+	/**
+	 * @return nameused by the builder helper.
+	 */
 	protected String getName() {
 		return properties.name;
 	}
 
+	/**
+	 * @return {@link JobRepository} used by the builder helper.
+	 */
 	protected JobRepository getJobRepository() {
 		return properties.jobRepository;
 	}
 
+	/**
+ 	 * @return {@link PlatformTransactionManager} used by the builder helper.
+	 */
 	protected PlatformTransactionManager getTransactionManager() {
 		return properties.transactionManager;
 	}
 
+	/**
+	 * @return true if start is allowed if step is complete.
+	 */
 	protected boolean isAllowStartIfComplete() {
 		return properties.allowStartIfComplete != null ? properties.allowStartIfComplete : false;
 	}
 
+	/**
+	 * Set {@link CommonStepProperties} for the target {@link Step}.
+	 * @param target {@link Step} that will be enhanced.
+	 */
 	protected void enhance(Step target) {
 
 		if (target instanceof AbstractStep) {
@@ -164,6 +215,9 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	}
 
+	/**
+	 * Common properties used for creating {@link Step}s.
+	 */
 	public static class CommonStepProperties {
 
 		private List<StepExecutionListener> stepExecutionListeners = new ArrayList<>();
@@ -176,9 +230,16 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 		private PlatformTransactionManager transactionManager;
 
+		/**
+		 * Default constructor.
+		 */
 		public CommonStepProperties() {
 		}
 
+		/**
+		 * Constructor for {@link CommonStepProperties}
+		 * @param properties {@link CommonStepProperties} used to initialize the instance.
+		 */
 		public CommonStepProperties(CommonStepProperties properties) {
 			this.name = properties.name;
 			this.startLimit = properties.startLimit;
@@ -188,54 +249,100 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			this.stepExecutionListeners = new ArrayList<>(properties.stepExecutionListeners);
 		}
 
+		/**
+		 * @return the {@link JobRepository} used by the builder helper.
+		 */
 		public JobRepository getJobRepository() {
 			return jobRepository;
 		}
 
+		/**
+		 * Set the {@link JobRepository} to be used by the builder helper.
+		 * @param jobRepository the {@link JobRepository} to be used by the builder helper.
+		 */
 		public void setJobRepository(JobRepository jobRepository) {
 			this.jobRepository = jobRepository;
 		}
 
+		/**
+		 * @return the {@link PlatformTransactionManager} used by the builder helper.
+		 */
 		public PlatformTransactionManager getTransactionManager() {
 			return transactionManager;
 		}
 
+		/**
+		 * Set the {@link PlatformTransactionManager} to be used by the builder helper.
+		 * @param transactionManager the {@link PlatformTransactionManager} to be used by the builder helper.
+		 */
 		public void setTransactionManager(PlatformTransactionManager transactionManager) {
 			this.transactionManager = transactionManager;
 		}
 
+		/**
+		 * @return the name being used by the builder helper.
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * Set the name to be used by the builder helper.
+ 		 * @param name the name to be used by the builder helper.
+		 */
 		public void setName(String name) {
 			this.name = name;
 		}
 
+		/**
+		 * @return {@link List} of {@link StepExecutionListener}s used by builder helper.
+		 */
 		public List<StepExecutionListener> getStepExecutionListeners() {
 			return stepExecutionListeners;
 		}
 
+		/**
+		 * Adds a {@link List} of {@link StepExecutionListener}s to the list of listeners used by the builder helper.
+		 * @param stepExecutionListeners {@link List} of {@link StepExecutionListener}s to be added to the listeners used by the builder helper.
+		 */
 		public void addStepExecutionListeners(List<StepExecutionListener> stepExecutionListeners) {
 			this.stepExecutionListeners.addAll(stepExecutionListeners);
 		}
 
+		/**
+		 * Adds a {@link StepExecutionListener} to the list of listeners used by the builder helper.
+		 * @param stepExecutionListener {@link StepExecutionListener} to be added to the listeners used by the builder helper.
+		 */
 		public void addStepExecutionListener(StepExecutionListener stepExecutionListener) {
 			this.stepExecutionListeners.add(stepExecutionListener);
 		}
 
+		/**
+		 * @return the startLimit used by the builder helper.
+		 */
 		public Integer getStartLimit() {
 			return startLimit;
 		}
 
+		/**
+		 * Set the start limit used by the step builder helper.
+		 * @param startLimit the startLimit to be use by the builder helper.
+		 */
 		public void setStartLimit(Integer startLimit) {
 			this.startLimit = startLimit;
 		}
 
+		/**
+		 * @return the current value of allowStartIfComplete.
+		 */
 		public Boolean getAllowStartIfComplete() {
 			return allowStartIfComplete;
 		}
 
+		/**
+		 * Set the value for allowStartIfComplete for the builder helper.
+ 		 * @param allowStartIfComplete the allowStartIfComplete to be used by the builder helper.
+		 */
 		public void setAllowStartIfComplete(Boolean allowStartIfComplete) {
 			this.allowStartIfComplete = allowStartIfComplete;
 		}

@@ -199,12 +199,27 @@ public class BatchRetryTemplate implements RetryOperations {
 
 	private RetryPolicy retryPolicy;
 
+	/**
+	 * Execute the callback once if the policy dictates that we can, re-throwing
+	 * any exception encountered so that clients can re-present the same task later.
+	 * @param retryCallback the retryCallback.
+	 * @param states the states.
+	 */
 	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, Collection<RetryState> states) throws E,
 	Exception {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, batchState);
 	}
 
+
+
+	/**
+	 * Execute the callback once if the policy dictates that we can, re-throwing
+	 * any exception encountered so that clients can re-present the same task later.
+	 * @param retryCallback the RetryCallback
+	 * @param recoveryCallback the RecoveryCallback
+	 * @param states the RetryState
+	 */
 	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
 			Collection<RetryState> states) throws E, Exception {
 		RetryState batchState = new BatchRetryState(states);
@@ -233,6 +248,11 @@ public class BatchRetryTemplate implements RetryOperations {
 		return regular.execute(retryCallback);
 	}
 
+	/**
+	 * Create {@link List} of {@link RetryState}s from the keys provided.
+	 * @param keys {@link List} of keys.
+	 * @return {@link List} of {@link RetryState}s.
+	 */
 	public static List<RetryState> createState(List<?> keys) {
 		List<RetryState> states = new ArrayList<>();
 		for (Object key : keys) {
@@ -241,6 +261,12 @@ public class BatchRetryTemplate implements RetryOperations {
 		return states;
 	}
 
+	/**
+	 * Create {@link List} of {@link RetryState}s from the keys provided.
+	 * @param keys {@link List} of keys.
+	 * @param classifier {@link Classifier}
+	 * @return {@link List} of {@link RetryState}s.
+	 */
 	public static List<RetryState> createState(List<?> keys, Classifier<? super Throwable, Boolean> classifier) {
 		List<RetryState> states = new ArrayList<>();
 		for (Object key : keys) {
@@ -249,32 +275,56 @@ public class BatchRetryTemplate implements RetryOperations {
 		return states;
 	}
 
+	/**
+	 * Add {@link RetryListener} to delegate and regular retry templates.
+	 * @param listener {@link RetryListener} to be added to retry templates.
+	 */
 	public void registerListener(RetryListener listener) {
 		delegate.registerListener(listener);
 		regular.registerListener(listener);
 	}
 
+	/**
+	 * Add {@link BackOffPolicy}  to delegate and regular retry templates.
+	 * @param backOffPolicy {@link BackOffPolicy} to be added to retry templates.
+	 */
 	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
 		delegate.setBackOffPolicy(backOffPolicy);
 		regular.setBackOffPolicy(backOffPolicy);
 	}
 
+	/**
+	 * Add {@link RetryListener} array to delegate and regular retry templates.
+ 	 * @param listeners {@link RetryListener} array to be added to retry templates.
+	 */
 	public void setListeners(RetryListener[] listeners) {
 		delegate.setListeners(listeners);
 		regular.setListeners(listeners);
 	}
 
+	/**
+	 * Establish the {@link RetryContextCache} for the {@link BatchRetryTemplate}.
+	 * @param retryContextCache
+	 */
 	public void setRetryContextCache(RetryContextCache retryContextCache) {
 		delegate.setRetryContextCache(retryContextCache);
 		regular.setRetryContextCache(retryContextCache);
 	}
 
+	/**
+	 * Establish the {@link RetryPolicy} for the {@link BatchRetryTemplate}.
+	 * @param retryPolicy
+	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
 		this.retryPolicy = retryPolicy;
 		delegate.setRetryPolicy(retryPolicy);
 		regular.setRetryPolicy(retryPolicy);
 	}
 
+	/**
+	 * @param context  the current retry status.
+	 * @return true if the operation can proceed or if context is null.
+	 */
 	public boolean canRetry(RetryContext context) {
 		return context==null ? true : retryPolicy.canRetry(context);
 	}

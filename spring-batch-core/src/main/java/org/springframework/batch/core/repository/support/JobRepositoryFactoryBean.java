@@ -62,6 +62,9 @@ import static org.springframework.batch.support.DatabaseType.SYBASE;
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
 
+	/**
+	 * {@link Log} to be used by the factory bean.
+	 */
 	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
 
 	private DataSource dataSource;
@@ -163,6 +166,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.tablePrefix = tablePrefix;
 	}
 
+	/**
+	 * Sets the {@link DataFieldMaxValueIncrementerFactory} to be used by the factory bean.
+	 * @param incrementerFactory
+	 */
 	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
 		this.incrementerFactory = incrementerFactory;
 	}

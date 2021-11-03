@@ -45,7 +45,7 @@ import java.util.List;
  * <p>
  * Implementation of {@link JobRepository} that stores JobInstances,
  * JobExecutions, and StepExecutions using the injected DAOs.
- * <p>
+ * </p>
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -79,6 +79,13 @@ public class SimpleJobRepository implements JobRepository {
 	SimpleJobRepository() {
 	}
 
+	/**
+	 * Constructor to initialize the job {@link SimpleJobRepository}.
+	 * @param jobInstanceDao {@link JobInstanceDao} to be used by the repository.
+	 * @param jobExecutionDao {@link JobExecutionDao} to be used by the repository.
+	 * @param stepExecutionDao {@link StepExecutionDao} to be used by the repository.
+	 * @param ecDao {@link ExecutionContextDao} to be used by the repository.
+	 */
 	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
 			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();

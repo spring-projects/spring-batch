@@ -48,6 +48,9 @@ import org.springframework.util.xml.DomUtils;
  */
 public abstract class AbstractStepParser {
 
+	/**
+	 * id attribute for the step parser.
+	 */
 	protected static final String ID_ATTR = "id";
 
 	private static final String PARENT_ATTR = "parent";

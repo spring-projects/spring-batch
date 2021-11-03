@@ -24,7 +24,13 @@ import org.springframework.batch.core.StepContribution;
  * @since 2.0
  */
 public interface ChunkProcessor<I> {
-	
+
+	/**
+	 * Process the {@link Chunk}.
+	 * @param contribution the {@link StepContribution}
+	 * @param chunk the {@link Chunk} to be processed.
+	 * @throws Exception thrown if error occurs.
+	 */
 	void process(StepContribution contribution, Chunk<I> chunk) throws Exception;
 
 }

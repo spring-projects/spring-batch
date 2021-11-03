@@ -117,6 +117,10 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 	}
 
+	/**
+	 * Create a new {@link FaultTolerantStepBuilder}.
+	 * @return new {@link FaultTolerantStepBuilder}.
+	 */
 	public FaultTolerantStepBuilder<I, O> faultTolerant() {
 		return new FaultTolerantStepBuilder<>(this);
 	}
@@ -134,6 +138,9 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return super.build();
 	}
 
+	/**
+	 * Registers the {@link StepExecutionListener}s and {@link ChunkListener}s as ItemListeners.
+	 */
 	protected void registerStepListenerAsItemListener() {
 		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
 			checkAndAddItemListener(stepExecutionListener);
@@ -340,6 +347,10 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return this;
 	}
 
+	/**
+	 * @return If chunkOperations for the builder is not null then chunkOperations are returned,
+	 * else a {@link RepeatOperations} is created and returned.
+	 */
 	protected RepeatOperations createChunkOperations() {
 		RepeatOperations repeatOperations = chunkOperations;
 		if (repeatOperations == null) {
@@ -350,14 +361,23 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return repeatOperations;
 	}
 
+	/**
+	 * @return the {@link ItemReader} used by the builder.
+	 */
 	protected ItemReader<? extends I> getReader() {
 		return reader;
 	}
 
+	/**
+	 * @return the {@link ItemWriter} used by the builder.
+	 */
 	protected ItemWriter<? super O> getWriter() {
 		return writer;
 	}
 
+	/**
+ 	 * @return the {@link ItemProcessor} used by the builder.
+	 */
 	protected ItemProcessor<? super I, ? extends O> getProcessor() {
 		if(this.itemProcessorFunction != null) {
 			this.processor = new FunctionItemProcessor<>(this.itemProcessorFunction);
@@ -366,14 +386,23 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return processor;
 	}
 
+	/**
+	 * @return the chunk size used by the builder.
+	 */
 	protected int getChunkSize() {
 		return chunkSize;
 	}
 
+	/**
+	 * @return readerTransactionalQueue flag used by the builder.
+	 */
 	protected boolean isReaderTransactionalQueue() {
 		return readerTransactionalQueue;
 	}
 
+	/**
+	 * @return the {@link StepListener}s used by the builder.
+	 */
 	protected Set<StepListener> getItemListeners() {
 		return itemListeners;
 	}
@@ -398,6 +427,12 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		return new SimpleCompletionPolicy(chunkSize);
 	}
 
+	/**
+	 * Registers the {@link ItemReader}, {@link ItemWriter}, and {@link ItemProcessor} as a stream item or listener.
+	 * @param itemReader the {@link ItemReader} to be registered.
+	 * @param itemProcessor the {@link ItemProcessor} to be registered.
+	 * @param itemWriter the {@link ItemWriter} to be registered.
+	 */
 	protected void registerAsStreamsAndListeners(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {

@@ -46,14 +46,26 @@ public class Chunk<W> implements Iterable<W> {
 
 	private boolean busy;
 
+	/**
+	 * Default constructor for the chunk.
+	 */
 	public Chunk() {
 		this(null, null);
 	}
 
+	/**
+	 * Constructor for the chunk.
+	 * @param items the items associated with the chunk
+	 */
 	public Chunk(Collection<? extends W> items) {
 		this(items, null);
 	}
 
+	/**
+	 * Constructor for the chunk.
+	 * @param items the items associated with the chunk.
+	 * @param skips the skip entries associated with the chunk.
+	 */
 	public Chunk(Collection<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items != null) {
@@ -179,10 +191,17 @@ public class Chunk<W> implements Iterable<W> {
 		skips.clear();
 	}
 
+	/**
+	 * @return the current userData.  Defaults to null.
+	 */
 	public Object getUserData() {
 		return userData;
 	}
 
+	/**
+	 * Set the value for the userData.
+	 * @param userData the value to use.
+	 */
 	public void setUserData(Object userData) {
 		this.userData = userData;
 	}
@@ -210,6 +229,10 @@ public class Chunk<W> implements Iterable<W> {
 
 		private W next;
 
+		/**
+		 * Constructor for the ChunkIterator.
+		 * @param items items to be associated with the chunk.
+		 */
 		public ChunkIterator(List<W> items) {
 			iterator = items.iterator();
 		}
@@ -225,6 +248,12 @@ public class Chunk<W> implements Iterable<W> {
 			return next;
 		}
 
+		/**
+		 * Removes from the underlying collection the last element returned by this
+		 * iterator (optional operation). This method can be called only once per
+		 * call to next. Adds {@link SkipWrapper} to skips.
+		 * @param e
+		 */
 		public void remove(Throwable e) {
 			remove();
 			skips.add(new SkipWrapper<>(next, e));

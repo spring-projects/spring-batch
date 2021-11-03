@@ -19,8 +19,11 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.chunk.RemoteChunkingManagerStepBuilderFactory;
 import org.springframework.batch.integration.chunk.RemoteChunkingWorkerBuilder;
+import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilder;
 import org.springframework.batch.integration.partition.RemotePartitioningManagerStepBuilderFactory;
+import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilder;
 import org.springframework.batch.integration.partition.RemotePartitioningWorkerStepBuilderFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +53,12 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 
 	private RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory;
 
+	/**
+	 *
+	 * @param jobRepository to be used by batch i	ntegration.
+	 * @param jobExplorer to be used by batch integration.
+	 * @param transactionManager to be used by batch integration.
+	 */
 	@Autowired
 	public BatchIntegrationConfiguration(
 			JobRepository jobRepository,
@@ -61,21 +70,33 @@ public class BatchIntegrationConfiguration implements InitializingBean {
 		this.transactionManager = transactionManager;
 	}
 
+	/**
+	 * @return an instance of {@link RemoteChunkingManagerStepBuilderFactory}.
+	 */
 	@Bean
 	public RemoteChunkingManagerStepBuilderFactory remoteChunkingManagerStepBuilderFactory() {
 		return this.remoteChunkingManagerStepBuilderFactory;
 	}
 
+	/**
+	 * @return an instance of {@link RemoteChunkingWorkerBuilder}
+	 */
 	@Bean
 	public <I,O> RemoteChunkingWorkerBuilder<I, O> remoteChunkingWorkerBuilder() {
 		return remoteChunkingWorkerBuilder;
 	}
 
+	/**
+	 * @return an instance of {@link RemotePartitioningManagerStepBuilderFactory}.
+	*/
 	@Bean
 	public RemotePartitioningManagerStepBuilderFactory remotePartitioningManagerStepBuilderFactory() {
 		return this.remotePartitioningManagerStepBuilderFactory;
 	}
 
+	/**
+	 * @return an instance of {@link RemotePartitioningWorkerStepBuilderFactory}.
+	 */
 	@Bean
 	public RemotePartitioningWorkerStepBuilderFactory remotePartitioningWorkerStepBuilderFactory() {
 		return this.remotePartitioningWorkerStepBuilderFactory;

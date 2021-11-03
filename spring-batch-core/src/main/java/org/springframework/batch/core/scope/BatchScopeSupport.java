@@ -59,6 +59,9 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 		return order;
 	}
 
+	/**
+	 * @return the name associated with the {@link BatchScopeSupport}.
+	 */
 	public String getName() {
 		return this.name;
 	}
@@ -94,6 +97,9 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 		this.autoProxy = autoProxy;
 	}
 
+	/**
+	 * @return {@link String} retrieves the target name prefix.
+	 */
 	public abstract String getTargetNamePrefix();
 
 	/**
@@ -179,6 +185,13 @@ public abstract class BatchScopeSupport implements Scope, BeanFactoryPostProcess
 
 		private final boolean scoped;
 
+		/**
+		 * Constructor for initializing {@link Scopifier}
+		 * @param registry {@link BeanDefinitionRegistry} to be used by the {@link Scopifier}.
+		 * @param scope {@link String} specifying the scope.
+		 * @param proxyTargetClass boolean to specify if proxy target class.
+		 * @param scoped boolean to specify if scoped.
+		 */
 		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
 			super(new StringValueResolver() {
 				@Override

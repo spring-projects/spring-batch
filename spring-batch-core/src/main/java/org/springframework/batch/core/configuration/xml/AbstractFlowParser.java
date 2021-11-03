@@ -46,32 +46,74 @@ import org.springframework.util.xml.DomUtils;
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
 
+	/**
+	 * Establishes the id.
+	 */
 	protected static final String ID_ATTR = "id";
 
+	/**
+	 * Establishes a step.
+	 */
 	protected static final String STEP_ELE = "step";
 
+	/**
+	 * Establishes a  flow or sublflow.
+	 */
 	protected static final String FLOW_ELE = "flow";
 
+	/**
+	 * Establishes a decision
+	 */
 	protected static final String DECISION_ELE = "decision";
 
+	/**
+	 * Establishes a split.
+	 */
 	protected static final String SPLIT_ELE = "split";
 
+	/**
+	 * Next element to transition.
+	 */
 	protected static final String NEXT_ATTR = "next";
 
+	/**
+	 * Transition to the next step on successful completion of the current step.
+	 */
 	protected static final String NEXT_ELE = "next";
 
+	/**
+	 * Transition to stop.
+	 */
 	protected static final String END_ELE = "end";
 
+	/**
+	 * Transition to the next step on failed completion of the current step.
+	 */
 	protected static final String FAIL_ELE = "fail";
 
+	/**
+	 * Transition to stop.
+	 */
 	protected static final String STOP_ELE = "stop";
 
+	/**
+	 * Start a transition to a new state if the exit status from the previous state matches the pattern given.
+	 */
 	protected static final String ON_ATTR = "on";
 
+	/**
+	 * The state to which this transition should go.
+	 */
 	protected static final String TO_ATTR = "to";
 
+	/**
+	 * The restart attribute this transition will set.
+	 */
 	protected static final String RESTART_ATTR = "restart";
 
+	/**
+	 * The exit code that this transition will set. Use null to default to batchStatus.
+	 */
 	protected static final String EXIT_CODE_ATTR = "exit-code";
 
 	private static final InlineStepParser stepParser = new InlineStepParser();
@@ -80,7 +122,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	private static final DecisionParser decisionParser = new DecisionParser();
 
-	// For generating unique state names for end transitions
+	/**
+	 * 	Used as suffix to generate unique state names for end transitions.
+	 */
 	protected static int endCounter = 0;
 
 	private String jobFactoryRef;

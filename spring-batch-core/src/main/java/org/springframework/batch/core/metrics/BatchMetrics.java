@@ -46,8 +46,14 @@ public final class BatchMetrics {
 
 	private static final String METRICS_PREFIX = "spring.batch.";
 
+	/**
+	 * Success Status value.
+	 */
 	public static final String STATUS_SUCCESS = "SUCCESS";
 
+	/**
+	 * Failure Status value.
+	 */
 	public static final String STATUS_FAILURE = "FAILURE";
 
 	private BatchMetrics() {}

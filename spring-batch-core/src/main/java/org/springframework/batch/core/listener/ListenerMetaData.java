@@ -27,14 +27,29 @@ import java.lang.annotation.Annotation;
  */
 public interface ListenerMetaData {
 
+	/**
+	 * @return method name for the listener metadata.
+	 */
 	public String getMethodName();
 
+	/**
+	 * @return annotation for the listener metadata.
+	 */
 	public Class<? extends Annotation> getAnnotation();
 
+	/**
+	 * @return listener interface for the listener metadata.
+	 */
 	public Class<?> getListenerInterface();
 
+	/**
+	 * @return property name for the listener metadata.
+	 */
 	public String getPropertyName();
 
+	/**
+	 * @return parameter types for the listener metadata.
+	 */
 	public Class<?>[] getParamTypes();
 
 }

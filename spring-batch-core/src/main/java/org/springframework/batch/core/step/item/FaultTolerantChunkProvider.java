@@ -50,6 +50,11 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	private int maxSkipsOnRead = DEFAULT_MAX_SKIPS_ON_READ;
 
+	/**
+	 * Constructor that provides the {@link ItemReader} and {@link RepeatOperations} for the {@link FaultTolerantChunkProvider}
+	 * @param itemReader the {@link ItemReader} for the {@link FaultTolerantChunkProvider}.
+	 * @param repeatOperations the {@link RepeatOperations} for the {@link FaultTolerantChunkProvider}.
+	 */
 	public FaultTolerantChunkProvider(ItemReader<? extends I> itemReader, RepeatOperations repeatOperations) {
 		super(itemReader, repeatOperations);
 	}

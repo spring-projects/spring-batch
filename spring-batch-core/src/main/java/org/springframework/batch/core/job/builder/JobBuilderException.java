@@ -24,6 +24,11 @@ package org.springframework.batch.core.job.builder;
 @SuppressWarnings("serial")
 public class JobBuilderException extends RuntimeException {
 
+
+	/**
+	 * Constructor for {@link JobBuilderException} that associates this exception with the cause.
+	 * @param e The {@link Exception} cause.
+	 */
 	public JobBuilderException(Exception e) {
 		super(e);
 	}

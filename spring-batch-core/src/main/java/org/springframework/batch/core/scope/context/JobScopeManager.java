@@ -33,6 +33,11 @@ import org.springframework.batch.core.JobExecution;
 @Aspect
 public class JobScopeManager {
 
+	/**
+	 * Method to be executed for Aspect.
+	 * @param job the {@link Job} that is not scope aware.
+	 * @param jobExecution {@link JobExecution} associated with the {@link Job}.
+	 */
 	@Around("execution(void org.springframework.batch.core.Job+.execute(*)) && target(job) && args(jobExecution)")
 	public void execute(Job job, JobExecution jobExecution) {
 		JobSynchronizationManager.register(jobExecution);

@@ -86,6 +86,10 @@ public class FlowBuilder<Q> {
 
 	private boolean dirty = true;
 
+	/**
+	 * Constructor for FlowBuilder.
+	 * @param name associated with the {@link Flow} created by the builder.
+	 */
 	public FlowBuilder(String name) {
 		this.name = name;
 		this.prefix = name + ".";
@@ -238,6 +242,9 @@ public class FlowBuilder<Q> {
 		return build();
 	}
 
+	/**
+	 * @return a new instance of {@link Flow}.
+	 */
 	protected Flow flow() {
 		if (!dirty) {
 			// optimization in case this method is called consecutively
@@ -387,10 +394,21 @@ public class FlowBuilder<Q> {
 		dirty = true;
 	}
 
+	/**
+	 * Signal the successful end of the flow.
+	 *
+	 * @param pattern to add to the transition.
+	 */
 	protected void stop(String pattern) {
 		addTransition(pattern, stoppedState);
 	}
 
+	/**
+	 * Signal the successful end of the flow.
+	 *
+	 * @param pattern to add to the transition.
+	 * @param restart to add to the transition.
+	 */
 	protected void stop(String pattern, State restart) {
 		EndState next = new EndState(FlowExecutionStatus.STOPPED, "STOPPED", prefix + "stop" + (endCounter++), true);
 		addTransition(pattern, next);
@@ -421,6 +439,10 @@ public class FlowBuilder<Q> {
 
 		private final FlowBuilder<Q> parent;
 
+		/**
+		 * Constructor that accepts the parent {@link FlowBuilder}.
+		 * @param parent The parent {@link FlowBuilder} for this instance.
+		 */
 		public UnterminatedFlowBuilder(FlowBuilder<Q> parent) {
 			this.parent = parent;
 		}
@@ -452,6 +474,11 @@ public class FlowBuilder<Q> {
 
 		private final String pattern;
 
+		/**
+		 * Constructor that accepts the parent {@link FlowBuilder}.
+		 * @param parent The parent {@link FlowBuilder} for this instance.
+		 * @param pattern The apptern associated with this {@link TransitionBuilder}.
+		 */
 		public TransitionBuilder(FlowBuilder<Q> parent, String pattern) {
 			this.parent = parent;
 			this.pattern = pattern;

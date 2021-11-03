@@ -33,14 +33,32 @@ public class ChunkRequest<T> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The id of the job that the chunk is associated.
+	 */
 	private final long jobId;
 
+	/**
+	 * The collection of items that are to be processed.
+	 */
 	private final Collection<? extends T> items;
 
+	/**
+	 * Represents a contribution to a {@link org.springframework.batch.core.StepExecution}.
+	 */
 	private final StepContribution stepContribution;
 
+	/**
+	 * The sequence associated with the chunk.
+	 */
 	private final int sequence;
 
+	/**
+	 * @param sequence associated with the processed chunk.
+	 * @param items collection items to be processed.
+	 * @param jobId of the job that the chunk is associated.
+	 * @param stepContribution represents a contribution to a {@link org.springframework.batch.core.StepExecution}
+	 */
 	public ChunkRequest(int sequence, Collection<? extends T> items, long jobId, StepContribution stepContribution) {
 		this.sequence = sequence;
 		this.items = items;
@@ -48,14 +66,23 @@ public class ChunkRequest<T> implements Serializable {
 		this.stepContribution = stepContribution;
 	}
 
+	/**
+	 * @return The id of the job.
+	 */
 	public long getJobId() {
 		return jobId;
 	}
 
+	/**
+	 * @return The items to be processed.
+	 */
 	public Collection<? extends T> getItems() {
 		return items;
 	}
 
+	/**
+	 * @return sequence associated with the processed chunk.
+	 */
 	public int getSequence() {
 		return sequence;
 	}

@@ -57,6 +57,11 @@ public class CoreNamespaceUtils {
 
 	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 
+	/**
+	 * Create the beans based on the content of the source.
+	 * @param parserContext
+	 * @param source
+	 */
 	public static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
 		checkForStepScope(parserContext, source);
 		checkForJobScope(parserContext, source);

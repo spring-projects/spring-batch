@@ -27,7 +27,13 @@ import org.springframework.jms.support.JmsHeaders;
 public class JmsRedeliveredExtractor {
 	
 	private static final Log logger = LogFactory.getLog(JmsRedeliveredExtractor.class);
-	
+
+	/**
+	 * Extracts the redelivered flag for the response and adds it to the {@link ChunkResponse}.
+	 * @param input the {@link ChunkResponse} to be updated.
+	 * @param redelivered the redelivered flag for the response.
+	 * @return {@link ChunkResponse} containing the extracted redelivered flag.
+	 */
 	public ChunkResponse extract(ChunkResponse input, @Header(JmsHeaders.REDELIVERED) boolean redelivered) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Extracted redelivered flag for response, value="+redelivered);

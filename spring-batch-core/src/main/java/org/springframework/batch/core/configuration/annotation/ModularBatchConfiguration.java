@@ -72,6 +72,11 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 		return getConfigurer(configurers).getJobExplorer();
 	}
 
+	/**
+	 * Creates {@link AutomaticJobRegistrar} bean.
+	 * @return new instance of {@link AutomaticJobRegistrar}.
+	 * @throws Exception thrown if error occurs.
+	 */
 	@Bean
 	public AutomaticJobRegistrar jobRegistrar() throws Exception {
 		registrar.setJobLoader(new DefaultJobLoader(jobRegistry()));

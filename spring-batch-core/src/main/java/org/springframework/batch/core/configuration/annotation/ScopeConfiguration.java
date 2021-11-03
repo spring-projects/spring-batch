@@ -40,11 +40,17 @@ public class ScopeConfiguration {
 		stepScope.setAutoProxy(false);
 	}
 
+	/**
+	 * @return instance of {@link StepScope}.
+	 */
 	@Bean
 	public static StepScope stepScope() {
 		return stepScope;
 	}
 
+	/**
+	 * @return instance of {@link JobScope}.
+	 */
 	@Bean
 	public static JobScope jobScope() {
 		return jobScope;

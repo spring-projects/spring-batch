@@ -32,6 +32,12 @@ import org.springframework.core.io.Resource;
  */
 public abstract class AssertFile {
 
+	/**
+	 * Verifies that both {@link File}s contain the same content.
+	 * @param expected the {@link File} has the expected content.
+	 * @param actual the {@link File} to be inspected.
+	 * @throws Exception is thrown if the {@link File}s do not contain the same contents.
+	 */
 	public static void assertFileEquals(File expected, File actual) throws Exception {
 		BufferedReader expectedReader = new BufferedReader(new FileReader(expected));
 		BufferedReader actualReader = new BufferedReader(new FileReader(actual));
@@ -52,10 +58,22 @@ public abstract class AssertFile {
 		}
 	}
 
+	/**
+	 * Verifies that both {@link Resource}s contain the same content.
+	 * @param expected the {@link Resource} has the expected content.
+	 * @param actual the {@link Resource} to be inspected.
+	 * @throws Exception is thrown if the files do not contain the same contents.
+	 */
 	public static void assertFileEquals(Resource expected, Resource actual) throws Exception {
 		assertFileEquals(expected.getFile(), actual.getFile());
 	}
 
+	/**
+	 * Verifies that the {@link File} contains the expected line count.
+	 * @param expectedLineCount the number of lines expected to be in the {@link File}.
+	 * @param file the {@link File} to be inspected.
+	 * @throws Exception is thrown if the number of lines in the {@link File} do not match the expected number of lines.
+	 */
 	public static void assertLineCount(int expectedLineCount, File file) throws Exception {
 		BufferedReader expectedReader = new BufferedReader(new FileReader(file));
 		try {
@@ -70,6 +88,12 @@ public abstract class AssertFile {
 		}
 	}
 
+	/**
+	 * Verifies that the {@link Resource} contains the expected line count.
+	 * @param expectedLineCount the number of lines expected to be in the {@link Resource}.
+	 * @param resource the {@link Resource} to be inspected.
+	 * @throws Exception is thrown if the number of lines in the {@link Resource} do not match the expected number of lines.
+	 */
 	public static void assertLineCount(int expectedLineCount, Resource resource) throws Exception {
 		assertLineCount(expectedLineCount, resource.getFile());
 	}

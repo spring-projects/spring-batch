@@ -60,30 +60,65 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	private StepBuilderFactory stepBuilderFactory;
 
+	/**
+	 * Establish the {@link JobBuilderFactory} for the batch execution.
+	 * @return instance of the {@link JobBuilderFactory}
+	 * @throws Exception
+	 */
 	@Bean
 	public JobBuilderFactory jobBuilders() throws Exception {
 		return this.jobBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link StepBuilderFactory} for the batch execution.
+	 * @return instance of the {@link StepBuilderFactory}
+	 * @throws Exception
+	 */
 	@Bean
 	public StepBuilderFactory stepBuilders() throws Exception {
 		return this.stepBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link JobRepository} for the batch execution.
+	 * @return instance of the {@link JobRepository}
+	 * @throws Exception
+	 */
 	@Bean
 	public abstract JobRepository jobRepository() throws Exception;
 
+	/**
+	 * Establish the {@link JobLauncher} for the batch execution.
+	 * @return instance of the {@link JobLauncher}
+	 * @throws Exception
+	 */
 	@Bean
 	public abstract JobLauncher jobLauncher() throws Exception;
 
+	/**
+	 * Establish the {@link JobExplorer} for the batch execution.
+	 * @return instance of the {@link JobExplorer}
+	 * @throws Exception
+	 */
 	@Bean
 	public abstract JobExplorer jobExplorer() throws Exception;
 
+	/**
+	 * Establish the {@link JobRegistry} for the batch execution.
+	 * @return instance of the {@link JobRegistry}
+	 * @throws Exception
+	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
 		return this.jobRegistry;
 	}
 
+	/**
+	 * Establish the {@link PlatformTransactionManager} for the batch execution.
+	 * @return instance of the {@link PlatformTransactionManager}
+	 * @throws Exception
+	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
 
 	@Override

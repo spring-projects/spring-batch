@@ -157,6 +157,11 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 		return this;
 	}
 
+	/**
+	 * Build the step from the components collected by the fluent setters.
+	 *
+	 * @return a {@link PartitionStep} fully configured and ready to execute.
+	 */
 	public Step build() {
 		PartitionStep step = new PartitionStep();
 		step.setName(getName());
@@ -220,34 +225,58 @@ public class PartitionStepBuilder extends StepBuilderHelper<PartitionStepBuilder
 
 	}
 
+	/**
+	 * @return {@link TaskExecutor} used by the builder.
+	 */
 	protected TaskExecutor getTaskExecutor() {
 		return taskExecutor;
 	}
 
+	/**
+	 * @return {@link Partitioner} used by the builder.
+	 */
 	protected Partitioner getPartitioner() {
 		return partitioner;
 	}
 
+	/**
+	 * @return {@link Step} used by the builder.
+	 */
 	protected Step getStep() {
 		return step;
 	}
 
+	/**
+	 * @return {@link PartitionHandler} used by the builder.
+	 */
 	protected PartitionHandler getPartitionHandler() {
 		return partitionHandler;
 	}
 
+	/**
+	 * @return gridSize used by the builder.
+	 */
 	protected int getGridSize() {
 		return gridSize;
 	}
 
+	/**
+	 * @return {@link StepExecutionSplitter} used by the builder.
+	 */
 	protected StepExecutionSplitter getSplitter() {
 		return splitter;
 	}
 
+	/**
+	 * @return {@link StepExecutionAggregator} used by the builder.
+	 */
 	protected StepExecutionAggregator getAggregator() {
 		return aggregator;
 	}
 
+	/**
+	 * @return stepName used by the builder.
+	 */
 	protected String getStepName() {
 		return stepName;
 	}

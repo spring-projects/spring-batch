@@ -28,14 +28,29 @@ package org.springframework.batch.core.launch.support;
  */
 public interface ExitCodeMapper {
 
+	/**
+	 * Exit code to use when the job completes successfully.
+	 */
 	static int JVM_EXITCODE_COMPLETED = 0;
 
+	/**
+	 * Exit code to use when an exception occurs.
+	 */
 	static int JVM_EXITCODE_GENERIC_ERROR = 1;
 
+	/**
+	 * Exit code used for a job error.
+	 */
 	static int JVM_EXITCODE_JOB_ERROR = 2;
 
+	/**
+	 * The exit status to use when a job does not exist.
+	 */
 	public static final String NO_SUCH_JOB = "NO_SUCH_JOB";
 
+	/**
+	 * The exit status to use when a job was not provided.
+ 	 */
 	public static final String JOB_NOT_PROVIDED = "JOB_NOT_PROVIDED";
 
 	/**

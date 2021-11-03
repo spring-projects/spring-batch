@@ -36,7 +36,13 @@ import org.springframework.lang.Nullable;
  */
 public enum JobListenerMetaData implements ListenerMetaData {
 
+	/**
+	 * Before job method enumeration.
+	 */
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
+	/**
+	 * After job method enumeration.
+	 */
 	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
 
 

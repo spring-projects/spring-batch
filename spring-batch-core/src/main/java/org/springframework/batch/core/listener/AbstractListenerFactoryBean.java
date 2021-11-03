@@ -167,10 +167,20 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 
 	}
 
+	/**
+	 * @param propertyName the property name.
+	 * @return the {@link ListenerMetaData} for the property name.
+	 */
 	protected abstract ListenerMetaData getMetaDataFromPropertyName(String propertyName);
 
+	/**
+ 	 * @return {@link ListenerMetaData} array.
+	 */
 	protected abstract ListenerMetaData[] getMetaDataValues();
 
+	/**
+ 	 * @return the default listener {@link Class}.
+	 */
 	protected abstract Class<?> getDefaultListenerClass();
 
 	protected MethodInvoker getMethodInvokerByName(String methodName, Object candidate, Class<?>... params) {
@@ -187,10 +197,18 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		return true;
 	}
 
+	/**
+	 * Set the delegate for the factory bean.
+	 * @param delegate the delegate.
+	 */
 	public void setDelegate(Object delegate) {
 		this.delegate = delegate;
 	}
 
+	/**
+	 * Set the metadata map for the factory bean.
+ 	 * @param metaDataMap the metadata {@link Map} .
+	 */
 	public void setMetaDataMap(Map<String, String> metaDataMap) {
 		this.metaDataMap = metaDataMap;
 	}

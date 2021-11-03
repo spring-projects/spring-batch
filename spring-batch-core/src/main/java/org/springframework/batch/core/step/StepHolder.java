@@ -26,6 +26,9 @@ import org.springframework.batch.core.Step;
  */
 public interface StepHolder {
 
+	/**
+ 	 * @return {@link Step}.
+	 */
 	Step getStep();
 
 }

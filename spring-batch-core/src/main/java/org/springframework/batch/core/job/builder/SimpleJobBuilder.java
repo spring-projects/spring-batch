@@ -46,6 +46,11 @@ public class SimpleJobBuilder extends JobBuilderHelper<SimpleJobBuilder> {
 		super(parent);
 	}
 
+	/**
+	 * Build the {@link Job} from the components collected by the fluent setters.
+	 *
+	 * @return a {@link Job} fully configured and ready to execute
+	 */
 	public Job build() {
 		if (builder != null) {
 			return builder.end().build();

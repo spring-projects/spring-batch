@@ -127,6 +127,12 @@ public class SplitState extends AbstractState implements FlowHolder {
 		return doAggregation(results, executor);
 	}
 
+	/**
+	 * Aggregate the results using the {@link FlowExecutionAggregator}.
+	 * @param results {@link Collection} of {@link FlowExecution}s.
+	 * @param executor the {@link FlowExecutor}.
+	 * @return the {@link FlowExecutionStatus} returned from the {@link FlowExecutionAggregator}.
+	 */
 	protected FlowExecutionStatus doAggregation(Collection<FlowExecution> results, FlowExecutor executor) {
 		return aggregator.aggregate(results);
 	}

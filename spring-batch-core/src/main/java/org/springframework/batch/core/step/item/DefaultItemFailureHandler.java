@@ -32,6 +32,9 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
  */
 public class DefaultItemFailureHandler extends ItemListenerSupport<Object,Object> {
 
+	/**
+	 * The logger to be used for this class or those that inherit from it.
+ 	 */
 	protected static final Log logger = LogFactory
 			.getLog(DefaultItemFailureHandler.class);
 

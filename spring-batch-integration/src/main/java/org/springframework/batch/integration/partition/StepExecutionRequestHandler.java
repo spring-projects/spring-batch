@@ -44,6 +44,11 @@ public class StepExecutionRequestHandler {
 		this.jobExplorer = jobExplorer;
 	}
 
+	/**
+	 * Handles the {@link StepExecutionRequest}.
+	 * @param request the {@link StepExecutionRequest} that will be handled.
+	 * @return The {@link StepExecution} that is associated with the request.
+	 */
 	@ServiceActivator
 	public StepExecution handle(StepExecutionRequest request) {
 

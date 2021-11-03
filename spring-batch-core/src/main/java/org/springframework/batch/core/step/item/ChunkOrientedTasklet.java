@@ -44,6 +44,11 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 
 	private static Log logger = LogFactory.getLog(ChunkOrientedTasklet.class);
 
+	/**
+	 * Constructor for the {@link ChunkOrientedTasklet}
+	 * @param chunkProvider the {@link ChunkProvider} to be used by the tasklet.
+	 * @param chunkProcessor the {@link ChunkProcessor} to be used by the tasklet.
+	 */
 	public ChunkOrientedTasklet(ChunkProvider<I> chunkProvider, ChunkProcessor<I> chunkProcessor) {
 		this.chunkProvider = chunkProvider;
 		this.chunkProcessor = chunkProcessor;

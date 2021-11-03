@@ -48,10 +48,17 @@ public class JobParameters implements Serializable {
 
 	private final Map<String,JobParameter> parameters;
 
+	/**
+	 * Default constructor.
+	 */
 	public JobParameters() {
 		this.parameters = new LinkedHashMap<>();
 	}
 
+	/**
+	 * Constructor that is initialized with content of a {@link Map} that contains a string key and {@link JobParameter} value.
+	 * @param parameters {@link Map} that contains a string key and {@link JobParameter} value.
+	 */
 	public JobParameters(Map<String,JobParameter> parameters) {
 		this.parameters = new LinkedHashMap<>(parameters);
 	}
@@ -226,6 +233,9 @@ public class JobParameters implements Serializable {
 		return parameters.toString();
 	}
 
+	/**
+	 * @return a {@link Properties} that contains the key and values for the {@link JobParameter}s.
+	 */
 	public Properties toProperties() {
 		Properties props = new Properties();
 

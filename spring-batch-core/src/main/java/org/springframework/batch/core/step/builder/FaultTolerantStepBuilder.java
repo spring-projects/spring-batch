@@ -152,6 +152,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return super.build();
 	}
 
+	/**
+	 * Register {@link StepExecutionListener}s and {@link ChunkListener} that are instances of {@link SkipListener}.
+	 */
 	@SuppressWarnings("unchecked")
 	protected void registerStepListenerAsSkipListener() {
 		for (StepExecutionListener stepExecutionListener: properties.getStepExecutionListeners()){
@@ -432,6 +435,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		return this;
 	}
 
+	/**
+	 * @return new {@link ChunkProvider}.
+	 */
 	protected ChunkProvider<I> createChunkProvider() {
 
 		SkipPolicy readSkipPolicy = createSkipPolicy();
@@ -449,6 +455,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
+	/**
+	 * @return new {@link ChunkProcessor}.
+	 */
 	protected ChunkProcessor<I> createChunkProcessor() {
 
 		BatchRetryTemplate batchRetryTemplate = createRetryOperations();
@@ -486,6 +495,9 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 				BeanCreationException.class);
 	}
 
+	/**
+	 * If streamIsReader is true and is not concurrent, then the {@link ChunkMonitor} will set its reader to the current reader.
+	 */
 	protected void detectStreamInReader() {
 		if (streamIsReader) {
 			if (!concurrent()) {
@@ -562,6 +574,10 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
+	/**
+	 * If {@link SkipPolicy} already exists it will return the existing {@link SkipPolicy}, else it will create a new one.
+	 * @return {@link SkipPolicy}.
+	 */
 	protected SkipPolicy createSkipPolicy() {
 		SkipPolicy skipPolicy = this.skipPolicy;
 		Map<Class<? extends Throwable>, Boolean> map = new HashMap<>(
@@ -630,10 +646,16 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	}
 
+	/**
+	 * @return the {@link ChunkMonitor}.
+	 */
 	protected ChunkMonitor getChunkMonitor() {
 		return this.chunkMonitor;
 	}
 
+	/**
+	 * @return {@link Set} of {@link SkipListener}s.
+	 */
 	protected Set<SkipListener<? super I, ? super O>> getSkipListeners() {
 		return skipListeners;
 	}

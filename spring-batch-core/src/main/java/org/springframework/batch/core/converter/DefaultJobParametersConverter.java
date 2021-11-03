@@ -64,10 +64,19 @@ import java.util.Properties;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
+	/**
+	 * Parameter key suffix representing the date type.
+	 */
 	public static final String DATE_TYPE = "(date)";
 
+	/**
+	 * Parameter key suffix representing the string type.
+	 */
 	public static final String STRING_TYPE = "(string)";
 
+	/**
+	 * Parameter key suffix representing the long type.
+	 */
 	public static final String LONG_TYPE = "(long)";
 
 	private static final String DOUBLE_TYPE = "(double)";

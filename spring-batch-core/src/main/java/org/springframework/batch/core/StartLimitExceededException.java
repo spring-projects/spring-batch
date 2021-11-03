@@ -22,6 +22,10 @@ package org.springframework.batch.core;
 @SuppressWarnings("serial")
 public class StartLimitExceededException extends RuntimeException {
 
+	/**
+	 * Constructor that sets the message for the exception.
+	 * @param  message for the exception.
+	 */
 	public StartLimitExceededException(String message) {
 		super(message);
 	}

@@ -25,6 +25,10 @@ package org.springframework.batch.core.step.builder;
 @SuppressWarnings("serial")
 public class StepBuilderException extends RuntimeException {
 
+	/**
+	 * Constructor that sets the  cause for the exception.
+	 * @param e cause for the exception.
+	 */
 	public StepBuilderException(Exception e) {
 		super(e);
 	}

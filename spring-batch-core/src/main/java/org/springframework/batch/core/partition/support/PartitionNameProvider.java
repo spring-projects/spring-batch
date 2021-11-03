@@ -41,6 +41,11 @@ import java.util.Collection;
  */
 public interface PartitionNameProvider {
 
+	/**
+	 * Retrieve a {@link Collection} of partition names based on grid size.
+	 * @param gridSize size of the grid.
+	 * @return {@link Collection} of partition names.
+	 */
 	Collection<String> getPartitionNames(int gridSize);
 
 }

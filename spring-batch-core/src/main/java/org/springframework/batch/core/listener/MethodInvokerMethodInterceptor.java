@@ -42,10 +42,19 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 	private final Map<String, Set<MethodInvoker>> invokerMap;
 	private final boolean ordered;
 
+	/**
+	 * Constructor that sets the invoker map and defaults ordered to false.
+	 * @param invokerMap {@link Map} to be used.
+	 */
 	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap) {
 		this(invokerMap, false);
 	}
 
+	/**
+	 * Constructor that sets the invoker map and ordered attributes.
+	 * @param invokerMap {@link Map} to be used.
+	 * @param ordered the value for ordered that is to be used.
+	 */
 	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap, boolean ordered) {
 		this.ordered = ordered;
 		this.invokerMap = invokerMap;

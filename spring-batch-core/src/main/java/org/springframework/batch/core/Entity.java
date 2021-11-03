@@ -37,10 +37,18 @@ public class Entity implements Serializable {
 
 	private volatile Integer version;
 
+	/**
+	 * Default constructor for {@link Entity}.
+	 * The id defaults to zero.
+	 */
 	public Entity() {
 		super();
 	}
 
+	/**
+	 * The constructor for the {@link Entity} where the id is established.
+	 * @param id The id for the entity.
+	 */
 	public Entity(Long id) {
 		super();
 
@@ -50,10 +58,16 @@ public class Entity implements Serializable {
 		this.id = id;
 	}
 
+	/**
+	 * @return The id associated with the {@link Entity}.
+	 */
 	public Long getId() {
 		return id;
 	}
 
+	/**
+	 * @param id the id for the {@link Entity}.
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}

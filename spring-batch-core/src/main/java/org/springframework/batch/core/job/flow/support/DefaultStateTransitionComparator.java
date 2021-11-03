@@ -30,6 +30,9 @@ import java.util.Comparator;
  * @since 3.0
  */
 public class DefaultStateTransitionComparator implements Comparator<StateTransition> {
+	/**
+	 * The default name to be used when creating bean for this {@link Comparator}
+	 */
 	public static final String STATE_TRANSITION_COMPARATOR = "batch_state_transition_comparator";
 
 	/* (non-Javadoc)

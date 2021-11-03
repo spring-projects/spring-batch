@@ -69,14 +69,23 @@ public class EndState extends AbstractState {
 		this.abandon = abandon;
 	}
 
+	/**
+	 * @return The {@link FlowExecutionStatus}
+	 */
 	protected FlowExecutionStatus getStatus() {
 		return this.status;
 	}
 
+	/**
+	 * @return the abandon state.
+	 */
 	protected boolean isAbandon() {
 		return this.abandon;
 	}
 
+	/**
+	 * @return The exit status
+	 */
 	protected String getCode() {
 		return this.code;
 	}

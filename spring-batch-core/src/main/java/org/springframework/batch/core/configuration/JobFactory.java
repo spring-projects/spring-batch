@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.explore.JobExplorer;
 
 /**
  * Strategy for creating a single job.
@@ -24,9 +25,16 @@ import org.springframework.batch.core.Job;
  *
  */
 public interface JobFactory {
-	
+
+	/**
+	 * Create new instance of {@link Job}.
+	 * @return {@link Job}.
+	 */
 	Job createJob();
-	
+
+	/**
+	 * @return {@link String} containing the job Name.
+	 */
 	String getJobName();
 
 }

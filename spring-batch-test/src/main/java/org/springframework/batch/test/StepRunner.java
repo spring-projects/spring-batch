@@ -74,6 +74,13 @@ public class StepRunner {
 
 	private JobRepository jobRepository;
 
+	/**
+	 * Constructor with mandatory properties.
+	 *
+	 * @param launcher the {@link JobLauncher} to be used by the {@link StepRunner}.
+	 * @param jobRepository the {@link JobRepository} to be used by the {@link StepRunner}.
+	 * }
+	 */
 	public StepRunner(JobLauncher launcher, JobRepository jobRepository) {
 		this.launcher = launcher;
 		this.jobRepository = jobRepository;

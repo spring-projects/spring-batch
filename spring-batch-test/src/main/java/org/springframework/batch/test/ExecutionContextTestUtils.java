@@ -35,12 +35,27 @@ import org.springframework.lang.Nullable;
  */
 public class ExecutionContextTestUtils {
 
+	/**
+	 * 	 * Retrieve {@link ExecutionContext} value from {@link JobExecution}.
+	 * @param jobExecution the {@link JobExecution} that contains the value.
+	 * @param key the key of the value to be retrieved.
+	 * @param <T> Expected type to be returned.
+	 * @return The value returned from the {@link JobExecution}'s {@link ExecutionContext}.
+	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T> T getValueFromJob(JobExecution jobExecution, String key) {
 		return (T) jobExecution.getExecutionContext().get(key);
 	}
 
+	/**
+	 * Retrieve {@link ExecutionContext} value from {@link StepExecution}.
+	 * @param jobExecution the {@link JobExecution} that contains the {@link StepExecution}.
+	 * @param stepName the name of the step associated with the {@link StepExecution}.
+	 * @param key the key of the value to be retrieved.
+	 * @param <T> Expected type to be returned.
+	 * @return The value returned from the {@link StepExecution}'s {@link ExecutionContext}.
+	 */
 	@Nullable
 	public static <T> T getValueFromStepInJob(JobExecution jobExecution, String stepName, String key) {
 		StepExecution stepExecution = null;
@@ -61,6 +76,13 @@ public class ExecutionContextTestUtils {
 		return result;
 	}
 
+	/**
+	 * Retrieve {@link ExecutionContext} value from {@link StepExecution}.
+	 * @param stepExecution the {@link StepExecution} to retrieve the value.
+	 * @param key the key of the value to be retrieved.
+	 * @param <T> Expected type to be returned.
+	 * @return The value returned from the {@link StepExecution}'s {@link ExecutionContext}.
+	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T> T getValueFromStep(StepExecution stepExecution, String key) {

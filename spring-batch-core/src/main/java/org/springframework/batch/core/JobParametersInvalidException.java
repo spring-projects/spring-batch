@@ -25,6 +25,10 @@ package org.springframework.batch.core;
 @SuppressWarnings("serial")
 public class JobParametersInvalidException extends JobExecutionException {
 
+	/**
+	 * Constructor that sets the message for the exception.
+	 * @param msg {@link String} message for the {@link Exception}.
+	 */
 	public JobParametersInvalidException(String msg) {
 		super(msg);
 	}

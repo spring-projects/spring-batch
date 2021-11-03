@@ -68,6 +68,9 @@ public class JobScope extends BatchScopeSupport {
 	 */
 	public static final String ID_KEY = "JOB_IDENTIFIER";
 
+	/**
+	 * Default constructor for job scope.
+	 */
 	public JobScope() {
 		super();
 		setName("job");

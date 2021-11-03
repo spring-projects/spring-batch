@@ -150,6 +150,12 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 	}
 
+	/**
+	 * Parse the element to retrieve {@link BeanMetadataElement}.
+	 * @param element {@link Element} to be parsed.
+	 * @param parserContext {@link ParserContext}.
+	 * @return {@link BeanMetadataElement} extracted from element parameter.
+	 */
 	public BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
 		String refAttribute = element.getAttribute(REF_ATTR);
 		Element beanElement = DomUtils.getChildElementByTagName(element, BEAN_ELE);

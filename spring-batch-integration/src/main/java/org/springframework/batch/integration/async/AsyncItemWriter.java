@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamWriter;
@@ -31,6 +32,11 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+/**
+ * An {@link ItemWriter} to be used along with the {@link AsyncItemProcessor}. It unpacks
+ * the {@link Future} from the processor and then passes it onto the {@link ItemWriter} delegate.
+ * @param <T>
+ */
 public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(AsyncItemWriter.class);

@@ -28,11 +28,27 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public interface BatchConfigurer {
 
+	/**
+	 * @return {@link JobRepository}.
+	 * @throws Exception thrown if error occurs.
+	 */
 	JobRepository getJobRepository() throws Exception;
 
+	/**
+	 * @return {@link PlatformTransactionManager}.
+	 * @throws Exception thrown if error occurs.
+	 */
 	PlatformTransactionManager getTransactionManager() throws Exception;
 
+	/**
+	 * @return {@link JobLauncher}.
+	 * @throws Exception thrown if error occurs.
+	 */
 	JobLauncher getJobLauncher() throws Exception;
 
+	/**
+ 	 * @return {@link JobExplorer}.
+	 * @throws Exception thrown if error occurs.
+	 */
 	JobExplorer getJobExplorer() throws Exception;
 }

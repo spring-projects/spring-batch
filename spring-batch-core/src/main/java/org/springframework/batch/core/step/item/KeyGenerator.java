@@ -24,7 +24,12 @@ package org.springframework.batch.core.step.item;
  *
  */
 public interface KeyGenerator {
-	
+
+	/**
+	 * Get the key to uniquely identify an item.
+	 * @param item the {@link Object} that will be used to generate the key.
+	 * @return unique key.
+	 */
 	Object getKey(Object item);
 
 }

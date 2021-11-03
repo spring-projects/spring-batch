@@ -186,18 +186,31 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		return buffer.toString();
 	}
 
+	/**
+	 * @param initScripts Establish the initialization scripts to be used.
+	 */
 	public void setInitScripts(Resource[] initScripts) {
 		this.initScripts = initScripts;
 	}
 
+	/**
+	 * @param destroyScripts Establish the destroy scripts to be used.
+	 */
 	public void setDestroyScripts(Resource[] destroyScripts) {
 		this.destroyScripts = destroyScripts;
 	}
 
+	/**
+	 * @param dataSource Establish the {@link DataSource} to be used.
+	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * If set to true an exception will not be thrown if drop command fails.
+	 * @param ignoreFailedDrop defaults to true.
+	 */
 	public void setIgnoreFailedDrop(boolean ignoreFailedDrop) {
 		this.ignoreFailedDrop = ignoreFailedDrop;
 	}

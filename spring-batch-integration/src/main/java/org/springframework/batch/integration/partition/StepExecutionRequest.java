@@ -28,10 +28,19 @@ public class StepExecutionRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The id of the step execution.
+	 */
 	private Long stepExecutionId;
 
+	/**
+	 * The name of the step to execute.
+	 */
 	private String stepName;
 
+	/**
+	 * The id of the job execution.
+	 */
 	private Long jobExecutionId;
 
 	private StepExecutionRequest() {
@@ -50,14 +59,23 @@ public class StepExecutionRequest implements Serializable {
 		this.stepExecutionId = stepExecutionId;
 	}
 
+	/**
+	 * @return the id of the job execution.
+	 */
 	public Long getJobExecutionId() {
 		return jobExecutionId;
 	}
 
+	/**
+	 * @return the id of the step execution.
+	 */
 	public Long getStepExecutionId() {
 		return stepExecutionId;
 	}
 
+	/**
+	 * @return the name of the step to execute.
+	 */
 	public String getStepName() {
 		return stepName;
 	}

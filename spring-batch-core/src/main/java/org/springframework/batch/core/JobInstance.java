@@ -43,6 +43,11 @@ public class JobInstance extends Entity {
 
 	private final String jobName;
 
+	/**
+	 * Constructor for {@link JobInstance}.
+ 	 * @param id the instance id.
+	 * @param jobName the name associated with the {@link JobInstance}.
+	 */
 	public JobInstance(Long id, String jobName) {
 		super(id);
 		Assert.hasLength(jobName, "A jobName is required");
@@ -61,6 +66,9 @@ public class JobInstance extends Entity {
 		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
+	/**
+	 * @return current instanceId
+	 */
 	public long getInstanceId() {
 		return super.getId();
 	}

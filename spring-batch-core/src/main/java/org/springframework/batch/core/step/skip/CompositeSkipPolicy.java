@@ -24,14 +24,25 @@ public class CompositeSkipPolicy implements SkipPolicy {
 
 	private SkipPolicy[] skipPolicies;
 
+	/**
+	 * Default Constructor that establishes {@link SkipPolicy}s as an empty array.
+	 */
 	public CompositeSkipPolicy() {
 		this(new SkipPolicy[0]);
 	}
 
+	/**
+	 * Constructor that establishes the {@link SkipPolicy}s for the {@link CompositeSkipPolicy}.
+	 * @param skipPolicies array containing {@link SkipPolicy}s.
+	 */
 	public CompositeSkipPolicy(SkipPolicy[] skipPolicies) {
 		this.skipPolicies = skipPolicies;
 	}
 
+	/**
+	 * Establish the {@link SkipPolicy}s for the {@link CompositeSkipPolicy}.
+	 * @param skipPolicies array containing {@link SkipPolicy}s.
+	 */
 	public void setSkipPolicies(SkipPolicy[] skipPolicies) {
 		this.skipPolicies = skipPolicies;
 	}

@@ -29,12 +29,18 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class StepLocatorStepFactoryBean implements FactoryBean<Step> {
 
+	/**
+	 * {@link StepLocator} to be used by the factory bean.
+	 */
 	public StepLocator stepLocator;
 
+	/**
+	 * Step name to be used by the factory bean.
+	 */
 	public String stepName;
 
 	/**
-	 * @param stepLocator instance of {@link StepLocator} to be used by the factory bean.
+	 * @param stepLocator {@link StepLocator} to be used by the factory bean.
 	 */
 	public void setStepLocator(StepLocator stepLocator) {
 		this.stepLocator = stepLocator;

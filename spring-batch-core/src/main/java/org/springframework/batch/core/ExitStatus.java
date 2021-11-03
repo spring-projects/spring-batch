@@ -74,10 +74,21 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	private final String exitDescription;
 
+	/**
+	 * Constructor that accepts the exitCode and sets the exitDescription to an empty {@link String}.
+	 *
+	 * @param exitCode to be used for the {@link ExitStatus}.
+	 */
 	public ExitStatus(String exitCode) {
 		this(exitCode, "");
 	}
 
+	/**
+	 * Constructor that establishes the exitCode and the exitDescription for the {@link ExitStatus}.
+	 *
+	 * @param exitCode to be used for the {@link ExitStatus}.
+	 * @param exitDescription to be used for the {@link ExitStatus}.
+	 */
 	public ExitStatus(String exitCode, String exitDescription) {
 		super();
 		this.exitCode = exitCode;

@@ -30,6 +30,10 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 
 	private ExceptionHandler[] handlers = new ExceptionHandler[0];
 
+	/**
+	 * Set the {@link ExceptionHandler}s for the {@link CompositeExceptionHandler}.
+	 * @param handlers array containing {@link ExceptionHandler}.
+	 */
 	public void setHandlers(ExceptionHandler[] handlers) {
 		this.handlers = Arrays.asList(handlers).toArray(new ExceptionHandler[handlers.length]);
 	}

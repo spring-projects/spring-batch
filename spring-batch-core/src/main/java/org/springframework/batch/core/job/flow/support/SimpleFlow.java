@@ -67,6 +67,10 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	private Comparator<StateTransition> stateTransitionComparator;
 
+	/**
+	 * Set the state transition comparator for the simple flow.
+	 * @param stateTransitionComparator the {@link Comparator<StateTransition>} to be used for the simple flow.
+	 */
 	public void setStateTransitionComparator(Comparator<StateTransition> stateTransitionComparator) {
 		this.stateTransitionComparator = stateTransitionComparator;
 	}
@@ -80,6 +84,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 		this.name = name;
 	}
 
+	/**
+	 * @return the start state of the simple flow.
+	 */
 	public State getStartState() {
 		return this.startState;
 	}
@@ -193,10 +200,16 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	}
 
+	/**
+	 * @return the transition map of the simple flow.
+	 */
 	protected Map<String, Set<StateTransition>> getTransitionMap() {
 		return transitionMap;
 	}
 
+	/**
+	 * @return the state map used by the simple flow.
+	 */
 	protected Map<String, State> getStateMap() {
 		return stateMap;
 	}
@@ -243,6 +256,13 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	}
 
+	/**
+	 * Returns if the siomple flow is continued.
+	 * @param state {@link State} of the simple flow.
+	 * @param status {@link FlowExecutionStatus} of the simple flow.
+	 * @param stepExecution {@link StepExecution} of the simple flow.
+	 * @return true if simple flow is continued.
+	 */
 	protected boolean isFlowContinued(State state, FlowExecutionStatus status, StepExecution stepExecution) {
 		boolean continued = true;
 

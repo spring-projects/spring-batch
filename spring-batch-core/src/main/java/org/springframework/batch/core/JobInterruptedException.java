@@ -33,10 +33,19 @@ public class JobInterruptedException extends JobExecutionException {
 	
 	private BatchStatus status = BatchStatus.STOPPED;
 
+	/**
+	 * Constructor that sets the  message for the exception.
+	 * @param msg message for the exception.
+	 */
 	public JobInterruptedException(String msg) {
 		super(msg);
 	}
 
+	/**
+	 * Constructor that sets the  message for the exception.
+	 * @param msg message for the exception.
+	 * @param status the desired {@link BatchStatus} of the surrounding execution after interruption.
+	 */
 	public JobInterruptedException(String msg, BatchStatus status) {
 		super(msg);
 		this.status = status;

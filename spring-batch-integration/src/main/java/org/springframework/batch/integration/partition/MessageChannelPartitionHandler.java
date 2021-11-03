@@ -84,20 +84,44 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 	private static Log logger = LogFactory.getLog(MessageChannelPartitionHandler.class);
 
+	/**
+	 * The number of step executions that will be created.
+	 */
 	private int gridSize = 1;
 
+	/**
+	 * Gateway for sending and receiving messages to the remote workers.
+	 */
 	private MessagingTemplate messagingGateway;
 
+	/**
+	 * The name of the {@link Step} instance to execute business logic .
+	 */
 	private String stepName;
 
+	/**
+	 * Milliseconds between polls, defaults to 10000 (10 seconds).
+	 */
 	private long pollInterval = 10000;
 
+	/**
+	 * {@link org.springframework.batch.core.explore.JobExplorer} to use for lookups.
+	 */
 	private JobExplorer jobExplorer;
 
+	/**
+	 * Shows whether a repository will be polled for worker results.  If true it will poll a job repository for worker results.
+	 */
 	private boolean pollRepositoryForResults = false;
 
+	/**
+	 * Milliseconds to wait, defaults to -1 (no timeout).
+	 */
 	private long timeout = -1;
 
+	/**
+	 * {@link javax.sql.DataSource} that points to the job repository's store.
+	 */
 	private DataSource dataSource;
 
 	/**
@@ -211,6 +235,9 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 		return messages;
 	}
 
+	/**
+	 * @param replyChannel the pollable channel to be used as the reply channel.
+	 */
 	public void setReplyChannel(PollableChannel replyChannel) {
 		this.replyChannel = replyChannel;
 	}

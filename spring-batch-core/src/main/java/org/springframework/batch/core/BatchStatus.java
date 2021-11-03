@@ -26,7 +26,7 @@ package org.springframework.batch.core;
  */
 public enum BatchStatus {
 
-	/**
+	/*
 	 * The order of the status values is significant because it can be used to
 	 * aggregate a set of status values - the result should be the maximum
 	 * value. Since COMPLETED is first in the order, only if all elements of an
@@ -37,8 +37,45 @@ public enum BatchStatus {
 	 * steps that have finished processing, but were not successful, and where
 	 * they should be skipped on a restart (so FAILED is the wrong status).
 	 */
-	COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN;
+	/**
+	 * The batch job has successfully completed its execution
+	 */
+	COMPLETED,
+	/**
+	 * Status of a batch job prior to execution of the job.
+	 */
+	STARTING,
+	/**
+	 * Status of a batch job that is running.
+	 */
+	STARTED,
+	/**
+	 * Status of batch job waiting for a step to complete before stopping the batch job.
+	 */
+	STOPPING,
+	/**
+	 * Status of a batch job that has been stopped by request.
+	 */
+	STOPPED,
+	/**
+	 * Status of a batch job that has failed during its execution.
+	 */
+	FAILED,
+	/**
+	 * Status of a batch job that did not stop properly and can not be restarted.
+	 */
+	ABANDONED,
+	/**
+	 * Status of a batch job that is in an uncertain state.
+	 */
+	UNKNOWN;
 
+	/**
+	 * Convenience method to return the higher value status of the statuses pass in to the method.
+	 * @param status1 first status to check
+	 * @param status2 second status to check
+	 * @return the higher value status of the two statuses.
+	 */
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		return status1.isGreaterThan(status2) ? status1 : status2;
 	}

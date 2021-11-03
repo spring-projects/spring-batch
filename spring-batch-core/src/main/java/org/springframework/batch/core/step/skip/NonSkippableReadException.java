@@ -25,6 +25,11 @@ package org.springframework.batch.core.step.skip;
 @SuppressWarnings("serial")
 public class NonSkippableReadException extends SkipException {
 
+	/**
+	 * Constructor that sets the message  and cause for the exception.
+	 * @param msg {@link String} message for the {@link Exception}.
+	 * @param cause the cause of the exception.
+	 */
 	public NonSkippableReadException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

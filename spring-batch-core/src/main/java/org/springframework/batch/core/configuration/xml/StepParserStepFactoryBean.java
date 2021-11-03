@@ -278,6 +278,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		}
 	}
 
+	/**
+	 * Create a partition {@link Step}.
+	 * @return {@link Step}.
+	 */
 	protected Step createPartitionStep() {
 
 		PartitionStepBuilder builder;
@@ -303,6 +307,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Creates a fault tolerant {@link Step}.
+	 * @return {@link Step}.
+	 */
 	protected Step createFaultTolerantStep() {
 
 		FaultTolerantStepBuilder<I, O> builder = getFaultTolerantStepBuilder(this.name);
@@ -383,6 +391,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Creates a new {@link FaultTolerantStepBuilder}.
+	 * @param stepName the name of the step used by the created builder.
+	 * @return {@link FaultTolerantStepBuilder}
+	 */
 	protected FaultTolerantStepBuilder<I, O> getFaultTolerantStepBuilder(String stepName) {
 		return new FaultTolerantStepBuilder<>(new StepBuilder(stepName));
 	}
@@ -399,6 +412,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		}
 	}
 
+	/**
+	 * Creates new {@link TaskletStep}.
+	 * @return {@link TaskletStep}.
+	 */
 	protected Step createSimpleStep() {
 		SimpleStepBuilder<I, O> builder = getSimpleStepBuilder(name);
 
@@ -436,6 +453,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		return builder.build();
 	}
 
+	/**
+	 * Set the state of the {@link AbstractTaskletStepBuilder}.
+	 * @param builder the {@link AbstractTaskletStepBuilder} to be enhanced.
+	 */
 	@SuppressWarnings("serial")
 	protected void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
 
@@ -479,6 +500,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Create new {@link org.springframework.batch.core.job.flow.FlowStep}.
+	 * @return {@link org.springframework.batch.core.job.flow.FlowStep}
+	 */
 	protected Step createFlowStep() {
 		FlowStepBuilder builder = new StepBuilder(name).flow(flow);
 		enhanceCommonStep(builder);
@@ -901,6 +926,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		this.commitInterval = commitInterval;
 	}
 
+	/**
+	 * @return the commitInterval.
+	 */
 	protected Integer getCommitInterval() {
 		return this.commitInterval;
 	}

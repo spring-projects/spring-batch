@@ -36,6 +36,9 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 */
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
 
+	/**
+	 * The default exit message length for the DAO.
+	 */
 	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
@@ -44,10 +47,16 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 
+	/**
+	 * @return {@link String} containing the current query.
+	 */
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
 
+	/**
+	 * @return {@link String} containing the current table prefix.
+	 */
 	protected String getTablePrefix() {
 		return tablePrefix;
 	}
@@ -63,18 +72,34 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.tablePrefix = tablePrefix;
 	}
 
+	/**
+	 * Establish the {@link JdbcOperations} used by the dAo.
+	 * @param jdbcTemplate the {@link JdbcOperations} to be used.
+	 */
 	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+	/**
+	 * @return {@link JdbcOperations} used by the DAO.
+	 */
 	protected JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 
+	/**
+	 * Retrieve the type of clob as defined {@link Types}
+	 * @return clob type.
+	 */
 	public int getClobTypeToUse() {
 		return clobTypeToUse;
 	}
 
+
+	/**
+	 * Set the type of clob to use based on the constants in {@link Types}.
+	 * @param clobTypeToUse the type of CLOB to use.  Defaults to {@link Types#CLOB}.
+	 */
 	public void setClobTypeToUse(int clobTypeToUse) {
 		this.clobTypeToUse = clobTypeToUse;
 	}

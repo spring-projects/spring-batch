@@ -29,12 +29,20 @@ package org.springframework.batch.core.step.skip;
 public class SkipLimitExceededException extends SkipException {
 
 	private final long skipLimit;
-	
+
+	/**
+	 * Constructor that sets the cause and skip limit that was exceeded for the exception.
+	 * @param t cause for the exception.
+	 * @param skipLimit the skip limit that was exceeded.
+	 */
 	public SkipLimitExceededException(long skipLimit, Throwable t) {
 		super("Skip limit of '" + skipLimit + "' exceeded", t);
 		this.skipLimit = skipLimit;
 	}
-	
+
+	/**
+	 * @return the skip limit that was exceeded.
+	 */
 	public long getSkipLimit() {
 	    return skipLimit;
     }

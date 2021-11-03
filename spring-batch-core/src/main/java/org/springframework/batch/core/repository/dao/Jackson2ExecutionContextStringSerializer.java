@@ -56,6 +56,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
 /**
@@ -124,6 +125,10 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
                 .build();
     }
 
+    /**
+     * Public setter for the {@link ObjectMapper}.
+     * @param objectMapper the {@link ObjectMapper} to be associated with the DAO.
+     */
     public void setObjectMapper(ObjectMapper objectMapper) {
         Assert.notNull(objectMapper, "ObjectMapper must not be null");
         this.objectMapper = objectMapper.copy();

@@ -25,7 +25,11 @@ package org.springframework.batch.core.step.item;
  */
 @SuppressWarnings("serial")
 public class ForceRollbackForWriteSkipException extends RuntimeException {
-
+	/**
+	 * Constructs a new exception with the specified detail message and cause.
+	 * @param msg the detailed message.
+	 * @param cause the cause.
+	 */
 	public ForceRollbackForWriteSkipException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

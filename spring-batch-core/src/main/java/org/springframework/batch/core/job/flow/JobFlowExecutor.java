@@ -43,6 +43,9 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	private final JobExecution execution;
 
+	/**
+	 * {@link ExitStatus} for the {@link JobFlowExecutor}.
+	 */
 	protected ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 	private final StepHandler stepHandler;
