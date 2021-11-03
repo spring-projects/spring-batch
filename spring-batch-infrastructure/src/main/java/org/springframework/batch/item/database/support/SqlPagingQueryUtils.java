@@ -68,7 +68,7 @@ public class SqlPagingQueryUtils {
 	 * opposed to the first page (false)
 	 * @param limitClause the implementation specific limit clause to be used
 	 * @return the generated query
-	 * @deprecated in favor of {@link #generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider, java.lang.String)}
+	 * @deprecated as of v5.0 in favor of {@link #generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider, java.lang.String)}
 	 */
 	@Deprecated
 	public static String generateLimitGroupedSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery,
