@@ -28,6 +28,15 @@
 				<entry key="name" value="java.lang.String" />
 			</util:map>
 		</property>
+		<property name="typePermissions">
+			<bean class="com.thoughtworks.xstream.security.ExplicitTypePermission">
+				<constructor-arg>
+					<util:list>
+						<value>org.springframework.batch.sample.domain.trade.CustomerCredit</value>
+					</util:list>
+				</constructor-arg>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
