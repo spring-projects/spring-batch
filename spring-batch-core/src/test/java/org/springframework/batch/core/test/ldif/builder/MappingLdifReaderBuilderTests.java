@@ -17,7 +17,6 @@
 package org.springframework.batch.core.test.ldif.builder;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,7 +41,6 @@ import static org.junit.Assert.fail;
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
  */
-@Ignore
 @RunWith(SpringRunner.class)
 public class MappingLdifReaderBuilderTests {
 	@Autowired

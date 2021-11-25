@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/applicationContext-test2.xml"})
 public class MappingLdifReaderTests {
