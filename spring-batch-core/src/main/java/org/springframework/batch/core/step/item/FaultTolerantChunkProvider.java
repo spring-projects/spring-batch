@@ -29,7 +29,7 @@ import org.springframework.classify.BinaryExceptionClassifier;
 import org.springframework.classify.Classifier;
 
 /**
- * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
+ * FaultTolerant implementation of the {@link ChunkProvider} interface, that
  * allows for skipping or retry of items that cause exceptions during reading or
  * processing.
  * 
