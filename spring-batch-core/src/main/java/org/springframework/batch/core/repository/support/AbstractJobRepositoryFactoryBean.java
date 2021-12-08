@@ -32,6 +32,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -59,10 +60,12 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	private boolean validateTransactionState = true;
 
+	private static final String ISOLATION_LEVEL_PREFIX = "ISOLATION_";
+
 	/**
 	 * Default value for isolation level in create* method.
 	 */
-	private static final String DEFAULT_ISOLATION_LEVEL = "ISOLATION_SERIALIZABLE";
+	private static final String DEFAULT_ISOLATION_LEVEL = ISOLATION_LEVEL_PREFIX + "SERIALIZABLE";
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -133,6 +136,21 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 	 */
 	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
 		this.isolationLevelForCreate = isolationLevelForCreate;
+	}
+
+	/**
+	 * public setter for the isolation level to be used for the transaction when
+	 * job execution entities are initially created. The default is
+	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
+	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
+	 *
+	 * @param isolationLevelForCreate the isolation level to set
+	 *
+	 * @see SimpleJobRepository#createJobExecution(String,
+	 * org.springframework.batch.core.JobParameters)
+	 */
+	public void setIsolationLevelForCreate(Isolation isolationLevelForCreate) {
+		this.setIsolationLevelForCreate(ISOLATION_LEVEL_PREFIX + isolationLevelForCreate.name());
 	}
 
 	/**

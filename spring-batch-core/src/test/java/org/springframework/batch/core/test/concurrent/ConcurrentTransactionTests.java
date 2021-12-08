@@ -58,6 +58,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.util.ClassUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -170,7 +171,7 @@ public class ConcurrentTransactionTests {
 		protected JobRepository createJobRepository() throws Exception {
 			JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 			factory.setDataSource(getDataSource());
-			factory.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
+			factory.setIsolationLevelForCreate(Isolation.READ_COMMITTED);
 			factory.setTransactionManager(getTransactionManager());
 			factory.afterPropertiesSet();
 			return  factory.getObject();

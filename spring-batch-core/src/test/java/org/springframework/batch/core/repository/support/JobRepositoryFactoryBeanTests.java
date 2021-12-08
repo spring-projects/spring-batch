@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.junit.Assert.assertEquals;
@@ -52,6 +53,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Lucas Ward
  * @author Will Schipp
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobRepositoryFactoryBeanTests {
@@ -331,7 +333,7 @@ public class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testSetTransactionAttributesForCreateMethod() throws Exception {
 
-		factory.setIsolationLevelForCreate("ISOLATION_READ_UNCOMMITTED");
+		factory.setIsolationLevelForCreate(Isolation.READ_UNCOMMITTED);
 		testCreateRepository();
 		JobRepository repository = factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
