@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.util.Assert;
  *
  * @author Lucas Ward
  * @author Dave Syer
+ * @author Taeik Lim
  *
  */
 @SuppressWarnings("serial")
@@ -154,10 +156,11 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the time that this execution ended
+	 * Returns the time that this execution ended or {@code null} if the step is running.
 	 *
-	 * @return the time that this execution ended
+	 * @return the time that this execution ended or {@code null} if the step is running
 	 */
+	@Nullable
 	public Date getEndTime() {
 		return endTime;
 	}
