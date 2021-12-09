@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -34,6 +35,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  */
 @SuppressWarnings("serial")
@@ -157,10 +159,11 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the time that this execution ended
+	 * Returns the time that this execution ended or {@code null} if the step is running.
 	 *
-	 * @return the time that this execution ended
+	 * @return the time that this execution ended or {@code null} if the step is running
 	 */
+	@Nullable
 	public Date getEndTime() {
 		return endTime;
 	}
