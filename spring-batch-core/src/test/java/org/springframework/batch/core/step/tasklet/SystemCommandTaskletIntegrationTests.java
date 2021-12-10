@@ -58,7 +58,7 @@ public class SystemCommandTaskletIntegrationTests {
 	private SystemCommandTasklet tasklet;
 
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
-			"systemCommandJob"), 1L, new JobParameters(), "configurationName"));
+			"systemCommandJob"), 1L, new JobParameters()));
 
 	@Mock
 	private JobExplorer jobExplorer;

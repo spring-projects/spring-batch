@@ -120,12 +120,6 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.batch</groupId>
-			<artifactId>jakarta.batch-api</artifactId>
-			<version>${jakarta.batch-api.version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-geode</artifactId>
 			<version>${spring-data-geode.version}</version>

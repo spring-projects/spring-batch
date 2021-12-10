@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Will Schipp
  * @author Dimitrios Liapis
  * @author Baris Cubukcuoglu
+ * @author Mahmoud Ben Hassine
  *
  */
 public class SimpleJobRepositoryTests {
@@ -126,7 +127,7 @@ public class SimpleJobRepositoryTests {
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
-		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters, null);
+		jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 	}
 
 	@Test
@@ -146,7 +147,7 @@ public class SimpleJobRepositoryTests {
 	@Test
 	public void testUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(1L, job.getName()), 1L, jobParameters);
 		// new execution - call update on job DAO
 		jobExecutionDao.updateJobExecution(jobExecution);
 		jobRepository.update(jobExecution);

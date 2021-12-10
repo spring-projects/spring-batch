@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.batch.operations.BatchRuntimeException;
-
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.SkipListener;
@@ -123,8 +121,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	private Collection<Class<? extends Throwable>> nonRetryableExceptionClasses = new HashSet<>();
 
 	private Set<SkipListener<? super I, ? super O>> skipListeners = new LinkedHashSet<>();
-
-	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<>();
 
 	private int skipLimit = 0;
 
@@ -224,11 +220,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 	 */
 	public FaultTolerantStepBuilder<I, O> listener(SkipListener<? super I, ? super O> listener) {
 		skipListeners.add(listener);
-		return this;
-	}
-
-	public FaultTolerantStepBuilder<I, O> listener(org.springframework.batch.core.jsr.RetryListener listener) {
-		jsrRetryListeners.add(listener);
 		return this;
 	}
 
@@ -492,7 +483,7 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 		addNonRetryableExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				TransactionException.class, FatalStepExecutionException.class, SkipListenerFailedException.class,
 				SkipPolicyFailedException.class, RetryException.class, JobInterruptedException.class, Error.class,
-				BatchRuntimeException.class, BeanCreationException.class);
+				BeanCreationException.class);
 	}
 
 	protected void detectStreamInReader() {
@@ -645,10 +636,6 @@ public class FaultTolerantStepBuilder<I, O> extends SimpleStepBuilder<I, O> {
 
 	protected Set<SkipListener<? super I, ? super O>> getSkipListeners() {
 		return skipListeners;
-	}
-
-	protected Set<org.springframework.batch.core.jsr.RetryListener> getJsrRetryListeners() {
-		return jsrRetryListeners;
 	}
 
 	/**

@@ -149,7 +149,7 @@ public class SimpleJobRepository implements JobRepository {
 			executionContext = new ExecutionContext();
 		}
 
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
 		jobExecution.setExecutionContext(executionContext);
 		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
@@ -290,23 +290,4 @@ public class SimpleJobRepository implements JobRepository {
 		return jobInstance;
 	}
 
-	@Override
-	public JobExecution createJobExecution(JobInstance jobInstance,
-			JobParameters jobParameters, String jobConfigurationLocation) {
-
-		Assert.notNull(jobInstance, "A JobInstance is required to associate the JobExecution with");
-		Assert.notNull(jobParameters, "A JobParameters object is required to create a JobExecution");
-
-		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters, jobConfigurationLocation);
-		ExecutionContext executionContext = new ExecutionContext();
-		jobExecution.setExecutionContext(executionContext);
-		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
-
-		// Save the JobExecution so that it picks up an ID (useful for clients
-		// monitoring asynchronous executions):
-		jobExecutionDao.saveJobExecution(jobExecution);
-		ecDao.saveExecutionContext(jobExecution);
-
-		return jobExecution;
-	}
 }

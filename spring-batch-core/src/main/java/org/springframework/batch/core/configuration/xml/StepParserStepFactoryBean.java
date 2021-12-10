@@ -25,13 +25,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import jakarta.batch.api.chunk.listener.RetryProcessListener;
-import jakarta.batch.api.chunk.listener.RetryReadListener;
-import jakarta.batch.api.chunk.listener.RetryWriteListener;
-import jakarta.batch.api.chunk.listener.SkipProcessListener;
-import jakarta.batch.api.chunk.listener.SkipReadListener;
-import jakarta.batch.api.chunk.listener.SkipWriteListener;
-import jakarta.batch.api.partition.PartitionCollector;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -43,16 +36,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.jsr.ChunkListenerAdapter;
-import org.springframework.batch.core.jsr.ItemProcessListenerAdapter;
-import org.springframework.batch.core.jsr.ItemReadListenerAdapter;
-import org.springframework.batch.core.jsr.ItemWriteListenerAdapter;
-import org.springframework.batch.core.jsr.RetryProcessListenerAdapter;
-import org.springframework.batch.core.jsr.RetryReadListenerAdapter;
-import org.springframework.batch.core.jsr.RetryWriteListenerAdapter;
-import org.springframework.batch.core.jsr.SkipListenerAdapter;
-import org.springframework.batch.core.jsr.StepListenerAdapter;
-import org.springframework.batch.core.jsr.partition.PartitionCollectorAdapter;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.support.Partitioner;
@@ -105,6 +88,7 @@ import org.springframework.util.Assert;
  * @author Josh Long
  * @author Michael Minella
  * @author Chris Schaefer
+ * @author Mahmoud Ben Hassine
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
  * @see TaskletStep
@@ -158,10 +142,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	private PartitionHandler partitionHandler;
 
 	private int gridSize = DEFAULT_GRID_SIZE;
-
-	private Queue<Serializable> partitionQueue;
-
-	private ReentrantLock partitionLock;
 
 	//
 	// Tasklet Elements
@@ -232,30 +212,12 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	private Set<SkipListener<I, O>> skipListeners = new LinkedHashSet<>();
 
-	private Set<org.springframework.batch.core.jsr.RetryListener> jsrRetryListeners = new LinkedHashSet<>();
-
 	//
 	// Additional
 	//
 	private boolean hasChunkElement = false;
 
 	private StepExecutionAggregator stepExecutionAggregator;
-
-	/**
-	 * @param queue The {@link Queue} that is used for communication between {@link jakarta.batch.api.partition.PartitionCollector} and {@link jakarta.batch.api.partition.PartitionAnalyzer}
-	 */
-	public void setPartitionQueue(Queue<Serializable> queue) {
-		this.partitionQueue = queue;
-	}
-
-	/**
-	 * Used to coordinate access to the partition queue between the {@link jakarta.batch.api.partition.PartitionCollector} and {@link jakarta.batch.api.partition.AbstractPartitionAnalyzer}
-	 *
-	 * @param lock a lock that will be locked around accessing the partition queue
-	 */
-	public void setPartitionLock(ReentrantLock lock) {
-		this.partitionLock = lock;
-	}
 
 	/**
 	 * Create a {@link Step} from the configuration provided.
@@ -312,8 +274,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		for (Object listener : stepExecutionListeners) {
 			if(listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
-			} else if(listener instanceof jakarta.batch.api.listener.StepListener) {
-				builder.listener(new StepListenerAdapter((jakarta.batch.api.listener.StepListener) listener));
 			}
 		}
 	}
@@ -366,10 +326,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		}
 
 		for (SkipListener<I, O> listener : skipListeners) {
-			builder.listener(listener);
-		}
-
-		for (org.springframework.batch.core.jsr.RetryListener listener : jsrRetryListeners) {
 			builder.listener(listener);
 		}
 
@@ -485,10 +441,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 		enhanceCommonStep(builder);
 		for (ChunkListener listener : chunkListeners) {
-			if(listener instanceof PartitionCollectorAdapter) {
-				((PartitionCollectorAdapter) listener).setPartitionLock(partitionLock);
-			}
-
 			builder.listener(listener);
 
 		}
@@ -817,70 +769,25 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 				SkipListener<I, O> skipListener = (SkipListener<I, O>) listener;
 				skipListeners.add(skipListener);
 			}
-			if(listener instanceof SkipReadListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<>((SkipReadListener) listener, null, null);
-				skipListeners.add(skipListener);
-			}
-			if(listener instanceof SkipProcessListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<>(null, (SkipProcessListener) listener, null);
-				skipListeners.add(skipListener);
-			}
-			if(listener instanceof SkipWriteListener) {
-				SkipListener<I, O> skipListener = new SkipListenerAdapter<>(null, null, (SkipWriteListener) listener);
-				skipListeners.add(skipListener);
-			}
 			if (listener instanceof StepExecutionListener) {
 				StepExecutionListener stepExecutionListener = (StepExecutionListener) listener;
-				stepExecutionListeners.add(stepExecutionListener);
-			}
-			if(listener instanceof jakarta.batch.api.listener.StepListener) {
-				StepExecutionListener stepExecutionListener = new StepListenerAdapter((jakarta.batch.api.listener.StepListener) listener);
 				stepExecutionListeners.add(stepExecutionListener);
 			}
 			if (listener instanceof ChunkListener) {
 				ChunkListener chunkListener = (ChunkListener) listener;
 				chunkListeners.add(chunkListener);
 			}
-			if(listener instanceof jakarta.batch.api.chunk.listener.ChunkListener) {
-				ChunkListener chunkListener = new ChunkListenerAdapter((jakarta.batch.api.chunk.listener.ChunkListener) listener);
-				chunkListeners.add(chunkListener);
-			}
 			if (listener instanceof ItemReadListener) {
 				ItemReadListener<I> readListener = (ItemReadListener<I>) listener;
 				readListeners.add(readListener);
-			}
-			if(listener instanceof jakarta.batch.api.chunk.listener.ItemReadListener) {
-				ItemReadListener<I> itemListener = new ItemReadListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemReadListener) listener);
-				readListeners.add(itemListener);
 			}
 			if (listener instanceof ItemWriteListener) {
 				ItemWriteListener<O> writeListener = (ItemWriteListener<O>) listener;
 				writeListeners.add(writeListener);
 			}
-			if(listener instanceof jakarta.batch.api.chunk.listener.ItemWriteListener) {
-				ItemWriteListener<O> itemListener = new ItemWriteListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemWriteListener) listener);
-				writeListeners.add(itemListener);
-			}
 			if (listener instanceof ItemProcessListener) {
 				ItemProcessListener<I, O> processListener = (ItemProcessListener<I, O>) listener;
 				processListeners.add(processListener);
-			}
-			if(listener instanceof jakarta.batch.api.chunk.listener.ItemProcessListener) {
-				ItemProcessListener<I,O> itemListener = new ItemProcessListenerAdapter<>((jakarta.batch.api.chunk.listener.ItemProcessListener) listener);
-				processListeners.add(itemListener);
-			}
-			if(listener instanceof RetryReadListener) {
-				jsrRetryListeners.add(new RetryReadListenerAdapter((RetryReadListener) listener));
-			}
-			if(listener instanceof RetryProcessListener) {
-				jsrRetryListeners.add(new RetryProcessListenerAdapter((RetryProcessListener) listener));
-			}
-			if(listener instanceof RetryWriteListener) {
-				jsrRetryListeners.add(new RetryWriteListenerAdapter((RetryWriteListener) listener));
-			}
-			if(listener instanceof PartitionCollector) {
-				PartitionCollectorAdapter adapter = new PartitionCollectorAdapter(partitionQueue, (PartitionCollector) listener);
-				chunkListeners.add(adapter);
 			}
 		}
 	}

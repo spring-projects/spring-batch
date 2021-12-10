@@ -120,14 +120,4 @@ public class BatchStatusTests {
 		assertEquals(BatchStatus.COMPLETED, status);
 	}
 
-	@Test
-	public void testJsrConversion() {
-		assertEquals(jakarta.batch.runtime.BatchStatus.ABANDONED, BatchStatus.ABANDONED.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.COMPLETED, BatchStatus.COMPLETED.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.STARTED, BatchStatus.STARTED.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.STARTING, BatchStatus.STARTING.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.STOPPED, BatchStatus.STOPPED.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.STOPPING, BatchStatus.STOPPING.getBatchStatus());
-		assertEquals(jakarta.batch.runtime.BatchStatus.FAILED, BatchStatus.FAILED.getBatchStatus());
-	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
@@ -57,8 +56,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
-	private BatchPropertyContext propertyContext = null;
-
 	/**
 	 * Create a new instance of {@link StepContext} for this
 	 * {@link StepExecution}.
@@ -69,13 +66,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		super();
 		Assert.notNull(stepExecution, "A StepContext must have a non-null StepExecution");
 		this.stepExecution = stepExecution;
-	}
-
-	public StepContext(StepExecution stepExecution, BatchPropertyContext propertyContext) {
-		super();
-		Assert.notNull(stepExecution, "A StepContext must have a non-null StepExecution");
-		this.stepExecution = stepExecution;
-		this.propertyContext = propertyContext;
 	}
 
 	/**
@@ -156,18 +146,6 @@ public class StepContext extends SynchronizedAttributeAccessor {
 			result.put(entry.getKey(), entry.getValue().getValue());
 		}
 		return Collections.unmodifiableMap(result);
-	}
-
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	public Map<String, Object> getPartitionPlan() {
-		Map<String, Object> partitionPlanProperties = new HashMap<>();
-
-		if(propertyContext != null) {
-			Map partitionProperties = propertyContext.getStepProperties(getStepName());
-			partitionPlanProperties = partitionProperties;
-		}
-
-		return Collections.unmodifiableMap(partitionPlanProperties);
 	}
 
 	/**

@@ -30,7 +30,6 @@ import org.springframework.util.Assert;
  * @see Job
  * @see JobParameters
  * @see JobExecution
- * @see jakarta.batch.runtime.JobInstance
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -40,7 +39,7 @@ import org.springframework.util.Assert;
  *
  */
 @SuppressWarnings("serial")
-public class JobInstance extends Entity implements jakarta.batch.runtime.JobInstance{
+public class JobInstance extends Entity {
 
 	private final String jobName;
 
@@ -53,7 +52,6 @@ public class JobInstance extends Entity implements jakarta.batch.runtime.JobInst
 	/**
 	 * @return the job name. (Equivalent to getJob().getName())
 	 */
-	@Override
 	public String getJobName() {
 		return jobName;
 	}
@@ -63,7 +61,6 @@ public class JobInstance extends Entity implements jakarta.batch.runtime.JobInst
 		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
-	@Override
 	public long getInstanceId() {
 		return super.getId();
 	}

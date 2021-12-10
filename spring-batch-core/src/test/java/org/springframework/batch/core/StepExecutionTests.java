@@ -34,6 +34,7 @@ import org.springframework.util.SerializationUtils;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class StepExecutionTests {
@@ -305,7 +306,7 @@ public class StepExecutionTests {
 
 	private StepExecution newStepExecution(Step step, Long jobExecutionId, long stepExecutionId) {
 		JobInstance job = new JobInstance(3L, "testJob");
-		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters(), null), stepExecutionId);
+		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters()), stepExecutionId);
 		return execution;
 	}
 

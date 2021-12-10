@@ -76,7 +76,7 @@ public class CommandLineJobRunnerTests {
 
 	@Before
 	public void setUp() throws Exception {
-		JobExecution jobExecution = new JobExecution(null, 1L, null, null);
+		JobExecution jobExecution = new JobExecution(null, 1L, null);
 		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
@@ -314,7 +314,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartExecution() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
 		jobExecution.setStatus(BatchStatus.FAILED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -326,7 +326,7 @@ public class CommandLineJobRunnerTests {
 	public void testRestartExecutionNotFailed() throws Throwable {
 		String[] args = new String[] { jobPath, "-restart", "11" };
 		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(0L, jobName), 11L, jobParameters);
 		jobExecution.setStatus(BatchStatus.COMPLETED);
 		StubJobExplorer.jobExecution = jobExecution;
 		CommandLineJobRunner.main(args);
@@ -495,7 +495,7 @@ public class CommandLineJobRunnerTests {
 		}
 
 		private JobExecution createJobExecution(JobInstance jobInstance, BatchStatus status) {
-			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters, null);
+			JobExecution jobExecution = new JobExecution(jobInstance, 1L, jobParameters);
 			jobExecution.setStatus(status);
 			jobExecution.setStartTime(new Date());
 			if (status != BatchStatus.STARTED) {

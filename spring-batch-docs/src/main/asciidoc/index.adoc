@@ -28,8 +28,6 @@ parallel steps, remote chunking and partitioning.
 <<testing.adoc#testing,Unit Testing>> :: Job and Step testing facilities and APIs.
 <<common-patterns.adoc#commonPatterns, Common Patterns>> :: Common batch processing patterns
 and guidelines.
-<<jsr-352.adoc#jsr-352,JSR-352 Support>> :: JSR-352 support, similarities and differences
-with Spring Batch.
 <<spring-batch-integration.adoc#springBatchIntegration,Spring Batch Integration>> :: Integration
 between Spring Batch and Spring Integration projects.
 <<monitoring-and-metrics.adoc#monitoring-and-metrics,Monitoring and metrics>> :: Batch jobs

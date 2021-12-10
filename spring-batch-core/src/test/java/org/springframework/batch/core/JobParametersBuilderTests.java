@@ -252,7 +252,7 @@ public class JobParametersBuilderTests {
 	}
 
 	private JobExecution getJobExecution(JobInstance jobInstance, BatchStatus batchStatus) {
-		JobExecution jobExecution = new JobExecution(jobInstance, 1L, null, "TestConfig");
+		JobExecution jobExecution = new JobExecution(jobInstance, 1L, null);
 		if(batchStatus != null) {
 			jobExecution.setStatus(batchStatus);
 		}

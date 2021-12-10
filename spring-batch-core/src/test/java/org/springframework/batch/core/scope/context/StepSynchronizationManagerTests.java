@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 
 public class StepSynchronizationManagerTests {
 
 	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
-	private BatchPropertyContext propertyContext = new BatchPropertyContext();
 
 	@Before
 	@After
@@ -52,16 +50,6 @@ public class StepSynchronizationManagerTests {
 		assertNull(StepSynchronizationManager.getContext());
 		StepSynchronizationManager.register(stepExecution);
 		assertNotNull(StepSynchronizationManager.getContext());
-	}
-
-	@Test
-	public void testGetContextWithBatchProperties() {
-		StepContext context = StepSynchronizationManager.getContext();
-		assertNull(context);
-		StepSynchronizationManager.register(stepExecution, propertyContext);
-		context = StepSynchronizationManager.getContext();
-		assertNotNull(context);
-		assertEquals(stepExecution, context.getStepExecution());
 	}
 
 	@Test

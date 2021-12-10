@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.springframework.batch.core.scope.context;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.lang.Nullable;
 
 /**
@@ -38,16 +37,8 @@ public class StepSynchronizationManager {
 			new SynchronizationManagerSupport<StepExecution, StepContext>() {
 
 		@Override
-		protected StepContext createNewContext(StepExecution execution, @Nullable BatchPropertyContext propertyContext) {
-			StepContext context;
-
-			if(propertyContext != null) {
-				context = new StepContext(execution, propertyContext);
-			} else {
-				context = new StepContext(execution);
-			}
-
-			return context;
+		protected StepContext createNewContext(StepExecution execution) {
+			return new StepContext(execution);
 		}
 
 		@Override
@@ -78,21 +69,6 @@ public class StepSynchronizationManager {
 	 */
 	public static StepContext register(StepExecution stepExecution) {
 		return manager.register(stepExecution);
-	}
-
-	/**
-	 * Register a context with the current thread - always put a matching
-	 * {@link #close()} call in a finally block to ensure that the correct
-	 * context is available in the enclosing block.
-	 *
-	 * @param stepExecution the step context to register
-	 * @param propertyContext an instance of {@link BatchPropertyContext} to be
-	 * used by the StepSynchronizationManager.
-	 * @return a new {@link StepContext} or the current one if it has the same
-	 * {@link StepExecution}
-	 */
-	public static StepContext register(StepExecution stepExecution, BatchPropertyContext propertyContext) {
-		return manager.register(stepExecution, propertyContext);
 	}
 
 	/**

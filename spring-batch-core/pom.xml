@@ -51,11 +51,6 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>jakarta.batch</groupId>
-		    <artifactId>jakarta.batch-api</artifactId>
-			<version>${jakarta.batch-api.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-core</artifactId>
 			<version>${micrometer.version}</version>
@@ -254,12 +249,6 @@
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<version>${jaxb-core.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.ibm.jbatch</groupId>
-			<artifactId>com.ibm.jbatch-tck-spi</artifactId>
-			<version>${com.ibm.jbatch-tck-spi.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

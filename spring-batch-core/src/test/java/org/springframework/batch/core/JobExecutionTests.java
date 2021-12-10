@@ -31,12 +31,13 @@ import org.springframework.util.SerializationUtils;
 /**
  * @author Dave Syer
  * @author Dimitrios Liapis
+ * @author Mahmoud Ben Hassine
  *
  */
 public class JobExecutionTests {
 
 	private JobExecution execution = new JobExecution(new JobInstance(11L, "foo"),
-			12L, new JobParameters(), null);
+			12L, new JobParameters());
 
 	@Test
 	public void testJobExecution() {
@@ -52,12 +53,6 @@ public class JobExecutionTests {
 		assertNull(execution.getEndTime());
 		execution.setEndTime(new Date(100L));
 		assertEquals(100L, execution.getEndTime().getTime());
-	}
-
-	@Test
-	public void testGetJobConfigurationName() {
-		execution = new JobExecution(new JobInstance(null, "foo"), null, "/META-INF/batch-jobs/someJob.xml");
-		assertEquals("/META-INF/batch-jobs/someJob.xml", execution.getJobConfigurationName());
 	}
 
 	/**
@@ -122,7 +117,7 @@ public class JobExecutionTests {
 	@Test
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
-		execution = new JobExecution(new JobInstance(23L, "testJob"), null, new JobParameters(), null);
+		execution = new JobExecution(new JobInstance(23L, "testJob"), null, new JobParameters());
 		assertEquals(23, execution.getJobId().longValue());
 	}
 

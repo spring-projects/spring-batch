@@ -297,8 +297,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
                 "java.util.Properties",
                 "[Ljava.util.Properties;",
                 "org.springframework.batch.core.JobParameter",
-                "org.springframework.batch.core.JobParameters",
-                "org.springframework.batch.core.jsr.partition.JsrPartitionHandler$PartitionPlanState"
+                "org.springframework.batch.core.JobParameters"
         )));
 
         private final Set<String> trustedClassNames = new LinkedHashSet<>(TRUSTED_CLASS_NAMES);

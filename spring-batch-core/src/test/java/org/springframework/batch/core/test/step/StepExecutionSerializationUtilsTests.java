@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,14 @@ import org.springframework.util.SerializationUtils;
 /**
  * @author Dave Syer
  * @author Michael Minella
+ * @author Mahmoud Ben Hassine
  */
 public class StepExecutionSerializationUtilsTests {
 
 	@Test
 	public void testCycle() throws Exception {
 		StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(123L,
-				"job"), 321L, new JobParameters(), null), 11L);
+				"job"), 321L, new JobParameters()), 11L);
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
 		StepExecution result = getCopy(stepExecution);
 		assertEquals(stepExecution, result);
@@ -58,7 +59,7 @@ public class StepExecutionSerializationUtilsTests {
 		CompletionService<StepExecution> completionService = new ExecutorCompletionService<>(executor);
 
 		for (int i = 0; i < repeats; i++) {
-			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters(), null);
+			final JobExecution jobExecution = new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters());
 			for (int j = 0; j < threads; j++) {
 				completionService.submit(new Callable<StepExecution>() {
 					@Override

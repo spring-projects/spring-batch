@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
@@ -45,11 +44,9 @@ public class StepContextTests {
 
 	private List<String> list = new ArrayList<>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null, null), 1L);
+	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, "job"), 0L, null), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
-
-	private BatchPropertyContext propertyContext = new BatchPropertyContext();
 
 	@Test
 	public void testGetStepExecution() {
@@ -66,19 +63,6 @@ public class StepContextTests {
 		catch (IllegalArgumentException e) {
 			// expected
 		}
-	}
-
-	@Test
-	public void testGetPartitionPlan() {
-		Properties partitionPropertyValues = new Properties();
-		partitionPropertyValues.put("key1", "value1");
-
-		propertyContext.setStepProperties(stepExecution.getStepName(), partitionPropertyValues);
-
-		context = new StepContext(stepExecution, propertyContext);
-
-		Map<String, Object> plan = context.getPartitionPlan();
-		assertEquals("value1", plan.get("key1"));
 	}
 
 	@Test

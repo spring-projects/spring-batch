@@ -66,7 +66,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
-			+ "END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED, JOB_CONFIGURATION_LOCATION) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
@@ -75,17 +75,17 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ? and VERSION = ?";
 
-	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION"
+	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc";
 
-	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION "
+	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
 			+ "from %PREFIX%JOB_EXECUTION E where JOB_INSTANCE_ID = ? and JOB_EXECUTION_ID in (SELECT max(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION E2 where E2.JOB_INSTANCE_ID = ?)";
 
-	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, JOB_CONFIGURATION_LOCATION"
+	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String GET_RUNNING_EXECUTIONS = "SELECT E.JOB_EXECUTION_ID, E.START_TIME, E.END_TIME, E.STATUS, E.EXIT_CODE, E.EXIT_MESSAGE, E.CREATE_TIME, E.LAST_UPDATED, E.VERSION, "
-			+ "E.JOB_INSTANCE_ID, E.JOB_CONFIGURATION_LOCATION from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.START_TIME is not NULL and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
+			+ "E.JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.START_TIME is not NULL and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
@@ -154,13 +154,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
-				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated(),
-				jobExecution.getJobConfigurationName() };
+				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
 		getJdbcTemplate().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
-					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR });
+					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 
 		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 	}
@@ -412,17 +411,16 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		@Override
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
-			String jobConfigurationLocation = rs.getString(10);
 			JobExecution jobExecution;
 			if (jobParameters == null) {
 				jobParameters = getJobParameters(id);
 			}
 
 			if (jobInstance == null) {
-				jobExecution = new JobExecution(id, jobParameters, jobConfigurationLocation);
+				jobExecution = new JobExecution(id, jobParameters);
 			}
 			else {
-				jobExecution = new JobExecution(jobInstance, id, jobParameters, jobConfigurationLocation);
+				jobExecution = new JobExecution(jobInstance, id, jobParameters);
 			}
 
 			jobExecution.setStartTime(rs.getTimestamp(2));

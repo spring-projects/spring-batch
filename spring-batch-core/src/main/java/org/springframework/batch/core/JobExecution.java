@@ -65,8 +65,6 @@ public class JobExecution extends Entity {
 
 	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
-	private final String jobConfigurationName;
-
 	public JobExecution(JobExecution original) {
 		this.jobParameters = original.getJobParameters();
 		this.jobInstance = original.getJobInstance();
@@ -79,7 +77,6 @@ public class JobExecution extends Entity {
 		this.exitStatus = original.getExitStatus();
 		this.executionContext = original.getExecutionContext();
 		this.failureExceptions = original.getFailureExceptions();
-		this.jobConfigurationName = original.getJobConfigurationName();
 		this.setId(original.getId());
 		this.setVersion(original.getVersion());
 	}
@@ -91,22 +88,11 @@ public class JobExecution extends Entity {
 	 * @param job the job of which this execution is a part
 	 * @param id {@link Long} that represents the id for the JobExecution.
 	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
-	 * @param jobConfigurationName {@link String} instance that represents the
-	 * job configuration name (used with JSR-352).
 	 */
-	public JobExecution(JobInstance job, Long id, @Nullable JobParameters jobParameters, String jobConfigurationName) {
+	public JobExecution(JobInstance job, Long id, @Nullable JobParameters jobParameters) {
 		super(id);
 		this.jobInstance = job;
 		this.jobParameters = jobParameters == null ? new JobParameters() : jobParameters;
-		this.jobConfigurationName = jobConfigurationName;
-	}
-
-	public JobExecution(JobInstance job, JobParameters jobParameters, String jobConfigurationName) {
-		this(job, null, jobParameters, jobConfigurationName);
-	}
-
-	public JobExecution(Long id, JobParameters jobParameters, String jobConfigurationName) {
-		this(null, id, jobParameters, jobConfigurationName);
 	}
 
 	/**
@@ -116,15 +102,15 @@ public class JobExecution extends Entity {
 	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
-		this(job, null, jobParameters, null);
+		this(job, null, jobParameters);
 	}
 
 	public JobExecution(Long id, JobParameters jobParameters) {
-		this(null, id, jobParameters, null);
+		this(null, id, jobParameters);
 	}
 
 	public JobExecution(Long id) {
-		this(null, id, null, null);
+		this(null, id, null);
 	}
 
 	public JobParameters getJobParameters() {
@@ -281,10 +267,6 @@ public class JobExecution extends Entity {
 	 */
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
-	}
-
-	public String getJobConfigurationName() {
-		return this.jobConfigurationName;
 	}
 
 	/**

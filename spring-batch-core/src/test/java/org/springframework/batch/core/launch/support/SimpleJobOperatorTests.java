@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ public class SimpleJobOperatorTests {
 			}
 		});
 
-		jobOperator.setJobLauncher((job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters, null));
+		jobOperator.setJobLauncher((job, jobParameters) -> new JobExecution(new JobInstance(123L, job.getName()), 999L, jobParameters));
 
 		jobExplorer = mock(JobExplorer.class);
 
@@ -189,7 +189,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		jobExplorer.getJobExecution(111L);
 		Long value = jobOperator.restart(111L);
 		assertEquals(999, value.longValue());
@@ -198,7 +198,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetSummarySunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 		jobExplorer.getJobExecution(111L);
 		String value = jobOperator.getSummary(111L);
@@ -221,7 +221,7 @@ public class SimpleJobOperatorTests {
 	public void testGetStepExecutionSummariesSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		jobExecution.createStepExecution("step1");
 		jobExecution.createStepExecution("step2");
 		jobExecution.getStepExecutions().iterator().next().setId(21L);
@@ -245,7 +245,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testFindRunningExecutionsSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters);
 		when(jobExplorer.findRunningJobExecutions("foo")).thenReturn(Collections.singleton(jobExecution));
 		Set<Long> value = jobOperator.getRunningExecutions("foo");
 		assertEquals(111L, value.iterator().next().longValue());
@@ -267,7 +267,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testGetJobParametersSunnyDay() throws Exception {
 		final JobParameters jobParameters = new JobParameters();
-		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters, null));
+		when(jobExplorer.getJobExecution(111L)).thenReturn(new JobExecution(new JobInstance(123L, job.getName()), 111L, jobParameters));
 		String value = jobOperator.getParameters(111L);
 		assertEquals("a=b", value);
 	}
@@ -318,7 +318,7 @@ public class SimpleJobOperatorTests {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
 		when(jobExplorer.getJobInstance(123L)).thenReturn(jobInstance);
 
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		when(jobExplorer.getJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
 		List<Long> value = jobOperator.getExecutions(123L);
 		assertEquals(111L, value.iterator().next().longValue());
@@ -339,7 +339,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStop() throws Exception{
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		when(jobExplorer.getJobExecution(111L)).thenReturn(jobExecution);
 		jobExplorer.getJobExecution(111L);
 		jobRepository.update(jobExecution);
@@ -350,7 +350,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStopTasklet() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = mock(StoppableTasklet.class);
 		TaskletStep taskletStep = new TaskletStep();
 		taskletStep.setTasklet(tasklet);
@@ -375,7 +375,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStopTaskletWhenJobNotRegistered() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = mock(StoppableTasklet.class);
 		JobRegistry jobRegistry = mock(JobRegistry.class);
 		TaskletStep step = mock(TaskletStep.class);
@@ -393,7 +393,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStopTaskletException() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		StoppableTasklet tasklet = new StoppableTasklet() {
 
 			@Nullable
@@ -430,7 +430,7 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testAbort() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);
@@ -442,7 +442,7 @@ public class SimpleJobOperatorTests {
 	@Test(expected = JobExecutionAlreadyRunningException.class)
 	public void testAbortNonStopping() throws Exception {
 		JobInstance jobInstance = new JobInstance(123L, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters, null);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L, jobParameters);
 		jobExecution.setStatus(BatchStatus.STARTED);
 		when(jobExplorer.getJobExecution(123L)).thenReturn(jobExecution);
 		jobRepository.update(jobExecution);

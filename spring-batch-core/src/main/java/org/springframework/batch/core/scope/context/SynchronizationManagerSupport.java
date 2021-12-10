@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.springframework.batch.core.jsr.configuration.support.BatchPropertyContext;
 import org.springframework.lang.Nullable;
 
 
@@ -97,35 +96,7 @@ public abstract class SynchronizationManagerSupport<E, C> {
 		synchronized (contexts) {
 			context = contexts.get(execution);
 			if (context == null) {
-				context = createNewContext(execution, null);
-				contexts.put(execution, context);
-			}
-		}
-		increment();
-		return context;
-	}
-
-	/**
-	 * Register a context with the current thread - always put a matching {@link #close()} call in a finally block to
-	 * ensure that the correct
-	 * context is available in the enclosing block.
-	 *
-	 * @param execution the execution to register
-	 * @param propertyContext instance of {@link BatchPropertyContext} to be registered with this thread.
-	 * @return a new context or the current one if it has the same
-	 *         execution
-	 */
-	@Nullable
-	public C register(@Nullable E execution, @Nullable BatchPropertyContext propertyContext) {
-		if (execution == null) {
-			return null;
-		}
-		getCurrent().push(execution);
-		C context;
-		synchronized (contexts) {
-			context = contexts.get(execution);
-			if (context == null) {
-				context = createNewContext(execution, propertyContext);
+				context = createNewContext(execution);
 				contexts.put(execution, context);
 			}
 		}
@@ -202,6 +173,6 @@ public abstract class SynchronizationManagerSupport<E, C> {
 
 	protected abstract void close(C context);
 
-	protected abstract C createNewContext(E execution, @Nullable BatchPropertyContext propertyContext);
+	protected abstract C createNewContext(E execution);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,13 @@ import org.springframework.batch.core.JobParameters;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class ChunkContextTests {
 
 	private ChunkContext context = new ChunkContext(new StepContext(new JobExecution(new JobInstance(0L,
-			"job"), 1L, new JobParameters(Collections.singletonMap("foo", new JobParameter("bar"))), null)
+			"job"), 1L, new JobParameters(Collections.singletonMap("foo", new JobParameter("bar"))))
 	.createStepExecution("foo")));
 
 	@Test

@@ -1,3 +1,0 @@
-<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
-	<ref id="itemProcessor" class="org.springframework.batch.item.support.PassThroughItemProcessor" />
-</batch-artifacts>

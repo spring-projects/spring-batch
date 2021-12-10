@@ -109,29 +109,6 @@ public enum BatchStatus {
 	}
 
 	/**
-	 * Converts the current status to the JSR-352 equivalent
-	 * 
-	 * @return JSR-352 equivalent to the current status
-	 */
-	public jakarta.batch.runtime.BatchStatus getBatchStatus() {
-		if(this == ABANDONED) {
-			return jakarta.batch.runtime.BatchStatus.ABANDONED;
-		} else if(this == COMPLETED) {
-			return jakarta.batch.runtime.BatchStatus.COMPLETED;
-		} else if(this == STARTED) {
-			return jakarta.batch.runtime.BatchStatus.STARTED;
-		} else if(this == STARTING) {
-			return jakarta.batch.runtime.BatchStatus.STARTING;
-		} else if(this == STOPPED) {
-			return jakarta.batch.runtime.BatchStatus.STOPPED;
-		} else if(this == STOPPING) {
-			return jakarta.batch.runtime.BatchStatus.STOPPING;
-		} else {
-			return jakarta.batch.runtime.BatchStatus.FAILED;
-		}
-	}
-
-	/**
 	 * Find a BatchStatus that matches the beginning of the given value. If no
 	 * match is found, return COMPLETED as the default because has is low
 	 * precedence.

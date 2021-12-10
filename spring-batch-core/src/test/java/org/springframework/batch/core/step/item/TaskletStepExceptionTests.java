@@ -584,11 +584,6 @@ public class TaskletStepExceptionTests {
 			return null;
 		}
 
-		@Override
-		public JobExecution createJobExecution(JobInstance jobInstance,
-				JobParameters jobParameters, String jobConfigurationLocation) {
-			return null;
-		}
 	}
 	
 	@SuppressWarnings("serial")

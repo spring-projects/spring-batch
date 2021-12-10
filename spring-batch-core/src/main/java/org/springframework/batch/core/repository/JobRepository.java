@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,18 +67,6 @@ public interface JobRepository {
 	 * @return the new {@link JobInstance}
 	 */
 	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
-
-	/**
-	 * Create a new {@link JobExecution} based upon the {@link JobInstance} it's associated
-	 * with, the {@link JobParameters} used to execute it with and the location of the configuration
-	 * file that defines the job.
-	 *
-	 * @param jobInstance {@link JobInstance} instance to initialize the new JobExecution.
-	 * @param jobParameters {@link JobParameters} instance to initialize the new JobExecution.
-	 * @param jobConfigurationLocation {@link String} instance to initialize the new JobExecution.
-	 * @return the new {@link JobExecution}.
-	 */
-	JobExecution createJobExecution(JobInstance jobInstance, JobParameters jobParameters, String jobConfigurationLocation);
 
 	/**
 	 * <p>

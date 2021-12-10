@@ -24,7 +24,7 @@ import org.springframework.batch.sample.domain.order.Address;
 /**
  * Custom class that contains logic that would normally be be contained in
  * {@link org.springframework.batch.item.ItemReader} and
- * {@link jakarta.batch.api.chunk.ItemWriter}.
+ * {@link org.springframework.batch.item.ItemWriter}.
  * 
  * @author tomas.slanina
  * @author Robert Kasanicky

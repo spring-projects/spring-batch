@@ -32,8 +32,6 @@ include::testing.adoc[]
 
 include::common-patterns.adoc[]
 
-include::jsr-352.adoc[]
-
 include::spring-batch-integration.adoc[]
 
 include::monitoring-and-metrics.adoc[]

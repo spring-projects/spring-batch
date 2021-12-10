@@ -8,13 +8,6 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>../spring-batch-core/src/main/resources/org/springframework/batch/core/jsr/configuration/xml</directory>
-            <outputDirectory>batch</outputDirectory>
-            <includes>
-                <include>*.xsd</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>../spring-batch-core/src/main/resources/org/springframework/batch/core/configuration/xml</directory>
             <outputDirectory>batch</outputDirectory>
             <includes>

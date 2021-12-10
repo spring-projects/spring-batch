@@ -18,10 +18,6 @@ package org.springframework.batch.core.listener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import jakarta.batch.api.chunk.listener.RetryProcessListener;
-import jakarta.batch.api.chunk.listener.RetryReadListener;
-import jakarta.batch.api.chunk.listener.RetryWriteListener;
-import jakarta.batch.operations.BatchRuntimeException;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemProcessListener;
@@ -42,7 +38,7 @@ import org.springframework.lang.Nullable;
  * @author Mahmoud Ben Hassine
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadListener, RetryProcessListener, RetryWriteListener {
+ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -55,12 +51,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<>();
 
 	private CompositeSkipListener<T, S> skipListener = new CompositeSkipListener<>();
-
-	private CompositeRetryReadListener retryReadListener = new CompositeRetryReadListener();
-
-	private CompositeRetryProcessListener retryProcessListener = new CompositeRetryProcessListener();
-
-	private CompositeRetryWriteListener retryWriteListener = new CompositeRetryWriteListener();
 
 	/**
 	 * Initialize the listener instance.
@@ -114,15 +104,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 			@SuppressWarnings("unchecked")
 			SkipListener<T, S> skipListener = (SkipListener<T, S>) listener;
 			this.skipListener.register(skipListener);
-		}
-		if(listener instanceof RetryReadListener) {
-			this.retryReadListener.register((RetryReadListener) listener);
-		}
-		if(listener instanceof RetryProcessListener) {
-			this.retryProcessListener.register((RetryProcessListener) listener);
-		}
-		if(listener instanceof RetryWriteListener) {
-			this.retryWriteListener.register((RetryWriteListener) listener);
 		}
 	}
 
@@ -331,33 +312,6 @@ ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T, S>, RetryReadLi
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in afterFailedChunk.", e);
-		}
-	}
-
-	@Override
-	public void onRetryReadException(Exception ex) throws Exception {
-		try {
-			retryReadListener.onRetryReadException(ex);
-		} catch (Exception e) {
-			throw new BatchRuntimeException(e);
-		}
-	}
-
-	@Override
-	public void onRetryProcessException(Object item, Exception ex) throws Exception {
-		try {
-			retryProcessListener.onRetryProcessException(item, ex);
-		} catch (Exception e) {
-			throw new BatchRuntimeException(e);
-		}
-	}
-
-	@Override
-	public void onRetryWriteException(List<Object> items, Exception ex) throws Exception {
-		try {
-			retryWriteListener.onRetryWriteException(items, ex);
-		} catch (Exception e) {
-			throw new BatchRuntimeException(e);
 		}
 	}
 

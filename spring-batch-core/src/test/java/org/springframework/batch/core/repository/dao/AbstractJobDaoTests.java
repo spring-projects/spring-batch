@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public abstract class AbstractJobDaoTests {
@@ -185,7 +186,7 @@ public abstract class AbstractJobDaoTests {
 	public void testUpdateInvalidJobExecution() {
 
 		// id is invalid
-		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters, null);
+		JobExecution execution = new JobExecution(jobInstance, (long) 29432, jobParameters);
 		execution.incrementVersion();
 		try {
 			jobExecutionDao.updateJobExecution(execution);

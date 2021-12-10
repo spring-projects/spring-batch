@@ -18,7 +18,6 @@
 		<module>spring-batch-test</module>
 		<module>spring-batch-integration</module>
 		<module>spring-batch-samples</module>
-		<module>spring-batch-jsr352-tck</module>
 		<module>spring-batch-docs</module>
 	</modules>
 
@@ -72,7 +71,6 @@
 		<jakarta.annotation-api.version>2.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.0.1</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.0.0</jakarta.jms-api.version>
-		<jakarta.batch-api.version>2.0.0</jakarta.batch-api.version>
 		<jakarta.validation-api.version>3.0.0</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.0.0</jakarta.persistence-api.version>
 		<neo4j-ogm-core.version>3.2.21</neo4j-ogm-core.version>
@@ -111,7 +109,6 @@
 		<sqlserver.version>9.2.1.jre8</sqlserver.version>
 		<jtds.version>1.3.1</jtds.version>
 		<testcontainers.version>1.16.2</testcontainers.version>
-		<com.ibm.jbatch-tck-spi.version>1.0</com.ibm.jbatch-tck-spi.version>
 		<jsonassert.version>1.5.0</jsonassert.version>
 
 		<!-- samples dependencies -->
