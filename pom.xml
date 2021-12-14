@@ -93,7 +93,7 @@
 		<derby.version>10.14.2.0</derby.version>
 		<artemis.version>2.19.0</artemis.version>
 		<jaxb-core.version>3.0.2</jaxb-core.version>
-		<log4j.version>2.14.1</log4j.version>
+		<log4j.version>2.15.0</log4j.version>
 		<hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
 		<jakarta.el-api.version>4.0.0</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
