@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
@@ -114,12 +115,13 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
      * default set of trusted classes.
      */
     public Jackson2ExecutionContextStringSerializer(String... trustedClassNames) {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        this.objectMapper.configure(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES, true);
-        this.objectMapper.setDefaultTyping(createTrustedDefaultTyping(trustedClassNames));
-        this.objectMapper.registerModule(new JobParametersModule());
+        this.objectMapper = JsonMapper.builder()
+                .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
+                .configure(MapperFeature.BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES, true)
+                .setDefaultTyping(createTrustedDefaultTyping(trustedClassNames))
+                .addModule(new JobParametersModule())
+                .build();
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
