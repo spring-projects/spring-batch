@@ -6,4 +6,95 @@
 
 == What's New in Spring Batch 5.0
 
-TDB
+Spring Batch 5.0 release has the following major themes:
+
+* Java 17 Requirement
+* Dependencies Re-baseline
+* Batch infrastructure configuration updates
+* Pruning
+
+=== Java 17 Requirement
+
+Spring Batch follows Spring Framework's baselines for both Java version and third party dependencies.
+With Spring Batch 5, the Spring Framework version is being upgraded to Spring Framework 6 which requires Java 17.
+As a result, the Java version requirement for Spring Batch is also increasing to Java 17.
+
+=== Dependencies Re-baseline
+
+In order to continue the integration with supported versions of the third party libraries that Spring Batch uses,
+Spring Batch 5 is updating the dependencies across the board to the following versions:
+
+* Spring Framework 6
+* Spring Integration 6
+* Spring Data 3
+* Spring AMQP 3
+* Spring for Apache Kafka 3
+
+=== Batch infrastructure configuration updates
+
+==== DataSource requirement updates
+
+Historically, Spring Batch provided a Map-based job repository and job explorer implementations to work with
+an in-memory job repository. These implementations were deprecated in version 4 and completely removed in version 5.
+The recommended replacement is to use the Jdbc-based implementations with an embedded database like H2, HSQL, etc.
+
+In this release, the `@EnableBatchProcessing` annotation will configure a Jdbc-based `JobRepository` which requires a
+`DataSource` bean in the application context. The `DataSource` bean could refer to an embedded database to work with
+an in-memory job repository.
+
+==== Transaction manager bean exposure
+
+Up until version 4.3, the `@EnableBatchProcessing` annotation exposed a tranasaction manager bean in the application
+context. While this was convenient in many cases, the unconditional exposure of a tranasaction manager could
+interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` does not expose a
+transaction manager bean in the application context anymore.
+
+=== Pruning
+
+==== Deprecated APIs removal
+
+The following APIs were deprecated in previous versions and have been removed in this release:
+
+* Class `org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean`
+* Class `org.springframework.batch.core.repository.dao.MapExecutionContextDao`
+* Class `org.springframework.batch.core.repository.dao.MapJobExecutionDao`
+* Class `org.springframework.batch.core.repository.dao.MapJobInstanceDao`
+* Class `org.springframework.batch.core.repository.dao.MapStepExecutionDao`
+* Class `org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean`
+* Class `org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer`
+* Class `org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry`
+* Class `org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactory`
+* Class `org.springframework.batch.core.launch.support.ScheduledJobParametersFactory`
+* Class `org.springframework.batch.item.data.AbstractNeo4jItemReader`
+* Class `org.springframework.batch.item.database.support.ListPreparedStatementSetter`
+* Class `org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilder`
+* Class `org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory`
+* Class `org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilder`
+* Class `org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory`
+* Class `org.springframework.batch.test.AbstractJobTests`
+* Class `org.springframework.batch.item.xml.StaxUtils`
+* Enum `org.springframework.batch.item.file.transform.Alignment`
+* Method `org.springframework.batch.core.JobExecution#stop()`
+* Method `org.springframework.batch.core.JobParameters#getDouble(String key, double defaultValue)`
+* Method `org.springframework.batch.core.JobParameters#getLong(String key, long defaultValue)`
+* Method `org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter(JobRepository jobRepository, Step step, Partitioner partitioner)`
+* Method `org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter#getStartable(StepExecution stepExecution, ExecutionContext context)`
+* Method `org.springframework.batch.core.repository.support.AbstractJobRepositoryFactoryBean#getJobRepository()`
+* Method `org.springframework.batch.item.database.AbstractCursorItemReader#cleanupOnClose()`
+* Method `org.springframework.batch.item.database.HibernateItemWriter#doWrite(HibernateOperations hibernateTemplate, List<? extends T> items)`
+* Method `org.springframework.batch.item.database.JdbcCursorItemReader#cleanupOnClose()`
+* Method `org.springframework.batch.item.database.StoredProcedureItemReader#cleanupOnClose()`
+* Method `org.springframework.batch.item.database.builder.HibernatePagingItemReaderBuilder#useSatelessSession(boolean useStatelessSession)`
+* Method `org.springframework.batch.item.file.MultiResourceItemReader#getCurrentResource()`
+* Method `org.springframework.batch.integration.config.annotation.BatchIntegrationConfiguration#remoteChunkingMasterStepBuilderFactory()`
+* Method `org.springframework.batch.integration.config.annotation.BatchIntegrationConfiguration#remotePartitioningMasterStepBuilderFactory()`
+* Method `org.springframework.batch.item.util.FileUtils#setUpOutputFile(File file, boolean restarted, boolean overwriteOutputFile)`
+
+==== SQLFire support removal
+
+SqlFire has been announced to be EOL as of November 1st, 2014. The support of SQLFire as a job repository
+was deprecated in version 4.3 and removed in version 5.0.
+
+==== JSR-352 implementation removal
+
+Due to a lack of adoption, the implementation of the JSR-352 has been removed in this release.
