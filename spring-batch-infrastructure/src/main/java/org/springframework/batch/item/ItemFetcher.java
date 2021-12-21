@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.item;
 
-import com.mongodb.lang.Nullable;
 import org.springframework.batch.item.support.CompositeItemReader;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * Interface for item fetching. Given an item as input, this interface provides
