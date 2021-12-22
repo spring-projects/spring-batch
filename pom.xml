@@ -55,7 +55,7 @@
 		<spring-retry.version>1.3.1</spring-retry.version>
 		<spring-integration.version>6.0.0-SNAPSHOT</spring-integration.version>
 		<micrometer.version>1.8.1-SNAPSHOT</micrometer.version>
-		<jackson.version>2.13.0</jackson.version>
+		<jackson.version>2.13.1</jackson.version>
 
 		<!-- optional production dependencies -->
 		<spring-data-geode.version>3.0.0-SNAPSHOT</spring-data-geode.version>
@@ -67,23 +67,23 @@
 		<spring-ldap.version>2.3.5.BUILD-SNAPSHOT</spring-ldap.version>
 		<avro.version>1.9.2</avro.version>
 		<gson.version>2.8.9</gson.version>
-		<hibernate-core-jakarta.version>5.6.1.Final</hibernate-core-jakarta.version>
+		<hibernate-core-jakarta.version>5.6.3.Final</hibernate-core-jakarta.version>
 		<jakarta.annotation-api.version>2.0.0</jakarta.annotation-api.version>
 		<jakarta.mail-api.version>2.0.1</jakarta.mail-api.version>
 		<jakarta.jms-api.version>3.0.0</jakarta.jms-api.version>
 		<jakarta.validation-api.version>3.0.0</jakarta.validation-api.version>
 		<jakarta.persistence-api.version>3.0.0</jakarta.persistence-api.version>
-		<neo4j-ogm-core.version>3.2.21</neo4j-ogm-core.version>
+		<neo4j-ogm-core.version>3.2.28</neo4j-ogm-core.version>
 		<mongodb-driver-sync.version>4.4.0</mongodb-driver-sync.version>
 		<xstream.version>1.4.18</xstream.version>
-		<junit-jupiter.version>5.8.1</junit-jupiter.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 
 		<!-- test dependencies -->
 		<junit.version>4.13.2</junit.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<assertj.version>3.21.0</assertj.version>
-		<mockito.version>4.1.0</mockito.version>
-		<xmlunit.version>2.8.3</xmlunit.version>
+		<mockito.version>4.2.0</mockito.version>
+		<xmlunit.version>2.8.4</xmlunit.version>
 		<commons-io.version>2.11.0</commons-io.version>
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
 		<slf4j.version>1.7.32</slf4j.version>
@@ -93,8 +93,8 @@
 		<derby.version>10.14.2.0</derby.version>
 		<artemis.version>2.19.0</artemis.version>
 		<jaxb-core.version>3.0.2</jaxb-core.version>
-		<log4j.version>2.15.0</log4j.version>
-		<hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
+		<log4j.version>2.17.0</log4j.version>
+		<hibernate-validator.version>7.0.2.Final</hibernate-validator.version>
 		<jakarta.el-api.version>4.0.0</jakarta.el-api.version>
 		<jakarta.el.version>4.0.2</jakarta.el.version>
 		<jakarta.inject-api.version>2.0.0</jakarta.inject-api.version>
