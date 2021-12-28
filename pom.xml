@@ -92,7 +92,7 @@
 		<h2.version>2.1.210</h2.version>
 		<sqlite.version>3.36.0.3</sqlite.version>
 		<derby.version>10.14.2.0</derby.version>
-		<hana.version>2.9.12</hana.version>
+		<hana.version>2.11.17</hana.version>
 		<artemis.version>2.20.0</artemis.version>
 		<jaxb-core.version>3.0.2</jaxb-core.version>
 		<log4j.version>2.17.2</log4j.version>

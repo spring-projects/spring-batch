@@ -1,3 +1,0 @@
-#macro (sequence $name $value)CREATE SEQUENCE ${name} START WITH ${value} MINVALUE 0 NO CYCLE;
-#end
-#macro (notnull $name $type)ALTER (${name} ${type} NOT NULL)#end
