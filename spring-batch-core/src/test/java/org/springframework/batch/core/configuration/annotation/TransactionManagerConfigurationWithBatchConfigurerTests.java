@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -34,11 +36,6 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Mahmoud Ben Hassine
  */
 public class TransactionManagerConfigurationWithBatchConfigurerTests extends TransactionManagerConfigurationTests {
-
-	@Test(expected = UnsatisfiedDependencyException.class)
-	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
-		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
-	}
 
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
