@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,15 @@ import javax.sql.DataSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.util.AopTestUtils;
@@ -36,14 +40,22 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends TransactionManagerConfigurationTests {
 
-	@Test(expected = UnsatisfiedDependencyException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
-		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
+		// beans created by `@EnableBatchProcessing` are lazy proxies, SimpleBatchConfiguration.initialize is only triggered
+		// when a method is called on one of these proxies
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
 	}
 
-	@Test(expected = UnsatisfiedDependencyException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testConfigurationWithNoDataSourceAndTransactionManager() {
-		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndTransactionManager.class);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndTransactionManager.class);
+		// beans created by `@EnableBatchProcessing` are lazy proxies, SimpleBatchConfiguration.initialize is only triggered
+		// when a method is called on one of these proxies
+		JobRepository jobRepository = context.getBean(JobRepository.class);
+		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
 	}
 
 	@Test
@@ -73,14 +85,15 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		// In this case, the supplied primary transaction manager won't be used by batch and a DataSourceTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
 		Assert.assertTrue(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
-
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithNoDataSourceAndNoTransactionManager {
 
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithNoDataSourceAndTransactionManager {
 
@@ -90,6 +103,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		}
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndNoTransactionManager {
 
@@ -99,6 +113,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		}
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndOneTransactionManager {
 
@@ -113,6 +128,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		}
 	}
 
+	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndMultipleTransactionManagers {
 

@@ -62,7 +62,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * The user should to provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
+ * The user should provide a {@link DataSource} as a bean in the context, or else implement {@link BatchConfigurer} in
  * the configuration class itself, e.g.
  *
  * <pre class="code">
@@ -85,11 +85,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  * }
  * </pre>
  *
- * If multiple {@link javax.sql.DataSource}s are defined in the context, the one annotated with
- * {@link org.springframework.context.annotation.Primary} will be used (Note that if none
- * of them is annotated with {@link org.springframework.context.annotation.Primary}, the one
- * named <code>dataSource</code> will be used if any, otherwise a {@link UnsatisfiedDependencyException}
- * will be thrown).
+ * If multiple {@link javax.sql.DataSource}s are defined in the context, the primary autowire candidate
+ * will be used, otherwise an exception will be thrown.
  *
  * Note that only one of your configuration classes needs to have the <code>&#064;EnableBatchProcessing</code>
  * annotation. Once you have an <code>&#064;EnableBatchProcessing</code> class in your configuration you will have an

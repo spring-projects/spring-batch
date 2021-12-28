@@ -25,7 +25,10 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -50,7 +53,7 @@ import org.springframework.util.Assert;
 public abstract class AbstractBatchConfiguration implements ImportAware, InitializingBean {
 
 	@Autowired
-	private DataSource dataSource;
+	private ApplicationContext context;
 
 	private BatchConfigurer configurer;
 
@@ -153,7 +156,20 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(this.dataSource);
+			DataSource dataSource;
+			try {
+				dataSource = this.context.getBean(DataSource.class);
+			}  catch (NoUniqueBeanDefinitionException exception) {
+				throw new IllegalStateException(
+						"Multiple data sources are defined in the application context and no primary candidate was found. " +
+						"To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
+						exception);
+			} catch (NoSuchBeanDefinitionException exception) {
+				throw new IllegalStateException(
+						"To use the default BatchConfigurer, the application context must contain at least one data source.",
+						exception);
+			}
+			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
 			configurer.initialize();
 			this.configurer = configurer;
 			return configurer;
