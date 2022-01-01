@@ -88,7 +88,7 @@
 		<commons-dbcp2.version>2.9.0</commons-dbcp2.version>
 		<slf4j.version>1.7.32</slf4j.version>
 		<hsqldb.version>2.6.1</hsqldb.version>
-		<h2.version>1.4.200</h2.version>
+		<h2.version>2.0.206</h2.version>
 		<sqlite.version>3.36.0.3</sqlite.version>
 		<derby.version>10.14.2.0</derby.version>
 		<artemis.version>2.19.0</artemis.version>
