@@ -71,7 +71,7 @@ allprojects {
 		derbyVersion = '10.14.2.0'
 		groovyVersion = '2.5.14'
 		hamcrestVersion = '2.2'
-		h2databaseVersion = '1.4.200'
+		h2databaseVersion = '2.0.206'
 		hibernateVersion = '5.4.32.Final'
 		hibernateValidatorVersion = '6.1.7.Final'
 		javaxElVersion = '3.0.0'
@@ -425,6 +425,7 @@ project('spring-batch-core-tests') {
 		compile "org.springframework:spring-aop:$springVersion"
 
 		testCompile "org.hsqldb:hsqldb:$hsqldbVersion"
+		testCompile "com.h2database:h2:$h2databaseVersion"
 		testCompile "commons-io:commons-io:$commonsIoVersion"
 		testCompile "org.apache.derby:derby:$derbyVersion"
 		testCompile "junit:junit:${junitVersion}"

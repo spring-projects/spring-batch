@@ -18,6 +18,7 @@ package org.springframework.batch.core.test.repository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -29,6 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -39,6 +41,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -46,6 +49,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(Parameterized.class)
 public class H2CompatibilityModeJobRepositoryIntegrationTests {
@@ -58,31 +62,31 @@ public class H2CompatibilityModeJobRepositoryIntegrationTests {
 
 	@Test
 	public void testJobExecution() throws Exception {
-		var context = new AnnotationConfigApplicationContext();
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
 		context.register(TestConfiguration.class);
 		context.registerBean(DataSource.class, this::buildDataSource);
 		context.refresh();
-		var jobLauncher = context.getBean(JobLauncher.class);
-		var job = context.getBean(Job.class);
+		JobLauncher jobLauncher = context.getBean(JobLauncher.class);
+		Job job = context.getBean(Job.class);
 
-		var jobExecution = jobLauncher.run(job, new JobParameters());
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 
 		Assert.assertNotNull(jobExecution);
 		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		var jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(context.getBean(DataSource.class));
 		jdbcTemplate.execute("SHUTDOWN");
 	}
 
 	private DataSource buildDataSource() {
-		var connectionUrl = String.format(
+		String connectionUrl = String.format(
 				"jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;MODE=%s",
 				UUID.randomUUID(),
 				this.compatibilityMode
 		);
-		var dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
-		var populator = new ResourceDatabasePopulator();
-		var resource = new DefaultResourceLoader()
+		DataSource dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
+		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+		Resource resource = new DefaultResourceLoader()
 				.getResource("/org/springframework/batch/core/schema-h2.sql");
 		populator.addScript(resource);
 		DatabasePopulatorUtils.execute(populator, dataSource);
@@ -106,6 +110,6 @@ public class H2CompatibilityModeJobRepositoryIntegrationTests {
 	public static List<Object[]> data() throws Exception {
 		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values())
 				.map(mode -> new Object[]{mode.toString()})
-				.toList();
+				.collect(Collectors.toList());
 	}
 }
