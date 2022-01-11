@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,10 +100,10 @@ import org.springframework.transaction.PlatformTransactionManager;
  * able to <code>&#064;Autowired</code> some useful stuff into your context:
  *
  * <ul>
- * <li>a {@link JobRepository} (bean name "jobRepository")</li>
- * <li>a {@link JobLauncher} (bean name "jobLauncher")</li>
- * <li>a {@link JobRegistry} (bean name "jobRegistry")</li>
- * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer")</li>
+ * <li>a {@link JobRepository} (bean name "jobRepository" of type {@link org.springframework.batch.core.repository.support.SimpleJobRepository})</li>
+ * <li>a {@link JobLauncher} (bean name "jobLauncher" of type {@link org.springframework.batch.core.launch.support.SimpleJobLauncher})</li>
+ * <li>a {@link JobRegistry} (bean name "jobRegistry" of type {@link org.springframework.batch.core.configuration.support.MapJobRegistry})</li>
+ * <li>a {@link org.springframework.batch.core.explore.JobExplorer} (bean name "jobExplorer" of type {@link org.springframework.batch.core.explore.support.SimpleJobExplorer})</li>
  * <li>a {@link PlatformTransactionManager} (bean name "transactionManager")</li>
  * <li>a {@link JobBuilderFactory} (bean name "jobBuilders") as a convenience to prevent you from having to inject the
  * job repository into every job, as in the examples above</li>
