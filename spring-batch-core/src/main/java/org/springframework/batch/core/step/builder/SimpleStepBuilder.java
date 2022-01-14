@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,7 +267,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public SimpleStepBuilder<I, O> listener(Object listener) {
 		super.listener(listener);
@@ -289,9 +288,7 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 			itemListeners.add((StepListener) factory.getObject());
 		}
 
-		@SuppressWarnings("unchecked")
-		SimpleStepBuilder<I, O> result = this;
-		return result;
+		return this;
 	}
 
 
@@ -337,6 +334,11 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	 */
 	public SimpleStepBuilder<I, O> chunkOperations(RepeatOperations repeatTemplate) {
 		this.chunkOperations = repeatTemplate;
+		return this;
+	}
+
+	@Override
+	protected SimpleStepBuilder<I, O> self() {
 		return this;
 	}
 

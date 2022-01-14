@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,23 +65,17 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	public B repository(JobRepository jobRepository) {
 		properties.jobRepository = jobRepository;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	public B transactionManager(PlatformTransactionManager transactionManager) {
 		properties.transactionManager = transactionManager;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	public B startLimit(int startLimit) {
 		properties.startLimit = startLimit;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -101,24 +95,20 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());
 		}
 
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	public B listener(StepExecutionListener listener) {
 		properties.addStepExecutionListener(listener);
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	public B allowStartIfComplete(boolean allowStartIfComplete) {
 		properties.allowStartIfComplete = allowStartIfComplete;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
+
+	protected abstract B self();
 
 	protected String getName() {
 		return properties.name;

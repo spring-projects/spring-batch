@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,9 +141,7 @@ StepBuilderHelper<B> {
 	 */
 	public B listener(ChunkListener listener) {
 		chunkListeners.add(listener);
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -167,9 +165,7 @@ StepBuilderHelper<B> {
 			this.listener((ChunkListener) factory.getObject());
 		}
 
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -180,9 +176,7 @@ StepBuilderHelper<B> {
 	 */
 	public B stream(ItemStream stream) {
 		streams.add(stream);
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -194,9 +188,7 @@ StepBuilderHelper<B> {
 	 */
 	public B taskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -209,9 +201,7 @@ StepBuilderHelper<B> {
 	 */
 	public B throttleLimit(int throttleLimit) {
 		this.throttleLimit = throttleLimit;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -222,9 +212,7 @@ StepBuilderHelper<B> {
 	 */
 	public B exceptionHandler(ExceptionHandler exceptionHandler) {
 		this.exceptionHandler = exceptionHandler;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -236,9 +224,7 @@ StepBuilderHelper<B> {
 	 */
 	public B stepOperations(RepeatOperations repeatTemplate) {
 		this.stepOperations = repeatTemplate;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
@@ -250,9 +236,7 @@ StepBuilderHelper<B> {
 	 */
 	public B transactionAttribute(TransactionAttribute transactionAttribute) {
 		this.transactionAttribute = transactionAttribute;
-		@SuppressWarnings("unchecked")
-		B result = (B) this;
-		return result;
+		return self();
 	}
 
 	/**
