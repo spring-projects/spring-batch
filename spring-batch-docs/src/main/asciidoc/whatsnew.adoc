@@ -29,6 +29,9 @@ Spring Batch 5 is updating the dependencies across the board to the following ve
 * Spring Data 3
 * Spring AMQP 3
 * Spring for Apache Kafka 3
+* Micrometer 2
+
+This release also marks the migration to Jakarta EE 9 APIs.
 
 === Batch infrastructure configuration updates
 
