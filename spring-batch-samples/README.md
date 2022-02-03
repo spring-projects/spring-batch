@@ -129,6 +129,16 @@ and running.  The standard dashboard can be used to see the traffic
 from the `MessageProducer` to the `AmqpItemWriter`.  Make sure you
 launch the `MessageProducer` before launching the test.
 
+You can run the sample from the command line as following:
+
+```
+cd spring-batch-samples
+# Launch the test using the XML configuration
+../mvnw -Dtest=AMQPJobFunctionalTests#testLaunchJobWithXmlConfig test
+# Launch the test using the Java configuration
+../mvnw -Dtest=AMQPJobFunctionalTests#testLaunchJobWithJavaConfig test
+```
+
 ### BeanWrapperMapper Sample
 
 This sample shows the use of automatic mapping from fields in a file
