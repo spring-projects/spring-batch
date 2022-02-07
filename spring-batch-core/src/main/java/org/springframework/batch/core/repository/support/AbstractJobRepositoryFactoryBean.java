@@ -178,7 +178,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean<Jo
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(transactionManager, "TransactionManager must not be null.");
+		Assert.state(transactionManager != null, "TransactionManager must not be null.");
 		if (this.transactionAttributeSource == null) {
 			Properties transactionAttributes = new Properties();
 			transactionAttributes.setProperty("create*",

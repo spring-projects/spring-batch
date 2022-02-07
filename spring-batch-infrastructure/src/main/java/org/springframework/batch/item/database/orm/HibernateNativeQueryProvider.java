@@ -69,8 +69,8 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(StringUtils.hasText(sqlQuery), "Native SQL query cannot be empty");
-		Assert.notNull(entityClass, "Entity class cannot be NULL");
+		Assert.state(StringUtils.hasText(sqlQuery), "Native SQL query cannot be empty");
+		Assert.state(entityClass != null, "Entity class cannot be NULL");
 	}
 
 }

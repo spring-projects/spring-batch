@@ -72,8 +72,8 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	@Override
 	protected void init() {
-		Assert.notNull(this.kafkaTemplate, "KafkaTemplate must not be null.");
-		Assert.notNull(this.kafkaTemplate.getDefaultTopic(), "KafkaTemplate must have the default topic set.");
+		Assert.state(this.kafkaTemplate != null, "KafkaTemplate must not be null.");
+		Assert.state(this.kafkaTemplate.getDefaultTopic() != null, "KafkaTemplate must have the default topic set.");
 	}
 
 	/**

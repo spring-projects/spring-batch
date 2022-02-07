@@ -38,7 +38,7 @@ class JobRegistryBeanPostProcessorTests {
 
 	@Test
 	void testInitializationFails() {
-		Exception exception = assertThrows(IllegalArgumentException.class, processor::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, processor::afterPropertiesSet);
 		assertTrue(exception.getMessage().contains("JobRegistry"));
 	}
 

@@ -155,14 +155,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(dataSource, "DataSource may not be null");
+		Assert.state(dataSource != null, "DataSource may not be null");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Assert.notNull(queryProvider, "QueryProvider may not be null");
+		Assert.state(queryProvider != null, "QueryProvider may not be null");
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());

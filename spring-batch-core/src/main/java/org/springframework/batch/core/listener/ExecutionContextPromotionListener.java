@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * This class can be used to automatically promote items from the {@link Step}
@@ -77,10 +78,10 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.keys, "The 'keys' property must be provided");
-		Assert.notEmpty(this.keys, "The 'keys' property must not be empty");
-		Assert.notNull(this.statuses, "The 'statuses' property must be provided");
-		Assert.notEmpty(this.statuses, "The 'statuses' property must not be empty");
+		Assert.state(this.keys != null, "The 'keys' property must be provided");
+		Assert.state(!ObjectUtils.isEmpty(this.keys), "The 'keys' property must not be empty");
+		Assert.state(this.statuses != null, "The 'statuses' property must be provided");
+		Assert.state(!ObjectUtils.isEmpty(this.statuses), "The 'statuses' property must not be empty");
 	}
 
 	/**

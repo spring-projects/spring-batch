@@ -311,7 +311,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobInstanceIncrementer, "jobInstanceIncrementer is required");
+		Assert.state(jobInstanceIncrementer != null, "jobInstanceIncrementer is required");
 	}
 
 	/**

@@ -40,7 +40,7 @@ class CallableTaskletAdapterTests {
 
 	@Test
 	void testAfterPropertiesSet() {
-		assertThrows(IllegalArgumentException.class, adapter::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, adapter::afterPropertiesSet);
 	}
 
 }

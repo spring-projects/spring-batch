@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
+import org.springframework.util.StringUtils;
 
 /**
  * Superclass for delegating classes which dynamically call a custom method of injected
@@ -126,8 +127,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(targetObject, "targetObject must not be null");
-		Assert.hasLength(targetMethod, "targetMethod must not be empty");
+		Assert.state(targetObject != null, "targetObject must not be null");
+		Assert.state(StringUtils.hasText(targetMethod), "targetMethod must not be empty");
 		Assert.state(targetClassDeclaresTargetMethod(),
 				"target class must declare a method with matching name and parameter types");
 	}

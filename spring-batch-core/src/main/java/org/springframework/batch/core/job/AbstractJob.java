@@ -128,7 +128,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobRepository, "JobRepository must be set");
+		Assert.state(jobRepository != null, "JobRepository must be set");
 	}
 
 	/**

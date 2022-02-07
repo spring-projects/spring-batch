@@ -160,10 +160,10 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
-		Assert.notEmpty(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
+		Assert.state(unmarshaller != null, "The Unmarshaller must not be null.");
+		Assert.state(!fragmentRootElementNames.isEmpty(), "The FragmentRootElementNames must not be empty");
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
-			Assert.hasText(fragmentRootElementName.getLocalPart(),
+			Assert.state(StringUtils.hasText(fragmentRootElementName.getLocalPart()),
 					"The FragmentRootElementNames must not contain empty elements");
 		}
 	}

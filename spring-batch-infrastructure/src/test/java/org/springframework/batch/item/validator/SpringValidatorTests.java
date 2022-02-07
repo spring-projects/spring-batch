@@ -44,7 +44,7 @@ class SpringValidatorTests {
 	@Test
 	void testNullValidator() {
 		validator.setValidator(null);
-		assertThrows(IllegalArgumentException.class, validator::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, validator::afterPropertiesSet);
 	}
 
 	/**

@@ -545,7 +545,7 @@ class FlatFileItemWriterTests {
 	@Test
 	void testAfterPropertiesSetChecksMandatory() {
 		writer = new FlatFileItemWriter<>();
-		assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 	}
 
 	@Test

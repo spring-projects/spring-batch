@@ -153,7 +153,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		Assert.notNull(dataSource, "DataSource must not be null.");
+		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
 			jdbcOperations = new JdbcTemplate(dataSource);

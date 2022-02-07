@@ -141,7 +141,7 @@ class SimpleJobOperatorTests {
 	@Test
 	void testMandatoryProperties() {
 		jobOperator = new SimpleJobOperator();
-		assertThrows(IllegalArgumentException.class, jobOperator::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, jobOperator::afterPropertiesSet);
 	}
 
 	/**

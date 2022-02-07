@@ -39,7 +39,7 @@ public class AsyncItemWriter<T> implements ItemStreamWriter<Future<T>>, Initiali
 	private ItemWriter<T> delegate;
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegate, "A delegate ItemWriter must be provided.");
+		Assert.state(delegate != null, "A delegate ItemWriter must be provided.");
 	}
 
 	/**

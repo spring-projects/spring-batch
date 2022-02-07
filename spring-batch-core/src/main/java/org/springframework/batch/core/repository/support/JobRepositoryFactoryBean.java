@@ -199,7 +199,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		Assert.notNull(dataSource, "DataSource must not be null.");
+		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
 			jdbcOperations = new JdbcTemplate(dataSource);
@@ -226,12 +226,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			serializer = defaultSerializer;
 		}
 
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType),
+		Assert.state(incrementerFactory.isSupportedIncrementerType(databaseType),
 				() -> "'" + databaseType + "' is an unsupported database type.  The supported database types are "
 						+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 		if (clobType != null) {
-			Assert.isTrue(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
+			Assert.state(isValidTypes(clobType), "lobType must be a value from the java.sql.Types class");
 		}
 
 		if (this.conversionService == null) {

@@ -187,7 +187,7 @@ class SystemCommandTaskletIntegrationTests {
 	@Test
 	public void testCommandRunnerNotSet() throws Exception {
 		tasklet.setCommandRunner(null);
-		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*
@@ -196,10 +196,10 @@ class SystemCommandTaskletIntegrationTests {
 	@Test
 	void testCommandNotSet() {
 		tasklet.setCommand(null);
-		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 
 		tasklet.setCommand("");
-		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*
@@ -209,7 +209,7 @@ class SystemCommandTaskletIntegrationTests {
 	void testTimeoutNotSet() {
 		tasklet.setCommand("not-empty placeholder");
 		tasklet.setTimeout(0);
-		assertThrows(IllegalArgumentException.class, tasklet::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tasklet::afterPropertiesSet);
 	}
 
 	/*

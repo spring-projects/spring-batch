@@ -46,7 +46,7 @@ class AsyncItemProcessorTests {
 
 	@Test
 	void testNoDelegate() {
-		assertThrows(IllegalArgumentException.class, processor::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, processor::afterPropertiesSet);
 	}
 
 	@Test

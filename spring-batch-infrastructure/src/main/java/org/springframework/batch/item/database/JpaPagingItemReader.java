@@ -31,6 +31,7 @@ import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -144,8 +145,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		super.afterPropertiesSet();
 
 		if (queryProvider == null) {
-			Assert.notNull(entityManagerFactory, "EntityManager is required when queryProvider is null");
-			Assert.hasLength(queryString, "Query string is required when queryProvider is null");
+			Assert.state(entityManagerFactory != null, "EntityManager is required when queryProvider is null");
+			Assert.state(StringUtils.hasLength(queryString), "Query string is required when queryProvider is null");
 		}
 	}
 

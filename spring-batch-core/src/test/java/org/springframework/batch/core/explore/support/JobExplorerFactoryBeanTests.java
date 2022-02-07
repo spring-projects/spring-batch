@@ -84,7 +84,7 @@ class JobExplorerFactoryBeanTests {
 	void testMissingDataSource() {
 
 		factory.setDataSource(null);
-		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, factory::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("DataSource"), "Wrong message: " + message);
 

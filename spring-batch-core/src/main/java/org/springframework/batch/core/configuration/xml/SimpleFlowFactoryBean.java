@@ -33,6 +33,7 @@ import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Convenience factory for {@link SimpleFlow} instances for use in the XML namespace. It
@@ -94,7 +95,7 @@ public class SimpleFlowFactoryBean implements FactoryBean<SimpleFlow>, Initializ
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.hasText(name, "The flow must have a name");
+		Assert.state(StringUtils.hasText(name), "The flow must have a name");
 
 		if (flowType == null) {
 			flowType = SimpleFlow.class;

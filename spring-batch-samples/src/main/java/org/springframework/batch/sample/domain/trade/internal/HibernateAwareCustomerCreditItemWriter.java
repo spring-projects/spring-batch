@@ -68,7 +68,7 @@ public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<Custom
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(sessionFactory != null, "Hibernate SessionFactory is required");
-		Assert.notNull(dao, "Delegate DAO must be set");
+		Assert.state(dao != null, "Delegate DAO must be set");
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegate, "The delegate must be set.");
+		Assert.state(delegate != null, "The delegate must be set.");
 	}
 
 	/**

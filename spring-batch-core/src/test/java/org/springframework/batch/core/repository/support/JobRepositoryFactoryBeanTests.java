@@ -241,7 +241,7 @@ class JobRepositoryFactoryBeanTests {
 	void testMissingDataSource() {
 
 		factory.setDataSource(null);
-		Exception exception = assertThrows(IllegalArgumentException.class, factory::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, factory::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("DataSource"), "Wrong message: " + message);
 
@@ -255,7 +255,7 @@ class JobRepositoryFactoryBeanTests {
 		when(incrementerFactory.isSupportedIncrementerType("mockDb")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> factory.afterPropertiesSet());
+		Exception exception = assertThrows(IllegalStateException.class, () -> factory.afterPropertiesSet());
 		String message = exception.getMessage();
 		assertTrue(message.contains("TransactionManager"), "Wrong message: " + message);
 
@@ -268,7 +268,7 @@ class JobRepositoryFactoryBeanTests {
 		when(incrementerFactory.isSupportedIncrementerType("foo")).thenReturn(false);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> factory.afterPropertiesSet());
+		Exception exception = assertThrows(IllegalStateException.class, () -> factory.afterPropertiesSet());
 		String message = exception.getMessage();
 		assertTrue(message.contains("foo"), "Wrong message: " + message);
 
@@ -363,7 +363,7 @@ class JobRepositoryFactoryBeanTests {
 	@Test
 	void testInvalidCustomLobType() {
 		factory.setClobType(Integer.MAX_VALUE);
-		assertThrows(IllegalArgumentException.class, this::testCreateRepository);
+		assertThrows(IllegalStateException.class, this::testCreateRepository);
 	}
 
 	@Test

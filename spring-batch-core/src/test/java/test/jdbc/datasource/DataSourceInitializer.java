@@ -76,7 +76,7 @@ public class DataSourceInitializer implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource, "A DataSource is required");
+		Assert.state(dataSource != null, "A DataSource is required");
 		initialize();
 	}
 

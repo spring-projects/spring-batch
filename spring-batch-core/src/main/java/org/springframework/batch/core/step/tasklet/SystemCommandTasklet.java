@@ -37,6 +37,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -190,14 +192,13 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(commandRunner, "CommandRunner must be set");
-		Assert.notNull(cmdArray, "'cmdArray' property value must not be null");
-		Assert.notEmpty(cmdArray, "'cmdArray' property value is required with at least 1 element");
-		Assert.noNullElements(cmdArray, "'cmdArray' property value must not contain be null elements");
-		Assert.hasLength(cmdArray[0], "'cmdArray' property value is required with at least 1 element");
-		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
-		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
-		Assert.notNull(taskExecutor, "taskExecutor is required");
+		Assert.state(commandRunner != null, "CommandRunner must be set");
+		Assert.state(cmdArray != null, "'cmdArray' property value must not be null");
+		Assert.state(!ObjectUtils.isEmpty(cmdArray), "'cmdArray' property value is required with at least 1 element");
+		Assert.state(StringUtils.hasText(cmdArray[0]), "'cmdArray' property value is required with at least 1 element");
+		Assert.state(systemProcessExitCodeMapper != null, "SystemProcessExitCodeMapper must be set");
+		Assert.state(timeout > 0, "timeout value must be greater than zero");
+		Assert.state(taskExecutor != null, "taskExecutor is required");
 		stoppable = jobExplorer != null;
 	}
 

@@ -56,7 +56,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(chunkProcessor, "A ChunkProcessor must be provided");
+		Assert.state(chunkProcessor != null, "A ChunkProcessor must be provided");
 	}
 
 	/**

@@ -30,6 +30,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
+import org.springframework.util.StringUtils;
 
 /**
  * <p>
@@ -129,7 +130,7 @@ public class RepositoryItemWriter<T> implements ItemWriter<T>, InitializingBean 
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(repository != null, "A CrudRepository implementation is required");
 		if (this.methodName != null) {
-			Assert.hasText(this.methodName, "methodName must not be empty.");
+			Assert.state(StringUtils.hasText(this.methodName), "methodName must not be empty.");
 		}
 		else {
 			logger.debug("No method name provided, CrudRepository.saveAll will be used.");

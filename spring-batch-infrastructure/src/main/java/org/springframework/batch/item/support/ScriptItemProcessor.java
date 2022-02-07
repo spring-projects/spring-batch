@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 the original author or authors.
+ * Copyright 2014-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 				"Either a script source or script file must be provided, not both");
 
 		if (scriptSource != null && scriptEvaluator instanceof StandardScriptEvaluator) {
-			Assert.isTrue(StringUtils.hasLength(language),
+			Assert.state(StringUtils.hasLength(language),
 					"Language must be provided when using the default ScriptEvaluator and raw source code");
 
 			((StandardScriptEvaluator) scriptEvaluator).setLanguage(language);

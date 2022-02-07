@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(StringUtils.hasText(this.namedQuery), "Named query cannot be empty");
-		Assert.notNull(this.entityClass, "Entity class cannot be NULL");
+		Assert.state(StringUtils.hasText(this.namedQuery), "Named query cannot be empty");
+		Assert.state(this.entityClass != null, "Entity class cannot be NULL");
 	}
 
 }

@@ -56,7 +56,7 @@ public class FlatFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
+		Assert.state(lineAggregator != null, "A LineAggregator must be provided.");
 		if (append) {
 			shouldDeleteIfExists = false;
 		}

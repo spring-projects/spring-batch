@@ -93,7 +93,7 @@ public abstract class KeyValueItemWriter<K, V> implements ItemWriter<V>, Initial
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemKeyMapper, "itemKeyMapper requires a Converter type.");
+		Assert.state(itemKeyMapper != null, "itemKeyMapper requires a Converter type.");
 		init();
 	}
 

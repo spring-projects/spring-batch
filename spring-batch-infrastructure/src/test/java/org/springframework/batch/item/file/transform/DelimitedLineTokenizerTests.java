@@ -140,7 +140,7 @@ class DelimitedLineTokenizerTests {
 	@Test
 	void testDelimitedLineTokenizerEmptyString() {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
-		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test

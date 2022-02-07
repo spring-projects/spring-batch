@@ -75,7 +75,7 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(entityManagerFactory, "An EntityManagerFactory is required");
+		Assert.state(entityManagerFactory != null, "An EntityManagerFactory is required");
 	}
 
 	/**

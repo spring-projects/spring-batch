@@ -91,7 +91,7 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
+		Assert.state(pageSize > 0, "pageSize must be greater than zero");
 	}
 
 	@Nullable

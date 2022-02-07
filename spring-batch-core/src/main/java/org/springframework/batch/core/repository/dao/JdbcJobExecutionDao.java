@@ -138,7 +138,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobExecutionIncrementer, "The jobExecutionIncrementer must not be null.");
+		Assert.state(jobExecutionIncrementer != null, "The jobExecutionIncrementer must not be null.");
 	}
 
 	@Override

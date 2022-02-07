@@ -116,11 +116,11 @@ class StaxEventItemReaderTests {
 
 		source = createNewInputSource();
 		source.setFragmentRootElementName("");
-		assertThrows(IllegalArgumentException.class, source::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, source::afterPropertiesSet);
 
 		source = createNewInputSource();
 		source.setUnmarshaller(null);
-		assertThrows(IllegalArgumentException.class, source::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, source::afterPropertiesSet);
 	}
 
 	/**

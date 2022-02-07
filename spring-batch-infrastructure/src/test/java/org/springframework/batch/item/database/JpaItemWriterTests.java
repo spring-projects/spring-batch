@@ -61,7 +61,7 @@ class JpaItemWriterTests {
 	@Test
 	void testAfterPropertiesSet() {
 		writer = new JpaItemWriter<>();
-		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("EntityManagerFactory"), "Wrong message for exception: " + message);
 	}

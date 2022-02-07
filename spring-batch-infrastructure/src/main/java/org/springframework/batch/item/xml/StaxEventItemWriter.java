@@ -367,7 +367,7 @@ public class StaxEventItemWriter<T> extends AbstractItemStreamItemWriter<T>
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(marshaller, "A Marshaller is required");
+		Assert.state(marshaller != null, "A Marshaller is required");
 		if (rootTagName.contains("{")) {
 			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
 			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");

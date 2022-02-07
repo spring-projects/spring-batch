@@ -88,8 +88,8 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegates, "The 'delegates' may not be null");
-		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
+		Assert.state(delegates != null, "The 'delegates' may not be null");
+		Assert.state(!delegates.isEmpty(), "The 'delegates' may not be empty");
 	}
 
 	/**

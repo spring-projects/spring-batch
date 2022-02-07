@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,8 +78,8 @@ public class PartitionStep extends AbstractStep {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(stepExecutionSplitter, "StepExecutionSplitter must be provided");
-		Assert.notNull(partitionHandler, "PartitionHandler must be provided");
+		Assert.state(stepExecutionSplitter != null, "StepExecutionSplitter must be provided");
+		Assert.state(partitionHandler != null, "PartitionHandler must be provided");
 		super.afterPropertiesSet();
 	}
 

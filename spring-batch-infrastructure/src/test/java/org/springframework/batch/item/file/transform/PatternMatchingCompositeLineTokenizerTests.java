@@ -38,7 +38,7 @@ class PatternMatchingCompositeLineTokenizerTests {
 
 	@Test
 	void testNoTokenizers() {
-		assertThrows(IllegalArgumentException.class, tokenizer::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tokenizer::afterPropertiesSet);
 	}
 
 	@Test

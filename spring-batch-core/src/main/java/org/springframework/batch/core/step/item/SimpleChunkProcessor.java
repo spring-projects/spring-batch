@@ -99,7 +99,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(itemWriter, "ItemWriter must be set");
+		Assert.state(itemWriter != null, "ItemWriter must be set");
 	}
 
 	/**

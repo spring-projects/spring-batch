@@ -98,7 +98,7 @@ public class JobRegistryBeanPostProcessor
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobRegistry, "JobRegistry must not be null");
+		Assert.state(jobRegistry != null, "JobRegistry must not be null");
 	}
 
 	/**

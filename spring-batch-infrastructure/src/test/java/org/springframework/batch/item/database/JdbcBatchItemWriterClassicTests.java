@@ -85,17 +85,17 @@ class JdbcBatchItemWriterClassicTests {
 	@Test
 	void testAfterPropertiesSet() {
 		writer = new JdbcBatchItemWriter<>();
-		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		assertTrue(exception.getMessage().contains("NamedParameterJdbcTemplate"),
 				"Message does not contain ' NamedParameterJdbcTemplate'.");
 
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
-		exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.toLowerCase().contains("sql"), "Message does not contain 'sql'.");
 
 		writer.setSql("select * from foo where id = ?");
-		exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		assertTrue(exception.getMessage().contains("ItemPreparedStatementSetter"),
 				"Message does not contain 'ItemPreparedStatementSetter'.");
 

@@ -111,7 +111,7 @@ public class MessageChannelPartitionHandler extends AbstractPartitionHandler imp
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(stepName, "A step name must be provided for the remote workers.");
+		Assert.state(stepName != null, "A step name must be provided for the remote workers.");
 		Assert.state(messagingGateway != null, "The MessagingOperations must be set");
 
 		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);

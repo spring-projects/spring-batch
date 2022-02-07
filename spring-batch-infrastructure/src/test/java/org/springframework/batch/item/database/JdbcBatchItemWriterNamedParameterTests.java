@@ -101,13 +101,13 @@ public class JdbcBatchItemWriterNamedParameterTests {
 	@Test
 	void testAfterPropertiesSet() {
 		writer = new JdbcBatchItemWriter<>();
-		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		String message = exception.getMessage();
 		assertTrue(message.contains("NamedParameterJdbcTemplate"),
 				"Message does not contain 'NamedParameterJdbcTemplate'.");
 
 		writer.setJdbcTemplate(namedParameterJdbcOperations);
-		exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		message = exception.getMessage().toLowerCase();
 		assertTrue(message.contains("sql"), "Message does not contain 'sql'.");
 

@@ -142,8 +142,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(namedParameterJdbcTemplate, "A DataSource or a NamedParameterJdbcTemplate is required.");
-		Assert.notNull(sql, "An SQL statement is required.");
+		Assert.state(namedParameterJdbcTemplate != null, "A DataSource or a NamedParameterJdbcTemplate is required.");
+		Assert.state(sql != null, "An SQL statement is required.");
 		List<String> namedParameters = new ArrayList<>();
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
 		if (namedParameters.size() > 0) {
@@ -154,7 +154,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			usingNamedParameters = true;
 		}
 		if (!usingNamedParameters) {
-			Assert.notNull(itemPreparedStatementSetter,
+			Assert.state(itemPreparedStatementSetter != null,
 					"Using SQL statement with '?' placeholders requires an ItemPreparedStatementSetter");
 		}
 	}

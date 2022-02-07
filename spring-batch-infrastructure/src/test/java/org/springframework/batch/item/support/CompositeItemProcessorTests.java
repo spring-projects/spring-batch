@@ -103,11 +103,11 @@ class CompositeItemProcessorTests {
 
 		// value not set
 		composite.setDelegates(null);
-		assertThrows(IllegalArgumentException.class, composite::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, composite::afterPropertiesSet);
 
 		// empty list
 		composite.setDelegates(new ArrayList<ItemProcessor<Object, Object>>());
-		assertThrows(IllegalArgumentException.class, composite::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, composite::afterPropertiesSet);
 
 	}
 

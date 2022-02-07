@@ -231,7 +231,7 @@ class ExtendedConnectionDataSourceProxyTests {
 	void delegateIsRequired() {
 
 		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(null);
-		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tested::afterPropertiesSet);
 	}
 
 	@Test

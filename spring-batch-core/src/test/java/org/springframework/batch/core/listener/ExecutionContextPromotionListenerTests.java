@@ -247,7 +247,7 @@ class ExecutionContextPromotionListenerTests {
 	void keysMustBeSet() {
 		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
 		// didn't set the keys, same as listener.setKeys(null);
-		assertThrows(IllegalArgumentException.class, listener::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, listener::afterPropertiesSet);
 	}
 
 }

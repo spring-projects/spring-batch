@@ -110,10 +110,10 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jobLauncher, "JobLauncher must be provided");
-		Assert.notNull(jobRegistry, "JobLocator must be provided");
-		Assert.notNull(jobExplorer, "JobExplorer must be provided");
-		Assert.notNull(jobRepository, "JobRepository must be provided");
+		Assert.state(jobLauncher != null, "JobLauncher must be provided");
+		Assert.state(jobRegistry != null, "JobLocator must be provided");
+		Assert.state(jobExplorer != null, "JobExplorer must be provided");
+		Assert.state(jobRepository != null, "JobRepository must be provided");
 	}
 
 	/**

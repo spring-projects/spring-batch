@@ -278,7 +278,7 @@ public class DefaultJobLoader implements JobLoader, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(jobRegistry, "Job registry could not be null.");
+		Assert.state(jobRegistry != null, "Job registry could not be null.");
 	}
 
 }

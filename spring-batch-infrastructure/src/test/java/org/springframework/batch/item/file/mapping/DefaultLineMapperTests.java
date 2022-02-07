@@ -35,13 +35,13 @@ class DefaultLineMapperTests {
 
 	@Test
 	void testMandatoryTokenizer() {
-		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tested::afterPropertiesSet);
 	}
 
 	@Test
 	void testMandatoryMapper() {
 		tested.setLineTokenizer(new DelimitedLineTokenizer());
-		assertThrows(IllegalArgumentException.class, tested::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, tested::afterPropertiesSet);
 	}
 
 	@Test

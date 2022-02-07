@@ -60,7 +60,7 @@ class RepositoryItemWriterTests {
 		writer.setRepository(repository);
 		writer.setMethodName("");
 
-		Exception exception = assertThrows(IllegalArgumentException.class, writer::afterPropertiesSet);
+		Exception exception = assertThrows(IllegalStateException.class, writer::afterPropertiesSet);
 		assertEquals("methodName must not be empty.", exception.getMessage());
 	}
 

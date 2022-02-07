@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() {
-		Assert.notNull(tokenizer, "The LineTokenizer must be set");
-		Assert.notNull(fieldSetMapper, "The FieldSetMapper must be set");
+		Assert.state(tokenizer != null, "The LineTokenizer must be set");
+		Assert.state(fieldSetMapper != null, "The FieldSetMapper must be set");
 	}
 
 }

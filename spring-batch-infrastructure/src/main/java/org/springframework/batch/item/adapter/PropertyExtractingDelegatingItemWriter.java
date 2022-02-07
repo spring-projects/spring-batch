@@ -24,6 +24,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Delegates processing to a custom method - extracts property values from item object and
@@ -62,7 +63,8 @@ public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInv
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notEmpty(fieldsUsedAsTargetMethodArguments, "fieldsUsedAsTargetMethodArguments must not be empty");
+		Assert.state(!ObjectUtils.isEmpty(fieldsUsedAsTargetMethodArguments),
+				"fieldsUsedAsTargetMethodArguments must not be empty");
 	}
 
 	/**

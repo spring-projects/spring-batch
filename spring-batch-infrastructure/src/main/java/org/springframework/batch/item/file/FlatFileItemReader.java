@@ -286,7 +286,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(lineMapper, "LineMapper is required");
+		Assert.state(lineMapper != null, "LineMapper is required");
 	}
 
 	@Override

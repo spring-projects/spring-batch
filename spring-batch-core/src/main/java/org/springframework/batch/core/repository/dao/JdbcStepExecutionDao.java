@@ -129,7 +129,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
+		Assert.state(stepExecutionIncrementer != null, "StepExecutionIncrementer cannot be null.");
 	}
 
 	/**

@@ -52,7 +52,7 @@ class AggregateItemFieldSetMapperTests {
 
 	@Test
 	void testMandatoryProperties() {
-		assertThrows(IllegalArgumentException.class, mapper::afterPropertiesSet);
+		assertThrows(IllegalStateException.class, mapper::afterPropertiesSet);
 	}
 
 	@Test
