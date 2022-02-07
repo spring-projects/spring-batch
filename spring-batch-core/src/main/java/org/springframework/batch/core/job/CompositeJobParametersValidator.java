@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 the original author or authors.
+ * Copyright 2011-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(validators, "The 'validators' may not be null");
-		Assert.notEmpty(validators, "The 'validators' may not be empty");
+		Assert.state(validators != null, "The 'validators' may not be null");
+		Assert.state(!validators.isEmpty(), "The 'validators' may not be empty");
 	}
 
 

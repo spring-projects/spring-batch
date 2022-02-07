@@ -1403,7 +1403,7 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
     }
 
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(directory, "directory must be set");
+        Assert.state(directory != null, "directory must be set");
     }
 }
 ----

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -325,7 +325,7 @@ JobInstanceDao, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobInstanceIncrementer, "jobInstanceIncrementer is required");
+		Assert.state(jobInstanceIncrementer != null, "jobInstanceIncrementer is required");
 	}
 
 	/**

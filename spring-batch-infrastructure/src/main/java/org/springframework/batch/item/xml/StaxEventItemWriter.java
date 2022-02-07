@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,7 +388,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(marshaller, "A Marshaller is required");
+		Assert.state(marshaller != null, "A Marshaller is required");
 		if (rootTagName.contains("{")) {
 			rootTagNamespace = rootTagName.replaceAll("\\{(.*)\\}.*", "$1");
 			rootTagName = rootTagName.replaceAll("\\{.*\\}(.*)", "$1");

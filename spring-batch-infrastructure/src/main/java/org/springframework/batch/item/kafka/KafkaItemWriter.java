@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	@Override
 	protected void init() {
-		Assert.notNull(this.kafkaTemplate, "KafkaTemplate must not be null.");
-		Assert.notNull(this.kafkaTemplate.getDefaultTopic(), "KafkaTemplate must have the default topic set.");
+		Assert.state(this.kafkaTemplate != null, "KafkaTemplate must not be null.");
+		Assert.state(this.kafkaTemplate.getDefaultTopic() != null, "KafkaTemplate must have the default topic set.");
 	}
 
 	/**

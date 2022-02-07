@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		Assert.state(sessionFactory != null, "A SessionFactory must be provided");
 
 		if (queryProvider == null) {
-			Assert.notNull(sessionFactory, "session factory must be set");
+			Assert.state(sessionFactory != null, "session factory must be set");
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
 					"queryString or queryName must be set");
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,14 +165,14 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(dataSource, "DataSource may not be null");
+		Assert.state(dataSource != null, "DataSource may not be null");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		if (fetchSize != VALUE_NOT_SET) {
 			jdbcTemplate.setFetchSize(fetchSize);
 		}
 		jdbcTemplate.setMaxRows(getPageSize());
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-		Assert.notNull(queryProvider, "QueryProvider may not be null");
+		Assert.state(queryProvider != null, "QueryProvider may not be null");
 		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(getPageSize());
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(getPageSize());

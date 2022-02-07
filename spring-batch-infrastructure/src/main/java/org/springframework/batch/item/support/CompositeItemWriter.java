@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public class CompositeItemWriter<T> implements ItemStreamWriter<T>, Initializing
 
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegates, "The 'delegates' may not be null");
-		Assert.notEmpty(delegates, "The 'delegates' may not be empty");
+		Assert.state(delegates != null, "The 'delegates' may not be null");
+		Assert.state(!delegates.isEmpty(), "The 'delegates' may not be empty");
 	}
 
 	/**

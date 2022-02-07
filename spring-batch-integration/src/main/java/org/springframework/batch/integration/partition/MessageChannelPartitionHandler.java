@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2021 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ public class MessageChannelPartitionHandler implements PartitionHandler, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(stepName, "A step name must be provided for the remote workers.");
+		Assert.state(stepName != null, "A step name must be provided for the remote workers.");
 		Assert.state(messagingGateway != null, "The MessagingOperations must be set");
 
 		pollRepositoryForResults = !(dataSource == null && jobExplorer == null);

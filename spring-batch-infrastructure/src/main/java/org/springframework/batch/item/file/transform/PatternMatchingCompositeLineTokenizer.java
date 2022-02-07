@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, Ini
 	 */
     @Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
+		Assert.state(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {

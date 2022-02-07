@@ -36,13 +36,13 @@ public class CompositeJobParametersValidatorTests {
 		compositeJobParametersValidator = new CompositeJobParametersValidator();
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testValidatorsCanNotBeNull() throws Exception{
 		compositeJobParametersValidator.setValidators(null);
 		compositeJobParametersValidator.afterPropertiesSet();
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testValidatorsCanNotBeEmpty() throws Exception{
 		compositeJobParametersValidator.setValidators(new ArrayList<>());
 		compositeJobParametersValidator.afterPropertiesSet();

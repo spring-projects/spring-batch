@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public class KafkaItemWriterTests {
 			this.writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalArgumentException exception) {
+		catch (IllegalStateException exception) {
 			assertEquals("itemKeyMapper requires a Converter type.", exception.getMessage());
 		}
 
@@ -81,7 +81,7 @@ public class KafkaItemWriterTests {
 			this.writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
 		}
-		catch (IllegalArgumentException exception) {
+		catch (IllegalStateException exception) {
 			assertEquals("KafkaTemplate must not be null.", exception.getMessage());
 		}
 

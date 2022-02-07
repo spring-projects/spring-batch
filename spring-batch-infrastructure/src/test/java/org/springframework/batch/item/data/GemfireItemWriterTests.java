@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,14 +57,14 @@ public class GemfireItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException iae) {
+		} catch (IllegalStateException ise) {
 		}
 
 		writer.setTemplate(template);
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException iae) {
+		} catch (IllegalStateException ise) {
 		}
 
 		writer.setItemKeyMapper(new SpELItemKeyMapper<>("foo"));

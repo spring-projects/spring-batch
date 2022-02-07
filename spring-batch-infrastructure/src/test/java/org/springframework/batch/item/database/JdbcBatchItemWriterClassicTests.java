@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,9 +86,9 @@ public class JdbcBatchItemWriterClassicTests {
 		writer = new JdbcBatchItemWriter<>();
 		try {
 			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
+			fail("Expected IllegalStateException");
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 			String message = e.getMessage();
 			assertTrue("Message does not contain ' NamedParameterJdbcTemplate'.", message.indexOf("NamedParameterJdbcTemplate") >= 0);
@@ -96,9 +96,9 @@ public class JdbcBatchItemWriterClassicTests {
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		try {
 			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
+			fail("Expected IllegalStateException");
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 			String message = e.getMessage().toLowerCase();
 			assertTrue("Message does not contain 'sql'.", message.indexOf("sql") >= 0);
@@ -106,9 +106,9 @@ public class JdbcBatchItemWriterClassicTests {
 		writer.setSql("select * from foo where id = ?");
 		try {
 			writer.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
+			fail("Expected IllegalStateException");
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 			String message = e.getMessage();
 			assertTrue("Message does not contain 'ItemPreparedStatementSetter'.", message.indexOf("ItemPreparedStatementSetter") >= 0);

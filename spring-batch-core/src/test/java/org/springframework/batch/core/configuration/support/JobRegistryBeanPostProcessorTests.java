@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,9 @@ public class JobRegistryBeanPostProcessorTests {
 	public void testInitializationFails() throws Exception {
 		try {
 			processor.afterPropertiesSet();
-			fail("Expected IllegalArgumentException");
+			fail("Expected IllegalStateException");
 		}
-		catch (IllegalArgumentException e) {
+		catch (IllegalStateException e) {
 			// expected
 			assertTrue(e.getMessage().contains("JobRegistry"));
 		}

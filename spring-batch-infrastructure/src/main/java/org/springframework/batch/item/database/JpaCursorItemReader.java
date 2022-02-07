@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link org.springframework.batch.item.ItemStreamReader} implementation based
@@ -101,9 +102,9 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.entityManagerFactory, "EntityManagerFactory is required");
+		Assert.state(this.entityManagerFactory != null, "EntityManagerFactory is required");
 		if (this.queryProvider == null) {
-			Assert.hasLength(this.queryString, "Query string is required when queryProvider is null");
+			Assert.state(StringUtils.hasLength(this.queryString), "Query string is required when queryProvider is null");
 		}
 	}
 

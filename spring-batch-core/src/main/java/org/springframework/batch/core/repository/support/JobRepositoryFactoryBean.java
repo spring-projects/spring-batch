@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
-		Assert.notNull(dataSource, "DataSource must not be null.");
+		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
 			jdbcOperations = new JdbcTemplate(dataSource);	
@@ -197,12 +197,12 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			serializer = defaultSerializer;
 		}
 
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), () -> "'" + databaseType
+		Assert.state(incrementerFactory.isSupportedIncrementerType(databaseType), () -> "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 		if(lobType != null) {
-			Assert.isTrue(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
+			Assert.state(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
 		}
 
 		super.afterPropertiesSet();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class HibernateAwareCustomerCreditItemWriter implements ItemWriter<Custom
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(sessionFactory != null, "Hibernate SessionFactory is required");
-		Assert.notNull(dao, "Delegate DAO must be set");
+		Assert.state(dao != null, "Delegate DAO must be set");
 	}
 
 }

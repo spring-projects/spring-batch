@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2019 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorIt
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(jdbcTemplate, "Either jdbcTemplate or dataSource must be set");
+		Assert.state(jdbcTemplate != null, "Either jdbcTemplate or dataSource must be set");
 	}
 
 	/**

@@ -84,6 +84,6 @@ public class SynchronizedItemStreamWriter<T> implements ItemStreamWriter<T>, Ini
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.delegate, "A delegate item writer is required");
+		Assert.state(this.delegate != null, "A delegate item writer is required");
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,10 +157,10 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
-		Assert.notEmpty(fragmentRootElementNames, "The FragmentRootElementNames must not be empty");
+		Assert.state(unmarshaller != null, "The Unmarshaller must not be null.");
+		Assert.state(!fragmentRootElementNames.isEmpty(), "The FragmentRootElementNames must not be empty");
 		for (QName fragmentRootElementName : fragmentRootElementNames) {
-			Assert.hasText(fragmentRootElementName.getLocalPart(), "The FragmentRootElementNames must not contain empty elements");
+			Assert.state(StringUtils.hasText(fragmentRootElementName.getLocalPart()), "The FragmentRootElementNames must not contain empty elements");
 		}		
 	}
 

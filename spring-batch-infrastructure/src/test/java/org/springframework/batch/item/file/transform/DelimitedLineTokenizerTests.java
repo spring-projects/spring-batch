@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ public class DelimitedLineTokenizerTests {
 		tokenizer.tokenize("a b c");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testDelimitedLineTokenizerEmptyString() throws Exception {
 		DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer("");
 		tokenizer.afterPropertiesSet();

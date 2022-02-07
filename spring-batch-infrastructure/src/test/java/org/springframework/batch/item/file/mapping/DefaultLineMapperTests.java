@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ public class DefaultLineMapperTests {
 
 	private DefaultLineMapper<String> tested = new DefaultLineMapper<>();
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testMandatoryTokenizer() throws Exception {
 		tested.afterPropertiesSet();
 		tested.mapLine("foo", 1);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testMandatoryMapper() throws Exception {
 		tested.setLineTokenizer(new DelimitedLineTokenizer());
 		tested.afterPropertiesSet();

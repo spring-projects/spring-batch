@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -175,10 +176,10 @@ public class SystemCommandTasklet implements StepExecutionListener, StoppableTas
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.hasLength(command, "'command' property value is required");
-		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
-		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
-		Assert.notNull(taskExecutor, "taskExecutor is required");
+		Assert.state(StringUtils.hasLength(command), "'command' property value is required");
+		Assert.state(systemProcessExitCodeMapper != null, "SystemProcessExitCodeMapper must be set");
+		Assert.state(timeout > 0, "timeout value must be greater than zero");
+		Assert.state(taskExecutor != null, "taskExecutor is required");
 		stoppable = jobExplorer != null;
 	}
 
