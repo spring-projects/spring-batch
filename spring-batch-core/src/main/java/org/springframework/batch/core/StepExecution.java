@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,9 @@ public class StepExecution extends Entity {
 
 	private volatile long writeSkipCount = 0;
 
-	private volatile Date startTime = new Date(System.currentTimeMillis());
+	private volatile Date startTime = null;
+
+	private volatile Date createTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
 
@@ -241,6 +243,24 @@ public class StepExecution extends Entity {
 	 */
 	public void setRollbackCount(long rollbackCount) {
 		this.rollbackCount = rollbackCount;
+	}
+
+	/**
+	 * Gets the time this execution created
+	 *
+	 * @return the time when this execution was created.
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	/**
+	 * Sets the time this execution created
+	 *
+	 * @param createTime creation time of this execution.
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
 	/**
