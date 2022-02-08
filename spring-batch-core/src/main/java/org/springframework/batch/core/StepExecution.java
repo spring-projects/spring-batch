@@ -61,7 +61,9 @@ public class StepExecution extends Entity {
 
 	private volatile long writeSkipCount = 0;
 
-	private volatile Date startTime = new Date(System.currentTimeMillis());
+	private volatile Date startTime = null;
+
+	private volatile Date createTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
 
@@ -246,6 +248,24 @@ public class StepExecution extends Entity {
 	 */
 	public void setRollbackCount(long rollbackCount) {
 		this.rollbackCount = rollbackCount;
+	}
+
+	/**
+	 * Gets the time this execution was created
+	 *
+	 * @return the time when this execution was created.
+	 */
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	/**
+	 * Sets the time this execution was created
+	 *
+	 * @param createTime creation time of this execution.
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
 	/**
