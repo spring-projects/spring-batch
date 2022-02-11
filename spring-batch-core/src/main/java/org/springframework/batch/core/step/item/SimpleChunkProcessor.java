@@ -18,8 +18,8 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Timer;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
