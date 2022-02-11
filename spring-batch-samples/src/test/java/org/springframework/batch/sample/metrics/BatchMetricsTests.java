@@ -25,8 +25,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.api.instrument.Meter;
+import io.micrometer.api.instrument.Metrics;
 import org.junit.Test;
 
 import org.springframework.batch.core.ExitStatus;

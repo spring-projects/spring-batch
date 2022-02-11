@@ -19,9 +19,9 @@ package org.springframework.batch.core.job;
 import java.util.Collection;
 import java.util.Date;
 
-import io.micrometer.core.instrument.LongTaskTimer;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
+import io.micrometer.api.instrument.LongTaskTimer;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
