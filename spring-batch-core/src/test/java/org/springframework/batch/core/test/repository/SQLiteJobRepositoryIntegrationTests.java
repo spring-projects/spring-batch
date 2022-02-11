@@ -74,6 +74,7 @@ public class SQLiteJobRepositoryIntegrationTests {
 			SQLiteDataSource dataSource = new SQLiteDataSource();
 			dataSource.setUrl("jdbc:sqlite:target/spring-batch.sqlite");
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+			databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sqlite.sql"));
 			databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-sqlite.sql"));
 			databasePopulator.execute(dataSource);
 			return dataSource;
