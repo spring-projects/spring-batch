@@ -45,7 +45,7 @@ import java.util.List;
  * <p>
  * Implementation of {@link JobRepository} that stores JobInstances,
  * JobExecutions, and StepExecutions using the injected DAOs.
- * <p>
+ * </p>
  *
  * @author Lucas Ward
  * @author Dave Syer

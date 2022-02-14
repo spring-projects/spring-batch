@@ -126,7 +126,7 @@
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-		<maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.3.2</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
@@ -204,6 +204,8 @@
 					</excludePackageNames>
 					<overview>${project.basedir}/spring-batch-docs/src/main/javadoc/overview.html</overview>
 					<detectJavaApiLink>false</detectJavaApiLink>
+					<doclint>all,-missing</doclint>
+					<quiet>true</quiet>
 				</configuration>
 				<executions>
 					<execution>
