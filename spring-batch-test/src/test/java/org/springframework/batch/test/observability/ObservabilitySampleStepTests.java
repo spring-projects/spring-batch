@@ -15,44 +15,23 @@
  */
 package org.springframework.batch.test.observability;
 
-import java.util.function.BiConsumer;
-
 import io.micrometer.api.instrument.MeterRegistry;
 import io.micrometer.api.instrument.Metrics;
-import io.micrometer.tracing.Tracer;
 import io.micrometer.tracing.test.SampleTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.SpringBatchTestJUnit5Tests;
-import org.springframework.batch.test.StepRunner;
 import org.springframework.batch.test.context.SpringBatchTest;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.jdbc.JdbcTestUtils;
 
-import static org.junit.Assert.assertEquals;
+import static io.micrometer.tracing.test.simple.SpansAssert.assertThat;
 
 @SpringBatchTest
 public class ObservabilitySampleStepTests extends SampleTestRunner {
@@ -71,22 +50,22 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 	}
 
 	@Override
-	public BiConsumer<Tracer, MeterRegistry> yourCode() throws Exception {
-		return (tracer, meterRegistry) -> {
+	public SampleTestRunnerConsumer yourCode() {
+		return (bb, meterRegistry) -> {
 			// given
 			JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 			// when
-			JobExecution jobExecution = null;
-			try {
-				jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
-			}
-			catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
 			// then
 			Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+
+			// and
+			assertThat(bb.getFinishedSpans())
+					.haveSameTraceId()
+					.hasASpanWithName("job")
+					.hasASpanWithName("step");
 		};
 	}
 
