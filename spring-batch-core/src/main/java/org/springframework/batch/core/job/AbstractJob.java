@@ -18,10 +18,12 @@ package org.springframework.batch.core.job;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import io.micrometer.api.instrument.LongTaskTimer;
 import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
+import io.micrometer.api.instrument.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -304,8 +306,9 @@ InitializingBean {
 		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs",
 				Tag.of("name", execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
-		Timer.Sample timerSample = BatchMetrics.createTimerSample();
-		try {
+		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName())
+				.contextualName(execution.getJobInstance().getJobName()).start();
+		try (Observation.Scope scope = observation.openScope()) {
 
 			jobParametersValidator.validate(execution.getJobParameters());
 
@@ -361,11 +364,7 @@ InitializingBean {
 							ExitStatus.NOOP.addExitDescription("All steps already completed or no steps configured for this job.");
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
-
-				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
-						Tag.of("name", execution.getJobInstance().getJobName()),
-						Tag.of("status", execution.getExitStatus().getExitCode())
-				));
+				stopTaggedObservation(execution, observation);
 				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
@@ -382,6 +381,23 @@ InitializingBean {
 
 		}
 
+	}
+
+	private void stopTaggedObservation(JobExecution execution, Observation observation) {
+		observation.lowCardinalityTag(BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()))
+				.lowCardinalityTag(BatchJobObservation.JobLowCardinalityTags.JOB_STATUS.of(execution.getExitStatus().getExitCode()))
+				.highCardinalityTag(BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID.of(String.valueOf(execution.getJobInstance().getInstanceId())))
+				.highCardinalityTag(BatchJobObservation.JobHighCardinalityTags.JOB_EXECUTION_ID.of(String.valueOf(execution.getId())));
+		List<Throwable> throwables = execution.getFailureExceptions();
+		if (!throwables.isEmpty()) {
+			observation.error(mergedThrowables(throwables));
+		}
+		observation.stop();
+	}
+
+	private IllegalStateException mergedThrowables(List<Throwable> throwables) {
+		return new IllegalStateException(
+				throwables.stream().map(Throwable::toString).collect(Collectors.joining("\n")));
 	}
 
 	/**

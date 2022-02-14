@@ -133,3 +133,12 @@ This reader stores message offsets in the execution context to support restart c
             convert each item to Json and then writes it to an Json file.
 
 |===============
+
+:root-target: ../../../target
+
+[[observability]]
+== Observability metadata
+
+include::{root-target}/observability/_metrics.adoc[]
+
+include::{root-target}/observability/_spans.adoc[]

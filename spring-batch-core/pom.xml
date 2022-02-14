@@ -256,6 +256,12 @@
 			<version>${jakarta.inject-api.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-test</artifactId>
+			<version>${micrometer.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>

@@ -10,6 +10,14 @@
     <name>Spring Batch Docs</name>
     <description>Spring Batch documentation</description>
 
+    <properties>
+        <!-- Observability -->
+        <micrometer-docs-generator.version>1.0.0-SNAPSHOT</micrometer-docs-generator.version>
+        <micrometer-docs-generator.inputPath>${maven.multiModuleProjectDirectory}/spring-batch-core/</micrometer-docs-generator.inputPath>
+        <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
+        <micrometer-docs-generator.outputPath>${maven.multiModuleProjectDirectory}/spring-batch-docs/target/observability/</micrometer-docs-generator.outputPath>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.spring.docresources</groupId>
@@ -55,6 +63,59 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-metrics-metadata</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>io.micrometer.docs.metrics.DocsFromSources</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-tracing-metadata</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>io.micrometer.docs.spans.DocsFromSources</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.micrometer
+                        </groupId>
+                        <artifactId>micrometer-docs-generator-spans</artifactId>
+                        <version>${micrometer-docs-generator.version}
+                        </version>
+                        <type>jar</type>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.micrometer
+                        </groupId>
+                        <artifactId>micrometer-docs-generator-metrics</artifactId>
+                        <version>${micrometer-docs-generator.version}
+                        </version>
+                        <type>jar</type>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <includePluginDependencies>true</includePluginDependencies>
+                    <arguments>
+                        <argument>${micrometer-docs-generator.inputPath}</argument>
+                        <argument>${micrometer-docs-generator.inclusionPattern}</argument>
+                        <argument>${micrometer-docs-generator.outputPath}</argument>
+                    </arguments>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>

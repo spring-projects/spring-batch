@@ -21,9 +21,13 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import io.micrometer.api.instrument.LongTaskTimer;
+import io.micrometer.api.instrument.MeterRegistry;
 import io.micrometer.api.instrument.Metrics;
 import io.micrometer.api.instrument.Tag;
 import io.micrometer.api.instrument.Timer;
+import io.micrometer.api.instrument.observation.Observation;
+import io.micrometer.api.instrument.observation.TimerObservationHandler;
+import io.micrometer.api.instrument.simple.SimpleMeterRegistry;
 
 import org.springframework.lang.Nullable;
 
@@ -52,6 +56,14 @@ public final class BatchMetrics {
 
 	private BatchMetrics() {}
 
+	private static final MeterRegistry simpleMeterRegistry = new SimpleMeterRegistry().withTimerObservationHandler();
+
+	static {
+		// TODO: This shouldn't be necessary - we need to fix it in Micrometer
+		Metrics.globalRegistry.observationConfig().observationHandler(new TimerObservationHandler(Metrics.globalRegistry));
+		Metrics.globalRegistry.add(simpleMeterRegistry);
+	}
+
 	/**
 	 * Create a {@link Timer}.
 	 * @param name of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
@@ -64,6 +76,15 @@ public final class BatchMetrics {
 				.description(description)
 				.tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
+	}
+
+	/**
+	 * Create a new {@link Observation}. It's not started, you must
+	 * explicitly call {@link Observation#start()} to start it.
+	 * @return a new timer sample instance
+	 */
+	public static Observation createObservation(String name) {
+		return Observation.createNotStarted(name, Metrics.globalRegistry);
 	}
 
 	/**

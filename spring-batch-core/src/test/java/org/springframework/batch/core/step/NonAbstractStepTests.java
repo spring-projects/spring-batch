@@ -23,6 +23,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.micrometer.api.instrument.Metrics;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.tck.MeterRegistryAssert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -198,6 +203,15 @@ public class NonAbstractStepTests {
 				repository.saved.containsKey("beforeStep"));
 		assertTrue("Execution context modifications made by listener should be persisted",
 				repository.saved.containsKey("afterStep"));
+
+		// Observability
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
+				.hasTimerWithNameAndTags(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.job.name", "jobName"), Tag.of("spring.batch.step.name", "eventTrackingStep"), Tag.of("spring.batch.step.status", "COMPLETED")));
+	}
+
+	@After
+	public void cleanup() {
+		Metrics.globalRegistry.clear();
 	}
 
 	@Test

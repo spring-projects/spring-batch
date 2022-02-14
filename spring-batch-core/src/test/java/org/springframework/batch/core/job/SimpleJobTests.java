@@ -31,8 +31,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import io.micrometer.api.instrument.Metrics;
+import io.micrometer.api.instrument.Tag;
+import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.tck.MeterRegistryAssert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -211,6 +218,15 @@ public class SimpleJobTests {
 
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
+
+		// Observability
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
+				.hasTimerWithNameAndTags(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.job.name", "testJob"), Tag.of("spring.batch.job.status", "COMPLETED")));
+	}
+
+	@After
+	public void cleanup() {
+		Metrics.globalRegistry.clear();
 	}
 
 	@Test
