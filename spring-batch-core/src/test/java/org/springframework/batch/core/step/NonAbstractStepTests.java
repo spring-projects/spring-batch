@@ -184,6 +184,7 @@ public class NonAbstractStepTests {
 	 */
 	@Test
 	public void testExecute() throws Exception {
+		Metrics.globalRegistry.withTimerObservationHandler();
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 		tested.execute(execution);
 

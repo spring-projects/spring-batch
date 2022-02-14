@@ -208,6 +208,7 @@ public class SimpleJobTests {
 
 	@Test
 	public void testRunNormally() throws Exception {
+		Metrics.globalRegistry.withTimerObservationHandler();
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		job.execute(jobExecution);
