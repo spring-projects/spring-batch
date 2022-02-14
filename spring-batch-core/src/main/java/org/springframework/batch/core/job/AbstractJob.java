@@ -18,10 +18,12 @@ package org.springframework.batch.core.job;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import io.micrometer.api.instrument.LongTaskTimer;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -62,7 +64,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
-InitializingBean {
+InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -79,6 +81,8 @@ InitializingBean {
 	private JobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
 
 	private StepHandler stepHandler;
+
+	private BatchJobTagsProvider tagsProvider = new DefaultBatchJobTagsProvider();
 
 	/**
 	 * Default constructor.
@@ -304,8 +308,11 @@ InitializingBean {
 		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs",
 				Tag.of("name", execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
-		Timer.Sample timerSample = BatchMetrics.createTimerSample();
-		try {
+		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution))
+				.contextualName(execution.getJobInstance().getJobName())
+				.tagsProvider(this.tagsProvider)
+				.start();
+		try (Observation.Scope scope = observation.openScope()) {
 
 			jobParametersValidator.validate(execution.getJobParameters());
 
@@ -361,11 +368,7 @@ InitializingBean {
 							ExitStatus.NOOP.addExitDescription("All steps already completed or no steps configured for this job.");
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
-
-				timerSample.stop(BatchMetrics.createTimer("job", "Job duration",
-						Tag.of("name", execution.getJobInstance().getJobName()),
-						Tag.of("status", execution.getExitStatus().getExitCode())
-				));
+				stopObservation(execution, observation);
 				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
@@ -382,6 +385,19 @@ InitializingBean {
 
 		}
 
+	}
+
+	private void stopObservation(JobExecution execution, Observation observation) {
+		List<Throwable> throwables = execution.getFailureExceptions();
+		if (!throwables.isEmpty()) {
+			observation.error(mergedThrowables(throwables));
+		}
+		observation.stop();
+	}
+
+	private IllegalStateException mergedThrowables(List<Throwable> throwables) {
+		return new IllegalStateException(
+				throwables.stream().map(Throwable::toString).collect(Collectors.joining("\n")));
 	}
 
 	/**
@@ -441,6 +457,11 @@ InitializingBean {
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
 		jobRepository.update(jobExecution);
+	}
+
+	@Override
+	public void setTagsProvider(BatchJobTagsProvider tagsProvider) {
+		this.tagsProvider = tagsProvider;
 	}
 
 	@Override

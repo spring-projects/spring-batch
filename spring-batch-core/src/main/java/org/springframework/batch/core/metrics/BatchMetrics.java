@@ -20,10 +20,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import io.micrometer.api.instrument.LongTaskTimer;
-import io.micrometer.api.instrument.Metrics;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.observation.Observation;
+import io.micrometer.core.instrument.observation.TimerObservationHandler;
 
 import org.springframework.lang.Nullable;
 
@@ -64,6 +66,19 @@ public final class BatchMetrics {
 				.description(description)
 				.tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
+	}
+
+	/**
+	 * Create a new {@link Observation}. It's not started, you must
+	 * explicitly call {@link Observation#start()} to start it.
+	 *
+	 * Remember to register the {@link TimerObservationHandler}
+	 * via the {@code Metrics.globalRegistry.withTimerObservationHandler()}
+	 * in the user code. Otherwise you won't observe any metrics.
+	 * @return a new observation instance
+	 */
+	public static Observation createObservation(String name, Observation.Context context) {
+		return Observation.createNotStarted(name, context, Metrics.globalRegistry);
 	}
 
 	/**
