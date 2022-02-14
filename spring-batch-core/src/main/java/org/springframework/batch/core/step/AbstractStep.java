@@ -17,9 +17,10 @@ package org.springframework.batch.core.step;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
+import io.micrometer.core.instrument.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -54,7 +55,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
+public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware, Observation.TagsProviderAware<BatchStepTagsProvider> {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -67,6 +68,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	private CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
+
+	private BatchStepTagsProvider tagsProvider = new DefaultBatchStepTagsProvider();
 
 	/**
 	 * Default constructor.
@@ -192,7 +195,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Timer.Sample sample = BatchMetrics.createTimerSample();
+		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), new BatchStepContext(stepExecution))
+				.contextualName(stepExecution.getStepName())
+				.tagsProvider(this.tagsProvider)
+				.start();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -200,7 +206,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 		doExecutionRegistration(stepExecution);
 
-		try {
+		try (Observation.Scope scope = observation.openScope()) {
 			getCompositeListener().beforeStep(stepExecution);
 			open(stepExecution.getExecutionContext());
 
@@ -260,12 +266,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				logger.error(String.format("Encountered an error saving batch meta data for step %s in job %s. "
 						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
-
-			sample.stop(BatchMetrics.createTimer("step", "Step duration",
-					Tag.of("job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
-					Tag.of("name", stepExecution.getStepName()),
-					Tag.of("status", stepExecution.getExitStatus().getExitCode())
-			));
+			stopObservation(stepExecution, observation);
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
 			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(), stepExecution.getEndTime());
@@ -297,6 +298,19 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				logger.debug("Step execution complete: " + stepExecution.getSummary());
 			}
 		}
+	}
+
+	private void stopObservation(StepExecution stepExecution, Observation observation) {
+		List<Throwable> throwables = stepExecution.getFailureExceptions();
+		if (!throwables.isEmpty()) {
+			observation.error(mergedThrowables(throwables));
+		}
+		observation.stop();
+	}
+
+	private IllegalStateException mergedThrowables(List<Throwable> throwables) {
+		return new IllegalStateException(
+				throwables.stream().map(Throwable::toString).collect(Collectors.joining("\n")));
 	}
 
 	/**
@@ -394,4 +408,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
+	@Override
+	public void setTagsProvider(BatchStepTagsProvider tagsProvider) {
+		this.tagsProvider = tagsProvider;
+	}
 }
