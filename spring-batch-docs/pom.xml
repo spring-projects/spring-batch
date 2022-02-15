@@ -12,7 +12,7 @@
 
     <properties>
         <!-- Observability -->
-        <micrometer-docs-generator.version>1.0.0-SNAPSHOT</micrometer-docs-generator.version>
+        <micrometer-docs-generator.version>1.0.0-M1</micrometer-docs-generator.version>
         <micrometer-docs-generator.inputPath>${maven.multiModuleProjectDirectory}/spring-batch-core/</micrometer-docs-generator.inputPath>
         <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
         <micrometer-docs-generator.outputPath>${maven.multiModuleProjectDirectory}/spring-batch-docs/target/observability/</micrometer-docs-generator.outputPath>
@@ -64,14 +64,13 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>generate-metrics-metadata</id>
-                        <phase>prepare-package</phase>
+                        <phase>pre-site</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -81,7 +80,7 @@
                     </execution>
                     <execution>
                         <id>generate-tracing-metadata</id>
-                        <phase>prepare-package</phase>
+                        <phase>pre-site</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>

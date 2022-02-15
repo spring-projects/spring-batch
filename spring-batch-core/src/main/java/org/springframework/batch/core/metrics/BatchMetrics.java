@@ -73,7 +73,7 @@ public final class BatchMetrics {
 	 * explicitly call {@link Observation#start()} to start it.
 	 *
 	 * Remember to register the {@link TimerObservationHandler}
-	 * via the {@code Metrics.globalRegistry.withTimerObservationHandler()
+	 * via the {@code Metrics.globalRegistry.withTimerObservationHandler()}
 	 * in the user code. Otherwise you won't observe any metrics.
 	 * @return a new observation instance
 	 */
