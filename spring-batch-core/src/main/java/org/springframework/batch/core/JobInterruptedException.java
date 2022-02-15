@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,21 @@ public class JobInterruptedException extends JobExecutionException {
 	
 	private BatchStatus status = BatchStatus.STOPPED;
 
+	/**
+	 * Constructor that sets the message for the exception.
+	 *
+	 * @param msg The message for the exception.
+	 */
 	public JobInterruptedException(String msg) {
 		super(msg);
 	}
 
+	/**
+	 * Constructor that sets the message for the exception.
+	 *
+	 * @param msg The message for the exception.
+	 * @param status The desired {@link BatchStatus} of the surrounding execution after interruption.
+	 */
 	public JobInterruptedException(String msg, BatchStatus status) {
 		super(msg);
 		this.status = status;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,47 @@ public enum BatchStatus {
 	 * steps that have finished processing, but were not successful, and where
 	 * they should be skipped on a restart (so FAILED is the wrong status).
 	 */
-	COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN;
 
+	/**
+	 * The batch job has successfully completed its execution.
+	 */
+	COMPLETED,
+	/**
+	 * Status of a batch job prior to its execution.
+	 */
+	STARTING,
+	/**
+	 * Status of a batch job that is running.
+	 */
+	STARTED,
+	/**
+	 * Status of batch job waiting for a step to complete before stopping the batch job.
+	 */
+	STOPPING,
+	/**
+	 * Status of a batch job that has been stopped by request.
+	 */
+	STOPPED,
+	/**
+	 * Status of a batch job that has failed during its execution.
+	 */
+	FAILED,
+	/**
+	 * Status of a batch job that did not stop properly and can not be restarted.
+	 */
+	ABANDONED,
+	/**
+	 * Status of a batch job that is in an uncertain state.
+	 */
+	UNKNOWN;
+
+	/**
+	 * Convenience method to return the higher value status of the statuses pass in to the method.
+	 *
+	 * @param status1 The first status to check.
+	 * @param status2 The second status to check.
+	 * @return The higher value status of the two statuses.
+	 */
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		return status1.isGreaterThan(status2) ? status1 : status2;
 	}

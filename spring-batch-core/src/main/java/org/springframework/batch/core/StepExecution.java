@@ -233,6 +233,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Public setter for the number of items filtered out of this execution.
+	 *
 	 * @param filterCount the number of items filtered out of this execution to
 	 * set
 	 */
@@ -242,6 +243,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Setter for number of rollbacks for this execution
+	 *
 	 * @param rollbackCount long the number of rollbacks.
 	 */
 	public void setRollbackCount(long rollbackCount) {
@@ -496,10 +498,18 @@ public class StepExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
+	/**
+	 * @return The {@link List} of {@link Throwable} objects.
+	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
 
+	/**
+	 * Add a {@link Throwable} to failure exceptions.
+	 *
+	 * @param throwable The {@link Throwable} to add to failure exceptions.
+	 */
 	public void addFailureException(Throwable throwable) {
 		this.failureExceptions.add(throwable);
 	}
@@ -556,6 +566,9 @@ public class StepExecution extends Entity {
 		return String.format(getSummary() + ", exitDescription=%s", exitStatus.getExitDescription());
 	}
 
+	/**
+	 * @return  The {@link String} containing a summary of the step execution.
+	 */
 	public String getSummary() {
 		return super.toString()
 				+ String.format(

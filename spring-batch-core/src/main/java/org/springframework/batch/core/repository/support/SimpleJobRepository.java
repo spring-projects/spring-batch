@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@ import java.util.List;
 /**
  *
  * <p>
- * Implementation of {@link JobRepository} that stores JobInstances,
- * JobExecutions, and StepExecutions using the injected DAOs.
+ * Implementation of {@link JobRepository} that stores job instances,
+ * job executions, and step executions using the injected DAOs.
  * </p>
  *
  * @author Lucas Ward

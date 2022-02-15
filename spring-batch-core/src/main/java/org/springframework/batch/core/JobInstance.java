@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,12 @@ public class JobInstance extends Entity {
 
 	private final String jobName;
 
+	/**
+	 * Constructor for {@link JobInstance}.
+	 *
+	 * @param id The instance ID.
+	 * @param jobName The name associated with the {@link JobInstance}.
+	 */
 	public JobInstance(Long id, String jobName) {
 		super(id);
 		Assert.hasLength(jobName, "A jobName is required");
@@ -61,6 +67,9 @@ public class JobInstance extends Entity {
 		return super.toString() + ", Job=[" + jobName + "]";
 	}
 
+	/**
+	 * @return The current instance ID.
+	 */
 	public long getInstanceId() {
 		return super.getId();
 	}

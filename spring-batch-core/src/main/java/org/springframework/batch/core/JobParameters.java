@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,18 @@ public class JobParameters implements Serializable {
 
 	private final Map<String,JobParameter> parameters;
 
+	/**
+	 * Default constructor.
+	 */
 	public JobParameters() {
 		this.parameters = new LinkedHashMap<>();
 	}
 
+	/**
+	 * Constructor that is initialized with the content of a {@link Map} that contains a string key and {@link JobParameter} value.
+	 *
+	 * @param parameters The {@link Map} that contains a string key and {@link JobParameter} value.
+	 */
 	public JobParameters(Map<String,JobParameter> parameters) {
 		this.parameters = new LinkedHashMap<>(parameters);
 	}
@@ -226,6 +234,9 @@ public class JobParameters implements Serializable {
 		return parameters.toString();
 	}
 
+	/**
+	 * @return The {@link Properties} that contain the key and values for the {@link JobParameter}s.
+	 */
 	public Properties toProperties() {
 		Properties props = new Properties();
 

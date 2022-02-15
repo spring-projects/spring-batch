@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,12 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -278,6 +275,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		}
 	}
 
+	/**
+	 * Create a partition {@link Step}.
+	 *
+	 * @return The {@link Step}.
+	 */
 	protected Step createPartitionStep() {
 
 		PartitionStepBuilder builder;
@@ -303,6 +305,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Creates a fault tolerant {@link Step}.
+	 *
+	 * @return The {@link Step}.
+	 */
 	protected Step createFaultTolerantStep() {
 
 		FaultTolerantStepBuilder<I, O> builder = getFaultTolerantStepBuilder(this.name);
@@ -383,6 +390,12 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Creates a new {@link FaultTolerantStepBuilder}.
+	 *
+	 * @param stepName The name of the step used by the created builder.
+	 * @return The {@link FaultTolerantStepBuilder}.
+	 */
 	protected FaultTolerantStepBuilder<I, O> getFaultTolerantStepBuilder(String stepName) {
 		return new FaultTolerantStepBuilder<>(new StepBuilder(stepName));
 	}
@@ -399,6 +412,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		}
 	}
 
+	/**
+	 * Creates a new {@link TaskletStep}.
+	 *
+	 * @return The {@link TaskletStep}.
+	 */
 	protected Step createSimpleStep() {
 		SimpleStepBuilder<I, O> builder = getSimpleStepBuilder(name);
 
@@ -436,6 +454,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		return builder.build();
 	}
 
+	/**
+	 * Set the state of the {@link AbstractTaskletStepBuilder} using the values that were established for the factory bean.
+	 *
+	 * @param builder The {@link AbstractTaskletStepBuilder} to be modified.
+	 */
 	@SuppressWarnings("serial")
 	protected void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
 
@@ -479,6 +502,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	}
 
+	/**
+	 * Create a new {@link org.springframework.batch.core.job.flow.FlowStep}.
+	 *
+	 * @return The {@link org.springframework.batch.core.job.flow.FlowStep}.
+	 */
 	protected Step createFlowStep() {
 		FlowStepBuilder builder = new StepBuilder(name).flow(flow);
 		enhanceCommonStep(builder);
@@ -901,6 +929,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		this.commitInterval = commitInterval;
 	}
 
+	/**
+	 * @return The commit interval.
+	 */
 	protected Integer getCommitInterval() {
 		return this.commitInterval;
 	}

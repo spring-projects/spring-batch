@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,11 @@ package org.springframework.batch.core;
  */
 public interface Step {
 
-	static final String STEP_TYPE_KEY = "batch.stepType";
+	/**
+	 * The key to retrieve the batch step type.
+	 */
+	String STEP_TYPE_KEY = "batch.stepType";
+
 	/**
 	 * @return the name of this step.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,30 +60,72 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	private StepBuilderFactory stepBuilderFactory;
 
+	/**
+	 * Establish the {@link JobBuilderFactory} for the batch execution.
+	 *
+	 * @return The instance of the {@link JobBuilderFactory}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public JobBuilderFactory jobBuilders() throws Exception {
 		return this.jobBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link StepBuilderFactory} for the batch execution.
+	 *
+	 * @return The instance of the {@link StepBuilderFactory}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public StepBuilderFactory stepBuilders() throws Exception {
 		return this.stepBuilderFactory;
 	}
 
+	/**
+	 * Establish the {@link JobRepository} for the batch execution.
+	 *
+	 * @return The instance of the {@link JobRepository}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobRepository jobRepository() throws Exception;
 
+	/**
+	 * Establish the {@link JobLauncher} for the batch execution.
+	 *
+	 * @return The instance of the {@link JobLauncher}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobLauncher jobLauncher() throws Exception;
 
+	/**
+	 * Establish the {@link JobExplorer} for the batch execution.
+	 *
+	 * @return The instance of the {@link JobExplorer}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public abstract JobExplorer jobExplorer() throws Exception;
 
+	/**
+	 * Establish the {@link JobRegistry} for the batch execution.
+	 *
+	 * @return The instance of the {@link JobRegistry}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
 		return this.jobRegistry;
 	}
 
+	/**
+	 * Establish the {@link PlatformTransactionManager} for the batch execution.
+	 *
+	 * @return The instance of the {@link PlatformTransactionManager}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	public abstract PlatformTransactionManager transactionManager() throws Exception;
 
 	@Override
@@ -100,6 +142,12 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		this.stepBuilderFactory = new StepBuilderFactory(jobRepository(), transactionManager());
 	}
 
+	/**
+	 * If a {@link BatchConfigurer} exists, return it. If the configurers list is empty, create a {@link DefaultBatchConfigurer}.
+	 * If more than one configurer is present in the list, an {@link IllegalStateException} is thrown.
+	 * @param configurers The {@link Collection} of configurers to review.
+	 * @return The {@link BatchConfigurer} that was in the configurers collection or the one created.
+	 */
 	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) {
 		if (this.configurer != null) {
 			return this.configurer;
