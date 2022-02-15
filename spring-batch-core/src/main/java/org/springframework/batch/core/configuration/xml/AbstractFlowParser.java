@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,32 +46,74 @@ import org.springframework.util.xml.DomUtils;
  */
 public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionParser {
 
+	/**
+	 * Establishes the ID attribute.
+	 */
 	protected static final String ID_ATTR = "id";
 
+	/**
+	 * Establishes a Step element.
+	 */
 	protected static final String STEP_ELE = "step";
 
+	/**
+	 * Establishes a Flow element.
+	 */
 	protected static final String FLOW_ELE = "flow";
 
+	/**
+	 * Establishes a Decision element.
+	 */
 	protected static final String DECISION_ELE = "decision";
 
+	/**
+	 * Establishes a Split element.
+	 */
 	protected static final String SPLIT_ELE = "split";
 
+	/**
+	 * Establishes a Next attribute.
+	 */
 	protected static final String NEXT_ATTR = "next";
 
+	/**
+	 * Establishes a Next element.
+	 */
 	protected static final String NEXT_ELE = "next";
 
+	/**
+	 * Establishes an End element.
+	 */
 	protected static final String END_ELE = "end";
 
+	/**
+	 * Establishes a Fail element.
+	 */
 	protected static final String FAIL_ELE = "fail";
 
+	/**
+	 * Establishes a Stop element.
+	 */
 	protected static final String STOP_ELE = "stop";
 
+	/**
+	 * Establishes an On element.
+	 */
 	protected static final String ON_ATTR = "on";
 
+	/**
+	 * Establishes a To attribute.
+	 */
 	protected static final String TO_ATTR = "to";
 
+	/**
+	 * Establishes a Restart attribute.
+	 */
 	protected static final String RESTART_ATTR = "restart";
 
+	/**
+	 * Establishes a Exit Code element.
+	 */
 	protected static final String EXIT_CODE_ATTR = "exit-code";
 
 	private static final InlineStepParser stepParser = new InlineStepParser();
@@ -80,6 +122,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	private static final DecisionParser decisionParser = new DecisionParser();
 
+	/**
+	 * Used as a suffix to generate unique state names for end transitions.
+	 */
 	// For generating unique state names for end transitions
 	protected static int endCounter = 0;
 

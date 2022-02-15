@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,12 @@ public class StepBuilderFactory {
 
 	private PlatformTransactionManager transactionManager;
 
+	/**
+	 * Constructor for the {@link StepBuilderFactory}.
+	 *
+	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
+	 * @param transactionManager The {@link PlatformTransactionManager} to be used by the builder factory.
+	 */
 	public StepBuilderFactory(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		this.jobRepository = jobRepository;
 		this.transactionManager = transactionManager;

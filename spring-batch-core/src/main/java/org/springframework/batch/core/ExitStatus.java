@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,10 +74,21 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	private final String exitDescription;
 
+	/**
+	 * Constructor that accepts the exit code and sets the exit description to an empty {@link String}.
+	 *
+	 * @param exitCode The exit code to be used for the {@link ExitStatus}.
+	 */
 	public ExitStatus(String exitCode) {
 		this(exitCode, "");
 	}
 
+	/**
+	 * Constructor that establishes the exit code and the exit description for the {@link ExitStatus}.
+	 *
+	 * @param exitCode The exit code to be used for the {@link ExitStatus}.
+	 * @param exitDescription The exit description to be used for the {@link ExitStatus}.
+	 */
 	public ExitStatus(String exitCode, String exitDescription) {
 		super();
 		this.exitCode = exitCode;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,14 @@ public class SimpleJobExplorer implements JobExplorer {
 	SimpleJobExplorer() {
 	}
 
+	/**
+	 * Constructor to initialize the job {@link SimpleJobExplorer}.
+	 *
+	 * @param jobInstanceDao The {@link JobInstanceDao} to be used by the repository.
+	 * @param jobExecutionDao The {@link JobExecutionDao} to be used by the repository.
+	 * @param stepExecutionDao The {@link StepExecutionDao} to be used by the repository.
+	 * @param ecDao The {@link ExecutionContextDao} to be used by the repository.
+	 */
 	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
 			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();

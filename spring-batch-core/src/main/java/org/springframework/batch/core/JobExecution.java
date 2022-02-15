@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,11 @@ public class JobExecution extends Entity {
 
 	private transient volatile List<Throwable> failureExceptions = new CopyOnWriteArrayList<>();
 
+	/**
+	 * Constructor that sets the state of the instance to the {@link JobExecution} parameter.
+	 *
+	 * @param original The {@link JobExecution} to be copied.
+	 */
 	public JobExecution(JobExecution original) {
 		this.jobParameters = original.getJobParameters();
 		this.jobInstance = original.getJobInstance();
@@ -98,45 +103,83 @@ public class JobExecution extends Entity {
 	/**
 	 * Constructor for transient (unsaved) instances.
 	 *
-	 * @param job the enclosing {@link JobInstance}
-	 * @param jobParameters {@link JobParameters} instance for this JobExecution.
+	 * @param job The enclosing {@link JobInstance}.
+	 * @param jobParameters The {@link JobParameters} instance for this JobExecution.
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
 		this(job, null, jobParameters);
 	}
 
+	/**
+	 * Constructor that accepts the job execution ID and {@link JobParameters}.
+	 *
+	 * @param id The job execution ID.
+	 * @param jobParameters The {@link JobParameters} for the {@link JobExecution}.
+	 */
 	public JobExecution(Long id, JobParameters jobParameters) {
 		this(null, id, jobParameters);
 	}
 
+	/**
+	 * Constructor that accepts the job execution ID.
+	 *
+	 * @param id The job execution ID.
+	 */
 	public JobExecution(Long id) {
 		this(null, id, null);
 	}
 
+	/**
+	 * @return The current {@link JobParameters}.
+	 */
 	public JobParameters getJobParameters() {
 		return this.jobParameters;
 	}
 
+	/**
+	 * @return The current end time.
+	 */
 	public Date getEndTime() {
 		return endTime;
 	}
 
+	/**
+	 * Set the {@link JobInstance} used by the {@link JobExecution}.
+	 *
+	 * @param jobInstance The {@link JobInstance} used by the {@link JobExecution}.
+	 */
 	public void setJobInstance(JobInstance jobInstance) {
 		this.jobInstance = jobInstance;
 	}
 
+	/**
+	 * Set the end time.
+	 *
+	 * @param endTime The {@link Date} to be used for the end time.
+	 */
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 
+	/**
+	 * @return The current start time.
+	 */
 	public Date getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * Set the start time.
+	 *
+	 * @param startTime The {@link Date} to be used for the start time.
+	 */
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
+	/**
+	 * @return The current {@link BatchStatus}.
+	 */
 	public BatchStatus getStatus() {
 		return status;
 	}
@@ -297,6 +340,10 @@ public class JobExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
+	/**
+	 * Retrieve a list of exceptions.
+	 * @return The {@link List} of {@link Throwable} objects.
+	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}

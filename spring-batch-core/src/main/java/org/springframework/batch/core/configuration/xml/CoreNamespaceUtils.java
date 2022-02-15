@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,12 @@ public class CoreNamespaceUtils {
 
 	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 
+	/**
+	 * Create the beans based on the content of the source.
+	 *
+	 * @param parserContext The parser context to be used.
+	 * @param source The source for the auto registration.
+	 */
 	public static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
 		checkForStepScope(parserContext, source);
 		checkForJobScope(parserContext, source);
