@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,10 @@ import org.springframework.batch.core.scope.context.ChunkContext;
  */
 public interface ChunkListener extends StepListener {
 
-	static final String ROLLBACK_EXCEPTION_KEY = "sb_rollback_exception";
+	/**
+	 * The key for retrieving the rollback exception.
+	 */
+	String ROLLBACK_EXCEPTION_KEY = "sb_rollback_exception";
 
 	/**
 	 * Callback before the chunk is executed, but inside the transaction.

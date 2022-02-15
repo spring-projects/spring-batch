@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -473,10 +473,17 @@ public class StepExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
+	/**
+	 * @return The {@link List} of {@link Throwable}s.
+	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
 
+	/**
+	 * Add {@link Throwable} to failure exceptions.
+	 * @param throwable The {@link Throwable} to add to failure exceptions.
+	 */
 	public void addFailureException(Throwable throwable) {
 		this.failureExceptions.add(throwable);
 	}
@@ -533,6 +540,9 @@ public class StepExecution extends Entity {
 		return String.format(getSummary() + ", exitDescription=%s", exitStatus.getExitDescription());
 	}
 
+	/**
+	 * @return  The {@link String} containing summary of the step execution.
+	 */
 	public String getSummary() {
 		return super.toString()
 				+ String.format(

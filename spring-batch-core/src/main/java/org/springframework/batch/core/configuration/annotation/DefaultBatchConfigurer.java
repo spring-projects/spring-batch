@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
+/**
+ * Default implementation of the {@link BatchConfigurer}.
+ */
 @Component
 public class DefaultBatchConfigurer implements BatchConfigurer {
 
@@ -49,6 +52,9 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * @return The {@link DataSource} used by the {@link DefaultBatchConfigurer}.
+	 */
 	public DataSource getDataSource() {
 		return this.dataSource;
 	}
@@ -95,6 +101,9 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		return jobExplorer;
 	}
 
+	/**
+	 * Initialize the {@link DefaultBatchConfigurer} with the {@link JobRepository}, {@link JobExplorer} and, {@link JobLauncher}.
+	 */
 	@PostConstruct
 	public void initialize() {
 		try {
@@ -106,6 +115,10 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		}
 	}
 
+	/**
+	 * @return An instance of {@link JobLauncher}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobLauncher}.
+	 */
 	protected JobLauncher createJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(this.jobRepository);
@@ -113,6 +126,10 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		return jobLauncher;
 	}
 
+	/**
+	 * @return An instance of {@link JobRepository}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobRepository}.
+	 */
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(getDataSource());
@@ -121,6 +138,10 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		return factory.getObject();
 	}
 
+	/**
+	 * @return An instance of {@link JobExplorer}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobExplorer}.
+	 */
 	protected JobExplorer createJobExplorer() throws Exception {
 		JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
 		jobExplorerFactoryBean.setDataSource(getDataSource());

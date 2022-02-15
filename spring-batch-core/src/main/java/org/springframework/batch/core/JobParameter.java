@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,9 @@ public class JobParameter implements Serializable {
 		this(parameter, true);
 	}
 
+	/**
+	 * @return The identifying flag.  It is set to true if the job parameter is identifying.
+	 */
 	public boolean isIdentifying() {
 		return identifying;
 	}
@@ -168,10 +171,25 @@ public class JobParameter implements Serializable {
 	}
 
 	/**
-	 * Enumeration representing the type of a JobParameter.
+	 * Enumeration representing the type of {@link JobParameter}.
 	 */
 	public enum ParameterType {
 
-		STRING, DATE, LONG, DOUBLE;
+		/**
+		 * String parameter type.
+		 */
+		STRING,
+		/**
+		 * Date parameter type.
+		 */
+		DATE,
+		/**
+		 * Long parameter type.
+		 */
+		LONG,
+		/**
+		 * Double parameter type.
+		 */
+		DOUBLE;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,19 @@ import java.util.Properties;
  */
 public class DefaultJobParametersConverter implements JobParametersConverter {
 
+	/**
+	 * Parameter key suffix representing the date type.
+	 */
 	public static final String DATE_TYPE = "(date)";
 
+	/**
+	 * Parameter key suffix representing the string type.
+	 */
 	public static final String STRING_TYPE = "(string)";
 
+	/**
+	 * Parameter key suffix representing the long type.
+	 */
 	public static final String LONG_TYPE = "(long)";
 
 	private static final String DOUBLE_TYPE = "(double)";

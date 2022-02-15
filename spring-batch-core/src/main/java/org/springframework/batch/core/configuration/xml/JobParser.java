@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,6 +150,12 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 	}
 
+	/**
+	 * Parse the element to retrieve {@link BeanMetadataElement}.
+	 * @param element The {@link Element} to be parsed.
+	 * @param parserContext The {@link ParserContext}.
+	 * @return The {@link BeanMetadataElement} extracted from element parameter.
+	 */
 	public BeanMetadataElement parseBeanElement(Element element, ParserContext parserContext) {
 		String refAttribute = element.getAttribute(REF_ATTR);
 		Element beanElement = DomUtils.getChildElementByTagName(element, BEAN_ELE);

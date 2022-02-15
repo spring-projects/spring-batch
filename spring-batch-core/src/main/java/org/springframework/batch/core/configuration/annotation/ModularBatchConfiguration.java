@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,11 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 		return getConfigurer(configurers).getJobExplorer();
 	}
 
+	/**
+	 * Creates {@link AutomaticJobRegistrar} bean.
+	 * @return New instance of {@link AutomaticJobRegistrar}.
+	 * @throws Exception The {@link Exception} thrown if error occurs.
+	 */
 	@Bean
 	public AutomaticJobRegistrar jobRegistrar() throws Exception {
 		registrar.setJobLoader(new DefaultJobLoader(jobRegistry()));

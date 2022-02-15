@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,18 @@ public class Entity implements Serializable {
 
 	private volatile Integer version;
 
+	/**
+	 * Default constructor for {@link Entity}.
+	 * The ID defaults to zero.
+	 */
 	public Entity() {
 		super();
 	}
 
+	/**
+	 * The constructor for the {@link Entity} where the id is established.
+	 * @param id The ID for the entity.
+	 */
 	public Entity(Long id) {
 		super();
 
@@ -50,10 +58,16 @@ public class Entity implements Serializable {
 		this.id = id;
 	}
 
+	/**
+	 * @return The ID associated with the {@link Entity}.
+	 */
 	public Long getId() {
 		return id;
 	}
 
+	/**
+	 * @param id The ID for the {@link Entity}.
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
