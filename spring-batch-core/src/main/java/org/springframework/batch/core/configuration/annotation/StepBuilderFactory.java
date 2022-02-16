@@ -33,7 +33,7 @@ public class StepBuilderFactory {
 	private PlatformTransactionManager transactionManager;
 
 	/**
-	 * Constructor for {@link StepBuilderFactory}.
+	 * Constructor for the {@link StepBuilderFactory}.
 	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
 	 * @param transactionManager The {@link PlatformTransactionManager} to be used by the builder factory.
 	 */

@@ -75,7 +75,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	private final String exitDescription;
 
 	/**
-	 * Constructor that accepts the exitCode and sets the exitDescription to an empty {@link String}.
+	 * Constructor that accepts the exit code and sets the exit description to an empty {@link String}.
 	 *
 	 * @param exitCode The exit code to be used for the {@link ExitStatus}.
 	 */
@@ -84,7 +84,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * Constructor that establishes the exitCode and the exitDescription for the {@link ExitStatus}.
+	 * Constructor that establishes the exit code and the exit description for the {@link ExitStatus}.
 	 *
 	 * @param exitCode The exit code to be used for the {@link ExitStatus}.
 	 * @param exitDescription The exit description to be used for the {@link ExitStatus}.

@@ -56,7 +56,7 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Constructor that is initialized with content of a {@link Map} that contains a string key and {@link JobParameter} value.
+	 * Constructor that is initialized with the content of a {@link Map} that contains a string key and {@link JobParameter} value.
 	 * @param parameters The {@link Map} that contains a string key and {@link JobParameter} value.
 	 */
 	public JobParameters(Map<String,JobParameter> parameters) {

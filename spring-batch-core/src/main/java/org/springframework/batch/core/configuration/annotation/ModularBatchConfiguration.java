@@ -73,7 +73,7 @@ public class ModularBatchConfiguration extends AbstractBatchConfiguration {
 	}
 
 	/**
-	 * Creates {@link AutomaticJobRegistrar} bean.
+	 * Creates a {@link AutomaticJobRegistrar} bean.
 	 * @return New instance of {@link AutomaticJobRegistrar}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */

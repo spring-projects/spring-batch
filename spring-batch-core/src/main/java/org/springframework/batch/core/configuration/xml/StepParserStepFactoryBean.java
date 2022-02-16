@@ -16,15 +16,12 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -413,7 +410,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Creates new {@link TaskletStep}.
+	 * Creates a new {@link TaskletStep}.
 	 * @return The {@link TaskletStep}.
 	 */
 	protected Step createSimpleStep() {
@@ -454,8 +451,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Set the state of the {@link AbstractTaskletStepBuilder}.
-	 * @param builder The {@link AbstractTaskletStepBuilder} to be enhanced.
+	 * Set the state of the {@link AbstractTaskletStepBuilder} using the values that were established for the factory bean.
+	 * @param builder The {@link AbstractTaskletStepBuilder} to be modified.
 	 */
 	@SuppressWarnings("serial")
 	protected void enhanceTaskletStepBuilder(AbstractTaskletStepBuilder<?> builder) {
@@ -501,7 +498,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Create new {@link org.springframework.batch.core.job.flow.FlowStep}.
+	 * Create a new {@link org.springframework.batch.core.job.flow.FlowStep}.
 	 * @return The {@link org.springframework.batch.core.job.flow.FlowStep}.
 	 */
 	protected Step createFlowStep() {

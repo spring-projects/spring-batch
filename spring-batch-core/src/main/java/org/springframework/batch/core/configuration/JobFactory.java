@@ -26,13 +26,13 @@ import org.springframework.batch.core.Job;
 public interface JobFactory {
 
 	/**
-	 * Create new instance of {@link Job}.
+	 * Create a new instance of {@link Job}.
 	 * @return The {@link Job}.
 	 */
 	Job createJob();
 
 	/**
-	 * @return The {@link String} containing the {@link Job} Name.
+	 * @return The {@link String} containing the {@link Job} name.
 	 */
 	String getJobName();
 

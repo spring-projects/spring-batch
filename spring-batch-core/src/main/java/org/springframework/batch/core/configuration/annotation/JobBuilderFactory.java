@@ -29,7 +29,7 @@ public class JobBuilderFactory {
 	private JobRepository jobRepository;
 
 	/**
-	 * @param jobRepository The {@link JobRepository} to be used by builder factory.
+	 * @param jobRepository The {@link JobRepository} to be used by the builder factory.
 	 */
 	public JobBuilderFactory(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;

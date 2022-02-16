@@ -82,7 +82,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	protected static final String NEXT_ELE = "next";
 
 	/**
-	 * Establishes a End element.
+	 * Establishes an End element.
 	 */
 	protected static final String END_ELE = "end";
 
@@ -123,7 +123,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	private static final DecisionParser decisionParser = new DecisionParser();
 
 	/**
-	 * Used as suffix to generate unique state names for end transitions.
+	 * Used as a suffix to generate unique state names for end transitions.
 	 */
 	// For generating unique state names for end transitions
 	protected static int endCounter = 0;

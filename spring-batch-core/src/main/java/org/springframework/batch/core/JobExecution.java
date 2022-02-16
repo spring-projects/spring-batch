@@ -102,7 +102,7 @@ public class JobExecution extends Entity {
 	/**
 	 * Constructor for transient (unsaved) instances.
 	 *
-	 * @param job The enclosing {@link JobInstance}
+	 * @param job The enclosing {@link JobInstance}.
 	 * @param jobParameters The {@link JobParameters} instance for this JobExecution.
 	 */
 	public JobExecution(JobInstance job, JobParameters jobParameters) {
@@ -110,7 +110,7 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Constructor that accepts the current job execution ID and {@link JobParameters}.
+	 * Constructor that accepts the job execution ID and {@link JobParameters}.
 	 * @param id The job execution ID.
 	 * @param jobParameters The {@link JobParameters} for the {@link JobExecution}.
 	 */
@@ -119,7 +119,7 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Constructor that accepts the current job execution ID.
+	 * Constructor that accepts the job execution ID.
 	 * @param id The job execution ID.
 	 */
 	public JobExecution(Long id) {
@@ -336,7 +336,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Retrieve a list of exceptions.
-	 * @return The {@link List} of {@link Throwable}s.
+	 * @return The {@link List} of {@link Throwable} objects.
 	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;

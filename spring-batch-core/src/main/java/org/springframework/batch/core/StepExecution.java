@@ -474,14 +474,14 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @return The {@link List} of {@link Throwable}s.
+	 * @return The {@link List} of {@link Throwable} objects.
 	 */
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
 
 	/**
-	 * Add {@link Throwable} to failure exceptions.
+	 * Add a {@link Throwable} to failure exceptions.
 	 * @param throwable The {@link Throwable} to add to failure exceptions.
 	 */
 	public void addFailureException(Throwable throwable) {
@@ -541,7 +541,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @return  The {@link String} containing summary of the step execution.
+	 * @return  The {@link String} containing a summary of the step execution.
 	 */
 	public String getSummary() {
 		return super.toString()

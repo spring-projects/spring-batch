@@ -136,8 +136,8 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 	}
 
 	/**
-	 * Returns the {@link BatchConfigurer} if one is present in list.  Create {@link BatchConfigurer} if configurers list is empty.
-	 * If more than one configurer is present in the list then an {@link IllegalStateException} is thrown.
+	 * If a {@link BatchConfigurer}, return it. If the configurers list is empty, create {@link BatchConfigurer}.
+	 * If more than one configurer is present in the list, an {@link IllegalStateException} is thrown.
 	 * @param configurers The {@link Collection} of configurers to review.
 	 * @return The {@link BatchConfigurer} that was in the configurers collection or the one created.
 	 */

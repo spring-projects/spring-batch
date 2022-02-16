@@ -102,7 +102,7 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	/**
-	 * Initialize the {@link DefaultBatchConfigurer} with the {@link JobRepository}, {@link JobExplorer} and, {@link JobLauncher}.
+	 * Initialize the {@link DefaultBatchConfigurer} with the {@link JobRepository}, {@link JobExplorer}, and {@link JobLauncher}.
 	 */
 	@PostConstruct
 	public void initialize() {
