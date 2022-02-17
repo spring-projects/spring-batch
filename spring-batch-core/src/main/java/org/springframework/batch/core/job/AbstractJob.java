@@ -64,7 +64,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
-InitializingBean {
+InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -81,6 +81,8 @@ InitializingBean {
 	private JobParametersValidator jobParametersValidator = new DefaultJobParametersValidator();
 
 	private StepHandler stepHandler;
+
+	private BatchJobTagsProvider tagsProvider = new DefaultBatchJobTagsProvider();
 
 	/**
 	 * Default constructor.
@@ -307,7 +309,9 @@ InitializingBean {
 				Tag.of("name", execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName())
-				.contextualName(execution.getJobInstance().getJobName()).start();
+				.contextualName(execution.getJobInstance().getJobName())
+				.tagsProvider(this.tagsProvider)
+				.start();
 		try (Observation.Scope scope = observation.openScope()) {
 
 			jobParametersValidator.validate(execution.getJobParameters());
@@ -364,7 +368,7 @@ InitializingBean {
 							ExitStatus.NOOP.addExitDescription("All steps already completed or no steps configured for this job.");
 					execution.setExitStatus(exitStatus.and(newExitStatus));
 				}
-				stopTaggedObservation(execution, observation);
+				stopObservation(execution, observation);
 				longTaskTimerSample.stop();
 				execution.setEndTime(new Date());
 
@@ -383,11 +387,7 @@ InitializingBean {
 
 	}
 
-	private void stopTaggedObservation(JobExecution execution, Observation observation) {
-		observation.lowCardinalityTag(BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()))
-				.lowCardinalityTag(BatchJobObservation.JobLowCardinalityTags.JOB_STATUS.of(execution.getExitStatus().getExitCode()))
-				.highCardinalityTag(BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID.of(String.valueOf(execution.getJobInstance().getInstanceId())))
-				.highCardinalityTag(BatchJobObservation.JobHighCardinalityTags.JOB_EXECUTION_ID.of(String.valueOf(execution.getId())));
+	private void stopObservation(JobExecution execution, Observation observation) {
 		List<Throwable> throwables = execution.getFailureExceptions();
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
@@ -457,6 +457,11 @@ InitializingBean {
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
 		jobRepository.update(jobExecution);
+	}
+
+	@Override
+	public void setTagsProvider(BatchJobTagsProvider tagsProvider) {
+		this.tagsProvider = tagsProvider;
 	}
 
 	@Override

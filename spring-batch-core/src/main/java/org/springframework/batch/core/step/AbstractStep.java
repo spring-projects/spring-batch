@@ -55,7 +55,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware {
+public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware, Observation.TagsProviderAware<BatchStepTagsProvider> {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -68,6 +68,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	private CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
+
+	private BatchStepTagsProvider tagsProvider = new DefaultBatchStepTagsProvider();
 
 	/**
 	 * Default constructor.
@@ -194,7 +196,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName())
-				.contextualName(stepExecution.getStepName()).start();
+				.contextualName(stepExecution.getStepName())
+				.tagsProvider(this.tagsProvider)
+				.start();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -262,7 +266,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				logger.error(String.format("Encountered an error saving batch meta data for step %s in job %s. "
 						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
-			stopTaggedObservation(stepExecution, observation);
+			stopObservation(stepExecution, observation);
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
 			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(), stepExecution.getEndTime());
@@ -296,11 +300,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 	}
 
-	private void stopTaggedObservation(StepExecution stepExecution, Observation observation) {
-		observation.lowCardinalityTag(BatchStepObservation.StepLowCardinalityTags.STEP_NAME.of(stepExecution.getStepName()))
-				.lowCardinalityTag(BatchStepObservation.StepLowCardinalityTags.JOB_NAME.of(stepExecution.getJobExecution().getJobInstance().getJobName()))
-				.lowCardinalityTag(BatchStepObservation.StepLowCardinalityTags.STEP_STATUS.of(stepExecution.getExitStatus().getExitCode()))
-				.highCardinalityTag(BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID.of(String.valueOf(stepExecution.getId())));
+	private void stopObservation(StepExecution stepExecution, Observation observation) {
 		List<Throwable> throwables = stepExecution.getFailureExceptions();
 		if (!throwables.isEmpty()) {
 			observation.error(mergedThrowables(throwables));
@@ -408,4 +408,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		return exitStatus;
 	}
 
+	@Override
+	public void setTagsProvider(BatchStepTagsProvider tagsProvider) {
+		this.tagsProvider = tagsProvider;
+	}
 }

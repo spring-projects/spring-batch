@@ -17,6 +17,7 @@ package org.springframework.batch.test.observability;
 
 import io.micrometer.api.instrument.MeterRegistry;
 import io.micrometer.api.instrument.Metrics;
+import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.tracing.test.SampleTestRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -39,14 +40,16 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
+	private static MeterRegistry registry = Metrics.globalRegistry.withTimerObservationHandler();
+
 	@Override
 	protected MeterRegistry getMeterRegistry() {
-		return Metrics.globalRegistry;
+		return registry;
 	}
 
 	@AfterEach
 	void clean() {
-		Metrics.globalRegistry.clear();
+		registry.clear();
 	}
 
 	@Override
@@ -66,6 +69,11 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 					.haveSameTraceId()
 					.hasASpanWithName("job")
 					.hasASpanWithName("step");
+
+			// and
+			MeterRegistryAssert.assertThat(meterRegistry)
+					.hasTimerWithName("spring.batch.job")
+					.hasTimerWithName("spring.batch.step");
 		};
 	}
 
