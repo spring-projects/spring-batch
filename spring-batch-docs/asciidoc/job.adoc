@@ -764,7 +764,29 @@ semantics within the repository, and because the business logic might still be
 transactional (such as RDBMS access). For testing purposes many people find the
 `ResourcelessTransactionManager` useful.
 
+[NOTE]
+====
+The `MapJobRepositoryFactoryBean` and related classes have been deprecated in v4 and are scheduled
+for removal in v5. If you want to use an in-memory job repository, you can use an embedded database
+like H2, Apache Derby or HSQLDB. There are several ways to create an embedded database and use it in
+your Spring Batch application. One way to do that is by using the APIs from link:$$https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#jdbc-embedded-database-support$$[Spring JDBC]:
 
+[source, java]
+----
+@Bean
+public DataSource dataSource() {
+    return new EmbeddedDatabaseBuilder()
+            .setType(EmbeddedDatabaseType.H2)
+            .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+            .addScript("/org/springframework/batch/core/schema-h2.sql")
+            .build();
+}
+----
+
+Once you have defined your embedded datasource as a bean in your application context, it should be picked
+up automatically if you use `@EnableBatchProcessing`. Otherwise you can configure it manually using the
+JDBC based `JobRepositoryFactoryBean` as shown in the <<job.adoc#configuringJobRepository,Configuring a JobRepository section>>.
+====
 
 [[nonStandardDatabaseTypesInRepository]]
 ==== Non-standard Database Types in a Repository
