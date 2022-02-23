@@ -98,7 +98,7 @@ allprojects {
 		sqliteVersion = '3.32.3.3'
 		woodstoxVersion = '6.2.8'
 		xmlunitVersion = '2.8.4'
-		xstreamVersion = '1.4.16'
+		xstreamVersion = '1.4.19'
 		jrubyVersion = '1.7.27'
 		beanshellVersion = '2.0b5'
 		jaxbApiVersion = '2.3.1'
