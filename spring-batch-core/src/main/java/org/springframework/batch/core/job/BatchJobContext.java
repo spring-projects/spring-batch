@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.job;
 
-import io.micrometer.api.instrument.observation.Observation;
+import io.micrometer.core.instrument.observation.Observation;
 
 import org.springframework.batch.core.JobExecution;
 

@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.step;
 
-import io.micrometer.api.instrument.docs.DocumentedObservation;
-import io.micrometer.api.instrument.docs.TagKey;
+import io.micrometer.core.instrument.docs.DocumentedObservation;
+import io.micrometer.core.instrument.docs.TagKey;
 
 enum BatchStepObservation implements DocumentedObservation {
 

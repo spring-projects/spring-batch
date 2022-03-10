@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.micrometer.api.instrument.observation.Observation;
+import io.micrometer.core.instrument.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;

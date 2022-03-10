@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.job;
 
-import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.instrument.Tags;
 
 import org.springframework.batch.core.JobExecution;
 

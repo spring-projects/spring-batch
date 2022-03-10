@@ -20,12 +20,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import io.micrometer.api.instrument.LongTaskTimer;
-import io.micrometer.api.instrument.Metrics;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
-import io.micrometer.api.instrument.observation.Observation;
-import io.micrometer.api.instrument.observation.TimerObservationHandler;
+import io.micrometer.core.instrument.LongTaskTimer;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.observation.Observation;
+import io.micrometer.core.instrument.observation.TimerObservationHandler;
 
 import org.springframework.lang.Nullable;
 

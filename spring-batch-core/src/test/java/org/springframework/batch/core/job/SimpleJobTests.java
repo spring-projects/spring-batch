@@ -31,9 +31,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import io.micrometer.api.instrument.Metrics;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Tags;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import org.junit.After;
 import org.junit.Before;

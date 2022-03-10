@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.test.observability;
 
-import io.micrometer.api.instrument.MeterRegistry;
-import io.micrometer.api.instrument.Metrics;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.tracing.test.SampleTestRunner;
 import org.junit.jupiter.api.AfterEach;

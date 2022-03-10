@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import jakarta.annotation.PostConstruct;
 
-import io.micrometer.api.instrument.Metrics;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.CollectorRegistry;

@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.step;
 
-import io.micrometer.api.instrument.observation.Observation;
+import io.micrometer.core.instrument.observation.Observation;
 
 /**
  * {@link Observation.TagsProvider} for {@link BatchStepContext}.

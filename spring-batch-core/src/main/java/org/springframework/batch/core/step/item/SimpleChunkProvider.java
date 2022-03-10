@@ -18,9 +18,9 @@ package org.springframework.batch.core.step.item;
 
 import java.util.List;
 
-import io.micrometer.api.instrument.Metrics;
-import io.micrometer.api.instrument.Tag;
-import io.micrometer.api.instrument.Timer;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
