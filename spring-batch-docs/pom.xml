@@ -12,7 +12,7 @@
 
     <properties>
         <!-- Observability -->
-        <micrometer-docs-generator.version>1.0.0-M1</micrometer-docs-generator.version>
+        <micrometer-docs-generator.version>1.0.0-SNAPSHOT</micrometer-docs-generator.version>
         <micrometer-docs-generator.inputPath>${maven.multiModuleProjectDirectory}/spring-batch-core/</micrometer-docs-generator.inputPath>
         <micrometer-docs-generator.inclusionPattern>.*</micrometer-docs-generator.inclusionPattern>
         <micrometer-docs-generator.outputPath>${maven.multiModuleProjectDirectory}/spring-batch-docs/target/observability/</micrometer-docs-generator.outputPath>
