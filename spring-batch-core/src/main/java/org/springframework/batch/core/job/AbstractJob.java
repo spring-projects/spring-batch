@@ -308,7 +308,7 @@ InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs",
 				Tag.of("name", execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
-		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName())
+		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution))
 				.contextualName(execution.getJobInstance().getJobName())
 				.tagsProvider(this.tagsProvider)
 				.start();

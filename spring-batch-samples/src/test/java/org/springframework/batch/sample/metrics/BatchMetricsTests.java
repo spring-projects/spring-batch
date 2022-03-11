@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -59,6 +60,11 @@ import static org.junit.Assert.fail;
 public class BatchMetricsTests {
 
 	private static final int EXPECTED_SPRING_BATCH_METRICS = 10;
+
+	@BeforeClass
+	public static void setup() {
+		Metrics.globalRegistry.withTimerObservationHandler();
+	}
 
 	@Test
 	public void testCalculateDuration() {

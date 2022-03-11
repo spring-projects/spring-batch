@@ -77,8 +77,8 @@ public final class BatchMetrics {
 	 * in the user code. Otherwise you won't observe any metrics.
 	 * @return a new observation instance
 	 */
-	public static Observation createObservation(String name) {
-		return Observation.createNotStarted(name, Metrics.globalRegistry);
+	public static Observation createObservation(String name, Observation.Context context) {
+		return Observation.createNotStarted(name, context, Metrics.globalRegistry);
 	}
 
 	/**

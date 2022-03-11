@@ -195,7 +195,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName())
+		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), new BatchStepContext(stepExecution))
 				.contextualName(stepExecution.getStepName())
 				.tagsProvider(this.tagsProvider)
 				.start();
