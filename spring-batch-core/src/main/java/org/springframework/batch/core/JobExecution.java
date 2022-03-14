@@ -38,6 +38,7 @@ import org.springframework.lang.Nullable;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
+ * @author Taeik Lim
  *
  */
 @SuppressWarnings("serial")
@@ -139,6 +140,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current end time.
 	 */
+	@Nullable
 	public Date getEndTime() {
 		return endTime;
 	}
@@ -164,6 +166,7 @@ public class JobExecution extends Entity {
 	/**
 	 * @return The current start time.
 	 */
+	@Nullable
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -327,6 +330,7 @@ public class JobExecution extends Entity {
 	 *
 	 * @return Date representing the last time this JobExecution was updated.
 	 */
+	@Nullable
 	public Date getLastUpdated() {
 		return lastUpdated;
 	}
