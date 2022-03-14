@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import org.springframework.lang.Nullable;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Dimitrios Liapis
+ * @author Taeik Lim
  *
  */
 @SuppressWarnings("serial")
@@ -131,6 +132,7 @@ public class JobExecution extends Entity {
 		return this.jobParameters;
 	}
 
+	@Nullable
 	public Date getEndTime() {
 		return endTime;
 	}
@@ -143,6 +145,7 @@ public class JobExecution extends Entity {
 		this.endTime = endTime;
 	}
 
+	@Nullable
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -318,6 +321,7 @@ public class JobExecution extends Entity {
 	 *
 	 * @return Date representing the last time this JobExecution was updated.
 	 */
+	@Nullable
 	public Date getLastUpdated() {
 		return lastUpdated;
 	}

@@ -461,6 +461,7 @@ public class StepExecution extends Entity {
 	/**
 	 * @return the Date representing the last time this execution was persisted.
 	 */
+	@Nullable
 	public Date getLastUpdated() {
 		return lastUpdated;
 	}
