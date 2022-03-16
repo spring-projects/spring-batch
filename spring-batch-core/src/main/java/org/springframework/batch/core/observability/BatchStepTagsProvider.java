@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step;
+package org.springframework.batch.core.observability;
 
 import io.micrometer.core.instrument.observation.Observation;
 
-import org.springframework.batch.core.StepExecution;
+/**
+ * {@link Observation.TagsProvider} for {@link BatchStepContext}.
+ *
+ * @author Marcin Grzejszczak
+ * @since 5.0
+ */
+public interface BatchStepTagsProvider extends Observation.TagsProvider<BatchStepContext> {
 
-public class BatchStepContext extends Observation.Context {
-
-	private final StepExecution stepExecution;
-
-	public BatchStepContext(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
+	@Override
+	default boolean supportsContext(Observation.Context context) {
+		return context instanceof BatchStepContext;
 	}
-
-	public StepExecution getStepExecution() {
-		return stepExecution;
-	}
-
 }

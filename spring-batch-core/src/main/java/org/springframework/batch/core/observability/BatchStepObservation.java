@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.job;
+package org.springframework.batch.core.observability;
 
 import io.micrometer.core.instrument.docs.DocumentedObservation;
 import io.micrometer.core.instrument.docs.TagKey;
 
-enum BatchJobObservation implements DocumentedObservation {
+/**
+ * Observation created around a step execution.
+ *
+ * @author Marcin Grzejszczak
+ * @author Mahmoud Ben Hassine
+ * @since 5.0
+ */
+public enum BatchStepObservation implements DocumentedObservation {
 
-	/**
-	 * Observation created around a Job execution.
-	 */
-	BATCH_JOB_OBSERVATION {
+	BATCH_STEP_OBSERVATION {
 		@Override
 		public String getName() {
-			return "spring.batch.job";
+			return "spring.batch.step";
 		}
 
 		@Override
@@ -37,12 +41,12 @@ enum BatchJobObservation implements DocumentedObservation {
 
 		@Override
 		public TagKey[] getLowCardinalityTagKeys() {
-			return JobLowCardinalityTags.values();
+			return StepLowCardinalityTags.values();
 		}
 
 		@Override
 		public TagKey[] getHighCardinalityTagKeys() {
-			return JobHighCardinalityTags.values();
+			return StepHighCardinalityTags.values();
 		}
 
 		@Override
@@ -51,51 +55,62 @@ enum BatchJobObservation implements DocumentedObservation {
 		}
 	};
 
-	enum JobLowCardinalityTags implements TagKey {
+	enum StepLowCardinalityTags implements TagKey {
 
 		/**
-		 * Name of the Spring Batch job.
+		 * Name of the Spring Batch step.
+		 */
+		STEP_NAME {
+			@Override
+			public String getKey() {
+				return "spring.batch.step.name";
+			}
+		},
+
+		/**
+		 * Type of the Spring Batch step.
+		 */
+		STEP_TYPE {
+			@Override
+			public String getKey() {
+				return "spring.batch.step.type";
+			}
+		},
+
+		/**
+		 * Name of the Spring Batch job enclosing the step.
 		 */
 		JOB_NAME {
 			@Override
 			public String getKey() {
-				return "spring.batch.job.name";
+				return "spring.batch.step.job.name";
 			}
 		},
 
 		/**
-		 * Job status.
+		 * Step status.
 		 */
-		JOB_STATUS {
+		STEP_STATUS {
 			@Override
 			public String getKey() {
-				return "spring.batch.job.status";
+				return "spring.batch.step.status";
 			}
 		}
 
 	}
 
-	enum JobHighCardinalityTags implements TagKey {
+	enum StepHighCardinalityTags implements TagKey {
 
 		/**
-		 * ID of the Spring Batch job instance.
+		 * ID of the Spring Batch step execution.
 		 */
-		JOB_INSTANCE_ID {
+		STEP_EXECUTION_ID {
 			@Override
 			public String getKey() {
-				return "spring.batch.job.instanceId";
-			}
-		},
-
-		/**
-		 * ID of the Spring Batch execution.
-		 */
-		JOB_EXECUTION_ID {
-			@Override
-			public String getKey() {
-				return "spring.batch.job.executionId";
+				return "spring.batch.step.executionId";
 			}
 		}
 
 	}
+
 }

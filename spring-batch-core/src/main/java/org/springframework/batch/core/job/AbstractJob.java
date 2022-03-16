@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
-import org.springframework.batch.core.metrics.BatchMetrics;
+import org.springframework.batch.core.observability.BatchMetrics;
+import org.springframework.batch.core.observability.BatchJobContext;
+import org.springframework.batch.core.observability.BatchJobObservation;
+import org.springframework.batch.core.observability.BatchJobTagsProvider;
+import org.springframework.batch.core.observability.DefaultBatchJobTagsProvider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
