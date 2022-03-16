@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.batch.item.xml;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.thoughtworks.xstream.security.ExplicitTypePermission;
 
 import org.springframework.batch.item.xml.domain.Trade;
 import org.springframework.oxm.Unmarshaller;
@@ -38,6 +40,7 @@ public class XStreamUnmarshallingTests extends AbstractStaxEventReaderItemReader
 		unmarshaller.addAlias("customer", String.class);
 		unmarshaller.addAlias("price", BigDecimal.class);*/
 		unmarshaller.setAliases(aliasesMap);
+		unmarshaller.setTypePermissions(new ExplicitTypePermission(new Class[]{org.springframework.batch.item.xml.domain.Trade.class}));
 		return unmarshaller;
 	}
 
