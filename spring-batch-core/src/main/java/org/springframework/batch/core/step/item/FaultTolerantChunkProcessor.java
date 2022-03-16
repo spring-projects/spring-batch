@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.listener.StepListenerFailedException;
-import org.springframework.batch.core.metrics.BatchMetrics;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;

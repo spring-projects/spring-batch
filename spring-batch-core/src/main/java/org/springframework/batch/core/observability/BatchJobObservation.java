@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step;
+package org.springframework.batch.core.observability;
 
 import io.micrometer.core.instrument.docs.DocumentedObservation;
 import io.micrometer.core.instrument.docs.TagKey;
 
-enum BatchStepObservation implements DocumentedObservation {
+/**
+ * Observation created around a Job execution.
+ *
+ * @author Marcin Grzejszczak
+ * @author Mahmoud Ben Hassine
+ * @since 5.0
+ */
+public enum BatchJobObservation implements DocumentedObservation {
 
-	/**
-	 * Observation created around a Job execution.
-	 */
-	BATCH_STEP_OBSERVATION {
+	BATCH_JOB_OBSERVATION {
 		@Override
 		public String getName() {
-			return "spring.batch.step";
+			return "spring.batch.job";
 		}
 
 		@Override
@@ -37,12 +41,12 @@ enum BatchStepObservation implements DocumentedObservation {
 
 		@Override
 		public TagKey[] getLowCardinalityTagKeys() {
-			return StepLowCardinalityTags.values();
+			return JobLowCardinalityTags.values();
 		}
 
 		@Override
 		public TagKey[] getHighCardinalityTagKeys() {
-			return StepHighCardinalityTags.values();
+			return JobHighCardinalityTags.values();
 		}
 
 		@Override
@@ -51,27 +55,7 @@ enum BatchStepObservation implements DocumentedObservation {
 		}
 	};
 
-	enum StepLowCardinalityTags implements TagKey {
-
-		/**
-		 * Name of the Spring Batch job.
-		 */
-		STEP_NAME {
-			@Override
-			public String getKey() {
-				return "spring.batch.step.name";
-			}
-		},
-
-		/**
-		 * Type of the Spring Batch job.
-		 */
-		STEP_TYPE {
-			@Override
-			public String getKey() {
-				return "spring.batch.step.type";
-			}
-		},
+	enum JobLowCardinalityTags implements TagKey {
 
 		/**
 		 * Name of the Spring Batch job.
@@ -84,29 +68,38 @@ enum BatchStepObservation implements DocumentedObservation {
 		},
 
 		/**
-		 * Step status.
+		 * Job status.
 		 */
-		STEP_STATUS {
+		JOB_STATUS {
 			@Override
 			public String getKey() {
-				return "spring.batch.step.status";
+				return "spring.batch.job.status";
 			}
 		}
 
 	}
 
-	enum StepHighCardinalityTags implements TagKey {
+	enum JobHighCardinalityTags implements TagKey {
 
 		/**
-		 * ID of the Spring Batch execution.
+		 * ID of the Spring Batch job instance.
 		 */
-		STEP_EXECUTION_ID {
+		JOB_INSTANCE_ID {
 			@Override
 			public String getKey() {
-				return "spring.batch.step.executionId";
+				return "spring.batch.job.instanceId";
+			}
+		},
+
+		/**
+		 * ID of the Spring Batch job execution.
+		 */
+		JOB_EXECUTION_ID {
+			@Override
+			public String getKey() {
+				return "spring.batch.job.executionId";
 			}
 		}
 
 	}
-
 }

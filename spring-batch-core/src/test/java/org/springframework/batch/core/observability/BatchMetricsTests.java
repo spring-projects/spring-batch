@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.metrics;
+package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.metrics.BatchMetrics;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -162,8 +162,8 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.job")
-					.tag("name", "job")
-					.tag("status", "COMPLETED")
+					.tag("spring.batch.job.name", "job")
+					.tag("spring.batch.job.status", "COMPLETED")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.job " +
@@ -183,9 +183,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("name", "step1")
-					.tag("job.name", "job")
-					.tag("status", "COMPLETED")
+					.tag("spring.batch.step.name", "step1")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.step" +
@@ -196,9 +196,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("name", "step2")
-					.tag("job.name", "job")
-					.tag("status", "COMPLETED")
+					.tag("spring.batch.step.name", "step2")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.step" +
@@ -242,9 +242,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("name", "step3")
-					.tag("job.name", "job")
-					.tag("status", "COMPLETED")
+					.tag("spring.batch.step.name", "step3")
+					.tag("spring.batch.step.job.name", "job")
+					.tag("spring.batch.step.status", "COMPLETED")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.step" +

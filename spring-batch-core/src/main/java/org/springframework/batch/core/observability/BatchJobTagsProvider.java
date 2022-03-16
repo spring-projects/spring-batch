@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.job;
+package org.springframework.batch.core.observability;
 
 import io.micrometer.core.instrument.observation.Observation;
 
-import org.springframework.batch.core.JobExecution;
+/**
+ * {@link Observation.TagsProvider} for {@link BatchJobContext}.
+ * 
+ * @author Marcin Grzejszczak
+ * @since 5.0
+ */
+public interface BatchJobTagsProvider extends Observation.TagsProvider<BatchJobContext> {
 
-public class BatchJobContext extends Observation.Context {
-
-	private final JobExecution jobExecution;
-
-	public BatchJobContext(JobExecution jobExecution) {
-		this.jobExecution = jobExecution;
+	@Override
+	default boolean supportsContext(Observation.Context context) {
+		return context instanceof BatchJobContext;
 	}
-
-	public JobExecution getJobExecution() {
-		return jobExecution;
-	}
-
 }

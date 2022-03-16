@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.metrics;
+package org.springframework.batch.core.observability;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -75,7 +75,10 @@ public final class BatchMetrics {
 	 * Remember to register the {@link TimerObservationHandler}
 	 * via the {@code Metrics.globalRegistry.withTimerObservationHandler()}
 	 * in the user code. Otherwise you won't observe any metrics.
+	 * @param name of the observation
+	 * @param context of the observation
 	 * @return a new observation instance
+	 * @since 5.0
 	 */
 	public static Observation createObservation(String name, Observation.Context context) {
 		return Observation.createNotStarted(name, context, Metrics.globalRegistry);
