@@ -82,7 +82,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 	/**
 	 * Parameter key suffix representing the double type.
 	 */
-	private static final String DOUBLE_TYPE = "(double)";
+	public static final String DOUBLE_TYPE = "(double)";
 
 	private static final String NON_IDENTIFYING_FLAG = "-";
 
