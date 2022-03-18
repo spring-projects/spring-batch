@@ -19,6 +19,7 @@
 		<module>spring-batch-integration</module>
 		<module>spring-batch-samples</module>
 		<module>spring-batch-docs</module>
+		<module>spring-batch-bom</module>
 	</modules>
 
 	<organization>
