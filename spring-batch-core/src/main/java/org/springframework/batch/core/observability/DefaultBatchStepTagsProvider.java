@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.observability;
 
-import io.micrometer.core.instrument.Tags;
+import io.micrometer.observation.Tags;
 
 import org.springframework.batch.core.StepExecution;
 

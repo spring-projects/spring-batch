@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.step;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +25,7 @@ import io.micrometer.core.tck.MeterRegistryAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -41,6 +37,11 @@ import org.springframework.batch.core.observability.BatchStepObservation;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link AbstractStep}.
@@ -185,7 +186,6 @@ public class NonAbstractStepTests {
 	 */
 	@Test
 	public void testExecute() throws Exception {
-		Metrics.globalRegistry.withTimerObservationHandler();
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 		tested.execute(execution);
 
