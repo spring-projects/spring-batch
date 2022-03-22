@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.observability;
 
-import io.micrometer.core.instrument.docs.DocumentedObservation;
-import io.micrometer.core.instrument.docs.TagKey;
+import io.micrometer.observation.docs.DocumentedObservation;
+import io.micrometer.observation.docs.TagKey;
 
 /**
  * Observation created around a Job execution.

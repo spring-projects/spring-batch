@@ -24,8 +24,9 @@ import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.observation.Observation;
 import io.micrometer.core.instrument.observation.TimerObservationHandler;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 
 import org.springframework.lang.Nullable;
 
@@ -52,7 +53,19 @@ public final class BatchMetrics {
 
 	public static final String STATUS_FAILURE = "FAILURE";
 
-	private BatchMetrics() {}
+	/**
+	 * Global {@link ObservationRegistry}. A {@link TimerObservationHandler} is attached
+	 * to create a {@link Timer} for every finished {@link Observation}.
+	 */
+	public static final ObservationRegistry observationRegistry;
+
+	static {
+		observationRegistry = ObservationRegistry.create();
+		observationRegistry.observationConfig().observationHandler(new TimerObservationHandler(Metrics.globalRegistry));
+	}
+
+	private BatchMetrics() {
+	}
 
 	/**
 	 * Create a {@link Timer}.
@@ -81,7 +94,7 @@ public final class BatchMetrics {
 	 * @since 5.0
 	 */
 	public static Observation createObservation(String name, Observation.Context context) {
-		return Observation.createNotStarted(name, context, Metrics.globalRegistry);
+		return Observation.createNotStarted(name, context, observationRegistry);
 	}
 
 	/**

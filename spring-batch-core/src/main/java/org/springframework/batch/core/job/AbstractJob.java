@@ -23,9 +23,10 @@ import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.LongTaskTimer;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.observation.Observation;
+import io.micrometer.observation.Observation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -41,10 +42,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
-import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.BatchJobContext;
 import org.springframework.batch.core.observability.BatchJobObservation;
 import org.springframework.batch.core.observability.BatchJobTagsProvider;
+import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.core.observability.DefaultBatchJobTagsProvider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;

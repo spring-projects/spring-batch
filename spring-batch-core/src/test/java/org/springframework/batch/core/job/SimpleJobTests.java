@@ -16,14 +16,6 @@
 
 package org.springframework.batch.core.job;
 
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +52,14 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests for DefaultJobLifecycle.
@@ -208,7 +208,6 @@ public class SimpleJobTests {
 
 	@Test
 	public void testRunNormally() throws Exception {
-		Metrics.globalRegistry.withTimerObservationHandler();
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		job.execute(jobExecution);

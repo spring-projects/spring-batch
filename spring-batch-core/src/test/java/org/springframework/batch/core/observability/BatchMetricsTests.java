@@ -27,7 +27,6 @@ import javax.sql.DataSource;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.batch.core.ExitStatus;
@@ -39,7 +38,6 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.observability.BatchMetrics;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationContext;
@@ -60,11 +58,6 @@ import static org.junit.Assert.fail;
 public class BatchMetricsTests {
 
 	private static final int EXPECTED_SPRING_BATCH_METRICS = 10;
-
-	@BeforeClass
-	public static void setup() {
-		Metrics.globalRegistry.withTimerObservationHandler();
-	}
 
 	@Test
 	public void testCalculateDuration() {
