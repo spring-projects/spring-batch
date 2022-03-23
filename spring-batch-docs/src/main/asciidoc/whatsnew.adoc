@@ -11,7 +11,11 @@ Spring Batch 5.0 release has the following major themes:
 * Java 17 Requirement
 * Dependencies Re-baseline
 * Batch infrastructure configuration updates
+* New features
 * Pruning
+
+For more details about the changes,
+please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
 
 === Java 17 Requirement
 
@@ -51,6 +55,18 @@ Up until version 4.3, the `@EnableBatchProcessing` annotation exposed a tranasac
 context. While this was convenient in many cases, the unconditional exposure of a tranasaction manager could
 interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` does not expose a
 transaction manager bean in the application context anymore.
+
+=== New features
+
+==== Batch tracing with Micrometer
+
+With the upgrade to Micrometer 2, you can now get batch tracing in addition to batch metrics.
+Spring Batch will create a span for each job and a span for each step within a job. This tracing
+meta-data can be collected and viewed on a dahsboard like link:$$https://zipkin.io$$[Zipkin] for example.
+
+==== Support for SAP HANA a job repository in Spring Batch
+
+This release introduces the support of SAP HANA as an additional supported database for the job repository.
 
 === Pruning
 
@@ -100,4 +116,4 @@ was deprecated in version 4.3 and removed in version 5.0.
 
 ==== JSR-352 implementation removal
 
-Due to a lack of adoption, the implementation of the JSR-352 has been removed in this release.
+Due to a lack of adoption, the implementation of the JSR-352 has been discontinued in this release.
