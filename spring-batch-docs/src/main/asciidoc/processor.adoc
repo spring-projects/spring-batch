@@ -38,12 +38,12 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 
 The preceding class contains another `ItemWriter` to which it delegates after having
 provided some business logic. This pattern could easily be used for an `ItemReader` as
-well, perhaps to obtain more reference data based upon the input that was provided by the
+well, perhaps to obtain more reference data based on the input that was provided by the
 main `ItemReader`. It is also useful if you need to control the call to `write` yourself.
-However, if you only want to 'transform' the item passed in for writing before it is
+However, if you only want to "`transform`" the item passed in for writing before it is
 actually written, you need not `write` yourself. You can just modify the item. For this
-scenario, Spring Batch provides the `ItemProcessor` interface, as shown in the following
-interface definition:
+scenario, Spring Batch provides the `ItemProcessor` interface, as the following
+interface definition shows:
 
 [source, java]
 ----
@@ -83,12 +83,12 @@ public class BarWriter implements ItemWriter<Bar> {
 }
 ----
 
-In the preceding example, there is a class `Foo`, a class `Bar`, and a class
-`FooProcessor` that adheres to the `ItemProcessor` interface. The transformation is
+In the preceding example, there is a class named `Foo`, a class named `Bar`, and a class
+named `FooProcessor` that adheres to the `ItemProcessor` interface. The transformation is
 simple, but any type of transformation could be done here. The `BarWriter` writes `Bar`
 objects, throwing an exception if any other type is provided. Similarly, the
 `FooProcessor` throws an exception if anything but a `Foo` is provided. The
-`FooProcessor` can then be injected into a `Step`, as shown in the following example:
+`FooProcessor` can then be injected into a `Step`, as the following example shows:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -131,10 +131,10 @@ is optional for a `Step`.
 === Chaining ItemProcessors
 
 Performing a single transformation is useful in many scenarios, but what if you want to
-'chain' together multiple `ItemProcessor` implementations? This can be accomplished using
+"`chain`" together multiple `ItemProcessor` implementations? You can do so by using
 the composite pattern mentioned previously. To update the previous, single
 transformation, example, `Foo` is transformed to `Bar`, which is transformed to `Foobar`
-and written out, as shown in the following example:
+and written out, as the following example shows:
 
 [source, java]
 ----
@@ -182,7 +182,7 @@ itemProcessors.add(new BarProcessor());
 compositeProcessor.setDelegates(itemProcessors);
 ----
 
-Just as with the previous example, the composite processor can be configured into the
+Just as with the previous example, you can configure the composite processor into the
 `Step`:
 
 .XML Configuration
@@ -247,36 +247,36 @@ public CompositeItemProcessor compositeProcessor() {
 
 One typical use for an item processor is to filter out records before they are passed to
 the `ItemWriter`. Filtering is an action distinct from skipping. Skipping indicates that
-a record is invalid, while filtering simply indicates that a record should not be
+a record is invalid, while filtering indicates that a record should not be
 written.
 
 For example, consider a batch job that reads a file containing three different types of
 records: records to insert, records to update, and records to delete. If record deletion
-is not supported by the system, then we would not want to send any "delete" records to
-the `ItemWriter`. But, since these records are not actually bad records, we would want to
+is not supported by the system, we would not want to send any deletable records to
+the `ItemWriter`. However, since these records are not actually bad records, we would want to
 filter them out rather than skip them. As a result, the `ItemWriter` would receive only
-"insert" and "update" records.
+insertable and updatable records.
 
 To filter a record, you can return `null` from the `ItemProcessor`. The framework detects
 that the result is `null` and avoids adding that item to the list of records delivered to
-the `ItemWriter`. As usual, an exception thrown from the `ItemProcessor` results in a
+the `ItemWriter`. An exception thrown from the `ItemProcessor` results in a
 skip.
 
 [[validatingInput]]
 === Validating Input
 
-In the <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter, multiple approaches to parsing input have been
-discussed. Each major implementation throws an exception if it is not 'well-formed'. The
+The <<readersAndWriters.adoc#readersAndWriters,ItemReaders and ItemWriters>> chapter discusses multiple approaches to parsing input.
+Each major implementation throws an exception if it is not "`well formed.`" The
 `FixedLengthTokenizer` throws an exception if a range of data is missing. Similarly,
 attempting to access an index in a `RowMapper` or `FieldSetMapper` that does not exist or
 is in a different format than the one expected causes an exception to be thrown. All of
 these types of exceptions are thrown before `read` returns. However, they do not address
 the issue of whether or not the returned item is valid. For example, if one of the fields
-is an age, it obviously cannot be negative. It may parse correctly, because it exists and
+is an age, it cannot be negative. It may parse correctly, because it exists and
 is a number, but it does not cause an exception. Since there are already a plethora of
 validation frameworks, Spring Batch does not attempt to provide yet another. Rather, it
-provides a simple interface, called `Validator`, that can be implemented by any number of
-frameworks, as shown in the following interface definition:
+provides a simple interface, called `Validator`, that you can implement by any number of
+frameworks, as the following interface definition shows:
 
 [source, java]
 ----
@@ -288,8 +288,8 @@ public interface Validator<T> {
 ----
 
 The contract is that the `validate` method throws an exception if the object is invalid
-and returns normally if it is valid. Spring Batch provides an out of the box
-`ValidatingItemProcessor`, as shown in the following bean definition:
+and returns normally if it is valid. Spring Batch provides an
+`ValidatingItemProcessor`, as the following bean definition shows:
 
 .XML Configuration
 [source, xml, role="xmlContent"]
@@ -328,7 +328,7 @@ public SpringValidator validator() {
 ----
 
 You can also use the `BeanValidatingItemProcessor` to validate items annotated with
-the Bean Validation API (JSR-303) annotations. For example, given the following type `Person`:
+the Bean Validation API (JSR-303) annotations. For example, consider the following type `Person`:
 
 [source, java]
 ----
@@ -352,7 +352,7 @@ class Person {
 }
 ----
 
-you can validate items by declaring a `BeanValidatingItemProcessor` bean in your
+You can validate items by declaring a `BeanValidatingItemProcessor` bean in your
 application context and register it as a processor in your chunk-oriented step:
 
 [source, java]
@@ -370,8 +370,8 @@ public BeanValidatingItemProcessor<Person> beanValidatingItemProcessor() throws 
 === Fault Tolerance
 
 When a chunk is rolled back, items that have been cached during reading may be
-reprocessed.  If a step is configured to be fault tolerant (typically by using skip or
+reprocessed. If a step is configured to be fault-tolerant (typically by using skip or
 retry processing), any `ItemProcessor` used should be implemented in a way that is
-idempotent.  Typically that would consist of performing no changes on the input item for
-the `ItemProcessor` and only updating the
+idempotent. Typically that would consist of performing no changes on the input item for
+the `ItemProcessor` and updating only the
 instance that is the result.

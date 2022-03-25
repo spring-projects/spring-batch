@@ -3,10 +3,9 @@
 :toclevels: 4
 
 [[whatsNew]]
-
 == What's New in Spring Batch 5.0
 
-Spring Batch 5.0 release has the following major themes:
+Spring Batch 5.0 has the following major themes:
 
 * Java 17 Requirement
 * Dependencies Re-baseline
@@ -15,17 +14,18 @@ Spring Batch 5.0 release has the following major themes:
 * Pruning
 
 For more details about the changes,
-please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
+see the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
 
 === Java 17 Requirement
 
 Spring Batch follows Spring Framework's baselines for both Java version and third party dependencies.
-With Spring Batch 5, the Spring Framework version is being upgraded to Spring Framework 6 which requires Java 17.
+With Spring Batch 5, the Spring Framework version is being upgraded to Spring Framework 6, which requires Java 17.
 As a result, the Java version requirement for Spring Batch is also increasing to Java 17.
 
+[[dependencies-re-baseline]]
 === Dependencies Re-baseline
 
-In order to continue the integration with supported versions of the third party libraries that Spring Batch uses,
+To continue the integration with supported versions of the third party libraries that Spring Batch uses,
 Spring Batch 5 is updating the dependencies across the board to the following versions:
 
 * Spring Framework 6
@@ -37,24 +37,32 @@ Spring Batch 5 is updating the dependencies across the board to the following ve
 
 This release also marks the migration to Jakarta EE 9 APIs.
 
-=== Batch infrastructure configuration updates
+[[batch-infrastructure-configuration-updates]]
+=== Batch Infrastructure Configuration Updates
 
-==== DataSource requirement updates
+Spring Batch 5 includes the following infrastructure configuration updates:
 
-Historically, Spring Batch provided a Map-based job repository and job explorer implementations to work with
+* <<datasource-requirement-updates>>
+* <<transaction-manager-bean-exposure>>
+
+[[datasource-requirement-updates]]
+==== DataSource Requirement Updates
+
+Historically, Spring Batch provided a map-based job repository and job explorer implementations to work with
 an in-memory job repository. These implementations were deprecated in version 4 and completely removed in version 5.
-The recommended replacement is to use the Jdbc-based implementations with an embedded database like H2, HSQL, etc.
+The recommended replacement is to use the JDBC-based implementations with an embedded database, such as H2, HSQL, and others.
 
-In this release, the `@EnableBatchProcessing` annotation will configure a Jdbc-based `JobRepository` which requires a
+In this release, the `@EnableBatchProcessing` annotation configures a JDBC-based `JobRepository`, which requires a
 `DataSource` bean in the application context. The `DataSource` bean could refer to an embedded database to work with
 an in-memory job repository.
 
-==== Transaction manager bean exposure
+[[transaction-manager-bean-exposure]]
+==== Transaction Manager Bean Exposure
 
-Up until version 4.3, the `@EnableBatchProcessing` annotation exposed a tranasaction manager bean in the application
-context. While this was convenient in many cases, the unconditional exposure of a tranasaction manager could
-interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` does not expose a
-transaction manager bean in the application context anymore.
+Until version 4.3, the `@EnableBatchProcessing` annotation exposed a transaction manager bean in the application
+context. While this was convenient in many cases, the unconditional exposure of a transaction manager could
+interfere with a user-defined transaction manager. In this release, `@EnableBatchProcessing` no longer exposes a
+transaction manager bean in the application context.
 
 === New features
 
@@ -70,7 +78,14 @@ This release introduces the support of SAP HANA as an additional supported datab
 
 === Pruning
 
-==== Deprecated APIs removal
+Spring Batch 5 removes a number of items that are no longer needed, including:
+
+* <<deprecated-apis-removal>>
+* <<sqlfire-support-removal>>
+* <<jsr-352-implementation-removal>>
+
+[[deprecated-apis-removal]]
+==== Deprecated APIs Removal
 
 The following APIs were deprecated in previous versions and have been removed in this release:
 
@@ -109,11 +124,13 @@ The following APIs were deprecated in previous versions and have been removed in
 * Method `org.springframework.batch.integration.config.annotation.BatchIntegrationConfiguration#remotePartitioningMasterStepBuilderFactory()`
 * Method `org.springframework.batch.item.util.FileUtils#setUpOutputFile(File file, boolean restarted, boolean overwriteOutputFile)`
 
-==== SQLFire support removal
+[[sqlfire-support-removal]]
+==== SQLFire Support Removal
 
 SqlFire has been announced to be EOL as of November 1st, 2014. The support of SQLFire as a job repository
 was deprecated in version 4.3 and removed in version 5.0.
 
-==== JSR-352 implementation removal
+[[jsr-352-implementation-removal]]
+==== JSR-352 Implementation Removal
 
-Due to a lack of adoption, the implementation of the JSR-352 has been discontinued in this release.
+Due to a lack of adoption, the implementation of JSR-352 has been removed from this release.
