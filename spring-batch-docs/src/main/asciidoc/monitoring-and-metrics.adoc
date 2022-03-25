@@ -3,7 +3,6 @@
 :toclevels: 4
 
 [[monitoring-and-metrics]]
-
 == Monitoring and metrics
 
 Since version 4.2, Spring Batch provides support for batch monitoring and metrics
@@ -11,7 +10,6 @@ based on link:$$https://micrometer.io/$$[Micrometer]. This section describes
 which metrics are provided out-of-the-box and how to contribute custom metrics.
 
 [[built-in-metrics]]
-
 === Built-in metrics
 
 Metrics collection does not require any specific configuration. All metrics provided
@@ -32,7 +30,6 @@ under the `spring.batch` prefix. The following table explains all the metrics in
 NOTE: The `status` tag can be either `SUCCESS` or `FAILURE`.
 
 [[custom-metrics]]
-
 === Custom metrics
 
 If you want to use your own metrics in your custom components, we recommend using
@@ -71,20 +68,19 @@ public class MyTimedTasklet implements Tasklet {
 ----
 
 [[disabling-metrics]]
-
-=== Disabling metrics
+=== Disabling Metrics
 
 Metrics collection is a concern similar to logging. Disabling logs is typically
-done by configuring the logging library and this is no different for metrics.
-There is no feature in Spring Batch to disable micrometer's metrics, this should
-be done on micrometer's side. Since Spring Batch stores metrics in the global
-registry of micrometer with the `spring.batch` prefix, it is possible to configure
-micrometer to ignore/deny batch metrics with the following snippet:
+done by configuring the logging library, and this is no different for metrics.
+There is no feature in Spring Batch to disable Micrometer's metrics. This should
+be done on Micrometer's side. Since Spring Batch stores metrics in the global
+registry of Micrometer with the `spring.batch` prefix, you can configure
+micrometer to ignore or deny batch metrics with the following snippet:
 
 [source, java]
 ----
 Metrics.globalRegistry.config().meterFilter(MeterFilter.denyNameStartsWith("spring.batch"))
 ----
 
-Please refer to micrometer's link:$$http://micrometer.io/docs/concepts#_meter_filters$$[reference documentation]
+See Micrometer's link:$$http://micrometer.io/docs/concepts#_meter_filters$$[reference documentation]
 for more details.

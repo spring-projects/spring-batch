@@ -3,7 +3,6 @@
 :toclevels: 4
 
 [[commonPatterns]]
-
 == Common Batch Patterns
 
 ifndef::onlyonetoggle[]

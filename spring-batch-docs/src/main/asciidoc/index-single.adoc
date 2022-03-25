@@ -10,6 +10,8 @@ include::toggle.adoc[]
 
 include::spring-batch-intro.adoc[]
 
+include::spring-batch-architecture.adoc[]
+
 include::whatsnew.adoc[]
 
 include::domain.adoc[]

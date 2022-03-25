@@ -41,17 +41,15 @@ public interface RepeatCallback {
 ----
 
 The callback is executed repeatedly until the implementation determines that the
-iteration should end. The return value in these interfaces is an enumeration that can
-either be `RepeatStatus.CONTINUABLE` or `RepeatStatus.FINISHED`. A `RepeatStatus`
+iteration should end. The return value in these interfaces is an enumeration value that can
+be either `RepeatStatus.CONTINUABLE` or `RepeatStatus.FINISHED`. A `RepeatStatus`
 enumeration conveys information to the caller of the repeat operations about whether
-there is any more work to do. Generally speaking, implementations of `RepeatOperations`
-should inspect the `RepeatStatus` and use it as part of the decision to end the
-iteration. Any callback that wishes to signal to the caller that there is no more work to
-do can return `RepeatStatus.FINISHED`.
+any work remains. Generally speaking, implementations of `RepeatOperations`
+should inspect `RepeatStatus` and use it as part of the decision to end the
+iteration. Any callback that wishes to signal to the caller that there is no work remains
+can return `RepeatStatus.FINISHED`.
 
-The simplest general purpose implementation of `RepeatOperations` is `RepeatTemplate`, as
-shown in the following example:
-
+The simplest general purpose implementation of `RepeatOperations` is `RepeatTemplate`:
 
 [source, java]
 ----
@@ -71,9 +69,9 @@ template.iterate(new RepeatCallback() {
 
 In the preceding example, we return `RepeatStatus.CONTINUABLE`, to show that there is
 more work to do. The callback can also return `RepeatStatus.FINISHED`, to signal to the
-caller that there is no more work to do. Some iterations can be terminated by
+caller that there is no work remains. Some iterations can be terminated by
 considerations intrinsic to the work being done in the callback. Others are effectively
-infinite loops as far as the callback is concerned and the completion decision is
+infinite loops (as far as the callback is concerned), and the completion decision is
 delegated to an external policy, as in the case shown in the preceding example.
 
 [[repeatContext]]
@@ -81,7 +79,7 @@ delegated to an external policy, as in the case shown in the preceding example.
 ==== RepeatContext
 
 The method parameter for the `RepeatCallback` is a `RepeatContext`. Many callbacks ignore
-the context. However, if necessary, it can be used as an attribute bag to store transient
+the context. However, if necessary, you can use it as an attribute bag to store transient
 data for the duration of the iteration. After the `iterate` method returns, the context
 no longer exists.
 
@@ -91,28 +89,26 @@ calls to `iterate`. This is the case, for instance, if you want to count the num
 occurrences of an event in the iteration and remember it across subsequent calls.
 
 [[repeatStatus]]
-
 ==== RepeatStatus
 
 `RepeatStatus` is an enumeration used by Spring Batch to indicate whether processing has
-finished. It has two possible `RepeatStatus` values, described in the following table:
+finished. It has two possible `RepeatStatus` values:
 
 .RepeatStatus Properties
 
 |===============
 |__Value__|__Description__
-|CONTINUABLE|There is more work to do.
-|FINISHED|No more repetitions should take place.
+|`CONTINUABLE`|There is more work to do.
+|`FINISHED`|No more repetitions should take place.
 
 |===============
 
-`RepeatStatus` values can also be combined with a logical AND operation by using the
+You can combine `RepeatStatus` values with a logical AND operation by using the
 `and()` method in `RepeatStatus`. The effect of this is to do a logical AND on the
-continuable flag. In other words, if either status is `FINISHED`, then the result is
+continuable flag. In other words, if either status is `FINISHED`, the result is
 `FINISHED`.
 
 [[completionPolicies]]
-
 === Completion Policies
 
 Inside a `RepeatTemplate`, the termination of the loop in the `iterate` method is
@@ -132,7 +128,6 @@ decisions. For example, a batch processing window that prevents batch jobs from 
 once the online systems are in use would require a custom policy.
 
 [[repeatExceptionHandling]]
-
 === Exception Handling
 
 If there is an exception thrown inside a `RepeatCallback`, the `RepeatTemplate` consults
@@ -165,7 +160,6 @@ current `RepeatContext`. When set to `true`, the limit is kept across sibling co
 a nested iteration (such as a set of chunks inside a step).
 
 [[repeatListeners]]
-
 === Listeners
 
 Often, it is useful to be able to receive additional callbacks for cross-cutting concerns
@@ -195,7 +189,6 @@ order. In this case, `open` and `before` are called in the same order while `aft
 `onError`, and `close` are called in reverse order.
 
 [[repeatParallelProcessing]]
-
 === Parallel Processing
 
 Implementations of `RepeatOperations` are not restricted to executing the callback
@@ -207,21 +200,21 @@ of executing the whole iteration in the same thread (the same as a normal
 `RepeatTemplate`).
 
 [[declarativeIteration]]
-
 === Declarative Iteration
 
-Sometimes there is some business processing that you know you want to repeat every time
-it happens. The classic example of this is the optimization of a message pipeline. It is
-more efficient to process a batch of messages, if they are arriving frequently, than to
+Sometimes, there is some business processing that you know you want to repeat every time
+it happens. The classic example of this is the optimization of a message pipeline.
+If a batch of messages arrives frequently, it is more efficient to process them than to
 bear the cost of a separate transaction for every message. Spring Batch provides an AOP
-interceptor that wraps a method call in a `RepeatOperations` object for just this
+interceptor that wraps a method call in a `RepeatOperations` object for this
 purpose. The `RepeatOperationsInterceptor` executes the intercepted method and repeats
 according to the `CompletionPolicy` in the provided `RepeatTemplate`.
 
 [role="xmlContent"]
-The following example shows declarative iteration using the Spring AOP namespace to
+The following example shows declarative iteration that uses the Spring AOP namespace to
 repeat a service call to a method called `processMessage` (for more detail on how to
-configure AOP interceptors, see the Spring User Guide):
+configure AOP interceptors, see the
+<<https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop,Spring User Guide>>):
 
 [source, xml, role="xmlContent"]
 ----
@@ -236,9 +229,10 @@ configure AOP interceptors, see the Spring User Guide):
 ----
 
 [role="javaContent"]
-The following example demonstrates using Java configuration to
+The following example uses Java configuration to
 repeat a service call to a method called `processMessage` (for more detail on how to
-configure AOP interceptors, see the Spring User Guide):
+configure AOP interceptors, see the
+<<https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop,Spring User Guide>>):
 
 [source, java, role="javaContent"]
 ----
@@ -264,11 +258,11 @@ The preceding example uses a default `RepeatTemplate` inside the interceptor. To
 the policies, listeners, and other details, you can inject an instance of
 `RepeatTemplate` into the interceptor.
 
-If the intercepted method returns `void`, then the interceptor always returns
+If the intercepted method returns `void`, the interceptor always returns
 `RepeatStatus.CONTINUABLE` (so there is a danger of an infinite loop if the
 `CompletionPolicy` does not have a finite end point). Otherwise, it returns
-`RepeatStatus.CONTINUABLE` until the return value from the intercepted method is `null`,
-at which point it returns `RepeatStatus.FINISHED`. Consequently, the business logic
+`RepeatStatus.CONTINUABLE` until the return value from the intercepted method is `null`.
+At that point, it returns `RepeatStatus.FINISHED`. Consequently, the business logic
 inside the target method can signal that there is no more work to do by returning `null`
-or by throwing an exception that is re-thrown by the `ExceptionHandler` in the provided
+or by throwing an exception that is rethrown by the `ExceptionHandler` in the provided
 `RepeatTemplate`.

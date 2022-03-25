@@ -10,19 +10,19 @@ The reference documentation is divided into several sections:
 
 [horizontal]
 <<spring-batch-intro.adoc#spring-batch-intro,Spring Batch Introduction>> :: Background, usage
- scenarios and general guidelines.
+ scenarios, and general guidelines.
 <<whatsnew.adoc#whatsNew,What's new in Spring Batch 5.0>> :: New features introduced in version 5.0.
 <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>> :: Core concepts and abstractions
 of the Batch domain language.
-<<job.adoc#configureJob,Configuring and Running a Job>> :: Job configuration, execution and
+<<job.adoc#configureJob,Configuring and Running a Job>> :: Job configuration, execution, and
 administration.
-<<step.adoc#configureStep,Configuring a Step>> :: Step configuration, different types of steps,
+<<step.adoc#configureStep,Configuring a Step>> :: Step configuration, different types of steps, and
 controlling step flow.
 <<readersAndWriters.adoc#readersAndWriters,Item reading and writing>> :: `ItemReader`
 and `ItemWriter` interfaces and how to use them.
 <<processor.adoc#itemProcessor,Item processing>> :: `ItemProcessor` interface and how to use it.
 <<scalability.adoc#scalability,Scaling and Parallel Processing>> :: Multi-threaded steps,
-parallel steps, remote chunking and partitioning.
+parallel steps, remote chunking, and partitioning.
 <<repeat.adoc#repeat,Repeat>> :: Completion policies and exception handling of repetitive actions.
 <<retry.adoc#retry,Retry>> :: Retry and backoff policies of retryable operations.
 <<testing.adoc#testing,Unit Testing>> :: Job and Step testing facilities and APIs.
@@ -31,18 +31,18 @@ and guidelines.
 <<spring-batch-integration.adoc#springBatchIntegration,Spring Batch Integration>> :: Integration
 between Spring Batch and Spring Integration projects.
 <<monitoring-and-metrics.adoc#monitoring-and-metrics,Monitoring and metrics>> :: Batch jobs
-monitoring and metrics
+monitoring and metrics.
 
 The following appendices are available:
 
 [horizontal]
 <<appendix.adoc#listOfReadersAndWriters,List of ItemReaders and ItemWriters>> :: List of
-all item readers and writers provided out-of-the box.
+all provided item readers and writers.
 <<schema-appendix.adoc#metaDataSchema,Meta-Data Schema>> :: Core tables used by the Batch
 domain model.
 <<transaction-appendix.adoc#transactions,Batch Processing and Transactions>> :: Transaction
-boundaries, propagation and isolation levels used in Spring Batch.
-<<glossary.adoc#glossary,Glossary>> :: Glossary of common terms, concepts and vocabulary of
+boundaries, propagation, and isolation levels used in Spring Batch.
+<<glossary.adoc#glossary,Glossary>> :: Glossary of common terms, concepts, and vocabulary of
 the Batch domain.
 
 include::footer/index-footer.adoc[]
