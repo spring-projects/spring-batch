@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.observability;
 
-import io.micrometer.observation.Tags;
+import io.micrometer.common.Tags;
 
 import org.springframework.batch.core.StepExecution;
 
@@ -23,6 +23,7 @@ import org.springframework.batch.core.StepExecution;
  * Default {@link BatchStepTagsProvider} implementation.
  *
  * @author Marcin Grzejszczak
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
 public class DefaultBatchStepTagsProvider implements BatchStepTagsProvider {
