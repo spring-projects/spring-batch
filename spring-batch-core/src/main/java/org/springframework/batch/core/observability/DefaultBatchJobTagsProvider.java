@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.observability;
 
-import io.micrometer.observation.Tags;
+import io.micrometer.common.Tags;
 
 import org.springframework.batch.core.JobExecution;
 
@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobExecution;
  * Default {@link BatchJobTagsProvider} implementation.
  *
  * @author Marcin Grzejszczak
+ * @author Mahmoud Ben Hassine
  * @since 5.0
  */
 public class DefaultBatchJobTagsProvider implements BatchJobTagsProvider {

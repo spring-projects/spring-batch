@@ -65,6 +65,11 @@
 			<artifactId>micrometer-observation</artifactId>
 			<version>${micrometer.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-commons</artifactId>
+			<version>${micrometer.version}</version>
+		</dependency>
 
 		<!-- optional production dependencies -->
 		<dependency>
