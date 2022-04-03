@@ -113,7 +113,7 @@ public class MySQLJdbcJobRepositoryTests {
 	/*
 	 * This test is for issue https://github.com/spring-projects/spring-batch/issues/4087:
 	 * A round trip from a `java.lang.Long` or `java.lang.Double` JobParameter that value is null to the database and back
-	 * again should preserve nullable value which original, otherwise a different
+	 * again should preserve null. otherwise a different
 	 * job instance is created while the existing one should be used.
 	 *
 	 * This test ensures that round trip to the database with a `java.lang.Long` or `java.lang.Double`
@@ -125,14 +125,13 @@ public class MySQLJdbcJobRepositoryTests {
 	@Test
 	public void testLongOrDoubleNullable() throws Exception {
 		// given
-		Date date = new Date();
 		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("attribute", null) // as same as Double type
 				.toJobParameters();
 
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
-		this.jobOperator.restart(jobExecution.getId()); // should load the date parameter with fractional seconds precision here
+		this.jobOperator.restart(jobExecution.getId()); // should load the null value for java.lang.Long or java.lang.Double
 
 		// then
 		List<Long> jobInstances = this.jobOperator.getJobInstances("job", 0, 100);
