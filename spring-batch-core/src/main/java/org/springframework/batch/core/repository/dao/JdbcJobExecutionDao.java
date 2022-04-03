@@ -374,9 +374,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				if (type == ParameterType.STRING) {
 					value = new JobParameter(rs.getString(4), rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.LONG) {
-					value = new JobParameter(rs.getLong(6), rs.getString(8).equalsIgnoreCase("Y"));
+					long longVal = rs.getLong(6);
+					value = new JobParameter(rs.wasNull() ? null : longVal, rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.DOUBLE) {
-					value = new JobParameter(rs.getDouble(7), rs.getString(8).equalsIgnoreCase("Y"));
+					double doubleVal = rs.getDouble(7);
+					value = new JobParameter(rs.wasNull() ? null : doubleVal, rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.DATE) {
 					value = new JobParameter(rs.getTimestamp(5), rs.getString(8).equalsIgnoreCase("Y"));
 				}
