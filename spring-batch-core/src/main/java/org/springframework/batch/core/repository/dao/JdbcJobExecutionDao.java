@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2019 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -374,9 +374,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				if (type == ParameterType.STRING) {
 					value = new JobParameter(rs.getString(4), rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.LONG) {
-					value = new JobParameter(rs.getLong(6), rs.getString(8).equalsIgnoreCase("Y"));
+					long longValue = rs.getLong(6);
+					value = new JobParameter(rs.wasNull() ? null : longValue, rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.DOUBLE) {
-					value = new JobParameter(rs.getDouble(7), rs.getString(8).equalsIgnoreCase("Y"));
+					double doubleValue = rs.getDouble(7);
+					value = new JobParameter(rs.wasNull() ? null : doubleValue, rs.getString(8).equalsIgnoreCase("Y"));
 				} else if (type == ParameterType.DATE) {
 					value = new JobParameter(rs.getTimestamp(5), rs.getString(8).equalsIgnoreCase("Y"));
 				}

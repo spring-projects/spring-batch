@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,36 @@ public class MySQLJdbcJobRepositoryTests {
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 		this.jobOperator.restart(jobExecution.getId()); // should load the date parameter with fractional seconds precision here
+
+		// then
+		List<Long> jobInstances = this.jobOperator.getJobInstances("job", 0, 100);
+		Assert.assertEquals(1, jobInstances.size());
+		List<Long> jobExecutions = this.jobOperator.getExecutions(jobInstances.get(0));
+		Assert.assertEquals(2, jobExecutions.size());
+	}
+
+	/*
+	 * This test is for issue https://github.com/spring-projects/spring-batch/issues/4087:
+	 * A round trip from a `java.lang.Long` or `java.lang.Double` JobParameter that value is null to the database and back
+	 * again should preserve null. otherwise a different
+	 * job instance is created while the existing one should be used.
+	 *
+	 * This test ensures that round trip to the database with a `java.lang.Long` or `java.lang.Double`
+	 * parameter that value is null ends up with a single job instance (with two job executions)
+	 * being created and not two distinct job instances (with a job execution for
+	 * each one).
+	 *
+	 */
+	@Test
+	public void testLongOrDoubleNullable() throws Exception {
+		// given
+		JobParameters jobParameters = new JobParametersBuilder()
+				.addLong("attribute", null) // as same as Double type
+				.toJobParameters();
+
+		// when
+		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
+		this.jobOperator.restart(jobExecution.getId()); // should load the null value for java.lang.Long or java.lang.Double
 
 		// then
 		List<Long> jobInstances = this.jobOperator.getJobInstances("job", 0, 100);
