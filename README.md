@@ -49,7 +49,7 @@ In STS (or any Eclipse distro or other IDE with Maven support), import the modul
 If you want to build the project in a Docker container, you can proceed as follows:
 
 ```
-$> docker run -it --mount type=bind,source="$(pwd)",target=/spring-batch maven:3-openjdk-8 bash
+$> docker run -it --mount type=bind,source="$(pwd)",target=/spring-batch maven:3-openjdk-17 bash
 #> cd spring-batch
 #> ./mvnw package
 ```
@@ -59,7 +59,7 @@ If you want to work on a copy of the source code inside the container (no side e
 you can proceed as follows:
 
 ```
-$> docker run -it maven:3-openjdk-8 bash
+$> docker run -it maven:3-openjdk-17 bash
 #> git clone https://github.com/spring-projects/spring-batch.git
 #> cd spring-batch
 #> ./mvnw package
