@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,18 @@ package org.springframework.batch.core;
 /**
  * Indicates to the framework that a critical error has occurred and processing
  * should immediately stop.
- * 
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class UnexpectedJobExecutionException extends RuntimeException {
 	private static final long serialVersionUID = 8838982304219248527L;
 
 	/**
 	 * Constructs a new instance with a message.
-	 * 
-	 * @param msg the exception message.
-	 * 
+	 *
+	 * @param msg The exception message.
+	 *
 	 */
 	public UnexpectedJobExecutionException(String msg) {
 		super(msg);
@@ -38,10 +38,10 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a message.
-	 * 
-	 * @param msg the exception message.
-	 * @param nested instance of {@link Throwable} that is the cause of the exception.
-	 * 
+	 *
+	 * @param msg The exception message.
+	 * @param nested An instance of {@link Throwable} that is the cause of the exception.
+	 *
 	 */
 	public UnexpectedJobExecutionException(String msg, Throwable nested) {
 		super(msg, nested);

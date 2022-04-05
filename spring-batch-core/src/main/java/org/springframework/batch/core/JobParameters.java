@@ -28,15 +28,16 @@ import org.springframework.lang.Nullable;
 
 /**
  * Value object representing runtime parameters to a batch job. Because the
- * parameters have no individual meaning outside of the JobParameters they are
+ * parameters have no individual meaning outside
+ * of the {@code JobParameters} object they are
  * contained within, it is a value object rather than an entity. It is also
  * extremely important that a parameters object can be reliably compared to
- * another for equality, in order to determine if one JobParameters object
- * equals another. Furthermore, because these parameters will need to be
+ * another for equality, in order to determine if one {@code JobParameters} object
+ * equals another. Furthermore, because these parameters need to be
  * persisted, it is vital that the types added are restricted.
- * 
- * This class is immutable and therefore thread-safe.
- * 
+ *
+ * This class is immutable and, therefore, thread-safe.
+ *
  * @author Lucas Ward
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -56,19 +57,21 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Constructor that is initialized with the content of a {@link Map} that contains a string key and {@link JobParameter} value.
+	 * Constructor that is initialized with the content of a {@link Map}
+	 * that contains a {@code String} key and a {@link JobParameter} value.
 	 *
-	 * @param parameters The {@link Map} that contains a string key and {@link JobParameter} value.
+	 * @param parameters The {@link Map} that contains a {@code String} key
+	 *  and a {@link JobParameter} value.
 	 */
 	public JobParameters(Map<String,JobParameter> parameters) {
 		this.parameters = new LinkedHashMap<>(parameters);
 	}
 
 	/**
-	 * Typesafe Getter for the Long represented by the provided key.
-	 * 
-	 * @param key The key to get a value for
-	 * @return The <code>Long</code> value or {@code null} if the key is absent
+	 * Typesafe getter for the {@link Long} represented by the provided key.
+	 *
+	 * @param key The key for which to get a value.
+	 * @return The {@link Long} value or {@code null} if the key is absent.
 	 */
 	@Nullable
 	public Long getLong(String key){
@@ -80,13 +83,13 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Long represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
+	 * Typesafe getter for the {@link Long} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
 	 *
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is
+	 *  missing, the default value.
 	 */
 	@Nullable
 	public Long getLong(String key, @Nullable Long defaultValue){
@@ -99,10 +102,10 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the String represented by the provided key.
-	 * 
-	 * @param key The key to get a value for
-	 * @return The <code>String</code> value or {@code null} if the key is absent
+	 * Typesafe getter for the {@link String} represented by the provided key.
+	 *
+	 * @param key The key for which to get a value.
+	 * @return The {@link String} value or {@code null} if the key is absent.
 	 */
 	@Nullable
 	public String getString(String key){
@@ -111,13 +114,13 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the String represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
-	 * 
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
+	 * Typesafe getter for the {@link String} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
+	 *
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The defult value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is
+	 *  missing, the default value.
 	 */
 	@Nullable
 	public String getString(String key, @Nullable String defaultValue){
@@ -130,10 +133,10 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Long represented by the provided key.
-	 * 
-	 * @param key The key to get a value for
-	 * @return The <code>Double</code> value or {@code null} if the key is absent
+	 * Typesafe getter for the {@link Long} represented by the provided key.
+	 *
+	 * @param key The key for which to get a value.
+	 * @return The {@link Double} value or {@code null} if the key is absent.
 	 */
 	@Nullable
 	public Double getDouble(String key){
@@ -145,13 +148,13 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Double represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
+	 * Typesafe getter for the {@link Double} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
 	 *
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is
+	 *  missing, the default value.
 	 */
 	@Nullable
 	public Double getDouble(String key, @Nullable Double defaultValue){
@@ -164,11 +167,11 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Date represented by the provided key.
-	 * 
-	 * @param key The key to get a value for
-	 * @return The <code>java.util.Date</code> value or {@code null} if the key
-	 * is absent
+	 * Typesafe getter for the {@link Date} represented by the provided key.
+	 *
+	 * @param key The key for which to get a value.
+	 * @return the {@link java.util.Date} value or {@code null} if the key
+	 * is absent.
 	 */
 	@Nullable
 	public Date getDate(String key){
@@ -176,13 +179,13 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Typesafe Getter for the Date represented by the provided key.  If the
-	 * key does not exist, the default value will be returned.
-	 * 
-	 * @param key to return the value for
-	 * @param defaultValue to return if the value doesn't exist
-	 * @return the parameter represented by the provided key, defaultValue
-	 * otherwise.
+	 * Typesafe getter for the {@link Date} represented by the provided key. If the
+	 * key does not exist, the default value is returned.
+	 *
+	 * @param key The key for which to return the value.
+	 * @param defaultValue The default value to return if the value does not exist.
+	 * @return the parameter represented by the provided key or, if that is
+	 *  missing, the default value.
 	 */
 	@Nullable
 	public Date getDate(String key, @Nullable Date defaultValue){
@@ -195,8 +198,9 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * Get a map of all parameters, including string, long, and date.
-	 * 
+	 * Get a map of all parameters, including {@link String},
+	 * {@link Long}, and {@link Date} types.
+	 *
 	 * @return an unmodifiable map containing all parameters.
 	 */
 	public Map<String, JobParameter> getParameters(){
@@ -204,7 +208,7 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * @return true if the parameters is empty, false otherwise.
+	 * @return {@code true} if the parameters object is empty or {@code false} otherwise.
 	 */
 	public boolean isEmpty(){
 		return parameters.isEmpty();
@@ -235,7 +239,7 @@ public class JobParameters implements Serializable {
 	}
 
 	/**
-	 * @return The {@link Properties} that contain the key and values for the {@link JobParameter}s.
+	 * @return The {@link Properties} that contain the key and values for the {@link JobParameter} objects.
 	 */
 	public Properties toProperties() {
 		Properties props = new Properties();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2018 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.springframework.batch.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for obtaining the next {@link JobParameters} in a sequence.
- * 
+ * Interface for obtaining the next {@link JobParameters} object in a sequence.
+ *
  * @author Dave Syer
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
@@ -28,10 +28,10 @@ import org.springframework.lang.Nullable;
 public interface JobParametersIncrementer {
 
 	/**
-	 * Increment the provided parameters. If the input is empty, then this
+	 * Increments the provided parameters. If the input is empty, this method
 	 * should return a bootstrap or initial value to be used on the first
 	 * instance of a job.
-	 * 
+	 *
 	 * @param parameters the last value used
 	 * @return the next value to use (never {@code null})
 	 */

@@ -25,7 +25,7 @@ import java.io.StringWriter;
  * Value object used to carry information about the status of a
  * job or step execution.
  *
- * ExitStatus is immutable and therefore thread-safe.
+ * {@code ExitStatus} is immutable and, therefore, thread-safe.
  *
  * @author Dave Syer
  *
@@ -34,8 +34,8 @@ import java.io.StringWriter;
 public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
-	 * Convenient constant value representing unknown state - assumed not
-	 * continuable.
+	 * Convenient constant value representing unknown state - assumed to not
+	 * be continuable.
 	 */
 	public static final ExitStatus UNKNOWN = new ExitStatus("UNKNOWN");
 
@@ -54,8 +54,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
 
 	/**
-	 * Convenient constant value representing job that did no processing
-	 * (e.g. because it was already complete).
+	 * Convenient constant value representing a job that did no processing
+	 * (for example, because it was already complete).
 	 */
 	public static final ExitStatus NOOP = new ExitStatus("NOOP");
 
@@ -115,8 +115,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the exit
-	 * code, and a concatenation of the descriptions. If either value has a
-	 * higher severity then its exit code will be used in the result. In the
+	 * code and a concatenation of the descriptions. If either value has a
+	 * higher severity, its exit code is used in the result. In the
 	 * case of equal severity, the exit code is replaced if the new value is
 	 * alphabetically greater.<br>
 	 * <br>
@@ -132,9 +132,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * </ul>
 	 * Others have severity 7, so custom exit codes always win.<br>
 	 *
-	 * If the input is null just return this.
+	 * If the input is {@code null} just return this.
 	 *
-	 * @param status an {@link ExitStatus} to combine with this one.
+	 * @param status An {@link ExitStatus} object to combine with this one.
 	 * @return a new {@link ExitStatus} combining the current value and the
 	 * argument provided.
 	 */
@@ -150,8 +150,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * @param status an {@link ExitStatus} to compare
-	 * @return greater than zero, 0, less than zero according to the severity and exit code
+	 * @param status An {@link ExitStatus} to compare
+	 * @return greater than zero, 0, or less than zero,
+	 * according to the severity and exit code.
 	 * @see java.lang.Comparable
 	 */
 	@Override
@@ -166,8 +167,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * @param status
-	 * @return
+	 * Determines severity (an int between 1 and 7, inclusive)
+	 * based on an {@code ExitStatus} object.
+	 * @param status The {@code ExitStatus} object from which to determine the severity.
+	 * @return the severity number.
 	 */
 	private int severity(ExitStatus status) {
 		if (status.exitCode.startsWith(EXECUTING.exitCode)) {
@@ -202,7 +205,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * Compare the fields one by one.
+	 * Compare the fields, one by one.
 	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -226,9 +229,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Add an exit code to an existing {@link ExitStatus}. If there is already a
-	 * code present tit will be replaced.
+	 * code present, it will be replaced.
 	 *
-	 * @param code the code to add
+	 * @param code The code to add.
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
 	 * code.
 	 */
@@ -239,7 +242,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Check if this status represents a running process.
 	 *
-	 * @return true if the exit code is "EXECUTING" or "UNKNOWN"
+	 * @return {@code true} if the exit code is {@code EXECUTING} or {@code UNKNOWN}.
 	 */
 	public boolean isRunning() {
 		return "EXECUTING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
@@ -247,12 +250,12 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Add an exit description to an existing {@link ExitStatus}. If there is
-	 * already a description present the two will be concatenated with a
+	 * already a description present, the two are concatenated with a
 	 * semicolon.
 	 *
-	 * @param description the description to add
+	 * @param description The description to add.
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
-	 * description
+	 * description.
 	 */
 	public ExitStatus addExitDescription(String description) {
 		StringBuilder buffer = new StringBuilder();
@@ -271,10 +274,10 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Extract the stack trace from the throwable provided and append it to
-	 * the exist description.
+	 * the existing description.
 	 *
-	 * @param throwable {@link Throwable} instance containing the stack trace.
-	 * @return a new ExitStatus with the stack trace appended
+	 * @param throwable A {@link Throwable} instance containing the stack trace.
+	 * @return a new ExitStatus with the stack trace appended.
 	 */
 	public ExitStatus addExitDescription(Throwable throwable) {
 		StringWriter writer = new StringWriter();
@@ -284,8 +287,8 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	}
 
 	/**
-	 * @param status the exit code to be evaluated
-	 * @return true if the value matches a known exit code
+	 * @param status The {@code ExitStatus} object containing the exit code to be evaluated.
+	 * @return {@code true} if the value matches a known exit code.
 	 */
 	public static boolean isNonDefaultExitStatus(ExitStatus status) {
 		return status == null || status.getExitCode() == null ||

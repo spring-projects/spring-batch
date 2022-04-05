@@ -18,8 +18,8 @@ package org.springframework.batch.core;
 import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
- * Listener interface for the lifecycle of a chunk.  A chunk
- * can be thought of as a collection of items that will be
+ * Listener interface for the lifecycle of a chunk. A chunk
+ * can be thought of as a collection of items that are
  * committed together.
  *
  * @author Lucas Ward
@@ -52,11 +52,11 @@ public interface ChunkListener extends StepListener {
 
 	/**
 	 * Callback after a chunk has been marked for rollback.  It is invoked
-	 * after transaction rollback.  While the rollback will have occurred,
-	 * transactional resources might still be active and accessible.  Due to
-	 * this, data access code within this callback will still "participate" in
+	 * after transaction rollback. While the rollback will have occurred,
+	 * transactional resources might still be active and accessible. Due to
+	 * this, data access code within this callback still "participates" in
 	 * the original transaction unless it declares that it runs in its own
-	 * transaction.  Hence: <em> Use PROPAGATION_REQUIRES_NEW for any
+	 * transaction. <em>As a result, you should use {@code PROPAGATION_REQUIRES_NEW} for any
 	 * transactional operation that is called from here.</em>
 	 *
 	 * @param context the chunk context containing the exception that caused

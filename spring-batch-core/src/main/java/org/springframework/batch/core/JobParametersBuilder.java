@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import org.springframework.util.Assert;
 
 /**
  * Helper class for creating {@link JobParameters}. Useful because all
- * {@link JobParameter} objects are immutable, and must be instantiated separately
+ * {@link JobParameter} objects are immutable and must be instantiated separately
  * to ensure type safety. Once created, it can be used in the
- * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
- * various parameter types and creating a valid {@link JobParameters} once
+ * same was a {@link java.lang.StringBuilder} (except that order is irrelevant), by adding
+ * various parameter types and creating a valid {@link JobParameters} object once
  * finished.<br>
  * <br>
- * Using the identifying flag indicates if the parameter will be used
- * in the identification of a JobInstance.  That flag defaults to true.
+ * Using the {@code identifying} flag indicates if the parameter should be used
+ * in the identification of a {@link JobInstance} object. That flag defaults to {@code true}.
  *
  * @author Lucas Ward
  * @author Michael Minella
@@ -59,7 +59,7 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information.
 	 */
 	public JobParametersBuilder(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
@@ -75,10 +75,10 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Constructor to add conversion capabilities to support JSR-352.  Per the spec, it is expected that all
-	 * keys and values in the provided {@link Properties} instance are Strings
+	 * Constructor to add conversion capabilities to support JSR-352. Per the spec, it is expected that all
+	 * keys and values in the provided {@link Properties} instance are {@link String} objects.
 	 *
-	 * @param properties the job parameters to be used
+	 * @param properties the job parameters to be used.
 	 */
 	public JobParametersBuilder(Properties properties) {
 		this.parameterMap = new LinkedHashMap<>();
@@ -93,7 +93,7 @@ public class JobParametersBuilder {
 	/**
 	 * Copy constructor. Initializes the builder with the supplied parameters.
 	 * @param jobParameters {@link JobParameters} instance used to initialize the builder.
-	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information
+	 * @param jobExplorer {@link JobExplorer} used for looking up previous job parameter information.
 	 */
 	public JobParametersBuilder(JobParameters jobParameters, JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
@@ -103,8 +103,8 @@ public class JobParametersBuilder {
 	/**
 	 * Add a new identifying String parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, @NonNull String parameter) {
@@ -115,9 +115,9 @@ public class JobParametersBuilder {
 	/**
 	 * Add a new String parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
-	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying The indicates if the parameter is used as part of identifying a job instance.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addString(String key, @NonNull String parameter, boolean identifying) {
@@ -128,8 +128,8 @@ public class JobParametersBuilder {
 	/**
 	 * Add a new identifying {@link Date} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter) {
@@ -140,9 +140,9 @@ public class JobParametersBuilder {
 	/**
 	 * Add a new {@link Date} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
-	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job instance
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDate(String key, @NonNull Date parameter, boolean identifying) {
@@ -151,10 +151,10 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new identifying Long parameter for the given key.
+	 * Add a new identifying {@link Long} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, @NonNull Long parameter) {
@@ -163,11 +163,11 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new Long parameter for the given key.
+	 * Add a new {@link Long} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
-	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job instance.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addLong(String key, @NonNull Long parameter, boolean identifying) {
@@ -176,10 +176,10 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new identifying Double parameter for the given key.
+	 * Add a new identifying {@link Double} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, @NonNull Double parameter) {
@@ -188,11 +188,11 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new Double parameter for the given key.
+	 * Add a new {@link Double} parameter for the given key.
 	 *
-	 * @param key - parameter accessor.
-	 * @param parameter - runtime parameter. Must not be {@code null}.
-	 * @param identifying - indicates if the parameter is used as part of identifying a job instance
+	 * @param key The parameter accessor.
+	 * @param parameter The runtime parameter. Must not be {@code null}.
+	 * @param identifying Indicates if the parameter is used as part of identifying a job instance.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addDouble(String key, @NonNull Double parameter, boolean identifying) {
@@ -202,7 +202,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Conversion method that takes the current state of this builder and
-	 * returns it as a JobParameters object.
+	 * returns it as a {@code JobParameters} object.
 	 *
 	 * @return a valid {@link JobParameters} object.
 	 */
@@ -213,8 +213,8 @@ public class JobParametersBuilder {
 	/**
 	 * Add a new {@link JobParameter} for the given key.
 	 *
-	 * @param key - parameter accessor
-	 * @param jobParameter - runtime parameter
+	 * @param key The parameter accessor.
+	 * @param jobParameter The runtime parameter.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addParameter(String key, JobParameter jobParameter) {
@@ -225,7 +225,7 @@ public class JobParametersBuilder {
 
 	/**
 	 * Copy job parameters into the current state.
-	 * @param jobParameters parameters to copy in
+	 * @param jobParameters The parameters to copy in.
 	 * @return a reference to this object.
 	 */
 	public JobParametersBuilder addJobParameters(JobParameters jobParameters) {
@@ -237,14 +237,14 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Initializes the {@link JobParameters} based on the state of the {@link Job}.  This
+	 * Initializes the {@link JobParameters} based on the state of the {@link Job}. This
 	 * should be called after all parameters have been entered into the builder.
-	 * All parameters already set on this builder instance will be appended to
-	 * those retrieved from the job incrementer, overriding any with the same key (Same
-	 * behaviour as {@link org.springframework.batch.core.launch.support.CommandLineJobRunner}
-	 * with "-next" option and {@link org.springframework.batch.core.launch.JobOperator#startNextInstance(String)})
+	 * All parameters already set on this builder instance are appended to
+	 * those retrieved from the job incrementer, overriding any with the same key (this is the same
+	 * behavior as {@link org.springframework.batch.core.launch.support.CommandLineJobRunner}
+	 * with the {@code -next} option and {@link org.springframework.batch.core.launch.JobOperator#startNextInstance(String)}).
 	 *
-	 * @param job the job for which the {@link JobParameters} are being constructed.
+	 * @param job The job for which the {@link JobParameters} are being constructed.
 	 * @return a reference to this object.
 	 *
 	 * @since 4.0
