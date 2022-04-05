@@ -26,8 +26,8 @@ import org.springframework.util.DigestUtils;
 
 /**
  * Default implementation of the {@link JobKeyGenerator} interface.
- * This implementation provides a single hash value based on the JobParameters
- * passed in.  Only identifying parameters (per {@link JobParameter#isIdentifying()})
+ * This implementation provides a single hash value based on the {@link JobParameters} object
+ * passed in. Only identifying parameters (as per {@link JobParameter#isIdentifying()})
  * are used in the calculation of the key.
  *
  * @author Michael Minella

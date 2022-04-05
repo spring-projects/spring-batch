@@ -16,16 +16,16 @@
 package org.springframework.batch.core;
 
 /**
- * Batch domain interface representing the configuration of a step. As with the {@link Job}, a {@link Step} is meant to
- * explicitly represent the configuration of a step by a developer, but also the ability to execute the step.
- * 
+ * Batch domain interface representing the configuration of a step. As with a {@link Job}, a {@link Step} is meant to
+ * explicitly represent the configuration of a step by a developer but also the ability to execute the step.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface Step {
 
 	/**
-	 * The key to retrieve the batch step type.
+	 * The key to use when retrieving the batch step type.
 	 */
 	String STEP_TYPE_KEY = "batch.stepType";
 
@@ -35,7 +35,7 @@ public interface Step {
 	String getName();
 
 	/**
-	 * @return true if a step that is already marked as complete can be started again.
+	 * @return {@code true} if a step that is already marked as complete can be started again.
 	 */
 	boolean isAllowStartIfComplete();
 
@@ -46,14 +46,14 @@ public interface Step {
 
 	/**
 	 * Process the step and assign progress and status meta information to the {@link StepExecution} provided. The
-	 * {@link Step} is responsible for setting the meta information and also saving it if required by the
+	 * {@link Step} is responsible for setting the meta information and also saving it, if required by the
 	 * implementation.<br>
-	 * 
-	 * It is not safe to re-use an instance of {@link Step} to process multiple concurrent executions.
-	 * 
-	 * @param stepExecution an entity representing the step to be executed
-	 * 
-	 * @throws JobInterruptedException if the step is interrupted externally
+	 *
+	 * It is not safe to reuse an instance of {@link Step} to process multiple concurrent executions.
+	 *
+	 * @param stepExecution an entity representing the step to be executed.
+	 *
+	 * @throws JobInterruptedException if the step is interrupted externally.
 	 */
 	void execute(StepExecution stepExecution) throws JobInterruptedException;
 

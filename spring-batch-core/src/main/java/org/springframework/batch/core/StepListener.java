@@ -17,10 +17,10 @@ package org.springframework.batch.core;
 
 /**
  * Marker interface that acts as a parent to all step
- * domain listeners, such as: {@link StepExecutionListener}, 
- * {@link ChunkListener}, {@link ItemReadListener} and
+ * domain listeners, such as: {@link StepExecutionListener},
+ * {@link ChunkListener}, {@link ItemReadListener}, and
  * {@link ItemWriteListener}
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  *

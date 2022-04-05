@@ -16,26 +16,26 @@
 package org.springframework.batch.core;
 
 /**
- * Interface for listener to skipped items. Callbacks will be called by
+ * Interface for listener to skipped items. Callbacks are called by
  * {@link Step} implementations at the appropriate time in the step lifecycle.
- * Implementers of this interface should not assume that any method will be 
- * called immediately after an error has been encountered.  Because there 
- * may be errors later on in processing the chunk, this listener will not be
+ * Implementers of this interface should not assume that any method is
+ * called immediately after an error has been encountered. Because there
+ * may be errors later on in processing the chunk, this listener is not
  * called until just before committing.
- * 
+ *
  * @author Dave Syer
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface SkipListener<T,S> extends StepListener {
 
 	/**
-	 * Callback for a failure on read that is legal, so is not going to be
-	 * re-thrown. In case transaction is rolled back and items are re-read, this
-	 * callback will occur repeatedly for the same cause.  This will only happen
+	 * Callback for a failure on read that is legal and, consequently, is not going to be
+	 * re-thrown. In case a transaction is rolled back and items are re-read, this
+	 * callback occurs repeatedly for the same cause. This happens only
 	 * if read items are not buffered.
-	 * 
+	 *
 	 * @param t cause of the failure
 	 */
 	default void onSkipInRead(Throwable t) {
@@ -43,8 +43,8 @@ public interface SkipListener<T,S> extends StepListener {
 
 	/**
 	 * This item failed on write with the given exception, and a skip was called
-	 * for. 
-	 * 
+	 * for.
+	 *
 	 * @param item the failed item
 	 * @param t the cause of the failure
 	 */
@@ -53,8 +53,8 @@ public interface SkipListener<T,S> extends StepListener {
 
 	/**
 	 * This item failed on processing with the given exception, and a skip was called
-	 * for. 
-	 * 
+	 * for.
+	 *
 	 * @param item the failed item
 	 * @param t the cause of the failure
 	 */

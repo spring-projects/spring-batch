@@ -17,8 +17,8 @@
 package org.springframework.batch.core;
 
 /**
- * Enumeration representing the status of an Execution.
- * 
+ * Enumeration representing the status of an execution.
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Michael Minella
@@ -28,14 +28,14 @@ public enum BatchStatus {
 
 	/**
 	 * The order of the status values is significant because it can be used to
-	 * aggregate a set of status values - the result should be the maximum
-	 * value. Since COMPLETED is first in the order, only if all elements of an
-	 * execution are COMPLETED will the aggregate status be COMPLETED. A running
-	 * execution is expected to move from STARTING to STARTED to COMPLETED
+	 * aggregate a set of status values. The result should be the maximum
+	 * value. Since {@code COMPLETED} is first in the order, only if all elements of an
+	 * execution are {@code COMPLETED} can the aggregate status be COMPLETED. A running
+	 * execution is expected to move from {@code STARTING} to {@code STARTED} to {@code COMPLETED}
 	 * (through the order defined by {@link #upgradeTo(BatchStatus)}). Higher
-	 * values than STARTED signify more serious failure. ABANDONED is used for
-	 * steps that have finished processing, but were not successful, and where
-	 * they should be skipped on a restart (so FAILED is the wrong status).
+	 * values than {@code STARTED} signify more serious failures. {@code ABANDONED} is used for
+	 * steps that have finished processing but were not successful and where
+	 * they should be skipped on a restart (so {@code FAILED} is the wrong status).
 	 */
 
 	/**
@@ -72,7 +72,7 @@ public enum BatchStatus {
 	UNKNOWN;
 
 	/**
-	 * Convenience method to return the higher value status of the statuses pass in to the method.
+	 * Convenience method to return the higher value status of the statuses passed to the method.
 	 *
 	 * @param status1 The first status to check.
 	 * @param status2 The second status to check.
@@ -83,8 +83,8 @@ public enum BatchStatus {
 	}
 
 	/**
-	 * Convenience method to decide if a status indicates work is in progress.
-	 * 
+	 * Convenience method to decide if a status indicates that work is in progress.
+	 *
 	 * @return true if the status is STARTING, STARTED
 	 */
 	public boolean isRunning() {
@@ -94,8 +94,8 @@ public enum BatchStatus {
 	/**
 	 * Convenience method to decide if a status indicates execution was
 	 * unsuccessful.
-	 * 
-	 * @return true if the status is FAILED or greater
+	 *
+	 * @return {@code true} if the status is {@code FAILED} or greater.
 	 */
 	public boolean isUnsuccessful() {
 		return this == FAILED || this.isGreaterThan(FAILED);
@@ -104,13 +104,13 @@ public enum BatchStatus {
 	/**
 	 * Method used to move status values through their logical progression, and
 	 * override less severe failures with more severe ones. This value is
-	 * compared with the parameter and the one that has higher priority is
-	 * returned. If both are STARTED or less than the value returned is the
-	 * largest in the sequence STARTING, STARTED, COMPLETED. Otherwise the value
+	 * compared with the parameter, and the one that has higher priority is
+	 * returned. If both are {@code STARTED} or less than the value returned is the
+	 * largest in the sequence {@code STARTING}, {@code STARTED}, {@code COMPLETED}. Otherwise, the value
 	 * returned is the maximum of the two.
-	 * 
-	 * @param other another status to compare to
-	 * @return either this or the other status depending on their priority
+	 *
+	 * @param other Another status to which to compare.
+	 * @return either this or the other status, depending on their priority.
 	 */
 	public BatchStatus upgradeTo(BatchStatus other) {
 		if (isGreaterThan(STARTED) || other.isGreaterThan(STARTED)) {
@@ -124,36 +124,36 @@ public enum BatchStatus {
 	}
 
 	/**
-	 * @param other a status value to compare
-	 * @return true if this is greater than other
+	 * @param other A status value to which to compare.
+	 * @return {@code true} if this is greater than {@code other}.
 	 */
 	public boolean isGreaterThan(BatchStatus other) {
 		return this.compareTo(other) > 0;
 	}
 
 	/**
-	 * @param other a status value to compare
-	 * @return true if this is less than other
+	 * @param other A status value to which to compare.
+	 * @return {@code true} if this is less than {@code other}.
 	 */
 	public boolean isLessThan(BatchStatus other) {
 		return this.compareTo(other) < 0;
 	}
 
 	/**
-	 * @param other a status value to compare
-	 * @return true if this is less than other
+	 * @param other A status value to which to compare.
+	 * @return {@code true} if this is less than {@code other}.
 	 */
 	public boolean isLessThanOrEqualTo(BatchStatus other) {
 		return this.compareTo(other) <= 0;
 	}
 
 	/**
-	 * Find a BatchStatus that matches the beginning of the given value. If no
-	 * match is found, return COMPLETED as the default because has is low
+	 * Find a {@code BatchStatus} that matches the beginning of the given value. If no
+	 * match is found, return {@code COMPLETED} as the default because it has low
 	 * precedence.
-	 * 
-	 * @param value a string representing a status
-	 * @return a BatchStatus
+	 *
+	 * @param value A string representing a status.
+	 * @return a {BatchStatus} object.
 	 */
 	public static BatchStatus match(String value) {
 		for (BatchStatus status : values()) {
