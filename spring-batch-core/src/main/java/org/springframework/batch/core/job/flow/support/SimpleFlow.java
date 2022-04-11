@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 the original author or authors.
+ * Copyright 2006-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Dave Syer
  * @author Michael Minella
+ * @author Taeik Lim
  * @since 2.0
  */
 public class SimpleFlow implements Flow, InitializingBean {
@@ -126,9 +127,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (startState == null) {
-			initializeTransitions();
-		}
+		initializeTransitionsIfNotInitialized();
 	}
 
 	/**
@@ -136,9 +135,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	@Override
 	public FlowExecution start(FlowExecutor executor) throws FlowExecutionException {
-		if (startState == null) {
-			initializeTransitions();
-		}
+		initializeTransitionsIfNotInitialized();
+
 		State state = startState;
 		String stateName = state.getName();
 		return resume(stateName, executor);
@@ -261,6 +259,12 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	private boolean stateNameEndsWithStepName(State state, StepExecution stepExecution) {
 		return !(stepExecution == null || state == null) && !state.getName().endsWith(stepExecution.getStepName());
+	}
+
+	private synchronized void initializeTransitionsIfNotInitialized() {
+		if (startState == null) {
+			initializeTransitions();
+		}
 	}
 
 	/**
