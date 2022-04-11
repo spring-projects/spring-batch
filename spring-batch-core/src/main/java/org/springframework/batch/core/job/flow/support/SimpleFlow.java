@@ -48,6 +48,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  */
 public class SimpleFlow implements Flow, InitializingBean {
@@ -124,9 +125,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (startState == null) {
-			initializeTransitions();
-		}
+		initializeTransitionsIfNotInitialized();
 	}
 
 	/**
@@ -134,9 +133,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	@Override
 	public FlowExecution start(FlowExecutor executor) throws FlowExecutionException {
-		if (startState == null) {
-			initializeTransitions();
-		}
+		initializeTransitionsIfNotInitialized();
+
 		State state = startState;
 		String stateName = state.getName();
 		return resume(stateName, executor);
@@ -260,6 +258,12 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		return continued;
+	}
+
+	private synchronized void initializeTransitionsIfNotInitialized() {
+		if (startState == null) {
+			initializeTransitions();
+		}
 	}
 
 	/**
