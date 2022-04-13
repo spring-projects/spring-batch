@@ -36,6 +36,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.TransactionStatus;
@@ -55,7 +56,7 @@ public class Jaxb2NamespaceMarshallingTests {
 
 	private StaxEventItemWriter<QualifiedTrade> writer = new StaxEventItemWriter<>();
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private File outputFile;
 

@@ -36,6 +36,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -53,7 +54,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	protected StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<>();
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private File outputFile;
 

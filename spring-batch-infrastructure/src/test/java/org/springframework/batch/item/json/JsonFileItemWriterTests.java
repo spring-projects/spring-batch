@@ -30,6 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 
 /**
  * @author Mahmoud Ben Hassine
@@ -37,7 +38,7 @@ import org.springframework.core.io.Resource;
 @RunWith(MockitoJUnitRunner.class)
 public class JsonFileItemWriterTests {
 
-	private Resource resource;
+	private WritableResource resource;
 	@Mock
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 

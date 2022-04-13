@@ -32,6 +32,7 @@ import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
@@ -48,7 +49,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private boolean forceSync = false;
 
@@ -112,9 +113,9 @@ public class FlatFileItemWriterBuilder<T> {
 	 *
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
-	 * @see FlatFileItemWriter#setResource(Resource)
+	 * @see FlatFileItemWriter#setResource(WritableResource)
 	 */
-	public FlatFileItemWriterBuilder<T> resource(Resource resource) {
+	public FlatFileItemWriterBuilder<T> resource(WritableResource resource) {
 		this.resource = resource;
 
 		return this;

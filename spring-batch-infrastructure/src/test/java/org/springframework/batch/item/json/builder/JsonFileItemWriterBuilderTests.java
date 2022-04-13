@@ -30,6 +30,7 @@ import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class JsonFileItemWriterBuilderTests {
 
-	private Resource resource;
+	private WritableResource resource;
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
 	@Before

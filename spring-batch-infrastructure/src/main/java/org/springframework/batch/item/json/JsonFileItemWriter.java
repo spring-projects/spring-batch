@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.item.support.AbstractFileItemWriter;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -61,7 +62,7 @@ public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 	 * @param resource to write json data to
 	 * @param jsonObjectMarshaller used to marshal object into json representation
 	 */
-	public JsonFileItemWriter(Resource resource, JsonObjectMarshaller<T> jsonObjectMarshaller) {
+	public JsonFileItemWriter(WritableResource resource, JsonObjectMarshaller<T> jsonObjectMarshaller) {
 		Assert.notNull(resource, "resource must not be null");
 		Assert.notNull(jsonObjectMarshaller, "json object marshaller must not be null");
 		setResource(resource);

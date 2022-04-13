@@ -40,6 +40,7 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -838,7 +839,7 @@ public class FlatFileItemWriterTests {
 	 * If append=true a new output file should still be created on the first run (not restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
+		WritableResource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
 		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
 

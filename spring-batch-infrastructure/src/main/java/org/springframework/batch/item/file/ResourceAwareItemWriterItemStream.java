@@ -19,15 +19,15 @@ package org.springframework.batch.item.file;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 
 /**
  * Interface for {@link ItemWriter}s that implement {@link ItemStream} and write
- * output to {@link Resource}.
+ * output to {@link WritableResource}.
  * 
  * @author Robert Kasanicky
  */
 public interface ResourceAwareItemWriterItemStream<T> extends ItemStreamWriter<T> {
 
-	void setResource(Resource resource);
+	void setResource(WritableResource resource);
 }

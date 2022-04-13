@@ -52,6 +52,7 @@ import org.springframework.batch.item.xml.stax.UnopenedElementClosingEventWriter
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
@@ -103,7 +104,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	private static final String WRITE_STATISTICS_NAME = "record.count";
 
 	// file system resource
-	private Resource resource;
+	private WritableResource resource;
 
 	// xml marshaller
 	private Marshaller marshaller;
@@ -177,7 +178,7 @@ ResourceAwareItemWriterItemStream<T>, InitializingBean {
 	 * @param resource the output file
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(WritableResource resource) {
 		this.resource = resource;
 	}
 

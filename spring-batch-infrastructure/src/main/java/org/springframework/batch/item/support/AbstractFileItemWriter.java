@@ -42,6 +42,7 @@ import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
@@ -81,7 +82,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private static final String RESTART_DATA_NAME = "current.count";
 
-	private Resource resource;
+	private WritableResource resource;
 
 	protected OutputState state = null;
 
@@ -133,7 +134,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	 * @param resource the resource to be written to
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(WritableResource resource) {
 		this.resource = resource;
 	}
 

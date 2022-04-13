@@ -21,6 +21,7 @@ import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
@@ -32,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class JsonFileItemWriterBuilder<T> {
 
-	private Resource resource;
+	private WritableResource resource;
 	private JsonObjectMarshaller<T> jsonObjectMarshaller;
 	private FlatFileHeaderCallback headerCallback;
 	private FlatFileFooterCallback footerCallback;
@@ -119,13 +120,13 @@ public class JsonFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The {@link Resource} to be used as output.
+	 * The {@link WritableResource} to be used as output.
 	 *
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
-	 * @see JsonFileItemWriter#setResource(Resource)
+	 * @see JsonFileItemWriter#setResource(WritableResource)
 	 */
-	public JsonFileItemWriterBuilder<T> resource(Resource resource) {
+	public JsonFileItemWriterBuilder<T> resource(WritableResource resource) {
 		this.resource = resource;
 
 		return this;

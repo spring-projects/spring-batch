@@ -20,6 +20,7 @@ import java.util.Map;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.item.xml.StaxWriterCallback;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.util.Assert;
 
@@ -34,7 +35,7 @@ import org.springframework.util.Assert;
  */
 public class StaxEventItemWriterBuilder<T> {
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private Marshaller marshaller;
 
@@ -80,13 +81,13 @@ public class StaxEventItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The {@link Resource} to be used as output.
+	 * The {@link WritableResource} to be used as output.
 	 *
 	 * @param resource the output from the writer
 	 * @return the current instance of the builder.
-	 * @see StaxEventItemWriter#setResource(Resource)
+	 * @see StaxEventItemWriter#setResource(WritableResource)
 	 */
-	public StaxEventItemWriterBuilder<T> resource(Resource resource) {
+	public StaxEventItemWriterBuilder<T> resource(WritableResource resource) {
 		this.resource = resource;
 
 		return this;

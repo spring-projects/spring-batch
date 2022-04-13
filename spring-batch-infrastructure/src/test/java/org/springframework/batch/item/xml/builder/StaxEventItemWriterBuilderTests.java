@@ -36,6 +36,7 @@ import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -51,7 +52,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class StaxEventItemWriterBuilderTests {
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private List<Foo> items;
 

@@ -36,6 +36,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -56,7 +57,7 @@ public class TransactionalStaxEventItemWriterTests {
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	// output file
-	private Resource resource;
+	private WritableResource resource;
 
 	private ExecutionContext executionContext;
 
