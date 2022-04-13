@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,13 @@ import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
  * Base class for item writers that write data to a file or stream.
  * This class provides common features like restart, force sync, append etc.
- * The location of the output file is defined by a {@link Resource} which must
+ * The location of the output file is defined by a {@link WritableResource} which must
  * represent a writable file.<br>
  * 
  * Uses buffered writer to improve performance.<br>
@@ -81,7 +81,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	private static final String RESTART_DATA_NAME = "current.count";
 
-	private Resource resource;
+	private WritableResource resource;
 
 	protected OutputState state = null;
 
@@ -128,12 +128,12 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Setter for resource. Represents a file that can be written.
+	 * Setter for a writable resource. Represents a file that can be written.
 	 * 
 	 * @param resource the resource to be written to
 	 */
 	@Override
-	public void setResource(Resource resource) {
+	public void setResource(WritableResource resource) {
 		this.resource = resource;
 	}
 

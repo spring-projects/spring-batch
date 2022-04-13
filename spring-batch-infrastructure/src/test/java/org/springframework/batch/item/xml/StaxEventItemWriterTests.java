@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2021 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -65,7 +65,7 @@ public class StaxEventItemWriterTests {
 	private StaxEventItemWriter<Object> writer;
 
 	// output file
-	private Resource resource;
+	private WritableResource resource;
 
 	private ExecutionContext executionContext;
 
@@ -479,7 +479,7 @@ public class StaxEventItemWriterTests {
 
 	@Test
 	public void testNonExistantResource() throws Exception {
-		Resource doesntExist = mock(Resource.class);
+		WritableResource doesntExist = mock(WritableResource.class);
 		when(doesntExist.getFile()).thenReturn(File.createTempFile("arbitrary", null));
 		when(doesntExist.exists()).thenReturn(false);
 

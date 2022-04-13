@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -838,7 +838,7 @@ public class FlatFileItemWriterTests {
 	 * If append=true a new output file should still be created on the first run (not restart).
 	 */
 	public void testAppendToNotYetExistingFile() throws Exception {
-		Resource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
+		WritableResource toBeCreated = new FileSystemResource("target/FlatFileItemWriterTests.out");
 
 		outputFile = toBeCreated.getFile(); //enable easy content reading and auto-delete the file
 

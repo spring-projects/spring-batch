@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.batch.item.file.transform.FormatterLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
@@ -48,7 +48,7 @@ public class FlatFileItemWriterBuilder<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Resource resource;
+	private WritableResource resource;
 
 	private boolean forceSync = false;
 
@@ -108,13 +108,13 @@ public class FlatFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * The {@link Resource} to be used as output.
+	 * The {@link WritableResource} to be used as output.
 	 *
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
-	 * @see FlatFileItemWriter#setResource(Resource)
+	 * @see FlatFileItemWriter#setResource(WritableResource)
 	 */
-	public FlatFileItemWriterBuilder<T> resource(Resource resource) {
+	public FlatFileItemWriterBuilder<T> resource(WritableResource resource) {
 		this.resource = resource;
 
 		return this;

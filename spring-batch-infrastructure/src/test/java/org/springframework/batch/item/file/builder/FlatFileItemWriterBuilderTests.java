@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +56,7 @@ public class FlatFileItemWriterBuilderTests {
 
 	@Test(expected = IllegalStateException.class)
 	public void testMultipleLineAggregators() throws IOException {
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		new FlatFileItemWriterBuilder<Foo>()
 				.name("itemWriter")
@@ -72,7 +73,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void test() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -98,7 +99,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testDelimitedOutputWithDefaultDelimiter() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -125,7 +126,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testDelimitedOutputWithEmptyDelimiter() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -153,7 +154,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testDelimitedOutputWithDefaultFieldExtractor() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -181,7 +182,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testDelimitedOutputWithCustomFieldExtractor() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -209,7 +210,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testFormattedOutputWithDefaultFieldExtractor() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -237,7 +238,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testFormattedOutputWithCustomFieldExtractor() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
@@ -265,7 +266,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testFlags() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 
 		String encoding = Charset.defaultCharset().name();
 
@@ -287,7 +288,7 @@ public class FlatFileItemWriterBuilderTests {
 	@Test
 	public void testFlagsWithEncoding() throws Exception {
 
-		Resource output = new FileSystemResource(File.createTempFile("foo", "txt"));
+		WritableResource output = new FileSystemResource(File.createTempFile("foo", "txt"));
 		String encoding = "UTF-8";
 		FlatFileItemWriter<Foo> writer = new FlatFileItemWriterBuilder<Foo>()
 				.name("foo")
