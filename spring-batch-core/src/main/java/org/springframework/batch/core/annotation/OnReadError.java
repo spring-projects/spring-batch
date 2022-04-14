@@ -25,10 +25,10 @@ import org.springframework.batch.item.ItemReader;
 
 /**
  * Marks a method to be called if an exception is thrown by an
- * {@link ItemReader} <br>
+ * {@link ItemReader}. <br>
  * <br>
  * Expected signature: void onReadError({@link Exception} ex)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see ItemReadListener

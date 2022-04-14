@@ -29,7 +29,7 @@ import org.springframework.batch.item.ItemProcessor;
  * thrown in the {@link ItemProcessor}.<br>
  * <br>
  * Expected signature: void onSkipInProcess(T item, {@link Throwable} t)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see SkipListener

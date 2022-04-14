@@ -28,11 +28,11 @@ import org.springframework.batch.core.StepExecutionListener;
 
 /**
  * Marks a method to be called after a {@link Step} has completed. Annotated
- * methods will be called regardless of the status of the {@link StepExecution}. <br>
+ * methods are called regardless of the status of the {@link StepExecution}. <br>
  * <br>
  * Expected signature: {@link ExitStatus} afterStep({@link StepExecution}
  * stepExecution);
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see StepExecutionListener

@@ -27,11 +27,13 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * Marks a method to be called if an exception is thrown by an
- * {@link ItemWriter} <br>
+ * {@link ItemWriter}. Note that this annotation takes a {@link List}
+ * because Spring Batch generally processes a group of items
+ * (for the sake of efficiency).<br>
  * <br>
  * Expected signature: void onWriteError({@link Exception} exception,
  * {@link List}&lt;? extends S&gt; items)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see ItemWriteListener

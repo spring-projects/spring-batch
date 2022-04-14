@@ -26,11 +26,13 @@ import org.springframework.batch.item.ItemProcessor;
 
 /**
  * Marks a method to be called after an item is passed to an
- * {@link ItemProcessor} <br>
+ * {@link ItemProcessor}. {@code item} is the input item.
+ * {@code result} is the processed item. {@code result} can be null
+ * if the {@code item} is filtered.<br>
  * <br>
  * Expected signature: void afterProcess(T item, S result)
- * 
- * @author Lucas Ward
+ *
+ * @author Lucas Ward, Jay Bryant
  * @since 2.0
  * @see ItemProcessListener
  */
