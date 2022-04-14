@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import org.springframework.batch.core.JobExecutionListener;
 
 /**
  * Marks a method to be called after a {@link Job} has completed. Annotated
- * methods will be called regardless of the status of the {@link JobExecution}. <br>
+ * methods are called regardless of the status of the {@link JobExecution}. <br>
  * <br>
  * Expected signature: void afterJob({@link JobExecution} jobExecution)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see JobExecutionListener

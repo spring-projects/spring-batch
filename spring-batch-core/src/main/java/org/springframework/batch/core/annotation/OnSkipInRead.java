@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ import org.springframework.batch.item.ItemReader;
 
 /**
  * Marks a method to be called when an item is skipped due to an exception
- * thrown in the {@link ItemReader} <br>
+ * thrown in the {@link ItemReader}. <br>
  * <br>
  * Expected signature: void onSkipInRead({@link Throwable} t)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see SkipListener

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import org.springframework.batch.core.StepExecutionListener;
 
 /**
  * Marks a method to be called before a {@link Step} is executed, which comes
- * after a {@link StepExecution} is created and persisted, but before the first
+ * after a {@link StepExecution} is created and persisted but before the first
  * item is read. <br>
  * <br>
  * Expected signature: void beforeStep({@link StepExecution} stepExecution)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see StepExecutionListener

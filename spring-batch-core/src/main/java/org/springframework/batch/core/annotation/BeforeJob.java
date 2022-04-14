@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Marks a method to be called before a {@link Job} is executed, which comes
- * after a {@link JobExecution} is created and persisted, but before the first
+ * after a {@link JobExecution} is created and persisted but before the first
  * {@link Step} is executed. <br>
  * <br>
  * Expected signature: void beforeJob({@link JobExecution} jobExecution)
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see JobExecutionListener
