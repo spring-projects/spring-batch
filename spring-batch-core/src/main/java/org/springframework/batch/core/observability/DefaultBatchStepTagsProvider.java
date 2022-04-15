@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.core.observability;
 
-import io.micrometer.common.Tags;
+import io.micrometer.common.KeyValues;
 
 import org.springframework.batch.core.StepExecution;
 
@@ -29,17 +29,17 @@ import org.springframework.batch.core.StepExecution;
 public class DefaultBatchStepTagsProvider implements BatchStepTagsProvider {
 
 	@Override
-	public Tags getLowCardinalityTags(BatchStepContext context) {
+	public KeyValues getLowCardinalityKeyValues(BatchStepContext context) {
 		StepExecution execution = context.getStepExecution();
-		return Tags.of(BatchStepObservation.StepLowCardinalityTags.STEP_NAME.of(execution.getStepName()),
+		return KeyValues.of(BatchStepObservation.StepLowCardinalityTags.STEP_NAME.of(execution.getStepName()),
 				BatchStepObservation.StepLowCardinalityTags.JOB_NAME.of(execution.getJobExecution().getJobInstance().getJobName()),
 				BatchStepObservation.StepLowCardinalityTags.STEP_STATUS.of(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
-	public Tags getHighCardinalityTags(BatchStepContext context) {
+	public KeyValues getHighCardinalityKeyValues(BatchStepContext context) {
 		StepExecution execution = context.getStepExecution();
-		return Tags.of(BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID.of(String.valueOf(execution.getId())));
+		return KeyValues.of(BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID.of(String.valueOf(execution.getId())));
 	}
 
 }

@@ -60,7 +60,7 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware, Observation.TagsProviderAware<BatchStepTagsProvider> {
+public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware, Observation.KeyValuesProviderAware<BatchStepTagsProvider> {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -74,7 +74,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private JobRepository jobRepository;
 
-	private BatchStepTagsProvider tagsProvider = new DefaultBatchStepTagsProvider();
+	private BatchStepTagsProvider keyValuesProvider = new DefaultBatchStepTagsProvider();
 
 	/**
 	 * Default constructor.
@@ -202,7 +202,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		stepExecution.setStatus(BatchStatus.STARTED);
 		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), new BatchStepContext(stepExecution))
 				.contextualName(stepExecution.getStepName())
-				.tagsProvider(this.tagsProvider)
+				.keyValuesProvider(this.keyValuesProvider)
 				.start();
 		getJobRepository().update(stepExecution);
 
@@ -414,7 +414,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	@Override
-	public void setTagsProvider(BatchStepTagsProvider tagsProvider) {
-		this.tagsProvider = tagsProvider;
+	public void setKeyValuesProvider(BatchStepTagsProvider keyValuesProvider) {
+		this.keyValuesProvider = keyValuesProvider;
 	}
 }

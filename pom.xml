@@ -54,7 +54,7 @@
 		<spring-framework.version>6.0.0-SNAPSHOT</spring-framework.version>
 		<spring-retry.version>1.3.2</spring-retry.version>
 		<spring-integration.version>6.0.0-SNAPSHOT</spring-integration.version>
-		<micrometer.version>2.0.0-SNAPSHOT</micrometer.version>
+		<micrometer.version>1.10.0-SNAPSHOT</micrometer.version>
 		<jackson.version>2.13.2.2</jackson.version>
 
 		<!-- optional production dependencies -->

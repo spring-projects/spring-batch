@@ -15,30 +15,30 @@
  */
 package org.springframework.batch.core.observability;
 
-import io.micrometer.common.Tags;
+import io.micrometer.common.KeyValues;
 
 import org.springframework.batch.core.JobExecution;
 
 /**
- * Default {@link BatchJobTagsProvider} implementation.
+ * Default {@link BatchJobKeyValuesProvider} implementation.
  *
  * @author Marcin Grzejszczak
  * @author Mahmoud Ben Hassine
  * @since 5.0
  */
-public class DefaultBatchJobTagsProvider implements BatchJobTagsProvider {
+public class DefaultBatchJobKeyValuesProvider implements BatchJobKeyValuesProvider {
 
 	@Override
-	public Tags getLowCardinalityTags(BatchJobContext context) {
+	public KeyValues getLowCardinalityKeyValues(BatchJobContext context) {
 		JobExecution execution = context.getJobExecution();
-		return Tags.of(BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()),
+		return KeyValues.of(BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()),
 				BatchJobObservation.JobLowCardinalityTags.JOB_STATUS.of(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
-	public Tags getHighCardinalityTags(BatchJobContext context) {
+	public KeyValues getHighCardinalityKeyValues(BatchJobContext context) {
 		JobExecution execution = context.getJobExecution();
-		return Tags.of(BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID.of(String.valueOf(execution.getJobInstance().getInstanceId())),
+		return KeyValues.of(BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID.of(String.valueOf(execution.getJobInstance().getInstanceId())),
 				BatchJobObservation.JobHighCardinalityTags.JOB_EXECUTION_ID.of(String.valueOf(execution.getId())));
 	}
 
