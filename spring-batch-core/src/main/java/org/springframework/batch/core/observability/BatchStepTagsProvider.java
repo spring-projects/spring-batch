@@ -19,12 +19,12 @@ package org.springframework.batch.core.observability;
 import io.micrometer.observation.Observation;
 
 /**
- * {@link Observation.TagsProvider} for {@link BatchStepContext}.
+ * {@link Observation.KeyValuesProvider} for {@link BatchStepContext}.
  *
  * @author Marcin Grzejszczak
  * @since 5.0
  */
-public interface BatchStepTagsProvider extends Observation.TagsProvider<BatchStepContext> {
+public interface BatchStepTagsProvider extends Observation.KeyValuesProvider<BatchStepContext> {
 
 	@Override
 	default boolean supportsContext(Observation.Context context) {

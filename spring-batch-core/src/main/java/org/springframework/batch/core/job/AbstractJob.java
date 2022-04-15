@@ -44,9 +44,9 @@ import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.observability.BatchJobContext;
 import org.springframework.batch.core.observability.BatchJobObservation;
-import org.springframework.batch.core.observability.BatchJobTagsProvider;
+import org.springframework.batch.core.observability.BatchJobKeyValuesProvider;
 import org.springframework.batch.core.observability.BatchMetrics;
-import org.springframework.batch.core.observability.DefaultBatchJobTagsProvider;
+import org.springframework.batch.core.observability.DefaultBatchJobKeyValuesProvider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
@@ -69,7 +69,7 @@ import org.springframework.util.ClassUtils;
  * @author Mahmoud Ben Hassine
  */
 public abstract class AbstractJob implements Job, StepLocator, BeanNameAware,
-InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
+InitializingBean, Observation.KeyValuesProviderAware<BatchJobKeyValuesProvider> {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
@@ -87,7 +87,7 @@ InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 
 	private StepHandler stepHandler;
 
-	private BatchJobTagsProvider tagsProvider = new DefaultBatchJobTagsProvider();
+	private BatchJobKeyValuesProvider keyValuesProvider = new DefaultBatchJobKeyValuesProvider();
 
 	/**
 	 * Default constructor.
@@ -315,7 +315,7 @@ InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution))
 				.contextualName(execution.getJobInstance().getJobName())
-				.tagsProvider(this.tagsProvider)
+				.keyValuesProvider(this.keyValuesProvider)
 				.start();
 		try (Observation.Scope scope = observation.openScope()) {
 
@@ -465,8 +465,8 @@ InitializingBean, Observation.TagsProviderAware<BatchJobTagsProvider> {
 	}
 
 	@Override
-	public void setTagsProvider(BatchJobTagsProvider tagsProvider) {
-		this.tagsProvider = tagsProvider;
+	public void setKeyValuesProvider(BatchJobKeyValuesProvider keyValuesProvider) {
+		this.keyValuesProvider = keyValuesProvider;
 	}
 
 	@Override
