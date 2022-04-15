@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.observability;
 
+import io.micrometer.common.docs.KeyName;
 import io.micrometer.observation.docs.DocumentedObservation;
-import io.micrometer.common.docs.TagKey;
 
 /**
  * Observation created around a step execution.
@@ -40,12 +40,12 @@ public enum BatchStepObservation implements DocumentedObservation {
 		}
 
 		@Override
-		public TagKey[] getLowCardinalityTagKeys() {
+		public KeyName[] getLowCardinalityKeyNames() {
 			return StepLowCardinalityTags.values();
 		}
 
 		@Override
-		public TagKey[] getHighCardinalityTagKeys() {
+		public KeyName[] getHighCardinalityKeyNames() {
 			return StepHighCardinalityTags.values();
 		}
 
@@ -55,14 +55,14 @@ public enum BatchStepObservation implements DocumentedObservation {
 		}
 	};
 
-	enum StepLowCardinalityTags implements TagKey {
+	enum StepLowCardinalityTags implements KeyName {
 
 		/**
 		 * Name of the Spring Batch step.
 		 */
 		STEP_NAME {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.step.name";
 			}
 		},
@@ -72,7 +72,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_TYPE {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.step.type";
 			}
 		},
@@ -82,7 +82,7 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		JOB_NAME {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.step.job.name";
 			}
 		},
@@ -92,21 +92,21 @@ public enum BatchStepObservation implements DocumentedObservation {
 		 */
 		STEP_STATUS {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.step.status";
 			}
 		}
 
 	}
 
-	enum StepHighCardinalityTags implements TagKey {
+	enum StepHighCardinalityTags implements KeyName {
 
 		/**
 		 * ID of the Spring Batch step execution.
 		 */
 		STEP_EXECUTION_ID {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.step.executionId";
 			}
 		}

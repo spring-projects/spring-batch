@@ -16,8 +16,8 @@
 
 package org.springframework.batch.core.observability;
 
+import io.micrometer.common.docs.KeyName;
 import io.micrometer.observation.docs.DocumentedObservation;
-import io.micrometer.common.docs.TagKey;
 
 /**
  * Observation created around a Job execution.
@@ -40,12 +40,12 @@ public enum BatchJobObservation implements DocumentedObservation {
 		}
 
 		@Override
-		public TagKey[] getLowCardinalityTagKeys() {
+		public KeyName[] getLowCardinalityKeyNames() {
 			return JobLowCardinalityTags.values();
 		}
 
 		@Override
-		public TagKey[] getHighCardinalityTagKeys() {
+		public KeyName[] getHighCardinalityKeyNames() {
 			return JobHighCardinalityTags.values();
 		}
 
@@ -55,14 +55,14 @@ public enum BatchJobObservation implements DocumentedObservation {
 		}
 	};
 
-	enum JobLowCardinalityTags implements TagKey {
+	enum JobLowCardinalityTags implements KeyName {
 
 		/**
 		 * Name of the Spring Batch job.
 		 */
 		JOB_NAME {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.job.name";
 			}
 		},
@@ -72,21 +72,21 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_STATUS {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.job.status";
 			}
 		}
 
 	}
 
-	enum JobHighCardinalityTags implements TagKey {
+	enum JobHighCardinalityTags implements KeyName {
 
 		/**
 		 * ID of the Spring Batch job instance.
 		 */
 		JOB_INSTANCE_ID {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.job.instanceId";
 			}
 		},
@@ -96,7 +96,7 @@ public enum BatchJobObservation implements DocumentedObservation {
 		 */
 		JOB_EXECUTION_ID {
 			@Override
-			public String getKey() {
+			public String getKeyName() {
 				return "spring.batch.job.executionId";
 			}
 		}
