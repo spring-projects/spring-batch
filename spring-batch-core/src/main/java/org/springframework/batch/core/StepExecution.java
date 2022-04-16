@@ -251,7 +251,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Gets the time this execution created
+	 * Gets the time this execution was created
 	 *
 	 * @return the time when this execution was created.
 	 */
@@ -260,7 +260,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Sets the time this execution created
+	 * Sets the time this execution was created
 	 *
 	 * @param createTime creation time of this execution.
 	 */
