@@ -175,6 +175,25 @@ public class SimpleJobRepositoryIntegrationTests {
 	}
 
 	/*
+	 * If JobExecution is waiting to start, exception will be thrown in attempt
+	 * to create new execution.
+	 */
+	@Transactional
+	@Test
+	public void testStartingJobRejectsAnotherJobExecution() throws Exception {
+		job.setRestartable(true);
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+
+		try {
+			jobRepository.createJobExecution(job.getName(), jobParameters);
+			fail();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
+	}
+
+	/*
 	 * If JobExecution is already running, exception will be thrown in attempt
 	 * to create new execution.
 	 */

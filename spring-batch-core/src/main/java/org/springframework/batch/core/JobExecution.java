@@ -260,6 +260,14 @@ public class JobExecution extends Entity {
 	}
 
 	/**
+	 * Test if this {@link JobExecution} indicates that it is waiting to start.
+	 * @return true if the status is {@link BatchStatus#STARTING}.
+	 */
+	public boolean isStarting() {
+		return status == BatchStatus.STARTING;
+	}
+
+	/**
 	 * Test if this {@link JobExecution} indicates that it is running.
 	 * Note that this does not necessarily mean that it has been persisted.
 	 *
