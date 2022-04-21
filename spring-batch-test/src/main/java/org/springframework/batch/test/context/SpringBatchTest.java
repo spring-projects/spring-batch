@@ -56,10 +56,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
  * public class MyBatchJobTests {
  *
- *    &#064;@Autowired
+ *    &#064;Autowired
  *    private JobLauncherTestUtils jobLauncherTestUtils;
  *
- *    &#064;@Autowired
+ *    &#064;Autowired
  *    private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
  *    &#064;Before
@@ -91,10 +91,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * &#064;ContextConfiguration(classes = MyBatchJobConfiguration.class)
  * public class MyBatchJobTests {
  *
- *    &#064;@Autowired
+ *    &#064;Autowired
  *    private JobLauncherTestUtils jobLauncherTestUtils;
  *
- *    &#064;@Autowired
+ *    &#064;Autowired
  *    private JobRepositoryTestUtils jobRepositoryTestUtils;
  *
  *    &#064;BeforeEach
