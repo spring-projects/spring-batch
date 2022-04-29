@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a bug report to help us improve the project
 title: ''
 labels: 'type: bug, status: waiting-for-triage'
 assignees: ''
@@ -24,4 +24,4 @@ A clear and concise description of what you expected to happen.
 
 **Minimal Complete Reproducible example**
 Please provide a failing unit test or a [minimal complete example](https://stackoverflow.com/help/minimal-reproducible-example) that reproduces the issue.
-Reports that are reproducible will take priority over reports that are not reproducible.
+Bug reports that are reproducible will take priority in resolution over reports that are not reproducible.
