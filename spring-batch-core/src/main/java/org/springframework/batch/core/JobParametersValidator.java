@@ -23,8 +23,10 @@ import org.springframework.lang.Nullable;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  *
  */
+@FunctionalInterface
 public interface JobParametersValidator {
 
 	/**

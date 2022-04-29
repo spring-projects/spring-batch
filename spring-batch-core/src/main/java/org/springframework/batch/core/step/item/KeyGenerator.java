@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@ package org.springframework.batch.core.step.item;
  * itself cannot be modified to properly override equals.
  *
  * @author Dave Syer
+ * @author Taeik Lim
  *
  */
+@FunctionalInterface
 public interface KeyGenerator {
 
 	Object getKey(Object item);

@@ -23,8 +23,10 @@ import org.springframework.lang.Nullable;
  * @author Dave Syer
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @since 2.0
  */
+@FunctionalInterface
 public interface JobParametersIncrementer {
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,11 @@ import org.springframework.lang.Nullable;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Taeik Lim
  * @param <I> type of input item
  * @param <O> type of output item
  */
+@FunctionalInterface
 public interface ItemProcessor<I, O> {
 
 	/**
