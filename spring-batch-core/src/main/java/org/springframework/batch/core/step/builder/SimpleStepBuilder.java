@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -47,7 +46,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.function.FunctionItemProcessor;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -77,8 +75,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	private ItemWriter<? super O> writer;
 
 	private ItemProcessor<? super I, ? extends O> processor;
-
-	private Function<? super I, ? extends O> itemProcessorFunction;
 
 	private int chunkSize = 0;
 
@@ -112,7 +108,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 		this.reader = parent.reader;
 		this.writer = parent.writer;
 		this.processor = parent.processor;
-		this.itemProcessorFunction = parent.itemProcessorFunction;
 		this.itemListeners = parent.itemListeners;
 		this.readerTransactionalQueue = parent.readerTransactionalQueue;
 	}
@@ -237,19 +232,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	/**
-	 * A {@link Function} to be delegated to as an {@link ItemProcessor}.  If this is set,
-	 * it will take precedence over any {@code ItemProcessor} configured via
-	 * {@link #processor(ItemProcessor)}.
-	 *
-	 * @param function the function to delegate item processing to
-	 * @return this for fluent chaining
-	 */
-	public SimpleStepBuilder<I, O> processor(Function<? super I, ? extends O> function) {
-		this.itemProcessorFunction = function;
-		return this;
-	}
-
-	/**
 	 * Sets a flag to say that the reader is transactional (usually a queue), which is to say that failed items might be
 	 * rolled back and re-presented in a subsequent transaction. Default is false, meaning that the items are read
 	 * outside a transaction and possibly cached.
@@ -359,10 +341,6 @@ public class SimpleStepBuilder<I, O> extends AbstractTaskletStepBuilder<SimpleSt
 	}
 
 	protected ItemProcessor<? super I, ? extends O> getProcessor() {
-		if(this.itemProcessorFunction != null) {
-			this.processor = new FunctionItemProcessor<>(this.itemProcessorFunction);
-		}
-
 		return processor;
 	}
 
