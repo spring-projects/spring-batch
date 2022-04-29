@@ -20,8 +20,10 @@ package org.springframework.batch.core.step.item;
  * itself cannot be modified to properly override equals.
  *
  * @author Dave Syer
+ * @author Taeik Lim
  *
  */
+@FunctionalInterface
 public interface KeyGenerator {
 
 	Object getKey(Object item);

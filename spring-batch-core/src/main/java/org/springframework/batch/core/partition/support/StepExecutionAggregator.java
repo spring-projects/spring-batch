@@ -24,9 +24,12 @@ import org.springframework.batch.core.StepExecution;
  * partitioned or remote execution.
  *
  * @author Dave Syer
+ * @author Taeik Lim
+ *
  * @since 2.1
  *
  */
+@FunctionalInterface
 public interface StepExecutionAggregator {
 
 	/**
