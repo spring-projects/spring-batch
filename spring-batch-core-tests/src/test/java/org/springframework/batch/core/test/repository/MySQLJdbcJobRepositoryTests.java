@@ -73,6 +73,7 @@ public class MySQLJdbcJobRepositoryTests {
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-mysql.sql"));
 		databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-mysql.sql"));
 		databasePopulator.execute(this.dataSource);
 	}
