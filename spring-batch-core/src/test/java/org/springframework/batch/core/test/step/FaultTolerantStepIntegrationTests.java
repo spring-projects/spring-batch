@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,6 @@ public class FaultTolerantStepIntegrationTests {
 	@Before
 	public void setUp() {
 		ItemReader<Integer> itemReader = new ListItemReader<>(createItems());
-		ItemProcessor<Integer, Integer> itemProcessor = item -> item > 20 ? null : item;
 		ItemWriter<Integer> itemWriter = chunk -> {
 			if (chunk.contains(1)) {
 				throw new IllegalArgumentException();
@@ -80,7 +79,7 @@ public class FaultTolerantStepIntegrationTests {
 		stepBuilder = new StepBuilderFactory(jobRepository, transactionManager).get("step")
 				.<Integer, Integer>chunk(CHUNK_SIZE)
 				.reader(itemReader)
-				.processor(itemProcessor)
+				.processor(item -> item > 20 ? null : item)
 				.writer(itemWriter)
 				.faultTolerant();
 	}
