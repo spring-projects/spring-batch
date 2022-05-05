@@ -11,6 +11,8 @@ The reference documentation is divided into several sections:
 [horizontal]
 <<spring-batch-intro.adoc#spring-batch-intro,Spring Batch Introduction>> :: Background, usage
  scenarios, and general guidelines.
+<<spring-batch-architecture.adoc#springBatchArchitecture,Spring Batch Architecture>> :: Spring Batch
+architecture, general batch principles, batch processing strategies.
 <<whatsnew.adoc#whatsNew,What's new in Spring Batch 5.0>> :: New features introduced in version 5.0.
 <<domain.adoc#domainLanguageOfBatch,The Domain Language of Batch>> :: Core concepts and abstractions
 of the Batch domain language.
