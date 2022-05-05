@@ -1821,5 +1821,4 @@ have to tell it manually that you know that the execution either failed
 or should be considered aborted (change its status to
 `FAILED` or `ABANDONED`). This is
 a business decision, and there is no way to automate it. Change the
-status to `FAILED` only if it is not restartable or if
-you know the restart data is not valid.
+status to `FAILED` only if it is restartable and you know that the restart data is valid.
