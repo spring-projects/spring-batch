@@ -1839,13 +1839,11 @@ A job execution which is `FAILED` can be
       will move on to the next step (as determined by the job flow definition
       and the step execution exit status).
 
-If the process died (`"kill -9"` or server
-      failure) the job is, of course, not running, but the `JobRepository` has
-      no way of knowing because no-one told it before the process died. You
-      have to tell it manually that you know that the execution either failed
-      or should be considered aborted (change its status to
-      `FAILED` or `ABANDONED`) - it's
-      a business decision and there is no way to automate it. Only change the
-      status to `FAILED` if it is not restartable, or if
-      you know the restart data is valid. There is a utility in Spring Batch
-      Admin `JobService` to abort a job execution.
+If the process died (`kill -9` or server
+failure), the job is, of course, not running, but the `JobRepository` has
+no way of knowing because no one told it before the process died. You
+have to tell it manually that you know that the execution either failed
+or should be considered aborted (change its status to
+`FAILED` or `ABANDONED`). This is
+a business decision, and there is no way to automate it. Change the
+status to `FAILED` only if it is restartable and you know that the restart data is valid.
