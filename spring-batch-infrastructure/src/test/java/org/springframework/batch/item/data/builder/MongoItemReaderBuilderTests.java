@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -37,11 +37,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
  * @author Parikshit Dutta
+ * @author Mahmoud Ben Hassine
  */
 public class MongoItemReaderBuilderTests {
 	@Mock
@@ -209,10 +212,19 @@ public class MongoItemReaderBuilderTests {
 	}
 
 	@Test
-	public void testNullSorts() {
+	public void testNullSortsWithQueryString() {
 		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
 				.targetType(String.class)
 				.jsonQuery("{ }")
+				.name("mongoReaderTest")
+				.pageSize(50), "sorts map is required.");
+	}
+
+	@Test
+	public void testNullSortsWithQuery() {
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
+				.targetType(String.class)
+				.query(query(where("_id").is("10")))
 				.name("mongoReaderTest")
 				.pageSize(50), "sorts map is required.");
 	}

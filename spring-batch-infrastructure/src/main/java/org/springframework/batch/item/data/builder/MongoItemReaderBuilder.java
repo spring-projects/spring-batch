@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -284,7 +284,7 @@ public class MongoItemReaderBuilder<T> {
 		Assert.notNull(this.targetType, "targetType is required.");
 		Assert.state(StringUtils.hasText(this.jsonQuery) || this.query != null, "A query is required");
 
-		if(StringUtils.hasText(this.jsonQuery)) {
+		if (StringUtils.hasText(this.jsonQuery) || this.query != null) {
 			Assert.notNull(this.sorts, "sorts map is required.");
 		}
 
