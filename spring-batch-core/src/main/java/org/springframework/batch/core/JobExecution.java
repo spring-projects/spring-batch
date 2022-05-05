@@ -322,7 +322,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Get the date representing the last time this {@code JobExecution} was updated in
-	 * the {@link JobRepository}.
+	 * the {@link org.springframework.batch.core.repository.JobRepository}.
 	 *
 	 * @return a {@code Date} object representing the last time this
 	 *  {@code JobExecution} was updated.
@@ -381,8 +381,8 @@ public class JobExecution extends Entity {
 	 *
 	 * @param stream instance of {@link ObjectInputStream}.
 	 *
-	 * @throws {@code IOException} if an error occurs during read.
-	 * @throws {@code ClassNotFoundException} thrown if the class is not found.
+	 * @throws IOException if an error occurs during read.
+	 * @throws ClassNotFoundException thrown if the class is not found.
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
