@@ -20,6 +20,7 @@ package org.springframework.batch.core;
  * explicitly represent the configuration of a step by a developer but also the ability to execute the step.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public interface Step {
@@ -36,13 +37,19 @@ public interface Step {
 
 	/**
 	 * @return {@code true} if a step that is already marked as complete can be started again.
+	 * Defaults to {@code false}.
 	 */
-	boolean isAllowStartIfComplete();
+	default boolean isAllowStartIfComplete() {
+		return false;
+	}
 
 	/**
-	 * @return the number of times a job can be started with the same identifier.
+	 * @return the number of times a step can be (re)started for the same job instance.
+	 * Defaults to {@code Integer.MAX_VALUE}
 	 */
-	int getStartLimit();
+	default int getStartLimit() {
+		return Integer.MAX_VALUE;
+	}
 
 	/**
 	 * Process the step and assign progress and status meta information to the {@link StepExecution} provided. The

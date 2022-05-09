@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core;
 
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.lang.Nullable;
 
 /**
@@ -33,9 +34,11 @@ public interface Job {
 	/**
 	 * Flag to indicate if this job can be restarted, at least in principle.
 	 *
-	 * @return true if this job can be restarted after a failure
+	 * @return true if this job can be restarted after a failure. Defaults to {@code true}.
 	 */
-	boolean isRestartable();
+	default boolean isRestartable() {
+		return true;
+	}
 
 	/**
 	 * Run the {@link JobExecution} and update the meta information, such as status
@@ -52,10 +55,12 @@ public interface Job {
 	 * sequence, they can use this incrementer. The return value may be {@code null},
 	 * when this job does not have a natural sequence.
 	 *
-	 * @return in incrementer to be used for creating new parameters
+	 * @return an incrementer to be used for creating new parameters. Defaults to {@code null}.
 	 */
 	@Nullable
-	JobParametersIncrementer getJobParametersIncrementer();
+	default JobParametersIncrementer getJobParametersIncrementer() {
+		return null;
+	}
 
 	/**
 	 * A validator for the job parameters of a {@link JobExecution}. Clients of
@@ -63,8 +68,10 @@ public interface Job {
 	 * the execution.
 	 *
 	 * @return a validator that can be used to check parameter values (never
-	 * {@code null}).
+	 * {@code null}). Defaults to {@link DefaultJobParametersValidator}.
 	 */
-	JobParametersValidator getJobParametersValidator();
+	default JobParametersValidator getJobParametersValidator() {
+		return new DefaultJobParametersValidator();
+	}
 
 }
