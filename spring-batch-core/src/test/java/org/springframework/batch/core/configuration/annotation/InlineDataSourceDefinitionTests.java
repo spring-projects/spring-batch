@@ -38,7 +38,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-// https://github.com/spring-projects/spring-batch/issues/3991
 public class InlineDataSourceDefinitionTests {
 
     @Test
