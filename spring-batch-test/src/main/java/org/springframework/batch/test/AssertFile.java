@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.batch.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
  * This class can be used to assert that two files are the same.
  *
  * @author Dan Garrette
+ * @author Glenn Renfro
  * @since 2.0
  */
 public abstract class AssertFile {
@@ -39,12 +40,12 @@ public abstract class AssertFile {
 			int lineNum = 1;
 			for (String expectedLine = null; (expectedLine = expectedReader.readLine()) != null; lineNum++) {
 				String actualLine = actualReader.readLine();
-				assertEquals("Line number " + lineNum + " does not match.", expectedLine, actualLine);
+				assertEquals(expectedLine, actualLine, "Line number " + lineNum + " does not match.");
 			}
 
 			String actualLine = actualReader.readLine();
-			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
-					actualLine);
+			assertEquals(null, actualLine,
+					"More lines than expected.  There should not be a line number " + lineNum + ".");
 		}
 		finally {
 			expectedReader.close();
