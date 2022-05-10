@@ -27,6 +27,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 /**
  * @author Dave Syer
+ * @author Glenn Renfro
  *
  */
 class CustomerCreditUpdatePreparedStatementSetterTests {

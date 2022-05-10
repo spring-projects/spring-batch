@@ -15,14 +15,6 @@
  */
 package org.springframework.batch.sample.quartz;
 
-import static org.mockito.Mockito.mock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.quartz.Job;
@@ -44,9 +36,18 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.lang.Nullable;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 /**
  * @author Dave Syer
- *
+ * @author Glenn Renfro
+ * 
  */
 class JobLauncherDetailsTests {
 
@@ -57,7 +58,7 @@ class JobLauncherDetailsTests {
 	private final List<Serializable> list = new ArrayList<>();
 
 	@BeforeEach
-	void setUp() {
+	public void setUp() throws Exception {
 		details.setJobLauncher(new JobLauncher() {
 			@Override
 			public JobExecution run(org.springframework.batch.core.Job job, JobParameters jobParameters)

@@ -16,31 +16,30 @@
 
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-
-import java.util.Date;
-
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import javax.sql.DataSource;
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  * @since 2.0
  */
-@SpringJUnitConfig(
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml", "/jobs/iosample/jdbcPaging.xml" })
 class TwoJobInstancesPagingFunctionalTests {
 

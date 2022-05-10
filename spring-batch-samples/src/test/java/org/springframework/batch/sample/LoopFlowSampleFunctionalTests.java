@@ -15,23 +15,27 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Checks that expected number of items have been processed.
  *
  * @author Dan Garrette
+ * @author Glenn Renfro
  * @since 2.0
  */
-@SpringJUnitConfig(
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml", "/job-runner-context.xml" })
 class LoopFlowSampleFunctionalTests {
 

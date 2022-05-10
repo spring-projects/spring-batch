@@ -16,20 +16,23 @@
 
 package org.springframework.batch.sample.iosample;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Dan Garrette
  * @author Dave Syer
  * @since 2.0
  */
-@SpringJUnitConfig(locations = "/jobs/iosample/jdbcPaging.xml")
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "/jobs/iosample/jdbcPaging.xml")
 class JdbcPagingFunctionalTests extends AbstractIoSampleTests {
 
 	@Override

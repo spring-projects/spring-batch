@@ -15,15 +15,11 @@
  */
 package org.springframework.batch.sample.support;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.batch.item.Chunk;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.junit.jupiter.api.Test;
-
-import org.springframework.batch.item.Chunk;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.

@@ -15,32 +15,34 @@
  */
 package org.springframework.batch.sample.domain.football.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.football.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  *
  */
-@SpringJUnitConfig(locations = { "/data-source-context.xml" })
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = { "/data-source-context.xml" })
 class JdbcGameDaoIntegrationTests {
 
 	private JdbcGameDao gameDao;
@@ -58,7 +60,7 @@ class JdbcGameDaoIntegrationTests {
 	}
 
 	@BeforeEach
-	void onSetUpBeforeTransaction() {
+	void onSetUpBeforeTransaction() throws Exception {
 		game.setId("XXXXX00");
 		game.setYear(1996);
 		game.setTeam("mia");

@@ -55,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
 class JsonSupportIntegrationTests {
 

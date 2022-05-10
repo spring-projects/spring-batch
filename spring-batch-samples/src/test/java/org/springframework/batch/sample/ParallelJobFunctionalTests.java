@@ -16,21 +16,24 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
-@SpringJUnitConfig(
+import javax.sql.DataSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/parallelJob.xml", "/job-runner-context.xml" })
 class ParallelJobFunctionalTests {
 

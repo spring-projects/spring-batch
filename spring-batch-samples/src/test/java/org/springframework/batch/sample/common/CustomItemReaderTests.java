@@ -15,12 +15,6 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.ExecutionContext;
@@ -29,12 +23,19 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * Unit test class that was used as part of the Reference Documentation. I'm only
  * including it in the code to help keep the reference documentation up to date as the
  * code base shifts.
  *
  * @author Lucas Ward
+ * @author Glenn Renfro
  *
  */
 class CustomItemReaderTests {

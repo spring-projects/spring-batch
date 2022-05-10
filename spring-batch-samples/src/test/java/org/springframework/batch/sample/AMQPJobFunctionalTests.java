@@ -19,11 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * <p>
@@ -39,7 +41,8 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * </p>
  */
 
-@SpringJUnitConfig(
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/amqp-example-job.xml", "/job-runner-context.xml" })
 class AMQPJobFunctionalTests {
 
