@@ -54,13 +54,19 @@ public class JobExecutionTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.JobExecution#getEndTime()}.
+	 * Test method for {@link org.springframework.batch.core.JobExecution#isRunning()}.
 	 */
 	@Test
 	public void testIsRunning() {
-		execution.setStartTime(new Date());
+		execution.setStatus(BatchStatus.STARTING);
 		assertTrue(execution.isRunning());
-		execution.setEndTime(new Date(100L));
+		execution.setStatus(BatchStatus.STARTED);
+		assertTrue(execution.isRunning());
+		execution.setStatus(BatchStatus.STOPPING);
+		assertTrue(execution.isRunning());
+		execution.setStatus(BatchStatus.COMPLETED);
+		assertFalse(execution.isRunning());
+		execution.setStatus(BatchStatus.FAILED);
 		assertFalse(execution.isRunning());
 	}
 

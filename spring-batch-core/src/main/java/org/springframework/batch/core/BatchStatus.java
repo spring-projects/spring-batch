@@ -84,10 +84,10 @@ public enum BatchStatus {
 
 	/**
 	 * Convenience method to decide if a status indicates that work is in progress.
-	 * @return true if the status is STARTING, STARTED
+	 * @return true if the status is STARTING, STARTED, STOPPING
 	 */
 	public boolean isRunning() {
-		return this == STARTING || this == STARTED;
+		return this == STARTING || this == STARTED || this == STOPPING;
 	}
 
 	/**

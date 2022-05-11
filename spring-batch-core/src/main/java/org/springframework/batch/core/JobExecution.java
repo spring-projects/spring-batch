@@ -256,10 +256,10 @@ public class JobExecution extends Entity {
 	/**
 	 * Test if this {@link JobExecution} indicates that it is running. Note that this does
 	 * not necessarily mean that it has been persisted.
-	 * @return {@code true} if the end time is null and the start time is not null.
+	 * @return {@code true} if the status is one of the running status.
 	 */
 	public boolean isRunning() {
-		return startTime != null && endTime == null;
+		return status.isRunning();
 	}
 
 	/**

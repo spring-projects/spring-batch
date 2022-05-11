@@ -201,6 +201,7 @@ public abstract class AbstractJobExecutionDaoTests {
 		exec.setCreateTime(new Date(0));
 		exec.setStartTime(new Date(1L));
 		exec.setEndTime(new Date(2L));
+		exec.setStatus(BatchStatus.COMPLETED);
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
@@ -212,9 +213,17 @@ public abstract class AbstractJobExecutionDaoTests {
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
+		// Stopping JobExecution as status is STOPPING
+		exec = new JobExecution(jobInstance, jobParameters);
+		exec.setStartTime(new Date(3L));
+		exec.setStatus(BatchStatus.STOPPING);
+		exec.setLastUpdated(new Date(5L));
+		dao.saveJobExecution(exec);
+
 		// Running JobExecution as StartTime is populated but EndTime is null
 		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setStartTime(new Date(2L));
+		exec.setStatus(BatchStatus.STARTED);
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
@@ -228,7 +237,7 @@ public abstract class AbstractJobExecutionDaoTests {
 
 		Set<JobExecution> values = dao.findRunningJobExecutions(exec.getJobInstance().getJobName());
 
-		assertEquals(1, values.size());
+		assertEquals(3, values.size());
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
 		assertEquals(5L, value.getLastUpdated().getTime());
