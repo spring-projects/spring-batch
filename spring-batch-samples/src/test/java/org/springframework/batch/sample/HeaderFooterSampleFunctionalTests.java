@@ -15,23 +15,26 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringJUnitConfig(
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/headerFooterSample.xml", "/job-runner-context.xml" })
-class HeaderFooterSampleFunctionalTests {
+public class HeaderFooterSampleFunctionalTests {
 
 	@Autowired
 	@Qualifier("inputResource")
@@ -60,12 +63,13 @@ class HeaderFooterSampleFunctionalTests {
 		int lineCount = 0;
 		while ((line = inputReader.readLine()) != null) {
 			lineCount++;
-			assertTrue(outputReader.readLine().contains(line), "input line should correspond to output line");
+			assertTrue("input line should correspond to output line", outputReader.readLine().contains(line));
 		}
 
 		// footer contains the item count
 		int itemCount = lineCount - 1; // minus 1 due to header line
-		assertTrue(outputReader.readLine().contains(String.valueOf(itemCount)));
+		assertTrue("OutputReader did not contain the values specified",
+				outputReader.readLine().contains(String.valueOf(itemCount)));
 
 		inputReader.close();
 		outputReader.close();

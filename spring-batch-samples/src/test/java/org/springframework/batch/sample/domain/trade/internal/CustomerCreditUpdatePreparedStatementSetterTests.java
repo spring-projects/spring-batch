@@ -27,6 +27,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 /**
  * @author Dave Syer
+ * @author Glenn Renfro
  *
  */
 class CustomerCreditUpdatePreparedStatementSetterTests {
@@ -38,7 +39,7 @@ class CustomerCreditUpdatePreparedStatementSetterTests {
 	private PreparedStatement ps;
 
 	@BeforeEach
-	void setUp() {
+	public void setUp() throws Exception {
 		ps = mock(PreparedStatement.class);
 		credit = new CustomerCredit();
 		credit.setId(13);

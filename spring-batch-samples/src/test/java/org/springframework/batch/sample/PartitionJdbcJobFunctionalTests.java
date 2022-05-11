@@ -16,15 +16,8 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -39,11 +32,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringJUnitConfig(
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/partitionJdbcJob.xml", "/job-runner-context.xml" })
-class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
+public class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 
 	@Autowired
 	@Qualifier("inputTestReader")
@@ -84,7 +88,7 @@ class PartitionJdbcJobFunctionalTests implements ApplicationContextAware {
 
 		assertEquals(inputs.size(), outputs.size());
 		int itemCount = inputs.size();
-		assertTrue(itemCount > 0);
+		assertTrue("Input from reader has no entries.", itemCount > 0);
 
 		inputs.iterator();
 		for (int i = 0; i < itemCount; i++) {

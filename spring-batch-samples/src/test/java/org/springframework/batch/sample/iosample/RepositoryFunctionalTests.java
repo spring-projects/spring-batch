@@ -15,16 +15,20 @@
  */
 package org.springframework.batch.sample.iosample;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.test.MetaDataInstanceFactory;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringJUnitConfig(locations = "/jobs/iosample/repository.xml")
-class RepositoryFunctionalTests extends AbstractIoSampleTests {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "/jobs/iosample/repository.xml")
+public class RepositoryFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {

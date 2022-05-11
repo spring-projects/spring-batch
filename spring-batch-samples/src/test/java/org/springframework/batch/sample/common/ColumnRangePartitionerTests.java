@@ -15,27 +15,34 @@
  */
 package org.springframework.batch.sample.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Map;
 
 import javax.sql.DataSource;
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringJUnitConfig
-class ColumnRangePartitionerTests {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-	@Autowired
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration
+public class ColumnRangePartitionerTests {
+
 	private DataSource dataSource;
 
-	private final ColumnRangePartitioner partitioner = new ColumnRangePartitioner();
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	private ColumnRangePartitioner partitioner = new ColumnRangePartitioner();
 
 	@Test
-	void testPartition() {
+	public void testPartition() {
 		partitioner.setDataSource(dataSource);
 		partitioner.setTable("CUSTOMER");
 		partitioner.setColumn("ID");

@@ -16,32 +16,33 @@
 package org.springframework.batch.sample.common;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class OutputFileListenerTests {
+public class OutputFileListenerTests {
 
-	private final OutputFileListener listener = new OutputFileListener();
+	private OutputFileListener listener = new OutputFileListener();
 
-	private final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
+	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 1L);
 
 	@Test
-	void testCreateOutputNameFromInput() {
+	public void testCreateOutputNameFromInput() {
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("{outputFile=file:./target/output/foo.csv}", stepExecution.getExecutionContext().toString());
 	}
 
 	@Test
-	void testSetPath() {
+	public void testSetPath() {
 		listener.setPath("spam/");
 		listener.createOutputNameFromInput(stepExecution);
 		assertEquals("{outputFile=spam/foo.csv}", stepExecution.getExecutionContext().toString());
 	}
 
 	@Test
-	void testSetOutputKeyName() {
+	public void testSetOutputKeyName() {
 		listener.setPath("");
 		listener.setOutputKeyName("spam");
 		listener.createOutputNameFromInput(stepExecution);
@@ -49,7 +50,7 @@ class OutputFileListenerTests {
 	}
 
 	@Test
-	void testSetInputKeyName() {
+	public void testSetInputKeyName() {
 		listener.setPath("");
 		listener.setInputKeyName("spam");
 		stepExecution.getExecutionContext().putString("spam", "bar");

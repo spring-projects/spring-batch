@@ -15,17 +15,15 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.mockito.Mockito.mock;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
+
+import java.math.BigDecimal;
+
+import static org.mockito.Mockito.mock;
 
 class CustomerCreditUpdateProcessorTests {
 
@@ -36,7 +34,7 @@ class CustomerCreditUpdateProcessorTests {
 	private static final double CREDIT_FILTER = 355.0;
 
 	@BeforeEach
-	void setUp() {
+	public void setUp() {
 		dao = mock(CustomerCreditDao.class);
 
 		writer = new CustomerCreditUpdateWriter();

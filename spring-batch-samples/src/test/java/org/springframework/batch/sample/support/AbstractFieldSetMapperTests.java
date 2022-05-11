@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Encapsulates basic logic for testing custom {@link FieldSetMapper} implementations.
  *
  * @author Robert Kasanicky
+ * @author Glenn Renfro
  */
 public abstract class AbstractFieldSetMapperTests {
 

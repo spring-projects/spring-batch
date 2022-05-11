@@ -15,30 +15,31 @@
  */
 package org.springframework.batch.sample.domain.football.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Collections;
-
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  *
  */
-@SpringJUnitConfig(locations = { "/data-source-context.xml" })
-class JdbcPlayerSummaryDaoIntegrationTests {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = { "/data-source-context.xml" })
+public class JdbcPlayerSummaryDaoIntegrationTests {
 
 	private JdbcPlayerSummaryDao playerSummaryDao;
 
@@ -68,7 +69,7 @@ class JdbcPlayerSummaryDaoIntegrationTests {
 	}
 
 	@BeforeEach
-	void onSetUpInTransaction() {
+	public void onSetUpInTransaction() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY");
 	}
 

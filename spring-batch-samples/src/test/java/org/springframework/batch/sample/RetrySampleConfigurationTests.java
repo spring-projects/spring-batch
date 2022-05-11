@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.sample.config.DataSourceConfiguration;
 import org.springframework.batch.sample.config.JobRunnerConfiguration;
@@ -27,7 +25,10 @@ import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeIte
 import org.springframework.batch.sample.support.RetrySampleItemWriter;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Checks that expected number of items have been processed.
@@ -35,10 +36,12 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Robert Kasanicky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
-@SpringJUnitConfig(
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		classes = { DataSourceConfiguration.class, RetrySampleConfiguration.class, JobRunnerConfiguration.class })
-class RetrySampleConfigurationTests {
+public class RetrySampleConfigurationTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;

@@ -16,8 +16,21 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -25,24 +38,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.jdbc.JdbcTestUtils;
-
-@SpringJUnitConfig(
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(
 		locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
-class CustomerFilterJobFunctionalTests {
+public class CustomerFilterJobFunctionalTests {
 
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 
@@ -63,7 +64,8 @@ class CustomerFilterJobFunctionalTests {
 	}
 
 	@BeforeEach
-	void onSetUp() {
+
+	public void onSetUp() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 		jdbcTemplate.update("update CUSTOMER set credit=100000");
@@ -76,7 +78,7 @@ class CustomerFilterJobFunctionalTests {
 	}
 
 	@AfterEach
-	void tearDown() {
+	public void tearDown() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 	}
@@ -95,7 +97,7 @@ class CustomerFilterJobFunctionalTests {
 		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
-				Customer customer = customers.get(activeRow++);
+				CustomerFilterJobFunctionalTests.Customer customer = customers.get(activeRow++);
 				assertEquals(customer.getName(), rs.getString(1));
 				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 			}

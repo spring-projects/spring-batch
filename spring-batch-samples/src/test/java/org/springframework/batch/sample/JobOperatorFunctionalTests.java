@@ -15,19 +15,12 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -35,10 +28,18 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringJUnitConfig(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
-class JobOperatorFunctionalTests {
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml" })
+public class JobOperatorFunctionalTests {
 
 	private static final Log LOG = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
@@ -52,7 +53,7 @@ class JobOperatorFunctionalTests {
 	private JobRegistry jobRegistry;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	public void setUp() throws Exception {
 		if (!jobRegistry.getJobNames().contains(job.getName())) {
 			jobRegistry.register(new ReferenceJobFactory(job));
 		}
@@ -112,7 +113,7 @@ class JobOperatorFunctionalTests {
 		// there is just a single step in the test job
 		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
 		LOG.info(summaries);
-		assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
+		Assertions.assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
 	}
 
 	@Test
@@ -121,7 +122,7 @@ class JobOperatorFunctionalTests {
 
 		Set<String> names = operator.getJobNames();
 		assertEquals(1, names.size());
-		assertTrue(names.contains(jobName));
+		Assertions.assertTrue(names.contains(jobName));
 
 		long exec1 = operator.startNextInstance(jobName);
 		long exec2 = operator.startNextInstance(jobName);
@@ -133,8 +134,8 @@ class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		Set<Long> executions = operator.getRunningExecutions(jobName);
-		assertTrue(executions.contains(exec1));
-		assertTrue(executions.contains(exec2));
+		Assertions.assertTrue(executions.contains(exec1));
+		Assertions.assertTrue(executions.contains(exec2));
 
 		int count = 0;
 		boolean running = operator.getSummary(exec1).contains("STARTED")

@@ -15,15 +15,13 @@
  */
 package org.springframework.batch.sample;
 
-import javax.sql.DataSource;
-
 import org.apache.activemq.artemis.core.config.Configuration;
 import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -34,6 +32,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +42,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Base class for remote partitioning tests.
  *
  * @author Mahmoud Ben Hassine
+ * @author Glenn Renfro
  */
+
+@ExtendWith(SpringExtension.class)
 @PropertySource("classpath:remote-partitioning.properties")
 public abstract class RemotePartitioningJobFunctionalTests {
 
@@ -63,7 +67,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	protected abstract Class<?> getWorkerConfigurationClass();
 
 	@BeforeEach
-	void setUp() throws Exception {
+	public void setUp() throws Exception {
 		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61617")
 				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
 				.setJournalDatasync(false);
@@ -90,7 +94,7 @@ public abstract class RemotePartitioningJobFunctionalTests {
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		this.workerApplicationContext.close();
 		this.brokerService.stop();
 	}

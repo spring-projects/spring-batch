@@ -15,26 +15,10 @@
  */
 package org.springframework.batch.sample;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -48,14 +32,21 @@ import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
 import org.springframework.batch.sample.skip.SkippableExceptionDuringProcessSample;
 import org.springframework.batch.sample.skip.SkippableExceptionDuringReadSample;
 import org.springframework.batch.sample.skip.SkippableExceptionDuringWriteSample;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.jdbc.JdbcTestUtils;
+
+import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the error item is
@@ -65,8 +56,9 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
  */
-@SpringJUnitConfig(locations = { "/skipSample-job-launcher-context.xml" })
-class SkipSampleFunctionalTests {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = { "/skipSample-job-launcher-context.xml" })
+public class SkipSampleFunctionalTests {
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -86,7 +78,7 @@ class SkipSampleFunctionalTests {
 	}
 
 	@BeforeEach
-	void setUp() {
+	public void setUp() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE", "CUSTOMER");
 		for (int i = 1; i < 10; i++) {
 			jdbcTemplate.update("INSERT INTO CUSTOMER (ID, VERSION, NAME, CREDIT) VALUES (" + incrementer.nextIntValue()

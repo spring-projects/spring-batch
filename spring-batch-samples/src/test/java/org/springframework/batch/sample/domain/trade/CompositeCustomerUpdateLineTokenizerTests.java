@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.sample.domain.trade;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
@@ -25,8 +22,12 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.lang.Nullable;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * @author Lucas Ward
+ * @author Glenn Renfro
  *
  */
 class CompositeCustomerUpdateLineTokenizerTests {
@@ -40,7 +41,7 @@ class CompositeCustomerUpdateLineTokenizerTests {
 	private CompositeCustomerUpdateLineTokenizer compositeTokenizer;
 
 	@BeforeEach
-	void init() {
+	public void init() {
 		customerTokenizer = new StubLineTokenizer(customerFieldSet);
 		compositeTokenizer = new CompositeCustomerUpdateLineTokenizer();
 		compositeTokenizer.setCustomerTokenizer(customerTokenizer);

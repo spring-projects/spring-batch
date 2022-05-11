@@ -15,19 +15,17 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
 
-class CustomerUpdateProcessorTests {
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CustomerUpdateProcessorTests {
 
 	@Test
 	void testProcess() {

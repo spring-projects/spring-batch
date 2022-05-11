@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch TaskletSampleApp",
+            "request": "launch",
+            "mainClass": "io.spring.taskletsampleapp.TaskletSampleApp",
+            "projectName": "tasklet-sample-app"
+        },
+        {
+            "type": "java",
+            "name": "Launch TaskletSampleApp For XML",
+            "request": "launch",
+            "mainClass": "io.spring.taskletsampleapp.TaskletSampleApp",
+            "projectName": "tasklet-sample-app",
+            "vmArgs": "-Dspring.profiles.active=xml -Dspring.batch.initializer.enabled=true"
+        }
+    ]
+}

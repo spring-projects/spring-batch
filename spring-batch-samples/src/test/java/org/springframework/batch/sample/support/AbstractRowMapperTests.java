@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.sample.support;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,12 +23,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
+
 import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Encapsulates logic for testing custom {@link RowMapper} implementations.
  *
  * @author Robert Kasanicky
+ * @author Glenn Renfro
  * @param <T> the item type
  */
 public abstract class AbstractRowMapperTests<T> {

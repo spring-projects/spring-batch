@@ -15,21 +15,21 @@
  */
 package org.springframework.batch.sample.jmx;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.management.Notification;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.jmx.export.notification.NotificationPublisher;
 import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
+import javax.management.Notification;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Dave Syer
  * @author Thomas Risberg
+ * @author Glenn Renfro
  *
  */
 class JobExecutionNotificationPublisherTests {

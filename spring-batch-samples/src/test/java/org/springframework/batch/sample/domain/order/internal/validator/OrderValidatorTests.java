@@ -15,27 +15,28 @@
  */
 package org.springframework.batch.sample.domain.order.internal.validator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.batch.sample.domain.order.*;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.batch.sample.domain.order.Address;
-import org.springframework.batch.sample.domain.order.BillingInfo;
-import org.springframework.batch.sample.domain.order.Customer;
-import org.springframework.batch.sample.domain.order.LineItem;
-import org.springframework.batch.sample.domain.order.Order;
-import org.springframework.batch.sample.domain.order.ShippingInfo;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class OrderValidatorTests {
+public class OrderValidatorTests {
 
-	private final OrderValidator orderValidator = new OrderValidator();
+	private OrderValidator orderValidator;
+
+	@BeforeEach
+	public void setUp() throws Exception {
+		orderValidator = new OrderValidator();
+	}
 
 	@Test
 	void testSupports() {

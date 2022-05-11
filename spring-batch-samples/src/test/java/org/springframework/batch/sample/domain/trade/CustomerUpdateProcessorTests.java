@@ -15,21 +15,20 @@
  */
 package org.springframework.batch.sample.domain.trade;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.batch.sample.domain.trade.CustomerOperation.ADD;
-import static org.springframework.batch.sample.domain.trade.CustomerOperation.DELETE;
-import static org.springframework.batch.sample.domain.trade.CustomerOperation.UPDATE;
-
-import java.math.BigDecimal;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.springframework.batch.sample.domain.trade.CustomerOperation.*;
 
 /**
  * @author Lucas Ward
+ * @author Glenn Renfro
  *
  */
 class CustomerUpdateProcessorTests {
@@ -41,7 +40,7 @@ class CustomerUpdateProcessorTests {
 	private CustomerUpdateProcessor processor;
 
 	@BeforeEach
-	void init() {
+	public void init() {
 		customerDao = mock(CustomerDao.class);
 		logger = mock(InvalidCustomerLogger.class);
 		processor = new CustomerUpdateProcessor();

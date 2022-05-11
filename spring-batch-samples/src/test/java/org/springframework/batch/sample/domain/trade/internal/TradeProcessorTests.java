@@ -15,16 +15,13 @@
  */
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.mockito.Mockito.mock;
-
-import java.util.Collections;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
+
+import static org.mockito.Mockito.mock;
 
 class TradeProcessorTests {
 
@@ -33,7 +30,7 @@ class TradeProcessorTests {
 	private TradeWriter processor;
 
 	@BeforeEach
-	void setUp() {
+	public void setUp() {
 		writer = mock(TradeDao.class);
 
 		processor = new TradeWriter();
