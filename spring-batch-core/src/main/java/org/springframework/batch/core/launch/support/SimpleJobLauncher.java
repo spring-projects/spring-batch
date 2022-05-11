@@ -119,7 +119,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 			 */
 			for (StepExecution execution : lastExecution.getStepExecutions()) {
 				BatchStatus status = execution.getStatus();
-				if (status.isRunning() || status == BatchStatus.STOPPING) {
+				if (status.isRunning()) {
 					throw new JobExecutionAlreadyRunningException(
 							"A job execution for this job is already running: " + lastExecution);
 				}

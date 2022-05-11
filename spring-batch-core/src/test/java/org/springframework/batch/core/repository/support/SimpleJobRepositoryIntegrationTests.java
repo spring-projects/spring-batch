@@ -37,6 +37,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -76,6 +77,7 @@ class SimpleJobRepositoryIntegrationTests {
 		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 
 		jobRepository.update(firstExecution);
+		firstExecution.setStatus(BatchStatus.FAILED);
 		firstExecution.setEndTime(LocalDateTime.now());
 		jobRepository.update(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParams);
@@ -97,6 +99,7 @@ class SimpleJobRepositoryIntegrationTests {
 		LocalDateTime now = LocalDateTime.now();
 		firstExecution.setStartTime(now);
 		firstExecution.setEndTime(now.plus(1, ChronoUnit.SECONDS));
+		firstExecution.setStatus(BatchStatus.COMPLETED);
 		jobRepository.update(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
@@ -222,6 +225,50 @@ class SimpleJobRepositoryIntegrationTests {
 		JobExecution jobExecution2 = jobRepository.createJobExecution(job.getName(), jobParameters);
 		assertNotNull(jobExecution1);
 		assertNotNull(jobExecution2);
+	}
+
+	/*
+	 * When a job execution is running, JobExecutionAlreadyRunningException should be
+	 * thrown if trying to create any other ones with same job parameters.
+	 */
+	@Transactional
+	@Test
+	public void testReExecuteWithSameJobParametersWhenRunning() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder().addString("stringKey", "stringValue")
+				.toJobParameters();
+
+		// jobExecution with status STARTING
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		try {
+			jobRepository.createJobExecution(job.getName(), jobParameters);
+			fail();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
+
+		// jobExecution with status STARTED
+		jobExecution.setStatus(BatchStatus.STARTED);
+		jobExecution.setStartTime(LocalDateTime.now());
+		jobRepository.update(jobExecution);
+		try {
+			jobRepository.createJobExecution(job.getName(), jobParameters);
+			fail();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
+
+		// jobExecution with status STOPPING
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobRepository.update(jobExecution);
+		try {
+			jobRepository.createJobExecution(job.getName(), jobParameters);
+			fail();
+		}
+		catch (JobExecutionAlreadyRunningException e) {
+			// expected
+		}
 	}
 
 }

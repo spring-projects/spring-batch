@@ -163,6 +163,7 @@ class JobStepTests {
 		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		jobExecution.setEndTime(LocalDateTime.now());
+		jobExecution.setStatus(BatchStatus.FAILED);
 		jobRepository.update(jobExecution);
 
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());

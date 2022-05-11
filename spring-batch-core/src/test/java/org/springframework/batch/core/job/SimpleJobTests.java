@@ -363,6 +363,7 @@ class SimpleJobTests {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		jobRepository.add(stepExecution1);
 		jobExecution.setEndTime(LocalDateTime.now());
+		jobExecution.setStatus(BatchStatus.COMPLETED);
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		job.execute(jobExecution);

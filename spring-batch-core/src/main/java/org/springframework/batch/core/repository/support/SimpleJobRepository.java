@@ -136,7 +136,7 @@ public class SimpleJobRepository implements JobRepository {
 
 			// check for running executions and find the last started
 			for (JobExecution execution : executions) {
-				if (execution.isRunning() || execution.isStopping()) {
+				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException(
 							"A job execution for this job is already running: " + jobInstance);
 				}

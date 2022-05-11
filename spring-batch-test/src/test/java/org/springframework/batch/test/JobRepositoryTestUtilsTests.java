@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -84,6 +85,7 @@ class JobRepositoryTestUtilsTests {
 		List<JobExecution> list = new ArrayList<>();
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
 		jobExecution.setEndTime(LocalDateTime.now());
+		jobExecution.setStatus(BatchStatus.COMPLETED);
 		list.add(jobExecution);
 		jobRepository.update(jobExecution);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());

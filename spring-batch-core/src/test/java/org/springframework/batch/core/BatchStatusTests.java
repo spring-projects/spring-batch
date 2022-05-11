@@ -71,6 +71,7 @@ class BatchStatusTests {
 		assertFalse(BatchStatus.COMPLETED.isRunning());
 		assertTrue(BatchStatus.STARTED.isRunning());
 		assertTrue(BatchStatus.STARTING.isRunning());
+		assertTrue(BatchStatus.STOPPING.isRunning());
 	}
 
 	@Test
