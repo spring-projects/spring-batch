@@ -159,9 +159,14 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 			DataSource dataSource;
 			try {
 				dataSource = this.context.getBean(DataSource.class);
+			}  catch (NoUniqueBeanDefinitionException exception) {
+				throw new IllegalStateException(
+						"Multiple data sources are defined in the application context and no primary candidate was found." +
+						"To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
+						exception);
 			} catch (NoSuchBeanDefinitionException exception) {
 				throw new IllegalStateException(
-						"To use the default BatchConfigurer the context must contain precisely one DataSource",
+						"To use the default BatchConfigurer, the context must contain at least one datasource bean.",
 						exception);
 			}
 			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);

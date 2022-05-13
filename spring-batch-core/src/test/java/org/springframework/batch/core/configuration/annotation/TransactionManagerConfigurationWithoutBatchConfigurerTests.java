@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -35,6 +36,16 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Mahmoud Ben Hassine
  */
 public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends TransactionManagerConfigurationTests {
+
+	@Test(expected = BeanCreationException.class)
+	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
+		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
+	}
+
+	@Test(expected = BeanCreationException.class)
+	public void testConfigurationWithNoDataSourceAndTransactionManager() {
+		new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndTransactionManager.class);
+	}
 
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
@@ -63,6 +74,11 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		// In this case, the supplied primary transaction manager won't be used by batch and a DataSourceTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
 		Assert.assertTrue(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
+	}
+
+	@EnableBatchProcessing
+	public static class BatchConfigurationWithNoDataSourceAndNoTransactionManager {
+
 	}
 
 	@EnableBatchProcessing

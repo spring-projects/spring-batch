@@ -92,6 +92,12 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 		return createLazyProxy(transactionManager, PlatformTransactionManager.class);
 	}
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		this.initialize();
+	}
+
 	private <T> T createLazyProxy(AtomicReference<T> reference, Class<T> type) {
 		ProxyFactory factory = new ProxyFactory();
 		factory.setTargetSource(new ReferenceTargetSource<>(reference));
