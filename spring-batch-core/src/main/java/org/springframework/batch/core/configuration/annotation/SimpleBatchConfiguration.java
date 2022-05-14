@@ -47,7 +47,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	@Autowired
-	private ApplicationContext context;
+	protected ApplicationContext context;
 
 	@Autowired(required = false)
 	private Collection<BatchConfigurer> configurers;
