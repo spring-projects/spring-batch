@@ -22,6 +22,7 @@ import org.springframework.batch.core.repository.JobRepository;
  * Convenient factory for a {@link JobBuilder} which sets the {@link JobRepository} automatically.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class JobBuilderFactory {
@@ -43,8 +44,7 @@ public class JobBuilderFactory {
 	 * @return a job builder
 	 */
 	public JobBuilder get(String name) {
-		JobBuilder builder = new JobBuilder(name).repository(jobRepository);
-		return builder;
+		return new JobBuilder(name).repository(this.jobRepository);
 	}
 
 }

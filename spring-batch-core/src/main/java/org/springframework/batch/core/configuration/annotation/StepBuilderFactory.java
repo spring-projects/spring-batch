@@ -24,6 +24,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * {@link PlatformTransactionManager} automatically.
  * 
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  * 
  */
 public class StepBuilderFactory {
@@ -51,9 +52,9 @@ public class StepBuilderFactory {
 	 * @return a step builder
 	 */
 	public StepBuilder get(String name) {
-		StepBuilder builder = new StepBuilder(name).repository(jobRepository).transactionManager(
-				transactionManager);
-		return builder;
+		return new StepBuilder(name)
+				.repository(this.jobRepository)
+				.transactionManager(this.transactionManager);
 	}
 
 }

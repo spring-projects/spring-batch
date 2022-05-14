@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.annotation;
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -39,8 +40,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface. {@link BatchConfigurer}.
+ * Base {@code Configuration} class providing common structure for enabling and using Spring Batch.
+ * Customization is available by implementing the {@link BatchConfigurer} interface.
  * 
  * @author Dave Syer
  * @author Michael Minella
@@ -56,8 +57,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 	private ApplicationContext context;
 
 	private BatchConfigurer configurer;
-
-	private JobRegistry jobRegistry = new MapJobRegistry();
 
 	private JobBuilderFactory jobBuilderFactory;
 
@@ -120,7 +119,7 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 	 */
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
-		return this.jobRegistry;
+		return new MapJobRegistry();
 	}
 
 	/**
@@ -133,10 +132,11 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	@Override
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
-		AnnotationAttributes enabled = AnnotationAttributes.fromMap(importMetadata.getAnnotationAttributes(
-				EnableBatchProcessing.class.getName(), false));
-		Assert.notNull(enabled,
-				"@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName());
+		Map<String, Object> annotationAttributes =
+				importMetadata.getAnnotationAttributes(EnableBatchProcessing.class.getName(), false);
+		AnnotationAttributes enabled = AnnotationAttributes.fromMap(annotationAttributes);
+		String message = "@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName();
+		Assert.notNull(enabled, message);
 	}
 
 	@Override
@@ -156,23 +156,11 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 			return this.configurer;
 		}
 		if (configurers == null || configurers.isEmpty()) {
-			DataSource dataSource;
-			try {
-				dataSource = this.context.getBean(DataSource.class);
-			}  catch (NoUniqueBeanDefinitionException exception) {
-				throw new IllegalStateException(
-						"Multiple data sources are defined in the application context and no primary candidate was found. " +
-						"To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
-						exception);
-			} catch (NoSuchBeanDefinitionException exception) {
-				throw new IllegalStateException(
-						"To use the default BatchConfigurer, the application context must contain at least one data source.",
-						exception);
-			}
+			DataSource dataSource = getDataSource();
 			DefaultBatchConfigurer configurer = new DefaultBatchConfigurer(dataSource);
 			configurer.initialize();
 			this.configurer = configurer;
-			return configurer;
+			return this.configurer;
 		}
 		if (configurers.size() > 1) {
 			throw new IllegalStateException(
@@ -181,6 +169,23 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		}
 		this.configurer = configurers.iterator().next();
 		return this.configurer;
+	}
+
+	private DataSource getDataSource() {
+		DataSource dataSource;
+		try {
+			dataSource = this.context.getBean(DataSource.class);
+		}  catch (NoUniqueBeanDefinitionException exception) {
+			throw new IllegalStateException(
+					"Multiple data sources are defined in the application context and no primary candidate was found. " +
+					"To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
+					exception);
+		} catch (NoSuchBeanDefinitionException exception) {
+			throw new IllegalStateException(
+					"To use the default BatchConfigurer, the application context must contain at least one data source.",
+					exception);
+		}
+		return dataSource;
 	}
 
 }

@@ -43,23 +43,6 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	private JobExplorer jobExplorer;
 
 	/**
-	 * Sets the dataSource.
-	 *
-	 * @param dataSource The data source to use. Must not be {@code null}.
-	 */
-	public void setDataSource(DataSource dataSource) {
-		Assert.notNull(dataSource, "DataSource must not be null");
-		this.dataSource = dataSource;
-	}
-
-	/**
-	 * @return The {@link DataSource} used by the {@link DefaultBatchConfigurer}.
-	 */
-	public DataSource getDataSource() {
-		return this.dataSource;
-	}
-
-	/**
 	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This constructor
 	 * will configure a default {@link DataSourceTransactionManager}.
 	 *
@@ -81,24 +64,42 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		this.transactionManager = transactionManager;
 	}
 
-	@Override
-	public JobRepository getJobRepository() {
-		return jobRepository;
+	/**
+	 * Sets the dataSource.
+	 *
+	 * @param dataSource The data source to use. Must not be {@code null}.
+	 */
+	public void setDataSource(DataSource dataSource) {
+		Assert.notNull(dataSource, "DataSource must not be null");
+		this.dataSource = dataSource;
 	}
 
+	/**
+	 * @return The {@link DataSource} used by the {@link DefaultBatchConfigurer}.
+	 */
+	public DataSource getDataSource() {
+		return this.dataSource;
+	}
+
+
 	@Override
-	public PlatformTransactionManager getTransactionManager() {
-		return transactionManager;
+	public JobRepository getJobRepository() {
+		return this.jobRepository;
 	}
 
 	@Override
 	public JobLauncher getJobLauncher() {
-		return jobLauncher;
+		return this.jobLauncher;
 	}
 
 	@Override
 	public JobExplorer getJobExplorer() {
-		return jobExplorer;
+		return this.jobExplorer;
+	}
+
+	@Override
+	public PlatformTransactionManager getTransactionManager() {
+		return this.transactionManager;
 	}
 
 	/**
