@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.annotation;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -34,11 +35,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch. Customization is
- * available by implementing the {@link BatchConfigurer} interface. The main components are created as lazy proxies that
- * only initialize when a method is called. This is to prevent (as much as possible) configuration cycles from
- * developing when these components are needed in a configuration resource that itself provides a
- * {@link BatchConfigurer}.
+ * Base {@code Configuration} class providing common structure for enabling and using Spring Batch.
+ * Customization is available by implementing the {@link BatchConfigurer} interface.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -51,98 +49,36 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 	@Autowired
 	private ApplicationContext context;
 
-	private boolean initialized = false;
-
-	private AtomicReference<JobRepository> jobRepository = new AtomicReference<>();
-
-	private AtomicReference<JobLauncher> jobLauncher = new AtomicReference<>();
-
-	private AtomicReference<JobRegistry> jobRegistry = new AtomicReference<>();
-
-	private AtomicReference<PlatformTransactionManager> transactionManager = new AtomicReference<>();
-
-	private AtomicReference<JobExplorer> jobExplorer = new AtomicReference<>();
+	@Autowired(required = false)
+	private Collection<BatchConfigurer> configurers;
 
 	@Override
 	@Bean
 	public JobRepository jobRepository() throws Exception {
-		return createLazyProxy(jobRepository, JobRepository.class);
+		return getConfigurer(configurers).getJobRepository();
 	}
 
 	@Override
 	@Bean
 	public JobLauncher jobLauncher() throws Exception {
-		return createLazyProxy(jobLauncher, JobLauncher.class);
+		return getConfigurer(configurers).getJobLauncher();
 	}
 
 	@Override
 	@Bean
 	public JobRegistry jobRegistry() throws Exception {
-		return createLazyProxy(jobRegistry, JobRegistry.class);
+		return new MapJobRegistry();
 	}
 
 	@Override
 	@Bean
-	public JobExplorer jobExplorer() {
-		return createLazyProxy(jobExplorer, JobExplorer.class);
+	public JobExplorer jobExplorer() throws Exception {
+		return getConfigurer(configurers).getJobExplorer();
 	}
 
 	@Override
 	public PlatformTransactionManager transactionManager() throws Exception {
-		return createLazyProxy(transactionManager, PlatformTransactionManager.class);
-	}
-
-	private <T> T createLazyProxy(AtomicReference<T> reference, Class<T> type) {
-		ProxyFactory factory = new ProxyFactory();
-		factory.setTargetSource(new ReferenceTargetSource<>(reference));
-		factory.addAdvice(new PassthruAdvice());
-		factory.setInterfaces(new Class<?>[] { type });
-		@SuppressWarnings("unchecked")
-		T proxy = (T) factory.getProxy();
-		return proxy;
-	}
-
-	/**
-	 * Sets up the basic components by extracting them from the {@link BatchConfigurer configurer}, defaulting to some
-	 * sensible values as long as a unique DataSource is available.
-	 *
-	 * @throws Exception if there is a problem in the configurer
-	 */
-	protected void initialize() throws Exception {
-		if (initialized) {
-			return;
-		}
-		BatchConfigurer configurer = getConfigurer(context.getBeansOfType(BatchConfigurer.class).values());
-		jobRepository.set(configurer.getJobRepository());
-		jobLauncher.set(configurer.getJobLauncher());
-		transactionManager.set(configurer.getTransactionManager());
-		jobRegistry.set(new MapJobRegistry());
-		jobExplorer.set(configurer.getJobExplorer());
-		initialized = true;
-	}
-
-	private class PassthruAdvice implements MethodInterceptor {
-
-		@Override
-		public Object invoke(MethodInvocation invocation) throws Throwable {
-			return invocation.proceed();
-		}
-
-	}
-
-	private class ReferenceTargetSource<T> extends AbstractLazyCreationTargetSource {
-
-		private AtomicReference<T> reference;
-
-		public ReferenceTargetSource(AtomicReference<T> reference) {
-			this.reference = reference;
-		}
-
-		@Override
-		protected Object createObject() throws Exception {
-			initialize();
-			return reference.get();
-		}
+		return getConfigurer(configurers).getTransactionManager();
 	}
 
 }
