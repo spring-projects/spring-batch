@@ -66,12 +66,6 @@ public class SimpleBatchConfiguration extends AbstractBatchConfiguration {
 
 	@Override
 	@Bean
-	public JobRegistry jobRegistry() throws Exception {
-		return new MapJobRegistry();
-	}
-
-	@Override
-	@Bean
 	public JobExplorer jobExplorer() throws Exception {
 		return getConfigurer(configurers).getJobExplorer();
 	}
