@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
  * Java Application. Do the same any time you want to wipe the database and start again.
  *
  * @author Dave Syer
+ * @author Mahmoud Ben Hassine
  *
  */
 public class DataSourceInitializer implements InitializingBean {
@@ -97,7 +98,7 @@ public class DataSourceInitializer implements InitializingBean {
 			throw new IllegalArgumentException("Script resource is null or does not exist");
 		}
 
-		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
+		TransactionTemplate transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 
 			@Override

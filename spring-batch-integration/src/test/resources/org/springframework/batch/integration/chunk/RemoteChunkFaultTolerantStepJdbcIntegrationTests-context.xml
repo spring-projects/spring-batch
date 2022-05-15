@@ -110,7 +110,7 @@
 		<property name="validationQuery" value="${batch.jdbc.validationQuery}" />
 	</bean>
 
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 

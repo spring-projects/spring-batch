@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -61,7 +61,7 @@ public class StoredprocedureItemReaderConfigTests {
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
@@ -97,7 +97,7 @@ public class StoredprocedureItemReaderConfigTests {
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(ds);
@@ -132,7 +132,7 @@ public class StoredprocedureItemReaderConfigTests {
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final StoredProcedureItemReader<String> reader = new StoredProcedureItemReader<>();
 		reader.setDataSource(ds);

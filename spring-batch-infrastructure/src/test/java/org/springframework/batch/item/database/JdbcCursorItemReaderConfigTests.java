@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 the original author or authors.
+ * Copyright 2008-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.junit.runners.JUnit4;
 import org.mockito.ArgumentCaptor;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -56,7 +56,7 @@ public class JdbcCursorItemReaderConfigTests {
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
@@ -88,7 +88,7 @@ public class JdbcCursorItemReaderConfigTests {
 		when(ds.getConnection()).thenReturn(con);
 		when(ds.getConnection()).thenReturn(con);
 		con.commit();
-		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<>();
 		reader.setDataSource(ds);

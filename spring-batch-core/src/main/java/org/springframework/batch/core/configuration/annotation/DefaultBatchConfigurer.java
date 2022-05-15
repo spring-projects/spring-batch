@@ -25,7 +25,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
@@ -48,11 +48,11 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	/**
 	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This
-	 * constructor will configure a default {@link DataSourceTransactionManager}.
+	 * constructor will configure a default {@link JdbcTransactionManager}.
 	 * @param dataSource to use for the job repository and job explorer
 	 */
 	public DefaultBatchConfigurer(DataSource dataSource) {
-		this(dataSource, new DataSourceTransactionManager(dataSource));
+		this(dataSource, new JdbcTransactionManager(dataSource));
 	}
 
 	/**

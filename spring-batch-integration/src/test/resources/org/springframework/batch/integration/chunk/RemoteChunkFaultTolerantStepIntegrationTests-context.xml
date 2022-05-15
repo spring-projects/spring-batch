@@ -83,7 +83,7 @@
 		<jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
 	</jdbc:initialize-database>
 
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 

@@ -117,7 +117,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * </ul>
  *
  * The transaction manager provided by this annotation will be of type
- * {@link org.springframework.jdbc.datasource.DataSourceTransactionManager} configured
+ * {@link org.springframework.jdbc.support.JdbcTransactionManager} configured
  * with the {@link javax.sql.DataSource} provided within the context.
  *
  * In order to use a custom transaction manager, a custom {@link BatchConfigurer} should

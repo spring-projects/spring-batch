@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2018 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SmartDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -183,7 +183,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy();
 		csds.setDataSource(ds);
-		PlatformTransactionManager tm = new DataSourceTransactionManager(csds);
+		PlatformTransactionManager tm = new JdbcTransactionManager(csds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final TransactionTemplate tt2 = new TransactionTemplate(tm);
 		tt2.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

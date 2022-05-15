@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -45,10 +45,10 @@ public class TransactionManagerConfigurationWithBatchConfigurerTests extends Tra
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
-		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
-		DataSourceTransactionManager dataSourceTransactionManager = AopTestUtils
+		Assert.assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
+		JdbcTransactionManager JdbcTransactionManager = AopTestUtils
 				.getTargetObject(platformTransactionManager);
-		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
+		Assert.assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
 		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
 				platformTransactionManager);
 	}

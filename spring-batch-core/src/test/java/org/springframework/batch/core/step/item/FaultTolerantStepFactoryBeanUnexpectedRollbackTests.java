@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 the original author or authors.
+ * Copyright 2010-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.springframework.batch.core.step.factory.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.TransactionException;
@@ -62,7 +62,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		factory.setItemWriter(writer);
 
 		@SuppressWarnings("serial")
-		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource) {
+		JdbcTransactionManager transactionManager = new JdbcTransactionManager(dataSource) {
 			private boolean failed = false;
 
 			@Override
