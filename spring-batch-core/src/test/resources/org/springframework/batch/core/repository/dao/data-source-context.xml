@@ -17,7 +17,7 @@
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	<bean id="incrementerParent" class="org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer"

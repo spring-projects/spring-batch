@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2021 the original author or authors.
+ * Copyright 2009-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
@@ -114,7 +114,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
 		repositoryFactory.setDataSource(embeddedDatabase);
-		repositoryFactory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
+		repositoryFactory.setTransactionManager(new JdbcTransactionManager(embeddedDatabase));
 		repositoryFactory.afterPropertiesSet();
 		repository = repositoryFactory.getObject();
 		factory.setJobRepository(repository);

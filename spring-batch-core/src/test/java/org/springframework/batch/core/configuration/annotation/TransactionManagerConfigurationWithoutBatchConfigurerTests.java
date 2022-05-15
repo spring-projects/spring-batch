@@ -31,7 +31,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -68,9 +68,9 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
 		PlatformTransactionManager platformTransactionManager = getTransactionManagerSetOnJobRepository(
 				applicationContext.getBean(JobRepository.class));
-		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
-		DataSourceTransactionManager dataSourceTransactionManager = (DataSourceTransactionManager) platformTransactionManager;
-		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
+		Assert.assertTrue(platformTransactionManager instanceof JdbcTransactionManager);
+		JdbcTransactionManager JdbcTransactionManager = (JdbcTransactionManager) platformTransactionManager;
+		Assert.assertEquals(applicationContext.getBean(DataSource.class), JdbcTransactionManager.getDataSource());
 	}
 
 	@Test
@@ -81,10 +81,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 				.getBean(PlatformTransactionManager.class);
 		Assert.assertSame(transactionManager, platformTransactionManager);
 		// In this case, the supplied transaction manager won't be used by batch and a
-		// DataSourceTransactionManager will be used instead.
+		// JdbcTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
 		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
-				applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
+				applicationContext.getBean(JobRepository.class)) instanceof JdbcTransactionManager);
 	}
 
 	@Test
@@ -95,10 +95,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 				.getBean(PlatformTransactionManager.class);
 		Assert.assertSame(transactionManager2, platformTransactionManager);
 		// In this case, the supplied primary transaction manager won't be used by batch
-		// and a DataSourceTransactionManager will be used instead.
+		// and a JdbcTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
 		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
-				applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
+				applicationContext.getBean(JobRepository.class)) instanceof JdbcTransactionManager);
 	}
 
 	@Configuration

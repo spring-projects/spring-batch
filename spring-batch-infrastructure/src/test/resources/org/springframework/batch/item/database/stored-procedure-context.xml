@@ -17,7 +17,7 @@
 		<property name="dataDirectory" value="target/derby-home"/>
 	</bean>
 	
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 

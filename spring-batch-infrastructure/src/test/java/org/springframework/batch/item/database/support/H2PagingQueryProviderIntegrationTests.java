@@ -31,7 +31,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.springframework.batch.item.database.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -41,6 +41,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author Henning Pöttker
+ * @author Mahmoud Ben Hassine
  */
 @RunWith(Parameterized.class)
 public class H2PagingQueryProviderIntegrationTests {
@@ -56,7 +57,7 @@ public class H2PagingQueryProviderIntegrationTests {
 		String connectionUrl = String.format("jdbc:h2:mem:%s;MODE=%s", UUID.randomUUID(), compatibilityMode);
 		DataSource dataSource = new SimpleDriverDataSource(new org.h2.Driver(), connectionUrl, "sa", "");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+		PlatformTransactionManager transactionManager = new JdbcTransactionManager(dataSource);
 		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
 		transactionTemplate.executeWithoutResult(status -> {

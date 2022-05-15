@@ -11,7 +11,7 @@
 	<beans:bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 	    <beans:property name="dataSource" ref="dataSource" />
 	</beans:bean>
-	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<beans:bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
 		<beans:property name="dataSource" ref="dataSource"/>
 	</beans:bean>
 	<beans:bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>

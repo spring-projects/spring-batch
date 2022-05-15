@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -190,7 +190,7 @@ public class StoredProcedureItemReaderBuilderTests {
 
 		@Bean
 		public PlatformTransactionManager transactionManager(DataSource dataSource) {
-			DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+			JdbcTransactionManager transactionManager = new JdbcTransactionManager();
 
 			transactionManager.setDataSource(dataSource);
 

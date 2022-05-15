@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DeadlockLoserDataAccessException;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.listener.RetryListenerSupport;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -297,7 +297,7 @@ public class StepParserTests {
 	public void testTransactionManagerDefaults() throws Exception {
 		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
-		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof DataSourceTransactionManager);
+		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof JdbcTransactionManager);
 
 		assertDummyTransactionManager("specifiedTxMgrStep", "dummyTxMgr", ctx);
 
