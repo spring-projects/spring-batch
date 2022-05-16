@@ -15,18 +15,17 @@
  */
 package org.springframework.batch.test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.ComparisonFailure;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.FileSystemResource;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This class can be used to assert that two files are the same.
  *
  * @author Dan Garrette
+ * @author Glenn Renfro
  * @since 2.0
  */
 class AssertFileTests {
@@ -39,21 +38,36 @@ class AssertFileTests {
 	}
 
 	@Test
-	void testAssertEquals_notEqual() {
-		Error error = assertThrows(ComparisonFailure.class, () -> executeAssertEquals("input1.txt", "input2.txt"));
-		assertTrue(error.getMessage().startsWith("Line number 3 does not match."));
+	public void testAssertEquals_notEqual() throws Exception {
+		try {
+			executeAssertEquals("input1.txt", "input2.txt");
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("Line number 3 does not match."));
+		}
 	}
 
 	@Test
-	void testAssertEquals_tooLong() {
-		Error error = assertThrows(AssertionError.class, () -> executeAssertEquals("input3.txt", "input1.txt"));
-		assertTrue(error.getMessage().startsWith("More lines than expected.  There should not be a line number 4."));
+	public void testAssertEquals_tooLong() throws Exception {
+		try {
+			executeAssertEquals("input3.txt", "input1.txt");
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("More lines than expected.  There should not be a line number 4."));
+		}
 	}
 
 	@Test
-	void testAssertEquals_tooShort() {
-		Error error = assertThrows(AssertionError.class, () -> executeAssertEquals("input1.txt", "input3.txt"));
-		assertTrue(error.getMessage().startsWith("Line number 4 does not match."));
+	public void testAssertEquals_tooShort() throws Exception {
+		try {
+			executeAssertEquals("input1.txt", "input3.txt");
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("Line number 4 does not match."));
+		}
 	}
 
 	@Test
@@ -62,15 +76,25 @@ class AssertFileTests {
 	}
 
 	@Test
-	void testAssertEquals_blank_tooLong() {
-		Error error = assertThrows(AssertionError.class, () -> executeAssertEquals("blank.txt", "input1.txt"));
-		assertTrue(error.getMessage().startsWith("More lines than expected.  There should not be a line number 1."));
+	public void testAssertEquals_blank_tooLong() throws Exception {
+		try {
+			executeAssertEquals("blank.txt", "input1.txt");
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("More lines than expected.  There should not be a line number 1."));
+		}
 	}
 
 	@Test
-	void testAssertEquals_blank_tooShort() {
-		Error error = assertThrows(AssertionError.class, () -> executeAssertEquals("input1.txt", "blank.txt"));
-		assertTrue(error.getMessage().startsWith("Line number 1 does not match."));
+	public void testAssertEquals_blank_tooShort() throws Exception {
+		try {
+			executeAssertEquals("input1.txt", "blank.txt");
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertTrue(e.getMessage().startsWith("Line number 1 does not match."));
+		}
 	}
 
 	private void executeAssertEquals(String expected, String actual) throws Exception {
