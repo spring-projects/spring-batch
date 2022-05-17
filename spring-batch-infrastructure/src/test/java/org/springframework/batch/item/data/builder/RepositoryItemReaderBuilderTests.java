@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Glenn Renfro
  * @author Drummond Dawson
+ * @author Mahmoud Ben Hassine
  */
 public class RepositoryItemReaderBuilderTests {
 
@@ -86,36 +87,6 @@ public class RepositoryItemReaderBuilderTests {
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
-	}
-
-	@Test
-	public void testRepositoryMethodReference() throws Exception {
-		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference<>(
-				this.repository);
-		repositoryMethodReference.methodIs().foo(null);
-		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repositoryMethodReference)
-				.sorts(this.sorts).maxItemCount(5).name("bar").build();
-		String result = (String) reader.read();
-		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
-		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
-	}
-
-	@Test
-	public void testRepositoryMethodReferenceWithArgs() throws Exception {
-		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference<>(
-				this.repository);
-		repositoryMethodReference.methodIs().foo(ARG1, ARG2, ARG3, null);
-		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repositoryMethodReference)
-				.sorts(this.sorts).maxItemCount(5).name("bar").build();
-		ArgumentCaptor<String> arg1Captor = ArgumentCaptor.forClass(String.class);
-		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
-		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
-		when(this.repository.foo(arg1Captor.capture(), arg2Captor.capture(), arg3Captor.capture(),
-				this.pageRequestContainer.capture())).thenReturn(this.page);
-
-		String result = (String) reader.read();
-		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
-		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
 	}
 
 	@Test

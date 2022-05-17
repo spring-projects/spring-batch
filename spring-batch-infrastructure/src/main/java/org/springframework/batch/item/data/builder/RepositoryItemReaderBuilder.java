@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2017-2022 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -52,8 +52,6 @@ public class RepositoryItemReaderBuilder<T> {
 	private int pageSize = 10;
 
 	private String methodName;
-
-	private RepositoryMethodReference<?> repositoryMethodReference;
 
 	private boolean saveState = true;
 
@@ -187,42 +185,10 @@ public class RepositoryItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Specifies a repository and the type-safe method to call for the reader. The method
-	 * configured via this mechanism must take
-	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
-	 * This method can be used in place of
-	 * {@link #repository(PagingAndSortingRepository)}, {@link #methodName(String)}, and
-	 * {@link #arguments(List)}.
-	 *
-	 * Note: The repository that is used by the repositoryMethodReference must be
-	 * non-final.
-	 * @param repositoryMethodReference of the used to get a repository and type-safe
-	 * method for use by the reader.
-	 * @return The current instance of the builder.
-	 * @see RepositoryItemReader#setMethodName(String)
-	 * @see RepositoryItemReader#setRepository(PagingAndSortingRepository)
-	 *
-	 */
-	public RepositoryItemReaderBuilder<T> repository(RepositoryMethodReference<?> repositoryMethodReference) {
-		this.repositoryMethodReference = repositoryMethodReference;
-
-		return this;
-	}
-
-	/**
 	 * Builds the {@link RepositoryItemReader}.
 	 * @return a {@link RepositoryItemReader}
 	 */
 	public RepositoryItemReader<T> build() {
-		if (this.repositoryMethodReference != null) {
-			this.methodName = this.repositoryMethodReference.getMethodName();
-			this.repository = this.repositoryMethodReference.getRepository();
-
-			if (CollectionUtils.isEmpty(this.arguments)) {
-				this.arguments = this.repositoryMethodReference.getArguments();
-			}
-		}
-
 		Assert.notNull(this.sorts, "sorts map is required.");
 		Assert.notNull(this.repository, "repository is required.");
 		Assert.hasText(this.methodName, "methodName is required.");
@@ -241,79 +207,6 @@ public class RepositoryItemReaderBuilder<T> {
 		reader.setSort(this.sorts);
 		reader.setName(this.name);
 		return reader;
-	}
-
-	/**
-	 * Establishes a proxy that will capture a the Repository and the associated
-	 * methodName that will be used by the reader.
-	 *
-	 * @param <T> The type of repository that will be used by the reader. The class must
-	 * not be final.
-	 */
-	public static class RepositoryMethodReference<T> {
-
-		private RepositoryMethodInterceptor repositoryInvocationHandler;
-
-		private PagingAndSortingRepository<?, ?> repository;
-
-		public RepositoryMethodReference(PagingAndSortingRepository<?, ?> repository) {
-			this.repository = repository;
-			this.repositoryInvocationHandler = new RepositoryMethodInterceptor();
-		}
-
-		/**
-		 * The proxy returned prevents actual method execution and is only used to gather,
-		 * information about the method.
-		 * @return T is a proxy of the object passed in in the constructor
-		 */
-		@SuppressWarnings("unchecked")
-		public T methodIs() {
-			Enhancer enhancer = new Enhancer();
-			enhancer.setSuperclass(this.repository.getClass());
-			enhancer.setCallback(this.repositoryInvocationHandler);
-			return (T) enhancer.create();
-		}
-
-		PagingAndSortingRepository<?, ?> getRepository() {
-			return this.repository;
-		}
-
-		String getMethodName() {
-			return this.repositoryInvocationHandler.getMethodName();
-		}
-
-		List<Object> getArguments() {
-			return this.repositoryInvocationHandler.getArguments();
-		}
-
-	}
-
-	private static class RepositoryMethodInterceptor implements MethodInterceptor {
-
-		private String methodName;
-
-		private List<Object> arguments;
-
-		@Override
-		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-			this.methodName = method.getName();
-			if (objects != null && objects.length > 1) {
-				arguments = new ArrayList<>(Arrays.asList(objects));
-				// remove last entry because that will be provided by the
-				// RepositoryItemReader
-				arguments.remove(objects.length - 1);
-			}
-			return null;
-		}
-
-		String getMethodName() {
-			return this.methodName;
-		}
-
-		List<Object> getArguments() {
-			return arguments;
-		}
-
 	}
 
 }
