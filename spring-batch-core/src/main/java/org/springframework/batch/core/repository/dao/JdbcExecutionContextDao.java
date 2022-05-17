@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,7 +75,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
 
-	private static final String CHARSET_NAME = "ISO-8859-1";
+	private static final String CHARSET_NAME = StandardCharsets.UTF_8.name();
 
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
 
