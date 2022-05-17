@@ -254,6 +254,7 @@ public class Jackson2ExecutionContextStringSerializer implements ExecutionContex
      */
     static class TrustedTypeIdResolver implements TypeIdResolver {
         private static final Set<String> TRUSTED_CLASS_NAMES = Collections.unmodifiableSet(new HashSet(Arrays.asList(
+                "javax.xml.namespace.QName",
                 "java.util.UUID",
                 "java.util.ArrayList",
                 "java.util.Arrays$ArrayList",
