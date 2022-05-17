@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.item.file;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,8 +49,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private static final Log logger = LogFactory.getLog(FlatFileItemReader.class);
 
-	// default encoding for input files
-	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
+	public static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 
 	public static final String[] DEFAULT_COMMENT_PREFIXES = new String[] { "#" };
 

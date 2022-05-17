@@ -24,6 +24,7 @@ import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
@@ -74,8 +75,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	public static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
-	// default encoding for writing to flat files - set to charset of this Java virtual machine.
-	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
+	public static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 

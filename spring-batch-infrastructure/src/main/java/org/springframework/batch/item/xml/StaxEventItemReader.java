@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2020 the original author or authors.
+ * Copyright 2006-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.batch.item.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -64,7 +65,7 @@ ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
-	public static final String DEFAULT_ENCODING = Charset.defaultCharset().name();
+	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	private FragmentEventReader fragmentReader;
 
