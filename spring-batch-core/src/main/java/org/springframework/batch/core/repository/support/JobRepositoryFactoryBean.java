@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.springframework.batch.core.repository.support;
 
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Types;
 import javax.sql.DataSource;
 
@@ -43,6 +45,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -81,6 +84,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private ExecutionContextSerializer serializer;
 
 	private Integer lobType;
+
+	private Charset charset = StandardCharsets.UTF_8;
 
 	/**
 	 * @param type a value from the {@link java.sql.Types} class to indicate the type to use for a CLOB
@@ -167,6 +172,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		this.incrementerFactory = incrementerFactory;
 	}
 
+	/**
+	 * Set the {@link Charset} to use when serializing/deserializing the execution context.
+	 * Defaults to "UTF-8". Must not be {@code null}.
+	 * @param charset to use when serializing/deserializing the execution context.
+	 * @see JdbcExecutionContextDao#setCharset(Charset)
+	 * @since 5.0
+	 */
+	public void setCharset(@NonNull Charset charset) {
+		Assert.notNull(charset, "Charset must not be null");
+		this.charset = charset;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -251,6 +268,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setSerializer(serializer);
+		dao.setCharset(charset);
 
 		if (lobHandler != null) {
 			dao.setLobHandler(lobHandler);

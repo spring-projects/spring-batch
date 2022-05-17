@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2021 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 
 package org.springframework.batch.core.explore.support;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
@@ -38,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -68,6 +72,8 @@ implements InitializingBean {
 	private LobHandler lobHandler;
 
 	private ExecutionContextSerializer serializer;
+
+	private Charset charset = StandardCharsets.UTF_8;
 
 	/**
 	 * A custom implementation of the {@link ExecutionContextSerializer}.
@@ -118,6 +124,18 @@ implements InitializingBean {
 		this.lobHandler = lobHandler;
 	}
 
+	/**
+	 * Set the {@link Charset} to use when deserializing the execution context.
+	 * Defaults to "UTF-8". Must not be {@code null}.
+	 * @param charset to use when deserializing the execution context.
+	 * @see JdbcExecutionContextDao#setCharset(Charset)
+	 * @since 5.0
+	 */
+	public void setCharset(@NonNull Charset charset) {
+		Assert.notNull(charset, "Charset must not be null");
+		this.charset = charset;
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -145,6 +163,7 @@ implements InitializingBean {
 		dao.setLobHandler(lobHandler);
 		dao.setTablePrefix(tablePrefix);
 		dao.setSerializer(serializer);
+		dao.setCharset(charset);
 		dao.afterPropertiesSet();
 		return dao;
 	}

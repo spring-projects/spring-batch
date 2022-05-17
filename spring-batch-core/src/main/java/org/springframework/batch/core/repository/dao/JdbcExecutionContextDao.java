@@ -19,6 +19,7 @@ package org.springframework.batch.core.repository.dao;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,6 +41,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -75,7 +77,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
 
-	private static final String CHARSET_NAME = StandardCharsets.UTF_8.name();
+	private Charset charset = StandardCharsets.UTF_8;
 
 	private static final int DEFAULT_MAX_VARCHAR_LENGTH = 2500;
 
@@ -107,6 +109,17 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 */
 	public void setShortContextLength(int shortContextLength) {
 		this.shortContextLength = shortContextLength;
+	}
+
+	/**
+	 * Set the {@link Charset} to use when serializing/deserializing the execution context.
+	 * Must not be {@code null}. Defaults to "UTF-8".
+	 * @param charset to use when serializing/deserializing the execution context.
+	 * @since 5.0
+	 */
+	public void setCharset(@NonNull Charset charset) {
+		Assert.notNull(charset, "Charset must not be null");
+		this.charset = charset;
 	}
 
 	@Override
@@ -303,7 +316,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		try {
 			serializer.serialize(m, out);
-			results = new String(out.toByteArray(), CHARSET_NAME);
+			results = new String(out.toByteArray(), charset.name());
 		}
 		catch (IOException ioe) {
 			throw new IllegalArgumentException("Could not serialize the execution context", ioe);
@@ -324,7 +337,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 			Map<String, Object> map;
 			try {
-				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes(CHARSET_NAME));
+				ByteArrayInputStream in = new ByteArrayInputStream(serializedContext.getBytes(charset.name()));
 				map = serializer.deserialize(in);
 			}
 			catch (IOException ioe) {
