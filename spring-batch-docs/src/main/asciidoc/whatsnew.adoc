@@ -2,6 +2,10 @@
 :toc: left
 :toclevels: 4
 
+This section shows the major highlights of Spring Batch 5 and is not an exhaustive list of changes.
+For more details,
+please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
+
 [[whatsNew]]
 == What's New in Spring Batch 5.0
 
@@ -12,9 +16,6 @@ Spring Batch 5.0 has the following major themes:
 * Batch infrastructure configuration updates
 * New features
 * Pruning
-
-For more details about the changes,
-see the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide].
 
 === Java 17 Requirement
 
@@ -33,7 +34,7 @@ Spring Batch 5 is updating the dependencies across the board to the following ve
 * Spring Data 3
 * Spring AMQP 3
 * Spring for Apache Kafka 3
-* Micrometer 2
+* Micrometer 1.10
 
 This release also marks the migration to Jakarta EE 9 APIs.
 
@@ -68,7 +69,7 @@ transaction manager bean in the application context.
 
 ==== Batch tracing with Micrometer
 
-With the upgrade to Micrometer 2, you can now get batch tracing in addition to batch metrics.
+With the upgrade to Micrometer 1.10, you can now get batch tracing in addition to batch metrics.
 Spring Batch will create a span for each job and a span for each step within a job. This tracing
 meta-data can be collected and viewed on a dahsboard like link:$$https://zipkin.io$$[Zipkin] for example.
 
@@ -76,61 +77,54 @@ meta-data can be collected and viewed on a dahsboard like link:$$https://zipkin.
 
 This release introduces the support of SAP HANA as an additional supported database for the job repository.
 
+==== New Maven Bill Of Materials for Spring Batch modules
+
+This feature has been requested several times and is finally shipped in v5. It is now possible to use the newly
+added Maven BOM to import Spring Batch modules with a consistent version number.
+
+==== UTF-8 by default
+
+Several issues related to characters encoding have been reported over the years in different
+areas of the framework, like inconsitent default encoding between file-based item readers
+and writers, serialization/deserialization issues when dealing with multi-byte characters
+in the execution context, etc.
+
+In the same spirit as link:$$https://openjdk.java.net/jeps/400$$[JEP 400] and following the
+link:$$http://utf8everywhere.org$$[UTF-8 manifesto], this release updates the default encoding
+to UTF-8 in all areas of the framework and ensures this default is configurable as needed.
+
+==== Native support
+
+The effort towards providing support to compile Spring Batch applications as native executables
+using the GraalVM native-image compiler has started in v4.2 and was shipped as experimental in v4.3.
+
+In this release, the native support has been improved significantly and is now considered out of beta.
+
 === Pruning
 
 Spring Batch 5 removes a number of items that are no longer needed, including:
 
-* <<deprecated-apis-removal>>
+* <<api-deprecation-and-removal>>
 * <<sqlfire-support-removal>>
 * <<jsr-352-implementation-removal>>
 
-[[deprecated-apis-removal]]
-==== Deprecated APIs Removal
+[[api-deprecation-and-removal]]
+==== API deprecation and removal
 
-The following APIs were deprecated in previous versions and have been removed in this release:
+In this major release, all APIs that were deprecated in previous versions have been removed.
+Moreover, some APIs have been deprecated in v5.0 and are scheduled for removal in v5.2.
+Finally, some APIs have been moved or removed without deprecation for practical reasons.
 
-* Class `org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean`
-* Class `org.springframework.batch.core.repository.dao.MapExecutionContextDao`
-* Class `org.springframework.batch.core.repository.dao.MapJobExecutionDao`
-* Class `org.springframework.batch.core.repository.dao.MapJobInstanceDao`
-* Class `org.springframework.batch.core.repository.dao.MapStepExecutionDao`
-* Class `org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean`
-* Class `org.springframework.batch.core.repository.dao.XStreamExecutionContextStringSerializer`
-* Class `org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry`
-* Class `org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextFactory`
-* Class `org.springframework.batch.core.launch.support.ScheduledJobParametersFactory`
-* Class `org.springframework.batch.item.data.AbstractNeo4jItemReader`
-* Class `org.springframework.batch.item.database.support.ListPreparedStatementSetter`
-* Class `org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilder`
-* Class `org.springframework.batch.integration.chunk.RemoteChunkingMasterStepBuilderFactory`
-* Class `org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilder`
-* Class `org.springframework.batch.integration.partition.RemotePartitioningMasterStepBuilderFactory`
-* Class `org.springframework.batch.test.AbstractJobTests`
-* Class `org.springframework.batch.item.xml.StaxUtils`
-* Enum `org.springframework.batch.item.file.transform.Alignment`
-* Method `org.springframework.batch.core.JobExecution#stop()`
-* Method `org.springframework.batch.core.JobParameters#getDouble(String key, double defaultValue)`
-* Method `org.springframework.batch.core.JobParameters#getLong(String key, long defaultValue)`
-* Method `org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter(JobRepository jobRepository, Step step, Partitioner partitioner)`
-* Method `org.springframework.batch.core.partition.support.SimpleStepExecutionSplitter#getStartable(StepExecution stepExecution, ExecutionContext context)`
-* Method `org.springframework.batch.core.repository.support.AbstractJobRepositoryFactoryBean#getJobRepository()`
-* Method `org.springframework.batch.item.database.AbstractCursorItemReader#cleanupOnClose()`
-* Method `org.springframework.batch.item.database.HibernateItemWriter#doWrite(HibernateOperations hibernateTemplate, List<? extends T> items)`
-* Method `org.springframework.batch.item.database.JdbcCursorItemReader#cleanupOnClose()`
-* Method `org.springframework.batch.item.database.StoredProcedureItemReader#cleanupOnClose()`
-* Method `org.springframework.batch.item.database.builder.HibernatePagingItemReaderBuilder#useSatelessSession(boolean useStatelessSession)`
-* Method `org.springframework.batch.item.file.MultiResourceItemReader#getCurrentResource()`
-* Method `org.springframework.batch.integration.config.annotation.BatchIntegrationConfiguration#remoteChunkingMasterStepBuilderFactory()`
-* Method `org.springframework.batch.integration.config.annotation.BatchIntegrationConfiguration#remotePartitioningMasterStepBuilderFactory()`
-* Method `org.springframework.batch.item.util.FileUtils#setUpOutputFile(File file, boolean restarted, boolean overwriteOutputFile)`
+Please refer to the link:$$https://github.com/spring-projects/spring-batch/wiki/Spring-Batch-5.0-Migration-Guide$$[migration guide]
+for more details about these changes.
 
 [[sqlfire-support-removal]]
 ==== SQLFire Support Removal
 
 SqlFire has been announced to be EOL as of November 1st, 2014. The support of SQLFire as a job repository
-was deprecated in version 4.3 and removed in version 5.0.
+was deprecated in version v4.3 and removed in version v5.0.
 
 [[jsr-352-implementation-removal]]
 ==== JSR-352 Implementation Removal
 
-Due to a lack of adoption, the implementation of JSR-352 has been removed from this release.
+Due to a lack of adoption, the implementation of JSR-352 has been discontinued in this release.
