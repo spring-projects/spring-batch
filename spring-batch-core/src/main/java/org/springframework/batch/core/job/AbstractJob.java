@@ -310,8 +310,9 @@ InitializingBean, Observation.KeyValuesProviderAware<BatchJobKeyValuesProvider> 
 		}
 
 		JobSynchronizationManager.register(execution);
-		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer("job.active", "Active jobs",
-				Tag.of("name", execution.getJobInstance().getJobName()));
+		String activeJobMeterName = "job.active";
+		LongTaskTimer longTaskTimer = BatchMetrics.createLongTaskTimer(activeJobMeterName, "Active jobs",
+				Tag.of(BatchMetrics.METRICS_PREFIX + activeJobMeterName + ".name", execution.getJobInstance().getJobName()));
 		LongTaskTimer.Sample longTaskTimerSample = longTaskTimer.start();
 		Observation observation = BatchMetrics.createObservation(BatchJobObservation.BATCH_JOB_OBSERVATION.getName(), new BatchJobContext(execution))
 				.contextualName(execution.getJobInstance().getJobName())

@@ -47,7 +47,7 @@ import org.springframework.lang.Nullable;
  */
 public final class BatchMetrics {
 
-	private static final String METRICS_PREFIX = "spring.batch.";
+	public static final String METRICS_PREFIX = "spring.batch.";
 
 	public static final String STATUS_SUCCESS = "SUCCESS";
 

@@ -341,10 +341,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	protected void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status, String description) {
+		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + metricName;
 		sample.stop(BatchMetrics.createTimer(metricName, description + " duration",
-				Tag.of("job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
-				Tag.of("step.name", stepExecution.getStepName()),
-				Tag.of("status", status)
+				Tag.of(fullyQualifiedMetricName + ".job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),
+				Tag.of(fullyQualifiedMetricName + ".status", status)
 		));
 	}
 

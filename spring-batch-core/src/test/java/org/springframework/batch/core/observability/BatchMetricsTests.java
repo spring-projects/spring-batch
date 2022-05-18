@@ -165,7 +165,7 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.job.active")
-					.tag("name", "job")
+					.tag("spring.batch.job.active.name", "job")
 					.longTaskTimer();
 		} catch (Exception e) {
 			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active" +
@@ -200,9 +200,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.item.read")
-					.tag("job.name", "job")
-					.tag("step.name", "step2")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step2")
+					.tag("spring.batch.item.read.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.item.read" +
@@ -211,9 +211,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.item.process")
-					.tag("job.name", "job")
-					.tag("step.name", "step2")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.item.process.job.name", "job")
+					.tag("spring.batch.item.process.step.name", "step2")
+					.tag("spring.batch.item.process.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.item.process" +
@@ -222,9 +222,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.chunk.write")
-					.tag("job.name", "job")
-					.tag("step.name", "step2")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.chunk.write.job.name", "job")
+					.tag("spring.batch.chunk.write.step.name", "step2")
+					.tag("spring.batch.chunk.write.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
@@ -246,9 +246,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.item.read")
-					.tag("job.name", "job")
-					.tag("step.name", "step3")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step3")
+					.tag("spring.batch.item.read.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.item.read" +
@@ -257,9 +257,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.item.process")
-					.tag("job.name", "job")
-					.tag("step.name", "step3")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.item.process.job.name", "job")
+					.tag("spring.batch.item.process.step.name", "step3")
+					.tag("spring.batch.item.process.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.item.process" +
@@ -268,9 +268,9 @@ public class BatchMetricsTests {
 
 		try {
 			Metrics.globalRegistry.get("spring.batch.chunk.write")
-					.tag("job.name", "job")
-					.tag("step.name", "step3")
-					.tag("status", "SUCCESS")
+					.tag("spring.batch.chunk.write.job.name", "job")
+					.tag("spring.batch.chunk.write.step.name", "step3")
+					.tag("spring.batch.chunk.write.status", "SUCCESS")
 					.timer();
 		} catch (Exception e) {
 			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
