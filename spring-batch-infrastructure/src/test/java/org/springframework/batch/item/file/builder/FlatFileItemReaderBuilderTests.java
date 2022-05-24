@@ -23,7 +23,9 @@ import java.util.List;
 import org.junit.Test;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.FixedLengthBufferedReaderFactory;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
@@ -49,6 +51,7 @@ import static org.junit.Assert.fail;
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
  * @author Drummond Dawson
+ * @author Parikshit Dutta
  */
 public class FlatFileItemReaderBuilderTests {
 
@@ -445,6 +448,26 @@ public class FlatFileItemReaderBuilderTests {
 		assertNull(reader.read());
 	}
 
+	@Test
+	public void testFixedLengthBufferedReaderSetFactory() throws Exception {
+		FlatFileItemReader<String> reader = new FlatFileItemReaderBuilder<String>()
+				.name("stringReader")
+				.resource(getResource("Sale012019 1   00000011000000000Sale022020 2   00000022000000000"))
+				.bufferedReaderFactory(new FixedLengthBufferedReaderFactory())
+				.lineMapper(new PassThroughLineMapper())
+				.targetType(String.class)
+				.build();
+
+		reader.open(new ExecutionContext());
+
+		String fistItem = reader.read();
+		assertEquals("Sale012019 1   00000011000000000", fistItem);
+
+		String secondItem = reader.read();
+		assertEquals("Sale022020 2   00000022000000000", secondItem);
+
+		assertNull(reader.read());
+	}
 
 	@Test
 	public void testName() throws Exception {
