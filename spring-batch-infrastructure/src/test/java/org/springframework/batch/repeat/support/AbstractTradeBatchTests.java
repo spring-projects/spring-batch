@@ -66,22 +66,26 @@ public abstract class AbstractTradeBatchTests {
 	}
 
 	protected static class TradeMapper implements FieldSetMapper<Trade> {
-	    @Override
+
+		@Override
 		public Trade mapFieldSet(FieldSet fs) {
 			return new Trade(fs);
 		}
+
 	}
 
 	protected static class TradeWriter implements ItemWriter<Trade> {
+
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
-	    @Override
+		@Override
 		public synchronized void write(List<? extends Trade> data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}
+
 	}
 
 }

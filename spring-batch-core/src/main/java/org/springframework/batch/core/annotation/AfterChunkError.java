@@ -24,8 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method to be called after a chunk has failed and been
- * marked for rollback.<br>
+ * Marks a method to be called after a chunk has failed and been marked for rollback.<br>
  * <br>
  * Expected signature: void afterFailedChunk(ChunkContext context)
  *
@@ -34,7 +33,7 @@ import java.lang.annotation.Target;
  * @see ChunkListener#afterChunkError(ChunkContext context)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface AfterChunkError {
 
 }

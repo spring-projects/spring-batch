@@ -19,9 +19,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**
- * Facilitates assigning names to objects persisting data in {@link ExecutionContext} and generating keys for
- * {@link ExecutionContext} based on the name.
- * 
+ * Facilitates assigning names to objects persisting data in {@link ExecutionContext} and
+ * generating keys for {@link ExecutionContext} based on the name.
+ *
  * @author Robert Kasanicky
  */
 public class ExecutionContextUserSupport {
@@ -52,9 +52,8 @@ public class ExecutionContextUserSupport {
 	}
 
 	/**
-	 * Prefix the argument with {@link #getName()} to create a unique key that can be safely used to identify data
-	 * stored in {@link ExecutionContext}.
-	 *
+	 * Prefix the argument with {@link #getName()} to create a unique key that can be
+	 * safely used to identify data stored in {@link ExecutionContext}.
 	 * @param suffix {@link String} to be used to generate the key.
 	 * @return the key that was generated based on the name and the suffix.
 	 */

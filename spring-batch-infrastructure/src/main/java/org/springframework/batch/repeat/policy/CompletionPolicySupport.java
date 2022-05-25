@@ -23,20 +23,20 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * Very simple base class for {@link CompletionPolicy} implementations.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class CompletionPolicySupport implements CompletionPolicy {
 
 	/**
-	 * If exit status is not continuable return <code>true</code>, otherwise
-	 * delegate to {@link #isComplete(RepeatContext)}.
-	 * 
+	 * If exit status is not continuable return <code>true</code>, otherwise delegate to
+	 * {@link #isComplete(RepeatContext)}.
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
 	 * RepeatStatus)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		if (result != null && !result.isContinuable()) {
 			return true;
@@ -48,30 +48,30 @@ public class CompletionPolicySupport implements CompletionPolicy {
 
 	/**
 	 * Always true.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public boolean isComplete(RepeatContext context) {
 		return true;
 	}
 
 	/**
 	 * Build a new {@link RepeatContextSupport} and return it.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatContext start(RepeatContext context) {
 		return new RepeatContextSupport(context);
 	}
 
 	/**
 	 * Increment the context so the counter is up to date. Do nothing else.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#update(org.springframework.batch.repeat.RepeatContext)
 	 */
-    @Override
+	@Override
 	public void update(RepeatContext context) {
 		if (context instanceof RepeatContextSupport) {
 			((RepeatContextSupport) context).increment();

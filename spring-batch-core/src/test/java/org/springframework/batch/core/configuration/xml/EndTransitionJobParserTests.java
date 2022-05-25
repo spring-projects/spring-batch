@@ -67,11 +67,13 @@ public class EndTransitionJobParserTests extends AbstractJobParserTests {
 		try {
 			jobExecution = createJobExecution();
 			fail("JobInstanceAlreadyCompleteException expected");
-		} catch (JobInstanceAlreadyCompleteException e) {
+		}
+		catch (JobInstanceAlreadyCompleteException e) {
 			//
 			// Expected
 			//
 		}
 
 	}
+
 }

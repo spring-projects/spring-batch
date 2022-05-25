@@ -74,4 +74,5 @@ public class BeanWrapperFieldExtractorTests {
 		extractor.setNames(null);
 		extractor.afterPropertiesSet();
 	}
+
 }

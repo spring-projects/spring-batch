@@ -19,17 +19,17 @@ import java.util.Collection;
 
 /**
  * A listable extension of {@link JobLocator}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface ListableJobLocator extends JobLocator {
 
 	/**
-	 * Provides the currently registered job names. The return value is
-	 * unmodifiable and disconnected from the underlying registry storage.
-	 * 
+	 * Provides the currently registered job names. The return value is unmodifiable and
+	 * disconnected from the underlying registry storage.
 	 * @return a collection of String. Empty if none are registered.
 	 */
 	Collection<String> getJobNames();
+
 }

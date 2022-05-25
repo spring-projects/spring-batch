@@ -37,18 +37,18 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void before(RepeatContext context) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void before(RepeatContext context) {
 				calls.add("2");
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count <= 1);
@@ -66,14 +66,14 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListener() {
-            @Override
+			@Override
 			public void before(RepeatContext context) {
 				calls.add("1");
 				context.setCompleteOnly();
 			}
 		});
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.FINISHED;
@@ -88,18 +88,18 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("2");
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count <= 1);
@@ -115,19 +115,19 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void open(RepeatContext context) {
 				calls.add("2");
 				context.setCompleteOnly();
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.CONTINUABLE;
@@ -141,13 +141,13 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.registerListener(new RepeatListener() {
-            @Override
+			@Override
 			public void open(RepeatContext context) {
 				calls.add("1");
 			}
 		});
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				context.setCompleteOnly();
@@ -162,18 +162,18 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void close(RepeatContext context) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void close(RepeatContext context) {
 				calls.add("2");
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				return RepeatStatus.continueIf(count < 2);
@@ -185,24 +185,23 @@ public class RepeatListenerTests extends TestCase {
 		assertEquals("[2, 1]", calls.toString());
 	}
 
-
 	public void testOnErrorInterceptors() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 			}
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
@@ -220,19 +219,19 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 			}
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
@@ -253,12 +252,12 @@ public class RepeatListenerTests extends TestCase {
 		final List<Object> calls = new ArrayList<>();
 		final List<Object> fails = new ArrayList<>();
 		template.setListeners(new RepeatListener[] { new RepeatListener() {
-            @Override
+			@Override
 			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListener() {
-            @Override
+			@Override
 			public void onError(RepeatContext context, Throwable t) {
 				calls.add("2");
 				fails.add("2");
@@ -266,7 +265,7 @@ public class RepeatListenerTests extends TestCase {
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
@@ -281,8 +280,9 @@ public class RepeatListenerTests extends TestCase {
 		System.err.println(calls);
 		// The after is not executed on error...
 		assertEquals("2", calls.get(0));
-		assertEquals("2", calls.get(calls.size()-1));
+		assertEquals("2", calls.get(calls.size() - 1));
 		assertFalse(calls.contains("1"));
 		assertEquals(fails.size(), calls.size());
 	}
+
 }

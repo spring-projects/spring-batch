@@ -43,11 +43,11 @@ import org.springframework.test.jdbc.JdbcTestUtils;
  * @author Dan Garrette
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @Since 2.1
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/mailJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/mailJob.xml", "/job-runner-context.xml" })
 public class MailJobFunctionalTests {
 
 	private static final String email = "to@company.com";
@@ -124,6 +124,5 @@ public class MailJobFunctionalTests {
 			jdbcTemplate.update("insert into USERS values (?,?,?)", record);
 		}
 	}
-
 
 }

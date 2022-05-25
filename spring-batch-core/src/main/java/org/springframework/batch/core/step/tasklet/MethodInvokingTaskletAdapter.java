@@ -23,14 +23,12 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 /**
- * A {@link Tasklet} that wraps a method in a POJO. By default the return
- * value is {@link ExitStatus#COMPLETED} unless the delegate POJO itself returns
- * an {@link ExitStatus}. The POJO method is usually going to have no arguments,
- * but a static argument or array of arguments can be used by setting the
- * arguments property.
+ * A {@link Tasklet} that wraps a method in a POJO. By default the return value is
+ * {@link ExitStatus#COMPLETED} unless the delegate POJO itself returns an
+ * {@link ExitStatus}. The POJO method is usually going to have no arguments, but a static
+ * argument or array of arguments can be used by setting the arguments property.
  *
  * @see AbstractMethodInvokingDelegator
- *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  *
@@ -38,9 +36,9 @@ import org.springframework.lang.Nullable;
 public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
 
 	/**
-	 * Delegate execution to the target object and translate the return value to
-	 * an {@link ExitStatus} by invoking a method in the delegate POJO. Ignores
-	 * the {@link StepContribution} and the attributes.
+	 * Delegate execution to the target object and translate the return value to an
+	 * {@link ExitStatus} by invoking a method in the delegate POJO. Ignores the
+	 * {@link StepContribution} and the attributes.
 	 *
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
@@ -48,16 +46,15 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		if (getArguments() == null) {
-			setArguments(new Object[]{contribution, chunkContext});
+			setArguments(new Object[] { contribution, chunkContext });
 		}
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;
 	}
 
 	/**
-	 * If the result is an {@link ExitStatus} already just return that,
-	 * otherwise return {@link ExitStatus#COMPLETED}.
-	 *
+	 * If the result is an {@link ExitStatus} already just return that, otherwise return
+	 * {@link ExitStatus#COMPLETED}.
 	 * @param result the value returned by the delegate method
 	 * @return an {@link ExitStatus} consistent with the result
 	 */

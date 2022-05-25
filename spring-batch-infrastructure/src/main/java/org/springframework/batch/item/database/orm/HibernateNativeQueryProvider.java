@@ -24,13 +24,12 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * This query provider creates Hibernate {@link Query}s from injected native SQL
- * queries. This is useful if there is a need to utilize database-specific
- * features such as query hints, the CONNECT keyword in Oracle, etc.
+ * This query provider creates Hibernate {@link Query}s from injected native SQL queries.
+ * This is useful if there is a need to utilize database-specific features such as query
+ * hints, the CONNECT keyword in Oracle, etc.
  * </p>
- * 
+ *
  * @author Anatoly Polinsky
- * 
  * @param <E> entity returned by executing the query
  */
 public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvider<E> {
@@ -41,11 +40,11 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 
 	/**
 	 * <p>
-	 * Create an {@link NativeQuery} from the session provided (preferring
-	 * stateless if both are available).
+	 * Create an {@link NativeQuery} from the session provided (preferring stateless if
+	 * both are available).
 	 * </p>
 	 */
-    @Override
+	@Override
 	@SuppressWarnings("unchecked")
 	public NativeQuery<E> createQuery() {
 
@@ -69,4 +68,5 @@ public class HibernateNativeQueryProvider<E> extends AbstractHibernateQueryProvi
 		Assert.isTrue(StringUtils.hasText(sqlQuery), "Native SQL query cannot be empty");
 		Assert.notNull(entityClass, "Entity class cannot be NULL");
 	}
+
 }

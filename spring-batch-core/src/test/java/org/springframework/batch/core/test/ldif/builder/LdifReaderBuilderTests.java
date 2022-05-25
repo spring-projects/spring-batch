@@ -68,7 +68,8 @@ public class LdifReaderBuilderTests {
 
 	@Test
 	public void testBasicRead() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo").build();
+		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo")
+				.build();
 		LdapAttributes ldapAttributes = firstRead();
 		assertEquals("The attribute name for the first record did not match expected result",
 				"cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com", ldapAttributes.getName().toString());
@@ -105,12 +106,12 @@ public class LdifReaderBuilderTests {
 
 	@Test
 	public void testSaveState() throws Exception {
-		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo").build();
+		this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/test.ldif")).name("foo")
+				.build();
 		ExecutionContext executionContext = new ExecutionContext();
 		firstRead(executionContext);
 		this.ldifReader.update(executionContext);
-		assertEquals("foo.read.count did not have the expected result", 1,
-				executionContext.getInt("foo.read.count"));
+		assertEquals("foo.read.count did not have the expected result", 1, executionContext.getInt("foo.read.count"));
 	}
 
 	@Test
@@ -127,7 +128,8 @@ public class LdifReaderBuilderTests {
 	public void testStrict() {
 		// Test that strict when enabled will throw an exception.
 		try {
-			this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/teadsfst.ldif")).name("foo").build();
+			this.ldifReader = new LdifReaderBuilder().resource(context.getResource("classpath:/teadsfst.ldif"))
+					.name("foo").build();
 			this.ldifReader.open(new ExecutionContext());
 			fail("IllegalStateException should have been thrown, because strict was set to true");
 		}
@@ -161,5 +163,7 @@ public class LdifReaderBuilderTests {
 		public void handleRecord(LdapAttributes attributes) {
 			callbackAttributeName = attributes.getName().toString();
 		}
+
 	}
+
 }

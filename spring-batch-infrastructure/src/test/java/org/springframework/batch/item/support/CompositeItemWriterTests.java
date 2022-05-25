@@ -27,7 +27,7 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * Tests for {@link CompositeItemWriter}
- * 
+ *
  * @author Robert Kasanicky
  * @author Will Schipp
  */
@@ -58,7 +58,6 @@ public class CompositeItemWriterTests {
 
 		itemWriter.setDelegates(writers);
 		itemWriter.write(data);
-
 
 	}
 

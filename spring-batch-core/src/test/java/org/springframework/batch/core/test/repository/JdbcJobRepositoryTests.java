@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
 public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 
 	private JobSupport job;
@@ -85,7 +85,8 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
-		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");;
+		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_INSTANCE");
+		;
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
 	}
@@ -185,7 +186,7 @@ public class JdbcJobRepositoryTests extends AbstractIntegrationTests {
 				try {
 					JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 
-					//simulate running execution
+					// simulate running execution
 					execution.setStartTime(new Date());
 					repository.update(execution);
 

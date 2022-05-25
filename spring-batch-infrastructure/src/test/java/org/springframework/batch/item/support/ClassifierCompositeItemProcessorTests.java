@@ -30,11 +30,11 @@ import org.springframework.lang.Nullable;
  * @author Jimmy Praet
  */
 public class ClassifierCompositeItemProcessorTests {
-	
+
 	@Test
 	public void testBasicClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessor<>();
-		
+
 		ItemProcessor<String, String> fooProcessor = new ItemProcessor<String, String>() {
 			@Nullable
 			@Override
@@ -49,25 +49,25 @@ public class ClassifierCompositeItemProcessorTests {
 				return item;
 			}
 		};
-		
-		Map<String, ItemProcessor<?, ? extends String>> routingConfiguration = 
-				new HashMap<>();
+
+		Map<String, ItemProcessor<?, ? extends String>> routingConfiguration = new HashMap<>();
 		routingConfiguration.put("foo", fooProcessor);
 		routingConfiguration.put("*", defaultProcessor);
 		processor.setClassifier(new PatternMatchingClassifier<>(routingConfiguration));
-		
+
 		assertEquals("bar", processor.process("bar"));
 		assertEquals("foo: foo", processor.process("foo"));
 		assertEquals("baz", processor.process("baz"));
 	}
 
 	/**
-	 * Test the ClassifierCompositeItemProcessor with delegates that have more specific generic types for input as well as output.
+	 * Test the ClassifierCompositeItemProcessor with delegates that have more specific
+	 * generic types for input as well as output.
 	 */
 	@Test
 	public void testGenericsClassifierCompositeItemProcessor() throws Exception {
 		ClassifierCompositeItemProcessor<Number, CharSequence> processor = new ClassifierCompositeItemProcessor<>();
-		
+
 		ItemProcessor<Integer, String> intProcessor = new ItemProcessor<Integer, String>() {
 			@Nullable
 			@Override
@@ -89,20 +89,18 @@ public class ClassifierCompositeItemProcessorTests {
 				return new StringBuilder("number: " + item);
 			}
 		};
-		
-		SubclassClassifier<Number, ItemProcessor<?, ? extends CharSequence>> classifier = 
-				new SubclassClassifier<>();
-		Map<Class<? extends Number>, ItemProcessor<?, ? extends CharSequence>> typeMap = 
-				new HashMap<>();
+
+		SubclassClassifier<Number, ItemProcessor<?, ? extends CharSequence>> classifier = new SubclassClassifier<>();
+		Map<Class<? extends Number>, ItemProcessor<?, ? extends CharSequence>> typeMap = new HashMap<>();
 		typeMap.put(Integer.class, intProcessor);
 		typeMap.put(Long.class, longProcessor);
 		typeMap.put(Number.class, defaultProcessor);
 		classifier.setTypeMap(typeMap);
 		processor.setClassifier(classifier);
-		
+
 		assertEquals("int: 1", processor.process(Integer.valueOf(1)).toString());
 		assertEquals("long: 2", processor.process(Long.valueOf(2)).toString());
 		assertEquals("number: 3", processor.process(Byte.valueOf((byte) 3)).toString());
 	}
-	
+
 }

@@ -39,99 +39,96 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public abstract class AvroItemWriterTestSupport extends AvroTestFixtures {
 
-    /*
-     * This item reader configured for Specific Avro types.
-     */
-    protected  <T> void verifyRecords(byte[] bytes, List<T> actual, Class<T> clazz, boolean embeddedSchema) throws Exception {
-        doVerify(bytes, clazz, actual, embeddedSchema);
-    }
+	/*
+	 * This item reader configured for Specific Avro types.
+	 */
+	protected <T> void verifyRecords(byte[] bytes, List<T> actual, Class<T> clazz, boolean embeddedSchema)
+			throws Exception {
+		doVerify(bytes, clazz, actual, embeddedSchema);
+	}
 
-    protected  <T> void verifyRecordsWithEmbeddedHeader(byte[] bytes, List<T> actual, Class<T> clazz) throws Exception {
-        doVerify(bytes, clazz, actual, true);
-    }
+	protected <T> void verifyRecordsWithEmbeddedHeader(byte[] bytes, List<T> actual, Class<T> clazz) throws Exception {
+		doVerify(bytes, clazz, actual, true);
+	}
 
+	private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedSchema) throws Exception {
+		AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>().type(clazz)
+				.resource(new ByteArrayResource(bytes)).embeddedSchema(embeddedSchema).build();
 
-    private <T> void doVerify(byte[] bytes, Class<T> clazz, List<T> actual, boolean embeddedSchema) throws Exception {
-        AvroItemReader<T> avroItemReader = new AvroItemReaderBuilder<T>()
-                .type(clazz)
-                .resource(new ByteArrayResource(bytes))
-                .embeddedSchema(embeddedSchema)
-                .build();
+		avroItemReader.open(new ExecutionContext());
 
-        avroItemReader.open(new ExecutionContext());
+		List<T> records = new ArrayList<>();
+		T record;
+		while ((record = avroItemReader.read()) != null) {
+			records.add(record);
+		}
+		assertThat(records).hasSize(4);
+		assertThat(records).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
+	}
 
-        List<T> records = new ArrayList<>();
-        T record;
-        while ((record = avroItemReader.read()) != null) {
-            records.add(record);
-        }
-        assertThat(records).hasSize(4);
-        assertThat(records).containsExactlyInAnyOrder(actual.get(0), actual.get(1), actual.get(2), actual.get(3));
-    }
+	protected static class OutputStreamResource implements WritableResource {
 
+		final private OutputStream outputStream;
 
-    protected static class OutputStreamResource implements WritableResource {
+		public OutputStreamResource(OutputStream outputStream) {
+			this.outputStream = outputStream;
+		}
 
-        final private  OutputStream outputStream;
+		@Override
+		public OutputStream getOutputStream() throws IOException {
+			return this.outputStream;
+		}
 
-        public OutputStreamResource(OutputStream outputStream) {
-            this.outputStream = outputStream;
-        }
+		@Override
+		public boolean exists() {
+			return true;
+		}
 
-        @Override
-        public OutputStream getOutputStream() throws IOException {
-            return this.outputStream;
-        }
+		@Override
+		public URL getURL() throws IOException {
+			return null;
+		}
 
-        @Override
-        public boolean exists() {
-            return true;
-        }
+		@Override
+		public URI getURI() throws IOException {
+			return null;
+		}
 
-        @Override
-        public URL getURL() throws IOException {
-            return null;
-        }
+		@Override
+		public File getFile() throws IOException {
+			return null;
+		}
 
-        @Override
-        public URI getURI() throws IOException {
-            return null;
-        }
+		@Override
+		public long contentLength() throws IOException {
+			return 0;
+		}
 
-        @Override
-        public File getFile() throws IOException {
-            return null;
-        }
+		@Override
+		public long lastModified() throws IOException {
+			return 0;
+		}
 
-        @Override
-        public long contentLength() throws IOException {
-            return 0;
-        }
+		@Override
+		public Resource createRelative(String relativePath) throws IOException {
+			return null;
+		}
 
-        @Override
-        public long lastModified() throws IOException {
-            return 0;
-        }
+		@Override
+		public String getFilename() {
+			return null;
+		}
 
-        @Override
-        public Resource createRelative(String relativePath) throws IOException {
-            return null;
-        }
+		@Override
+		public String getDescription() {
+			return "Output stream resource";
+		}
 
-        @Override
-        public String getFilename() {
-            return null;
-        }
+		@Override
+		public InputStream getInputStream() throws IOException {
+			return null;
+		}
 
-        @Override
-        public String getDescription() {
-            return "Output stream resource";
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return null;
-        }
-    }
+	}
 
 }

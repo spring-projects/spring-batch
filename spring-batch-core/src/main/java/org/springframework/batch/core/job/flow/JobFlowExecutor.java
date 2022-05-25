@@ -29,8 +29,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.lang.Nullable;
 
 /**
- * Implementation of {@link FlowExecutor} for use in components that need to
- * execute a flow related to a {@link JobExecution}.
+ * Implementation of {@link FlowExecutor} for use in components that need to execute a
+ * flow related to a {@link JobExecution}.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -62,20 +62,21 @@ public class JobFlowExecutor implements FlowExecutor {
 	}
 
 	@Override
-	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-	StartLimitExceededException {
+	public String executeStep(Step step)
+			throws JobInterruptedException, JobRestartException, StartLimitExceededException {
 		boolean isRerun = isStepRestart(step);
 		StepExecution stepExecution = stepHandler.handleStep(step, execution);
 		stepExecutionHolder.set(stepExecution);
 
 		if (stepExecution == null) {
-			return  ExitStatus.COMPLETED.getExitCode();
+			return ExitStatus.COMPLETED.getExitCode();
 		}
 		if (stepExecution.isTerminateOnly()) {
-			throw new JobInterruptedException("Step requested termination: "+stepExecution, stepExecution.getStatus());
+			throw new JobInterruptedException("Step requested termination: " + stepExecution,
+					stepExecution.getStatus());
 		}
 
-		if(isRerun) {
+		if (isRerun) {
 			stepExecution.getExecutionContext().put("batch.restart", true);
 		}
 
@@ -124,8 +125,8 @@ public class JobFlowExecutor implements FlowExecutor {
 	public boolean isRestart() {
 		if (getStepExecution() != null && getStepExecution().getStatus() == BatchStatus.ABANDONED) {
 			/*
-			 * This is assumed to be the last step execution and it was marked
-			 * abandoned, so we are in a restart of a stopped step.
+			 * This is assumed to be the last step execution and it was marked abandoned,
+			 * so we are in a restart of a stopped step.
 			 */
 			// TODO: mark the step execution in some more definitive way?
 			return true;
@@ -140,7 +141,8 @@ public class JobFlowExecutor implements FlowExecutor {
 
 	/**
 	 * @param status {@link FlowExecutionStatus} to convert.
-	 * @return A {@link BatchStatus} appropriate for the {@link FlowExecutionStatus} provided
+	 * @return A {@link BatchStatus} appropriate for the {@link FlowExecutionStatus}
+	 * provided
 	 */
 	protected BatchStatus findBatchStatus(FlowExecutionStatus status) {
 		for (BatchStatus batchStatus : BatchStatus.values()) {

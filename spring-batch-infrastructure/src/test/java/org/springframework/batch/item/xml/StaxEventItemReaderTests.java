@@ -60,7 +60,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link StaxEventItemReader}.
- * 
+ *
  * @author Robert Kasanicky
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -94,8 +94,8 @@ public class StaxEventItemReaderTests {
 	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
-	
-	private static final String[] MULTI_FRAGMENT_ROOT_ELEMENTS = {"fragmentA", "fragmentB"};
+
+	private static final String[] MULTI_FRAGMENT_ROOT_ELEMENTS = { "fragmentA", "fragmentB" };
 
 	private ExecutionContext executionContext;
 
@@ -135,8 +135,8 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * Regular usage scenario. ItemReader should pass XML fragments to unmarshaller wrapped with StartDocument and
-	 * EndDocument events.
+	 * Regular usage scenario. ItemReader should pass XML fragments to unmarshaller
+	 * wrapped with StartDocument and EndDocument events.
 	 */
 	@Test
 	public void testFragmentWrapping() throws Exception {
@@ -247,7 +247,7 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
-	
+
 	@Test
 	public void testMultiFragment() throws Exception {
 
@@ -262,22 +262,23 @@ public class StaxEventItemReaderTests {
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentNameSpace() throws Exception {
 
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
-		source.setFragmentRootElementNames(new String[] {"{urn:org.test.bar}fragmentA", "fragmentB"});
+		source.setFragmentRootElementNames(new String[] { "{urn:org.test.bar}fragmentA", "fragmentB" });
 		source.afterPropertiesSet();
 		source.open(executionContext);
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
-		assertNull(source.read()); // there are only two fragments (one has wrong namespace)
+		assertNull(source.read()); // there are only two fragments (one has wrong
+									// namespace)
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentRestart() throws Exception {
@@ -289,23 +290,23 @@ public class StaxEventItemReaderTests {
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
-		
-		source.update(executionContext);		
+
+		source.update(executionContext);
 		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		
+
 		source.close();
-		
+
 		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		
+
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
+	}
 
 	@Test
 	public void testMultiFragmentNested() throws Exception {
@@ -322,7 +323,7 @@ public class StaxEventItemReaderTests {
 
 		source.close();
 	}
-	
+
 	@Test
 	public void testMultiFragmentNestedRestart() throws Exception {
 
@@ -333,24 +334,24 @@ public class StaxEventItemReaderTests {
 		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
-		
-		source.update(executionContext);		
+
+		source.update(executionContext);
 		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		
+
 		source.close();
-		
+
 		source = createNewInputSource();
 		source.setResource(new ByteArrayResource(xmlMultiFragment.getBytes()));
 		source.setFragmentRootElementNames(MULTI_FRAGMENT_ROOT_ELEMENTS);
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		
+
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only three fragments
 
 		source.close();
-	}	
-	
+	}
+
 	/**
 	 * Cursor is moved before beginning of next fragment.
 	 */
@@ -372,7 +373,8 @@ public class StaxEventItemReaderTests {
 	 * Empty document works OK.
 	 */
 	@Test
-	public void testMoveCursorToNextFragmentOnEmpty() throws XMLStreamException, FactoryConfigurationError, IOException {
+	public void testMoveCursorToNextFragmentOnEmpty()
+			throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(emptyXml.getBytes());
 		XMLEventReader reader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(resource.getInputStream());
 
@@ -383,7 +385,8 @@ public class StaxEventItemReaderTests {
 	 * Document with no fragments works OK.
 	 */
 	@Test
-	public void testMoveCursorToNextFragmentOnMissing() throws XMLStreamException, FactoryConfigurationError, IOException {
+	public void testMoveCursorToNextFragmentOnMissing()
+			throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(missingXml.getBytes());
 		XMLEventReader reader = StaxUtils.createDefensiveInputFactory().createXMLEventReader(resource.getInputStream());
 		assertFalse(source.moveCursorToNextFragment(reader));
@@ -436,7 +439,8 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * Statistics return the current record count. Calling read after end of input does not increase the counter.
+	 * Statistics return the current record count. Calling read after end of input does
+	 * not increase the counter.
 	 */
 	@Test
 	public void testExecutionContext() throws Exception {
@@ -577,9 +581,9 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * Make sure the reader doesn't end up in inconsistent state if there's an error during unmarshalling (BATCH-1738).
-	 * After an error during <code>read</code> the next <code>read</code> call should continue with reading the next
-	 * fragment.
+	 * Make sure the reader doesn't end up in inconsistent state if there's an error
+	 * during unmarshalling (BATCH-1738). After an error during <code>read</code> the next
+	 * <code>read</code> call should continue with reading the next fragment.
 	 */
 	@Test
 	public void exceptionDuringUnmarshalling() throws Exception {
@@ -607,9 +611,9 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testDtdXml() {
-		String xmlWithDtd = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE rohit [\n<!ENTITY entityex SYSTEM \"file://" +
-				new File("src/test/resources/org/springframework/batch/support/existing.txt").getAbsolutePath() +
-				"\">\n]>\n<abc>&entityex;</abc>";
+		String xmlWithDtd = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!DOCTYPE rohit [\n<!ENTITY entityex SYSTEM \"file://"
+				+ new File("src/test/resources/org/springframework/batch/support/existing.txt").getAbsolutePath()
+				+ "\">\n]>\n<abc>&entityex;</abc>";
 		StaxEventItemReader<String> reader = new StaxEventItemReader<>();
 		reader.setName("foo");
 		reader.setResource(new ByteArrayResource(xmlWithDtd.getBytes()));
@@ -621,7 +625,8 @@ public class StaxEventItemReaderTests {
 					xmlEventReader.nextEvent();
 					xmlEventReader.nextEvent();
 					return xmlEventReader.getElementText();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -633,7 +638,8 @@ public class StaxEventItemReaderTests {
 		try {
 			reader.read();
 			fail("Should fail when XML contains DTD");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			MatcherAssert.assertThat(e.getMessage(), Matchers.containsString("Undeclared general entity \"entityex\""));
 		}
 	}
@@ -684,15 +690,16 @@ public class StaxEventItemReaderTests {
 	}
 
 	/**
-	 * A simple XMLEvent unmarshaller mock - check for the start and end document events for the fragment root & end
-	 * tags + skips the fragment contents.
+	 * A simple XMLEvent unmarshaller mock - check for the start and end document events
+	 * for the fragment root & end tags + skips the fragment contents.
 	 */
 	private static class MockFragmentUnmarshaller implements Unmarshaller {
 
 		/**
 		 * Skips the XML fragment contents.
 		 */
-		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader, QName fragmentName) throws XMLStreamException {
+		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader, QName fragmentName)
+				throws XMLStreamException {
 			XMLEvent eventInsideFragment;
 			List<XMLEvent> events = new ArrayList<>();
 			do {
@@ -702,7 +709,8 @@ public class StaxEventItemReaderTests {
 					break;
 				}
 				events.add(eventReader.nextEvent());
-			} while (eventInsideFragment != null);
+			}
+			while (eventInsideFragment != null);
 
 			return events;
 		}
@@ -713,8 +721,8 @@ public class StaxEventItemReaderTests {
 		}
 
 		/**
-		 * A simple mapFragment implementation checking the StaxEventReaderItemReader basic read functionality.
-		 * 
+		 * A simple mapFragment implementation checking the StaxEventReaderItemReader
+		 * basic read functionality.
 		 * @param source
 		 * @return list of the events from fragment body
 		 */
@@ -753,7 +761,7 @@ public class StaxEventItemReaderTests {
 			}
 			return fragmentContent;
 		}
-		
+
 		private boolean isFragmentRootElement(String name) {
 			return FRAGMENT_ROOT_ELEMENT.equals(name) || Arrays.asList(MULTI_FRAGMENT_ROOT_ELEMENTS).contains(name);
 		}
@@ -762,16 +770,18 @@ public class StaxEventItemReaderTests {
 
 	@SuppressWarnings("unchecked")
 	private static class ItemCountAwareMockFragmentUnmarshaller extends MockFragmentUnmarshaller {
+
 		@Override
-		public Object unmarshal(Source source) throws XmlMappingException,
-		IOException {
+		public Object unmarshal(Source source) throws XmlMappingException, IOException {
 			List<XMLEvent> fragment = (List<XMLEvent>) super.unmarshal(source);
-			if(fragment != null) {
+			if (fragment != null) {
 				return new ItemCountAwareFragment(fragment);
-			} else {
+			}
+			else {
 				return null;
 			}
 		}
+
 	}
 
 	private static class ItemCountAwareFragment implements ItemCountAware {
@@ -809,6 +819,7 @@ public class StaxEventItemReaderTests {
 		public void setOpenCalled(boolean openCalled) {
 			this.openCalled = openCalled;
 		}
+
 	}
 
 	private static class NonExistentResource extends AbstractResource {
@@ -830,5 +841,7 @@ public class StaxEventItemReaderTests {
 		public InputStream getInputStream() throws IOException {
 			return null;
 		}
+
 	}
+
 }

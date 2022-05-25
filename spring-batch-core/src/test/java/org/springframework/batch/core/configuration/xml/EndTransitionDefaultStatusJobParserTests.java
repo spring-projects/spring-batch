@@ -51,4 +51,5 @@ public class EndTransitionDefaultStatusJobParserTests extends AbstractJobParserT
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution1.getExitStatus().getExitCode());
 
 	}
+
 }

@@ -29,12 +29,13 @@ import org.springframework.batch.core.launch.NoSuchJobException;
  *
  */
 public class MapJobRegistryTests extends TestCase {
-	
+
 	private MapJobRegistry registry = new MapJobRegistry();
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.support.MapJobRegistry#unregister(String)}.
-	 * @throws Exception 
+	 * Test method for
+	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#unregister(String)}.
+	 * @throws Exception
 	 */
 	public void testUnregister() throws Exception {
 		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
@@ -46,26 +47,29 @@ public class MapJobRegistryTests extends TestCase {
 		}
 		catch (NoSuchJobException e) {
 			// expected
-			assertTrue(e.getMessage().indexOf("foo")>=0);
+			assertTrue(e.getMessage().indexOf("foo") >= 0);
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testReplaceDuplicateConfiguration() throws Exception {
 		registry.register(new ReferenceJobFactory(new JobSupport("foo")));
 		try {
 			registry.register(new ReferenceJobFactory(new JobSupport("foo")));
 			fail("Expected DuplicateJobConfigurationException");
-		} catch (DuplicateJobException e) {
+		}
+		catch (DuplicateJobException e) {
 			// unexpected: even if the job is different we want a DuplicateJobException
-			assertTrue(e.getMessage().indexOf("foo")>=0);
+			assertTrue(e.getMessage().indexOf("foo") >= 0);
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJob(java.lang.String)}.
 	 */
 	public void testRealDuplicateConfiguration() throws Exception {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
@@ -73,15 +77,17 @@ public class MapJobRegistryTests extends TestCase {
 		try {
 			registry.register(jobFactory);
 			fail("Unexpected DuplicateJobConfigurationException");
-		} catch (DuplicateJobException e) {
+		}
+		catch (DuplicateJobException e) {
 			// expected
-			assertTrue(e.getMessage().indexOf("foo")>=0);
+			assertTrue(e.getMessage().indexOf("foo") >= 0);
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJobNames()}.
-	 * @throws Exception 
+	 * Test method for
+	 * {@link org.springframework.batch.core.configuration.support.MapJobRegistry#getJobNames()}.
+	 * @throws Exception
 	 */
 	public void testGetJobConfigurations() throws Exception {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));

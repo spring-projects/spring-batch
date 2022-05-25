@@ -24,7 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 
 /**
  * DAO interface for persisting and retrieving {@link ExecutionContext}s.
- * 
+ *
  * @author Robert Kasanicky
  * @author David Turanski
  */
@@ -43,43 +43,39 @@ public interface ExecutionContextDao {
 	ExecutionContext getExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * Persist the execution context associated with the given jobExecution,
-	 * persistent entry for the context should not exist yet.
-	 *
+	 * Persist the execution context associated with the given jobExecution, persistent
+	 * entry for the context should not exist yet.
 	 * @param jobExecution {@link JobExecution} instance that contains the context.
 	 */
 	void saveExecutionContext(final JobExecution jobExecution);
 
 	/**
-	 * Persist the execution context associated with the given stepExecution,
-	 * persistent entry for the context should not exist yet.
-	 *
+	 * Persist the execution context associated with the given stepExecution, persistent
+	 * entry for the context should not exist yet.
 	 * @param stepExecution {@link StepExecution} instance that contains the context.
 	 */
 	void saveExecutionContext(final StepExecution stepExecution);
 
 	/**
-	 * Persist the execution context associated with each stepExecution in a given collection,
-	 * persistent entry for the context should not exist yet.
-	 *
-	 * @param stepExecutions a collection of {@link StepExecution}s that contain
-	 * the contexts.
+	 * Persist the execution context associated with each stepExecution in a given
+	 * collection, persistent entry for the context should not exist yet.
+	 * @param stepExecutions a collection of {@link StepExecution}s that contain the
+	 * contexts.
 	 */
 	void saveExecutionContexts(final Collection<StepExecution> stepExecutions);
 
 	/**
-	 * Persist the updates of execution context associated with the given
-	 * jobExecution. Persistent entry should already exist for this context.
-	 *
+	 * Persist the updates of execution context associated with the given jobExecution.
+	 * Persistent entry should already exist for this context.
 	 * @param jobExecution {@link JobExecution} instance that contains the context.
 	 */
 	void updateExecutionContext(final JobExecution jobExecution);
 
 	/**
-	 * Persist the updates of execution context associated with the given
-	 * stepExecution. Persistent entry should already exist for this context.
-	 *
+	 * Persist the updates of execution context associated with the given stepExecution.
+	 * Persistent entry should already exist for this context.
 	 * @param stepExecution {@link StepExecution} instance that contains the context.
 	 */
 	void updateExecutionContext(final StepExecution stepExecution);
+
 }

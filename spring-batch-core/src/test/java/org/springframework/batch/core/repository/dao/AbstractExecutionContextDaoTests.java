@@ -66,26 +66,22 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	}
 
 	/**
-	 * @return Configured {@link ExecutionContextDao} implementation ready for
-	 * use.
+	 * @return Configured {@link ExecutionContextDao} implementation ready for use.
 	 */
 	protected abstract JobExecutionDao getJobExecutionDao();
 
 	/**
-	 * @return Configured {@link ExecutionContextDao} implementation ready for
-	 * use.
+	 * @return Configured {@link ExecutionContextDao} implementation ready for use.
 	 */
 	protected abstract JobInstanceDao getJobInstanceDao();
 
 	/**
-	 * @return Configured {@link ExecutionContextDao} implementation ready for
-	 * use.
+	 * @return Configured {@link ExecutionContextDao} implementation ready for use.
 	 */
 	protected abstract StepExecutionDao getStepExecutionDao();
 
 	/**
-	 * @return Configured {@link ExecutionContextDao} implementation ready for
-	 * use.
+	 * @return Configured {@link ExecutionContextDao} implementation ready for use.
 	 */
 	protected abstract ExecutionContextDao getExecutionContextDao();
 
@@ -93,7 +89,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Test
 	public void testSaveAndFindJobContext() {
 
-		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
+		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
 		contextDao.saveExecutionContext(jobExecution);
 
@@ -160,8 +156,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Test
 	public void testUpdateContext() {
 
-		ExecutionContext ctx = new ExecutionContext(Collections
-				.<String, Object> singletonMap("key", "value"));
+		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
 		contextDao.saveExecutionContext(jobExecution);
 
@@ -177,7 +172,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Test
 	public void testSaveAndFindStepContext() {
 
-		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
+		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
 		contextDao.saveExecutionContext(stepExecution);
 
@@ -201,7 +196,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 	@Test
 	public void testUpdateStepContext() {
 
-		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
+		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object>singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
 		contextDao.saveExecutionContext(stepExecution);
 

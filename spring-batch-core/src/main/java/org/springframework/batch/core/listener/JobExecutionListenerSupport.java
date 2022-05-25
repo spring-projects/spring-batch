@@ -20,21 +20,27 @@ import org.springframework.batch.core.JobExecutionListener;
 
 /**
  * @author Dave Syer
- *
- * @deprecated as of 5.0, in favor of the default methods on the {@link JobExecutionListener}
+ * @deprecated as of 5.0, in favor of the default methods on the
+ * {@link JobExecutionListener}
  */
 @Deprecated
 public class JobExecutionListenerSupport implements JobExecutionListener {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.domain.JobListener#afterJob()
 	 */
 	@Override
 	public void afterJob(JobExecution jobExecution) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.JobListener#beforeJob(org.springframework.batch.core.domain.JobExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.domain.JobListener#beforeJob(org.springframework.
+	 * batch.core.domain.JobExecution)
 	 */
 	@Override
 	public void beforeJob(JobExecution jobExecution) {

@@ -135,4 +135,5 @@ public class PatternMatcherTests {
 	public void testMatchPrefixDefaultValueNoMatch() {
 		assertEquals(1, new PatternMatcher<>(defaultMap).match("bat").intValue());
 	}
+
 }

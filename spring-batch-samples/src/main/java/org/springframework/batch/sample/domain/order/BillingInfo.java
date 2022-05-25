@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.domain.order;
 
-
 public class BillingInfo {
+
 	public static final String LINE_ID_BILLING_INFO = "BIN";
 
 	private String paymentId;
@@ -85,4 +85,5 @@ public class BillingInfo {
 
 		return true;
 	}
+
 }

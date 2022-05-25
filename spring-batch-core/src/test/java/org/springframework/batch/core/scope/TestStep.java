@@ -51,7 +51,7 @@ public class TestStep implements Step {
 		if (context != null) {
 			context.setAttribute("collaborator", collaborator.getName());
 			context.setAttribute("collaborator.class", collaborator.getClass().toString());
-			if (collaborator.getParent()!=null) {
+			if (collaborator.getParent() != null) {
 				context.setAttribute("parent", collaborator.getParent().getName());
 				context.setAttribute("parent.class", collaborator.getParent().getClass().toString());
 			}

@@ -18,16 +18,16 @@ package org.springframework.batch.item.file.transform;
 
 /**
  * Interface used to create string representing object.
- * 
+ *
  * @author Dave Syer
  */
 public interface LineAggregator<T> {
-	
+
 	/**
 	 * Create a string from the value provided.
-	 * 
 	 * @param item values to be converted
 	 * @return string
 	 */
 	String aggregate(T item);
+
 }

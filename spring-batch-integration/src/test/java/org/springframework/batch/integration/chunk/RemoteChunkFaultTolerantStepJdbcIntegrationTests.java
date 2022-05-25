@@ -38,7 +38,7 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Before
 	public void drain() {
 		Message<?> message = replies.receive(100L);
-		while (message!=null) {
+		while (message != null) {
 			message = replies.receive(100L);
 		}
 	}
@@ -46,8 +46,8 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Test
 	@DirtiesContext
 	public void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("unsupported"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("unsupported"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -58,8 +58,8 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Test
 	@DirtiesContext
 	public void testFailedStepOnError() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("error"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("error"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -70,8 +70,8 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Test
 	@DirtiesContext
 	public void testSunnyDayFaultTolerant() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("3"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3"))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -81,9 +81,10 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 	@Test
 	@DirtiesContext
 	public void testSkipsInWriter() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("item.three", "fail")
-				.addLong("run.id", 1L).toJobParameters());
-		// System.err.println(new SimpleJdbcTemplate(dataSource).queryForList("SELECT * FROM INT_MESSAGE_GROUP"));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addString("item.three", "fail").addLong("run.id", 1L).toJobParameters());
+		// System.err.println(new SimpleJdbcTemplate(dataSource).queryForList("SELECT *
+		// FROM INT_MESSAGE_GROUP"));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -91,4 +92,5 @@ public class RemoteChunkFaultTolerantStepJdbcIntegrationTests {
 		// The whole chunk gets skipped...
 		assertEquals(2, stepExecution.getWriteSkipCount());
 	}
+
 }

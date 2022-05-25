@@ -40,10 +40,10 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.util.Assert;
 
 /**
- * This is a builder for the {@link JdbcPagingItemReader}.  When configuring, either a
- * {@link PagingQueryProvider} or the SQL fragments should be provided.  If the SQL
+ * This is a builder for the {@link JdbcPagingItemReader}. When configuring, either a
+ * {@link PagingQueryProvider} or the SQL fragments should be provided. If the SQL
  * fragments are provided, the metadata from the provided {@link DataSource} will be used
- * to create a PagingQueryProvider for you.  If both are provided, the PagingQueryProvider
+ * to create a PagingQueryProvider for you. If both are provided, the PagingQueryProvider
  * will be used.
  *
  * @author Michael Minella
@@ -85,10 +85,9 @@ public class JdbcPagingItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -102,7 +101,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -115,7 +113,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -128,7 +125,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -140,8 +136,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The {@link DataSource} to query against.  Required.
-	 *
+	 * The {@link DataSource} to query against. Required.
 	 * @param dataSource the {@link DataSource}
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setDataSource(DataSource)
@@ -154,7 +149,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * A hint to the underlying RDBMS as to how many records to return with each fetch.
-	 *
 	 * @param fetchSize number of records
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setFetchSize(int)
@@ -166,8 +160,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The {@link RowMapper} used to map the query results to objects.  Required.
-	 *
+	 * The {@link RowMapper} used to map the query results to objects. Required.
 	 * @param rowMapper a {@link RowMapper} implementation
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setRowMapper(RowMapper)
@@ -179,9 +172,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Creates a {@link BeanPropertyRowMapper} to be used as your
-	 * {@link RowMapper}.
-	 *
+	 * Creates a {@link BeanPropertyRowMapper} to be used as your {@link RowMapper}.
 	 * @param mappedClass the class for the row mapper
 	 * @return this instance for method chaining
 	 * @see BeanPropertyRowMapper
@@ -194,7 +185,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * A {@link Map} of values to set on the SQL's prepared statement.
-	 *
 	 * @param parameterValues Map of values
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setParameterValues(Map)
@@ -206,9 +196,8 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The number of records to request per page/query.  Defaults to 10.  Must be greater
+	 * The number of records to request per page/query. Defaults to 10. Must be greater
 	 * than zero.
-	 *
 	 * @param pageSize number of items
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setPageSize(int)
@@ -220,9 +209,9 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The SQL <code>GROUP BY</code> clause for a db specific @{@link PagingQueryProvider}.
-	 * This is only used if a PagingQueryProvider is not provided.
-	 *
+	 * The SQL <code>GROUP BY</code> clause for a db
+	 * specific @{@link PagingQueryProvider}. This is only used if a PagingQueryProvider
+	 * is not provided.
 	 * @param groupClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setGroupClause(String)
@@ -236,7 +225,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	/**
 	 * The SQL <code>SELECT</code> clause for a db specific {@link PagingQueryProvider}.
 	 * This is only used if a PagingQueryProvider is not provided.
-	 *
 	 * @param selectClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setSelectClause(String)
@@ -250,7 +238,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	/**
 	 * The SQL <code>FROM</code> clause for a db specific {@link PagingQueryProvider}.
 	 * This is only used if a PagingQueryProvider is not provided.
-	 *
 	 * @param fromClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setFromClause(String)
@@ -264,7 +251,6 @@ public class JdbcPagingItemReaderBuilder<T> {
 	/**
 	 * The SQL <code>WHERE</code> clause for a db specific {@link PagingQueryProvider}.
 	 * This is only used if a PagingQueryProvider is not provided.
-	 *
 	 * @param whereClause the SQL clause
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setWhereClause(String)
@@ -276,8 +262,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The keys to sort by.  These keys <em>must</em> create a unique key.
-	 *
+	 * The keys to sort by. These keys <em>must</em> create a unique key.
 	 * @param sortKeys keys to sort by and the direction for each.
 	 * @return this instance for method chaining
 	 * @see AbstractSqlPagingQueryProvider#setSortKeys(Map)
@@ -289,11 +274,10 @@ public class JdbcPagingItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A {@link PagingQueryProvider} to provide the queries required.  If provided, the
-	 * SQL fragments configured via {@link #selectClause(String)},
+	 * A {@link PagingQueryProvider} to provide the queries required. If provided, the SQL
+	 * fragments configured via {@link #selectClause(String)},
 	 * {@link #fromClause(String)}, {@link #whereClause(String)}, {@link #groupClause},
 	 * and {@link #sortKeys(Map)} are ignored.
-	 *
 	 * @param provider the db specific query provider
 	 * @return this instance for method chaining
 	 * @see JdbcPagingItemReader#setQueryProvider(PagingQueryProvider)
@@ -306,16 +290,14 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 	/**
 	 * Provides a completely built instance of the {@link JdbcPagingItemReader}
-	 *
 	 * @return a {@link JdbcPagingItemReader}
 	 */
 	public JdbcPagingItemReader<T> build() {
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.notNull(this.dataSource, "dataSource is required");
 
-		if(this.saveState) {
-			Assert.hasText(this.name,
-					"A name is required when saveState is set to true");
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveState is set to true");
 		}
 
 		JdbcPagingItemReader<T> reader = new JdbcPagingItemReader<>();
@@ -328,7 +310,7 @@ public class JdbcPagingItemReaderBuilder<T> {
 		reader.setFetchSize(this.fetchSize);
 		reader.setParameterValues(this.parameterValues);
 
-		if(this.queryProvider == null) {
+		if (this.queryProvider == null) {
 			Assert.hasLength(this.selectClause, "selectClause is required when not providing a PagingQueryProvider");
 			Assert.hasLength(this.fromClause, "fromClause is required when not providing a PagingQueryProvider");
 			Assert.notEmpty(this.sortKeys, "sortKeys are required when not providing a PagingQueryProvider");
@@ -354,23 +336,45 @@ public class JdbcPagingItemReaderBuilder<T> {
 
 			switch (databaseType) {
 
-				case DERBY: provider = new DerbyPagingQueryProvider(); break;
-				case DB2:
-				case DB2VSE:
-				case DB2ZOS:
-				case DB2AS400: provider = new Db2PagingQueryProvider(); break;
-				case H2: provider = new H2PagingQueryProvider(); break;
-				case HANA: provider = new HanaPagingQueryProvider(); break;
-				case HSQL: provider = new HsqlPagingQueryProvider(); break;
-				case SQLSERVER: provider = new SqlServerPagingQueryProvider(); break;
-				case MYSQL: provider = new MySqlPagingQueryProvider(); break;
-				case ORACLE: provider = new OraclePagingQueryProvider(); break;
-				case POSTGRES: provider = new PostgresPagingQueryProvider(); break;
-				case SYBASE: provider = new SybasePagingQueryProvider(); break;
-				case SQLITE: provider = new SqlitePagingQueryProvider(); break;
-				default:
-					throw new IllegalArgumentException("Unable to determine PagingQueryProvider type " +
-							"from database type: " + databaseType);
+			case DERBY:
+				provider = new DerbyPagingQueryProvider();
+				break;
+			case DB2:
+			case DB2VSE:
+			case DB2ZOS:
+			case DB2AS400:
+				provider = new Db2PagingQueryProvider();
+				break;
+			case H2:
+				provider = new H2PagingQueryProvider();
+				break;
+			case HANA:
+				provider = new HanaPagingQueryProvider();
+				break;
+			case HSQL:
+				provider = new HsqlPagingQueryProvider();
+				break;
+			case SQLSERVER:
+				provider = new SqlServerPagingQueryProvider();
+				break;
+			case MYSQL:
+				provider = new MySqlPagingQueryProvider();
+				break;
+			case ORACLE:
+				provider = new OraclePagingQueryProvider();
+				break;
+			case POSTGRES:
+				provider = new PostgresPagingQueryProvider();
+				break;
+			case SYBASE:
+				provider = new SybasePagingQueryProvider();
+				break;
+			case SQLITE:
+				provider = new SqlitePagingQueryProvider();
+				break;
+			default:
+				throw new IllegalArgumentException(
+						"Unable to determine PagingQueryProvider type " + "from database type: " + databaseType);
 			}
 
 			provider.setSelectClause(this.selectClause);
@@ -385,4 +389,5 @@ public class JdbcPagingItemReaderBuilder<T> {
 			throw new IllegalArgumentException("Unable to determine PagingQueryProvider type", e);
 		}
 	}
+
 }

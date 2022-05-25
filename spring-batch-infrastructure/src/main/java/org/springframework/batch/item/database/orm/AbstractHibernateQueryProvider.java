@@ -21,23 +21,27 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 /**
- * <p>Abstract Hibernate Query Provider to serve as a base class for all
- * Hibernate {@link Query} providers.</p>
+ * <p>
+ * Abstract Hibernate Query Provider to serve as a base class for all Hibernate
+ * {@link Query} providers.
+ * </p>
  *
- * <p>The implementing provider can be configured to use either
- * {@link StatelessSession} sufficient for simple mappings without the need
- * to cascade to associated objects or standard Hibernate {@link Session}
- * for more advanced mappings or when caching is desired.</p>
+ * <p>
+ * The implementing provider can be configured to use either {@link StatelessSession}
+ * sufficient for simple mappings without the need to cascade to associated objects or
+ * standard Hibernate {@link Session} for more advanced mappings or when caching is
+ * desired.
+ * </p>
  *
  * @author Anatoly Polinsky
  * @author Dave Syer
- *
  * @since 2.1
  *
  */
 public abstract class AbstractHibernateQueryProvider<T> implements HibernateQueryProvider<T> {
 
 	private StatelessSession statelessSession;
+
 	private Session statefulSession;
 
 	@Override
@@ -51,7 +55,7 @@ public abstract class AbstractHibernateQueryProvider<T> implements HibernateQuer
 	}
 
 	public boolean isStatelessSession() {
-		return this.statefulSession==null && this.statelessSession!=null;
+		return this.statefulSession == null && this.statelessSession != null;
 	}
 
 	protected StatelessSession getStatelessSession() {
@@ -61,4 +65,5 @@ public abstract class AbstractHibernateQueryProvider<T> implements HibernateQuer
 	protected Session getStatefulSession() {
 		return statefulSession;
 	}
+
 }

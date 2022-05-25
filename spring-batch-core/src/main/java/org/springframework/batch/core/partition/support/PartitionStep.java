@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 
 /**
- * Implementation of {@link Step} which partitions the execution and spreads the
- * load using a {@link PartitionHandler}.
+ * Implementation of {@link Step} which partitions the execution and spreads the load
+ * using a {@link PartitionHandler}.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -45,9 +45,8 @@ public class PartitionStep extends AbstractStep {
 	private StepExecutionAggregator stepExecutionAggregator = new DefaultStepExecutionAggregator();
 
 	/**
-	 * A {@link PartitionHandler} which can send out step executions for remote
-	 * processing and bring back the results.
-	 *
+	 * A {@link PartitionHandler} which can send out step executions for remote processing
+	 * and bring back the results.
 	 * @param partitionHandler the {@link PartitionHandler} to set
 	 */
 	public void setPartitionHandler(PartitionHandler partitionHandler) {
@@ -55,10 +54,8 @@ public class PartitionStep extends AbstractStep {
 	}
 
 	/**
-	 * A {@link StepExecutionAggregator} that can aggregate step executions when
-	 * they come back from the handler. Defaults to a
-	 * {@link DefaultStepExecutionAggregator}.
-	 *
+	 * A {@link StepExecutionAggregator} that can aggregate step executions when they come
+	 * back from the handler. Defaults to a {@link DefaultStepExecutionAggregator}.
 	 * @param stepExecutionAggregator the {@link StepExecutionAggregator} to set
 	 */
 	public void setStepExecutionAggregator(StepExecutionAggregator stepExecutionAggregator) {
@@ -74,8 +71,8 @@ public class PartitionStep extends AbstractStep {
 	}
 
 	/**
-	 * Assert that mandatory properties are set (stepExecutionSplitter,
-	 * partitionHandler) and delegate top superclass.
+	 * Assert that mandatory properties are set (stepExecutionSplitter, partitionHandler)
+	 * and delegate top superclass.
 	 *
 	 * @see AbstractStep#afterPropertiesSet()
 	 */
@@ -88,13 +85,11 @@ public class PartitionStep extends AbstractStep {
 
 	/**
 	 * Delegate execution to the {@link PartitionHandler} provided. The
-	 * {@link StepExecution} passed in here becomes the parent or manager
-	 * execution for the partition, summarising the status on exit of the
-	 * logical grouping of work carried out by the {@link PartitionHandler}. The
-	 * individual step executions and their input parameters (through
-	 * {@link ExecutionContext}) for the partition elements are provided by the
-	 * {@link StepExecutionSplitter}.
-	 *
+	 * {@link StepExecution} passed in here becomes the parent or manager execution for
+	 * the partition, summarising the status on exit of the logical grouping of work
+	 * carried out by the {@link PartitionHandler}. The individual step executions and
+	 * their input parameters (through {@link ExecutionContext}) for the partition
+	 * elements are provided by the {@link StepExecutionSplitter}.
 	 * @param stepExecution the manager step execution for the partition
 	 *
 	 * @see Step#execute(StepExecution)
@@ -121,4 +116,5 @@ public class PartitionStep extends AbstractStep {
 	protected PartitionHandler getPartitionHandler() {
 		return partitionHandler;
 	}
+
 }

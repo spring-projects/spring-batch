@@ -25,10 +25,9 @@ import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
- * Marks a method to be called after an item is passed to an
- * {@link ItemProcessor}. {@code item} is the input item.
- * {@code result} is the processed item. {@code result} can be null
- * if the {@code item} is filtered.<br>
+ * Marks a method to be called after an item is passed to an {@link ItemProcessor}.
+ * {@code item} is the input item. {@code result} is the processed item. {@code result}
+ * can be null if the {@code item} is filtered.<br>
  * <br>
  * Expected signature: void afterProcess(T item, S result)
  *
@@ -37,7 +36,7 @@ import org.springframework.batch.item.ItemProcessor;
  * @see ItemProcessListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface AfterProcess {
 
 }

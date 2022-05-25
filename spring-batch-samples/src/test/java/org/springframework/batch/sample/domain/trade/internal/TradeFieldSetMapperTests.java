@@ -24,9 +24,13 @@ import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final String CUSTOMER = "Mike Tomcat";
+
 	private static final BigDecimal PRICE = new BigDecimal(1.3);
+
 	private static final long QUANTITY = 7;
+
 	private static final String ISIN = "fj893gnsalX";
 
 	@Override
@@ -54,4 +58,5 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<Trade> fieldSetMapper() {
 		return new TradeFieldSetMapper();
 	}
+
 }

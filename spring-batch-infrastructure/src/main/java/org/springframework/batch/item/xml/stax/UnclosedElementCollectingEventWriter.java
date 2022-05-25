@@ -25,7 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 /**
- * Delegating XMLEventWriter, which collects the QNames of elements that were opened but not closed.
+ * Delegating XMLEventWriter, which collects the QNames of elements that were opened but
+ * not closed.
  *
  * @author Jimmy Praet
  * @since 3.0
@@ -38,14 +39,19 @@ public class UnclosedElementCollectingEventWriter extends AbstractEventWriterWra
 		super(wrappedEventWriter);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.stream.events.XMLEvent)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.
+	 * stream.events.XMLEvent)
 	 */
 	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
 		if (event.isStartElement()) {
 			unclosedElements.addLast(event.asStartElement().getName());
-		} else if (event.isEndElement()) {
+		}
+		else if (event.isEndElement()) {
 			unclosedElements.removeLast();
 		}
 		super.add(event);
@@ -54,4 +60,5 @@ public class UnclosedElementCollectingEventWriter extends AbstractEventWriterWra
 	public List<QName> getUnclosedElements() {
 		return unclosedElements;
 	}
+
 }

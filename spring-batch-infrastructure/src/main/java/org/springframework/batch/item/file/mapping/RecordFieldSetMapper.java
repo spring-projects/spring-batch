@@ -25,10 +25,10 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
 /**
- * This is a {@link FieldSetMapper} that supports Java records mapping
- * (requires JKD 14 or higher).  It uses the record's canonical constructor
- * to map components with the same name as tokens in the {@link FieldSet}.
- * 
+ * This is a {@link FieldSetMapper} that supports Java records mapping (requires JKD 14 or
+ * higher). It uses the record's canonical constructor to map components with the same
+ * name as tokens in the {@link FieldSet}.
+ *
  * @param <T> type of mapped items
  * @author Mahmoud Ben Hassine
  * @since 4.3
@@ -36,13 +36,15 @@ import org.springframework.util.Assert;
 public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 
 	private final SimpleTypeConverter typeConverter = new SimpleTypeConverter();
+
 	private final Constructor<T> mappedConstructor;
+
 	private String[] constructorParameterNames;
+
 	private Class<?>[] constructorParameterTypes;
 
 	/**
 	 * Create a new {@link RecordFieldSetMapper}.
-	 * 
 	 * @param targetType type of mapped items
 	 */
 	public RecordFieldSetMapper(Class<T> targetType) {
@@ -51,11 +53,10 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 
 	/**
 	 * Create a new {@link RecordFieldSetMapper}.
-	 * 
 	 * @param targetType type of mapped items
 	 * @param conversionService service to use to convert raw data to typed fields
 	 */
-	public RecordFieldSetMapper(Class< T> targetType, ConversionService conversionService) {
+	public RecordFieldSetMapper(Class<T> targetType, ConversionService conversionService) {
 		this.typeConverter.setConversionService(conversionService);
 		this.mappedConstructor = BeanUtils.getResolvableConstructor(targetType);
 		if (this.mappedConstructor.getParameterCount() > 0) {
@@ -80,4 +81,5 @@ public class RecordFieldSetMapper<T> implements FieldSetMapper<T> {
 		}
 		return BeanUtils.instantiateClass(this.mappedConstructor, args);
 	}
+
 }

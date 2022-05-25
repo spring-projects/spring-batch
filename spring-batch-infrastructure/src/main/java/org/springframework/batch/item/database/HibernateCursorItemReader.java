@@ -33,21 +33,19 @@ import org.springframework.util.ClassUtils;
 
 /**
  * {@link ItemStreamReader} for reading database records built on top of Hibernate. It
- * executes the HQL query when initialized iterates over the result set as
- * {@link #read()} method is called, returning an object corresponding to
- * current row. The query can be set directly using
- * {@link #setQueryString(String)}, a named query can be used by
- * {@link #setQueryName(String)}, or a query provider strategy can be supplied
- * via {@link #setQueryProvider(HibernateQueryProvider)}.
+ * executes the HQL query when initialized iterates over the result set as {@link #read()}
+ * method is called, returning an object corresponding to current row. The query can be
+ * set directly using {@link #setQueryString(String)}, a named query can be used by
+ * {@link #setQueryName(String)}, or a query provider strategy can be supplied via
+ * {@link #setQueryProvider(HibernateQueryProvider)}.
  *
  *
  * <p>
- * The reader can be configured to use either {@link StatelessSession}
- * sufficient for simple mappings without the need to cascade to associated
- * objects or standard hibernate {@link Session} for more advanced mappings or
- * when caching is desired. When stateful session is used it will be cleared in
- * the {@link #update(ExecutionContext)} method without being flushed (no data
- * modifications are expected).
+ * The reader can be configured to use either {@link StatelessSession} sufficient for
+ * simple mappings without the need to cascade to associated objects or standard hibernate
+ * {@link Session} for more advanced mappings or when caching is desired. When stateful
+ * session is used it will be cleared in the {@link #update(ExecutionContext)} method
+ * without being flushed (no data modifications are expected).
  * </p>
  *
  * The implementation is <b>not</b> thread-safe.
@@ -55,8 +53,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> 
-        implements InitializingBean {
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
+		implements InitializingBean {
 
 	private HibernateItemReaderHelper<T> helper = new HibernateItemReaderHelper<>();
 
@@ -80,7 +78,6 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	/**
 	 * The parameter values to apply to a query (map of name:value).
-	 *
 	 * @param parameterValues the parameter values to set
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
@@ -90,9 +87,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	/**
 	 * A query name for an externalized query. Either this or the {
 	 * {@link #setQueryString(String) query string} or the {
-	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} should
-	 * be set.
-	 *
+	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} should be set.
 	 * @param queryName name of a hibernate named query
 	 */
 	public void setQueryName(String queryName) {
@@ -100,9 +95,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	/**
-	 * Fetch size used internally by Hibernate to limit amount of data fetched
-	 * from database per round trip.
-	 *
+	 * Fetch size used internally by Hibernate to limit amount of data fetched from
+	 * database per round trip.
 	 * @param fetchSize the fetch size to pass down to Hibernate
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -110,10 +104,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	/**
-	 * A query provider. Either this or the {{@link #setQueryString(String)
-	 * query string} or the {{@link #setQueryName(String) query name} should be
-	 * set.
-	 *
+	 * A query provider. Either this or the {{@link #setQueryString(String) query string}
+	 * or the {{@link #setQueryName(String) query name} should be set.
 	 * @param queryProvider Hibernate query provider
 	 */
 	public void setQueryProvider(HibernateQueryProvider<T> queryProvider) {
@@ -124,7 +116,6 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * A query string in HQL. Either this or the {
 	 * {@link #setQueryProvider(HibernateQueryProvider) query provider} or the {
 	 * {@link #setQueryName(String) query name} should be set.
-	 *
 	 * @param queryString HQL query string
 	 */
 	public void setQueryString(String queryString) {
@@ -133,7 +124,6 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	/**
 	 * The Hibernate SessionFactory to use the create a session.
-	 *
 	 * @param sessionFactory the {@link SessionFactory} to set
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -142,10 +132,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	/**
 	 * Can be set only in uninitialized state.
-	 *
-	 * @param useStatelessSession <code>true</code> to use
-	 * {@link StatelessSession} <code>false</code> to use standard hibernate
-	 * {@link Session}
+	 * @param useStatelessSession <code>true</code> to use {@link StatelessSession}
+	 * <code>false</code> to use standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		helper.setUseStatelessSession(useStatelessSession);
@@ -190,7 +178,6 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	/**
 	 * Update the context and clear the session if stateful.
-	 *
 	 * @param executionContext the current {@link ExecutionContext}
 	 * @throws ItemStreamException if there is a problem
 	 */
@@ -201,11 +188,9 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	/**
-	 * Wind forward through the result set to the item requested. Also clears
-	 * the session every now and then (if stateful) to avoid memory problems.
-	 * The frequency of session clearing is the larger of the fetch size (if
-	 * set) and 100.
-	 *
+	 * Wind forward through the result set to the item requested. Also clears the session
+	 * every now and then (if stateful) to avoid memory problems. The frequency of session
+	 * clearing is the larger of the fetch size (if set) and 100.
 	 * @param itemIndex the first item to read
 	 * @throws Exception if there is a problem
 	 * @see AbstractItemCountingItemStreamItemReader#jumpToItem(int)
@@ -222,7 +207,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	@Override
 	protected void doClose() throws Exception {
 
-		if(initialized) {
+		if (initialized) {
 			if (cursor != null) {
 				cursor.close();
 			}
@@ -232,4 +217,5 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 		initialized = false;
 	}
+
 }

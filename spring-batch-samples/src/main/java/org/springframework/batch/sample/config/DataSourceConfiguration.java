@@ -37,22 +37,22 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 @Configuration
 @PropertySource("classpath:/batch-hsql.properties")
 public class DataSourceConfiguration {
-	
+
 	@Autowired
 	private Environment environment;
-	
+
 	@Autowired
 	private ResourceLoader resourceLoader;
-	
+
 	@PostConstruct
 	protected void initialize() {
 		ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
 		populator.addScript(resourceLoader.getResource(environment.getProperty("batch.schema.script")));
 		populator.setContinueOnError(true);
-		DatabasePopulatorUtils.execute(populator , dataSource());
+		DatabasePopulatorUtils.execute(populator, dataSource());
 	}
-	
-	@Bean(destroyMethod="close")
+
+	@Bean(destroyMethod = "close")
 	public DataSource dataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(environment.getProperty("batch.jdbc.driver"));

@@ -37,7 +37,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {ValidationSampleConfiguration.class})
+@ContextConfiguration(classes = { ValidationSampleConfiguration.class })
 public class ValidationSampleFunctionalTests {
 
 	@Autowired
@@ -63,4 +63,5 @@ public class ValidationSampleFunctionalTests {
 		Assert.assertEquals(1, writtenItems.size());
 		Assert.assertEquals("foo", writtenItems.get(0).getName());
 	}
+
 }

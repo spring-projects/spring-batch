@@ -26,10 +26,11 @@ import org.junit.Test;
  *
  */
 public class SystemPropertyInitializerTests {
-	
+
 	private static final String SIMPLE_NAME = SystemPropertyInitializerTests.class.getSimpleName();
+
 	private SystemPropertyInitializer initializer = new SystemPropertyInitializer();
-	
+
 	@Before
 	@After
 	public void initializeProperty() {
@@ -52,7 +53,7 @@ public class SystemPropertyInitializerTests {
 		assertEquals("foo", System.getProperty(SystemPropertyInitializer.ENVIRONMENT));
 	}
 
-	@Test(expected=IllegalStateException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testNoDefaultValue() throws Exception {
 		initializer.afterPropertiesSet();
 	}

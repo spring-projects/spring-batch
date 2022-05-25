@@ -38,34 +38,30 @@ public interface JobInstanceDao {
 	/**
 	 * Create a JobInstance with given name and parameters.
 	 *
-	 * PreConditions: JobInstance for given name and parameters must not already
-	 * exist
+	 * PreConditions: JobInstance for given name and parameters must not already exist
 	 *
-	 * PostConditions: A valid job instance will be returned which has been
-	 * persisted and contains an unique Id.
-	 *
+	 * PostConditions: A valid job instance will be returned which has been persisted and
+	 * contains an unique Id.
 	 * @param jobName {@link String} containing the name of the job.
-	 * @param jobParameters {@link JobParameters} containing the parameters for
-	 * the JobInstance.
+	 * @param jobParameters {@link JobParameters} containing the parameters for the
+	 * JobInstance.
 	 * @return JobInstance {@link JobInstance} instance that was created.
 	 */
 	JobInstance createJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
-	 * Find the job instance that matches the given name and parameters. If no
-	 * matching job instances are found, then returns null.
-	 *
+	 * Find the job instance that matches the given name and parameters. If no matching
+	 * job instances are found, then returns null.
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters with which the job was executed
-	 * @return {@link JobInstance} object matching the job name and
-	 * {@link JobParameters} or {@code null}
+	 * @return {@link JobInstance} object matching the job name and {@link JobParameters}
+	 * or {@code null}
 	 */
 	@Nullable
 	JobInstance getJobInstance(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Fetch the job instance with the provided identifier.
-	 *
 	 * @param instanceId the job identifier
 	 * @return the job instance with this identifier or {@code null} if it doesn't exist
 	 */
@@ -74,21 +70,19 @@ public interface JobInstanceDao {
 
 	/**
 	 * Fetch the JobInstance for the provided JobExecution.
-	 *
 	 * @param jobExecution the JobExecution
-	 * @return the JobInstance for the provided execution or {@code null} if it doesn't exist.
+	 * @return the JobInstance for the provided execution or {@code null} if it doesn't
+	 * exist.
 	 */
 	@Nullable
 	JobInstance getJobInstance(JobExecution jobExecution);
 
 	/**
-	 * Fetch the last job instances with the provided name, sorted backwards by
-	 * primary key.
+	 * Fetch the last job instances with the provided name, sorted backwards by primary
+	 * key.
 	 *
-	 * if using the JdbcJobInstance, you can provide the jobName with a wildcard
-	 * (e.g. *Job) to return 'like' job names. (e.g. *Job will return 'someJob' 
-	 * and 'otherJob')
-	 *
+	 * if using the JdbcJobInstance, you can provide the jobName with a wildcard (e.g.
+	 * *Job) to return 'like' job names. (e.g. *Job will return 'someJob' and 'otherJob')
 	 * @param jobName the job name
 	 * @param start the start index of the instances to return
 	 * @param count the maximum number of objects to return
@@ -109,34 +103,29 @@ public interface JobInstanceDao {
 	}
 
 	/**
-	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs
-	 * that have ever been executed.
-	 *
+	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs that have
+	 * ever been executed.
 	 * @return the names of all job instances
 	 */
 	List<String> getJobNames();
-	
+
 	/**
-	 * Fetch the last job instances with the provided name, sorted backwards by
-	 * primary key, using a 'like' criteria
-	 * 
+	 * Fetch the last job instances with the provided name, sorted backwards by primary
+	 * key, using a 'like' criteria
 	 * @param jobName {@link String} containing the name of the job.
-	 * @param start int containing the offset of where list of job instances
-	 * results should begin.
+	 * @param start int containing the offset of where list of job instances results
+	 * should begin.
 	 * @param count int containing the number of job instances to return.
 	 * @return a list of {@link JobInstance} for the job name requested.
 	 */
 	List<JobInstance> findJobInstancesByName(String jobName, int start, int count);
 
-
 	/**
-	 * Query the repository for the number of unique {@link JobInstance}s
-	 * associated with the supplied job name.
-	 *
+	 * Query the repository for the number of unique {@link JobInstance}s associated with
+	 * the supplied job name.
 	 * @param jobName the name of the job to query for
-	 * @return the number of {@link JobInstance}s that exist within the
-	 * associated job repository
-	 *
+	 * @return the number of {@link JobInstance}s that exist within the associated job
+	 * repository
 	 * @throws NoSuchJobException thrown if no Job has the jobName specified.
 	 */
 	int getJobInstanceCount(@Nullable String jobName) throws NoSuchJobException;

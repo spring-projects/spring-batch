@@ -24,8 +24,7 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 /**
  * Implementation of the {@link FlowExecutionAggregator} interface that aggregates
  * {@link FlowExecutionStatus}', using the status with the high precedence as the
- * aggregate status.  See {@link FlowExecutionStatus} for details on status
- * precedence.
+ * aggregate status. See {@link FlowExecutionStatus} for details on status precedence.
  *
  * @author Dave Syer
  * @since 2.0
@@ -33,9 +32,9 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
 	/**
-	 * Aggregate all of the {@link FlowExecutionStatus}es of the
-	 * {@link FlowExecution}s into one status. The aggregate status will be the
-	 * status with the highest precedence.
+	 * Aggregate all of the {@link FlowExecutionStatus}es of the {@link FlowExecution}s
+	 * into one status. The aggregate status will be the status with the highest
+	 * precedence.
 	 *
 	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */

@@ -39,26 +39,25 @@ import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvo
 import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
 
 /**
- * {@link FactoryBean} implementation that builds a listener based on the
- * various lifecycle methods or annotations that are provided. There are three
- * possible ways of having a method called as part of a listener lifecycle:
+ * {@link FactoryBean} implementation that builds a listener based on the various
+ * lifecycle methods or annotations that are provided. There are three possible ways of
+ * having a method called as part of a listener lifecycle:
  *
  * <ul>
- * <li>Interface implementation: By implementing any of the subclasses of a
- * listener interface, methods on said interface will be called
+ * <li>Interface implementation: By implementing any of the subclasses of a listener
+ * interface, methods on said interface will be called
  * <li>Annotations: Annotating a method will result in registration.
- * <li>String name of the method to be called, which is tied to a
- * {@link ListenerMetaData} value in the metaDataMap.
+ * <li>String name of the method to be called, which is tied to a {@link ListenerMetaData}
+ * value in the metaDataMap.
  * </ul>
  *
- * It should be noted that methods obtained by name or annotation that don't
- * match the listener method signatures to which they belong will cause errors.
- * However, it is acceptable to have no parameters at all. If the same method is
- * marked in more than one way. (i.e. the method name is given and it is
- * annotated) the method will only be called once. However, if the same class
- * has multiple methods tied to a particular listener, each method will be
- * called. Also note that the same annotations cannot be applied to two separate
- * methods in a single class.
+ * It should be noted that methods obtained by name or annotation that don't match the
+ * listener method signatures to which they belong will cause errors. However, it is
+ * acceptable to have no parameters at all. If the same method is marked in more than one
+ * way. (i.e. the method name is given and it is annotated) the method will only be called
+ * once. However, if the same class has multiple methods tied to a particular listener,
+ * each method will be called. Also note that the same annotations cannot be applied to
+ * two separate methods in a single class.
  *
  * @author Lucas Ward
  * @author Dan Garrette
@@ -111,7 +110,7 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 				synthetic = true;
 			}
 
-			if(metaData.getAnnotation() != null) {
+			if (metaData.getAnnotation() != null) {
 				invoker = getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes());
 				if (invoker != null) {
 					invokers.add(invoker);
@@ -201,14 +200,13 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 	}
 
 	/**
-	 * Convenience method to check whether the given object is or can be made
-	 * into a listener.
-	 *
+	 * Convenience method to check whether the given object is or can be made into a
+	 * listener.
 	 * @param target the object to check
 	 * @param listenerType the class of the listener.
 	 * @param metaDataValues array of {@link ListenerMetaData}.
-	 * @return true if the delegate is an instance of any of the listener
-	 * interface, or contains the marker annotations
+	 * @return true if the delegate is an instance of any of the listener interface, or
+	 * contains the marker annotations
 	 */
 	public static boolean isListener(Object target, Class<?> listenerType, ListenerMetaData[] metaDataValues) {
 		if (target == null) {
@@ -224,8 +222,11 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 				return true;
 			}
 
-			if(targetSource != null && targetSource.getTargetClass() != null && targetSource.getTargetClass().isInterface()) {
-				logger.warn(String.format("%s is an interface. The implementing class will not be queried for annotation based listener configurations. If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.", targetSource.getTargetClass().getName()));
+			if (targetSource != null && targetSource.getTargetClass() != null
+					&& targetSource.getTargetClass().isInterface()) {
+				logger.warn(String.format(
+						"%s is an interface. The implementing class will not be queried for annotation based listener configurations. If using @StepScope on a @Bean method, be sure to return the implementing class so listener annotations can be used.",
+						targetSource.getTargetClass().getName()));
 			}
 		}
 		for (ListenerMetaData metaData : metaDataValues) {
@@ -235,4 +236,5 @@ public abstract class AbstractListenerFactoryBean<T> implements FactoryBean<Obje
 		}
 		return false;
 	}
+
 }

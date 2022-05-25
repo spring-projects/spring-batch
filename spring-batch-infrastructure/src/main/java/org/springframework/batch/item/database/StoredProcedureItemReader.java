@@ -35,14 +35,15 @@ import org.springframework.util.ClassUtils;
 
 /**
  * <p>
- * Item reader implementation that executes a stored procedure and then reads the returned cursor
- * and continually retrieves the next row in the <code>ResultSet</code>.
+ * Item reader implementation that executes a stored procedure and then reads the returned
+ * cursor and continually retrieves the next row in the <code>ResultSet</code>.
  * </p>
  *
  * <p>
- * The callable statement used to open the cursor is created with the 'READ_ONLY' option as well as with the
- * 'TYPE_FORWARD_ONLY' option. By default the cursor will be opened using a separate connection which means
- * that it will not participate in any transactions created as part of the step processing.
+ * The callable statement used to open the cursor is created with the 'READ_ONLY' option
+ * as well as with the 'TYPE_FORWARD_ONLY' option. By default the cursor will be opened
+ * using a separate connection which means that it will not participate in any
+ * transactions created as part of the step processing.
  * </p>
  *
  * <p>
@@ -82,7 +83,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Set the RowMapper to be used for all calls to read().
-	 *
 	 * @param rowMapper the RowMapper to use to map the results
 	 */
 	public void setRowMapper(RowMapper<T> rowMapper) {
@@ -90,10 +90,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Set the SQL statement to be used when creating the cursor. This statement
-	 * should be a complete and valid SQL statement, as it will be run directly
-	 * without any modification.
-	 *
+	 * Set the SQL statement to be used when creating the cursor. This statement should be
+	 * a complete and valid SQL statement, as it will be run directly without any
+	 * modification.
 	 * @param sprocedureName the SQL used to call the statement
 	 */
 	public void setProcedureName(String sprocedureName) {
@@ -101,9 +100,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Set the PreparedStatementSetter to use if any parameter values that need
-	 * to be set in the supplied query.
-	 *
+	 * Set the PreparedStatementSetter to use if any parameter values that need to be set
+	 * in the supplied query.
 	 * @param preparedStatementSetter used to populate the SQL
 	 */
 	public void setPreparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
@@ -111,9 +109,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Add one or more declared parameters. Used for configuring this operation when used in a
-	 * bean factory. Each parameter will specify SQL type and (optionally) the parameter's name.
-	 *
+	 * Add one or more declared parameters. Used for configuring this operation when used
+	 * in a bean factory. Each parameter will specify SQL type and (optionally) the
+	 * parameter's name.
 	 * @param parameters Array containing the declared <code>SqlParameter</code> objects
 	 */
 	public void setParameters(SqlParameter[] parameters) {
@@ -122,7 +120,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Set whether this stored procedure is a function.
-	 *
 	 * @param function indicator
 	 */
 	public void setFunction(boolean function) {
@@ -130,10 +127,9 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	}
 
 	/**
-	 * Set the parameter position of the REF CURSOR. Only used for Oracle and
-	 * PostgreSQL that use REF CURSORs. For any other database this should be
-	 * kept as 0 which is the default.
-	 *
+	 * Set the parameter position of the REF CURSOR. Only used for Oracle and PostgreSQL
+	 * that use REF CURSORs. For any other database this should be kept as 0 which is the
+	 * default.
 	 * @param refCursorPosition The parameter position of the REF CURSOR
 	 */
 	public void setRefCursorPosition(int refCursorPosition) {
@@ -142,9 +138,7 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 
 	/**
 	 * Assert that mandatory properties are set.
-	 *
-	 * @throws IllegalArgumentException if either data source or SQL properties
-	 * not set.
+	 * @throws IllegalArgumentException if either data source or SQL properties not set.
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -157,12 +151,10 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 	protected void openCursor(Connection con) {
 
 		Assert.state(procedureName != null, "Procedure Name must not be null.");
-		Assert.state(refCursorPosition >= 0,
-				"invalid refCursorPosition specified as " + refCursorPosition + "; it can't be " +
-				"specified as a negative number.");
-		Assert.state(refCursorPosition == 0 || refCursorPosition > 0,
-				"invalid refCursorPosition specified as " + refCursorPosition + "; there are " +
-						parameters.length + " parameters defined.");
+		Assert.state(refCursorPosition >= 0, "invalid refCursorPosition specified as " + refCursorPosition
+				+ "; it can't be " + "specified as a negative number.");
+		Assert.state(refCursorPosition == 0 || refCursorPosition > 0, "invalid refCursorPosition specified as "
+				+ refCursorPosition + "; there are " + parameters.length + " parameters defined.");
 
 		CallMetaDataContext callContext = new CallMetaDataContext();
 		callContext.setAccessCallParameterMetaData(false);
@@ -172,7 +164,6 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 		callContext.processParameters(Arrays.asList(parameters));
 		SqlParameter cursorParameter = callContext.createReturnResultSetParameter("cursor", rowMapper);
 		this.callString = callContext.createCallString();
-
 
 		if (log.isDebugEnabled()) {
 			log.debug("Call string is: " + callString);
@@ -196,7 +187,8 @@ public class StoredProcedureItemReader<T> extends AbstractCursorItemReader<T> {
 						ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			}
 			else {
-				callableStatement = con.prepareCall(callString, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+				callableStatement = con.prepareCall(callString, ResultSet.TYPE_FORWARD_ONLY,
+						ResultSet.CONCUR_READ_ONLY);
 			}
 			applyStatementSettings(callableStatement);
 			if (this.preparedStatementSetter != null) {

@@ -22,22 +22,21 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.util.Assert;
 
 /**
- * Helper class for policies that need to count the number of occurrences of
- * some event (e.g. an exception type in the context) in the scope of a batch.
- * The value of the counter can be stored between batches in a nested context,
- * so that the termination decision is based on the aggregate of a number of
- * sibling batches.
- * 
+ * Helper class for policies that need to count the number of occurrences of some event
+ * (e.g. an exception type in the context) in the scope of a batch. The value of the
+ * counter can be stored between batches in a nested context, so that the termination
+ * decision is based on the aggregate of a number of sibling batches.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class RepeatContextCounter {
 
 	final private String countKey;
 
 	/**
-	 * Flag to indicate whether the count is stored at the level of the parent
-	 * context, or just local to the current context. Default value is false.
+	 * Flag to indicate whether the count is stored at the level of the parent context, or
+	 * just local to the current context. Default value is false.
 	 */
 	final private boolean useParent;
 
@@ -45,14 +44,13 @@ public class RepeatContextCounter {
 
 	/**
 	 * Increment the counter.
-	 * 
 	 * @param delta the amount by which to increment the counter.
 	 */
 	final public void increment(int delta) {
 		AtomicInteger count = getCounter();
 		count.addAndGet(delta);
 	}
-	
+
 	/**
 	 * Increment by 1.
 	 */
@@ -71,17 +69,16 @@ public class RepeatContextCounter {
 
 	/**
 	 * Construct a new {@link RepeatContextCounter}.
-	 * 
 	 * @param context the current context.
 	 * @param countKey the key to use to store the counter in the context.
-	 * @param useParent true if the counter is to be shared between siblings.
-	 * The state will be stored in the parent of the context (if it exists)
-	 * instead of the context itself.
+	 * @param useParent true if the counter is to be shared between siblings. The state
+	 * will be stored in the parent of the context (if it exists) instead of the context
+	 * itself.
 	 */
 	public RepeatContextCounter(RepeatContext context, String countKey, boolean useParent) {
 
 		super();
-		
+
 		Assert.notNull(context, "The context must be provided to initialize a counter");
 
 		this.countKey = countKey;

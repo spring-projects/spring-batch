@@ -42,11 +42,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 /**
  * Test suite for various failure scenarios during job processing.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class FlowJobFailureTests {
 
@@ -58,8 +58,7 @@ public class FlowJobFailureTests {
 	public void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -91,8 +90,8 @@ public class FlowJobFailureTests {
 		List<StateTransition> transitions = new ArrayList<>();
 		StepState step = new StepState(new StepSupport("step") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 				// This is what happens if the repository meta-data cannot be
 				// updated
 				stepExecution.setExitStatus(ExitStatus.UNKNOWN);

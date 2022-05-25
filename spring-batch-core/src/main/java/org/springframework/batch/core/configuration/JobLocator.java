@@ -22,22 +22,19 @@ import org.springframework.lang.Nullable;
 /**
  * A runtime service locator interface for retrieving job configurations by
  * <code>name</code>.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface JobLocator {
 
 	/**
 	 * Locates a {@link Job} at runtime.
-	 * 
-	 * @param name the name of the {@link Job} which should be
-	 * unique
+	 * @param name the name of the {@link Job} which should be unique
 	 * @return a {@link Job} identified by the given name
-	 * 
-	 * @throws NoSuchJobException if the required configuration can
-	 * not be found.
+	 * @throws NoSuchJobException if the required configuration can not be found.
 	 */
 	Job getJob(@Nullable String name) throws NoSuchJobException;
+
 }

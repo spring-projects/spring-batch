@@ -40,7 +40,6 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Convenience constructor for setting the {@link ChunkListener}s.
-	 *
 	 * @param listeners list of {@link ChunkListener}.
 	 */
 	public CompositeChunkListener(List<? extends ChunkListener> listeners) {
@@ -49,7 +48,6 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Convenience constructor for setting the {@link ChunkListener}s.
-	 *
 	 * @param listeners array of {@link ChunkListener}.
 	 */
 	public CompositeChunkListener(ChunkListener... listeners) {
@@ -58,7 +56,6 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Public setter for the listeners.
-	 *
 	 * @param listeners list of {@link ChunkListener}.
 	 */
 	public void setListeners(List<? extends ChunkListener> listeners) {
@@ -67,7 +64,6 @@ public class CompositeChunkListener implements ChunkListener {
 
 	/**
 	 * Register additional listener.
-	 *
 	 * @param chunkListener instance of {@link ChunkListener}.
 	 */
 	public void register(ChunkListener chunkListener) {
@@ -88,8 +84,8 @@ public class CompositeChunkListener implements ChunkListener {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritizing those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritizing those that
+	 * implement {@link Ordered}.
 	 *
 	 * @see org.springframework.batch.core.ChunkListener#beforeChunk(ChunkContext context)
 	 */
@@ -104,7 +100,8 @@ public class CompositeChunkListener implements ChunkListener {
 	/**
 	 * Call the registered listeners in reverse order.
 	 *
-	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext context)
+	 * @see org.springframework.batch.core.ChunkListener#afterChunkError(ChunkContext
+	 * context)
 	 */
 	@Override
 	public void afterChunkError(ChunkContext context) {
@@ -113,4 +110,5 @@ public class CompositeChunkListener implements ChunkListener {
 			listener.afterChunkError(context);
 		}
 	}
+
 }

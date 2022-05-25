@@ -24,13 +24,12 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 
 /**
- * Simple interface for controlling jobs, including possible ad-hoc executions,
- * based on different runtime identifiers. It is extremely important to note
- * that this interface makes absolutely no guarantees about whether or not calls
- * to it are executed synchronously or asynchronously. The javadocs for specific
- * implementations should be checked to ensure callers fully understand how the
- * job will be run.
- * 
+ * Simple interface for controlling jobs, including possible ad-hoc executions, based on
+ * different runtime identifiers. It is extremely important to note that this interface
+ * makes absolutely no guarantees about whether or not calls to it are executed
+ * synchronously or asynchronously. The javadocs for specific implementations should be
+ * checked to ensure callers fully understand how the job will be run.
+ *
  * @author Lucas Ward
  * @author Dave Syer
  */
@@ -38,30 +37,26 @@ import org.springframework.batch.core.repository.JobRestartException;
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution for the given {@link Job} and {@link JobParameters}
-	 * . If a {@link JobExecution} was able to be created successfully, it will
-	 * always be returned by this method, regardless of whether or not the
-	 * execution was successful. If there is a past {@link JobExecution} which
-	 * has paused, the same {@link JobExecution} is returned instead of a new
-	 * one created. A exception will only be thrown if there is a failure to
-	 * start the job. If the job encounters some error while processing, the
-	 * JobExecution will be returned, and the status will need to be inspected.
-	 *
+	 * Start a job execution for the given {@link Job} and {@link JobParameters} . If a
+	 * {@link JobExecution} was able to be created successfully, it will always be
+	 * returned by this method, regardless of whether or not the execution was successful.
+	 * If there is a past {@link JobExecution} which has paused, the same
+	 * {@link JobExecution} is returned instead of a new one created. A exception will
+	 * only be thrown if there is a failure to start the job. If the job encounters some
+	 * error while processing, the JobExecution will be returned, and the status will need
+	 * to be inspected.
 	 * @param job the job to be executed.
 	 * @param jobParameters the parameters passed to this execution of the job.
-	 * @return the {@link JobExecution} if it returns synchronously. If the
-	 * implementation is asynchronous, the status might well be unknown.
-	 * 
-	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified
-	 * by the properties already has an execution running.
-	 * @throws IllegalArgumentException if the job or jobInstanceProperties are
-	 * null.
-	 * @throws JobRestartException if the job has been run before and
-	 * circumstances that preclude a re-start.
-	 * @throws JobInstanceAlreadyCompleteException if the job has been run
-	 * before with the same parameters and completed successfully
-	 * @throws JobParametersInvalidException if the parameters are not valid for
-	 * this job
+	 * @return the {@link JobExecution} if it returns synchronously. If the implementation
+	 * is asynchronous, the status might well be unknown.
+	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified by the
+	 * properties already has an execution running.
+	 * @throws IllegalArgumentException if the job or jobInstanceProperties are null.
+	 * @throws JobRestartException if the job has been run before and circumstances that
+	 * preclude a re-start.
+	 * @throws JobInstanceAlreadyCompleteException if the job has been run before with the
+	 * same parameters and completed successfully
+	 * @throws JobParametersInvalidException if the parameters are not valid for this job
 	 */
 	public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException;

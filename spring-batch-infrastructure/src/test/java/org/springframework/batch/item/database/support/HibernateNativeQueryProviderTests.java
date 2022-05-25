@@ -76,6 +76,7 @@ public class HibernateNativeQueryProviderTests {
 	}
 
 	private static class Foo {
+
 	}
 
 }

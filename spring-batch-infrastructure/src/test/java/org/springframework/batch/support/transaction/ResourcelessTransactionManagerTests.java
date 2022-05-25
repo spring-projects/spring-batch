@@ -29,7 +29,7 @@ public class ResourcelessTransactionManagerTests {
 	private ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
 
 	private int txStatus = Integer.MIN_VALUE;
-	
+
 	private int count = 0;
 
 	@Test
@@ -115,13 +115,13 @@ public class ResourcelessTransactionManagerTests {
 	public void testRollback() {
 		try {
 			new TransactionTemplate(transactionManager).execute(status -> {
-					TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                        @Override
-						public void afterCompletion(int status) {
-							txStatus = status;
-						}
-					});
-					throw new RuntimeException("Rollback!");
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+					@Override
+					public void afterCompletion(int status) {
+						txStatus = status;
+					}
+				});
+				throw new RuntimeException("Rollback!");
 			});
 			fail("Expected RuntimeException");
 		}

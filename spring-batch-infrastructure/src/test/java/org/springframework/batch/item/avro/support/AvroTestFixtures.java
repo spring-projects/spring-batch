@@ -58,9 +58,7 @@ public abstract class AvroTestFixtures {
 			new PlainOldUser("Joe", 1, "pink"));
 	//@formatter:on
 
-
 	protected Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
-
 
 	protected Resource plainOldUserSchemaResource = new ByteArrayResource(PlainOldUser.SCHEMA.toString().getBytes());
 
@@ -72,8 +70,8 @@ public abstract class AvroTestFixtures {
 	protected Resource dataResourceWithSchema = new ClassPathResource(
 			"org/springframework/batch/item/avro/user-data.avro");
 
-	protected Resource plainOldUserDataResource
-			= new ClassPathResource("org/springframework/batch/item/avro/plain-old-user-data-no-schema.avro");
+	protected Resource plainOldUserDataResource = new ClassPathResource(
+			"org/springframework/batch/item/avro/plain-old-user-data-no-schema.avro");
 
 	protected String schemaString(Resource resource) {
 		{
@@ -93,15 +91,14 @@ public abstract class AvroTestFixtures {
 	}
 
 	protected List<GenericRecord> genericAvroGeneratedUsers() {
-		return this.avroGeneratedUsers.stream().map(u-> {
-					GenericData.Record avroRecord;
-					avroRecord = new GenericData.Record(u.getSchema());
-					avroRecord.put("name", u.getName());
-					avroRecord.put("favorite_number", u.getFavoriteNumber());
-					avroRecord.put("favorite_color",u.getFavoriteColor());
-					return avroRecord;
-				}
-				).collect(Collectors.toList());
+		return this.avroGeneratedUsers.stream().map(u -> {
+			GenericData.Record avroRecord;
+			avroRecord = new GenericData.Record(u.getSchema());
+			avroRecord.put("name", u.getName());
+			avroRecord.put("favorite_number", u.getFavoriteNumber());
+			avroRecord.put("favorite_color", u.getFavoriteColor());
+			return avroRecord;
+		}).collect(Collectors.toList());
 	}
 
 	protected List<PlainOldUser> plainOldUsers() {
@@ -113,14 +110,16 @@ public abstract class AvroTestFixtures {
 	}
 
 	protected static class PlainOldUser {
+
 		public static final Schema SCHEMA = ReflectData.get().getSchema(PlainOldUser.class);
+
 		private CharSequence name;
 
 		private int favoriteNumber;
 
 		private CharSequence favoriteColor;
 
-		public PlainOldUser(){
+		public PlainOldUser() {
 
 		}
 
@@ -146,33 +145,35 @@ public abstract class AvroTestFixtures {
 			GenericData.Record avroRecord = new GenericData.Record(SCHEMA);
 			avroRecord.put("name", this.name);
 			avroRecord.put("favoriteNumber", this.favoriteNumber);
-			avroRecord.put("favoriteColor",this.favoriteColor);
+			avroRecord.put("favoriteColor", this.favoriteColor);
 			return avroRecord;
 		}
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			PlainOldUser that = (PlainOldUser) o;
-			return favoriteNumber == that.favoriteNumber &&
-					Objects.equals(name, that.name) &&
-					Objects.equals(favoriteColor, that.favoriteColor);
+			return favoriteNumber == that.favoriteNumber && Objects.equals(name, that.name)
+					&& Objects.equals(favoriteColor, that.favoriteColor);
 		}
 
 		@Override
 		public int hashCode() {
 			return Objects.hash(name, favoriteNumber, favoriteColor);
 		}
+
 	}
 
 	public static void createPlainOldUsersWithNoEmbeddedSchema() throws Exception {
 
 		DatumWriter<PlainOldUser> userDatumWriter = new ReflectDatumWriter<>(AvroTestFixtures.PlainOldUser.class);
 
-		FileOutputStream fileOutputStream =  new FileOutputStream("plain-old-user-data-no-schema.avro");
+		FileOutputStream fileOutputStream = new FileOutputStream("plain-old-user-data-no-schema.avro");
 
-		Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream,null);
+		Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream, null);
 		userDatumWriter.write(new PlainOldUser("David", 20, "blue"), encoder);
 		userDatumWriter.write(new PlainOldUser("Sue", 4, "red"), encoder);
 		userDatumWriter.write(new PlainOldUser("Alana", 13, "yellow"), encoder);
@@ -182,4 +183,5 @@ public abstract class AvroTestFixtures {
 		fileOutputStream.flush();
 		fileOutputStream.close();
 	}
+
 }

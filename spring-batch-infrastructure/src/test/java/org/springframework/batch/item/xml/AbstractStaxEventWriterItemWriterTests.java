@@ -47,7 +47,7 @@ import org.springframework.util.StopWatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class AbstractStaxEventWriterItemWriterTests {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private static final int MAX_WRITE = 100;
@@ -98,10 +98,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 		stopWatch.stop();
 		logger.info("Timing for XML writer: " + stopWatch);
 
-		assertThat(
-				Input.from(expected.getFile()),
-				CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
-						.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
+		assertThat(Input.from(expected.getFile()), CompareMatcher.isSimilarTo(Input.from(resource.getFile()))
+				.withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
 	}
 
 	@Before

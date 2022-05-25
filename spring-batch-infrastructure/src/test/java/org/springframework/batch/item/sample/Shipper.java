@@ -16,13 +16,13 @@
 
 package org.springframework.batch.item.sample;
 
-
 /**
  * An XML shipper.
- * 
+ *
  * This is a complex type.
  */
 public class Shipper {
+
 	private String name;
 
 	private double perOunceRate;

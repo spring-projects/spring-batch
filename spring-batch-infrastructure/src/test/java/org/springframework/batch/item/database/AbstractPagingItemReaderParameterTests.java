@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractPagingItemReaderParameterTests {
 
 	protected AbstractPagingItemReader<Foo> tested;
+
 	protected ExecutionContext executionContext = new ExecutionContext();
 
 	@Autowired
@@ -45,13 +46,13 @@ public abstract class AbstractPagingItemReaderParameterTests {
 
 	@After
 	public void tearDown() {
-		((ItemStream)tested).close();
+		((ItemStream) tested).close();
 	}
 
 	@Test
 	public void testRead() throws Exception {
 
-		((ItemStream)tested).open(executionContext);
+		((ItemStream) tested).open(executionContext);
 
 		Foo foo2 = tested.read();
 		Assert.assertEquals(2, foo2.getValue());
@@ -72,8 +73,8 @@ public abstract class AbstractPagingItemReaderParameterTests {
 	@Test
 	public void testReadAfterJumpFirstPage() throws Exception {
 
-		executionContext.putInt(getName()+".read.count", 2);
-		((ItemStream)tested).open(executionContext);
+		executionContext.putInt(getName() + ".read.count", 2);
+		((ItemStream) tested).open(executionContext);
 
 		Foo foo4 = tested.read();
 		Assert.assertEquals(4, foo4.getValue());
@@ -88,8 +89,8 @@ public abstract class AbstractPagingItemReaderParameterTests {
 	@Test
 	public void testReadAfterJumpSecondPage() throws Exception {
 
-		executionContext.putInt(getName()+".read.count", 3);
-		((ItemStream)tested).open(executionContext);
+		executionContext.putInt(getName() + ".read.count", 3);
+		((ItemStream) tested).open(executionContext);
 
 		Foo foo5 = tested.read();
 		Assert.assertEquals(5, foo5.getValue());
@@ -97,10 +98,11 @@ public abstract class AbstractPagingItemReaderParameterTests {
 		Object o = tested.read();
 		Assert.assertNull(o);
 	}
-	
+
 	protected String getName() {
 		return tested.getClass().getSimpleName();
 	}
-	
+
 	protected abstract AbstractPagingItemReader<Foo> getItemReader() throws Exception;
+
 }

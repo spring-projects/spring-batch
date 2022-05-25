@@ -30,8 +30,8 @@ import org.springframework.util.SerializationUtils;
  */
 public class ChunkRequestTests {
 
-	private ChunkRequest<String> request = new ChunkRequest<>(0, Arrays.asList("foo", "bar"),
-			111L, MetaDataInstanceFactory.createStepExecution().createStepContribution());
+	private ChunkRequest<String> request = new ChunkRequest<>(0, Arrays.asList("foo", "bar"), 111L,
+			MetaDataInstanceFactory.createStepExecution().createStepContribution());
 
 	@Test
 	public void testGetJobId() {
@@ -56,8 +56,8 @@ public class ChunkRequestTests {
 	@Test
 	public void testSerializable() throws Exception {
 		@SuppressWarnings("unchecked")
-		ChunkRequest<String> result = (ChunkRequest<String>) SerializationUtils.deserialize(SerializationUtils
-				.serialize(request));
+		ChunkRequest<String> result = (ChunkRequest<String>) SerializationUtils
+				.deserialize(SerializationUtils.serialize(request));
 		assertNotNull(result.getStepContribution());
 		assertEquals(111L, result.getJobId());
 		assertEquals(2, result.getItems().size());

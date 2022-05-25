@@ -26,14 +26,12 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a
- * {@link org.springframework.batch.core.Step} and goes on to (optionally) list
- * a set of transitions from that step to others with &lt;next on="pattern"
- * to="stepName"/&gt;. Used by the {@link JobParser}.
- * 
+ * Internal parser for the &lt;step/&gt; elements inside a job. A step element references
+ * a bean definition for a {@link org.springframework.batch.core.Step} and goes on to
+ * (optionally) list a set of transitions from that step to others with &lt;next
+ * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
+ *
  * @see JobParser
- * 
  * @author Dave Syer
  * @author Thomas Risberg
  * @since 2.0
@@ -42,14 +40,13 @@ public class InlineStepParser extends AbstractStepParser {
 
 	/**
 	 * Parse the step and turn it into a list of transitions.
-	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 *        from the enclosing tag
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean} from the
+	 * enclosing tag
 	 * @return a collection of bean definitions for
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *         instances objects
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} instances
+	 * objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobFactoryRef) {
 

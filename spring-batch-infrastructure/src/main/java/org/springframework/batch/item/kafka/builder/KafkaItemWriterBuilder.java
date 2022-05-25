@@ -61,10 +61,11 @@ public class KafkaItemWriterBuilder<K, V> {
 	}
 
 	/**
-	 * Indicate if the items being passed to the writer are all to be sent as delete events to the topic. A delete
-	 * event is made of a key with a null value. If set to false (default), the items will be sent with provided value
-	 * and key converter by the itemKeyMapper. If set to true, the items will be sent with the key converter from the
-	 * value by the itemKeyMapper and a null value.
+	 * Indicate if the items being passed to the writer are all to be sent as delete
+	 * events to the topic. A delete event is made of a key with a null value. If set to
+	 * false (default), the items will be sent with provided value and key converter by
+	 * the itemKeyMapper. If set to true, the items will be sent with the key converter
+	 * from the value by the itemKeyMapper and a null value.
 	 * @param delete removal indicator.
 	 * @return The current instance of the builder.
 	 * @see KafkaItemWriter#setDelete(boolean)
@@ -76,7 +77,6 @@ public class KafkaItemWriterBuilder<K, V> {
 
 	/**
 	 * The time limit to wait when flushing items to Kafka.
-	 *
 	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
 	 * @return The current instance of the builder.
 	 * @see KafkaItemWriter#setTimeout(long)
@@ -102,4 +102,5 @@ public class KafkaItemWriterBuilder<K, V> {
 		writer.setTimeout(this.timeout);
 		return writer;
 	}
+
 }

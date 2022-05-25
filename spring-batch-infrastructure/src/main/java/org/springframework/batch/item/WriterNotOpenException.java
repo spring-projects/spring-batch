@@ -18,7 +18,7 @@ package org.springframework.batch.item;
 /**
  * Exception indicating that an {@link ItemWriter} needed to be opened before being
  * written to.
- * 
+ *
  * @author Lucas Ward
  */
 @SuppressWarnings("serial")
@@ -26,7 +26,6 @@ public class WriterNotOpenException extends ItemWriterException {
 
 	/**
 	 * Create a new {@link WriterNotOpenException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public WriterNotOpenException(String message) {
@@ -34,12 +33,13 @@ public class WriterNotOpenException extends ItemWriterException {
 	}
 
 	/**
-	 * Create a new {@link WriterNotOpenException} based on a message and another exception.
-	 * 
+	 * Create a new {@link WriterNotOpenException} based on a message and another
+	 * exception.
 	 * @param msg the message for this exception
 	 * @param nested the other exception
 	 */
 	public WriterNotOpenException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
+
 }

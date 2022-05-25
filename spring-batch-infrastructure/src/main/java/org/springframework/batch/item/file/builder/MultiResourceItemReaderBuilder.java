@@ -47,10 +47,9 @@ public class MultiResourceItemReaderBuilder<T> {
 	private String name;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -64,7 +63,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -78,7 +76,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	/**
 	 * The array of resources that the {@link MultiResourceItemReader} will use to
 	 * retrieve items.
-	 *
 	 * @param resources the array of resources to use.
 	 * @return this instance for method chaining.
 	 *
@@ -92,7 +89,6 @@ public class MultiResourceItemReaderBuilder<T> {
 
 	/**
 	 * Establishes the delegate to use for reading the resources provided.
-	 *
 	 * @param delegate reads items from single {@link Resource}.
 	 * @return this instance for method chaining.
 	 *
@@ -108,7 +104,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	 * In strict mode the reader will throw an exception on
 	 * {@link MultiResourceItemReader#open(org.springframework.batch.item.ExecutionContext)}
 	 * if there are no resources to read.
-	 *
 	 * @param strict false by default.
 	 * @return this instance for method chaining.
 	 * @see MultiResourceItemReader#setStrict(boolean)
@@ -122,7 +117,6 @@ public class MultiResourceItemReaderBuilder<T> {
 	/**
 	 * Used to order the injected resources, by default compares
 	 * {@link Resource#getFilename()} values.
-	 *
 	 * @param comparator the comparator to use for ordering resources.
 	 * @return this instance for method chaining.
 	 * @see MultiResourceItemReader#setComparator(Comparator)
@@ -135,7 +129,6 @@ public class MultiResourceItemReaderBuilder<T> {
 
 	/**
 	 * Builds the {@link MultiResourceItemReader}.
-	 *
 	 * @return a {@link MultiResourceItemReader}
 	 */
 	public MultiResourceItemReader<T> build() {

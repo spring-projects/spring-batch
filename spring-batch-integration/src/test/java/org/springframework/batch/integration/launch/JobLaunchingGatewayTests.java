@@ -32,7 +32,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- *
  * @author Gunnar Hillert
  * @since 1.3
  *
@@ -42,12 +41,12 @@ public class JobLaunchingGatewayTests {
 	@Test
 	public void testExceptionRaised() throws Exception {
 
-		final Message<JobLaunchRequest> message = MessageBuilder.withPayload(new JobLaunchRequest(new JobSupport("testJob"),
-		new JobParameters())).build();
+		final Message<JobLaunchRequest> message = MessageBuilder
+				.withPayload(new JobLaunchRequest(new JobSupport("testJob"), new JobParameters())).build();
 
 		final JobLauncher jobLauncher = mock(JobLauncher.class);
 		when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
-			.thenThrow(new JobParametersInvalidException("This is a JobExecutionException."));
+				.thenThrow(new JobParametersInvalidException("This is a JobExecutionException."));
 
 		JobLaunchingGateway jobLaunchingGateway = new JobLaunchingGateway(jobLauncher);
 
@@ -62,4 +61,5 @@ public class JobLaunchingGatewayTests {
 		fail("Expecting a MessageHandlingException to be thrown.");
 
 	}
+
 }

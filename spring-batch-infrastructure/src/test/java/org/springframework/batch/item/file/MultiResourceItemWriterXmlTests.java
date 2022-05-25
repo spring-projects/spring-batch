@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package org.springframework.batch.item.file;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -34,8 +35,7 @@ import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 
 /**
- * Tests for {@link MultiResourceItemWriter} delegating to
- * {@link StaxEventItemWriter}.
+ * Tests for {@link MultiResourceItemWriter} delegating to {@link StaxEventItemWriter}.
  */
 public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTests {
 
@@ -56,8 +56,8 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 	 * Writes object's toString representation as tag.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
-		
-        @Override
+
+		@Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			Assert.isInstanceOf(Result.class, result);
 
@@ -69,21 +69,23 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 				writer.add(factory.createEndElement("prefix", "namespace", graph.toString()));
 				writer.add(factory.createEndDocument());
 			}
-			catch ( Exception e) {
+			catch (Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}
 
-        @Override
+		@Override
 		public boolean supports(Class<?> clazz) {
 			return true;
 		}
+
 	}
 
 	@Override
 	protected String readFile(File f) throws Exception {
 		String content = super.readFile(f);
-		//skip the <?xml ... ?> header to avoid platform issues with single vs. double quotes
+		// skip the <?xml ... ?> header to avoid platform issues with single vs. double
+		// quotes
 		return content.substring(content.indexOf("?>") + 2);
 	}
 
@@ -105,10 +107,8 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		tested.update(executionContext);
 		tested.close();
 
-
 		assertEquals(xmlDocStart + "<prefix:4/>" + xmlDocEnd, readFile(part2));
-		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd,
-				readFile(part1));
+		assertEquals(xmlDocStart + "<prefix:1/><prefix:2/><prefix:3/>" + xmlDocEnd, readFile(part1));
 
 		tested.open(executionContext);
 
@@ -121,9 +121,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		tested.close();
 
 		assertEquals(xmlDocStart + "<prefix:4/><prefix:5/>" + xmlDocEnd, readFile(part2));
-		assertEquals(xmlDocStart
-				+ "<prefix:6/><prefix:7/><prefix:8/><prefix:9/>" + xmlDocEnd,
-				readFile(part3));
+		assertEquals(xmlDocStart + "<prefix:6/><prefix:7/><prefix:8/><prefix:9/>" + xmlDocEnd, readFile(part3));
 	}
 
 }

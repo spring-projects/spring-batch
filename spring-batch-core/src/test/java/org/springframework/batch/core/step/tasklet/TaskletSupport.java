@@ -24,9 +24,9 @@ public class TaskletSupport implements Tasklet {
 
 	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution,
-			ChunkContext chunkContext) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		System.out.println("The tasklet was executed");
 		return RepeatStatus.FINISHED;
 	}
+
 }

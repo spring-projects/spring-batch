@@ -21,9 +21,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * This class will specifically test the capabilities of
- * {@link JobRepositoryTestUtils} to test {@link SimpleJob}s.
- * 
+ * This class will specifically test the capabilities of {@link JobRepositoryTestUtils} to
+ * test {@link SimpleJob}s.
+ *
  * @author Dan Garrette
  * @since 2.0
  */

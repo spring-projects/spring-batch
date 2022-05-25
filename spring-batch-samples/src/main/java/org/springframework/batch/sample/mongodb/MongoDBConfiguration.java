@@ -39,8 +39,7 @@ public class MongoDBConfiguration {
 
 	@Bean
 	public MongoTemplate mongoTemplate() {
-		String connectionString = "mongodb://" +
-				this.mongodbHost + ":" + this.mongodbPort + "/" + this.mongodbDatabase;
+		String connectionString = "mongodb://" + this.mongodbHost + ":" + this.mongodbPort + "/" + this.mongodbDatabase;
 		MongoClient mongoClient = MongoClients.create(connectionString);
 		return new MongoTemplate(mongoClient, "test");
 	}

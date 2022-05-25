@@ -32,32 +32,30 @@ import java.util.Map.Entry;
 
 /**
  * <p>
- * A simple {@link ItemWriter} that can send mail messages. If it fails there is
- * no guarantee about which of the messages were sent, but the ones that failed
- * can be picked up in the error handler. Because the mail protocol is not
- * transactional, failures should be dealt with here if possible rather than
- * allowing them to be rethrown (which is the default).
+ * A simple {@link ItemWriter} that can send mail messages. If it fails there is no
+ * guarantee about which of the messages were sent, but the ones that failed can be picked
+ * up in the error handler. Because the mail protocol is not transactional, failures
+ * should be dealt with here if possible rather than allowing them to be rethrown (which
+ * is the default).
  * </p>
- * 
+ *
  * <p>
- * Delegates the actual sending of messages to a {@link JavaMailSender}, using the
- * batch method {@link JavaMailSender#send(MimeMessage[])}, which normally uses
- * a single server connection for the whole batch (depending on the
- * implementation). The efficiency of for large volumes of messages (repeated
- * calls to the item writer) might be improved by the use of a special
- * {@link JavaMailSender} that caches connections to the server in between
- * calls.
+ * Delegates the actual sending of messages to a {@link JavaMailSender}, using the batch
+ * method {@link JavaMailSender#send(MimeMessage[])}, which normally uses a single server
+ * connection for the whole batch (depending on the implementation). The efficiency of for
+ * large volumes of messages (repeated calls to the item writer) might be improved by the
+ * use of a special {@link JavaMailSender} that caches connections to the server in
+ * between calls.
  * </p>
- * 
+ *
  * <p>
  * Stateless, so automatically restartable.
  * </p>
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.1
- * 
+ *
  */
 public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 
@@ -67,7 +65,6 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 
 	/**
 	 * A {@link JavaMailSender} to be used to send messages in {@link #write(List)}.
-	 * 
 	 * @param mailSender service for doing the work of sending a MIME message
 	 */
 	public void setJavaMailSender(JavaMailSender mailSender) {
@@ -75,9 +72,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	}
 
 	/**
-	 * The handler for failed messages. Defaults to a
-	 * {@link DefaultMailErrorHandler}.
-	 * 
+	 * The handler for failed messages. Defaults to a {@link DefaultMailErrorHandler}.
 	 * @param mailErrorHandler the mail error handler to set
 	 */
 	public void setMailErrorHandler(MailErrorHandler mailErrorHandler) {
@@ -86,9 +81,8 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 
 	/**
 	 * Check mandatory properties (mailSender).
-	 * 
 	 * @throws IllegalStateException if the mandatory properties are not set
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws IllegalStateException {
@@ -99,7 +93,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 	 * @param items the items to send
 	 * @see ItemWriter#write(List)
 	 */
-    @Override
+	@Override
 	public void write(List<? extends MimeMessage> items) throws MailException {
 		try {
 			mailSender.send(items.toArray(new MimeMessage[items.size()]));
@@ -107,7 +101,7 @@ public class MimeMessageItemWriter implements ItemWriter<MimeMessage> {
 		catch (MailSendException e) {
 			Map<Object, Exception> failedMessages = e.getFailedMessages();
 			for (Entry<Object, Exception> entry : failedMessages.entrySet()) {
-				mailErrorHandler.handle(new MimeMailMessage((MimeMessage)entry.getKey()), entry.getValue());
+				mailErrorHandler.handle(new MimeMailMessage((MimeMessage) entry.getKey()), entry.getValue());
 			}
 		}
 	}

@@ -19,7 +19,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 
 /**
  * Base exception indicating that the skip has failed or caused a failure.
- * 
+ *
  * @author Dave Syer
  */
 @SuppressWarnings("serial")
@@ -39,7 +39,5 @@ public abstract class SkipException extends UnexpectedJobExecutionException {
 	public SkipException(String msg) {
 		super(msg);
 	}
-	
-	
 
 }

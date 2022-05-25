@@ -18,12 +18,11 @@ package org.springframework.batch.core.step.skip;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 
 /**
- * Special exception to indicate a failure in a skip policy. These need
- * special treatment in the framework in case a skip sends itself into an
- * infinite loop.
- * 
+ * Special exception to indicate a failure in a skip policy. These need special treatment
+ * in the framework in case a skip sends itself into an infinite loop.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class SkipPolicyFailedException extends UnexpectedJobExecutionException {

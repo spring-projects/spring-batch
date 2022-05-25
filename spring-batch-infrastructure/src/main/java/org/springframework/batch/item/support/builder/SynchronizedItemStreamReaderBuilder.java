@@ -24,7 +24,6 @@ import org.springframework.util.Assert;
  * Creates a fully qualified SynchronizedItemStreamReader.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 public class SynchronizedItemStreamReaderBuilder<T> {
@@ -35,7 +34,6 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 	 * The item stream reader to use as a delegate. Items are read from the delegate and
 	 * passed to the caller in
 	 * {@link org.springframework.batch.item.support.SynchronizedItemStreamReader#read()}.
-	 *
 	 * @param delegate the delegate to set
 	 * @return this instance for method chaining
 	 * @see SynchronizedItemStreamReader#setDelegate(ItemStreamReader)
@@ -48,7 +46,6 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link SynchronizedItemStreamReader}.
-	 *
 	 * @return a new {@link SynchronizedItemStreamReader}
 	 */
 	public SynchronizedItemStreamReader<T> build() {
@@ -58,4 +55,5 @@ public class SynchronizedItemStreamReaderBuilder<T> {
 		reader.setDelegate(this.delegate);
 		return reader;
 	}
+
 }

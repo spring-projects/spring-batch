@@ -41,6 +41,7 @@ public class GemfireItemWriterBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private GemfireTemplate template;
 
@@ -107,18 +108,23 @@ public class GemfireItemWriterBuilderTests {
 	}
 
 	static class Foo {
+
 		public GemfireItemWriterBuilderTests.Bar bar;
 
 		public Foo(GemfireItemWriterBuilderTests.Bar bar) {
 			this.bar = bar;
 		}
+
 	}
 
 	static class Bar {
+
 		public String val;
 
 		public Bar(String b1) {
 			this.val = b1;
 		}
+
 	}
+
 }

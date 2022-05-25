@@ -32,27 +32,31 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link org.springframework.batch.item.ItemStreamReader} implementation based
- *  on JPA {@link Query#getResultStream()}. It executes the JPQL query when
- *  initialized and iterates over the result set as {@link #read()} method is called,
- *  returning an object corresponding to the current row. The query can be set
- *  directly using {@link #setQueryString(String)}, or using a query provider via
- *  {@link #setQueryProvider(JpaQueryProvider)}.
- * 
+ * {@link org.springframework.batch.item.ItemStreamReader} implementation based on JPA
+ * {@link Query#getResultStream()}. It executes the JPQL query when initialized and
+ * iterates over the result set as {@link #read()} method is called, returning an object
+ * corresponding to the current row. The query can be set directly using
+ * {@link #setQueryString(String)}, or using a query provider via
+ * {@link #setQueryProvider(JpaQueryProvider)}.
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Mahmoud Ben Hassine
  * @param <T> type of items to read
  * @since 4.3
  */
-public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T>
-		implements InitializingBean {
+public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	private EntityManagerFactory entityManagerFactory;
+
 	private EntityManager entityManager;
+
 	private String queryString;
+
 	private JpaQueryProvider queryProvider;
+
 	private Map<String, Object> parameterValues;
+
 	private Iterator<T> iterator;
 
 	/**
@@ -64,7 +68,6 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Set the JPA entity manager factory.
-	 *
 	 * @param entityManagerFactory JPA entity manager factory
 	 */
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
@@ -73,7 +76,6 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Set the JPA query provider.
-	 *
 	 * @param queryProvider JPA query provider
 	 */
 	public void setQueryProvider(JpaQueryProvider queryProvider) {
@@ -82,7 +84,6 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Set the JPQL query string.
-	 *
 	 * @param queryString JPQL query string
 	 */
 	public void setQueryString(String queryString) {
@@ -91,9 +92,8 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	/**
 	 * Set the parameter values to be used for the query execution.
-	 *
-	 * @param parameterValues the values keyed by parameter names used in
-	 * the query string.
+	 * @param parameterValues the values keyed by parameter names used in the query
+	 * string.
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
@@ -150,4 +150,5 @@ public class JpaCursorItemReader<T> extends AbstractItemCountingItemStreamItemRe
 			this.entityManager.close();
 		}
 	}
+
 }

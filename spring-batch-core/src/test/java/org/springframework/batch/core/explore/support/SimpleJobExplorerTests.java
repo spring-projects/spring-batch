@@ -69,16 +69,14 @@ public class SimpleJobExplorerTests {
 		stepExecutionDao = mock(StepExecutionDao.class);
 		ecDao = mock(ExecutionContextDao.class);
 
-		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao,
-				stepExecutionDao, ecDao);
+		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
 	}
 
 	@Test
 	public void testGetJobExecution() throws Exception {
 		when(jobExecutionDao.getJobExecution(123L)).thenReturn(jobExecution);
-		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(
-				jobInstance);
+		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
 		jobExplorer.getJobExecution(123L);
 	}
@@ -101,13 +99,11 @@ public class SimpleJobExplorerTests {
 		when(jobExecutionDao.getJobExecution(jobExecution.getId())).thenReturn(jobExecution);
 		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		StepExecution stepExecution = jobExecution.createStepExecution("foo");
-		when(stepExecutionDao.getStepExecution(jobExecution, 123L))
-		.thenReturn(stepExecution);
+		when(stepExecutionDao.getStepExecution(jobExecution, 123L)).thenReturn(stepExecution);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
 		stepExecution = jobExplorer.getStepExecution(jobExecution.getId(), 123L);
 
-		assertEquals(jobInstance,
-				stepExecution.getJobExecution().getJobInstance());
+		assertEquals(jobInstance, stepExecution.getJobExecution().getJobInstance());
 
 		verify(jobInstanceDao).getJobInstance(jobExecution);
 	}
@@ -115,8 +111,7 @@ public class SimpleJobExplorerTests {
 	@Test
 	public void testGetStepExecutionMissing() throws Exception {
 		when(jobExecutionDao.getJobExecution(jobExecution.getId())).thenReturn(jobExecution);
-		when(stepExecutionDao.getStepExecution(jobExecution, 123L))
-		.thenReturn(null);
+		when(stepExecutionDao.getStepExecution(jobExecution, 123L)).thenReturn(null);
 		assertNull(jobExplorer.getStepExecution(jobExecution.getId(), 123L));
 	}
 
@@ -129,10 +124,8 @@ public class SimpleJobExplorerTests {
 	@Test
 	public void testFindRunningJobExecutions() throws Exception {
 		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		when(jobExecutionDao.findRunningJobExecutions("job")).thenReturn(
-				Collections.singleton(jobExecution));
-		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(
-				jobInstance);
+		when(jobExecutionDao.findRunningJobExecutions("job")).thenReturn(Collections.singleton(jobExecution));
+		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
 		when(ecDao.getExecutionContext(jobExecution)).thenReturn(null);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
@@ -142,10 +135,8 @@ public class SimpleJobExplorerTests {
 	@Test
 	public void testFindJobExecutions() throws Exception {
 		StepExecution stepExecution = jobExecution.createStepExecution("step");
-		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(
-				Collections.singletonList(jobExecution));
-		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(
-				jobInstance);
+		when(jobExecutionDao.findJobExecutions(jobInstance)).thenReturn(Collections.singletonList(jobExecution));
+		when(jobInstanceDao.getJobInstance(jobExecution)).thenReturn(jobInstance);
 		stepExecutionDao.addStepExecutions(jobExecution);
 		when(ecDao.getExecutionContext(jobExecution)).thenReturn(null);
 		when(ecDao.getExecutionContext(stepExecution)).thenReturn(null);
@@ -184,10 +175,11 @@ public class SimpleJobExplorerTests {
 		assertEquals(4, jobExplorer.getJobInstanceCount("myJob"));
 	}
 
-	@Test(expected=NoSuchJobException.class)
+	@Test(expected = NoSuchJobException.class)
 	public void testGetJobInstanceCountException() throws Exception {
 		when(jobInstanceDao.getJobInstanceCount("throwException")).thenThrow(new NoSuchJobException("expected"));
 
 		jobExplorer.getJobInstanceCount("throwException");
 	}
+
 }

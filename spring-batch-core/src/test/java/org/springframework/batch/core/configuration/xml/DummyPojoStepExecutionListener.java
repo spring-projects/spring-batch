@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-
 /**
  * @author Dave Syer
  * @since 2.1.2

@@ -32,26 +32,32 @@ import java.util.Map;
 
 /**
  * <p>
- * {@link org.springframework.batch.item.ItemProcessor} implementation that passes the current
- * item to process to the provided script. Exposes the current item for processing via the
+ * {@link org.springframework.batch.item.ItemProcessor} implementation that passes the
+ * current item to process to the provided script. Exposes the current item for processing
+ * via the
  * {@link org.springframework.batch.item.support.ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME}
  * key name ("item"). A custom key name can be set by invoking:
  * {@link org.springframework.batch.item.support.ScriptItemProcessor#setItemBindingVariableName}
- * with the desired key name. The thread safety of this {@link org.springframework.batch.item.ItemProcessor}
- * depends on the implementation of the {@link org.springframework.scripting.ScriptEvaluator} used.
+ * with the desired key name. The thread safety of this
+ * {@link org.springframework.batch.item.ItemProcessor} depends on the implementation of
+ * the {@link org.springframework.scripting.ScriptEvaluator} used.
  * </p>
- *
  *
  * @author Chris Schaefer
  * @since 3.0
  */
 public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
+
 	private static final String ITEM_BINDING_VARIABLE_NAME = "item";
 
 	private String language;
+
 	private ScriptSource script;
+
 	private ScriptSource scriptSource;
+
 	private ScriptEvaluator scriptEvaluator;
+
 	private String itemBindingVariableName = ITEM_BINDING_VARIABLE_NAME;
 
 	@Nullable
@@ -66,11 +72,11 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 	/**
 	 * <p>
-	 * Sets the {@link org.springframework.core.io.Resource} location of the script to use.
-	 * The script language will be deduced from the filename extension.
+	 * Sets the {@link org.springframework.core.io.Resource} location of the script to
+	 * use. The script language will be deduced from the filename extension.
 	 * </p>
-	 *
-	 * @param resource the {@link org.springframework.core.io.Resource} location of the script to use.
+	 * @param resource the {@link org.springframework.core.io.Resource} location of the
+	 * script to use.
 	 */
 	public void setScript(Resource resource) {
 		Assert.notNull(resource, "The script resource cannot be null");
@@ -82,7 +88,6 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	 * <p>
 	 * Sets the provided {@link String} as the script source code to use.
 	 * </p>
-	 *
 	 * @param scriptSource the {@link String} form of the script source code to use.
 	 * @param language the language of the script.
 	 */
@@ -101,7 +106,6 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 	 * {@link org.springframework.batch.item.support.ScriptItemProcessor#ITEM_BINDING_VARIABLE_NAME}
 	 * is not suitable ("item").
 	 * </p>
-	 *
 	 * @param itemBindingVariableName the desired binding variable name
 	 */
 	public void setItemBindingVariableName(String itemBindingVariableName) {
@@ -110,12 +114,13 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 	/**
 	 * <p>
-	 * Provides the ability to set a custom {@link org.springframework.scripting.ScriptEvaluator}
-	 * implementation. If not set, a {@link org.springframework.scripting.support.StandardScriptEvaluator}
-	 * will be used by default.
+	 * Provides the ability to set a custom
+	 * {@link org.springframework.scripting.ScriptEvaluator} implementation. If not set, a
+	 * {@link org.springframework.scripting.support.StandardScriptEvaluator} will be used
+	 * by default.
 	 * </p>
-	 *
-	 * @param scriptEvaluator the {@link org.springframework.scripting.ScriptEvaluator} to use
+	 * @param scriptEvaluator the {@link org.springframework.scripting.ScriptEvaluator} to
+	 * use
 	 */
 	public void setScriptEvaluator(ScriptEvaluator scriptEvaluator) {
 		this.scriptEvaluator = scriptEvaluator;
@@ -123,7 +128,7 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		if(scriptEvaluator == null) {
+		if (scriptEvaluator == null) {
 			scriptEvaluator = new StandardScriptEvaluator();
 		}
 
@@ -152,4 +157,5 @@ public class ScriptItemProcessor<I, O> implements ItemProcessor<I, O>, Initializ
 
 		throw new IllegalStateException("Either a script source or script needs to be provided.");
 	}
+
 }

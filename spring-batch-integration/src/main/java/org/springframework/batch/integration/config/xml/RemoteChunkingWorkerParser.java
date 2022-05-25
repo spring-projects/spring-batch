@@ -45,13 +45,21 @@ import org.springframework.util.StringUtils;
  * @since 3.1
  */
 public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
+
 	private static final String INPUT_CHANNEL_ATTRIBUTE = "input-channel";
+
 	private static final String OUTPUT_CHANNEL_ATTRIBUTE = "output-channel";
+
 	private static final String ITEM_PROCESSOR_ATTRIBUTE = "item-processor";
+
 	private static final String ITEM_WRITER_ATTRIBUTE = "item-writer";
+
 	private static final String ITEM_PROCESSOR_PROPERTY_NAME = "itemProcessor";
+
 	private static final String ITEM_WRITER_PROPERTY_NAME = "itemWriter";
+
 	private static final String CHUNK_PROCESSOR_PROPERTY_NAME = "chunkProcessor";
+
 	private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkHandler_";
 
 	@Override
@@ -72,24 +80,24 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 
 		BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
 
-		BeanDefinitionBuilder chunkProcessorBuilder =
-				BeanDefinitionBuilder
-						.genericBeanDefinition(SimpleChunkProcessor.class)
-						.addPropertyReference(ITEM_WRITER_PROPERTY_NAME, itemWriter);
+		BeanDefinitionBuilder chunkProcessorBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition(SimpleChunkProcessor.class)
+				.addPropertyReference(ITEM_WRITER_PROPERTY_NAME, itemWriter);
 
-		if(StringUtils.hasText(itemProcessor)) {
+		if (StringUtils.hasText(itemProcessor)) {
 			chunkProcessorBuilder.addPropertyReference(ITEM_PROCESSOR_PROPERTY_NAME, itemProcessor);
-		} else {
+		}
+		else {
 			chunkProcessorBuilder.addPropertyValue(ITEM_PROCESSOR_PROPERTY_NAME, new PassThroughItemProcessor<>());
 		}
 
-		BeanDefinition chunkProcessorChunkHandler =
-				BeanDefinitionBuilder
-						.genericBeanDefinition(ChunkProcessorChunkHandler.class)
-						.addPropertyValue(CHUNK_PROCESSOR_PROPERTY_NAME, chunkProcessorBuilder.getBeanDefinition())
-						.getBeanDefinition();
+		BeanDefinition chunkProcessorChunkHandler = BeanDefinitionBuilder
+				.genericBeanDefinition(ChunkProcessorChunkHandler.class)
+				.addPropertyValue(CHUNK_PROCESSOR_PROPERTY_NAME, chunkProcessorBuilder.getBeanDefinition())
+				.getBeanDefinition();
 
-		beanDefinitionRegistry.registerBeanDefinition(CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX + id, chunkProcessorChunkHandler);
+		beanDefinitionRegistry.registerBeanDefinition(CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX + id,
+				chunkProcessorChunkHandler);
 
 		new ServiceActivatorParser(id).parse(element, parserContext);
 
@@ -97,9 +105,13 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 	}
 
 	private static class ServiceActivatorParser extends AbstractConsumerEndpointParser {
+
 		private static final String TARGET_METHOD_NAME_PROPERTY_NAME = "targetMethodName";
+
 		private static final String TARGET_OBJECT_PROPERTY_NAME = "targetObject";
+
 		private static final String HANDLE_CHUNK_METHOD_NAME = "handleChunk";
+
 		private static final String CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX = "chunkProcessorChunkHandler_";
 
 		private String id;
@@ -110,10 +122,14 @@ public class RemoteChunkingWorkerParser extends AbstractBeanDefinitionParser {
 
 		@Override
 		protected BeanDefinitionBuilder parseHandler(Element element, ParserContext parserContext) {
-			BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(ServiceActivatorFactoryBean.class);
+			BeanDefinitionBuilder builder = BeanDefinitionBuilder
+					.genericBeanDefinition(ServiceActivatorFactoryBean.class);
 			builder.addPropertyValue(TARGET_METHOD_NAME_PROPERTY_NAME, HANDLE_CHUNK_METHOD_NAME);
-			builder.addPropertyValue(TARGET_OBJECT_PROPERTY_NAME, new RuntimeBeanReference(CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX + id));
+			builder.addPropertyValue(TARGET_OBJECT_PROPERTY_NAME,
+					new RuntimeBeanReference(CHUNK_PROCESSOR_CHUNK_HANDLER_BEAN_NAME_PREFIX + id));
 			return builder;
 		}
+
 	}
+
 }

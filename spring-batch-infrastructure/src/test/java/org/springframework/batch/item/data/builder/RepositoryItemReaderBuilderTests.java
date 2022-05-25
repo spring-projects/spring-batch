@@ -46,8 +46,10 @@ import static org.mockito.Mockito.when;
 public class RepositoryItemReaderBuilderTests {
 
 	private static final String ARG1 = "foo";
-	private static final  String ARG2 = "bar";
-	private static final  String ARG3 = "baz";
+
+	private static final String ARG2 = "bar";
+
+	private static final String ARG3 = "baz";
 
 	private static final String TEST_CONTENT = "FOOBAR";
 
@@ -80,11 +82,7 @@ public class RepositoryItemReaderBuilderTests {
 	@Test
 	public void testBasicRead() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.methodName("foo")
-				.name("bar")
-				.build();
+				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").build();
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
@@ -92,14 +90,11 @@ public class RepositoryItemReaderBuilderTests {
 
 	@Test
 	public void testRepositoryMethodReference() throws Exception {
-		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference =
-				new RepositoryItemReaderBuilder.RepositoryMethodReference<>(this.repository);
+		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference<>(
+				this.repository);
 		repositoryMethodReference.methodIs().foo(null);
-		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>()
-				.repository(repositoryMethodReference)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.name("bar").build();
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repositoryMethodReference)
+				.sorts(this.sorts).maxItemCount(5).name("bar").build();
 		String result = (String) reader.read();
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("page size was not expected value.", 10, this.pageRequestContainer.getValue().getPageSize());
@@ -107,14 +102,11 @@ public class RepositoryItemReaderBuilderTests {
 
 	@Test
 	public void testRepositoryMethodReferenceWithArgs() throws Exception {
-		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference =
-				new RepositoryItemReaderBuilder.RepositoryMethodReference<>(this.repository);
+		RepositoryItemReaderBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemReaderBuilder.RepositoryMethodReference<>(
+				this.repository);
 		repositoryMethodReference.methodIs().foo(ARG1, ARG2, ARG3, null);
-		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>()
-				.repository(repositoryMethodReference)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.name("bar").build();
+		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(repositoryMethodReference)
+				.sorts(this.sorts).maxItemCount(5).name("bar").build();
 		ArgumentCaptor<String> arg1Captor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> arg2Captor = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> arg3Captor = ArgumentCaptor.forClass(String.class);
@@ -129,24 +121,14 @@ public class RepositoryItemReaderBuilderTests {
 	@Test
 	public void testCurrentItemCount() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-				.sorts(this.sorts)
-				.currentItemCount(6)
-				.maxItemCount(5)
-				.methodName("foo")
-				.name("bar")
-				.build();
+				.sorts(this.sorts).currentItemCount(6).maxItemCount(5).methodName("foo").name("bar").build();
 		assertNull("Result returned from reader was not null.", reader.read());
 	}
 
 	@Test
 	public void testPageSize() throws Exception {
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.methodName("foo")
-				.name("bar")
-				.pageSize(2)
-				.build();
+				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").pageSize(2).build();
 		reader.read();
 		assertEquals("page size was not expected value.", 2, this.pageRequestContainer.getValue().getPageSize());
 	}
@@ -154,10 +136,7 @@ public class RepositoryItemReaderBuilderTests {
 	@Test
 	public void testNoMethodName() throws Exception {
 		try {
-			new RepositoryItemReaderBuilder<>().repository(this.repository)
-					.sorts(this.sorts)
-					.maxItemCount(10)
-					.build();
+			new RepositoryItemReaderBuilder<>().repository(this.repository).sorts(this.sorts).maxItemCount(10).build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
@@ -166,11 +145,8 @@ public class RepositoryItemReaderBuilderTests {
 					"methodName is required.", iae.getMessage());
 		}
 		try {
-			new RepositoryItemReaderBuilder<>().repository(this.repository)
-					.sorts(this.sorts)
-					.methodName("")
-					.maxItemCount(5)
-					.build();
+			new RepositoryItemReaderBuilder<>().repository(this.repository).sorts(this.sorts).methodName("")
+					.maxItemCount(5).build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
@@ -183,10 +159,7 @@ public class RepositoryItemReaderBuilderTests {
 	@Test
 	public void testSaveState() throws Exception {
 		try {
-			new RepositoryItemReaderBuilder<>().repository(repository)
-					.methodName("foo")
-					.sorts(sorts)
-					.maxItemCount(5)
+			new RepositoryItemReaderBuilder<>().repository(repository).methodName("foo").sorts(sorts).maxItemCount(5)
 					.build();
 
 			fail("IllegalArgumentException should have been thrown");
@@ -197,21 +170,14 @@ public class RepositoryItemReaderBuilderTests {
 		}
 		// No IllegalStateException for a name that is not set, should not be thrown since
 		// saveState was false.
-		new RepositoryItemReaderBuilder<>().repository(repository)
-				.saveState(false)
-				.methodName("foo")
-				.sorts(sorts)
-				.maxItemCount(5)
-				.build();
+		new RepositoryItemReaderBuilder<>().repository(repository).saveState(false).methodName("foo").sorts(sorts)
+				.maxItemCount(5).build();
 	}
 
 	@Test
 	public void testNullSort() throws Exception {
 		try {
-			new RepositoryItemReaderBuilder<>().repository(repository)
-					.methodName("foo")
-					.maxItemCount(5)
-					.build();
+			new RepositoryItemReaderBuilder<>().repository(repository).methodName("foo").maxItemCount(5).build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
@@ -224,10 +190,7 @@ public class RepositoryItemReaderBuilderTests {
 	@Test
 	public void testNoRepository() throws Exception {
 		try {
-			new RepositoryItemReaderBuilder<>().sorts(this.sorts)
-					.maxItemCount(10)
-					.methodName("foo")
-					.build();
+			new RepositoryItemReaderBuilder<>().sorts(this.sorts).maxItemCount(10).methodName("foo").build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
@@ -250,12 +213,7 @@ public class RepositoryItemReaderBuilderTests {
 				this.pageRequestContainer.capture())).thenReturn(this.page);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.methodName("foo")
-				.name("bar")
-				.arguments(args)
-				.build();
+				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").arguments(args).build();
 
 		String result = (String) reader.read();
 		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
@@ -270,12 +228,7 @@ public class RepositoryItemReaderBuilderTests {
 				this.pageRequestContainer.capture())).thenReturn(this.page);
 
 		RepositoryItemReader<Object> reader = new RepositoryItemReaderBuilder<>().repository(this.repository)
-				.sorts(this.sorts)
-				.maxItemCount(5)
-				.methodName("foo")
-				.name("bar")
-				.arguments(ARG1, ARG2, ARG3)
-				.build();
+				.sorts(this.sorts).maxItemCount(5).methodName("foo").name("bar").arguments(ARG1, ARG2, ARG3).build();
 
 		String result = (String) reader.read();
 		verifyMultiArgRead(arg1Captor, arg2Captor, arg3Captor, result);
@@ -286,9 +239,11 @@ public class RepositoryItemReaderBuilderTests {
 		Object foo(PageRequest request);
 
 		Object foo(String arg1, String arg2, String arg3, PageRequest request);
+
 	}
 
-	private void verifyMultiArgRead(ArgumentCaptor<String> arg1Captor, ArgumentCaptor<String> arg2Captor, ArgumentCaptor<String> arg3Captor, String result) {
+	private void verifyMultiArgRead(ArgumentCaptor<String> arg1Captor, ArgumentCaptor<String> arg2Captor,
+			ArgumentCaptor<String> arg3Captor, String result) {
 		assertEquals("Result returned from reader was not expected value.", TEST_CONTENT, result);
 		assertEquals("ARG1 for calling method did not match expected result", ARG1, arg1Captor.getValue());
 		assertEquals("ARG2 for calling method did not match expected result", ARG2, arg2Captor.getValue());
@@ -296,4 +251,5 @@ public class RepositoryItemReaderBuilderTests {
 		assertEquals("Result Total Pages did not match expected result", 10,
 				this.pageRequestContainer.getValue().getPageSize());
 	}
+
 }

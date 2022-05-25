@@ -20,23 +20,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 
-
 /**
- * Wraps calls for 'Processing' methods which output a single Object to write
- * the string representation of the object to the log.
- * 
+ * Wraps calls for 'Processing' methods which output a single Object to write the string
+ * representation of the object to the log.
+ *
  * @author Lucas Ward
  */
 public class LogAdvice {
-    
-    private static Log log = LogFactory.getLog(LogAdvice.class);
 
-    /*
-     * Wraps original method and adds logging both before and after method
-     */
-    public void doBasicLogging(JoinPoint pjp) throws Throwable {
-    	Object[] args = pjp.getArgs();
-    	StringBuilder output = new StringBuilder();
+	private static Log log = LogFactory.getLog(LogAdvice.class);
+
+	/*
+	 * Wraps original method and adds logging both before and after method
+	 */
+	public void doBasicLogging(JoinPoint pjp) throws Throwable {
+		Object[] args = pjp.getArgs();
+		StringBuilder output = new StringBuilder();
 
 		output.append(pjp.getTarget().getClass().getName()).append(": ");
 		output.append(pjp.toShortString()).append(": ");
@@ -45,12 +44,11 @@ public class LogAdvice {
 			output.append(arg).append(" ");
 		}
 
-
 		log.info("Basic: " + output.toString());
-    }
-    
-    public void doStronglyTypedLogging(Object item){
-    	log.info("Processed: " + item);
-    }
+	}
+
+	public void doStronglyTypedLogging(Object item) {
+		log.info("Processed: " + item);
+	}
 
 }

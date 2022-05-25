@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests for {@link FaultTolerantStepFactoryBean} with unexpected rollback.
  */
-@ContextConfiguration(locations="classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml")
+@ContextConfiguration(locations = "classpath:/org/springframework/batch/core/repository/dao/data-source-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 
@@ -64,6 +64,7 @@ public class FaultTolerantStepFactoryBeanUnexpectedRollbackTests {
 		@SuppressWarnings("serial")
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource) {
 			private boolean failed = false;
+
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
 				if (writer.getWritten().isEmpty() || failed || !isExistingTransaction(status.getTransaction())) {

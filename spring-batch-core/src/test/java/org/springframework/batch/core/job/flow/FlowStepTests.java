@@ -49,14 +49,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 public class FlowStepTests {
 
 	private JobRepository jobRepository;
+
 	private JobExecution jobExecution;
 
 	@Before
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
 		jobRepositoryFactoryBean.setDataSource(embeddedDatabase);
 		jobRepositoryFactoryBean.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -66,17 +66,19 @@ public class FlowStepTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.flow.FlowStep#afterPropertiesSet()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.flow.FlowStep#afterPropertiesSet()}.
 	 */
-	@Test(expected=IllegalStateException.class)
-	public void testAfterPropertiesSet() throws Exception{
+	@Test(expected = IllegalStateException.class)
+	public void testAfterPropertiesSet() throws Exception {
 		FlowStep step = new FlowStep();
 		step.setJobRepository(jobRepository);
 		step.afterPropertiesSet();
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
 	 */
 	@Test
 	public void testDoExecute() throws Exception {
@@ -144,7 +146,8 @@ public class FlowStepTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.flow.FlowStep#doExecute(org.springframework.batch.core.StepExecution)}.
 	 */
 	@Test
 	public void testExecuteWithParentContext() throws Exception {

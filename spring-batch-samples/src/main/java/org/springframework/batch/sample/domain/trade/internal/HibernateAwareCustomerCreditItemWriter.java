@@ -26,8 +26,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Delegates writing to a custom DAO and flushes + clears hibernate session to
- * fulfill the {@link ItemWriter} contract.
+ * Delegates writing to a custom DAO and flushes + clears hibernate session to fulfill the
+ * {@link ItemWriter} contract.
  *
  * @author Robert Kasanicky
  * @author Michael Minella

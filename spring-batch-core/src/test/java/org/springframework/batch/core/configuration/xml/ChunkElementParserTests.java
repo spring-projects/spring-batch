@@ -93,11 +93,12 @@ public class ChunkElementParserTests {
 	public void testIllegalSkipAndRetryAttributes() throws Exception {
 		try {
 			ConfigurableApplicationContext context = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
-		Step step = context.getBean("s1", Step.class);
-		assertNotNull("Step not parsed", step);
-		fail("Expected BeanCreationException");
-		} catch (BeanCreationException e) {
+					"org/springframework/batch/core/configuration/xml/ChunkElementIllegalSkipAndRetryAttributeParserTests-context.xml");
+			Step step = context.getBean("s1", Step.class);
+			assertNotNull("Step not parsed", step);
+			fail("Expected BeanCreationException");
+		}
+		catch (BeanCreationException e) {
 			// expected
 		}
 	}
@@ -180,8 +181,8 @@ public class ChunkElementParserTests {
 		}
 		catch (BeanCreationException e) {
 			String msg = e.getMessage();
-			assertTrue("Wrong message: " + msg, msg
-					.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"));
+			assertTrue("Wrong message: " + msg,
+					msg.contains("The field 'processor-transactional' cannot be false if 'reader-transactional"));
 		}
 
 	}
@@ -295,8 +296,7 @@ public class ChunkElementParserTests {
 				"skippableExceptionClassifier");
 	}
 
-	private SkipPolicy getSkipPolicy(String stepName,
-			ApplicationContext ctx) throws Exception {
+	private SkipPolicy getSkipPolicy(String stepName, ApplicationContext ctx) throws Exception {
 		return (SkipPolicy) getNestedPathInStep(stepName, ctx, "tasklet.chunkProvider.skipPolicy");
 	}
 
@@ -358,8 +358,8 @@ public class ChunkElementParserTests {
 		return object;
 	}
 
-	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified,
-			Class<? extends Throwable> cls, boolean include) {
+	private void containsClassified(Map<Class<? extends Throwable>, Boolean> classified, Class<? extends Throwable> cls,
+			boolean include) {
 		assertTrue(classified.containsKey(cls));
 		assertEquals(include, classified.get(cls));
 	}
@@ -396,4 +396,5 @@ public class ChunkElementParserTests {
 		return new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/ChunkElementParentAttributeParserTests-context.xml");
 	}
+
 }

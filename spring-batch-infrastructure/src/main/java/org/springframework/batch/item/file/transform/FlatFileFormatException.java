@@ -15,12 +15,10 @@
  */
 package org.springframework.batch.item.file.transform;
 
-
-
 /**
- * Exception indicating that some type of error has occurred while
- * attempting to parse a line of input into tokens.
- * 
+ * Exception indicating that some type of error has occurred while attempting to parse a
+ * line of input into tokens.
+ *
  * @author Lucas Ward
  * @author Michael Minella
  *
@@ -32,27 +30,26 @@ public class FlatFileFormatException extends RuntimeException {
 
 	/**
 	 * Create a new {@link FlatFileFormatException} based on a message.
-	 *
 	 * @param message the message for this exception
-	 * @param input {@link String} containing the input for that caused this
-	 * exception to be thrown.
+	 * @param input {@link String} containing the input for that caused this exception to
+	 * be thrown.
 	 */
 	public FlatFileFormatException(String message, String input) {
 		super(message);
 		this.input = input;
 	}
+
 	/**
 	 * Create a new {@link FlatFileFormatException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public FlatFileFormatException(String message) {
 		super(message);
 	}
-	
+
 	/**
-	 * Create a new {@link FlatFileFormatException} based on a message and another exception.
-	 * 
+	 * Create a new {@link FlatFileFormatException} based on a message and another
+	 * exception.
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -62,8 +59,10 @@ public class FlatFileFormatException extends RuntimeException {
 
 	/**
 	 * Retrieve the input that caused this exception.
-	 *
 	 * @return String containing the input.
 	 */
-	public String getInput() { return input; }
+	public String getInput() {
+		return input;
+	}
+
 }

@@ -21,10 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Tokenizer used to process data obtained from files with fixed-length format.
- * Columns are specified by array of Range objects ({@link #setColumns(Range[])}
- * ).
- * 
+ * Tokenizer used to process data obtained from files with fixed-length format. Columns
+ * are specified by array of Range objects ({@link #setColumns(Range[])} ).
+ *
  * @author tomas.slanina
  * @author peter.zozom
  * @author Dave Syer
@@ -41,13 +40,12 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 	/**
 	 * Set the column ranges. Used in conjunction with the
-	 * {@link RangeArrayPropertyEditor} this property can be set in the form of
-	 * a String describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or
-	 * "1-2,4-5,7-10". If the last range is open then the rest of the line is
-	 * read into that column (irrespective of the strict flag setting).
-	 * 
+	 * {@link RangeArrayPropertyEditor} this property can be set in the form of a String
+	 * describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or "1-2,4-5,7-10". If
+	 * the last range is open then the rest of the line is read into that column
+	 * (irrespective of the strict flag setting).
+	 *
 	 * @see #setStrict(boolean)
-	 * 
 	 * @param ranges the column ranges expected in the input
 	 */
 	public void setColumns(Range... ranges) {
@@ -57,8 +55,8 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 	/*
 	 * Calculate the highest value within an array of ranges. The ranges aren't
-	 * necessarily in order. For example: "5-10, 1-4,11-15". Furthermore, there
-	 * isn't always a min and max, such as: "1,4-20, 22"
+	 * necessarily in order. For example: "5-10, 1-4,11-15". Furthermore, there isn't
+	 * always a min and max, such as: "1,4-20, 22"
 	 */
 	private void calculateMaxRange(Range[] ranges) {
 		if (ranges == null || ranges.length == 0) {
@@ -88,16 +86,13 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	}
 
 	/**
-	 * Yields the tokens resulting from the splitting of the supplied
-	 * <code>line</code>.
-	 * 
+	 * Yields the tokens resulting from the splitting of the supplied <code>line</code>.
 	 * @param line the line to be tokenized (can be <code>null</code>)
-	 * 
 	 * @return the resulting tokens (empty if the line is null)
-	 * @throws IncorrectLineLengthException if line length is greater than or
-	 * less than the max range set.
+	 * @throws IncorrectLineLengthException if line length is greater than or less than
+	 * the max range set.
 	 */
-    @Override
+	@Override
 	protected List<String> doTokenize(String line) {
 		List<String> tokens = new ArrayList<>(ranges.length);
 		int lineLength;
@@ -106,11 +101,13 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 		lineLength = line.length();
 
 		if (lineLength < maxRange && isStrict()) {
-			throw new IncorrectLineLengthException("Line is shorter than max range " + maxRange, maxRange, lineLength, line);
+			throw new IncorrectLineLengthException("Line is shorter than max range " + maxRange, maxRange, lineLength,
+					line);
 		}
 
 		if (!open && lineLength > maxRange && isStrict()) {
-			throw new IncorrectLineLengthException("Line is longer than max range " + maxRange, maxRange, lineLength, line);
+			throw new IncorrectLineLengthException("Line is longer than max range " + maxRange, maxRange, lineLength,
+					line);
 		}
 
 		for (int i = 0; i < ranges.length; i++) {
@@ -133,4 +130,5 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 		return tokens;
 	}
+
 }

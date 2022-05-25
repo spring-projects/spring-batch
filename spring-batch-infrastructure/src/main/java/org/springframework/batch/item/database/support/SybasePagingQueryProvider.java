@@ -20,8 +20,8 @@ import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.util.StringUtils;
 
 /**
- * Sybase implementation of a {@link PagingQueryProvider} using
- * database specific features.
+ * Sybase implementation of a {@link PagingQueryProvider} using database specific
+ * features.
  *
  * @author Thomas Risberg
  * @author Michael Minella
@@ -36,7 +36,7 @@ public class SybasePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateGroupedTopSqlQuery(this, true, buildTopClause(pageSize));
 		}
 		else {

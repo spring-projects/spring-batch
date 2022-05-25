@@ -18,24 +18,23 @@ package org.springframework.batch.item.file;
 
 import org.springframework.batch.support.AbstractExceptionTests;
 
-
 public class FlatFileParseExceptionTests extends AbstractExceptionTests {
 
-    @Override
+	@Override
 	public Exception getException(String msg) throws Exception {
 		return new FlatFileParseException(msg, "bar");
 	}
 
-    @Override
+	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new FlatFileParseException(msg, t, "bar", 100);
 	}
-	
+
 	public void testMessageInputLineCount() throws Exception {
 		FlatFileParseException exception = new FlatFileParseException("foo", "bar", 100);
 		assertEquals("foo", exception.getMessage());
 		assertEquals("bar", exception.getInput());
 		assertEquals(100, exception.getLineNumber());
 	}
-	
+
 }

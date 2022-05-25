@@ -16,18 +16,16 @@
 package org.springframework.batch.core;
 
 /**
- * Exception for {@link Job} to signal that some {@link JobParameters} are
- * invalid.
- * 
+ * Exception for {@link Job} to signal that some {@link JobParameters} are invalid.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class JobParametersInvalidException extends JobExecutionException {
 
 	/**
 	 * Constructor that sets the message for the exception.
-	 *
 	 * @param msg The {@link String} message for the {@link Exception}.
 	 */
 	public JobParametersInvalidException(String msg) {

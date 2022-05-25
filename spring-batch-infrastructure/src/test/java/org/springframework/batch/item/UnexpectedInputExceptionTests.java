@@ -20,12 +20,12 @@ import org.springframework.batch.repeat.AbstractExceptionTests;
 
 public class UnexpectedInputExceptionTests extends AbstractExceptionTests {
 
-    @Override
+	@Override
 	public Exception getException(String msg) throws Exception {
 		return new UnexpectedInputException(msg, null);
 	}
 
-    @Override
+	@Override
 	public Exception getException(String msg, Throwable t) throws Exception {
 		return new UnexpectedInputException(msg, t);
 	}

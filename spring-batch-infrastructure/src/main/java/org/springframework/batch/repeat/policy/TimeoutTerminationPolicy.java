@@ -20,17 +20,17 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
- * Termination policy that times out after a fixed period. Allows graceful exit
- * from a batch if the latest result comes in after the timeout expires (i.e.
- * does not throw a timeout exception).<br>
- * 
+ * Termination policy that times out after a fixed period. Allows graceful exit from a
+ * batch if the latest result comes in after the timeout expires (i.e. does not throw a
+ * timeout exception).<br>
+ *
  * N.B. It may often be the case that the batch governed by this policy will be
- * transactional, and the transaction might have its own timeout. In this case
- * the transaction might throw a timeout exception on commit if its timeout
- * threshold is lower than the termination policy.
- * 
+ * transactional, and the transaction might have its own timeout. In this case the
+ * transaction might throw a timeout exception on commit if its timeout threshold is lower
+ * than the termination policy.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 
@@ -49,9 +49,8 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 	}
 
 	/**
-	 * Construct a {@link TimeoutTerminationPolicy} with the specified timeout
-	 * value (in milliseconds).
-	 * 
+	 * Construct a {@link TimeoutTerminationPolicy} with the specified timeout value (in
+	 * milliseconds).
 	 * @param timeout duration of the timeout.
 	 */
 	public TimeoutTerminationPolicy(long timeout) {
@@ -61,7 +60,7 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 
 	/**
 	 * Check the timeout and complete gracefully if it has expires.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
 	@Override
@@ -71,7 +70,7 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 
 	/**
 	 * Start the clock on the timeout.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
 	@Override

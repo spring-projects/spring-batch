@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.domain.order;
 
-
 public class ShippingInfo {
+
 	public static final String LINE_ID_SHIPPING_INFO = "SIN";
 
 	private String shipperId;
@@ -99,4 +99,5 @@ public class ShippingInfo {
 
 		return true;
 	}
+
 }

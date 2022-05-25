@@ -25,8 +25,8 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Mock {@link ItemWriter} that will throw an exception when a certain number of
- * items have been written.
+ * Mock {@link ItemWriter} that will throw an exception when a certain number of items
+ * have been written.
  */
 public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 

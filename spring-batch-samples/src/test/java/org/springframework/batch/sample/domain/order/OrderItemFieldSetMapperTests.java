@@ -24,13 +24,21 @@ import org.springframework.batch.sample.domain.order.internal.mapper.OrderItemFi
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final BigDecimal DISCOUNT_AMOUNT = new BigDecimal("1");
+
 	private static final BigDecimal DISCOUNT_PERC = new BigDecimal("2");
+
 	private static final BigDecimal HANDLING_PRICE = new BigDecimal("3");
+
 	private static final long ITEM_ID = 4;
+
 	private static final BigDecimal PRICE = new BigDecimal("5");
+
 	private static final int QUANTITY = 6;
+
 	private static final BigDecimal SHIPPING_PRICE = new BigDecimal("7");
+
 	private static final BigDecimal TOTAL_PRICE = new BigDecimal("8");
 
 	@Override
@@ -64,4 +72,5 @@ public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<LineItem> fieldSetMapper() {
 		return new OrderItemFieldSetMapper();
 	}
+
 }

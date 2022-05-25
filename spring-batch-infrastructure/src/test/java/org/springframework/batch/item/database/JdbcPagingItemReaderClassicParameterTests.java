@@ -38,13 +38,14 @@ import org.springframework.test.util.ReflectionTestUtils;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
+@ContextConfiguration(
+		locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
 public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagingItemReaderParameterTests {
 
 	// force jumpToItemQuery in JdbcPagingItemReader.doJumpToPage(int)
 	private static boolean forceJumpToItemQuery = false;
-	
-    @Override
+
+	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>() {
 			@Override
@@ -65,18 +66,16 @@ public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagin
 		queryProvider.setSortKeys(sortKeys);
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
 		reader.setQueryProvider(queryProvider);
-		reader.setRowMapper(
-				new RowMapper<Foo>() {
-                    @Override
-					public Foo mapRow(ResultSet rs, int i) throws SQLException {
-						Foo foo = new Foo();
-						foo.setId(rs.getInt(1));
-						foo.setName(rs.getString(2));
-						foo.setValue(rs.getInt(3));
-						return foo;
-					}
-				}
-		);
+		reader.setRowMapper(new RowMapper<Foo>() {
+			@Override
+			public Foo mapRow(ResultSet rs, int i) throws SQLException {
+				Foo foo = new Foo();
+				foo.setId(rs.getInt(1));
+				foo.setName(rs.getString(2));
+				foo.setValue(rs.getInt(3));
+				return foo;
+			}
+		});
 		reader.setPageSize(3);
 		reader.afterPropertiesSet();
 		reader.setSaveState(true);
@@ -84,20 +83,21 @@ public class JdbcPagingItemReaderClassicParameterTests extends AbstractJdbcPagin
 		return reader;
 
 	}
-    
+
 	@Test
-	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {		
+	public void testReadAfterJumpSecondPageWithJumpToItemQuery() throws Exception {
 		try {
 			forceJumpToItemQuery = true;
 			super.testReadAfterJumpSecondPage();
-		} finally {
-			forceJumpToItemQuery = false;	
+		}
+		finally {
+			forceJumpToItemQuery = false;
 		}
 	}
-    
-    @Override
-    protected String getName() {
-    	return "JdbcPagingItemReader";
-    }    
+
+	@Override
+	protected String getName() {
+		return "JdbcPagingItemReader";
+	}
 
 }

@@ -48,24 +48,31 @@ public class JobParserParentAttributeTests {
 	@Autowired
 	@Qualifier("listenerClearingJob")
 	private Job listenerClearingJob;
+
 	@Autowired
 	@Qualifier("defaultRepoJob")
 	private Job defaultRepoJob;
+
 	@Autowired
 	@Qualifier("specifiedRepoJob")
 	private Job specifiedRepoJob;
+
 	@Autowired
 	@Qualifier("inheritSpecifiedRepoJob")
 	private Job inheritSpecifiedRepoJob;
+
 	@Autowired
 	@Qualifier("overrideInheritedRepoJob")
 	private Job overrideInheritedRepoJob;
+
 	@Autowired
 	@Qualifier("job3")
 	private Job job3;
+
 	@Autowired
 	@Qualifier("job2")
 	private Job job2;
+
 	@Autowired
 	@Qualifier("job1")
 	private Job job1;

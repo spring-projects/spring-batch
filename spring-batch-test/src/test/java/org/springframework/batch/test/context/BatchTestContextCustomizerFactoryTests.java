@@ -65,4 +65,5 @@ public class BatchTestContextCustomizerFactoryTests {
 	private static class MyOtherJobTest {
 
 	}
+
 }

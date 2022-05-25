@@ -24,11 +24,10 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
 
 /**
- * A {@link ChannelInterceptor} that adds the current {@link StepExecution} (if
- * there is one) as a header to the message. Downstream asynchronous handlers
- * can then take advantage of the step context without needing to be step
- * scoped, which is a problem for handlers executing in another thread because
- * the scope context is not available.
+ * A {@link ChannelInterceptor} that adds the current {@link StepExecution} (if there is
+ * one) as a header to the message. Downstream asynchronous handlers can then take
+ * advantage of the step context without needing to be step scoped, which is a problem for
+ * handlers executing in another thread because the scope context is not available.
  *
  * @author Dave Syer
  *

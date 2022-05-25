@@ -83,8 +83,8 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 	@Test
 	public void testAdditionalTrustedClass() throws IOException {
 		// given
-		Jackson2ExecutionContextStringSerializer serializer =
-				new Jackson2ExecutionContextStringSerializer("java.util.Locale");
+		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer(
+				"java.util.Locale");
 		Map<String, Object> context = new HashMap<>(1);
 		context.put("locale", Locale.getDefault());
 
@@ -106,21 +106,31 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 	public static class Person {
+
 		public String name;
+
 		public int age;
+
 		@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 		public PhoneNumber phone;
+
 	}
 
 	public static abstract class PhoneNumber {
+
 		public int areaCode, local;
+
 	}
 
 	public static class InternationalNumber extends PhoneNumber {
+
 		public int countryCode;
+
 	}
 
-	public static class DomesticNumber extends PhoneNumber{}
+	public static class DomesticNumber extends PhoneNumber {
+
+	}
 
 	@Test
 	public void unmappedTypeTest() throws IOException {
@@ -152,24 +162,34 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 	}
 
 	public static class UnmappedPerson {
+
 		public String name;
+
 		public int age;
+
 		public UnmappedPhoneNumber phone;
+
 	}
 
 	public static abstract class UnmappedPhoneNumber {
+
 		public int areaCode, local;
+
 	}
 
 	public static class UnmappedInternationalNumber extends UnmappedPhoneNumber {
+
 		public int countryCode;
+
 	}
 
-	public static class UnmappedDomesticNumber extends UnmappedPhoneNumber{}
+	public static class UnmappedDomesticNumber extends UnmappedPhoneNumber {
+
+	}
 
 	@Test
 	public void arrayAsListSerializationTest() throws IOException {
-		//given
+		// given
 		List<String> list = Arrays.asList("foo", "bar");
 		String key = "Arrays.asList";
 		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
@@ -185,12 +205,12 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		// then
 		Object deserializedValue = deserializedContext.get(key);
 		Assert.assertTrue(List.class.isAssignableFrom(deserializedValue.getClass()));
-		Assert.assertTrue(((List<String>)deserializedValue).containsAll(list));
+		Assert.assertTrue(((List<String>) deserializedValue).containsAll(list));
 	}
 
 	@Test
 	public void testSqlTimestampSerialization() throws IOException {
-		//given
+		// given
 		Jackson2ExecutionContextStringSerializer serializer = new Jackson2ExecutionContextStringSerializer();
 		Map<String, Object> context = new HashMap<>(1);
 		Timestamp timestamp = new Timestamp(Instant.now().toEpochMilli());
@@ -206,4 +226,5 @@ public class Jackson2ExecutionContextStringSerializerTests extends AbstractExecu
 		Timestamp deserializedTimestamp = (Timestamp) deserializedContext.get("timestamp");
 		Assert.assertEquals(timestamp, deserializedTimestamp);
 	}
+
 }

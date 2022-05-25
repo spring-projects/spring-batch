@@ -35,8 +35,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch.
- * Customization is available by implementing the {@link BatchConfigurer} interface.
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine

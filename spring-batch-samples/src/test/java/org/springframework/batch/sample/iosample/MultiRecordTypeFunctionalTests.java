@@ -49,4 +49,5 @@ public class MultiRecordTypeFunctionalTests {
 		jobLauncherTestUtils.launchJob();
 		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}
+
 }

@@ -24,7 +24,6 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
 public class JobParserExceptionTests {
 
 	@Test
@@ -60,7 +59,8 @@ public class JobParserExceptionTests {
 		}
 		catch (BeanCreationException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.matches(".*Missing state for \\[StateTransition: \\[state=.*s2, pattern=\\*, next=.*s3\\]\\]"));
+			assertTrue("Wrong message: " + message, message
+					.matches(".*Missing state for \\[StateTransition: \\[state=.*s2, pattern=\\*, next=.*s3\\]\\]"));
 		}
 	}
 
@@ -73,8 +73,10 @@ public class JobParserExceptionTests {
 		}
 		catch (BeanDefinitionParsingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.startsWith("Configuration problem: You are using a version of the spring-batch XSD"));
-		} catch (BeanDefinitionStoreException e) {
+			assertTrue("Wrong message: " + message,
+					message.startsWith("Configuration problem: You are using a version of the spring-batch XSD"));
+		}
+		catch (BeanDefinitionStoreException e) {
 			// Probably the internet is not available and the schema validation failed.
 			fail("Wrong exception when schema didn't match: " + e.getMessage());
 		}

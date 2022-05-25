@@ -26,10 +26,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * This is a field extractor for a java bean. Given an array of property names,
- * it will reflectively call getters on the item and return an array of all the
- * values.
- * 
+ * This is a field extractor for a java bean. Given an array of property names, it will
+ * reflectively call getters on the item and return an array of all the values.
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -48,7 +47,7 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 	/**
 	 * @see org.springframework.batch.item.file.transform.FieldExtractor#extract(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public Object[] extract(T item) {
 		List<Object> values = new ArrayList<>();
 
@@ -59,8 +58,9 @@ public class BeanWrapperFieldExtractor<T> implements FieldExtractor<T>, Initiali
 		return values.toArray();
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(names, "The 'names' property must be set.");
 	}
+
 }

@@ -33,9 +33,10 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author peter.zozom
- * 
+ *
  */
 public class OrderItemReader implements ItemReader<Order> {
+
 	private static Log log = LogFactory.getLog(OrderItemReader.class);
 
 	private Order order;
@@ -153,7 +154,7 @@ public class OrderItemReader implements ItemReader<Order> {
 
 	/**
 	 * @param fieldSetReader reads lines from the file converting them to
-	 *        {@link FieldSet}.
+	 * {@link FieldSet}.
 	 */
 	public void setFieldSetReader(ItemReader<FieldSet> fieldSetReader) {
 		this.fieldSetReader = fieldSetReader;

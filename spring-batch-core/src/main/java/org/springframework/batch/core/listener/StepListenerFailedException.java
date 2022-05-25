@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-
 /**
  * Exception to indicate a problem in a step listener.
  *
@@ -33,4 +32,5 @@ public class StepListenerFailedException extends RuntimeException {
 	public StepListenerFailedException(String message, Throwable t) {
 		super(message, t);
 	}
+
 }

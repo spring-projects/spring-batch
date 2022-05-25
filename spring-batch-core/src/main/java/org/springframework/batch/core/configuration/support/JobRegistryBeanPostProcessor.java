@@ -37,15 +37,15 @@ import org.springframework.util.Assert;
 
 /**
  * A {@link BeanPostProcessor} that registers {@link Job} beans with a
- * {@link JobRegistry}. Include a bean of this type along with your job
- * configuration, and use the same {@link JobRegistry} as a {@link JobLocator}
- * when you need to locate a {@link Job} to launch.
+ * {@link JobRegistry}. Include a bean of this type along with your job configuration, and
+ * use the same {@link JobRegistry} as a {@link JobLocator} when you need to locate a
+ * {@link Job} to launch.
  *
  * @author Dave Syer
  *
  */
-public class JobRegistryBeanPostProcessor implements BeanPostProcessor, BeanFactoryAware, InitializingBean,
-DisposableBean {
+public class JobRegistryBeanPostProcessor
+		implements BeanPostProcessor, BeanFactoryAware, InitializingBean, DisposableBean {
 
 	private static Log logger = LogFactory.getLog(JobRegistryBeanPostProcessor.class);
 
@@ -59,13 +59,11 @@ DisposableBean {
 	private DefaultListableBeanFactory beanFactory;
 
 	/**
-	 * The group name for jobs registered by this component. Optional (defaults
-	 * to null, which means that jobs are registered with their bean names).
-	 * Useful where there is a hierarchy of application contexts all
-	 * contributing to the same {@link JobRegistry}: child contexts can then
-	 * define an instance with a unique group name to avoid clashes between job
-	 * names.
-	 *
+	 * The group name for jobs registered by this component. Optional (defaults to null,
+	 * which means that jobs are registered with their bean names). Useful where there is
+	 * a hierarchy of application contexts all contributing to the same
+	 * {@link JobRegistry}: child contexts can then define an instance with a unique group
+	 * name to avoid clashes between job names.
 	 * @param groupName the groupName to set
 	 */
 	public void setGroupName(String groupName) {
@@ -74,7 +72,6 @@ DisposableBean {
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
-	 *
 	 * @param jobRegistry the jobConfigurationRegistry to set
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -84,8 +81,7 @@ DisposableBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
+	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
 	 * .springframework.beans.factory.BeanFactory)
 	 */
 	@Override
@@ -106,8 +102,8 @@ DisposableBean {
 	}
 
 	/**
-	 * Unregister all the {@link Job} instances that were registered by this
-	 * post processor.
+	 * Unregister all the {@link Job} instances that were registered by this post
+	 * processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	@Override
@@ -137,7 +133,7 @@ DisposableBean {
 				if (beanFactory != null && beanFactory.containsBean(beanName)) {
 					groupName = getGroupName(beanFactory.getBeanDefinition(beanName), job);
 				}
-				job = groupName==null ? job : new GroupAwareJob(groupName, job);
+				job = groupName == null ? job : new GroupAwareJob(groupName, job);
 				ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
 				String name = jobFactory.getJobName();
 				if (logger.isDebugEnabled()) {
@@ -155,10 +151,9 @@ DisposableBean {
 	}
 
 	/**
-	 * Determine a group name for the job to be registered. Default
-	 * implementation just returns the {@link #setGroupName(String) groupName}
-	 * configured. Provides an extension point for specialised subclasses.
-	 *
+	 * Determine a group name for the job to be registered. Default implementation just
+	 * returns the {@link #setGroupName(String) groupName} configured. Provides an
+	 * extension point for specialised subclasses.
 	 * @param beanDefinition the bean definition for the job
 	 * @param job the job
 	 * @return a group name for the job (or null if not needed)
@@ -177,4 +172,5 @@ DisposableBean {
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
+
 }

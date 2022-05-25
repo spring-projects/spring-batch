@@ -25,10 +25,10 @@ import org.springframework.util.Assert;
  * Creates a fully qualified LdifReader.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
-public class LdifReaderBuilder  {
+public class LdifReaderBuilder {
+
 	private Resource resource;
 
 	private int recordsToSkip = 0;
@@ -46,10 +46,9 @@ public class LdifReaderBuilder  {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -63,7 +62,6 @@ public class LdifReaderBuilder  {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -76,7 +74,6 @@ public class LdifReaderBuilder  {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -89,7 +86,6 @@ public class LdifReaderBuilder  {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -104,7 +100,6 @@ public class LdifReaderBuilder  {
 	 * In strict mode the reader will throw an exception on
 	 * {@link LdifReader#open(org.springframework.batch.item.ExecutionContext)} if the
 	 * input resource does not exist.
-	 *
 	 * @param strict true by default
 	 * @return this instance for method chaining.
 	 * @see LdifReader#setStrict(boolean)
@@ -118,7 +113,6 @@ public class LdifReaderBuilder  {
 	/**
 	 * {@link RecordCallbackHandler RecordCallbackHandler} implementations can be used to
 	 * take action on skipped records.
-	 *
 	 * @param skippedRecordsCallback will be called for each one of the initial skipped
 	 * lines before any items are read.
 	 * @return this instance for method chaining.
@@ -134,7 +128,6 @@ public class LdifReaderBuilder  {
 	 * Public setter for the number of lines to skip at the start of a file. Can be used
 	 * if the file contains a header without useful (column name) information, and without
 	 * a comment delimiter at the beginning of the lines.
-	 *
 	 * @param recordsToSkip the number of lines to skip
 	 * @return this instance for method chaining.
 	 * @see LdifReader#setRecordsToSkip(int)
@@ -147,7 +140,6 @@ public class LdifReaderBuilder  {
 
 	/**
 	 * Establishes the resource that will be used as the input for the LdifReader.
-	 *
 	 * @param resource the resource that will be read.
 	 * @return this instance for method chaining.
 	 * @see LdifReader#setResource(Resource)
@@ -160,7 +152,6 @@ public class LdifReaderBuilder  {
 
 	/**
 	 * Returns a fully constructed {@link LdifReader}.
-	 *
 	 * @return a new {@link org.springframework.batch.item.ldif.LdifReader}
 	 */
 	public LdifReader build() {

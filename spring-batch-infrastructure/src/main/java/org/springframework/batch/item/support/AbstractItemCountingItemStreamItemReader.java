@@ -26,12 +26,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Abstract superclass for {@link ItemReader}s that supports restart by storing
- * item count in the {@link ExecutionContext} (therefore requires item ordering
- * to be preserved between runs).
- * 
+ * Abstract superclass for {@link ItemReader}s that supports restart by storing item count
+ * in the {@link ExecutionContext} (therefore requires item ordering to be preserved
+ * between runs).
+ *
  * Subclasses are inherently <b>not</b> thread-safe.
- * 
+ *
  * @author Robert Kasanicky
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
@@ -50,32 +50,34 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 
 	/**
 	 * Read next item from input.
-	 * 
 	 * @return an item or {@code null} if the data source is exhausted
-	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation
+	 * by the framework
 	 */
 	@Nullable
 	protected abstract T doRead() throws Exception;
 
 	/**
 	 * Open resources necessary to start reading input.
-	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation
+	 * by the framework
 	 */
 	protected abstract void doOpen() throws Exception;
 
 	/**
 	 * Close the resources opened in {@link #doOpen()}.
-	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation
+	 * by the framework
 	 */
 	protected abstract void doClose() throws Exception;
 
 	/**
-	 * Move to the given item index. Subclasses should override this method if
-	 * there is a more efficient way of moving to given index than re-reading
-	 * the input using {@link #doRead()}.
-	 *
+	 * Move to the given item index. Subclasses should override this method if there is a
+	 * more efficient way of moving to given index than re-reading the input using
+	 * {@link #doRead()}.
 	 * @param itemIndex index of item (0 based) to jump to.
-	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation by the framework
+	 * @throws Exception Allows subclasses to throw checked exceptions for interpretation
+	 * by the framework
 	 */
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
@@ -91,7 +93,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		}
 		currentItemCount++;
 		T item = doRead();
-		if(item instanceof ItemCountAware) {
+		if (item instanceof ItemCountAware) {
 			((ItemCountAware) item).setItemCount(currentItemCount);
 		}
 		return item;
@@ -102,13 +104,12 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	}
 
 	/**
-	 * The index of the item to start reading from. If the
-	 * {@link ExecutionContext} contains a key <code>[name].read.count</code>
-	 * (where <code>[name]</code> is the name of this component) the value from
-	 * the {@link ExecutionContext} will be used in preference.
-	 * 
+	 * The index of the item to start reading from. If the {@link ExecutionContext}
+	 * contains a key <code>[name].read.count</code> (where <code>[name]</code> is the
+	 * name of this component) the value from the {@link ExecutionContext} will be used in
+	 * preference.
+	 *
 	 * @see #setName(String)
-	 * 
 	 * @param count the value of the current item count
 	 */
 	public void setCurrentItemCount(int count) {
@@ -116,15 +117,13 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 	}
 
 	/**
-	 * The maximum index of the items to be read. If the
-	 * {@link ExecutionContext} contains a key
-	 * <code>[name].read.count.max</code> (where <code>[name]</code> is the name
-	 * of this component) the value from the {@link ExecutionContext} will be
-	 * used in preference.
-	 * 
+	 * The maximum index of the items to be read. If the {@link ExecutionContext} contains
+	 * a key <code>[name].read.count.max</code> (where <code>[name]</code> is the name of
+	 * this component) the value from the {@link ExecutionContext} will be used in
+	 * preference.
+	 *
 	 * @see #setName(String)
-	 * 
-	 * @param count the value of the maximum item count.  count must be greater than zero.
+	 * @param count the value of the maximum item count. count must be greater than zero.
 	 */
 	public void setMaxItemCount(int count) {
 		Assert.isTrue(count > 0, "count must be greater than zero");
@@ -164,7 +163,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 		if (executionContext.containsKey(getExecutionContextKey(READ_COUNT))) {
 			itemCount = executionContext.getInt(getExecutionContextKey(READ_COUNT));
 		}
-		else if(currentItemCount > 0) {
+		else if (currentItemCount > 0) {
 			itemCount = currentItemCount;
 		}
 
@@ -194,14 +193,11 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> extends Abstra
 
 	}
 
-
 	/**
 	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to
-	 * save any state from this stream, and you don't need it to be restartable.
-	 * Always set it to false if the reader is being used in a concurrent
-	 * environment.
-	 * 
+	 * {@link ExecutionContext}. Only switch this to false if you don't want to save any
+	 * state from this stream, and you don't need it to be restartable. Always set it to
+	 * false if the reader is being used in a concurrent environment.
 	 * @param saveState flag value (default true).
 	 */
 	public void setSaveState(boolean saveState) {

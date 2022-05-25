@@ -18,39 +18,40 @@ package org.springframework.batch.sample.domain.trade;
 
 import java.math.BigDecimal;
 
-
 public class CustomerDebit {
-    private String name;
-    private BigDecimal debit;
 
-    public CustomerDebit() {
-    }
+	private String name;
 
-    CustomerDebit(String name, BigDecimal debit) {
-        this.name = name;
-        this.debit = debit;
-    }
+	private BigDecimal debit;
 
-    public BigDecimal getDebit() {
-        return debit;
-    }
+	public CustomerDebit() {
+	}
 
-    public void setDebit(BigDecimal debit) {
-        this.debit = debit;
-    }
+	CustomerDebit(String name, BigDecimal debit) {
+		this.name = name;
+		this.debit = debit;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public BigDecimal getDebit() {
+		return debit;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setDebit(BigDecimal debit) {
+		this.debit = debit;
+	}
 
-    @Override
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
 	public String toString() {
-        return "CustomerDebit [name=" + name + ", debit=" + debit + "]";
-    }
+		return "CustomerDebit [name=" + name + ", debit=" + debit + "]";
+	}
 
 	@Override
 	public int hashCode() {
@@ -92,4 +93,5 @@ public class CustomerDebit {
 
 		return true;
 	}
+
 }

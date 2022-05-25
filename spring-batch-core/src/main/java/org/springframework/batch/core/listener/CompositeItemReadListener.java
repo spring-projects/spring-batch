@@ -32,8 +32,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
 	/**
 	 * Public setter for the listeners.
-	 *
-	 * @param itemReadListeners list of {@link ItemReadListener}s to be called when read events occur.
+	 * @param itemReadListeners list of {@link ItemReadListener}s to be called when read
+	 * events occur.
 	 */
 	public void setListeners(List<? extends ItemReadListener<? super T>> itemReadListeners) {
 		this.listeners.setItems(itemReadListeners);
@@ -41,7 +41,6 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 
 	/**
 	 * Register additional listener.
-	 *
 	 * @param itemReaderListener instance of {@link ItemReadListener} to be registered.
 	 */
 	public void register(ItemReadListener<? super T> itemReaderListener) {
@@ -49,8 +48,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
 	 */
 	@Override
@@ -62,8 +61,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	}
 
 	/**
-	 * Call the registered listeners in order, respecting and prioritising those
-	 * that implement {@link Ordered}.
+	 * Call the registered listeners in order, respecting and prioritising those that
+	 * implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
 	 */
 	@Override
@@ -75,8 +74,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	}
 
 	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
+	 * Call the registered listeners in reverse order, respecting and prioritising those
+	 * that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
 	 */
 	@Override
@@ -86,4 +85,5 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 			listener.onReadError(ex);
 		}
 	}
+
 }

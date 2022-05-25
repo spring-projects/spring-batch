@@ -23,11 +23,10 @@ import org.springframework.batch.core.step.job.JobParametersExtractor;
 import org.springframework.batch.core.step.job.JobStep;
 
 /**
- * A step builder for {@link JobStep} instances. A job step executes a nested {@link Job} with parameters taken from the
- * parent job or from the step execution.
- * 
+ * A step builder for {@link JobStep} instances. A job step executes a nested {@link Job}
+ * with parameters taken from the parent job or from the step execution.
+ *
  * @author Dave Syer
- * 
  * @since 2.2
  */
 public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
@@ -39,8 +38,8 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 	private JobParametersExtractor jobParametersExtractor;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	public JobStepBuilder(StepBuilderHelper<?> parent) {
@@ -49,7 +48,6 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	/**
 	 * Provide a job to execute during the step.
-	 * 
 	 * @param job the job to execute
 	 * @return this for fluent chaining
 	 */
@@ -60,7 +58,6 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	/**
 	 * Add a job launcher. Defaults to a simple job launcher.
-	 * 
 	 * @param jobLauncher the job launcher to use
 	 * @return this for fluent chaining
 	 */
@@ -70,9 +67,8 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 	}
 
 	/**
-	 * Provide a job parameters extractor. Useful for extracting job parameters from the parent step execution context
-	 * or job parameters.
-	 * 
+	 * Provide a job parameters extractor. Useful for extracting job parameters from the
+	 * parent step execution context or job parameters.
 	 * @param jobParametersExtractor the job parameters extractor to use
 	 * @return this for fluent chaining
 	 */
@@ -83,7 +79,6 @@ public class JobStepBuilder extends StepBuilderHelper<JobStepBuilder> {
 
 	/**
 	 * Build a step from the job provided.
-	 * 
 	 * @return a new job step
 	 */
 	public Step build() {

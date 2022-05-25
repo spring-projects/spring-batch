@@ -28,14 +28,14 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.MethodInvoker;
 
 /**
- * Superclass for delegating classes which dynamically call a custom method of
- * injected object. Provides convenient API for dynamic method invocation
- * shielding subclasses from low-level details and exception handling.
+ * Superclass for delegating classes which dynamically call a custom method of injected
+ * object. Provides convenient API for dynamic method invocation shielding subclasses from
+ * low-level details and exception handling.
  *
- * {@link Exception}s thrown by a successfully invoked delegate method are
- * re-thrown without wrapping. In case the delegate method throws a
- * {@link Throwable} that doesn't subclass {@link Exception} it will be wrapped
- * by {@link InvocationTargetThrowableWrapper}.
+ * {@link Exception}s thrown by a successfully invoked delegate method are re-thrown
+ * without wrapping. In case the delegate method throws a {@link Throwable} that doesn't
+ * subclass {@link Exception} it will be wrapped by
+ * {@link InvocationTargetThrowableWrapper}.
  *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
@@ -49,11 +49,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	private Object[] arguments;
 
 	/**
-	 * Invoker the target method with arguments set by
-	 * {@link #setArguments(Object[])}.
-	 *
+	 * Invoker the target method with arguments set by {@link #setArguments(Object[])}.
 	 * @return object returned by invoked method
-	 *
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethod() throws Exception {
@@ -64,10 +61,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * Invokes the target method with given argument.
-	 *
 	 * @param object argument for the target method
 	 * @return object returned by target method
-	 *
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArgument(Object object) throws Exception {
@@ -78,10 +73,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 	/**
 	 * Invokes the target method with given arguments.
-	 *
 	 * @param args arguments for the invoked method
 	 * @return object returned by invoked method
-	 *
 	 * @throws Exception exception thrown when executing the delegate method.
 	 */
 	protected T invokeDelegateMethodWithArguments(Object[] args) throws Exception {
@@ -140,8 +133,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	}
 
 	/**
-	 * @return true if target class declares a method matching target method
-	 * name with given number of arguments of appropriate type.
+	 * @return true if target class declares a method matching target method name with
+	 * given number of arguments of appropriate type.
 	 */
 	private boolean targetClassDeclaresTargetMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
@@ -184,8 +177,8 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	}
 
 	/**
-	 * @param targetObject the delegate - bean id can be used to set this value
-	 * in Spring configuration
+	 * @param targetObject the delegate - bean id can be used to set this value in Spring
+	 * configuration
 	 */
 	public void setTargetObject(Object targetObject) {
 		this.targetObject = targetObject;
@@ -200,15 +193,14 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	}
 
 	/**
-	 * @param arguments arguments values for the {
-	 * {@link #setTargetMethod(String)}. These will be used only when the
-	 * subclass tries to invoke the target method without providing explicit
-	 * argument values.
+	 * @param arguments arguments values for the { {@link #setTargetMethod(String)}. These
+	 * will be used only when the subclass tries to invoke the target method without
+	 * providing explicit argument values.
 	 *
-	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will
-	 * check the values are compatible with target method's signature. In case
-	 * arguments are null (not set) method signature will not be checked and it
-	 * is assumed correct values will be supplied at runtime.
+	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will check the
+	 * values are compatible with target method's signature. In case arguments are null
+	 * (not set) method signature will not be checked and it is assumed correct values
+	 * will be supplied at runtime.
 	 */
 	public void setArguments(Object[] arguments) {
 		this.arguments = arguments == null ? null : Arrays.asList(arguments).toArray();
@@ -221,7 +213,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	protected Object[] getArguments() {
 		return arguments;
 	}
-	
+
 	/**
 	 * Used to wrap a {@link Throwable} (not an {@link Exception}) thrown by a
 	 * reflectively-invoked delegate.
@@ -236,4 +228,5 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		}
 
 	}
+
 }

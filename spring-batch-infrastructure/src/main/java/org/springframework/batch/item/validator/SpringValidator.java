@@ -27,7 +27,7 @@ import org.springframework.validation.Errors;
 /**
  * Adapts the {@link org.springframework.validation.Validator} interface to
  * {@link org.springframework.batch.item.validator.Validator}.
- * 
+ *
  * @author Tomas Slanina
  * @author Robert Kasanicky
  */
@@ -38,7 +38,7 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	/**
 	 * @see Validator#validate(Object)
 	 */
-    @Override
+	@Override
 	public void validate(T item) throws ValidationException {
 
 		if (!validator.supports(item.getClass())) {
@@ -51,7 +51,8 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 		validator.validate(item, errors);
 
 		if (errors.hasErrors()) {
-			throw new ValidationException("Validation failed for " + item + ": " + errorsToString(errors), new BindException(errors));
+			throw new ValidationException("Validation failed for " + item + ": " + errorsToString(errors),
+					new BindException(errors));
 		}
 	}
 
@@ -68,8 +69,8 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 	}
 
 	/**
-	 * Append the string representation of elements of the collection (separated
-	 * by new lines) to the given StringBuilder.
+	 * Append the string representation of elements of the collection (separated by new
+	 * lines) to the given StringBuilder.
 	 */
 	private void appendCollection(Collection<?> collection, StringBuilder builder) {
 		for (Object value : collection) {
@@ -82,9 +83,10 @@ public class SpringValidator<T> implements Validator<T>, InitializingBean {
 		this.validator = validator;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(validator, "validator must be set");
 
 	}
+
 }

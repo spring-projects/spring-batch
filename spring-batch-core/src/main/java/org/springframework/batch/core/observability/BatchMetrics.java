@@ -34,10 +34,10 @@ import org.springframework.lang.Nullable;
  * Central class for batch metrics. It provides:
  *
  * <ul>
- *     <li>the main entry point to interact with Micrometer's {@link Metrics#globalRegistry}
- *     with common metrics such as {@link Timer} and {@link LongTaskTimer}.</li>
- *     <li>Some utility methods like calculating durations and formatting them in
- *     a human readable format.</li>
+ * <li>the main entry point to interact with Micrometer's {@link Metrics#globalRegistry}
+ * with common metrics such as {@link Timer} and {@link LongTaskTimer}.</li>
+ * <li>Some utility methods like calculating durations and formatting them in a human
+ * readable format.</li>
  * </ul>
  *
  * Only intended for internal use.
@@ -69,25 +69,24 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a {@link Timer}.
-	 * @param name of the timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the timer. Will be prefixed with
+	 * {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the timer
 	 * @param tags of the timer
 	 * @return a new timer instance
 	 */
 	public static Timer createTimer(String name, String description, Tag... tags) {
-		return Timer.builder(METRICS_PREFIX + name)
-				.description(description)
-				.tags(Arrays.asList(tags))
+		return Timer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
 	}
 
 	/**
-	 * Create a new {@link Observation}. It's not started, you must
-	 * explicitly call {@link Observation#start()} to start it.
+	 * Create a new {@link Observation}. It's not started, you must explicitly call
+	 * {@link Observation#start()} to start it.
 	 *
-	 * Remember to register the {@link TimerObservationHandler}
-	 * via the {@code Metrics.globalRegistry.withTimerObservationHandler()}
-	 * in the user code. Otherwise you won't observe any metrics.
+	 * Remember to register the {@link TimerObservationHandler} via the
+	 * {@code Metrics.globalRegistry.withTimerObservationHandler()} in the user code.
+	 * Otherwise you won't observe any metrics.
 	 * @param name of the observation
 	 * @param context of the observation
 	 * @return a new observation instance
@@ -107,15 +106,14 @@ public final class BatchMetrics {
 
 	/**
 	 * Create a new {@link LongTaskTimer}.
-	 * @param name of the long task timer. Will be prefixed with {@link BatchMetrics#METRICS_PREFIX}.
+	 * @param name of the long task timer. Will be prefixed with
+	 * {@link BatchMetrics#METRICS_PREFIX}.
 	 * @param description of the long task timer.
 	 * @param tags of the timer
 	 * @return a new long task timer instance
 	 */
 	public static LongTaskTimer createLongTaskTimer(String name, String description, Tag... tags) {
-		return LongTaskTimer.builder(METRICS_PREFIX + name)
-				.description(description)
-				.tags(Arrays.asList(tags))
+		return LongTaskTimer.builder(METRICS_PREFIX + name).description(description).tags(Arrays.asList(tags))
 				.register(Metrics.globalRegistry);
 	}
 

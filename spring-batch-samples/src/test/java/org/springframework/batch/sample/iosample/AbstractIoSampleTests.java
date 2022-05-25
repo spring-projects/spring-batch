@@ -41,15 +41,15 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 /**
- * Base class for IoSample tests that increase input customer credit by fixed
- * amount. Assumes inputs and outputs are in the same format and uses the job's
- * {@link ItemReader} to parse the outputs.
- * 
+ * Base class for IoSample tests that increase input customer credit by fixed amount.
+ * Assumes inputs and outputs are in the same format and uses the job's {@link ItemReader}
+ * to parse the outputs.
+ *
  * @author Robert Kasanicky
  */
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml",
-		"/jobs/ioSampleJob.xml" })
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/job-runner-context.xml", "/jobs/ioSampleJob.xml" })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, StepScopeTestExecutionListener.class })
 public abstract class AbstractIoSampleTests {
 
 	@Autowired
@@ -59,8 +59,7 @@ public abstract class AbstractIoSampleTests {
 	private ItemReader<CustomerCredit> reader;
 
 	/**
-	 * Check the resulting credits correspond to inputs increased by fixed
-	 * amount.
+	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
 	public void testUpdateCredit() throws Exception {
@@ -97,9 +96,9 @@ public abstract class AbstractIoSampleTests {
 	}
 
 	/**
-	 * Configure the reader to read outputs (if necessary). Required for
-	 * file-to-file jobs jobs, usually no-op for database jobs where inputs are
-	 * updated (rather than outputs created).
+	 * Configure the reader to read outputs (if necessary). Required for file-to-file jobs
+	 * jobs, usually no-op for database jobs where inputs are updated (rather than outputs
+	 * created).
 	 */
 	protected abstract void pointReaderToOutput(ItemReader<CustomerCredit> reader);
 
@@ -135,9 +134,8 @@ public abstract class AbstractIoSampleTests {
 	}
 
 	/**
-	 * Create a {@link StepExecution} that can be used to satisfy step scoped
-	 * dependencies in the test itself (not in the job it launches).
-	 * 
+	 * Create a {@link StepExecution} that can be used to satisfy step scoped dependencies
+	 * in the test itself (not in the job it launches).
 	 * @return a {@link StepExecution}
 	 */
 	protected StepExecution getStepExecution() {

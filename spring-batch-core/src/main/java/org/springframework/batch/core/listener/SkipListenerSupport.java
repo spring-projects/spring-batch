@@ -22,29 +22,36 @@ import org.springframework.batch.core.SkipListener;
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @deprecated as of v5.0 in favor of the default methods in {@link SkipListener}.
  *
  */
 @Deprecated
-public class SkipListenerSupport<T,S> implements SkipListener<T,S> {
+public class SkipListenerSupport<T, S> implements SkipListener<T, S> {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInRead(Throwable t) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
+	 * java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInWrite(S item, Throwable t) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.SkipListener#onSkipInProcess(java.lang.Object, java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.SkipListener#onSkipInProcess(java.lang.Object,
+	 * java.lang.Throwable)
 	 */
 	@Override
 	public void onSkipInProcess(T item, Throwable t) {

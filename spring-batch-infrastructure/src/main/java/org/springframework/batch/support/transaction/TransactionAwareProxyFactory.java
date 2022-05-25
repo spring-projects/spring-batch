@@ -36,30 +36,29 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * <p>
- * Factory for transaction aware objects (like lists, sets, maps). If a
- * transaction is active when a method is called on an instance created by the
- * factory, it makes a copy of the target object and carries out all operations
- * on the copy. Only when the transaction commits is the target re-initialised
- * with the copy.
+ * Factory for transaction aware objects (like lists, sets, maps). If a transaction is
+ * active when a method is called on an instance created by the factory, it makes a copy
+ * of the target object and carries out all operations on the copy. Only when the
+ * transaction commits is the target re-initialised with the copy.
  * </p>
- * 
+ *
  * <p>
- * Works well with collections and maps for testing transactional behaviour
- * without needing a database. The base implementation handles lists, sets and
- * maps. Subclasses can implement {@link #begin(Object)} and
- * {@link #commit(Object, Object)} to provide support for other resources.
+ * Works well with collections and maps for testing transactional behaviour without
+ * needing a database. The base implementation handles lists, sets and maps. Subclasses
+ * can implement {@link #begin(Object)} and {@link #commit(Object, Object)} to provide
+ * support for other resources.
  * </p>
- * 
+ *
  * <p>
  * Generally not intended for multi-threaded use, but the
- * {@link #createAppendOnlyTransactionalMap() append only version} of
- * collections gives isolation between threads operating on different keys in a
- * map, provided they only append to the map. (Threads are limited to removing
- * entries that were created in the same transaction.)
+ * {@link #createAppendOnlyTransactionalMap() append only version} of collections gives
+ * isolation between threads operating on different keys in a map, provided they only
+ * append to the map. (Threads are limited to removing entries that were created in the
+ * same transaction.)
  * </p>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class TransactionAwareProxyFactory<T> {
 
@@ -79,10 +78,9 @@ public class TransactionAwareProxyFactory<T> {
 	}
 
 	/**
-	 * Make a copy of the target that can be used inside a transaction to
-	 * isolate changes from the original. Also called from the factory
-	 * constructor to isolate the target from the original value passed in.
-	 * 
+	 * Make a copy of the target that can be used inside a transaction to isolate changes
+	 * from the original. Also called from the factory constructor to isolate the target
+	 * from the original value passed in.
 	 * @param target the target object (List, Set or Map)
 	 * @return an independent copy
 	 */
@@ -116,10 +114,8 @@ public class TransactionAwareProxyFactory<T> {
 	}
 
 	/**
-	 * Take the working copy state and commit it back to the original target.
-	 * The target then reflects all the changes applied to the copy during a
-	 * transaction.
-	 * 
+	 * Take the working copy state and commit it back to the original target. The target
+	 * then reflects all the changes applied to the copy during a transaction.
 	 * @param copy the working copy.
 	 * @param target the original target of the factory.
 	 */
@@ -205,7 +201,7 @@ public class TransactionAwareProxyFactory<T> {
 			this.key = key;
 		}
 
-        @Override
+		@Override
 		public void afterCompletion(int status) {
 			if (status == TransactionSynchronization.STATUS_COMMITTED) {
 				synchronized (target) {
@@ -214,11 +210,12 @@ public class TransactionAwareProxyFactory<T> {
 			}
 			TransactionSynchronizationManager.unbindResource(key);
 		}
+
 	}
 
 	private class TransactionAwareInterceptor implements MethodInterceptor {
 
-        @Override
+		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 
 			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -243,8 +240,8 @@ public class TransactionAwareProxyFactory<T> {
 			if (appendOnly) {
 				String methodName = invocation.getMethod().getName();
 				if ((result == null && methodName.equals("get"))
-						|| (Boolean.FALSE.equals(result) && (methodName.startsWith("contains")) || (Boolean.TRUE
-								.equals(result) && methodName.startsWith("isEmpty")))) {
+						|| (Boolean.FALSE.equals(result) && (methodName.startsWith("contains"))
+								|| (Boolean.TRUE.equals(result) && methodName.startsWith("isEmpty")))) {
 					// In appendOnly mode the result of a get might not be
 					// in the cache...
 					return invocation.proceed();
@@ -259,6 +256,7 @@ public class TransactionAwareProxyFactory<T> {
 			return result;
 
 		}
+
 	}
 
 }

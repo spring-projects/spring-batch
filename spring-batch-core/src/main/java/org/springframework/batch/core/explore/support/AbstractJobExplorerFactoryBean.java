@@ -24,12 +24,10 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * A {@link FactoryBean} that automates the creation of a
- * {@link SimpleJobExplorer}. Declares abstract methods for providing DAO
- * object implementations.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer}.
+ * Declares abstract methods for providing DAO object implementations.
  *
  * @see JobExplorerFactoryBean
- *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
@@ -38,35 +36,30 @@ public abstract class AbstractJobExplorerFactoryBean implements FactoryBean<JobE
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs during JobInstanceDao creation.
 	 */
 	protected abstract JobInstanceDao createJobInstanceDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link JobExecutionDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs during JobExecutionDao creation.
 	 */
 	protected abstract JobExecutionDao createJobExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link StepExecutionDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs during StepExecutionDao creation.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
 
 	/**
 	 * @return fully configured {@link ExecutionContextDao} implementation.
-	 *
 	 * @throws Exception thrown if error occurs during ExecutionContextDao creation.
 	 */
 	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	/**
 	 * The type of object to be returned from {@link #getObject()}.
-	 *
 	 * @return JobExplorer.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */

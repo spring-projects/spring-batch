@@ -19,22 +19,20 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailMessage;
 
 /**
- * This class is used to handle errors that occur when email messages are unable
- * to be sent.
- * 
+ * This class is used to handle errors that occur when email messages are unable to be
+ * sent.
+ *
  * @author Dan Garrette
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public interface MailErrorHandler {
 
 	/**
-	 * This method will be called for each message that failed sending in the
-	 * chunk. If the failed message is needed by the handler it will need to be
-	 * downcast according to its runtime type. If an exception is thrown from
-	 * this method, then it will propagate to the caller.
-	 * 
+	 * This method will be called for each message that failed sending in the chunk. If
+	 * the failed message is needed by the handler it will need to be downcast according
+	 * to its runtime type. If an exception is thrown from this method, then it will
+	 * propagate to the caller.
 	 * @param message the failed message
 	 * @param exception the exception that caused the failure
 	 * @throws MailException if the exception cannot be handled

@@ -40,20 +40,18 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * Command line launcher for registering jobs with a {@link JobRegistry}.
- * Normally this will be used in conjunction with an external trigger for the
- * jobs registered, e.g. a JMX MBean wrapper for a {@link JobLauncher}, or a
- * Quartz trigger.
+ * Command line launcher for registering jobs with a {@link JobRegistry}. Normally this
+ * will be used in conjunction with an external trigger for the jobs registered, e.g. a
+ * JMX MBean wrapper for a {@link JobLauncher}, or a Quartz trigger.
  * </p>
  *
  * <p>
- * With any launch of a batch job within Spring Batch, a Spring context
- * containing the {@link Job} has to be created. Using this launcher, the jobs
- * are all registered with a {@link JobRegistry} defined in a parent application
- * context. The jobs are then set up in child contexts. All dependencies of the
- * runner will then be satisfied by autowiring by type from the parent
- * application context. Default values are provided for all fields except the
- * {@link JobRegistry}. Therefore, if autowiring fails to set it then an
+ * With any launch of a batch job within Spring Batch, a Spring context containing the
+ * {@link Job} has to be created. Using this launcher, the jobs are all registered with a
+ * {@link JobRegistry} defined in a parent application context. The jobs are then set up
+ * in child contexts. All dependencies of the runner will then be satisfied by autowiring
+ * by type from the parent application context. Default values are provided for all fields
+ * except the {@link JobRegistry}. Therefore, if autowiring fails to set it then an
  * exception will be thrown.
  * </p>
  *
@@ -63,9 +61,8 @@ import org.springframework.util.Assert;
 public class JobRegistryBackgroundJobRunner {
 
 	/**
-	 * System property key that switches the runner to "embedded" mode
-	 * (returning immediately from the main method). Useful for testing
-	 * purposes.
+	 * System property key that switches the runner to "embedded" mode (returning
+	 * immediately from the main method). Useful for testing purposes.
 	 */
 	public static final String EMBEDDED = JobRegistryBackgroundJobRunner.class.getSimpleName() + ".EMBEDDED";
 
@@ -84,7 +81,8 @@ public class JobRegistryBackgroundJobRunner {
 	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<>());
 
 	/**
-	 * @param parentContextPath the parentContextPath to be used by the JobRegistryBackgroundJobRunner.
+	 * @param parentContextPath the parentContextPath to be used by the
+	 * JobRegistryBackgroundJobRunner.
 	 */
 	public JobRegistryBackgroundJobRunner(String parentContextPath) {
 		super();
@@ -93,7 +91,6 @@ public class JobRegistryBackgroundJobRunner {
 
 	/**
 	 * A loader for the jobs that are going to be registered.
-	 *
 	 * @param jobLoader the {@link JobLoader} to set
 	 */
 	public void setJobLoader(JobLoader jobLoader) {
@@ -102,7 +99,6 @@ public class JobRegistryBackgroundJobRunner {
 
 	/**
 	 * A job registry that can be used to create a job loader (if none is provided).
-	 *
 	 * @param jobRegistry the {@link JobRegistry} to set
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -110,8 +106,7 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * Public getter for the startup errors encountered during parent context
-	 * creation.
+	 * Public getter for the startup errors encountered during parent context creation.
 	 * @return the errors
 	 */
 	public static List<Exception> getErrors() {
@@ -145,8 +140,8 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * If there is no {@link JobLoader} then try and create one from existing
-	 * bean definitions.
+	 * If there is no {@link JobLoader} then try and create one from existing bean
+	 * definitions.
 	 */
 	private void maybeCreateJobLoader() {
 
@@ -172,11 +167,10 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * Supply a list of application context locations, starting with the parent
-	 * context, and followed by the children. The parent must contain a
-	 * {@link JobRegistry} and the child contexts are expected to contain
-	 * {@link Job} definitions, each of which will be registered wit the
-	 * registry.
+	 * Supply a list of application context locations, starting with the parent context,
+	 * and followed by the children. The parent must contain a {@link JobRegistry} and the
+	 * child contexts are expected to contain {@link Job} definitions, each of which will
+	 * be registered wit the registry.
 	 *
 	 * Example usage:
 	 *
@@ -184,13 +178,12 @@ public class JobRegistryBackgroundJobRunner {
 	 * $ java -classpath ... JobRegistryBackgroundJobRunner job-registry-context.xml job1.xml job2.xml ...
 	 * </pre>
 	 *
-	 * The child contexts are created only when needed though the
-	 * {@link JobFactory} interface (but the XML is validated on startup by
-	 * using it to create a {@link BeanFactory} which is then discarded).
+	 * The child contexts are created only when needed though the {@link JobFactory}
+	 * interface (but the XML is validated on startup by using it to create a
+	 * {@link BeanFactory} which is then discarded).
 	 *
-	 * The parent context is created in a separate thread, and the program will
-	 * pause for input in an infinite loop until the user hits any key.
-	 *
+	 * The parent context is created in a separate thread, and the program will pause for
+	 * input in an infinite loop until the user hits any key.
 	 * @param args the context locations to use (first one is for parent)
 	 * @throws Exception if anything goes wrong with the context creation
 	 */
@@ -247,8 +240,8 @@ public class JobRegistryBackgroundJobRunner {
 		}
 
 		synchronized (JobRegistryBackgroundJobRunner.class) {
-			System.out
-			.println("Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
+			System.out.println(
+					"Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
 			JobRegistryBackgroundJobRunner.class.wait();
 		}
 		launcher.destroy();
@@ -256,8 +249,8 @@ public class JobRegistryBackgroundJobRunner {
 	}
 
 	/**
-	 * Unregister all the {@link Job} instances that were registered by this
-	 * post processor.
+	 * Unregister all the {@link Job} instances that were registered by this post
+	 * processor.
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	private void destroy() throws Exception {
@@ -266,8 +259,8 @@ public class JobRegistryBackgroundJobRunner {
 
 	private void run() {
 		final ApplicationContext parent = new ClassPathXmlApplicationContext(parentContextPath);
-		parent.getAutowireCapableBeanFactory().autowireBeanProperties(this,
-				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+		parent.getAutowireCapableBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE,
+				false);
 		parent.getAutowireCapableBeanFactory().initializeBean(this, getClass().getSimpleName());
 		this.parentContext = parent;
 	}

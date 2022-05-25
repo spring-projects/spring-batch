@@ -30,8 +30,8 @@ import java.util.Collection;
 
 /**
  * An {@link ExceptionHandler} that is aware of the retry context so that it can
- * distinguish between a fatal exception and one that can be retried. Delegates
- * the actual exception handling to another {@link ExceptionHandler}.
+ * distinguish between a fatal exception and one that can be retried. Delegates the actual
+ * exception handling to another {@link ExceptionHandler}.
  *
  * @author Dave Syer
  *
@@ -53,23 +53,23 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 
 	/**
 	 * Create an exception handler from its mandatory properties.
-	 *
-	 * @param retryPolicy the retry policy that will be under effect when an
-	 * exception is encountered
-	 * @param exceptionHandler the delegate to use if an exception actually
-	 * needs to be handled
+	 * @param retryPolicy the retry policy that will be under effect when an exception is
+	 * encountered
+	 * @param exceptionHandler the delegate to use if an exception actually needs to be
+	 * handled
 	 * @param fatalExceptionClasses exceptions
 	 */
-	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Collection<Class<? extends Throwable>> fatalExceptionClasses) {
+	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler,
+			Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
 		this.fatalExceptionClassifier = new BinaryExceptionClassifier(fatalExceptionClasses);
 	}
 
 	/**
-	 * Check if the exception is going to be retried, and veto the handling if
-	 * it is. If retry is exhausted or the exception is on the fatal list, then
-	 * handle using the delegate.
+	 * Check if the exception is going to be retried, and veto the handling if it is. If
+	 * retry is exhausted or the exception is on the fatal list, then handle using the
+	 * delegate.
 	 *
 	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
@@ -88,25 +88,26 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	}
 
 	/**
-	 * If retry is exhausted set up some state in the context that can be used
-	 * to signal that the exception should be handled.
+	 * If retry is exhausted set up some state in the context that can be used to signal
+	 * that the exception should be handled.
 	 *
 	 * @see org.springframework.retry.RetryListener#close(org.springframework.retry.RetryContext,
 	 * org.springframework.retry.RetryCallback, java.lang.Throwable)
 	 */
 	@Override
-	public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {
+	public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback,
+			Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Marking retry as exhausted: "+context);
+				logger.debug("Marking retry as exhausted: " + context);
 			}
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
 		}
 	}
 
 	/**
-	 * Get the parent context (the retry is in an inner "chunk" loop and we want
-	 * the exception to be handled at the outer "step" level).
+	 * Get the parent context (the retry is in an inner "chunk" loop and we want the
+	 * exception to be handled at the outer "step" level).
 	 * @return the {@link RepeatContext} that should hold the exhausted flag.
 	 */
 	private RepeatContext getRepeatContext() {

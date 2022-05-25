@@ -30,25 +30,29 @@ import org.springframework.util.Assert;
  * Builder for {@link JpaCursorItemReader}.
  *
  * @author Mahmoud Ben Hassine
- *
  * @since 4.3
  */
 public class JpaCursorItemReaderBuilder<T> {
 
 	private EntityManagerFactory entityManagerFactory;
+
 	private String queryString;
+
 	private JpaQueryProvider queryProvider;
+
 	private Map<String, Object> parameterValues;
+
 	private boolean saveState = true;
+
 	private String name;
+
 	private int maxItemCount = Integer.MAX_VALUE;
+
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link ItemStreamSupport}
-	 * should be persisted within the {@link ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the {@link ItemStreamSupport} should be persisted within
+	 * the {@link ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -59,9 +63,8 @@ public class JpaCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The name used to calculate the key within the {@link ExecutionContext}.
-	 * Required if {@link #saveState(boolean)} is set to true.
-	 *
+	 * The name used to calculate the key within the {@link ExecutionContext}. Required if
+	 * {@link #saveState(boolean)} is set to true.
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see ItemStreamSupport#setName(String)
@@ -74,7 +77,6 @@ public class JpaCursorItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -87,7 +89,6 @@ public class JpaCursorItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -99,9 +100,8 @@ public class JpaCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A map of parameter values to be set on the query. The key of the map is 
-	 * the name of the parameter to be set with the value being the value to be set.
-	 *
+	 * A map of parameter values to be set on the query. The key of the map is the name of
+	 * the parameter to be set with the value being the value to be set.
 	 * @param parameterValues map of values
 	 * @return this instance for method chaining
 	 * @see JpaCursorItemReader#setParameterValues(Map)
@@ -113,9 +113,8 @@ public class JpaCursorItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A query provider. This should be set only if {@link #queryString(String)}
-	 * have not been set.
-	 *
+	 * A query provider. This should be set only if {@link #queryString(String)} have not
+	 * been set.
 	 * @param queryProvider the query provider
 	 * @return this instance for method chaining
 	 * @see JpaCursorItemReader#setQueryProvider(JpaQueryProvider)
@@ -129,7 +128,6 @@ public class JpaCursorItemReaderBuilder<T> {
 	/**
 	 * The JPQL query string to execute. This should only be set if
 	 * {@link #queryProvider(JpaQueryProvider)} has not been set.
-	 *
 	 * @param queryString the JPQL query
 	 * @return this instance for method chaining
 	 * @see JpaCursorItemReader#setQueryString(String)
@@ -143,7 +141,6 @@ public class JpaCursorItemReaderBuilder<T> {
 	/**
 	 * The {@link EntityManagerFactory} to be used for executing the configured
 	 * {@link #queryString}.
-	 *
 	 * @param entityManagerFactory {@link EntityManagerFactory} used to create
 	 * {@link jakarta.persistence.EntityManager}
 	 * @return this instance for method chaining
@@ -156,7 +153,6 @@ public class JpaCursorItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link JpaCursorItemReader}.
-	 *
 	 * @return a new {@link JpaCursorItemReader}
 	 */
 	public JpaCursorItemReader<T> build() {
@@ -179,4 +175,5 @@ public class JpaCursorItemReaderBuilder<T> {
 		reader.setName(this.name);
 		return reader;
 	}
+
 }

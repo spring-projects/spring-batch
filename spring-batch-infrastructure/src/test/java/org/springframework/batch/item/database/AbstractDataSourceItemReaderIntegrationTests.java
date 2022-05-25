@@ -36,9 +36,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Common scenarios for testing {@link ItemReader} implementations which read
- * data from database.
- * 
+ * Common scenarios for testing {@link ItemReader} implementations which read data from
+ * database.
+ *
  * @author Lucas Ward
  * @author Robert Kasanicky
  * @author Thomas Risberg
@@ -82,7 +82,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(reader).afterPropertiesSet();
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -102,9 +102,9 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	/*
-	 * Restart scenario - read records, save restart data, create new input
-	 * source and restore from restart data - the new input source should
-	 * continue where the old one finished.
+	 * Restart scenario - read records, save restart data, create new input source and
+	 * restore from restart data - the new input source should continue where the old one
+	 * finished.
 	 */
 	@Test
 	@Transactional
@@ -112,7 +112,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -120,7 +120,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(reader).update(executionContext);
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -133,9 +133,9 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	/*
-	 * Restart scenario - read records, save restart data, create new input
-	 * source and restore from restart data - the new input source should
-	 * continue where the old one finished.
+	 * Restart scenario - read records, save restart data, create new input source and
+	 * restore from restart data - the new input source should continue where the old one
+	 * finished.
 	 */
 	@Test
 	@Transactional
@@ -143,7 +143,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testRestartOnSecondPage() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 		assertEquals(1, foo1.getValue());
 		Foo foo2 = reader.read();
@@ -154,7 +154,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(4, foo4.getValue());
 
 		getAsItemStream(reader).update(executionContext);
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -177,7 +177,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testInvalidRestore() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 		assertEquals(1, foo1.getValue());
 
@@ -185,7 +185,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(reader).update(executionContext);
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -218,8 +218,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	/*
-	 * Rollback scenario with restart - input source rollbacks to last
-	 * commit point.
+	 * Rollback scenario with restart - input source rollbacks to last commit point.
 	 */
 	@Test
 	@Transactional
@@ -227,7 +226,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testRollbackAndRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 
 		getAsItemStream(reader).update(executionContext);
@@ -237,7 +236,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		assertTrue(!foo2.equals(foo3));
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -248,10 +247,9 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		assertEquals(foo2, reader.read());
 		assertEquals(foo3, reader.read());
 	}
-	
+
 	/*
-	 * Rollback scenario with restart - input source rollbacks to last
-	 * commit point.
+	 * Rollback scenario with restart - input source rollbacks to last commit point.
 	 */
 	@Test
 	@Transactional
@@ -259,7 +257,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	public void testRollbackOnFirstChunkAndRestart() throws Exception {
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo1 = reader.read();
 
 		Foo foo2 = reader.read();
@@ -267,7 +265,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		assertTrue(!foo2.equals(foo3));
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -283,9 +281,8 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	@Transactional
 	@DirtiesContext
 	public void testMultipleRestarts() throws Exception {
-		
+
 		getAsItemStream(reader).open(executionContext);
-		
 
 		Foo foo1 = reader.read();
 
@@ -296,7 +293,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		Foo foo3 = reader.read();
 		assertTrue(!foo2.equals(foo3));
-	
+
 		getAsItemStream(reader).close();
 
 		// create new input source
@@ -306,30 +303,30 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 		assertEquals(foo2, reader.read());
 		assertEquals(foo3, reader.read());
-		
+
 		getAsItemStream(reader).update(executionContext);
-		
+
 		getAsItemStream(reader).close();
 
 		// create new input source
 		reader = createItemReader();
 
 		getAsItemStream(reader).open(executionContext);
-		
+
 		Foo foo4 = reader.read();
 		Foo foo5 = reader.read();
 		assertEquals(4, foo4.getValue());
 		assertEquals(5, foo5.getValue());
 	}
-	
-	//set transaction to false and make sure the tests work
+
+	// set transaction to false and make sure the tests work
 	@Test
 	@DirtiesContext
 	public void testTransacted() throws Exception {
 		if (reader instanceof JpaPagingItemReader) {
-			((JpaPagingItemReader<Foo>)reader).setTransacted(false);
+			((JpaPagingItemReader<Foo>) reader).setTransacted(false);
 			this.testNormalProcessing();
-		}//end if
+		} // end if
 	}
 
 	protected ItemStream getAsItemStream(ItemReader<Foo> source) {

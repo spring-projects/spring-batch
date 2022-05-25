@@ -38,10 +38,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/data-source-context.xml"})
+@ContextConfiguration(locations = { "/data-source-context.xml" })
 public class JdbcTradeWriterTests implements InitializingBean {
+
 	private JdbcOperations jdbcTemplate;
+
 	private JdbcTradeDao writer;
+
 	private AbstractDataFieldMaxValueIncrementer incrementer;
 
 	@Autowired
@@ -73,7 +76,7 @@ public class JdbcTradeWriterTests implements InitializingBean {
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals("testCustomer", rs.getString("CUSTOMER"));
 				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
-				assertEquals(5,rs.getLong("QUANTITY"));
+				assertEquals(5, rs.getLong("QUANTITY"));
 			}
 		});
 	}
@@ -82,4 +85,5 @@ public class JdbcTradeWriterTests implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		this.writer.setIncrementer(incrementer);
 	}
+
 }

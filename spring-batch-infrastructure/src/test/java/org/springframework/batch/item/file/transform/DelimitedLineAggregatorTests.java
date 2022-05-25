@@ -22,14 +22,14 @@ import org.junit.Test;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class DelimitedLineAggregatorTests {
 
 	private static DelimitedLineAggregator<String[]> aggregator;
 
 	private FieldExtractor<String[]> defaultFieldExtractor = new FieldExtractor<String[]>() {
-	    @Override
+		@Override
 		public Object[] extract(String[] item) {
 			return item;
 		}
@@ -56,4 +56,5 @@ public class DelimitedLineAggregatorTests {
 	public void testAggregateWithNull() {
 		assertEquals("foo,,bar", aggregator.aggregate(new String[] { "foo", null, "bar" }));
 	}
+
 }

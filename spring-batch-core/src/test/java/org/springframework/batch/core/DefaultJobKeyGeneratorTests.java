@@ -36,11 +36,10 @@ public class DefaultJobKeyGeneratorTests {
 
 	@Test
 	public void testMixedParameters() {
-		JobParameters jobParameters1 = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "foo").toJobParameters();
-		JobParameters jobParameters2 = new JobParametersBuilder().addString(
-				"foo", "bar", true).addString("bar", "foo", true)
-				.addString("ignoreMe", "irrelevant", false).toJobParameters();
+		JobParameters jobParameters1 = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
+				.toJobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addString("foo", "bar", true)
+				.addString("bar", "foo", true).addString("ignoreMe", "irrelevant", false).toJobParameters();
 		String key1 = jobKeyGenerator.generateKey(jobParameters1);
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);
 		assertEquals(key1, key2);
@@ -48,20 +47,21 @@ public class DefaultJobKeyGeneratorTests {
 
 	@Test
 	public void testCreateJobKey() {
-		JobParameters jobParameters = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "foo").toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
+				.toJobParameters();
 		String key = jobKeyGenerator.generateKey(jobParameters);
 		assertEquals(32, key.length());
 	}
 
 	@Test
 	public void testCreateJobKeyOrdering() {
-		JobParameters jobParameters1 = new JobParametersBuilder().addString(
-				"foo", "bar").addString("bar", "foo").toJobParameters();
+		JobParameters jobParameters1 = new JobParametersBuilder().addString("foo", "bar").addString("bar", "foo")
+				.toJobParameters();
 		String key1 = jobKeyGenerator.generateKey(jobParameters1);
-		JobParameters jobParameters2 = new JobParametersBuilder().addString(
-				"bar", "foo").addString("foo", "bar").toJobParameters();
+		JobParameters jobParameters2 = new JobParametersBuilder().addString("bar", "foo").addString("foo", "bar")
+				.toJobParameters();
 		String key2 = jobKeyGenerator.generateKey(jobParameters2);
 		assertEquals(key1, key2);
 	}
+
 }

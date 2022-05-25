@@ -23,13 +23,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Two-phase {@link LineMapper} implementation consisting of tokenization of the line into {@link FieldSet} followed by
- * mapping to item. If finer grained control of exceptions is needed, the {@link LineMapper} interface should be
- * implemented directly.
- * 
+ * Two-phase {@link LineMapper} implementation consisting of tokenization of the line into
+ * {@link FieldSet} followed by mapping to item. If finer grained control of exceptions is
+ * needed, the {@link LineMapper} interface should be implemented directly.
+ *
  * @author Robert Kasanicky
  * @author Lucas Ward
- * 
  * @param <T> type of the item
  */
 public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
@@ -38,7 +37,7 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 
 	private FieldSetMapper<T> fieldSetMapper;
 
-    @Override
+	@Override
 	public T mapLine(String line, int lineNumber) throws Exception {
 		return fieldSetMapper.mapFieldSet(tokenizer.tokenize(line));
 	}
@@ -51,7 +50,7 @@ public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 		this.fieldSetMapper = fieldSetMapper;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() {
 		Assert.notNull(tokenizer, "The LineTokenizer must be set");
 		Assert.notNull(fieldSetMapper, "The FieldSetMapper must be set");

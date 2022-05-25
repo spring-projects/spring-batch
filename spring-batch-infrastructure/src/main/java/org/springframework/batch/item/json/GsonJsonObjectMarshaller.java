@@ -19,8 +19,8 @@ package org.springframework.batch.item.json;
 import com.google.gson.Gson;
 
 /**
- * A json object marshaller that uses <a href="https://github.com/google/gson">Google Gson</a>
- * to marshal an object into a json representation.
+ * A json object marshaller that uses <a href="https://github.com/google/gson">Google
+ * Gson</a> to marshal an object into a json representation.
  *
  * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
@@ -33,15 +33,15 @@ public class GsonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 	public GsonJsonObjectMarshaller() {
 		this(new Gson());
 	}
-	
+
 	public GsonJsonObjectMarshaller(Gson gson) {
 		this.gson = gson;
 	}
-	
+
 	/**
 	 * Set the {@link Gson} object to use.
 	 * @param gson object to use
-	 * @see #GsonJsonObjectMarshaller(Gson)    
+	 * @see #GsonJsonObjectMarshaller(Gson)
 	 */
 	public void setGson(Gson gson) {
 		this.gson = gson;
@@ -51,4 +51,5 @@ public class GsonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 	public String marshal(T item) {
 		return gson.toJson(item);
 	}
+
 }

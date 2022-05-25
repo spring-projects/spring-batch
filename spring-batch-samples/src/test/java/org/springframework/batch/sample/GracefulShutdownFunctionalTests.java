@@ -35,15 +35,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Functional test for graceful shutdown. A batch container is started in a new
- * thread, then it's stopped using {@link JobOperator#stop(long)}.
- * 
+ * Functional test for graceful shutdown. A batch container is started in a new thread,
+ * then it's stopped using {@link JobOperator#stop(long)}.
+ *
  * @author Lucas Ward
  * @author Parikshit Dutta
- * 
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
 public class GracefulShutdownFunctionalTests {
 
 	/** Logger */
@@ -80,4 +81,5 @@ public class GracefulShutdownFunctionalTests {
 		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
+
 }

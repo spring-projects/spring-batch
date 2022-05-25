@@ -52,7 +52,6 @@ public class JobListenerFactoryBean extends AbstractListenerFactoryBean<JobExecu
 	/**
 	 * Convenience method to wrap any object and expose the appropriate
 	 * {@link JobExecutionListener} interfaces.
-	 *
 	 * @param delegate a delegate object
 	 * @return a JobListener instance constructed from the delegate
 	 */
@@ -63,15 +62,15 @@ public class JobListenerFactoryBean extends AbstractListenerFactoryBean<JobExecu
 	}
 
 	/**
-	 * Convenience method to check whether the given object is or can be made
-	 * into a {@link JobExecutionListener}.
-	 *
+	 * Convenience method to check whether the given object is or can be made into a
+	 * {@link JobExecutionListener}.
 	 * @param delegate the object to check
-	 * @return true if the delegate is an instance of
-	 *         {@link JobExecutionListener}, or contains the marker annotations
+	 * @return true if the delegate is an instance of {@link JobExecutionListener}, or
+	 * contains the marker annotations
 	 */
 	public static boolean isListener(Object delegate) {
-		return AbstractListenerFactoryBean.isListener(delegate, JobExecutionListener.class, JobListenerMetaData
-				.values());
+		return AbstractListenerFactoryBean.isListener(delegate, JobExecutionListener.class,
+				JobListenerMetaData.values());
 	}
+
 }

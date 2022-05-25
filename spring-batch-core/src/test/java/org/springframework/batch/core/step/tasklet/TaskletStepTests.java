@@ -154,7 +154,8 @@ public class TaskletStepTests {
 		assertEquals(4, processed.size());
 		assertEquals(4, stepExecution.getReadCount());
 		assertEquals(4, stepExecution.getWriteCount());
-		assertEquals(3, stepExecution.getCommitCount()); //the empty chunk is the 3rd commit
+		assertEquals(3, stepExecution.getCommitCount()); // the empty chunk is the 3rd
+															// commit
 	}
 
 	@Test
@@ -175,8 +176,7 @@ public class TaskletStepTests {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance, jobParameters);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 		step = getStep(new String[0]);
-		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[0]), itemWriter,
-				new RepeatTemplate()));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[0]), itemWriter, new RepeatTemplate()));
 		step.setStepOperations(new RepeatTemplate());
 		step.execute(stepExecution);
 		assertEquals(0, processed.size());
@@ -230,8 +230,7 @@ public class TaskletStepTests {
 	public void testRepository() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -396,9 +395,8 @@ public class TaskletStepTests {
 	}
 
 	/*
-	 * Test that a job that is being restarted, but has saveExecutionAttributes
-	 * set to false, doesn't have restore or getExecutionAttributes called on
-	 * it.
+	 * Test that a job that is being restarted, but has saveExecutionAttributes set to
+	 * false, doesn't have restore or getExecutionAttributes called on it.
 	 */
 	@Test
 	public void testNoSaveExecutionAttributesRestartableJob() {
@@ -418,9 +416,8 @@ public class TaskletStepTests {
 	}
 
 	/*
-	 * Even though the job is restarted, and saveExecutionAttributes is true,
-	 * nothing will be restored because the Tasklet does not implement
-	 * Restartable.
+	 * Even though the job is restarted, and saveExecutionAttributes is true, nothing will
+	 * be restored because the Tasklet does not implement Restartable.
 	 */
 	@Test
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
@@ -448,7 +445,7 @@ public class TaskletStepTests {
 
 			@Override
 			public void update(ExecutionContext executionContext) {
-                                super.update(executionContext);
+				super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		};
@@ -471,7 +468,7 @@ public class TaskletStepTests {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void update(ExecutionContext executionContext) {
-                                super.update(executionContext);
+				super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		} });
@@ -516,7 +513,7 @@ public class TaskletStepTests {
 
 			@Override
 			public void open(ExecutionContext executionContext) throws ItemStreamException {
-                                super.open(executionContext);
+				super.open(executionContext);
 				assertEquals(1, list.size());
 			}
 		};
@@ -589,7 +586,7 @@ public class TaskletStepTests {
 
 			@Override
 			public void update(ExecutionContext executionContext) {
-                                super.update(executionContext);
+				super.update(executionContext);
 				executionContext.putString("foo", "bar");
 			}
 		};
@@ -641,8 +638,8 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'JobInterruptedException': " + msg, msg
-				.contains("JobInterruptedException"));
+		assertTrue("Message does not contain 'JobInterruptedException': " + msg,
+				msg.contains("JobInterruptedException"));
 	}
 
 	@Test
@@ -740,6 +737,7 @@ public class TaskletStepTests {
 				// Simulate failure on commit
 				throw new RuntimeException("Foo");
 			}
+
 			@Override
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				throw new RuntimeException("Bar");
@@ -766,7 +764,7 @@ public class TaskletStepTests {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
-                                super.close();
+				super.close();
 				throw new RuntimeException("Bar");
 			}
 		} });
@@ -816,9 +814,8 @@ public class TaskletStepTests {
 	}
 
 	/**
-	 * Execution context must not be left empty even if job failed before
-	 * committing first chunk - otherwise ItemStreams won't recognize it is
-	 * restart scenario on next run.
+	 * Execution context must not be left empty even if job failed before committing first
+	 * chunk - otherwise ItemStreams won't recognize it is restart scenario on next run.
 	 */
 	@Test
 	public void testRestartAfterFailureInFirstChunk() throws Exception {
@@ -861,8 +858,8 @@ public class TaskletStepTests {
 	}
 
 	/**
-	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
-	 * doesn't cause step failure.
+	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)} doesn't cause
+	 * step failure.
 	 * @throws JobInterruptedException
 	 */
 	@Test
@@ -949,9 +946,11 @@ public class TaskletStepTests {
 				throw new DataAccessResourceFailureException("stub exception");
 			}
 		}
+
 	}
 
-	private class MockRestartableItemReader extends AbstractItemStreamItemReader<String> implements StepExecutionListener {
+	private class MockRestartableItemReader extends AbstractItemStreamItemReader<String>
+			implements StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;
 
@@ -965,7 +964,7 @@ public class TaskletStepTests {
 
 		@Override
 		public void update(ExecutionContext executionContext) {
-                        super.update(executionContext);
+			super.update(executionContext);
 			getExecutionAttributesCalled = true;
 			executionContext.putString("spam", "bucket");
 		}

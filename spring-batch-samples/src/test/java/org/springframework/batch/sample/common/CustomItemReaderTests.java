@@ -30,16 +30,20 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.lang.Nullable;
 
 /**
- * Unit test class that was used as part of the Reference Documentation.  I'm only including it in the
- * code to help keep the reference documentation up to date as the code base shifts.
- * 
+ * Unit test class that was used as part of the Reference Documentation. I'm only
+ * including it in the code to help keep the reference documentation up to date as the
+ * code base shifts.
+ *
  * @author Lucas Ward
  *
  */
 public class CustomItemReaderTests {
+
 	private ItemReader<String> itemReader;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Before
@@ -48,38 +52,40 @@ public class CustomItemReaderTests {
 		items.add("1");
 		items.add("2");
 		items.add("3");
-		
+
 		itemReader = new CustomItemReader<>(items);
 	}
-	
+
 	@Test
-	public void testRead() throws Exception{
+	public void testRead() throws Exception {
 		assertEquals("1", itemReader.read());
 		assertEquals("2", itemReader.read());
 		assertEquals("3", itemReader.read());
 		assertNull(itemReader.read());
 	}
-	
+
 	@Test
-	public void testRestart() throws Exception{
+	public void testRestart() throws Exception {
 		ExecutionContext executionContext = new ExecutionContext();
-		((ItemStream)itemReader).open(executionContext);
+		((ItemStream) itemReader).open(executionContext);
 		assertEquals("1", itemReader.read());
-		((ItemStream)itemReader).update(executionContext);
+		((ItemStream) itemReader).update(executionContext);
 		List<String> items = new ArrayList<>();
 		items.add("1");
 		items.add("2");
 		items.add("3");
 		itemReader = new CustomItemReader<>(items);
-		
-		((ItemStream)itemReader).open(executionContext);
+
+		((ItemStream) itemReader).open(executionContext);
 		assertEquals("2", itemReader.read());
 	}
 
 	public static class CustomItemReader<T> implements ItemReader<T>, ItemStream {
+
 		private static final String CURRENT_INDEX = "current.index";
 
 		private List<T> items;
+
 		private int currentIndex = 0;
 
 		public CustomItemReader(List<T> items) {
@@ -97,20 +103,23 @@ public class CustomItemReaderTests {
 
 		@Override
 		public void open(ExecutionContext executionContext) throws ItemStreamException {
-			if(executionContext.containsKey(CURRENT_INDEX)){
+			if (executionContext.containsKey(CURRENT_INDEX)) {
 				currentIndex = executionContext.getInt(CURRENT_INDEX);
 			}
-			else{
+			else {
 				currentIndex = 0;
 			}
 		}
 
 		@Override
-		public void close() throws ItemStreamException {}
+		public void close() throws ItemStreamException {
+		}
 
 		@Override
 		public void update(ExecutionContext executionContext) throws ItemStreamException {
 			executionContext.putInt(CURRENT_INDEX, currentIndex);
 		}
+
 	}
+
 }

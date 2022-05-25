@@ -53,12 +53,11 @@ public class AnnotationMethodResolverTests {
 		assertNull(method);
 	}
 
-
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
 	private static @interface TestAnnotation {
-	}
 
+	}
 
 	@SuppressWarnings("unused")
 	private static class SingleAnnotationTestBean {
@@ -71,8 +70,8 @@ public class AnnotationMethodResolverTests {
 		public String lowerCase(String s) {
 			return s.toLowerCase();
 		}
-	}
 
+	}
 
 	private static class MultipleAnnotationTestBean {
 
@@ -85,8 +84,8 @@ public class AnnotationMethodResolverTests {
 		public String lowerCase(String s) {
 			return s.toLowerCase();
 		}
-	}
 
+	}
 
 	@SuppressWarnings("unused")
 	private static class NoAnnotationTestBean {
@@ -98,6 +97,7 @@ public class AnnotationMethodResolverTests {
 		String lowerCase(String s) {
 			return s.toLowerCase();
 		}
+
 	}
 
 }

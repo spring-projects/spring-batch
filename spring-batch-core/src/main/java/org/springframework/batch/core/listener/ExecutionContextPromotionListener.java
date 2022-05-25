@@ -28,14 +28,14 @@ import org.springframework.util.Assert;
 
 /**
  * This class can be used to automatically promote items from the {@link Step}
- * {@link ExecutionContext} to the {@link Job} {@link ExecutionContext} at the
- * end of a step. A list of keys should be provided that correspond to the items
- * in the {@link Step} {@link ExecutionContext} that should be promoted.
+ * {@link ExecutionContext} to the {@link Job} {@link ExecutionContext} at the end of a
+ * step. A list of keys should be provided that correspond to the items in the
+ * {@link Step} {@link ExecutionContext} that should be promoted.
  *
- * Additionally, an optional list of statuses can be set to indicate for which
- * exit status codes the promotion should occur. These statuses will be checked
- * using the {@link PatternMatcher}, so wildcards are allowed. By default,
- * promotion will only occur for steps with an exit code of "COMPLETED".
+ * Additionally, an optional list of statuses can be set to indicate for which exit status
+ * codes the promotion should occur. These statuses will be checked using the
+ * {@link PatternMatcher}, so wildcards are allowed. By default, promotion will only occur
+ * for steps with an exit code of "COMPLETED".
  *
  * @author Dan Garrette
  * @author Mahmoud Ben Hassine
@@ -60,10 +60,11 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 				for (String key : keys) {
 					if (stepContext.containsKey(key)) {
 						jobContext.put(key, stepContext.get(key));
-					} else {
+					}
+					else {
 						if (strict) {
-							throw new IllegalArgumentException("The key [" + key
-									+ "] was not found in the Step's ExecutionContext.");
+							throw new IllegalArgumentException(
+									"The key [" + key + "] was not found in the Step's ExecutionContext.");
 						}
 					}
 				}
@@ -91,18 +92,16 @@ public class ExecutionContextPromotionListener implements StepExecutionListener,
 	}
 
 	/**
-	 * @param statuses A list of statuses for which the promotion should occur.
-	 * Statuses can may contain wildcards recognizable by a
-	 * {@link PatternMatcher}.
+	 * @param statuses A list of statuses for which the promotion should occur. Statuses
+	 * can may contain wildcards recognizable by a {@link PatternMatcher}.
 	 */
 	public void setStatuses(String[] statuses) {
 		this.statuses = statuses;
 	}
 
 	/**
-	 * If set to TRUE, the listener will throw an exception if any 'key' is not
-	 * found in the Step {@link ExecutionContext}. FALSE by default.
-	 *
+	 * If set to TRUE, the listener will throw an exception if any 'key' is not found in
+	 * the Step {@link ExecutionContext}. FALSE by default.
 	 * @param strict boolean the value of the flag.
 	 */
 	public void setStrict(boolean strict) {

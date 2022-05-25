@@ -41,10 +41,10 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 
 	public static volatile boolean fail = false;
 
-        public ExampleItemReader() {
-                this.setExecutionContextName(ClassUtils.getShortName(this.getClass()));
-        }
-        
+	public ExampleItemReader() {
+		this.setExecutionContextName(ClassUtils.getShortName(this.getClass()));
+	}
+
 	/**
 	 * @param min the min to set
 	 */
@@ -74,8 +74,8 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 				if (fail) {
 					// Only fail once per flag setting...
 					fail = false;
-					logger.info(String.format("Throwing exception index=%s, item=%s, in (%s)", index, input[index],
-							this));
+					logger.info(
+							String.format("Throwing exception index=%s, item=%s, in (%s)", index, input[index], this));
 					index++;
 					throw new RuntimeException("Planned failure");
 				}
@@ -86,13 +86,13 @@ public class ExampleItemReader extends AbstractItemStreamItemReader<String> {
 
 	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		index = (int) executionContext.getLong(getExecutionContextKey("POSITION"), min);
 	}
 
 	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		executionContext.putLong(getExecutionContextKey("POSITION"), index);
 	}
 

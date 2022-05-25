@@ -34,7 +34,8 @@ public class DatasourceTests {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_BARS");
@@ -43,4 +44,5 @@ public class DatasourceTests {
 
 		jdbcTemplate.update("INSERT into T_BARS (id,name,foo_date) values (?,?,null)", 0, "foo");
 	}
+
 }

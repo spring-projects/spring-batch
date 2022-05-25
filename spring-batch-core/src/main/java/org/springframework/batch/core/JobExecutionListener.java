@@ -16,10 +16,10 @@
 package org.springframework.batch.core;
 
 /**
- * Provide callbacks at specific points in the lifecycle of a {@link Job}.
- * Implementations can be stateful if they are careful to either ensure thread
- * safety or to use one instance of a listener per job, assuming that job
- * instances themselves are not used by more than one thread.
+ * Provide callbacks at specific points in the lifecycle of a {@link Job}. Implementations
+ * can be stateful if they are careful to either ensure thread safety or to use one
+ * instance of a listener per job, assuming that job instances themselves are not used by
+ * more than one thread.
  *
  * @author Dave Syer
  * @author Parikshit Dutta
@@ -28,17 +28,15 @@ public interface JobExecutionListener {
 
 	/**
 	 * Callback before a job executes.
-	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	default void beforeJob(JobExecution jobExecution) {
 	}
 
 	/**
-	 * Callback after completion of a job. Called after both successful and
-	 * failed executions. To perform logic on a particular status, use
+	 * Callback after completion of a job. Called after both successful and failed
+	 * executions. To perform logic on a particular status, use
 	 * {@code if (jobExecution.getStatus() == BatchStatus.X)}.
-	 *
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	default void afterJob(JobExecution jobExecution) {

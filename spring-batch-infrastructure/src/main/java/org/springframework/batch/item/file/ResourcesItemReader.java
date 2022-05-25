@@ -27,23 +27,21 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * {@link ItemReader} which produces {@link Resource} instances from an array.
- * This can be used conveniently with a configuration entry that injects a
- * pattern (e.g. <code>mydir/*.txt</code>, which can then be converted by Spring
- * to an array of Resources by the ApplicationContext.
- * 
+ * {@link ItemReader} which produces {@link Resource} instances from an array. This can be
+ * used conveniently with a configuration entry that injects a pattern (e.g.
+ * <code>mydir/*.txt</code>, which can then be converted by Spring to an array of
+ * Resources by the ApplicationContext.
+ *
  * <br>
  * <br>
- * 
+ *
  * Thread-safe between calls to {@link #open(ExecutionContext)}. The
- * {@link ExecutionContext} is not accurate in a multi-threaded environment, so
- * do not rely on that data for restart (i.e. always open with a fresh context).
- * 
+ * {@link ExecutionContext} is not accurate in a multi-threaded environment, so do not
+ * rely on that data for restart (i.e. always open with a fresh context).
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @see ResourceArrayPropertyEditor
- * 
  * @since 2.1
  */
 public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> {
@@ -54,7 +52,7 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 
 	private AtomicInteger counter = new AtomicInteger(0);
 
-        public ResourcesItemReader() {
+	public ResourcesItemReader() {
 		/*
 		 * Initialize the name for the key in the execution context.
 		 */
@@ -63,7 +61,6 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 
 	/**
 	 * The resources to serve up as items. Hint: use a pattern to configure.
-	 * 
 	 * @param resources the resources
 	 */
 	public void setResources(Resource[] resources) {
@@ -71,10 +68,10 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 	}
 
 	/**
-	 * Increments a counter and returns the next {@link Resource} instance from
-	 * the input, or {@code null} if none remain.
+	 * Increments a counter and returns the next {@link Resource} instance from the input,
+	 * or {@code null} if none remain.
 	 */
-    @Override
+	@Override
 	@Nullable
 	public synchronized Resource read() throws Exception {
 		int index = counter.incrementAndGet() - 1;
@@ -84,15 +81,15 @@ public class ResourcesItemReader extends AbstractItemStreamItemReader<Resource> 
 		return resources[index];
 	}
 
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-                super.open(executionContext);
+		super.open(executionContext);
 		counter.set(executionContext.getInt(getExecutionContextKey(COUNT_KEY), 0));
 	}
 
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-                super.update(executionContext);
+		super.update(executionContext);
 		executionContext.putInt(getExecutionContextKey(COUNT_KEY), counter.get());
 	}
 

@@ -52,18 +52,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SQLServerJobRepositoryIntegrationTests {
 
 	// TODO find the best way to externalize and manage image versions
-	private static final DockerImageName SQLSERVER_IMAGE = DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
+	private static final DockerImageName SQLSERVER_IMAGE = DockerImageName
+			.parse("mcr.microsoft.com/mssql/server:2019-CU11-ubuntu-20.04");
 
 	@ClassRule
 	public static MSSQLServerContainer<?> sqlserver = new MSSQLServerContainer<>(SQLSERVER_IMAGE).acceptLicense();
-	
+
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
-	
+
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
@@ -75,7 +78,7 @@ public class SQLServerJobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -100,11 +103,10 @@ public class SQLServerJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

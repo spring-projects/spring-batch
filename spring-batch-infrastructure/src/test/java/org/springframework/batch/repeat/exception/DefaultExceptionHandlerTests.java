@@ -23,13 +23,15 @@ import org.springframework.batch.repeat.RepeatContext;
 public class DefaultExceptionHandlerTests extends TestCase {
 
 	private DefaultExceptionHandler handler = new DefaultExceptionHandler();
+
 	private RepeatContext context = null;
-	
+
 	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
@@ -38,8 +40,10 @@ public class DefaultExceptionHandlerTests extends TestCase {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
-		} catch (Error e) {
+		}
+		catch (Error e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
+
 }

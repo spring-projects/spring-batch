@@ -108,63 +108,52 @@ public class ConcurrentTransactionTests {
 
 		@Bean
 		public Flow flow() {
-			return new FlowBuilder<Flow>("flow")
-					.start(stepBuilderFactory.get("flow.step1")
-								.tasklet(new Tasklet() {
-									@Nullable
-									@Override
-									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-										return RepeatStatus.FINISHED;
-									}
-								}).build()
-					).next(stepBuilderFactory.get("flow.step2")
-								.tasklet(new Tasklet() {
-									@Nullable
-									@Override
-									public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-										return RepeatStatus.FINISHED;
-									}
-								}).build()
-					).build();
+			return new FlowBuilder<Flow>("flow").start(stepBuilderFactory.get("flow.step1").tasklet(new Tasklet() {
+				@Nullable
+				@Override
+				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+					return RepeatStatus.FINISHED;
+				}
+			}).build()).next(stepBuilderFactory.get("flow.step2").tasklet(new Tasklet() {
+				@Nullable
+				@Override
+				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+					return RepeatStatus.FINISHED;
+				}
+			}).build()).build();
 		}
 
 		@Bean
 		public Step firstStep() {
-			return stepBuilderFactory.get("firstStep")
-					.tasklet(new Tasklet() {
-						@Nullable
-						@Override
-						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-							System.out.println(">> Beginning concurrent job test");
-							return RepeatStatus.FINISHED;
-						}
-					}).build();
+			return stepBuilderFactory.get("firstStep").tasklet(new Tasklet() {
+				@Nullable
+				@Override
+				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+					System.out.println(">> Beginning concurrent job test");
+					return RepeatStatus.FINISHED;
+				}
+			}).build();
 		}
 
 		@Bean
 		public Step lastStep() {
-			return stepBuilderFactory.get("lastStep")
-					.tasklet(new Tasklet() {
-						@Nullable
-						@Override
-						public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-							System.out.println(">> Ending concurrent job test");
-							return RepeatStatus.FINISHED;
-						}
-					}).build();
+			return stepBuilderFactory.get("lastStep").tasklet(new Tasklet() {
+				@Nullable
+				@Override
+				public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+					System.out.println(">> Ending concurrent job test");
+					return RepeatStatus.FINISHED;
+				}
+			}).build();
 		}
 
 		@Bean
 		public Job concurrentJob() {
-			Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor()).add(flow(), flow(), flow(), flow(), flow(), flow(), flow()).build();
+			Flow splitFlow = new FlowBuilder<Flow>("splitflow").split(new SimpleAsyncTaskExecutor())
+					.add(flow(), flow(), flow(), flow(), flow(), flow(), flow()).build();
 
-			return jobBuilderFactory.get("concurrentJob")
-					.start(firstStep())
-					.next(stepBuilderFactory.get("splitFlowStep")
-							.flow(splitFlow)
-							.build())
-					.next(lastStep())
-					.build();
+			return jobBuilderFactory.get("concurrentJob").start(firstStep())
+					.next(stepBuilderFactory.get("splitFlowStep").flow(splitFlow).build()).next(lastStep()).build();
 		}
 
 		@Override
@@ -174,22 +163,23 @@ public class ConcurrentTransactionTests {
 			factory.setIsolationLevelForCreate(Isolation.READ_COMMITTED);
 			factory.setTransactionManager(getTransactionManager());
 			factory.afterPropertiesSet();
-			return  factory.getObject();
+			return factory.getObject();
 		}
+
 	}
 
 	@Configuration
 	static class DataSourceConfiguration {
+
 		/**
-		 * This datasource configuration configures the HSQLDB instance using MVCC.  When
+		 * This datasource configuration configures the HSQLDB instance using MVCC. When
 		 * configured using the default behavior, transaction serialization errors are
 		 * thrown (default configuration example below).
 		 *
-		 * 			return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
-		 * 				 addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
-		 * 				 addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
-		 * 				 build());
-
+		 * return new PooledEmbeddedDataSource(new EmbeddedDatabaseBuilder().
+		 * addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql").
+		 * addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").
+		 * build());
 		 * @return
 		 */
 		@Bean
@@ -202,7 +192,8 @@ public class ConcurrentTransactionTests {
 				@SuppressWarnings("unchecked")
 				public void configureConnectionProperties(ConnectionProperties properties, String databaseName) {
 					try {
-						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver", this.getClass().getClassLoader()));
+						properties.setDriverClass((Class<? extends Driver>) ClassUtils.forName("org.hsqldb.jdbcDriver",
+								this.getClass().getClassLoader()));
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -225,12 +216,16 @@ public class ConcurrentTransactionTests {
 			});
 
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
-			databasePopulator.addScript(defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
+			databasePopulator.addScript(defaultResourceLoader
+					.getResource("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"));
+			databasePopulator.addScript(
+					defaultResourceLoader.getResource("classpath:org/springframework/batch/core/schema-hsqldb.sql"));
 			embeddedDatabaseFactory.setDatabasePopulator(databasePopulator);
 			embeddedDatabaseFactory.setGenerateUniqueDatabaseName(true);
 
 			return embeddedDatabaseFactory.getDatabase();
 		}
+
 	}
+
 }

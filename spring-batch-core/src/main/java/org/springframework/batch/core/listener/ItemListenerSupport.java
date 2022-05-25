@@ -21,9 +21,8 @@ import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * Basic no-op implementation of the {@link ItemReadListener},
- * {@link ItemProcessListener}, and {@link ItemWriteListener} interfaces. All
- * are implemented, since it is very common that all may need to be implemented
- * at once.
+ * {@link ItemProcessListener}, and {@link ItemWriteListener} interfaces. All are
+ * implemented, since it is very common that all may need to be implemented at once.
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine

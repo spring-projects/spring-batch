@@ -22,9 +22,9 @@ import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Composite {@link ExceptionHandler} that loops though a list of delegates.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeExceptionHandler implements ExceptionHandler {
 
@@ -35,16 +35,17 @@ public class CompositeExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Iterate over the handlers delegating the call to each in turn. The chain
-	 * ends if an exception is thrown.
-	 * 
+	 * Iterate over the handlers delegating the call to each in turn. The chain ends if an
+	 * exception is thrown.
+	 *
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
-    @Override
+	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		for (int i = 0; i < handlers.length; i++) {
 			ExceptionHandler handler = handlers[i];
 			handler.handleException(context, throwable);
 		}
 	}
+
 }

@@ -31,7 +31,6 @@ public class SynchronizedItemStreamWriterBuilder<T> {
 
 	/**
 	 * Set the delegate {@link ItemStreamWriter}.
-	 * 
 	 * @param delegate the delegate to set
 	 * @return this instance for method chaining
 	 */
@@ -43,7 +42,6 @@ public class SynchronizedItemStreamWriterBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link SynchronizedItemStreamWriter}.
-	 * 
 	 * @return a new {@link SynchronizedItemStreamWriter}
 	 */
 	public SynchronizedItemStreamWriter<T> build() {
@@ -53,4 +51,5 @@ public class SynchronizedItemStreamWriterBuilder<T> {
 		writer.setDelegate(this.delegate);
 		return writer;
 	}
+
 }

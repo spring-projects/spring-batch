@@ -23,18 +23,19 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * A convenient strategy for SQL updates, acting effectively as the inverse of
  * {@link RowMapper}.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface ItemPreparedStatementSetter<T> {
+
 	/**
-	 * Set parameter values on the given PreparedStatement as determined from
-	 * the provided item.
+	 * Set parameter values on the given PreparedStatement as determined from the provided
+	 * item.
 	 * @param item the item to obtain the values from
 	 * @param ps the PreparedStatement to invoke setter methods on
-	 * @throws SQLException if a SQLException is encountered (i.e. there is no
-	 * need to catch SQLException)
+	 * @throws SQLException if a SQLException is encountered (i.e. there is no need to
+	 * catch SQLException)
 	 */
 	void setValues(T item, PreparedStatement ps) throws SQLException;
 

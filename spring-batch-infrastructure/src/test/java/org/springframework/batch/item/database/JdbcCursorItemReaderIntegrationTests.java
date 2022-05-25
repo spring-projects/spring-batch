@@ -22,20 +22,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for {@link JdbcCursorItemReader}
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
-    @Override
+	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<>();
 		result.setDataSource(dataSource);
 		result.setSql("select ID, NAME, VALUE from T_FOOS");
 		result.setIgnoreWarnings(true);
 		result.setVerifyCursorPosition(true);
-		
+
 		result.setRowMapper(new FooRowMapper());
 		result.setFetchSize(10);
 		result.setMaxRows(100);
@@ -45,6 +45,4 @@ public class JdbcCursorItemReaderIntegrationTests extends AbstractGenericDataSou
 		return result;
 	}
 
-	
-	
 }

@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  * @author Lucas Ward
  * @author Will Schipp
- * 
+ *
  */
 public class AbstractEventWriterWrapperTests extends TestCase {
 
@@ -37,7 +37,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	XMLEventWriter xmlEventWriter;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -47,7 +47,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	public void testAdd() throws XMLStreamException {
 
-		XMLEvent event =  mock(XMLEvent.class);
+		XMLEvent event = mock(XMLEvent.class);
 		xmlEventWriter.add(event);
 		eventWriterWrapper.add(event);
 
@@ -104,8 +104,11 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 	}
 
 	private static class StubEventWriter extends AbstractEventWriterWrapper {
+
 		public StubEventWriter(XMLEventWriter wrappedEventWriter) {
 			super(wrappedEventWriter);
 		}
+
 	}
+
 }

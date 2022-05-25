@@ -45,7 +45,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- *
  * @author Will Schipp
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -57,68 +56,71 @@ public class MessageChannelPartitionHandlerTests {
 
 	@Test
 	public void testNoPartitions() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 
-		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
-		//verify
+		// execute
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+		// verify
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testHandleNoReply() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
-		//when
+		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(message.getPayload()).thenReturn(Collections.emptyList());
 		when(operations.receive((PollableChannel) any())).thenReturn(message);
-		//set
+		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
-		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
-		//verify
+		// execute
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+		// verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testHandleWithReplyChannel() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
 		PollableChannel replyChannel = mock(PollableChannel.class);
-		//when
+		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(message.getPayload()).thenReturn(Collections.emptyList());
 		when(operations.receive(replyChannel)).thenReturn(message);
-		//set
+		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setReplyChannel(replyChannel);
 
-		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
-		//verify
+		// execute
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+		// verify
 		assertNotNull(executions);
 		assertTrue(executions.isEmpty());
 
@@ -127,36 +129,36 @@ public class MessageChannelPartitionHandlerTests {
 	@SuppressWarnings("rawtypes")
 	@Test(expected = MessageTimeoutException.class)
 	public void messageReceiveTimeout() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		StepExecution managerStepExecution = mock(StepExecution.class);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		Message message = mock(Message.class);
-		//when
+		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		stepExecutions.add(new StepExecution("step1", new JobExecution(5L)));
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(message.getPayload()).thenReturn(Collections.emptyList());
-		//set
+		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 
-		//execute
+		// execute
 		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 	}
 
 	@Test
 	public void testHandleWithJobRepositoryPolling() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
 		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		JobExplorer jobExplorer = mock(JobExplorer.class);
-		//when
+		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		StepExecution partition1 = new StepExecution("step1:partition1", jobExecution, 2L);
 		StepExecution partition2 = new StepExecution("step1:partition2", jobExecution, 3L);
@@ -170,39 +172,41 @@ public class MessageChannelPartitionHandlerTests {
 		stepExecutions.add(partition2);
 		stepExecutions.add(partition3);
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
-		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3, partition3, partition3, partition3, partition4);
+		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3,
+				partition3, partition3, partition3, partition4);
 
-		//set
+		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setJobExplorer(jobExplorer);
 		messageChannelPartitionHandler.setStepName("step1");
 		messageChannelPartitionHandler.setPollInterval(500L);
 		messageChannelPartitionHandler.afterPropertiesSet();
 
-		//execute
-		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
-		//verify
+		// execute
+		Collection<StepExecution> executions = messageChannelPartitionHandler.handle(stepExecutionSplitter,
+				managerStepExecution);
+		// verify
 		assertNotNull(executions);
 		assertEquals(3, executions.size());
 		assertTrue(executions.contains(partition1));
 		assertTrue(executions.contains(partition2));
 		assertTrue(executions.contains(partition4));
 
-		//verify
+		// verify
 		verify(operations, times(3)).send(any(Message.class));
 	}
 
 	@Test(expected = TimeoutException.class)
 	public void testHandleWithJobRepositoryPollingTimeout() throws Exception {
-		//execute with no default set
+		// execute with no default set
 		messageChannelPartitionHandler = new MessageChannelPartitionHandler();
-		//mock
+		// mock
 		JobExecution jobExecution = new JobExecution(5L, new JobParameters());
 		StepExecution managerStepExecution = new StepExecution("step1", jobExecution, 1L);
 		StepExecutionSplitter stepExecutionSplitter = mock(StepExecutionSplitter.class);
 		MessagingTemplate operations = mock(MessagingTemplate.class);
 		JobExplorer jobExplorer = mock(JobExplorer.class);
-		//when
+		// when
 		HashSet<StepExecution> stepExecutions = new HashSet<>();
 		StepExecution partition1 = new StepExecution("step1:partition1", jobExecution, 2L);
 		StepExecution partition2 = new StepExecution("step1:partition2", jobExecution, 3L);
@@ -216,14 +220,15 @@ public class MessageChannelPartitionHandlerTests {
 		when(stepExecutionSplitter.split(any(StepExecution.class), eq(1))).thenReturn(stepExecutions);
 		when(jobExplorer.getStepExecution(eq(5L), any(Long.class))).thenReturn(partition2, partition1, partition3);
 
-		//set
+		// set
 		messageChannelPartitionHandler.setMessagingOperations(operations);
 		messageChannelPartitionHandler.setJobExplorer(jobExplorer);
 		messageChannelPartitionHandler.setStepName("step1");
 		messageChannelPartitionHandler.setTimeout(1000L);
 		messageChannelPartitionHandler.afterPropertiesSet();
 
-		//execute
+		// execute
 		messageChannelPartitionHandler.handle(stepExecutionSplitter, managerStepExecution);
 	}
+
 }

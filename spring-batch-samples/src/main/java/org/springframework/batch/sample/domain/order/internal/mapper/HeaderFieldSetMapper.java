@@ -23,6 +23,7 @@ import org.springframework.batch.sample.domain.order.Order;
 public class HeaderFieldSetMapper implements FieldSetMapper<Order> {
 
 	public static final String ORDER_ID_COLUMN = "ORDER_ID";
+
 	public static final String ORDER_DATE_COLUMN = "ORDER_DATE";
 
 	@Override
@@ -33,4 +34,5 @@ public class HeaderFieldSetMapper implements FieldSetMapper<Order> {
 
 		return order;
 	}
+
 }

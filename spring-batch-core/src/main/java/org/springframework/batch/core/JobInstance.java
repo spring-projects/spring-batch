@@ -19,18 +19,17 @@ package org.springframework.batch.core;
 import org.springframework.util.Assert;
 
 /**
- * Batch domain object representing a uniquely identifiable job run.
- * {@code JobInstance} can be restarted multiple times in case of execution failure, and
- * its lifecycle ends with first successful execution.
+ * Batch domain object representing a uniquely identifiable job run. {@code JobInstance}
+ * can be restarted multiple times in case of execution failure, and its lifecycle ends
+ * with first successful execution.
  *
  * Trying to execute an existing {@code JobInstance} that has already completed
- * successfully results in an error. An error is also raised for an attempt
- * to restart a failed {@code JobInstance} if the {@code Job} is not restartable.
+ * successfully results in an error. An error is also raised for an attempt to restart a
+ * failed {@code JobInstance} if the {@code Job} is not restartable.
  *
  * @see Job
  * @see JobParameters
  * @see JobExecution
- *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -45,7 +44,6 @@ public class JobInstance extends Entity {
 
 	/**
 	 * Constructor for {@link JobInstance}.
-	 *
 	 * @param id The instance ID.
 	 * @param jobName The name associated with the {@link JobInstance}.
 	 */
@@ -62,9 +60,9 @@ public class JobInstance extends Entity {
 		return jobName;
 	}
 
-  /**
+	/**
 	 * Adds the job name to the string representation of the super class ({@link Entity}).
-   */
+	 */
 	@Override
 	public String toString() {
 		return super.toString() + ", Job=[" + jobName + "]";
@@ -76,4 +74,5 @@ public class JobInstance extends Entity {
 	public long getInstanceId() {
 		return super.getId();
 	}
+
 }

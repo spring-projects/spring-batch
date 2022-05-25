@@ -33,7 +33,6 @@ import org.springframework.util.Assert;
  * <a href="https://github.com/FasterXML/jackson">Jackson</a>.
  *
  * @param <T> type of the target object
- *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
@@ -86,7 +85,8 @@ public class JacksonJsonObjectReader<T> implements JsonObjectReader<T> {
 			if (this.jsonParser.nextToken() == JsonToken.START_OBJECT) {
 				return this.mapper.readValue(this.jsonParser, this.itemType);
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new ParseException("Unable to read next JSON object", e);
 		}
 		return null;

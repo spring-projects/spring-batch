@@ -28,4 +28,5 @@ public interface FooDao {
 	Foo getFoo(Object key);
 
 	void setDataSource(DataSource dataSource);
+
 }

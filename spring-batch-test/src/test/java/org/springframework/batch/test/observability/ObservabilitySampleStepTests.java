@@ -62,14 +62,10 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 			Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 			// and
-			assertThat(bb.getFinishedSpans())
-					.haveSameTraceId()
-					.hasASpanWithName("job")
-					.hasASpanWithName("step");
+			assertThat(bb.getFinishedSpans()).haveSameTraceId().hasASpanWithName("job").hasASpanWithName("step");
 
 			// and
-			MeterRegistryAssert.assertThat(meterRegistry)
-					.hasTimerWithName("spring.batch.job")
+			MeterRegistryAssert.assertThat(meterRegistry).hasTimerWithName("spring.batch.job")
 					.hasTimerWithName("spring.batch.step");
 		};
 	}
@@ -79,4 +75,5 @@ public class ObservabilitySampleStepTests extends SampleTestRunner {
 	static class TestConfig {
 
 	}
+
 }

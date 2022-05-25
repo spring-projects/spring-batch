@@ -19,18 +19,16 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
- * Checked exception that indicates a name clash when registering
- * {@link Job} instances.
- * 
+ * Checked exception that indicates a name clash when registering {@link Job} instances.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class DuplicateJobException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg error message.
 	 */
 	public DuplicateJobException(String msg) {

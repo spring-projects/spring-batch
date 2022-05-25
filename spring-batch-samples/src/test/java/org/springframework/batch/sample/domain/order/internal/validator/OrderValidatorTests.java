@@ -283,7 +283,8 @@ public class OrderValidatorTests {
 		info = new ShippingInfo();
 		info.setShipperId("FEDX");
 		info.setShippingTypeId("EXP");
-		info.setShippingInfo("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+		info.setShippingInfo(
+				"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
 		order.setShipping(info);
 
 		errors = new BeanPropertyBindingResult(order, "validOrder");
@@ -340,7 +341,8 @@ public class OrderValidatorTests {
 		assertEquals("error.lineitems.totalprice", errors.getFieldErrors("lineItems").get(6).getCode());
 	}
 
-	private LineItem buildLineItem(long itemId, double price, int discountPercentage, int discountAmount, long shippingPrice, long handlingPrice, int qty, int totalPrice) {
+	private LineItem buildLineItem(long itemId, double price, int discountPercentage, int discountAmount,
+			long shippingPrice, long handlingPrice, int qty, int totalPrice) {
 		LineItem invalidId = new LineItem();
 		invalidId.setItemId(itemId);
 		invalidId.setPrice(new BigDecimal(price));
@@ -352,4 +354,5 @@ public class OrderValidatorTests {
 		invalidId.setTotalPrice(new BigDecimal(totalPrice));
 		return invalidId;
 	}
+
 }

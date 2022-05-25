@@ -22,13 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * A {@link Poller} that uses the callers thread to poll for a result as soon as
- * it is asked for. This is often appropriate if you expect a result relatively
- * quickly, or if there is only one such result expected (otherwise it is more
- * efficient to use a background thread to do the polling).
- * 
+ * A {@link Poller} that uses the callers thread to poll for a result as soon as it is
+ * asked for. This is often appropriate if you expect a result relatively quickly, or if
+ * there is only one such result expected (otherwise it is more efficient to use a
+ * background thread to do the polling).
+ *
  * @author Dave Syer
- * 
  * @param <S> the type of the result
  */
 public class DirectPoller<S> implements Poller<S> {
@@ -40,13 +39,13 @@ public class DirectPoller<S> implements Poller<S> {
 	}
 
 	/**
-	 * Get a future for a non-null result from the callback. Only when the
-	 * result is asked for (using {@link Future#get()} or
-	 * {@link Future#get(long, TimeUnit)} will the polling actually start.
-	 * 
+	 * Get a future for a non-null result from the callback. Only when the result is asked
+	 * for (using {@link Future#get()} or {@link Future#get(long, TimeUnit)} will the
+	 * polling actually start.
+	 *
 	 * @see Poller#poll(Callable)
 	 */
-    @Override
+	@Override
 	public Future<S> poll(Callable<S> callable) throws Exception {
 		return new DirectPollingFuture<>(interval, callable);
 	}
@@ -68,13 +67,13 @@ public class DirectPoller<S> implements Poller<S> {
 			this.callable = callable;
 		}
 
-        @Override
+		@Override
 		public boolean cancel(boolean mayInterruptIfRunning) {
 			cancelled = true;
 			return true;
 		}
 
-        @Override
+		@Override
 		public S get() throws InterruptedException, ExecutionException {
 			try {
 				return get(-1, TimeUnit.MILLISECONDS);
@@ -84,7 +83,7 @@ public class DirectPoller<S> implements Poller<S> {
 			}
 		}
 
-        @Override
+		@Override
 		public S get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 
 			try {
@@ -125,12 +124,12 @@ public class DirectPoller<S> implements Poller<S> {
 
 		}
 
-        @Override
+		@Override
 		public boolean isCancelled() {
 			return cancelled;
 		}
 
-        @Override
+		@Override
 		public boolean isDone() {
 			return cancelled || result != null;
 		}

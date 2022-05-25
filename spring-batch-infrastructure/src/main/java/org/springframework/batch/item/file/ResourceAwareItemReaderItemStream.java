@@ -22,12 +22,13 @@ import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.core.io.Resource;
 
 /**
- * Interface for {@link ItemReader}s that implement {@link ItemStream} and read
- * input from {@link Resource}.
- * 
+ * Interface for {@link ItemReader}s that implement {@link ItemStream} and read input from
+ * {@link Resource}.
+ *
  * @author Robert Kasanicky
  */
 public interface ResourceAwareItemReaderItemStream<T> extends ItemStreamReader<T> {
 
 	void setResource(Resource resource);
+
 }

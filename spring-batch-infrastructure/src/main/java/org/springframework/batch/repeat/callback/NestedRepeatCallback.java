@@ -22,12 +22,12 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 
 /**
- * Callback that delegates to another callback, via a {@link RepeatOperations}
- * instance. Useful when nesting or composing batches in one another, e.g. for
- * breaking a batch down into chunks.
- * 
+ * Callback that delegates to another callback, via a {@link RepeatOperations} instance.
+ * Useful when nesting or composing batches in one another, e.g. for breaking a batch down
+ * into chunks.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class NestedRepeatCallback implements RepeatCallback {
 
@@ -37,9 +37,8 @@ public class NestedRepeatCallback implements RepeatCallback {
 
 	/**
 	 * Constructor setting mandatory fields.
-	 * 
-	 * @param template the {@link RepeatOperations} to use when calling the
-	 * delegate callback
+	 * @param template the {@link RepeatOperations} to use when calling the delegate
+	 * callback
 	 * @param callback the {@link RepeatCallback} delegate
 	 */
 	public NestedRepeatCallback(RepeatOperations template, RepeatCallback callback) {
@@ -49,14 +48,15 @@ public class NestedRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Simply calls template.execute(callback). Clients can use this to repeat a
-	 * batch process, or to break a process up into smaller chunks (e.g. to
-	 * change the transaction boundaries).
-	 * 
+	 * Simply calls template.execute(callback). Clients can use this to repeat a batch
+	 * process, or to break a process up into smaller chunks (e.g. to change the
+	 * transaction boundaries).
+	 *
 	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(RepeatContext)
 	 */
-    @Override
+	@Override
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		return template.iterate(callback);
 	}
+
 }

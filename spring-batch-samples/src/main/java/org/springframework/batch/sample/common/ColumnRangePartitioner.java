@@ -26,9 +26,8 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Simple minded partitioner for a range of values of a column in a database
- * table. Works best if the values are uniformly distributed (e.g.
- * auto-generated primary key values).
+ * Simple minded partitioner for a range of values of a column in a database table. Works
+ * best if the values are uniformly distributed (e.g. auto-generated primary key values).
  *
  * @author Dave Syer
  *
@@ -43,7 +42,6 @@ public class ColumnRangePartitioner implements Partitioner {
 
 	/**
 	 * The name of the SQL table the data are in.
-	 *
 	 * @param table the name of the table
 	 */
 	public void setTable(String table) {
@@ -52,7 +50,6 @@ public class ColumnRangePartitioner implements Partitioner {
 
 	/**
 	 * The name of the column to partition.
-	 *
 	 * @param column the column name.
 	 */
 	public void setColumn(String column) {
@@ -61,7 +58,6 @@ public class ColumnRangePartitioner implements Partitioner {
 
 	/**
 	 * The data source for connecting to the database.
-	 *
 	 * @param dataSource a {@link DataSource}
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -69,10 +65,10 @@ public class ColumnRangePartitioner implements Partitioner {
 	}
 
 	/**
-	 * Partition a database table assuming that the data in the column specified
-	 * are uniformly distributed. The execution context values will have keys
-	 * <code>minValue</code> and <code>maxValue</code> specifying the range of
-	 * values to consider in each partition.
+	 * Partition a database table assuming that the data in the column specified are
+	 * uniformly distributed. The execution context values will have keys
+	 * <code>minValue</code> and <code>maxValue</code> specifying the range of values to
+	 * consider in each partition.
 	 *
 	 * @see Partitioner#partition(int)
 	 */
@@ -103,4 +99,5 @@ public class ColumnRangePartitioner implements Partitioner {
 
 		return result;
 	}
+
 }

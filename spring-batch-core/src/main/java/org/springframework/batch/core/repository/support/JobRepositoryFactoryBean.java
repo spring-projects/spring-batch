@@ -52,10 +52,9 @@ import org.springframework.util.StringUtils;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 /**
- * A {@link FactoryBean} that automates the creation of a
- * {@link SimpleJobRepository} using JDBC DAO implementations which persist
- * batch metadata in database. Requires the user to describe what kind of
- * database they are using.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobRepository}
+ * using JDBC DAO implementations which persist batch metadata in database. Requires the
+ * user to describe what kind of database they are using.
  *
  * @author Ben Hale
  * @author Lucas Ward
@@ -88,17 +87,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private Charset charset = StandardCharsets.UTF_8;
 
 	/**
-	 * @param type a value from the {@link java.sql.Types} class to indicate the type to use for a CLOB
+	 * @param type a value from the {@link java.sql.Types} class to indicate the type to
+	 * use for a CLOB
 	 */
 	public void setClobType(int type) {
 		this.lobType = type;
 	}
 
 	/**
-	 * A custom implementation of the {@link ExecutionContextSerializer}.
-	 * The default, if not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
-	 *
-	 * @param serializer used to serialize/deserialize {@link org.springframework.batch.item.ExecutionContext}
+	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
+	 * not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
+	 * @param serializer used to serialize/deserialize
+	 * {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -106,10 +106,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * A special handler for large objects. The default is usually fine, except
-	 * for some (usually older) versions of Oracle. The default is determined
-	 * from the data base type.
-	 *
+	 * A special handler for large objects. The default is usually fine, except for some
+	 * (usually older) versions of Oracle. The default is determined from the data base
+	 * type.
 	 * @param lobHandler the {@link LobHandler} to set
 	 *
 	 * @see LobHandler
@@ -119,15 +118,13 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * Public setter for the length of long string columns in database. Do not
-	 * set this if you haven't modified the schema. Note this value will be used
-	 * for the exit message in both {@link JdbcJobExecutionDao} and
-	 * {@link JdbcStepExecutionDao} and also the short version of the execution
-	 * context in {@link JdbcExecutionContextDao} . For databases with
-	 * multi-byte character sets this number can be smaller (by up to a factor
-	 * of 2 for 2-byte characters) than the declaration of the column length in
-	 * the DDL for the tables.
-	 *
+	 * Public setter for the length of long string columns in database. Do not set this if
+	 * you haven't modified the schema. Note this value will be used for the exit message
+	 * in both {@link JdbcJobExecutionDao} and {@link JdbcStepExecutionDao} and also the
+	 * short version of the execution context in {@link JdbcExecutionContextDao} . For
+	 * databases with multi-byte character sets this number can be smaller (by up to a
+	 * factor of 2 for 2-byte characters) than the declaration of the column length in the
+	 * DDL for the tables.
 	 * @param maxVarCharLength the exitMessageLength to set
 	 */
 	public void setMaxVarCharLength(int maxVarCharLength) {
@@ -141,10 +138,11 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	/**
-	 * Public setter for the {@link JdbcOperations}. If this property is not set explicitly,
-	 * a new {@link JdbcTemplate} will be created for the configured DataSource by default.
+	 * Public setter for the {@link JdbcOperations}. If this property is not set
+	 * explicitly, a new {@link JdbcTemplate} will be created for the configured
+	 * DataSource by default.
 	 * @param jdbcOperations a {@link JdbcOperations}
 	 */
 	public void setJdbcOperations(JdbcOperations jdbcOperations) {
@@ -153,8 +151,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 	/**
 	 * Sets the database type.
-	 * @param dbType as specified by
-	 * {@link DefaultDataFieldMaxValueIncrementerFactory}
+	 * @param dbType as specified by {@link DefaultDataFieldMaxValueIncrementerFactory}
 	 */
 	public void setDatabaseType(String dbType) {
 		this.databaseType = dbType;
@@ -173,8 +170,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	/**
-	 * Set the {@link Charset} to use when serializing/deserializing the execution context.
-	 * Defaults to "UTF-8". Must not be {@code null}.
+	 * Set the {@link Charset} to use when serializing/deserializing the execution
+	 * context. Defaults to "UTF-8". Must not be {@code null}.
 	 * @param charset to use when serializing/deserializing the execution context.
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
@@ -190,8 +187,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
 		if (jdbcOperations == null) {
-			jdbcOperations = new JdbcTemplate(dataSource);	
-		}		
+			jdbcOperations = new JdbcTemplate(dataSource);
+		}
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
@@ -208,17 +205,17 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 			lobHandler = new DefaultLobHandler();
 		}
 
-		if(serializer == null) {
+		if (serializer == null) {
 			Jackson2ExecutionContextStringSerializer defaultSerializer = new Jackson2ExecutionContextStringSerializer();
 
 			serializer = defaultSerializer;
 		}
 
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), () -> "'" + databaseType
-				+ "' is an unsupported database type.  The supported database types are "
-				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
+		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType),
+				() -> "'" + databaseType + "' is an unsupported database type.  The supported database types are "
+						+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
-		if(lobType != null) {
+		if (lobType != null) {
 			Assert.isTrue(isValidTypes(lobType), "lobType must be a value from the java.sql.Types class");
 		}
 
@@ -239,8 +236,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
-		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
-				+ "JOB_EXECUTION_SEQ"));
+		dao.setJobExecutionIncrementer(
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(maxVarCharLength);
@@ -252,8 +249,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcOperations);
-		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
-				+ "STEP_EXECUTION_SEQ"));
+		dao.setStepExecutionIncrementer(
+				incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
 		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(maxVarCharLength);
@@ -281,9 +278,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	}
 
 	private int determineClobTypeToUse(String databaseType) throws Exception {
-		if(lobType != null) {
+		if (lobType != null) {
 			return lobType;
-		} else {
+		}
+		else {
 			if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
 				return Types.LONGVARCHAR;
 			}
@@ -298,7 +296,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		for (Field field : Types.class.getFields()) {
 			int curValue = field.getInt(null);
-			if(curValue == value) {
+			if (curValue == value) {
 				result = true;
 				break;
 			}

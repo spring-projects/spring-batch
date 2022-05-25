@@ -45,15 +45,14 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Wrapper for a {@link DataSource} that can run scripts on start up and shut
- * down.  Use as a bean definition <br>
- * 
- * Run this class to initialize a database in a running server process.
- * Make sure the server is running first by launching the "hsql-server" from the
- * <code>hsql.server</code> project. Then you can right click in Eclipse and
- * Run As -&gt; Java Application. Do the same any time you want to wipe the
- * database and start again.
- * 
+ * Wrapper for a {@link DataSource} that can run scripts on start up and shut down. Use as
+ * a bean definition <br>
+ *
+ * Run this class to initialize a database in a running server process. Make sure the
+ * server is running first by launching the "hsql-server" from the
+ * <code>hsql.server</code> project. Then you can right click in Eclipse and Run As -&gt;
+ * Java Application. Do the same any time you want to wipe the database and start again.
+ *
  * @author Dave Syer
  * @author Drummond Dawson
  * @author Mahmoud Ben Hassine
@@ -75,7 +74,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	/**
 	 * Main method as convenient entry point.
-	 * 
 	 * @param args arguments to be passed to main.
 	 */
 	@SuppressWarnings("resource")
@@ -126,13 +124,13 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		if (scriptResource == null || !scriptResource.exists()) {
 			return;
 		}
-		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(this.dataSource));
+		TransactionTemplate transactionTemplate = new TransactionTemplate(
+				new DataSourceTransactionManager(this.dataSource));
 		transactionTemplate.execute((TransactionCallback<Void>) status -> {
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(this.dataSource);
 			String[] scripts;
 			try {
-				scripts = StringUtils
-						.delimitedListToStringArray(stripComments(getScriptLines(scriptResource)), ";");
+				scripts = StringUtils.delimitedListToStringArray(stripComments(getScriptLines(scriptResource)), ";");
 			}
 			catch (IOException e) {
 				throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
@@ -144,7 +142,8 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 						jdbcTemplate.execute(trimmedScript);
 					}
 					catch (DataAccessException e) {
-						if (this.ignoreFailedDrop && trimmedScript.toLowerCase().startsWith("drop") && logger.isDebugEnabled()) {
+						if (this.ignoreFailedDrop && trimmedScript.toLowerCase().startsWith("drop")
+								&& logger.isDebugEnabled()) {
 							logger.debug("DROP script failed (ignoring): " + trimmedScript);
 						}
 						else {

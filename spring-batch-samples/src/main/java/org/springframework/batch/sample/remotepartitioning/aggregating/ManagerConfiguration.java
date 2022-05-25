@@ -35,15 +35,15 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.jms.dsl.Jms;
 
 /**
- * This configuration class is for the manager side of the remote partitioning sample.
- * The manager step will create 3 partitions for workers to process.
+ * This configuration class is for the manager side of the remote partitioning sample. The
+ * manager step will create 3 partitions for workers to process.
  *
  * @author Mahmoud Ben Hassine
  */
 @Configuration
 @EnableBatchProcessing
 @EnableBatchIntegration
-@Import(value = {DataSourceConfiguration.class, BrokerConfiguration.class})
+@Import(value = { DataSourceConfiguration.class, BrokerConfiguration.class })
 public class ManagerConfiguration {
 
 	private static final int GRID_SIZE = 3;
@@ -52,9 +52,8 @@ public class ManagerConfiguration {
 
 	private final RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory;
 
-
 	public ManagerConfiguration(JobBuilderFactory jobBuilderFactory,
-								RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory) {
+			RemotePartitioningManagerStepBuilderFactory managerStepBuilderFactory) {
 
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.managerStepBuilderFactory = managerStepBuilderFactory;
@@ -70,9 +69,7 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow outboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(requests())
-				.handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
+		return IntegrationFlows.from(requests()).handle(Jms.outboundAdapter(connectionFactory).destination("requests"))
 				.get();
 	}
 
@@ -86,10 +83,8 @@ public class ManagerConfiguration {
 
 	@Bean
 	public IntegrationFlow inboundFlow(ActiveMQConnectionFactory connectionFactory) {
-		return IntegrationFlows
-				.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
-				.channel(replies())
-				.get();
+		return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory).destination("replies"))
+				.channel(replies()).get();
 	}
 
 	/*
@@ -97,19 +92,13 @@ public class ManagerConfiguration {
 	 */
 	@Bean
 	public Step managerStep() {
-		return this.managerStepBuilderFactory.get("managerStep")
-				.partitioner("workerStep", new BasicPartitioner())
-				.gridSize(GRID_SIZE)
-				.outputChannel(requests())
-				.inputChannel(replies())
-				.build();
+		return this.managerStepBuilderFactory.get("managerStep").partitioner("workerStep", new BasicPartitioner())
+				.gridSize(GRID_SIZE).outputChannel(requests()).inputChannel(replies()).build();
 	}
 
 	@Bean
 	public Job remotePartitioningJob() {
-		return this.jobBuilderFactory.get("remotePartitioningJob")
-				.start(managerStep())
-				.build();
+		return this.jobBuilderFactory.get("remotePartitioningJob").start(managerStep()).build();
 	}
 
 }

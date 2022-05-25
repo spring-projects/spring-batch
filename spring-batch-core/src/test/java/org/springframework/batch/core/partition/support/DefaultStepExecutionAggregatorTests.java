@@ -41,7 +41,7 @@ public class DefaultStepExecutionAggregatorTests {
 
 	@Test
 	public void testAggregateEmpty() {
-		aggregator.aggregate(result, Collections.<StepExecution> emptySet());
+		aggregator.aggregate(result, Collections.<StepExecution>emptySet());
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class DefaultStepExecutionAggregatorTests {
 	public void testAggregateStatusSunnyDay() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.STARTING, result.getStatus());
 	}
@@ -63,7 +63,7 @@ public class DefaultStepExecutionAggregatorTests {
 		result.setStatus(BatchStatus.FAILED);
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.FAILED, result.getStatus());
 	}
@@ -72,7 +72,7 @@ public class DefaultStepExecutionAggregatorTests {
 	public void testAggregateStatusIncomplete() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.FAILED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(BatchStatus.FAILED, result.getStatus());
 	}
@@ -81,7 +81,7 @@ public class DefaultStepExecutionAggregatorTests {
 	public void testAggregateExitStatusSunnyDay() {
 		stepExecution1.setExitStatus(ExitStatus.EXECUTING);
 		stepExecution2.setExitStatus(ExitStatus.FAILED);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
 		assertEquals(ExitStatus.FAILED.and(ExitStatus.EXECUTING), result.getExitStatus());
 	}
@@ -104,7 +104,7 @@ public class DefaultStepExecutionAggregatorTests {
 		stepExecution2.setRollbackCount(16);
 		stepExecution2.setWriteCount(17);
 		stepExecution2.setWriteSkipCount(18);
-		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		aggregator.aggregate(result, Arrays.<StepExecution>asList(stepExecution1, stepExecution2));
 		assertEquals(12, result.getCommitCount());
 		assertEquals(14, result.getFilterCount());
 		assertEquals(16, result.getProcessSkipCount());
@@ -114,4 +114,5 @@ public class DefaultStepExecutionAggregatorTests {
 		assertEquals(24, result.getWriteCount());
 		assertEquals(26, result.getWriteSkipCount());
 	}
+
 }

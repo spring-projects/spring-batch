@@ -26,9 +26,9 @@ import java.util.Comparator;
 import static org.junit.Assert.*;
 
 /**
- * Tests to ensure that the current Resource is correctly being set on items that implement ResourceAware.
- * Because it there are extensive tests the reader in general, this will only test ResourceAware related
- * use cases.
+ * Tests to ensure that the current Resource is correctly being set on items that
+ * implement ResourceAware. Because it there are extensive tests the reader in general,
+ * this will only test ResourceAware related use cases.
  */
 public class MultiResourceItemReaderResourceAwareTests {
 
@@ -59,7 +59,7 @@ public class MultiResourceItemReaderResourceAwareTests {
 
 		tested.setDelegate(itemReader);
 		tested.setComparator(new Comparator<Resource>() {
-            @Override
+			@Override
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
 			}
@@ -75,44 +75,49 @@ public class MultiResourceItemReaderResourceAwareTests {
 
 		tested.open(ctx);
 
-        assertValueAndResource(r1, "1");
-        assertValueAndResource(r1, "2");
-        assertValueAndResource(r1, "3");
-        assertValueAndResource(r2, "4");
-        assertValueAndResource(r2, "5");
-        assertValueAndResource(r4, "6");
-        assertValueAndResource(r5, "7");
-        assertValueAndResource(r5, "8");
-        assertEquals(null, tested.read());
+		assertValueAndResource(r1, "1");
+		assertValueAndResource(r1, "2");
+		assertValueAndResource(r1, "3");
+		assertValueAndResource(r2, "4");
+		assertValueAndResource(r2, "5");
+		assertValueAndResource(r4, "6");
+		assertValueAndResource(r5, "7");
+		assertValueAndResource(r5, "8");
+		assertEquals(null, tested.read());
 
 		tested.close();
 	}
 
-    private void assertValueAndResource(Resource expectedResource, String expectedValue) throws Exception {
-        Foo foo = tested.read();
-        assertEquals(expectedValue, foo.value);
-        assertEquals(expectedResource, foo.resource);
-    }
+	private void assertValueAndResource(Resource expectedResource, String expectedValue) throws Exception {
+		Foo foo = tested.read();
+		assertEquals(expectedValue, foo.value);
+		assertEquals(expectedResource, foo.resource);
+	}
 
-    static final class FooLineMapper implements LineMapper<Foo> {
-        @Override
-        public Foo mapLine(String line, int lineNumber) throws Exception {
-            return new Foo(line);
-        }
-    }
+	static final class FooLineMapper implements LineMapper<Foo> {
 
-    static final class Foo implements ResourceAware {
+		@Override
+		public Foo mapLine(String line, int lineNumber) throws Exception {
+			return new Foo(line);
+		}
 
-        String value;
-        Resource resource;
+	}
 
-        Foo(String value) {
-            this.value = value;
-        }
+	static final class Foo implements ResourceAware {
 
-        @Override
-        public void setResource(Resource resource) {
-            this.resource = resource;
-        }
-    }
+		String value;
+
+		Resource resource;
+
+		Foo(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public void setResource(Resource resource) {
+			this.resource = resource;
+		}
+
+	}
+
 }

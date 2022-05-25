@@ -17,10 +17,10 @@ package org.springframework.batch.item.file.transform;
 
 /**
  * This class will convert an object to an array of its parts.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface FieldExtractor<T> {
 

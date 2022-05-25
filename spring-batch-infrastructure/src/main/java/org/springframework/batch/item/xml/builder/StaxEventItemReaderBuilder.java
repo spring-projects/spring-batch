@@ -65,10 +65,9 @@ public class StaxEventItemReaderBuilder<T> {
 	private String encoding = StaxEventItemReader.DEFAULT_ENCODING;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -82,7 +81,6 @@ public class StaxEventItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -95,7 +93,6 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -108,7 +105,6 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -121,7 +117,6 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * The {@link Resource} to be used as input.
-	 *
 	 * @param resource the input to the reader.
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemReader#setResource(Resource)
@@ -134,7 +129,6 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * An implementation of the {@link Unmarshaller} from Spring's OXM module.
-	 *
 	 * @param unmarshaller component responsible for unmarshalling XML chunks
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemReader#setUnmarshaller
@@ -148,7 +142,6 @@ public class StaxEventItemReaderBuilder<T> {
 	/**
 	 * Adds the list of fragments to be used as the root of each chunk to the
 	 * configuration.
-	 *
 	 * @param fragmentRootElements the XML root elements to be used to identify XML
 	 * chunks.
 	 * @return The current instance of the builder.
@@ -163,7 +156,6 @@ public class StaxEventItemReaderBuilder<T> {
 	/**
 	 * Adds the list of fragments to be used as the root of each chunk to the
 	 * configuration.
-	 *
 	 * @param fragmentRootElements the XML root elements to be used to identify XML
 	 * chunks.
 	 * @return The current instance of the builder.
@@ -178,7 +170,6 @@ public class StaxEventItemReaderBuilder<T> {
 	/**
 	 * Setting this value to true indicates that it is an error if the input does not
 	 * exist and an exception will be thrown. Defaults to true.
-	 *
 	 * @param strict indicates the input file must exist
 	 * @return The current instance of the builder
 	 * @see StaxEventItemReader#setStrict(boolean)
@@ -191,7 +182,6 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * Set the {@link XMLInputFactory}.
-	 *
 	 * @param xmlInputFactory to use
 	 * @return The current instance of the builder
 	 * @see StaxEventItemReader#setXmlInputFactory(XMLInputFactory)
@@ -203,8 +193,8 @@ public class StaxEventItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Encoding for the input file. Defaults to {@link StaxEventItemReader#DEFAULT_ENCODING}.
-	 *
+	 * Encoding for the input file. Defaults to
+	 * {@link StaxEventItemReader#DEFAULT_ENCODING}.
 	 * @param encoding String encoding algorithm
 	 * @return the current instance of the builder
 	 * @see StaxEventItemReader#setEncoding(String)
@@ -217,15 +207,14 @@ public class StaxEventItemReaderBuilder<T> {
 
 	/**
 	 * Validates the configuration and builds a new {@link StaxEventItemReader}
-	 *
 	 * @return a new instance of the {@link StaxEventItemReader}
 	 */
 	public StaxEventItemReader<T> build() {
 		StaxEventItemReader<T> reader = new StaxEventItemReader<>();
 
 		if (this.resource == null) {
-			logger.debug("The resource is null. This is only a valid scenario when " +
-					"injecting resource later as in when using the MultiResourceItemReader");
+			logger.debug("The resource is null. This is only a valid scenario when "
+					+ "injecting resource later as in when using the MultiResourceItemReader");
 		}
 
 		if (this.saveState) {
@@ -249,4 +238,5 @@ public class StaxEventItemReaderBuilder<T> {
 
 		return reader;
 	}
+
 }

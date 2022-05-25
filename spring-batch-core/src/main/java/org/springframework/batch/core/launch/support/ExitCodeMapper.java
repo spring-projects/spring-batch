@@ -17,11 +17,10 @@
 package org.springframework.batch.core.launch.support;
 
 /**
- * 
- * This interface should be implemented when an environment calling the batch
- * framework has specific requirements regarding the operating system process
- * return status.
- * 
+ *
+ * This interface should be implemented when an environment calling the batch framework
+ * has specific requirements regarding the operating system process return status.
+ *
  * @author Stijn Maller
  * @author Lucas Ward
  * @author Dave Syer
@@ -39,11 +38,10 @@ public interface ExitCodeMapper {
 	public static final String JOB_NOT_PROVIDED = "JOB_NOT_PROVIDED";
 
 	/**
-	 * Convert the exit code from String into an integer that the calling
-	 * environment as an operating system can interpret as an exit status.
+	 * Convert the exit code from String into an integer that the calling environment as
+	 * an operating system can interpret as an exit status.
 	 * @param exitCode The exit code which is used internally.
-	 * @return The corresponding exit status as known by the calling
-	 * environment.
+	 * @return The corresponding exit status as known by the calling environment.
 	 */
 	public int intValue(String exitCode);
 

@@ -24,45 +24,45 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 
 /**
- * Implementation of {@link ExceptionHandler} based on an {@link Classifier}.
- * The classifier determines whether to log the exception or rethrow it. The
- * keys in the classifier must be the same as the static enum in this class.
- * 
+ * Implementation of {@link ExceptionHandler} based on an {@link Classifier}. The
+ * classifier determines whether to log the exception or rethrow it. The keys in the
+ * classifier must be the same as the static enum in this class.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Logging levels for the handler.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	public static enum Level {
 
 		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * rethrown. If the throwable is not a RuntimeException it is wrapped in
-		 * a {@link RepeatException}.
+		 * Key for {@link Classifier} signalling that the throwable should be rethrown. If
+		 * the throwable is not a RuntimeException it is wrapped in a
+		 * {@link RepeatException}.
 		 */
 		RETHROW,
 
 		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at debug level.
+		 * Key for {@link Classifier} signalling that the throwable should be logged at
+		 * debug level.
 		 */
 		DEBUG,
 
 		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at warn level.
+		 * Key for {@link Classifier} signalling that the throwable should be logged at
+		 * warn level.
 		 */
 		WARN,
 
 		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at error level.
+		 * Key for {@link Classifier} signalling that the throwable should be logged at
+		 * error level.
 		 */
 		ERROR
 
@@ -73,9 +73,8 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<>(Level.RETHROW);
 
 	/**
-	 * Setter for the {@link Classifier} used by this handler. The default is to
-	 * map all throwable instances to {@link Level#RETHROW}.
-	 * 
+	 * Setter for the {@link Classifier} used by this handler. The default is to map all
+	 * throwable instances to {@link Level#RETHROW}.
 	 * @param exceptionClassifier the ExceptionClassifier to use
 	 */
 	public void setExceptionClassifier(Classifier<Throwable, Level> exceptionClassifier) {
@@ -83,15 +82,15 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Classify the throwables and decide whether to rethrow based on the
-	 * result. The context is not used.
-	 * 
-	 * @throws Throwable thrown if {@link LogOrRethrowExceptionHandler#exceptionClassifier}
-	 * is classified as {@link Level#RETHROW}.
-	 * 
+	 * Classify the throwables and decide whether to rethrow based on the result. The
+	 * context is not used.
+	 * @throws Throwable thrown if
+	 * {@link LogOrRethrowExceptionHandler#exceptionClassifier} is classified as
+	 * {@link Level#RETHROW}.
+	 *
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
-    @Override
+	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		Level key = exceptionClassifier.classify(throwable);

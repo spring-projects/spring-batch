@@ -33,13 +33,13 @@ import org.springframework.retry.RetryException;
 import org.springframework.util.Assert;
 
 /**
- * A {@link ChunkHandler} based on a {@link ChunkProcessor}. Knows how to distinguish between a processor that is fault
- * tolerant, and one that is not. If the processor is fault tolerant then exceptions can be propagated on the assumption
- * that there will be a roll back and the request will be re-delivered.
+ * A {@link ChunkHandler} based on a {@link ChunkProcessor}. Knows how to distinguish
+ * between a processor that is fault tolerant, and one that is not. If the processor is
+ * fault tolerant then exceptions can be propagated on the assumption that there will be a
+ * roll back and the request will be re-delivered.
  *
  * @author Dave Syer
  * @author Michael Minella
- *
  * @param <S> the type of the items in the chunk to be handled
  */
 @MessageEndpoint
@@ -60,7 +60,6 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 
 	/**
 	 * Public setter for the {@link ChunkProcessor}.
-	 *
 	 * @param chunkProcessor the chunkProcessor to set
 	 */
 	public void setChunkProcessor(ChunkProcessor<S> chunkProcessor) {
@@ -83,8 +82,8 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 		Throwable failure = process(chunkRequest, stepContribution);
 		if (failure != null) {
 			logger.debug("Failed chunk", failure);
-			return new ChunkResponse(false, chunkRequest.getSequence(), chunkRequest.getJobId(), stepContribution, failure.getClass().getName()
-					+ ": " + failure.getMessage());
+			return new ChunkResponse(false, chunkRequest.getSequence(), chunkRequest.getJobId(), stepContribution,
+					failure.getClass().getName() + ": " + failure.getMessage());
 		}
 
 		if (logger.isDebugEnabled()) {

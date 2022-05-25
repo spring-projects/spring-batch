@@ -17,11 +17,11 @@
 package org.springframework.batch.core.step.item;
 
 /**
- * Fatal exception to be thrown when a rollback must be forced, typically after
- * catching an exception that otherwise would not cause a rollback.
- * 
+ * Fatal exception to be thrown when a rollback must be forced, typically after catching
+ * an exception that otherwise would not cause a rollback.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class ForceRollbackForWriteSkipException extends RuntimeException {

@@ -24,9 +24,9 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.lang.Nullable;
 
 /**
- * Context and execution strategy for {@link FlowJob} to allow it to delegate
- * its execution step by step.
- * 
+ * Context and execution strategy for {@link FlowJob} to allow it to delegate its
+ * execution step by step.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
@@ -56,7 +56,6 @@ public interface FlowExecutor {
 	/**
 	 * Chance to clean up resources at the end of a flow (whether it completed
 	 * successfully or not).
-	 * 
 	 * @param result the final {@link FlowExecution}
 	 */
 	void close(FlowExecution result);
@@ -67,9 +66,7 @@ public interface FlowExecutor {
 	void abandonStepExecution();
 
 	/**
-	 * Handle any status changes that might be needed in the
-	 * {@link JobExecution}.
-	 *
+	 * Handle any status changes that might be needed in the {@link JobExecution}.
 	 * @param status status to update the {@link JobExecution} to.
 	 */
 	void updateJobExecutionStatus(FlowExecutionStatus status);

@@ -30,8 +30,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch.
- * Customization is available by implementing the {@link BatchConfigurer} interface.
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -45,7 +46,6 @@ public class ModularBatchConfiguration extends SimpleBatchConfiguration {
 
 	/**
 	 * Creates a {@link AutomaticJobRegistrar} bean.
-	 *
 	 * @return New instance of {@link AutomaticJobRegistrar}.
 	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */

@@ -31,9 +31,10 @@ import junit.framework.TestCase;
 public class AbstractEventReaderWrapperTests extends TestCase {
 
 	AbstractEventReaderWrapper eventReaderWrapper;
+
 	XMLEventReader xmlEventReader;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -101,8 +102,11 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 	}
 
 	private static class StubEventReader extends AbstractEventReaderWrapper {
+
 		public StubEventReader(XMLEventReader wrappedEventReader) {
 			super(wrappedEventReader);
 		}
+
 	}
+
 }

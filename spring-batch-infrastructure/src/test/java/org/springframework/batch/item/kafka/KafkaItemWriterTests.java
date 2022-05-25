@@ -41,6 +41,7 @@ public class KafkaItemWriterTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private KafkaTemplate<String, String> kafkaTemplate;
 
@@ -138,5 +139,7 @@ public class KafkaItemWriterTests {
 		public String convert(String source) {
 			return source;
 		}
+
 	}
+
 }

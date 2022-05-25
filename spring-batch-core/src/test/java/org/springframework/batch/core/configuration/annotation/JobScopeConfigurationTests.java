@@ -177,6 +177,7 @@ public class JobScopeConfigurationTests {
 	}
 
 	public static class SimpleCallable implements Callable<String> {
+
 		private final String value;
 
 		private SimpleCallable(String value) {
@@ -187,9 +188,11 @@ public class JobScopeConfigurationTests {
 		public String call() throws Exception {
 			return value;
 		}
+
 	}
 
 	public static class SimpleHolder {
+
 		private final String value;
 
 		protected SimpleHolder() {
@@ -203,6 +206,7 @@ public class JobScopeConfigurationTests {
 		public String call() throws Exception {
 			return value;
 		}
+
 	}
 
 	public static class Wrapper {
@@ -226,6 +230,7 @@ public class JobScopeConfigurationTests {
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			return RepeatStatus.FINISHED;
 		}
+
 	}
 
 	@Configuration
@@ -251,9 +256,8 @@ public class JobScopeConfigurationTests {
 		}
 
 		@Bean
-		@Scope(value="job", proxyMode = ScopedProxyMode.TARGET_CLASS)
-		protected SimpleHolder value(@Value("#{jobName}")
-		final String value) {
+		@Scope(value = "job", proxyMode = ScopedProxyMode.TARGET_CLASS)
+		protected SimpleHolder value(@Value("#{jobName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -264,9 +268,8 @@ public class JobScopeConfigurationTests {
 	public static class JobScopeConfigurationRequiringProxyTargetClass {
 
 		@Bean
-		@Scope(value="job", proxyMode = ScopedProxyMode.TARGET_CLASS)
-		protected SimpleHolder value(@Value("#{jobName}")
-		final String value) {
+		@Scope(value = "job", proxyMode = ScopedProxyMode.TARGET_CLASS)
+		protected SimpleHolder value(@Value("#{jobName}") final String value) {
 			return new SimpleHolder(value);
 		}
 
@@ -278,8 +281,7 @@ public class JobScopeConfigurationTests {
 
 		@Bean
 		@JobScope
-		protected Callable<String> value(@Value("#{jobName}")
-		final String value) {
+		protected Callable<String> value(@Value("#{jobName}") final String value) {
 			return new SimpleCallable(value);
 		}
 
@@ -290,9 +292,8 @@ public class JobScopeConfigurationTests {
 	public static class JobScopeConfigurationForcingInterfaceProxy {
 
 		@Bean
-		@Scope(value="job", proxyMode = ScopedProxyMode.INTERFACES)
-		protected SimpleHolder value(@Value("#{jobName}")
-		final String value) {
+		@Scope(value = "job", proxyMode = ScopedProxyMode.INTERFACES)
+		protected SimpleHolder value(@Value("#{jobName}") final String value) {
 			return new SimpleHolder(value);
 		}
 

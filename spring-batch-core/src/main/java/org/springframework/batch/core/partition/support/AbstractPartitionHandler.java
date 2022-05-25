@@ -23,11 +23,11 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 
 /**
- * Base {@link PartitionHandler} implementation providing common base
- * features. Subclasses are expected to implement only the
- * {@link #doHandle(org.springframework.batch.core.StepExecution, java.util.Set)}
- * method which returns with the result of the execution(s) or an exception if
- * the step failed to process.
+ * Base {@link PartitionHandler} implementation providing common base features. Subclasses
+ * are expected to implement only the
+ * {@link #doHandle(org.springframework.batch.core.StepExecution, java.util.Set)} method
+ * which returns with the result of the execution(s) or an exception if the step failed to
+ * process.
  *
  * @author Sebastien Gerard
  * @author Dave Syer
@@ -38,15 +38,13 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	private int gridSize = 1;
 
 	/**
-	 * Executes the specified {@link StepExecution} instances and returns an updated
-	 * view of them. Throws an {@link Exception} if anything goes wrong.
-	 *
+	 * Executes the specified {@link StepExecution} instances and returns an updated view
+	 * of them. Throws an {@link Exception} if anything goes wrong.
 	 * @param managerStepExecution the whole partition execution
 	 * @param partitionStepExecutions the {@link StepExecution} instances to execute
 	 * @return an updated view of these completed {@link StepExecution} instances
-	 * @throws Exception if anything goes wrong. This allows implementations to
-	 * be liberal and rely on the caller to translate an exception into a step
-	 * failure as necessary.
+	 * @throws Exception if anything goes wrong. This allows implementations to be liberal
+	 * and rely on the caller to translate an exception into a step failure as necessary.
 	 */
 	protected abstract Set<StepExecution> doHandle(StepExecution managerStepExecution,
 			Set<StepExecution> partitionStepExecutions) throws Exception;
@@ -64,7 +62,6 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 
 	/**
 	 * Returns the number of step executions.
-	 *
 	 * @return the number of step executions
 	 */
 	public int getGridSize() {
@@ -73,11 +70,10 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 
 	/**
 	 * Passed to the {@link StepExecutionSplitter} in the
-	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing
-	 * it how many {@link StepExecution} instances are required, ideally. The
-	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the
-	 * case of a restart, since the input data partitions must be preserved.
-	 *
+	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing it how
+	 * many {@link StepExecution} instances are required, ideally. The
+	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the case of a
+	 * restart, since the input data partitions must be preserved.
 	 * @param gridSize the number of step executions that will be created
 	 */
 	public void setGridSize(int gridSize) {
@@ -85,4 +81,3 @@ public abstract class AbstractPartitionHandler implements PartitionHandler {
 	}
 
 }
-

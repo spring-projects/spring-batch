@@ -87,13 +87,16 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 			}
 			return null;
 		}
+
 	}
 
 	@Configuration
 	@EnableBatchProcessing
 	public static class TestConfig {
+
 		@Autowired
 		private JobBuilderFactory jobBuilder;
+
 		@Autowired
 		private StepBuilderFactory stepBuilder;
 
@@ -107,25 +110,18 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 			EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
 			return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
 					.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-					.setType(EmbeddedDatabaseType.HSQL)
-					.build();
+					.setType(EmbeddedDatabaseType.HSQL).build();
 		}
 
 		@Bean
 		public Job jobUnderTest() {
-			return jobBuilder.get("job-under-test")
-					.start(stepUnderTest())
-					.build();
+			return jobBuilder.get("job-under-test").start(stepUnderTest()).build();
 		}
 
 		@Bean
 		public Step stepUnderTest() {
-			return stepBuilder.get("step-under-test")
-					.<String, String>chunk(1)
-					.reader(reader())
-					.processor(processor())
-					.writer(writer())
-					.build();
+			return stepBuilder.get("step-under-test").<String, String>chunk(1).reader(reader()).processor(processor())
+					.writer(writer()).build();
 		}
 
 		@Bean
@@ -151,10 +147,11 @@ public class StepScopeAnnotatedListenerIntegrationTests {
 			return new ItemWriter<String>() {
 
 				@Override
-				public void write(List<? extends String> items)
-						throws Exception {
+				public void write(List<? extends String> items) throws Exception {
 				}
 			};
 		}
+
 	}
+
 }

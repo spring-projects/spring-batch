@@ -28,9 +28,11 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 
 public class FlatFileCustomerCreditDaoTests {
+
 	private ResourceLifecycleItemWriter output;
+
 	private FlatFileCustomerCreditDao writer;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		output = mock(ResourceLifecycleItemWriter.class);
@@ -47,29 +49,30 @@ public class FlatFileCustomerCreditDaoTests {
 
 		writer.open(executionContext);
 	}
-	
+
 	@Test
-	public void testClose() throws Exception{
+	public void testClose() throws Exception {
 		output.close();
 
 		writer.close();
 	}
-	
+
 	@Test
 	public void testWrite() throws Exception {
 		CustomerCredit credit = new CustomerCredit();
 		credit.setCredit(new BigDecimal(1));
 		credit.setName("testName");
-		
+
 		writer.setSeparator(";");
-		
+
 		output.write(Collections.singletonList("testName;1"));
 		output.open(new ExecutionContext());
 
 		writer.writeCredit(credit);
 	}
-	
+
 	private interface ResourceLifecycleItemWriter extends ItemWriter<String>, ItemStream {
 
 	}
+
 }

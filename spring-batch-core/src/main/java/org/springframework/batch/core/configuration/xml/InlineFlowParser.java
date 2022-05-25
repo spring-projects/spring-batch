@@ -28,15 +28,15 @@ import org.w3c.dom.Element;
  *
  */
 public class InlineFlowParser extends AbstractFlowParser {
+
 	private final String flowName;
 
 	/**
-	 * Construct a {@link InlineFlowParser} with the specified name and using the
-	 * provided job repository ref.
-	 *
+	 * Construct a {@link InlineFlowParser} with the specified name and using the provided
+	 * job repository ref.
 	 * @param flowName the name of the flow
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 * from the enclosing tag
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean} from the
+	 * enclosing tag
 	 */
 	public InlineFlowParser(String flowName, String jobFactoryRef) {
 		this.flowName = flowName;
@@ -57,10 +57,12 @@ public class InlineFlowParser extends AbstractFlowParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		builder.getRawBeanDefinition().setAttribute("flowName", flowName);
 		builder.addPropertyValue("name", flowName);
-		builder.addPropertyValue("stateTransitionComparator", new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
+		builder.addPropertyValue("stateTransitionComparator",
+				new RuntimeBeanReference(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR));
 		super.doParse(element, parserContext, builder);
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		parserContext.popAndRegisterContainingComponent();
 
 	}
+
 }

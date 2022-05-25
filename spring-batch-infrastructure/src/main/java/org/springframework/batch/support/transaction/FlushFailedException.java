@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.support.transaction;
 
-
 /**
- * Unchecked exception indicating that an error has occurred while trying to flush a buffer.
- * 
+ * Unchecked exception indicating that an error has occurred while trying to flush a
+ * buffer.
+ *
  * @author Lucas Ward
  * @author Ben Hale
  */
@@ -27,7 +27,6 @@ public class FlushFailedException extends RuntimeException {
 
 	/**
 	 * Create a new {@link FlushFailedException} based on a message and another exception.
-	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -37,7 +36,6 @@ public class FlushFailedException extends RuntimeException {
 
 	/**
 	 * Create a new {@link FlushFailedException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public FlushFailedException(String message) {

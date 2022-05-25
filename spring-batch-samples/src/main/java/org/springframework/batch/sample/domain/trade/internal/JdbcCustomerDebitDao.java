@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
 /**
  * Reduces customer's credit by the provided amount.
  *
@@ -32,18 +31,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class JdbcCustomerDebitDao implements CustomerDebitDao {
 
-    private static final String UPDATE_CREDIT = "UPDATE CUSTOMER SET credit= credit-? WHERE name=?";
+	private static final String UPDATE_CREDIT = "UPDATE CUSTOMER SET credit= credit-? WHERE name=?";
 
-    private JdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
-    @Override
+	@Override
 	public void write(CustomerDebit customerDebit) {
-        jdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
-    }
+		jdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
+	}
 
-    @Autowired
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 }

@@ -25,24 +25,23 @@ import org.springframework.mail.SimpleMailMessage;
 /**
  * @author Dan Garrette
  * @author Dave Syer
- * 
  * @since 2.1
  */
-public class UserMailItemProcessor implements
-        ItemProcessor<User, SimpleMailMessage> {
+public class UserMailItemProcessor implements ItemProcessor<User, SimpleMailMessage> {
 
-    /**
-     * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
-     */
-    @Nullable
+	/**
+	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
+	 */
+	@Nullable
 	@Override
-	public SimpleMailMessage process( User user ) throws Exception {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo( user.getEmail() );
-        message.setFrom( "communications@thecompany.com" );
-        message.setSubject( user.getName() + "'s Account Info" );
-        message.setSentDate( new Date() );
-        message.setText( "Hello " + user.getName() );
-       return message;
-    }
+	public SimpleMailMessage process(User user) throws Exception {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(user.getEmail());
+		message.setFrom("communications@thecompany.com");
+		message.setSubject(user.getName() + "'s Account Info");
+		message.setSentDate(new Date());
+		message.setText("Hello " + user.getName());
+		return message;
+	}
+
 }

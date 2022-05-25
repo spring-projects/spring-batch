@@ -21,4 +21,5 @@ import org.springframework.batch.core.JobExecutionListener;
  * @author Mahmoud Ben Hassine
  */
 public class DummyJobExecutionListener implements JobExecutionListener {
+
 }

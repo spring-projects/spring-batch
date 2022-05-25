@@ -30,8 +30,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/taskletJob.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/taskletJob.xml", "/job-runner-context.xml" })
 public class TaskletJobFunctionalTests {
 
 	@Autowired
@@ -39,13 +39,14 @@ public class TaskletJobFunctionalTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder().addString("value", "foo")
-				.toJobParameters());
+		JobExecution jobExecution = jobLauncherTestUtils
+				.launchJob(new JobParametersBuilder().addString("value", "foo").toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals("yes", jobExecution.getExecutionContext().getString("done"));
 	}
 
 	public static class TestBean {
+
 		private String value;
 
 		public void setValue(String value) {
@@ -58,19 +59,16 @@ public class TaskletJobFunctionalTests {
 			assertEquals(3, integerValue.intValue());
 			assertEquals(3.14, doubleValue, 0.01);
 		}
+
 	}
-	
+
 	public static class Task {
-		
+
 		public boolean doWork(ChunkContext chunkContext) {
-			chunkContext.
-					getStepContext().
-					getStepExecution().
-					getJobExecution().
-					getExecutionContext().put("done", "yes");
+			chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put("done", "yes");
 			return true;
 		}
-		
+
 	}
 
 }

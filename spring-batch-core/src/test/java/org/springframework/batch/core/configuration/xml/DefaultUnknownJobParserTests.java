@@ -57,14 +57,16 @@ public class DefaultUnknownJobParserTests extends AbstractJobParserTests {
 		assertEquals(ExitStatus.UNKNOWN, stepExecution2.getExitStatus());
 
 	}
-	
+
 	public static class UnknownListener implements StepExecutionListener {
+
 		@Nullable
 		@Override
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			stepExecution.setStatus(BatchStatus.UNKNOWN);
 			return ExitStatus.UNKNOWN;
 		}
+
 	}
 
 }

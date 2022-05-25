@@ -131,10 +131,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	private String jobFactoryRef;
 
 	/**
-	 * Convenience method for subclasses to set the job factory reference if it
-	 * is available (null is fine, but the quality of error reports is better if
-	 * it is available).
-	 *
+	 * Convenience method for subclasses to set the job factory reference if it is
+	 * available (null is fine, but the quality of error reports is better if it is
+	 * available).
 	 * @param jobFactoryRef name of the ref
 	 */
 	protected void setJobFactoryRef(String jobFactoryRef) {
@@ -186,9 +185,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 					stepExists = true;
 				}
 				else if (nodeName.equals(SPLIT_ELE)) {
-					stateTransitions.addAll(splitParser
-							.parse(child, new ParserContext(parserContext.getReaderContext(), parserContext
-									.getDelegate(), builder.getBeanDefinition())));
+					stateTransitions.addAll(splitParser.parse(child, new ParserContext(parserContext.getReaderContext(),
+							parserContext.getDelegate(), builder.getBeanDefinition())));
 					stepExists = true;
 				}
 
@@ -203,8 +201,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 		String flowName = (String) builder.getRawBeanDefinition().getAttribute("flowName");
 		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
-			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step, flow or split",
-					element);
+			parserContext.getReaderContext()
+					.error("The flow [" + flowName + "] must contain at least one step, flow or split", element);
 		}
 
 		// Ensure that all elements are reachable
@@ -224,7 +222,6 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	/**
 	 * Find all of the elements that are pointed to by this element.
-	 *
 	 * @param element The parent element
 	 * @return a collection of reachable element names
 	 */
@@ -253,9 +250,9 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	/**
 	 * Find all of the elements reachable from the startElement.
-	 *
 	 * @param startElement name of the element to start from
-	 * @param reachableElementMap Map of elements that can be reached from the startElement
+	 * @param reachableElementMap Map of elements that can be reached from the
+	 * startElement
 	 * @param accumulator a collection of reachable element names
 	 */
 	protected void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
@@ -277,8 +274,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param stateDef The bean definition for the current state
 	 * @param element the &lt;step/gt; element to parse
 	 * @return a collection of
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
 	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
 			Element element) {
@@ -287,13 +283,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 
 	/**
 	 * @param parserContext the parser context for the bean factory
-	 * @param stepId the id of the current state if it is a step state, null
-	 * otherwise
+	 * @param stepId the id of the current state if it is a step state, null otherwise
 	 * @param stateDef The bean definition for the current state
 	 * @param element the &lt;step/gt; element to parse
 	 * @return a collection of
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
 	public static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
 			BeanDefinition stateDef, Element element) {
@@ -328,9 +322,8 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			}
 		}
 		else if (hasNextAttribute) {
-			parserContext.getReaderContext().error(
-					"The <" + element.getNodeName() + "/> may not contain a '" + NEXT_ATTR
-					+ "' attribute and a transition element", element);
+			parserContext.getReaderContext().error("The <" + element.getNodeName() + "/> may not contain a '"
+					+ NEXT_ATTR + "' attribute and a transition element", element);
 		}
 
 		return list;
@@ -357,8 +350,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @return a collection of
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
 	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
 			BeanDefinition stateDef, ParserContext parserContext) {
@@ -373,24 +365,24 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 		boolean abandon = stateId != null && StringUtils.hasText(restartAttribute) && !restartAttribute.equals(stateId);
 		String exitCodeAttribute = transitionElement.getAttribute(EXIT_CODE_ATTR);
 
-		return createTransition(status, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext, abandon);
+		return createTransition(status, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext,
+				abandon);
 	}
 
 	/**
 	 * @param status The batch status that this transition will set. Use
 	 * BatchStatus.UNKNOWN if not applicable.
-	 * @param on The pattern that this transition should match. Use null for
-	 * "no restriction" (same as "*").
+	 * @param on The pattern that this transition should match. Use null for "no
+	 * restriction" (same as "*").
 	 * @param next The state to which this transition should go. Use null if not
 	 * applicable.
-	 * @param exitCode The exit code that this transition will set. Use null to
-	 * default to batchStatus.
+	 * @param exitCode The exit code that this transition will set. Use null to default to
+	 * batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @param abandon the abandon flag to be used by the transition.
 	 * @return a collection of
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
 	protected static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
@@ -409,8 +401,7 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 			endBuilder.addConstructorArgValue(exitCodeExists ? exitCode : status.getName());
 
 			String endName = (status == FlowExecutionStatus.STOPPED ? STOP_ELE
-					: status == FlowExecutionStatus.FAILED ? FAIL_ELE : END_ELE)
-					+ (endCounter++);
+					: status == FlowExecutionStatus.FAILED ? FAIL_ELE : END_ELE) + (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
 
 			endBuilder.addConstructorArgValue(abandon);
@@ -456,11 +447,11 @@ public abstract class AbstractFlowParser extends AbstractSingleBeanDefinitionPar
 	/**
 	 * Strip the namespace from the element name if it exists.
 	 */
-	private static String stripNamespace(String elementName){
-		if(elementName.startsWith("batch:")){
+	private static String stripNamespace(String elementName) {
+		if (elementName.startsWith("batch:")) {
 			return elementName.substring(6);
 		}
-		else{
+		else {
 			return elementName;
 		}
 	}

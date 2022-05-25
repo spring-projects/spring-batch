@@ -21,9 +21,8 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Simulates temporary output trouble - requires to retry 3 times to pass
- * successfully.
- * 
+ * Simulates temporary output trouble - requires to retry 3 times to pass successfully.
+ *
  * @author Robert Kasanicky
  */
 public class RetrySampleItemWriter<T> implements ItemWriter<T> {

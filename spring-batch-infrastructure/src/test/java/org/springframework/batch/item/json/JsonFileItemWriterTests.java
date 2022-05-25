@@ -38,6 +38,7 @@ import org.springframework.core.io.WritableResource;
 public class JsonFileItemWriterTests {
 
 	private WritableResource resource;
+
 	@Mock
 	private JsonObjectMarshaller<String> jsonObjectMarshaller;
 
@@ -71,4 +72,5 @@ public class JsonFileItemWriterTests {
 		Mockito.verify(this.jsonObjectMarshaller).marshal("foo");
 		Mockito.verify(this.jsonObjectMarshaller).marshal("bar");
 	}
+
 }

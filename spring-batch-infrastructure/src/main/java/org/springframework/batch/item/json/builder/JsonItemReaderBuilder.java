@@ -29,7 +29,6 @@ import org.springframework.util.StringUtils;
  * A builder for {@link JsonItemReader}.
  *
  * @param <T> type of the target item
- *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
@@ -52,7 +51,8 @@ public class JsonItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Set the {@link JsonObjectReader} to use to read and map Json objects to domain objects.
+	 * Set the {@link JsonObjectReader} to use to read and map Json objects to domain
+	 * objects.
 	 * @param jsonObjectReader to use
 	 * @return The current instance of the builder.
 	 * @see JsonItemReader#setJsonObjectReader(JsonObjectReader)
@@ -90,8 +90,8 @@ public class JsonItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Setting this value to true indicates that it is an error if the input
-	 * does not exist and an exception will be thrown. Defaults to true.
+	 * Setting this value to true indicates that it is an error if the input does not
+	 * exist and an exception will be thrown. Defaults to true.
 	 * @param strict indicates the input resource must exist
 	 * @return The current instance of the builder.
 	 * @see JsonItemReader#setStrict(boolean)
@@ -103,9 +103,9 @@ public class JsonItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -150,8 +150,8 @@ public class JsonItemReaderBuilder<T> {
 		}
 
 		if (this.resource == null) {
-			logger.debug("The resource is null. This is only a valid scenario when " +
-					"injecting it later as in when using the MultiResourceItemReader");
+			logger.debug("The resource is null. This is only a valid scenario when "
+					+ "injecting it later as in when using the MultiResourceItemReader");
 		}
 
 		JsonItemReader<T> reader = new JsonItemReader<>();
@@ -165,4 +165,5 @@ public class JsonItemReaderBuilder<T> {
 
 		return reader;
 	}
+
 }

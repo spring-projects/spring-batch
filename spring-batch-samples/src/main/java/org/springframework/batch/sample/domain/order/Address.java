@@ -17,6 +17,7 @@
 package org.springframework.batch.sample.domain.order;
 
 public class Address {
+
 	public static final String LINE_ID_BILLING_ADDR = "BAD";
 
 	public static final String LINE_ID_SHIPPING_ADDR = "SAD";
@@ -146,4 +147,5 @@ public class Address {
 
 		return true;
 	}
+
 }

@@ -35,7 +35,7 @@ public class CallableTaskletAdapterTests {
 				return RepeatStatus.FINISHED;
 			}
 		});
-		assertEquals(RepeatStatus.FINISHED, adapter.execute(null,null));
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(null, null));
 	}
 
 	@Test

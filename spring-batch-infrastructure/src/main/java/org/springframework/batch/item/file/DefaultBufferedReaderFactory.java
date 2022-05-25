@@ -24,14 +24,13 @@ import org.springframework.core.io.Resource;
 
 /**
  * @author Dave Syer
- *
  * @since 2.1
  */
 public class DefaultBufferedReaderFactory implements BufferedReaderFactory {
 
-    @Override
+	@Override
 	public BufferedReader create(Resource resource, String encoding) throws UnsupportedEncodingException, IOException {
 		return new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 	}
-	
+
 }

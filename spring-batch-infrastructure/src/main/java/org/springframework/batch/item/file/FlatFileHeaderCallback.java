@@ -21,19 +21,18 @@ import java.io.IOException;
 
 /**
  * Callback interface for writing a header to a file.
- * 
+ *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
 public interface FlatFileHeaderCallback {
 
 	/**
-	 * Write contents to a file using the supplied {@link Writer}. It is not
-	 * required to flush the writer inside this method.
-	 *
+	 * Write contents to a file using the supplied {@link Writer}. It is not required to
+	 * flush the writer inside this method.
 	 * @param writer the {@link Writer} to be used to write the header.
-	 *
 	 * @throws IOException if error occurs during writing.
 	 */
 	void writeHeader(Writer writer) throws IOException;
+
 }

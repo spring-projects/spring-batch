@@ -18,9 +18,9 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
- * Checked exception indicating that a JobExecution that is not currently running has
- * been requested to stop.
- * 
+ * Checked exception indicating that a JobExecution that is not currently running has been
+ * requested to stop.
+ *
  * @author Dave Syer
  * @since 2.0
  */
@@ -29,8 +29,8 @@ public class JobExecutionNotRunningException extends JobExecutionException {
 
 	/**
 	 * Create a {@link JobExecutionNotRunningException} with a message.
-	 * 
-	 * @param msg the message to signal cause of failure with details about the job execution
+	 * @param msg the message to signal cause of failure with details about the job
+	 * execution
 	 */
 	public JobExecutionNotRunningException(String msg) {
 		super(msg);

@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @Ignore // FIXME https://github.com/spring-projects/spring-batch/issues/3847
 public class ConcurrentTransactionAwareProxyTests {
@@ -108,7 +108,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	public void testTransactionalContains() throws Exception {
 		final Map<Long, Map<String, String>> map = TransactionAwareProxyFactory.createAppendOnlyTransactionalMap();
 		boolean result = new TransactionTemplate(transactionManager).execute(new TransactionCallback<Boolean>() {
-            @Override
+			@Override
 			public Boolean doInTransaction(TransactionStatus status) {
 				return map.containsKey("foo");
 			}
@@ -122,7 +122,7 @@ public class ConcurrentTransactionAwareProxyTests {
 
 			final int count = i;
 			completionService.submit(new Callable<List<String>>() {
-                @Override
+				@Override
 				public List<String> call() throws Exception {
 					List<String> list = new ArrayList<>();
 					for (int i = 0; i < innerMax; i++) {
@@ -150,7 +150,7 @@ public class ConcurrentTransactionAwareProxyTests {
 		for (int i = 0; i < outerMax; i++) {
 
 			completionService.submit(new Callable<List<String>>() {
-                @Override
+				@Override
 				public List<String> call() throws Exception {
 					List<String> result = new ArrayList<>();
 					for (int i = 0; i < innerMax; i++) {
@@ -190,7 +190,7 @@ public class ConcurrentTransactionAwareProxyTests {
 				final long id = j * 1000 + 123L + i;
 
 				completionService.submit(new Callable<List<String>>() {
-                    @Override
+					@Override
 					public List<String> call() throws Exception {
 						List<String> list = new ArrayList<>();
 						for (int i = 0; i < innerMax; i++) {
@@ -213,7 +213,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	private String saveInSetAndAssert(final Set<String> set, final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				set.add(value);
 				return null;
@@ -229,7 +229,7 @@ public class ConcurrentTransactionAwareProxyTests {
 	private String saveInListAndAssert(final List<String> list, final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				list.add(value);
 				return null;
@@ -246,7 +246,7 @@ public class ConcurrentTransactionAwareProxyTests {
 			final String value) {
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				if (!map.containsKey(id)) {
 					map.put(id, new HashMap<>());

@@ -46,7 +46,7 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class})
+@ContextConfiguration(classes = { RemotePartitioningManagerStepBuilderTests.BatchConfiguration.class })
 public class RemotePartitioningManagerStepBuilderTests {
 
 	@Autowired
@@ -121,15 +121,14 @@ public class RemotePartitioningManagerStepBuilderTests {
 	public void eitherOutputChannelOrMessagingTemplateMustBeProvided() {
 		// given
 		RemotePartitioningManagerStepBuilder builder = new RemotePartitioningManagerStepBuilder("step")
-				.outputChannel(new DirectChannel())
-				.messagingTemplate(new MessagingTemplate());
+				.outputChannel(new DirectChannel()).messagingTemplate(new MessagingTemplate());
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalStateException.class,
-				builder::build);
+		final Exception expectedException = Assert.assertThrows(IllegalStateException.class, builder::build);
 
 		// then
-		assertThat(expectedException).hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
+		assertThat(expectedException)
+				.hasMessage("You must specify either an outputChannel or a messagingTemplate but not both.");
 	}
 
 	@Test
@@ -143,11 +142,10 @@ public class RemotePartitioningManagerStepBuilderTests {
 				() -> builder.partitionHandler(partitionHandler));
 
 		// then
-		assertThat(expectedException).hasMessage("When configuring a manager step " +
-				"for remote partitioning using the RemotePartitioningManagerStepBuilder, " +
-				"the partition handler will be automatically set to an instance " +
-				"of MessageChannelPartitionHandler. The partition handler must " +
-				"not be provided in this case.");
+		assertThat(expectedException).hasMessage("When configuring a manager step "
+				+ "for remote partitioning using the RemotePartitioningManagerStepBuilder, "
+				+ "the partition handler will be automatically set to an instance "
+				+ "of MessageChannelPartitionHandler. The partition handler must " + "not be provided in this case.");
 	}
 
 	@Test
@@ -159,20 +157,14 @@ public class RemotePartitioningManagerStepBuilderTests {
 		long pollInterval = 5000L;
 		DirectChannel outputChannel = new DirectChannel();
 		Partitioner partitioner = Mockito.mock(Partitioner.class);
-		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
+		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> {
+		};
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
-				.repository(jobRepository)
-				.outputChannel(outputChannel)
-				.partitioner("workerStep", partitioner)
-				.gridSize(gridSize)
-				.pollInterval(pollInterval)
-				.timeout(timeout)
-				.startLimit(startLimit)
-				.aggregator(stepExecutionAggregator)
-				.allowStartIfComplete(true)
-				.build();
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep").repository(jobRepository)
+				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
+				.pollInterval(pollInterval).timeout(timeout).startLimit(startLimit).aggregator(stepExecutionAggregator)
+				.allowStartIfComplete(true).build();
 
 		// then
 		Assert.assertNotNull(step);
@@ -202,18 +194,13 @@ public class RemotePartitioningManagerStepBuilderTests {
 		int startLimit = 3;
 		DirectChannel outputChannel = new DirectChannel();
 		Partitioner partitioner = Mockito.mock(Partitioner.class);
-		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> { };
+		StepExecutionAggregator stepExecutionAggregator = (result, executions) -> {
+		};
 
 		// when
-		Step step = new RemotePartitioningManagerStepBuilder("managerStep")
-				.repository(jobRepository)
-				.outputChannel(outputChannel)
-				.partitioner("workerStep", partitioner)
-				.gridSize(gridSize)
-				.startLimit(startLimit)
-				.aggregator(stepExecutionAggregator)
-				.allowStartIfComplete(true)
-				.build();
+		Step step = new RemotePartitioningManagerStepBuilder("managerStep").repository(jobRepository)
+				.outputChannel(outputChannel).partitioner("workerStep", partitioner).gridSize(gridSize)
+				.startLimit(startLimit).aggregator(stepExecutionAggregator).allowStartIfComplete(true).build();
 
 		// then
 		Assert.assertNotNull(step);
@@ -244,12 +231,10 @@ public class RemotePartitioningManagerStepBuilderTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
 
 	}
+
 }

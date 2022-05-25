@@ -24,20 +24,20 @@ import org.springframework.batch.item.sample.Foo;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class HibernateCursorItemReaderIntegrationTests extends AbstractHibernateCursorItemReaderIntegrationTests {
 
 	/**
 	 * Exception scenario.
-	 * 
-	 * {@link HibernateCursorItemReader#setUseStatelessSession(boolean)} can be
-	 * called only in uninitialized state.
+	 *
+	 * {@link HibernateCursorItemReader#setUseStatelessSession(boolean)} can be called
+	 * only in uninitialized state.
 	 */
 	@Test
 	public void testSetUseStatelessSession() {
-		HibernateCursorItemReader<Foo> inputSource = (HibernateCursorItemReader<Foo>)reader;
+		HibernateCursorItemReader<Foo> inputSource = (HibernateCursorItemReader<Foo>) reader;
 
 		// initialize and call setter => error
 		inputSource.open(new ExecutionContext());

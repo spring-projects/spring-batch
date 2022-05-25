@@ -81,8 +81,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean repositoryFactoryBean = new JobRepositoryFactoryBean();
 		repositoryFactoryBean.setDataSource(embeddedDatabase);
@@ -136,8 +135,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testVanillaIteration() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = factory.getObject();
 
@@ -154,8 +153,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestart() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = factory.getObject();
 
@@ -179,8 +178,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = factory.getObject();
 
@@ -208,10 +207,10 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, "job"), new JobParameters())
-		.createStepExecution("step").createStepContribution();
+				.createStepExecution("step").createStepContribution();
 		ChunkRequest chunk = new ChunkRequest(0, StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<>(chunk);
 		return message;
@@ -220,8 +219,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testEarlyCompletionSignalledInHandler() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,fail,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,fail,3,4,5,6"))));
 		factory.setCommitInterval(2);
 
 		Step step = factory.getObject();
@@ -247,8 +246,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestartWithNoBacklog() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = factory.getObject();
 
@@ -261,9 +260,9 @@ public class ChunkMessageItemWriterIntegrationTests {
 		writer.setMaxWaitTimeouts(2);
 
 		/*
-		 * With no backlog we process all the items, but the listener can't
-		 * reconcile the expected number of items with the actual. An infinite
-		 * loop would be bad, so the best we can do is fail as fast as possible.
+		 * With no backlog we process all the items, but the listener can't reconcile the
+		 * expected number of items with the actual. An infinite loop would be bad, so the
+		 * best we can do is fail as fast as possible.
 		 */
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
@@ -277,14 +276,14 @@ public class ChunkMessageItemWriterIntegrationTests {
 	}
 
 	/**
-	 * This one is flakey - we try to force it to wait until after the step to
-	 * finish processing just by waiting for long enough.
+	 * This one is flakey - we try to force it to wait until after the step to finish
+	 * processing just by waiting for long enough.
 	 */
 	@Test
 	public void testFailureInStepListener() throws Exception {
 
-		factory.setItemReader(new ListItemReader<>(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("wait,fail,3,4,5,6"))));
+		factory.setItemReader(
+				new ListItemReader<>(Arrays.asList(StringUtils.commaDelimitedListToStringArray("wait,fail,3,4,5,6"))));
 
 		Step step = factory.getObject();
 
@@ -302,8 +301,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 
 		String exitDescription = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Exit description does not contain exception type name: " + exitDescription, exitDescription
-				.contains(AsynchronousFailureException.class.getName()));
+		assertTrue("Exit description does not contain exception type name: " + exitDescription,
+				exitDescription.contains(AsynchronousFailureException.class.getName()));
 
 	}
 
@@ -317,12 +316,12 @@ public class ChunkMessageItemWriterIntegrationTests {
 		}
 	}
 
-	private StepExecution getStepExecution(Step step) throws JobExecutionAlreadyRunningException, JobRestartException,
-	JobInstanceAlreadyCompleteException {
+	private StepExecution getStepExecution(Step step)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong(
-				"job.counter", jobCounter++).toJobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
+				new JobParametersBuilder().addLong("job.counter", jobCounter++).toJobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		jobRepository.add(stepExecution);
 		return stepExecution;

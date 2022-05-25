@@ -70,28 +70,19 @@ public class ValidationSampleConfiguration {
 
 	@Bean
 	public Step step() throws Exception {
-		return this.steps.get("step")
-				.<Person, Person>chunk(1)
-				.reader(itemReader())
-				.processor(itemValidator())
-				.writer(itemWriter())
-				.build();
+		return this.steps.get("step").<Person, Person>chunk(1).reader(itemReader()).processor(itemValidator())
+				.writer(itemWriter()).build();
 	}
 
 	@Bean
 	public Job job() throws Exception {
-		return this.jobs.get("job")
-				.start(step())
-				.build();
+		return this.jobs.get("job").start(step()).build();
 	}
 
 	@Bean
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
-				.build();
+		return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 	}
 
 }

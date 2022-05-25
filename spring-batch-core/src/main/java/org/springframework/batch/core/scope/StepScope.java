@@ -25,16 +25,15 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.Scope;
 
 /**
- * Scope for step context. Objects in this scope use the Spring container as an
- * object factory, so there is only one instance of such a bean per executing
- * step. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
- * decorate the bean definitions).<br>
+ * Scope for step context. Objects in this scope use the Spring container as an object
+ * factory, so there is only one instance of such a bean per executing step. All objects
+ * in this scope are &lt;aop:scoped-proxy/&gt; (no need to decorate the bean
+ * definitions).<br>
  * <br>
  *
- * In addition, support is provided for late binding of references accessible
- * from the {@link StepContext} using #{..} placeholders. Using this feature,
- * bean properties can be pulled from the step or job execution context and the
- * job parameters. E.g.
+ * In addition, support is provided for late binding of references accessible from the
+ * {@link StepContext} using #{..} placeholders. Using this feature, bean properties can
+ * be pulled from the step or job execution context and the job parameters. E.g.
  *
  * <pre>
  * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
@@ -54,9 +53,9 @@ import org.springframework.beans.factory.config.Scope;
  * &lt;/bean&gt;
  * </pre>
  *
- * The {@link StepContext} is referenced using standard bean property paths (as
- * per {@link BeanWrapper}). The examples above all show the use of the Map
- * accessors provided as a convenience for step and job attributes.
+ * The {@link StepContext} is referenced using standard bean property paths (as per
+ * {@link BeanWrapper}). The examples above all show the use of the Map accessors provided
+ * as a convenience for step and job attributes.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -109,7 +108,6 @@ public class StepScope extends BatchScopeSupport {
 						logger.debug(String.format("Creating object in scope=%s, name=%s", this.getName(), name));
 					}
 
-
 					scopedObject = objectFactory.getObject();
 					context.setAttribute(name, scopedObject);
 
@@ -155,11 +153,9 @@ public class StepScope extends BatchScopeSupport {
 	}
 
 	/**
-	 * Get an attribute accessor in the form of a {@link StepContext} that can
-	 * be used to store scoped bean instances.
-	 *
-	 * @return the current step context which we can use as a scope storage
-	 * medium
+	 * Get an attribute accessor in the form of a {@link StepContext} that can be used to
+	 * store scoped bean instances.
+	 * @return the current step context which we can use as a scope storage medium
 	 */
 	private StepContext getContext() {
 		StepContext context = StepSynchronizationManager.getContext();
@@ -173,4 +169,5 @@ public class StepScope extends BatchScopeSupport {
 	public String getTargetNamePrefix() {
 		return TARGET_NAME_PREFIX;
 	}
+
 }

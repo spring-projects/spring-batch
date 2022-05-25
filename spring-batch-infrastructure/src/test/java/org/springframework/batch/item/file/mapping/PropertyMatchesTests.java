@@ -19,10 +19,10 @@ package org.springframework.batch.item.file.mapping;
 import junit.framework.TestCase;
 
 public class PropertyMatchesTests extends TestCase {
-	
+
 	public void setDuckSoup(String duckSoup) {
 	}
-	
+
 	public void setDuckPate(String duckPate) {
 	}
 
@@ -33,7 +33,7 @@ public class PropertyMatchesTests extends TestCase {
 		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", getClass(), 2).getPossibleMatches();
 		assertEquals(1, matches.length);
 	}
-	
+
 	public void testPropertyMatchesWithDefault() throws Exception {
 		String[] matches = PropertyMatches.forProperty("DUCK_SOUP", getClass()).getPossibleMatches();
 		assertEquals(1, matches.length);
@@ -41,25 +41,26 @@ public class PropertyMatchesTests extends TestCase {
 
 	public void testBuildErrorMessageNoMatches() throws Exception {
 		String msg = PropertyMatches.forProperty("foo", getClass(), 2).buildErrorMessage();
-		assertTrue(msg.indexOf("foo")>=0);
+		assertTrue(msg.indexOf("foo") >= 0);
 	}
 
 	public void testBuildErrorMessagePossibleMatch() throws Exception {
 		String msg = PropertyMatches.forProperty("DUCKSOUP", getClass(), 1).buildErrorMessage();
-		// the message contains the close match 
-		assertTrue(msg.indexOf("duckSoup")>=0);
+		// the message contains the close match
+		assertTrue(msg.indexOf("duckSoup") >= 0);
 	}
 
 	public void testBuildErrorMessageMultiplePossibleMatches() throws Exception {
 		String msg = PropertyMatches.forProperty("DUCKCRAP", getClass(), 4).buildErrorMessage();
 		// the message contains the close matches
-		assertTrue(msg.indexOf("duckSoup")>=0);
-		assertTrue(msg.indexOf("duckPate")>=0);
+		assertTrue(msg.indexOf("duckSoup") >= 0);
+		assertTrue(msg.indexOf("duckPate") >= 0);
 	}
-	
+
 	public void testEmptyString() throws Exception {
 		String[] matches = PropertyMatches.forProperty("", getClass(), 4).getPossibleMatches();
 		// TestCase base class has a name property
 		assertEquals("name", matches[0]);
 	}
+
 }

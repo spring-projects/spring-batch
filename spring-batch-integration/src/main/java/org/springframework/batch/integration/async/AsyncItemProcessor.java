@@ -31,20 +31,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * An {@link ItemProcessor} that delegates to a nested processor and in the
- * background. To allow for background processing the return value from the
- * processor is a {@link Future} which needs to be unpacked before the item can
- * be used by a client.
+ * An {@link ItemProcessor} that delegates to a nested processor and in the background. To
+ * allow for background processing the return value from the processor is a {@link Future}
+ * which needs to be unpacked before the item can be used by a client.
  *
- * Because the {@link Future} is typically unwrapped in the {@link ItemWriter},
- * there are lifecycle and stats limitations (since the framework doesn't know
- * what the result of the processor is).  While not an exhaustive list, things like
- * {@link StepExecution#filterCount} will not reflect the number of filtered items
- * and {@link org.springframework.batch.core.ItemProcessListener#onProcessError(Object, Exception)}
+ * Because the {@link Future} is typically unwrapped in the {@link ItemWriter}, there are
+ * lifecycle and stats limitations (since the framework doesn't know what the result of
+ * the processor is). While not an exhaustive list, things like
+ * {@link StepExecution#filterCount} will not reflect the number of filtered items and
+ * {@link org.springframework.batch.core.ItemProcessListener#onProcessError(Object, Exception)}
  * will not be called.
- * 
+ *
  * @author Dave Syer
- * 
  * @param <I> the input object type
  * @param <O> the output object type (will be wrapped in a Future)
  * @see AsyncItemWriter
@@ -57,7 +55,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 
 	/**
 	 * Check mandatory properties (the {@link #setDelegate(ItemProcessor)}).
-	 * 
+	 *
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -65,9 +63,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	}
 
 	/**
-	 * The {@link ItemProcessor} to use to delegate processing to in a
-	 * background thread.
-	 * 
+	 * The {@link ItemProcessor} to use to delegate processing to in a background thread.
 	 * @param delegate the {@link ItemProcessor} to use as a delegate
 	 */
 	public void setDelegate(ItemProcessor<I, O> delegate) {
@@ -75,10 +71,9 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	}
 
 	/**
-	 * The {@link TaskExecutor} to use to allow the item processing to proceed
-	 * in the background. Defaults to a {@link SyncTaskExecutor} so no threads
-	 * are created unless this is overridden.
-	 * 
+	 * The {@link TaskExecutor} to use to allow the item processing to proceed in the
+	 * background. Defaults to a {@link SyncTaskExecutor} so no threads are created unless
+	 * this is overridden.
 	 * @param taskExecutor a {@link TaskExecutor}
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -86,10 +81,9 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	}
 
 	/**
-	 * Transform the input by delegating to the provided item processor. The
-	 * return value is wrapped in a {@link Future} so that clients can unpack it
-	 * later.
-	 * 
+	 * Transform the input by delegating to the provided item processor. The return value
+	 * is wrapped in a {@link Future} so that clients can unpack it later.
+	 *
 	 * @see ItemProcessor#process(Object)
 	 */
 	@Nullable
@@ -119,7 +113,7 @@ public class AsyncItemProcessor<I, O> implements ItemProcessor<I, Future<O>>, In
 	 */
 	private StepExecution getStepExecution() {
 		StepContext context = StepSynchronizationManager.getContext();
-		if (context==null) {
+		if (context == null) {
 			return null;
 		}
 		StepExecution stepExecution = context.getStepExecution();

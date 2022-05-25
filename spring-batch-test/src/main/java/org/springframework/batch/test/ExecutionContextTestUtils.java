@@ -25,13 +25,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.lang.Nullable;
 
 /**
- * Convenience class for accessing {@link ExecutionContext} values from job and
- * step executions.
- * 
+ * Convenience class for accessing {@link ExecutionContext} values from job and step
+ * executions.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.1.4
- * 
+ *
  */
 public class ExecutionContextTestUtils {
 
@@ -53,8 +53,8 @@ public class ExecutionContextTestUtils {
 			}
 		}
 		if (stepExecution == null) {
-			throw new IllegalArgumentException("No such step in this job execution: " + stepName + " not in "
-					+ stepNames);
+			throw new IllegalArgumentException(
+					"No such step in this job execution: " + stepName + " not in " + stepNames);
 		}
 		@SuppressWarnings("unchecked")
 		T result = (T) stepExecution.getExecutionContext().get(key);

@@ -40,11 +40,15 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/data-source-context.xml"})
+@ContextConfiguration(locations = { "/data-source-context.xml" })
 public class JdbcPlayerDaoIntegrationTests {
+
 	private JdbcPlayerDao playerDao;
+
 	private Player player;
+
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -69,9 +73,9 @@ public class JdbcPlayerDaoIntegrationTests {
 
 	@Test
 	@Transactional
-	public void testSavePlayer(){
+	public void testSavePlayer() {
 		playerDao.savePlayer(player);
-        jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");
@@ -83,4 +87,5 @@ public class JdbcPlayerDaoIntegrationTests {
 			}
 		});
 	}
+
 }

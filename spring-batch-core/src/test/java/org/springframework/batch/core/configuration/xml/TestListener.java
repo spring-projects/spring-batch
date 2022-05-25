@@ -40,7 +40,7 @@ public class TestListener extends AbstractTestComponent implements StepExecution
 	}
 
 	@AfterRead
-	public void logItem(){
+	public void logItem() {
 
 	}
 

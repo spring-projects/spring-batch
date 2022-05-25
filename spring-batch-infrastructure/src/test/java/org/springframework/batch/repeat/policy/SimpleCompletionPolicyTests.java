@@ -29,7 +29,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 
 	RepeatStatus dummy = RepeatStatus.CONTINUABLE;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		context = policy.start(null);
@@ -72,4 +72,5 @@ public class SimpleCompletionPolicyTests extends TestCase {
 		policy.update(context);
 		assertFalse(policy.isComplete(context, dummy));
 	}
+
 }

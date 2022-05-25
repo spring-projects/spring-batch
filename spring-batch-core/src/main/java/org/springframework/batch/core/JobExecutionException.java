@@ -16,10 +16,10 @@
 package org.springframework.batch.core;
 
 /**
- * Root of exception hierarchy for checked exceptions in job and step execution.
- * Clients of the {@link Job} should expect to have to catch and deal with these
- * exceptions because they signal a user error or an inconsistent state between
- * the user's instructions and the data.
+ * Root of exception hierarchy for checked exceptions in job and step execution. Clients
+ * of the {@link Job} should expect to have to catch and deal with these exceptions
+ * because they signal a user error or an inconsistent state between the user's
+ * instructions and the data.
  *
  * @author Dave Syer
  *
@@ -36,13 +36,12 @@ public class JobExecutionException extends Exception {
 	}
 
 	/**
-	 * Construct a {@link JobExecutionException} with a generic message and a
-	 * cause.
-	 *
+	 * Construct a {@link JobExecutionException} with a generic message and a cause.
 	 * @param msg The message.
 	 * @param cause The cause of the exception.
 	 */
 	public JobExecutionException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
+
 }

@@ -84,4 +84,5 @@ public class JpaNamedQueryProviderTests {
 		Assert.notNull(result, "Result query must not be null");
 		verify(entityManager).createNamedQuery(namedQuery, Foo.class);
 	}
+
 }

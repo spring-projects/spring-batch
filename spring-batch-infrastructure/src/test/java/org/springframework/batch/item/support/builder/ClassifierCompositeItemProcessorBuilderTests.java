@@ -43,8 +43,7 @@ public class ClassifierCompositeItemProcessorBuilderTests {
 		routingConfiguration.put("foo", fooProcessor);
 		routingConfiguration.put("*", defaultProcessor);
 		ClassifierCompositeItemProcessor<String, String> processor = new ClassifierCompositeItemProcessorBuilder<String, String>()
-				.classifier(new PatternMatchingClassifier<>(routingConfiguration))
-				.build();
+				.classifier(new PatternMatchingClassifier<>(routingConfiguration)).build();
 
 		assertEquals("bar", processor.process("bar"));
 		assertEquals("foo: foo", processor.process("foo"));
@@ -62,4 +61,5 @@ public class ClassifierCompositeItemProcessorBuilderTests {
 					"A classifier is required.", iae.getMessage());
 		}
 	}
+
 }

@@ -23,11 +23,10 @@ import java.util.logging.Logger;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 
 /**
- * As of Spring 3.2, when a context is closed, the shutdown method is
- * called on any beans that are registered.  With an embedded database
- * that uses a connection pool, this can leave the connection pool open
- * with stale connections.  This wraps an {@link EmbeddedDatabase} and
- * ignores calls to {@link EmbeddedDatabase#shutdown()}.
+ * As of Spring 3.2, when a context is closed, the shutdown method is called on any beans
+ * that are registered. With an embedded database that uses a connection pool, this can
+ * leave the connection pool open with stale connections. This wraps an
+ * {@link EmbeddedDatabase} and ignores calls to {@link EmbeddedDatabase#shutdown()}.
  *
  * @author Phil Webb
  * @since 3.0
@@ -43,7 +42,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		this.dataSource = dataSource;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.DataSource#getConnection()
 	 */
 	@Override
@@ -51,7 +52,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return this.dataSource.getConnection();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -59,7 +62,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return this.dataSource.getConnection(username, password);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.CommonDataSource#getLogWriter()
 	 */
 	@Override
@@ -67,7 +72,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return this.dataSource.getLogWriter();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.CommonDataSource#setLogWriter(java.io.PrintWriter)
 	 */
 	@Override
@@ -75,7 +82,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		this.dataSource.setLogWriter(out);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.CommonDataSource#getLoginTimeout()
 	 */
 	@Override
@@ -83,7 +92,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return this.dataSource.getLoginTimeout();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see javax.sql.CommonDataSource#setLoginTimeout(int)
 	 */
 	@Override
@@ -91,7 +102,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		this.dataSource.setLoginTimeout(seconds);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see java.sql.Wrapper#unwrap(java.lang.Class)
 	 */
 	@Override
@@ -99,7 +112,9 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return this.dataSource.unwrap(iface);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
 	 */
 	@Override
@@ -111,10 +126,13 @@ public class PooledEmbeddedDataSource implements EmbeddedDatabase {
 		return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.jdbc.datasource.embedded.EmbeddedDatabase#shutdown()
 	 */
 	@Override
 	public void shutdown() {
 	}
+
 }

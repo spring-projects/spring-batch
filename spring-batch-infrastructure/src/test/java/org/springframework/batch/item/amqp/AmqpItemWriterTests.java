@@ -32,21 +32,23 @@ import java.util.Arrays;
  * @author Will Schipp
  */
 public class AmqpItemWriterTests {
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullAmqpTemplate() {
-        new AmqpItemWriter<String>(null);
-    }
 
-    @Test
-    public void voidTestWrite() throws Exception {
-        AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullAmqpTemplate() {
+		new AmqpItemWriter<String>(null);
+	}
 
-        amqpTemplate.convertAndSend("foo");
+	@Test
+	public void voidTestWrite() throws Exception {
+		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-        amqpTemplate.convertAndSend("bar");
+		amqpTemplate.convertAndSend("foo");
 
-        AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<>(amqpTemplate);
-        amqpItemWriter.write(Arrays.asList("foo", "bar"));
+		amqpTemplate.convertAndSend("bar");
 
-    }
+		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriter<>(amqpTemplate);
+		amqpItemWriter.write(Arrays.asList("foo", "bar"));
+
+	}
+
 }

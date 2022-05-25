@@ -25,10 +25,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Item writer that writes data in json format to an output file. The location
- * of the output file is defined by a {@link WritableResource} and must represent a
- * writable file. Items are transformed to json format using a
- * {@link JsonObjectMarshaller}. Items will be enclosed in a json array as follows:
+ * Item writer that writes data in json format to an output file. The location of the
+ * output file is defined by a {@link WritableResource} and must represent a writable
+ * file. Items are transformed to json format using a {@link JsonObjectMarshaller}. Items
+ * will be enclosed in a json array as follows:
  *
  * <p>
  * <code>
@@ -51,7 +51,9 @@ import org.springframework.util.ClassUtils;
 public class JsonFileItemWriter<T> extends AbstractFileItemWriter<T> {
 
 	private static final char JSON_OBJECT_SEPARATOR = ',';
+
 	private static final char JSON_ARRAY_START = '[';
+
 	private static final char JSON_ARRAY_STOP = ']';
 
 	private JsonObjectMarshaller<T> jsonObjectMarshaller;

@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Tests for {@link PropertyExtractingDelegatingItemWriter}
- * 
+ *
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
@@ -45,7 +45,8 @@ public class PropertyExtractingDelegatingItemProcessorIntegrationTests {
 	private FooService fooService;
 
 	/*
-	 * Regular usage scenario - input object should be passed to the service the injected invoker points to.
+	 * Regular usage scenario - input object should be passed to the service the injected
+	 * invoker points to.
 	 */
 	@Test
 	public void testProcess() throws Exception {

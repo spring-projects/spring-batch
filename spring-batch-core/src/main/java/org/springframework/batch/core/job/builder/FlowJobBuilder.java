@@ -22,11 +22,10 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.step.builder.StepBuilderException;
 
 /**
- * A job builder for {@link FlowJob} instances. A flow job delegates processing to a nested flow composed of steps and
- * conditional transitions between steps.
- * 
+ * A job builder for {@link FlowJob} instances. A flow job delegates processing to a
+ * nested flow composed of steps and conditional transitions between steps.
+ *
  * @author Dave Syer
- * 
  * @since 2.2
  */
 public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
@@ -34,8 +33,8 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 	private Flow flow;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common job properties
 	 */
 	public FlowJobBuilder(JobBuilderHelper<?> parent) {
@@ -43,8 +42,8 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 	}
 
 	/**
-	 * Start a job with this flow, but expect to transition from there to other flows or steps.
-	 * 
+	 * Start a job with this flow, but expect to transition from there to other flows or
+	 * steps.
 	 * @param flow the flow to start with
 	 * @return a builder to enable fluent chaining
 	 */
@@ -53,8 +52,8 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 	}
 
 	/**
-	 * Start a job with this step, but expect to transition from there to other flows or steps.
-	 * 
+	 * Start a job with this step, but expect to transition from there to other flows or
+	 * steps.
 	 * @param step the step to start with
 	 * @return a builder to enable fluent chaining
 	 */
@@ -64,7 +63,6 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 
 	/**
 	 * Provide a single flow to execute as the job.
-	 * 
 	 * @param flow the flow to execute
 	 * @return this for fluent chaining
 	 */
@@ -75,7 +73,6 @@ public class FlowJobBuilder extends JobBuilderHelper<FlowJobBuilder> {
 
 	/**
 	 * Build a job that executes the flow provided, normally composed of other steps.
-	 * 
 	 * @return a flow job
 	 */
 	public Job build() {

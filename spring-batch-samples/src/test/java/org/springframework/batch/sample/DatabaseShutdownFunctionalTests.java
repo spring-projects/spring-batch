@@ -34,31 +34,32 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Functional test for graceful shutdown.  A batch container is started in a new thread,
+ * Functional test for graceful shutdown. A batch container is started in a new thread,
  * then it's stopped using {@link JobOperator#stop(long)}}.
- * 
+ *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/infiniteLoopJob.xml", "/job-runner-context.xml" })
 public class DatabaseShutdownFunctionalTests {
-	
+
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Autowired
 	private JobOperator jobOperator;
-	
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-		
+
 	@Test
 	public void testLaunchJob() throws Exception {
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-		
+
 		Thread.sleep(1000);
 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
@@ -66,17 +67,17 @@ public class DatabaseShutdownFunctionalTests {
 		assertNotNull(jobExecution.getVersion());
 
 		jobOperator.stop(jobExecution.getId());
-		
+
 		int count = 0;
-		while(jobExecution.isRunning() && count <= 10){
-			logger.info("Checking for end time in JobExecution: count="+count);
+		while (jobExecution.isRunning() && count <= 10) {
+			logger.info("Checking for end time in JobExecution: count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
-		
+
 		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
 	}
-	
+
 }

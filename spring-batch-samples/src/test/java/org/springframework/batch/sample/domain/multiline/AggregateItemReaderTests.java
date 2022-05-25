@@ -24,7 +24,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
 public class AggregateItemReaderTests {
+
 	private ItemReader<AggregateItem<String>> input;
+
 	private AggregateItemReader<String> provider;
 
 	@Before
@@ -68,4 +70,5 @@ public class AggregateItemReaderTests {
 
 		assertNull(provider.read());
 	}
+
 }

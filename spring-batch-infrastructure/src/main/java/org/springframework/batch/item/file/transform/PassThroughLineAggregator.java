@@ -17,18 +17,18 @@
 package org.springframework.batch.item.file.transform;
 
 /**
- * A {@link LineAggregator} implementation that simply calls
- * {@link Object#toString()} on the given object
- * 
+ * A {@link LineAggregator} implementation that simply calls {@link Object#toString()} on
+ * the given object
+ *
  */
 public class PassThroughLineAggregator<T> implements LineAggregator<T> {
 
 	/**
 	 * Simply convert to a String with toString().
-	 * 
+	 *
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public String aggregate(T item) {
 		return item.toString();
 	}

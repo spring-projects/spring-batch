@@ -35,22 +35,22 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 
-    @Override
+	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		StaxEventItemReader<Foo> reader = new StaxEventItemReader<>();
 		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
-            @Override
+			@Override
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-				Attribute attr = null ;
+				Attribute attr = null;
 				try {
-					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader( source);
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}
-				catch  (Exception e) {
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 				Foo foo = new Foo();
@@ -58,7 +58,7 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 				return foo;
 			}
 
-            @Override
+			@Override
 			public boolean supports(Class<?> clazz) {
 				return true;
 			}
@@ -70,14 +70,14 @@ public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReader
 		return reader;
 	}
 
-    @Override
+	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		StaxEventItemReader<Foo> reader = (StaxEventItemReader<Foo>) tested;
 		reader.close();
-		
+
 		reader.setResource(new ByteArrayResource("<foos />".getBytes()));
 		reader.afterPropertiesSet();
-		
+
 		reader.open(new ExecutionContext());
 	}
 

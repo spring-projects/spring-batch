@@ -68,20 +68,13 @@ public class JobParametersBuilderTests {
 
 	@Test
 	public void testAddingExistingJobParameters() {
-		JobParameters params1 = new JobParametersBuilder()
-				.addString("foo", "bar")
-				.addString("bar", "baz")
+		JobParameters params1 = new JobParametersBuilder().addString("foo", "bar").addString("bar", "baz")
 				.toJobParameters();
 
-		JobParameters params2 = new JobParametersBuilder()
-				.addString("foo", "baz")
-				.toJobParameters();
+		JobParameters params2 = new JobParametersBuilder().addString("foo", "baz").toJobParameters();
 
-		JobParameters finalParams = new JobParametersBuilder()
-				.addString("baz", "quix")
-				.addJobParameters(params1)
-				.addJobParameters(params2)
-				.toJobParameters();
+		JobParameters finalParams = new JobParametersBuilder().addString("baz", "quix").addJobParameters(params1)
+				.addJobParameters(params2).toJobParameters();
 
 		assertEquals(finalParams.getString("foo"), "baz");
 		assertEquals(finalParams.getString("bar"), "baz");
@@ -107,7 +100,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testToJobRuntimeParameters(){
+	public void testToJobRuntimeParameters() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
 		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
@@ -120,7 +113,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testCopy(){
+	public void testCopy() {
 		this.parametersBuilder.addString("STRING", "string value");
 		this.parametersBuilder = new JobParametersBuilder(this.parametersBuilder.toJobParameters());
 		Iterator<String> parameters = this.parametersBuilder.toJobParameters().getParameters().keySet().iterator();
@@ -128,7 +121,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testOrderedTypes(){
+	public void testOrderedTypes() {
 		this.parametersBuilder.addDate("SCHEDULE_DATE", date);
 		this.parametersBuilder.addLong("LONG", 1L);
 		this.parametersBuilder.addString("STRING", "string value");
@@ -139,7 +132,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testOrderedStrings(){
+	public void testOrderedStrings() {
 		this.parametersBuilder.addString("foo", "value foo");
 		this.parametersBuilder.addString("bar", "value bar");
 		this.parametersBuilder.addString("spam", "value spam");
@@ -150,10 +143,10 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testAddJobParameter(){
+	public void testAddJobParameter() {
 		JobParameter jobParameter = new JobParameter("bar");
 		this.parametersBuilder.addParameter("foo", jobParameter);
-		Map<String,JobParameter> parameters = this.parametersBuilder.toJobParameters().getParameters();
+		Map<String, JobParameter> parameters = this.parametersBuilder.toJobParameters().getParameters();
 		assertEquals(1, parameters.size());
 		assertEquals("bar", parameters.get("foo").getValue());
 	}
@@ -174,9 +167,8 @@ public class JobParametersBuilderTests {
 		assertFalse(parameters.getParameters().get("STRING").isIdentifying());
 	}
 
-
 	@Test
-	public void testGetNextJobParametersFirstRun(){
+	public void testGetNextJobParametersFirstRun() {
 		job.setJobParametersIncrementer(new RunIdIncrementer());
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
@@ -184,7 +176,7 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersNoIncrementer(){
+	public void testGetNextJobParametersNoIncrementer() {
 		initializeForNextJobParameters();
 		final Exception expectedException = assertThrows(IllegalArgumentException.class,
 				() -> this.parametersBuilder.getNextJobParameters(this.job));
@@ -192,11 +184,11 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParameters(){
+	public void testGetNextJobParameters() {
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
 		this.jobExecutionList.add(getJobExecution(this.jobInstanceList.get(0), null));
-		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
+		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
@@ -204,12 +196,12 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersRestartable(){
+	public void testGetNextJobParametersRestartable() {
 		this.job.setRestartable(true);
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
 		this.jobExecutionList.add(getJobExecution(this.jobInstanceList.get(0), BatchStatus.FAILED));
-		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
+		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
 		this.parametersBuilder.addLong("NON_IDENTIFYING_LONG", 1L, false);
@@ -218,10 +210,10 @@ public class JobParametersBuilderTests {
 	}
 
 	@Test
-	public void testGetNextJobParametersNoPreviousExecution(){
+	public void testGetNextJobParametersNoPreviousExecution() {
 		this.job.setJobParametersIncrementer(new RunIdIncrementer());
 		this.jobInstanceList.add(new JobInstance(1L, "simpleJobInstance"));
-		when(this.jobExplorer.getJobInstances("simpleJob",0,1)).thenReturn(this.jobInstanceList);
+		when(this.jobExplorer.getJobInstances("simpleJob", 0, 1)).thenReturn(this.jobInstanceList);
 		when(this.jobExplorer.getJobExecutions(any())).thenReturn(this.jobExecutionList);
 		initializeForNextJobParameters();
 		this.parametersBuilder.getNextJobParameters(this.job);
@@ -244,6 +236,7 @@ public class JobParametersBuilderTests {
 		baseJobParametersVerify(parameters, paramCount);
 		assertEquals("1", parameters.getString("run.id"));
 	}
+
 	private void baseJobParametersVerify(JobParameters parameters, int paramCount) {
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
 		assertEquals(1L, parameters.getLong("LONG").longValue());
@@ -253,10 +246,11 @@ public class JobParametersBuilderTests {
 
 	private JobExecution getJobExecution(JobInstance jobInstance, BatchStatus batchStatus) {
 		JobExecution jobExecution = new JobExecution(jobInstance, 1L, null);
-		if(batchStatus != null) {
+		if (batchStatus != null) {
 			jobExecution.setStatus(batchStatus);
 		}
 		return jobExecution;
 
 	}
+
 }

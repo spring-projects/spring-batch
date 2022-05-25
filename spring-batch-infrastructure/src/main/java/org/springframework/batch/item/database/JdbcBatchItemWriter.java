@@ -37,22 +37,24 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.util.Assert;
 
 /**
- * <p>{@link ItemWriter} that uses the batching features from
+ * <p>
+ * {@link ItemWriter} that uses the batching features from
  * {@link NamedParameterJdbcTemplate} to execute a batch of statements for all items
- * provided.</p>
+ * provided.
+ * </p>
  *
  * The user must provide an SQL query and a special callback for either of
- * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}.
- * You can use either named parameters or the traditional '?' placeholders. If you use the
- * named parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
- * otherwise you should provide a  {@link ItemPreparedStatementSetter}.
- * This callback would be responsible for mapping the item to the parameters needed to
- * execute the SQL statement.<br>
+ * {@link ItemPreparedStatementSetter} or {@link ItemSqlParameterSourceProvider}. You can
+ * use either named parameters or the traditional '?' placeholders. If you use the named
+ * parameter support then you should provide a {@link ItemSqlParameterSourceProvider},
+ * otherwise you should provide a {@link ItemPreparedStatementSetter}. This callback would
+ * be responsible for mapping the item to the parameters needed to execute the SQL
+ * statement.<br>
  *
  * It is expected that {@link #write(List)} is called inside a transaction.<br>
  *
- * The writer is thread-safe after its properties are set (normal singleton
- * behavior), so it can be used to write in multiple concurrent transactions.
+ * The writer is thread-safe after its properties are set (normal singleton behavior), so
+ * it can be used to write in multiple concurrent transactions.
  *
  * @author Dave Syer
  * @author Thomas Risberg
@@ -78,8 +80,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	protected boolean usingNamedParameters;
 
 	/**
-	 * Public setter for the flag that determines whether an assertion is made
-	 * that all items cause at least one row to be updated.
+	 * Public setter for the flag that determines whether an assertion is made that all
+	 * items cause at least one row to be updated.
 	 * @param assertUpdates the flag to set. Defaults to true;
 	 */
 	public void setAssertUpdates(boolean assertUpdates) {
@@ -87,9 +89,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the query string to execute on write. The parameters
-	 * should correspond to those known to the
-	 * {@link ItemPreparedStatementSetter}.
+	 * Public setter for the query string to execute on write. The parameters should
+	 * correspond to those known to the {@link ItemPreparedStatementSetter}.
 	 * @param sql the query to set
 	 */
 	public void setSql(String sql) {
@@ -98,8 +99,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Public setter for the {@link ItemPreparedStatementSetter}.
-	 * @param preparedStatementSetter the {@link ItemPreparedStatementSetter} to
-	 * set. This is required when using traditional '?' placeholders for the SQL statement.
+	 * @param preparedStatementSetter the {@link ItemPreparedStatementSetter} to set. This
+	 * is required when using traditional '?' placeholders for the SQL statement.
 	 */
 	public void setItemPreparedStatementSetter(ItemPreparedStatementSetter<T> preparedStatementSetter) {
 		this.itemPreparedStatementSetter = preparedStatementSetter;
@@ -108,8 +109,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	/**
 	 * Public setter for the {@link ItemSqlParameterSourceProvider}.
 	 * @param itemSqlParameterSourceProvider the {@link ItemSqlParameterSourceProvider} to
-	 * set. This is required when using named parameters for the SQL statement and the type
-	 * to be written does not implement {@link Map}.
+	 * set. This is required when using named parameters for the SQL statement and the
+	 * type to be written does not implement {@link Map}.
 	 */
 	public void setItemSqlParameterSourceProvider(ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
 		this.itemSqlParameterSourceProvider = itemSqlParameterSourceProvider;
@@ -117,7 +118,6 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Public setter for the data source for injection purposes.
-	 *
 	 * @param dataSource {@link javax.sql.DataSource} to use for querying against
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -135,8 +135,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a
-	 * parameter source.
+	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL
+	 * statement plus a parameter source.
 	 */
 	@Override
 	public void afterPropertiesSet() {
@@ -146,16 +146,20 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql, namedParameters);
 		if (namedParameters.size() > 0) {
 			if (parameterCount != namedParameters.size()) {
-				throw new InvalidDataAccessApiUsageException("You can't use both named parameters and classic \"?\" placeholders: " + sql);
+				throw new InvalidDataAccessApiUsageException(
+						"You can't use both named parameters and classic \"?\" placeholders: " + sql);
 			}
 			usingNamedParameters = true;
 		}
 		if (!usingNamedParameters) {
-			Assert.notNull(itemPreparedStatementSetter, "Using SQL statement with '?' placeholders requires an ItemPreparedStatementSetter");
+			Assert.notNull(itemPreparedStatementSetter,
+					"Using SQL statement with '?' placeholders requires an ItemPreparedStatementSetter");
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
 	@SuppressWarnings("unchecked")
@@ -171,9 +175,10 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			int[] updateCounts;
 
 			if (usingNamedParameters) {
-				if(items.get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
+				if (items.get(0) instanceof Map && this.itemSqlParameterSourceProvider == null) {
 					updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, items.toArray(new Map[items.size()]));
-				} else {
+				}
+				else {
 					SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
 					int i = 0;
 					for (T item : items) {
@@ -183,16 +188,18 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				}
 			}
 			else {
-				updateCounts = namedParameterJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback<int[]>() {
-					@Override
-					public int[] doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-						for (T item : items) {
-							itemPreparedStatementSetter.setValues(item, ps);
-							ps.addBatch();
-						}
-						return ps.executeBatch();
-					}
-				});
+				updateCounts = namedParameterJdbcTemplate.getJdbcOperations().execute(sql,
+						new PreparedStatementCallback<int[]>() {
+							@Override
+							public int[] doInPreparedStatement(PreparedStatement ps)
+									throws SQLException, DataAccessException {
+								for (T item : items) {
+									itemPreparedStatementSetter.setValues(item, ps);
+									ps.addBatch();
+								}
+								return ps.executeBatch();
+							}
+						});
 			}
 
 			if (assertUpdates) {
@@ -206,4 +213,5 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 		}
 	}
+
 }

@@ -38,8 +38,8 @@ import org.springframework.util.Assert;
 /**
  * <p>
  * An {@link org.springframework.batch.item.ItemReader} implementation for Apache Kafka.
- * Uses a {@link KafkaConsumer} to read data from a given topic.
- * Multiple partitions within the same topic can be assigned to this reader.
+ * Uses a {@link KafkaConsumer} to read data from a given topic. Multiple partitions
+ * within the same topic can be assigned to this reader.
  * </p>
  *
  * <p>
@@ -72,8 +72,12 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	/**
 	 * Create a new {@link KafkaItemReader}.
-	 * <p><strong>{@code consumerProperties} must contain the following keys:
-	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer' </strong></p>.
+	 * <p>
+	 * <strong>{@code consumerProperties} must contain the following keys:
+	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer'
+	 * </strong>
+	 * </p>
+	 * .
 	 * @param consumerProperties properties of the consumer
 	 * @param topicName name of the topic to read data from
 	 * @param partitions list of partitions to read data from
@@ -84,8 +88,12 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	/**
 	 * Create a new {@link KafkaItemReader}.
-	 * <p><strong>{@code consumerProperties} must contain the following keys:
-	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer' </strong></p>.
+	 * <p>
+	 * <strong>{@code consumerProperties} must contain the following keys:
+	 * 'bootstrap.servers', 'group.id', 'key.deserializer' and 'value.deserializer'
+	 * </strong>
+	 * </p>
+	 * .
 	 * @param consumerProperties properties of the consumer
 	 * @param topicName name of the topic to read data from
 	 * @param partitions list of partitions to read data from
@@ -122,10 +130,9 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	/**
 	 * Set the flag that determines whether to save internal data for
-	 * {@link ExecutionContext}. Only switch this to false if you don't want to
-	 * save any state from this stream, and you don't need it to be restartable.
-	 * Always set it to false if the reader is being used in a concurrent
-	 * environment.
+	 * {@link ExecutionContext}. Only switch this to false if you don't want to save any
+	 * state from this stream, and you don't need it to be restartable. Always set it to
+	 * false if the reader is being used in a concurrent environment.
 	 * @param saveState flag value (default true).
 	 */
 	public void setSaveState(boolean saveState) {
@@ -142,13 +149,14 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 
 	/**
 	 * Setter for partition offsets. This mapping tells the reader the offset to start
-	 * reading from in each partition. This is optional, defaults to starting from
-	 * offset 0 in each partition. Passing an empty map makes the reader start
-	 * from the offset stored in Kafka for the consumer group ID.
-	 * 
-	 * <p><strong>In case of a restart, offsets stored in the execution context
-	 * will take precedence.</strong></p>
-	 * 
+	 * reading from in each partition. This is optional, defaults to starting from offset
+	 * 0 in each partition. Passing an empty map makes the reader start from the offset
+	 * stored in Kafka for the consumer group ID.
+	 *
+	 * <p>
+	 * <strong>In case of a restart, offsets stored in the execution context will take
+	 * precedence.</strong>
+	 * </p>
 	 * @param partitionOffsets mapping of starting offset in each partition
 	 */
 	public void setPartitionOffsets(Map<TopicPartition, Long> partitionOffsets) {
@@ -165,7 +173,8 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 			}
 		}
 		if (this.saveState && executionContext.containsKey(TOPIC_PARTITION_OFFSETS)) {
-			Map<TopicPartition, Long> offsets = (Map<TopicPartition, Long>) executionContext.get(TOPIC_PARTITION_OFFSETS);
+			Map<TopicPartition, Long> offsets = (Map<TopicPartition, Long>) executionContext
+					.get(TOPIC_PARTITION_OFFSETS);
 			for (Map.Entry<TopicPartition, Long> entry : offsets.entrySet()) {
 				this.partitionOffsets.put(entry.getKey(), entry.getValue() == 0 ? 0 : entry.getValue() + 1);
 			}
@@ -204,4 +213,5 @@ public class KafkaItemReader<K, V> extends AbstractItemStreamItemReader<V> {
 			this.kafkaConsumer.close();
 		}
 	}
+
 }

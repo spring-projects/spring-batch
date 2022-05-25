@@ -81,8 +81,8 @@ public class StepScopeIntegrationTests {
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
 		assertEquals("bar", collaborator);
-		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("collaborator.class"))
-				.matches(PROXY_TO_STRING_REGEX));
+		assertTrue("Scoped proxy not created",
+				((String) TestStep.getContext().getAttribute("collaborator.class")).matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test
@@ -95,8 +95,8 @@ public class StepScopeIntegrationTests {
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertNotNull(parent);
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
-				.matches(PROXY_TO_STRING_REGEX));
+		assertTrue("Scoped proxy not created",
+				((String) TestStep.getContext().getAttribute("parent.class")).matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test

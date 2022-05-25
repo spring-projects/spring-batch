@@ -42,21 +42,24 @@ public class HanaPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 99";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
-	
-	@Test @Override
+
+	@Test
+	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 1 OFFSET 0";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -113,9 +116,15 @@ public class HanaPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 		String jumpToItemQuery = this.pagingQueryProvider.generateJumpToItemQuery(7, 5);
 		String remainingPagesQuery = this.pagingQueryProvider.generateRemainingPagesQuery(5);
 
-		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 5", firstPage);
-		assertEquals("SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 1 OFFSET 4", jumpToItemQuery);
-		assertEquals("SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY owner.id ASC LIMIT 5", remainingPagesQuery);
+		assertEquals(
+				"SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 5",
+				firstPage);
+		assertEquals(
+				"SELECT owner.id FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id ORDER BY owner.id ASC LIMIT 1 OFFSET 4",
+				jumpToItemQuery);
+		assertEquals(
+				"SELECT owner.id as ownerid, first_name, last_name, dog_name FROM dog_owner owner INNER JOIN dog ON owner.id = dog.id WHERE ((owner.id > ?)) ORDER BY owner.id ASC LIMIT 5",
+				remainingPagesQuery);
 	}
 
 	@Override
@@ -137,4 +146,5 @@ public class HanaPagingQueryProviderTests extends AbstractSqlPagingQueryProvider
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC LIMIT 1 OFFSET 0";
 	}
+
 }

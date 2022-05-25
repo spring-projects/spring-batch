@@ -87,7 +87,7 @@ public class JdbcPagingRestartIntegrationTests {
 	}
 
 	@Test
-	@Ignore //FIXME
+	@Ignore // FIXME
 	public void testReaderFromStart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
@@ -110,25 +110,24 @@ public class JdbcPagingRestartIntegrationTests {
 	}
 
 	@Test
-	@Ignore //FIXME
+	@Ignore // FIXME
 	public void testReaderOnRestart() throws Exception {
 
 		ItemReader<Foo> reader = getItemReader();
 
 		int total = JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS");
 		int count = (total / pageSize) * pageSize;
-		int pagesToRead = Math.min(3, total/pageSize);
-		if (count >= pagesToRead*pageSize) {
-			count -= pagesToRead*pageSize;
+		int pagesToRead = Math.min(3, total / pageSize);
+		if (count >= pagesToRead * pageSize) {
+			count -= pagesToRead * pageSize;
 		}
 
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.putInt("JdbcPagingItemReader.read.count", count);
 		// Assume the primary keys are in order
 
-		List<Map<String, Object>> ids = jdbcTemplate
-				.queryForList("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC");
-		logger.debug("Ids: "+ids);
+		List<Map<String, Object>> ids = jdbcTemplate.queryForList("SELECT ID,NAME FROM T_FOOS ORDER BY ID ASC");
+		logger.debug("Ids: " + ids);
 		int startAfterValue = Integer.parseInt(ids.get(count - 1).get("ID").toString());
 		logger.debug("Start after: " + startAfterValue);
 		Map<String, Object> startAfterValues = new LinkedHashMap<>();

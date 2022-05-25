@@ -30,11 +30,12 @@ import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
  * @author Dave Syer
  *
  */
-public class HibernateCreditDao implements
-		CustomerCreditDao, RepeatListener {
+public class HibernateCreditDao implements CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;
+
 	private List<Throwable> errors = new ArrayList<>();
+
 	private SessionFactory sessionFactory;
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -43,7 +44,6 @@ public class HibernateCreditDao implements
 
 	/**
 	 * Public accessor for the errors property.
-	 *
 	 * @return the errors - a list of Throwable instances
 	 */
 	public List<Throwable> getErrors() {
@@ -53,7 +53,9 @@ public class HibernateCreditDao implements
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.springframework.batch.sample.domain.trade.internal.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
+	 * @see
+	 * org.springframework.batch.sample.domain.trade.internal.CustomerCreditWriter#write(
+	 * org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	@Override
 	public void writeCredit(CustomerCredit customerCredit) {
@@ -64,7 +66,8 @@ public class HibernateCreditDao implements
 			newCredit.setName(customerCredit.getName());
 			newCredit.setCredit(customerCredit.getCredit());
 			sessionFactory.getCurrentSession().save(newCredit);
-		} else {
+		}
+		else {
 			sessionFactory.getCurrentSession().update(customerCredit);
 		}
 	}
@@ -80,9 +83,7 @@ public class HibernateCreditDao implements
 
 	/**
 	 * Public setter for the failOnFlush property.
-	 *
-	 * @param failOnFlush
-	 *            the ID of the record you want to fail on flush (for testing)
+	 * @param failOnFlush the ID of the record you want to fail on flush (for testing)
 	 */
 	public void setFailOnFlush(int failOnFlush) {
 		this.failOnFlush = failOnFlush;
@@ -93,29 +94,45 @@ public class HibernateCreditDao implements
 		errors.add(e);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.
+	 * repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
 	@Override
 	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch.repeat.RepeatContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.RepeatInterceptor#before(org.springframework.batch
+	 * .repeat.RepeatContext)
 	 */
 	@Override
 	public void before(RepeatContext context) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.repeat.RepeatContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.RepeatInterceptor#close(org.springframework.batch.
+	 * repeat.RepeatContext)
 	 */
 	@Override
 	public void close(RepeatContext context) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.repeat.RepeatContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.RepeatInterceptor#open(org.springframework.batch.
+	 * repeat.RepeatContext)
 	 */
 	@Override
 	public void open(RepeatContext context) {

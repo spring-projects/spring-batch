@@ -45,10 +45,9 @@ public class MultiResourceItemWriterBuilder<T> {
 	private String name;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -62,7 +61,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -75,7 +73,6 @@ public class MultiResourceItemWriterBuilder<T> {
 
 	/**
 	 * Allows customization of the suffix of the created resources based on the index.
-	 *
 	 * @param suffixCreator the customizable ResourceSuffixCreator to use.
 	 * @return The current instance of the builder.
 	 * @see MultiResourceItemWriter#setResourceSuffixCreator(ResourceSuffixCreator)
@@ -89,7 +86,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	/**
 	 * After this limit is exceeded the next chunk will be written into newly created
 	 * resource.
-	 *
 	 * @param itemCountLimitPerResource the max numbers of items to be written per chunk.
 	 * @return The current instance of the builder.
 	 * @see MultiResourceItemWriter#setItemCountLimitPerResource(int)
@@ -116,7 +112,6 @@ public class MultiResourceItemWriterBuilder<T> {
 	 * Prototype for output resources. Actual output files will be created in the same
 	 * directory and use the same name as this prototype with appended suffix (according
 	 * to {@link MultiResourceItemWriter#setResourceSuffixCreator(ResourceSuffixCreator)}.
-	 *
 	 * @param resource the prototype resource to use as the basis for creating resources.
 	 * @return The current instance of the builder.
 	 * @see MultiResourceItemWriter#setResource(Resource)
@@ -129,14 +124,13 @@ public class MultiResourceItemWriterBuilder<T> {
 
 	/**
 	 * Builds the {@link MultiResourceItemWriter}.
-	 *
 	 * @return a {@link MultiResourceItemWriter}
 	 */
 	public MultiResourceItemWriter<T> build() {
 		Assert.notNull(this.resource, "resource is required.");
 		Assert.notNull(this.delegate, "delegate is required.");
 
-		if(this.saveState) {
+		if (this.saveState) {
 			org.springframework.util.Assert.hasText(this.name, "A name is required when saveState is true.");
 		}
 
@@ -144,7 +138,7 @@ public class MultiResourceItemWriterBuilder<T> {
 		writer.setResource(this.resource);
 		writer.setDelegate(this.delegate);
 		writer.setItemCountLimitPerResource(this.itemCountLimitPerResource);
-		if(this.suffixCreator != null) {
+		if (this.suffixCreator != null) {
 			writer.setResourceSuffixCreator(this.suffixCreator);
 		}
 		writer.setSaveState(this.saveState);

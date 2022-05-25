@@ -43,15 +43,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/partitionFileJob.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/partitionFileJob.xml", "/job-runner-context.xml" })
 public class PartitionFileJobFunctionalTests implements ApplicationContextAware {
+
 	@Autowired
 	@Qualifier("inputTestReader")
 	private ItemReader<CustomerCredit> inputReader;
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
+
 	private ApplicationContext applicationContext;
 
 	@Override
@@ -60,13 +62,12 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 	}
 
 	/**
-	 * Check the resulting credits correspond to inputs increased by fixed
-	 * amount.
+	 * Check the resulting credits correspond to inputs increased by fixed amount.
 	 */
 	@Test
 	public void testUpdateCredit() throws Exception {
-		assertTrue("Define a prototype bean called 'outputTestReader' to check the output", applicationContext
-				.containsBeanDefinition("outputTestReader"));
+		assertTrue("Define a prototype bean called 'outputTestReader' to check the output",
+				applicationContext.containsBeanDefinition("outputTestReader"));
 
 		open(inputReader);
 		List<CustomerCredit> inputs = new ArrayList<>(getCredits(inputReader));
@@ -124,4 +125,5 @@ public class PartitionFileJobFunctionalTests implements ApplicationContextAware 
 			((ItemStream) reader).close();
 		}
 	}
+
 }

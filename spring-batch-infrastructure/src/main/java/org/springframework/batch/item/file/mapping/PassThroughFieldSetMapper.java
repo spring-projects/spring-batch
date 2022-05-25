@@ -18,22 +18,21 @@ package org.springframework.batch.item.file.mapping;
 import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
- * Pass through {@link FieldSetMapper} useful for passing a {@link FieldSet}
- * back directly rather than a mapped object.
- * 
+ * Pass through {@link FieldSetMapper} useful for passing a {@link FieldSet} back directly
+ * rather than a mapped object.
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.file.FieldSetMapper#mapLine(org.springframework
+	 *
+	 * @see org.springframework.batch.item.file.FieldSetMapper#mapLine(org.springframework
 	 * .batch.io.file.FieldSet)
 	 */
-    @Override
+	@Override
 	public FieldSet mapFieldSet(FieldSet fs) {
 		return fs;
 	}

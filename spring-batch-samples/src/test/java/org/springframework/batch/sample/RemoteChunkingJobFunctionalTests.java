@@ -40,12 +40,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * The manager step of the job under test will read data and send chunks to the worker
- * (started in {@link RemoteChunkingJobFunctionalTests#setUp()}) for processing and writing.
+ * (started in {@link RemoteChunkingJobFunctionalTests#setUp()}) for processing and
+ * writing.
  *
  * @author Mahmoud Ben Hassine
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {JobRunnerConfiguration.class, ManagerConfiguration.class})
+@ContextConfiguration(classes = { JobRunnerConfiguration.class, ManagerConfiguration.class })
 @PropertySource("classpath:remote-chunking.properties")
 public class RemoteChunkingJobFunctionalTests {
 
@@ -60,13 +61,9 @@ public class RemoteChunkingJobFunctionalTests {
 
 	@Before
 	public void setUp() throws Exception {
-		Configuration configuration =
-				new ConfigurationImpl()
-						.addAcceptorConfiguration("jms", "tcp://localhost:61616")
-						.setPersistenceEnabled(false)
-						.setSecurityEnabled(false)
-						.setJMXManagementEnabled(false)
-						.setJournalDatasync(false);
+		Configuration configuration = new ConfigurationImpl().addAcceptorConfiguration("jms", "tcp://localhost:61616")
+				.setPersistenceEnabled(false).setSecurityEnabled(false).setJMXManagementEnabled(false)
+				.setJournalDatasync(false);
 		this.brokerService = new EmbeddedActiveMQ().setConfiguration(configuration).start();
 		this.workerApplicationContext = new AnnotationConfigApplicationContext(WorkerConfiguration.class);
 	}
@@ -84,8 +81,8 @@ public class RemoteChunkingJobFunctionalTests {
 
 		// then
 		Assert.assertEquals(ExitStatus.COMPLETED.getExitCode(), jobExecution.getExitStatus().getExitCode());
-		Assert.assertEquals(
-				"Waited for 2 results.", // the manager sent 2 chunks ({1, 2, 3} and {4, 5, 6}) to workers
+		Assert.assertEquals("Waited for 2 results.", // the manager sent 2 chunks ({1, 2,
+														// 3} and {4, 5, 6}) to workers
 				jobExecution.getExitStatus().getExitDescription());
 	}
 

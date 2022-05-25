@@ -18,20 +18,17 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
 
-
 /**
- * Checked exception to indicate that a required {@link Job} is not
- * available.
- * 
+ * Checked exception to indicate that a required {@link Job} is not available.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class JobInstanceAlreadyExistsException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg the error message.
 	 */
 	public JobInstanceAlreadyExistsException(String msg) {
@@ -45,4 +42,5 @@ public class JobInstanceAlreadyExistsException extends JobExecutionException {
 	public JobInstanceAlreadyExistsException(String msg, Throwable e) {
 		super(msg, e);
 	}
+
 }

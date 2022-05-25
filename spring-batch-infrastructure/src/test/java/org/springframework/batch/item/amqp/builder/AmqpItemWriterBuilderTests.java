@@ -50,10 +50,10 @@ public class AmqpItemWriterBuilderTests {
 	public void voidTestWrite() throws Exception {
 		AmqpTemplate amqpTemplate = mock(AmqpTemplate.class);
 
-		AmqpItemWriter<String> amqpItemWriter =
-				new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();
+		AmqpItemWriter<String> amqpItemWriter = new AmqpItemWriterBuilder<String>().amqpTemplate(amqpTemplate).build();
 		amqpItemWriter.write(Arrays.asList("foo", "bar"));
 		verify(amqpTemplate).convertAndSend("foo");
 		verify(amqpTemplate).convertAndSend("bar");
 	}
+
 }

@@ -26,8 +26,10 @@ import org.junit.Test;
  *
  */
 public class AggregateItemTests {
+
 	/**
-	 * Test method for {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getFooter()}.
+	 * Test method for
+	 * {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getFooter()}.
 	 */
 	@Test
 	public void testGetFooter() {
@@ -36,7 +38,8 @@ public class AggregateItemTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getHeader()}.
+	 * Test method for
+	 * {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getHeader()}.
 	 */
 	@Test
 	public void testGetHeader() {
@@ -49,7 +52,8 @@ public class AggregateItemTests {
 		try {
 			AggregateItem.getHeader().getItem();
 			fail("Expected IllegalStateException");
-		} catch(IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
@@ -59,8 +63,10 @@ public class AggregateItemTests {
 		try {
 			AggregateItem.getFooter().getItem();
 			fail("Expected IllegalStateException");
-		} catch(IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 	}
+
 }

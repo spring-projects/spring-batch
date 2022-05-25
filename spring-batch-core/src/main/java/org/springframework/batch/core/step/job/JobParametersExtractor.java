@@ -20,21 +20,18 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * Strategy interface for translating a {@link StepExecution} into
- * {@link JobParameters}.
- * 
+ * Strategy interface for translating a {@link StepExecution} into {@link JobParameters}.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface JobParametersExtractor {
 
 	/**
-	 * Extract job parameters from the step execution, for example from the
-	 * execution context or other properties.
-	 *
+	 * Extract job parameters from the step execution, for example from the execution
+	 * context or other properties.
 	 * @param job a {@link Job}
 	 * @param stepExecution a {@link StepExecution}
-	 *
 	 * @return some {@link JobParameters}
 	 */
 	JobParameters getJobParameters(Job job, StepExecution stepExecution);

@@ -27,10 +27,10 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
- * Simplest possible implementation of {@link Tasklet} with no skipping or
- * recovering or processing. Just delegates all calls to the provided
- * {@link ItemReader} and {@link ItemWriter}.
- * 
+ * Simplest possible implementation of {@link Tasklet} with no skipping or recovering or
+ * processing. Just delegates all calls to the provided {@link ItemReader} and
+ * {@link ItemWriter}.
+ *
  * @author Dave Syer
  */
 public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
@@ -43,26 +43,26 @@ public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 	}
 
 	/**
-	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
-	 * instance of {@link Tasklet}.
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an instance of
+	 * {@link Tasklet}.
 	 */
 	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		this(itemReader, itemWriter, repeatTemplate);
 	}
 
 	/**
-	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
-	 * instance of {@link Tasklet}.
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an instance of
+	 * {@link Tasklet}.
 	 */
-	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemProcessor<T, T> itemProcessor, ItemWriter<T> itemWriter,
-			RepeatOperations repeatOperations) {
-		super(new SimpleChunkProvider<>(itemReader, repeatOperations), new SimpleChunkProcessor<>(
-				itemProcessor, itemWriter));
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemProcessor<T, T> itemProcessor,
+			ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
+		super(new SimpleChunkProvider<>(itemReader, repeatOperations),
+				new SimpleChunkProcessor<>(itemProcessor, itemWriter));
 	}
 
 	/**
-	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
-	 * instance of {@link Tasklet}.
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an instance of
+	 * {@link Tasklet}.
 	 */
 	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter,
 			RepeatOperations repeatOperations) {

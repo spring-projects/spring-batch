@@ -60,7 +60,6 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 
 	/**
 	 * Setter for the key generator for the staging table.
-	 *
 	 * @param incrementer the {@link DataFieldMaxValueIncrementer} to set
 	 */
 	public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
@@ -78,29 +77,28 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 
 		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
 				new BatchPreparedStatementSetter() {
-			@Override
-			public int getBatchSize() {
-				return items.size();
-			}
+					@Override
+					public int getBatchSize() {
+						return items.size();
+					}
 
-			@Override
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				Assert.state(itemIterator.nextIndex() == i, "Item ordering must be preserved in batch sql update");
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						Assert.state(itemIterator.nextIndex() == i,
+								"Item ordering must be preserved in batch sql update");
 
-				ps.setLong(1, incrementer.nextLongValue());
-				ps.setLong(2, stepExecution.getJobExecution().getJobId());
-				ps.setBytes(3, SerializationUtils.serialize(itemIterator.next()));
-				ps.setString(4, NEW);
-			}
-		});
+						ps.setLong(1, incrementer.nextLongValue());
+						ps.setLong(2, stepExecution.getJobExecution().getJobId());
+						ps.setBytes(3, SerializationUtils.serialize(itemIterator.next()));
+						ps.setString(4, NEW);
+					}
+				});
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
-	 * )
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution )
 	 */
 	@Nullable
 	@Override
@@ -118,4 +116,5 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 	}
+
 }

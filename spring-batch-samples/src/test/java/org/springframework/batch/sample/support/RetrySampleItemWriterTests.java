@@ -25,7 +25,7 @@ import org.junit.Test;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class RetrySampleItemWriterTests {
@@ -52,4 +52,5 @@ public class RetrySampleItemWriterTests {
 
 		assertEquals(5, processor.getCounter());
 	}
+
 }

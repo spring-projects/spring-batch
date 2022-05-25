@@ -22,8 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.batch.item.ItemStreamException;
 
 /**
- * A json object marshaller that uses <a href="https://github.com/FasterXML/jackson">Jackson</a>
- * to marshal an object into a json representation.
+ * A json object marshaller that uses
+ * <a href="https://github.com/FasterXML/jackson">Jackson</a> to marshal an object into a
+ * json representation.
  *
  * @param <T> type of objects to marshal
  * @author Mahmoud Ben Hassine
@@ -51,11 +52,13 @@ public class JacksonJsonObjectMarshaller<T> implements JsonObjectMarshaller<T> {
 	}
 
 	@Override
-	public String marshal(T item)  {
+	public String marshal(T item) {
 		try {
 			return objectMapper.writeValueAsString(item);
-		} catch (JsonProcessingException e) {
+		}
+		catch (JsonProcessingException e) {
 			throw new ItemStreamException("Unable to marshal object " + item + " to Json", e);
 		}
 	}
+
 }

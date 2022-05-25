@@ -28,8 +28,8 @@ import org.springframework.util.StringUtils;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create
- * {@link FlowJob} objects. It stores all of the properties that are
- * configurable on the &lt;job/&gt;.
+ * {@link FlowJob} objects. It stores all of the properties that are configurable on the
+ * &lt;job/&gt;.
  *
  * @author Dan Garrette
  * @author Dave Syer
@@ -53,7 +53,6 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Constructor for the factory bean that initializes the name.
-	 *
 	 * @param name The name to be used by the factory bean.
 	 */
 	public JobParserJobFactoryBean(String name) {
@@ -95,7 +94,6 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Set the restartable flag for the factory bean.
-	 *
 	 * @param restartable The restartable flag to be used by the factory bean.
 	 */
 	public void setRestartable(Boolean restartable) {
@@ -104,7 +102,6 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Set the {@link JobRepository} for the factory bean.
-	 *
 	 * @param jobRepository The {@link JobRepository} to be used by the factory bean.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -113,8 +110,8 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Set the {@link JobParametersValidator} for the factory bean.
-	 *
-	 * @param jobParametersValidator The {@link JobParametersValidator} to be used by the factory bean.
+	 * @param jobParametersValidator The {@link JobParametersValidator} to be used by the
+	 * factory bean.
 	 */
 	public void setJobParametersValidator(JobParametersValidator jobParametersValidator) {
 		this.jobParametersValidator = jobParametersValidator;
@@ -133,8 +130,8 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Set the {@link JobParametersIncrementer} for the factory bean.
-	 *
-	 * @param jobParametersIncrementer The {@link JobParametersIncrementer} to be used by the factory bean.
+	 * @param jobParametersIncrementer The {@link JobParametersIncrementer} to be used by
+	 * the factory bean.
 	 */
 	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
@@ -142,7 +139,6 @@ public class JobParserJobFactoryBean implements SmartFactoryBean<FlowJob> {
 
 	/**
 	 * Set the flow for the factory bean.
-	 *
 	 * @param flow The {@link Flow} to be used by the factory bean.
 	 */
 	public void setFlow(Flow flow) {

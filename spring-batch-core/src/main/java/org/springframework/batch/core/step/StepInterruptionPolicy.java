@@ -21,20 +21,19 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * Strategy interface for an interruption policy. This policy allows
- * {@link Step} implementations to check if a job has been interrupted.
- * 
+ * Strategy interface for an interruption policy. This policy allows {@link Step}
+ * implementations to check if a job has been interrupted.
+ *
  * @author Lucas Ward
- * 
+ *
  */
 public interface StepInterruptionPolicy {
 
 	/**
-	 * Has the job been interrupted? If so then throw a
-	 * {@link JobInterruptedException}.
+	 * Has the job been interrupted? If so then throw a {@link JobInterruptedException}.
 	 * @param stepExecution the current context of the running step.
-	 * 
 	 * @throws JobInterruptedException when the job has been interrupted.
 	 */
 	void checkInterrupted(StepExecution stepExecution) throws JobInterruptedException;
+
 }

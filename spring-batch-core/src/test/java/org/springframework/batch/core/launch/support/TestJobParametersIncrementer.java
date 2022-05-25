@@ -24,7 +24,7 @@ public class TestJobParametersIncrementer implements JobParametersIncrementer {
 
 	@Override
 	public JobParameters getNext(@Nullable JobParameters parameters) {
-		return  new JobParametersBuilder().addString("foo", "spam").toJobParameters();
+		return new JobParametersBuilder().addString("foo", "spam").toJobParameters();
 	}
 
 }

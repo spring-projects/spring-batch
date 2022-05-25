@@ -72,11 +72,11 @@ public class DefaultPropertyEditorRegistrarTests {
 
 	@SuppressWarnings("unused")
 	private static class BeanWithIntArray {
+
 		private int[] numbers;
 
 		private long number;
 
-		
 		public void setNumbers(int[] numbers) {
 			this.numbers = numbers;
 		}
@@ -84,6 +84,7 @@ public class DefaultPropertyEditorRegistrarTests {
 		public void setNumber(long number) {
 			this.number = number;
 		}
+
 	}
 
 }

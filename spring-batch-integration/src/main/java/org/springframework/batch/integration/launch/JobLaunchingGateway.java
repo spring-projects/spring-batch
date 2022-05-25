@@ -25,11 +25,10 @@ import org.springframework.messaging.MessageHandlingException;
 import org.springframework.util.Assert;
 
 /**
- * The {@link JobLaunchingGateway} is used to launch Batch Jobs. Internally it
- * delegates to a {@link JobLaunchingMessageHandler}.
+ * The {@link JobLaunchingGateway} is used to launch Batch Jobs. Internally it delegates
+ * to a {@link JobLaunchingMessageHandler}.
  *
  * @author Gunnar Hillert
- *
  * @since 1.3
  */
 public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
@@ -38,7 +37,6 @@ public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
 
 	/**
 	 * Constructor taking a {@link JobLauncher} as parameter.
-	 *
 	 * @param jobLauncher Must not be null.
 	 *
 	 */
@@ -48,15 +46,12 @@ public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
 	}
 
 	/**
-	 * Launches a Batch Job using the provided request {@link Message}. The payload
-	 * of the {@link Message} <em>must</em> be an instance of {@link JobLaunchRequest}.
-	 *
+	 * Launches a Batch Job using the provided request {@link Message}. The payload of the
+	 * {@link Message} <em>must</em> be an instance of {@link JobLaunchRequest}.
 	 * @param requestMessage must not be null.
-	 * @return Generally a {@link JobExecution} will always be returned. An
-	 * exception ({@link MessageHandlingException}) will only be thrown if there
-	 * is a failure to start the job. The cause of the exception will be a
-	 * {@link JobExecutionException}.
-	 *
+	 * @return Generally a {@link JobExecution} will always be returned. An exception
+	 * ({@link MessageHandlingException}) will only be thrown if there is a failure to
+	 * start the job. The cause of the exception will be a {@link JobExecutionException}.
 	 * @throws MessageHandlingException when a job cannot be launched
 	 */
 	@Override
@@ -74,7 +69,8 @@ public class JobLaunchingGateway extends AbstractReplyProducingMessageHandler {
 
 		try {
 			jobExecution = this.jobLaunchingMessageHandler.launch(jobLaunchRequest);
-		} catch (JobExecutionException e) {
+		}
+		catch (JobExecutionException e) {
 			throw new MessageHandlingException(requestMessage, e);
 		}
 

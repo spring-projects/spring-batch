@@ -33,10 +33,8 @@ public interface ItemReadListener<T> extends StepListener {
 	}
 
 	/**
-	 * Called after {@link ItemReader#read()}.
-	 * This method is called only for actual items (that is, it is not called when the
-	 * reader returns {@code null}).
-	 *
+	 * Called after {@link ItemReader#read()}. This method is called only for actual items
+	 * (that is, it is not called when the reader returns {@code null}).
 	 * @param item returned from read()
 	 */
 	default void afterRead(T item) {
@@ -44,9 +42,9 @@ public interface ItemReadListener<T> extends StepListener {
 
 	/**
 	 * Called if an error occurs while trying to read.
-	 *
 	 * @param ex thrown from {@link ItemReader}
 	 */
 	default void onReadError(Exception ex) {
 	}
+
 }

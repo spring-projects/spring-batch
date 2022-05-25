@@ -111,8 +111,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean repositoryFactory = new JobRepositoryFactoryBean();
 		repositoryFactory.setDataSource(embeddedDatabase);
 		repositoryFactory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -134,26 +133,28 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	public void testBeforeChunkListenerException() throws Exception{
-		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(1)});
+	public void testBeforeChunkListenerException() throws Exception {
+		factory.setListeners(new StepListener[] { new ExceptionThrowingChunkListener(1) });
 		Step step = factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
-		assertTrue(stepExecution.getCommitCount() == 0);//Make sure exception was thrown in after, not before
+		assertTrue(stepExecution.getCommitCount() == 0);// Make sure exception was thrown
+														// in after, not before
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
 		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
 	}
 
 	@Test
-	public void testAfterChunkListenerException() throws Exception{
-		factory.setListeners(new StepListener []{new ExceptionThrowingChunkListener(2)});
+	public void testAfterChunkListenerException() throws Exception {
+		factory.setListeners(new StepListener[] { new ExceptionThrowingChunkListener(2) });
 		Step step = factory.getObject();
 		step.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
-		assertTrue(stepExecution.getCommitCount() > 0);//Make sure exception was thrown in after, not before
+		assertTrue(stepExecution.getCommitCount() > 0);// Make sure exception was thrown
+														// in after, not before
 		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertThat(e, instanceOf(FatalStepExecutionException.class));
 		assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
@@ -229,8 +230,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	/**
-	 * Scenario: Exception in processor that should cause rollback because of
-	 * checked exception
+	 * Scenario: Exception in processor that should cause rollback because of checked
+	 * exception
 	 */
 	@Test
 	public void testProcessorDefaultRollbackOnCheckedException() throws Exception {
@@ -530,7 +531,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testSkipInWriterTransactionalReader() throws Exception {
 		writer.setFailures("4");
-		ItemReader<String> reader = new ListItemReader<>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
+		ItemReader<String> reader = new ListItemReader<>(
+				TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("1", "2", "3", "4", "5")));
 		factory.setItemReader(reader);
 		factory.setCommitInterval(30);
 		factory.setSkipLimit(10);
@@ -602,7 +604,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@SuppressWarnings("unchecked")
 	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> arg) {
-		return Arrays.<Class<? extends Throwable>> asList(arg);
+		return Arrays.<Class<? extends Throwable>>asList(arg);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -614,33 +616,35 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		return map;
 	}
 
-	class ExceptionThrowingChunkListener implements ChunkListener{
+	class ExceptionThrowingChunkListener implements ChunkListener {
 
 		private int phase = -1;
 
 		public ExceptionThrowingChunkListener(int throwPhase) {
-			this.phase  = throwPhase;
+			this.phase = throwPhase;
 		}
 
 		@Override
 		public void beforeChunk(ChunkContext context) {
-			if(phase == 1){
+			if (phase == 1) {
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
 		@Override
 		public void afterChunk(ChunkContext context) {
-			if(phase == 2) {
+			if (phase == 2) {
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
 
 		@Override
 		public void afterChunkError(ChunkContext context) {
-			if(phase == 3) {
+			if (phase == 3) {
 				throw new IllegalArgumentException("Planned exception");
 			}
 		}
+
 	}
+
 }

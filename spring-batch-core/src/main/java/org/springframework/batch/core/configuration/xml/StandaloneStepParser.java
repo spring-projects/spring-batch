@@ -20,10 +20,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;step/&gt; elements for a job. A step element
- * references a bean definition for a
- * {@link org.springframework.batch.core.Step}.
- * 
+ * Internal parser for the &lt;step/&gt; elements for a job. A step element references a
+ * bean definition for a {@link org.springframework.batch.core.Step}.
+ *
  * @author Dave Syer
  * @author Thomas Risberg
  * @since 2.0
@@ -32,7 +31,6 @@ public class StandaloneStepParser extends AbstractStepParser {
 
 	/**
 	 * Parse the step and turn it into a list of transitions.
-	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
 	 * @return {@link AbstractBeanDefinition} instance.
@@ -40,4 +38,5 @@ public class StandaloneStepParser extends AbstractStepParser {
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 		return parseStep(element, parserContext, null);
 	}
+
 }

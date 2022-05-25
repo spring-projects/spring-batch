@@ -19,12 +19,12 @@ import java.util.Collection;
 
 /**
  * Convenient interface for components that contain nested flows.
- * 
+ *
  * @author Dave Syer
  *
  */
 public interface FlowHolder {
-	
+
 	Collection<Flow> getFlows();
 
 }

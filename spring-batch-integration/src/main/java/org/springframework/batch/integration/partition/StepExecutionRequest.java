@@ -18,8 +18,8 @@ package org.springframework.batch.integration.partition;
 import java.io.Serializable;
 
 /**
- * Class encapsulating information required to request a step execution in
- * a remote partitioning setup.
+ * Class encapsulating information required to request a step execution in a remote
+ * partitioning setup.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -35,7 +35,7 @@ public class StepExecutionRequest implements Serializable {
 	private Long jobExecutionId;
 
 	private StepExecutionRequest() {
-		//For Jackson deserialization
+		// For Jackson deserialization
 	}
 
 	/**

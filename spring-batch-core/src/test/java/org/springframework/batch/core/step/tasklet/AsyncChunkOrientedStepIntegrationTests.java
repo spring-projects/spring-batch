@@ -124,13 +124,14 @@ public class AsyncChunkOrientedStepIntegrationTests {
 	@Ignore
 	public void testStatus() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c", "a", "b", "c",
-				"a", "b", "c", "a", "b", "c" }), new ItemWriter<String>() {
-			@Override
-			public void write(List<? extends String> data) throws Exception {
-				written.addAll(data);
-			}
-		}, chunkOperations));
+		step.setTasklet(new TestingChunkOrientedTasklet<>(
+				getReader(new String[] { "a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b", "c" }),
+				new ItemWriter<String>() {
+					@Override
+					public void write(List<? extends String> data) throws Exception {
+						written.addAll(data);
+					}
+				}, chunkOperations));
 
 		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
 				new JobParameters(Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
@@ -139,15 +140,17 @@ public class AsyncChunkOrientedStepIntegrationTests {
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		// Need a transaction so one connection is enough to get job execution and its parameters
+		// Need a transaction so one connection is enough to get job execution and its
+		// parameters
 		StepExecution lastStepExecution = new TransactionTemplate(transactionManager)
-		.execute(new TransactionCallback<StepExecution>() {
-			@Override
-			public StepExecution doInTransaction(TransactionStatus status) {
-				return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
-			}
-		});
+				.execute(new TransactionCallback<StepExecution>() {
+					@Override
+					public StepExecution doInTransaction(TransactionStatus status) {
+						return jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
+					}
+				});
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
 	}
+
 }

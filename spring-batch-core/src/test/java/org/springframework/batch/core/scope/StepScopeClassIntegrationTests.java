@@ -40,7 +40,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @Ignore // Maybe one day support class replacement?
 public class StepScopeClassIntegrationTests implements BeanFactoryAware {
 
-
 	@Autowired
 	@Qualifier("value")
 	private Collaborator value;

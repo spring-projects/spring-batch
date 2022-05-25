@@ -31,56 +31,56 @@ public class JobParameterTests {
 	JobParameter jobParameter;
 
 	@Test
-	public void testStringParameter(){
+	public void testStringParameter() {
 		jobParameter = new JobParameter("test", true);
 		assertEquals("test", jobParameter.getValue());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testNullStringParameter(){
-		jobParameter = new JobParameter((String)null, true);
+	public void testNullStringParameter() {
+		jobParameter = new JobParameter((String) null, true);
 	}
 
 	@Test
-	public void testLongParameter(){
+	public void testLongParameter() {
 		jobParameter = new JobParameter(1L, true);
 		assertEquals(1L, jobParameter.getValue());
 	}
 
 	@Test
-	public void testDoubleParameter(){
+	public void testDoubleParameter() {
 		jobParameter = new JobParameter(1.1, true);
 		assertEquals(1.1, jobParameter.getValue());
 	}
 
 	@Test
-	public void testDateParameter(){
+	public void testDateParameter() {
 		Date epoch = new Date(0L);
 		jobParameter = new JobParameter(epoch, true);
 		assertEquals(new Date(0L), jobParameter.getValue());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testNullDateParameter(){
-		jobParameter = new JobParameter((Date)null, true);
+	public void testNullDateParameter() {
+		jobParameter = new JobParameter((Date) null, true);
 	}
 
 	@Test
-	public void testDateParameterToString(){
+	public void testDateParameterToString() {
 		Date epoch = new Date(0L);
 		jobParameter = new JobParameter(epoch, true);
 		assertEquals("0", jobParameter.toString());
 	}
 
 	@Test
-	public void testEquals(){
+	public void testEquals() {
 		jobParameter = new JobParameter("test", true);
 		JobParameter testParameter = new JobParameter("test", true);
 		assertTrue(jobParameter.equals(testParameter));
 	}
 
 	@Test
-	public void testHashcode(){
+	public void testHashcode() {
 		jobParameter = new JobParameter("test", true);
 		JobParameter testParameter = new JobParameter("test", true);
 		assertEquals(testParameter.hashCode(), jobParameter.hashCode());

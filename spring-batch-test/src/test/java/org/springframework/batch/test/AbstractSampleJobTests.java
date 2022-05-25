@@ -33,7 +33,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 /**
  * This is an abstract test class.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -92,7 +92,8 @@ public abstract class AbstractSampleJobTests {
 	@Test
 	@Repeat(10)
 	public void testStep3Execution() throws Exception {
-		// logging only, may complete in < 1ms (repeat so that it's likely to for at least one of those times)
+		// logging only, may complete in < 1ms (repeat so that it's likely to for at least
+		// one of those times)
 		assertEquals(BatchStatus.COMPLETED, jobLauncherTestUtils.launchStep("step3").getStatus());
 	}
 
@@ -106,7 +107,10 @@ public abstract class AbstractSampleJobTests {
 	}
 
 	private void verifyTasklet(int id) {
-		assertEquals(id, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'", Integer.class).intValue());
+		assertEquals(id,
+				jdbcTemplate
+						.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'", Integer.class)
+						.intValue());
 	}
 
 }

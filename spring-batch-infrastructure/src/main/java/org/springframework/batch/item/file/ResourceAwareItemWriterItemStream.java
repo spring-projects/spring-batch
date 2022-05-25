@@ -22,12 +22,13 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.core.io.WritableResource;
 
 /**
- * Interface for {@link ItemWriter}s that implement {@link ItemStream} and write
- * output to {@link WritableResource}.
- * 
+ * Interface for {@link ItemWriter}s that implement {@link ItemStream} and write output to
+ * {@link WritableResource}.
+ *
  * @author Robert Kasanicky
  */
 public interface ResourceAwareItemWriterItemStream<T> extends ItemStreamWriter<T> {
 
 	void setResource(WritableResource resource);
+
 }

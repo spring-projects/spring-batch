@@ -55,8 +55,8 @@ public class ResourceSplitterIntegrationTests {
 	/*
 	 * This is so cool (but see INT-190)...
 	 *
-	 * The incoming message is a Resource pattern, and it is converted to the
-	 * correct payload type with Spring's default strategy
+	 * The incoming message is a Resource pattern, and it is converted to the correct
+	 * payload type with Spring's default strategy
 	 */
 	@Splitter(inputChannel = "resources", outputChannel = "requests")
 	public Resource[] handle(Resource[] message) {
@@ -67,7 +67,7 @@ public class ResourceSplitterIntegrationTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	@Ignore //FIXME
+	@Ignore // FIXME
 	// This broke with Integration 2.0 in a milestone, so watch out when upgrading...
 	public void testVanillaConversion() throws Exception {
 		resources.send(new GenericMessage<>("classpath:*-context.xml"));

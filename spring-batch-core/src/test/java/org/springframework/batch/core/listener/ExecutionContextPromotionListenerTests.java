@@ -45,9 +45,9 @@ public class ExecutionContextPromotionListenerTests {
 	private static final String statusWildcard = "COMPL*SKIPS";
 
 	/**
-	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key}. statuses
-	 * is not set (defaults to {COMPLETED}).
-	 * 
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key}. statuses is not set
+	 * (defaults to {COMPLETED}).
+	 *
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -74,9 +74,9 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}.
-	 * statuses = {status}. ExitStatus = status
-	 * 
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}. statuses =
+	 * {status}. ExitStatus = status
+	 *
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -105,9 +105,9 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}.
-	 * statuses = {status}. ExitStatus = status2
-	 * 
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}. statuses =
+	 * {status}. ExitStatus = status2
+	 *
 	 * EXPECTED: no promotions.
 	 */
 	@Test
@@ -135,9 +135,8 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: keys = {key, key2}. statuses = {statusWildcard}. ExitStatus =
-	 * status
-	 * 
+	 * CONDITION: keys = {key, key2}. statuses = {statusWildcard}. ExitStatus = status
+	 *
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -166,7 +165,7 @@ public class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = {key, key2}. Only {key} exists in the ExecutionContext.
-	 * 
+	 *
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
 	@Test
@@ -193,7 +192,7 @@ public class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = {key}. key is already in job but not in step.
-	 * 
+	 *
 	 * EXPECTED: key is not erased.
 	 */
 	@Test
@@ -220,7 +219,7 @@ public class ExecutionContextPromotionListenerTests {
 	/**
 	 * CONDITION: strict = true. keys = {key, key2}. Only {key} exists in the
 	 * ExecutionContext.
-	 * 
+	 *
 	 * EXPECTED: IllegalArgumentException
 	 */
 	@Test(expected = IllegalArgumentException.class)
@@ -248,7 +247,7 @@ public class ExecutionContextPromotionListenerTests {
 
 	/**
 	 * CONDITION: keys = NULL
-	 * 
+	 *
 	 * EXPECTED: IllegalArgumentException
 	 */
 	@Test(expected = IllegalArgumentException.class)
@@ -257,4 +256,5 @@ public class ExecutionContextPromotionListenerTests {
 		// didn't set the keys, same as listener.setKeys(null);
 		listener.afterPropertiesSet();
 	}
+
 }

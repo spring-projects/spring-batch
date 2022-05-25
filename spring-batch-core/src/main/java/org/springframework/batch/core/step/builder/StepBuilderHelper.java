@@ -35,12 +35,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A base class and utility for other step builders providing access to common properties like job repository and
- * transaction manager.
- * 
+ * A base class and utility for other step builders providing access to common properties
+ * like job repository and transaction manager.
+ *
  * @author Dave Syer
  * @author Michael Minella
- *
  * @since 2.2
  */
 public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
@@ -55,8 +54,8 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 	}
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	protected StepBuilderHelper(StepBuilderHelper<?> parent) {
@@ -86,7 +85,6 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 
 	/**
 	 * Registers objects using the annotation based listener configuration.
-	 *
 	 * @param listener the object that has a method configured with listener annotation
 	 * @return this for fluent chaining
 	 */
@@ -95,7 +93,7 @@ public abstract class StepBuilderHelper<B extends StepBuilderHelper<B>> {
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), BeforeStep.class));
 		stepExecutionListenerMethods.addAll(ReflectionUtils.findMethod(listener.getClass(), AfterStep.class));
 
-		if(stepExecutionListenerMethods.size() > 0) {
+		if (stepExecutionListenerMethods.size() > 0) {
 			StepListenerFactoryBean factory = new StepListenerFactoryBean();
 			factory.setDelegate(listener);
 			properties.addStepExecutionListener((StepExecutionListener) factory.getObject());

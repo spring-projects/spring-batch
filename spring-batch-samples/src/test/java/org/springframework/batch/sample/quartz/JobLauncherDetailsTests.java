@@ -46,13 +46,16 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class JobLauncherDetailsTests {
+
 	private JobLauncherDetails details = new JobLauncherDetails();
+
 	private TriggerFiredBundle firedBundle;
+
 	private List<Serializable> list = new ArrayList<>();
-	
+
 	@Before
 	public void setUp() throws Exception {
 		details.setJobLauncher(new JobLauncher() {
@@ -74,7 +77,8 @@ public class JobLauncherDetailsTests {
 	}
 
 	private JobExecutionContext createContext(JobDetail jobDetail) {
-		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(), new Date(), new Date());
+		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTriggerImpl(), null, false, new Date(), new Date(),
+				new Date(), new Date());
 		return new StubJobExecutionContext();
 	}
 
@@ -158,12 +162,15 @@ public class JobLauncherDetailsTests {
 
 	@SuppressWarnings("serial")
 	private final class StubJobExecutionContext extends JobExecutionContextImpl {
+
 		private StubJobExecutionContext() {
 			super(mock(Scheduler.class), firedBundle, mock(Job.class));
 		}
+
 	}
-	
+
 	private static class StubJob implements org.springframework.batch.core.Job {
+
 		private final String name;
 
 		public StubJob(String name) {
@@ -194,5 +201,7 @@ public class JobLauncherDetailsTests {
 		public boolean isRestartable() {
 			return false;
 		}
+
 	}
+
 }

@@ -18,44 +18,47 @@ package org.springframework.batch.sample.domain.mail;
 /**
  * @author Dan Garrette
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public class User {
-    private int id;
-    private String name;
-    private String email;
 
-    public User() {
-    }
+	private int id;
 
-    public User( int id, String name, String email ) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-    }
+	private String name;
 
-    public int getId() {
-        return id;
-    }
+	private String email;
 
-    public void setId( int id ) {
-        this.id = id;
-    }
+	public User() {
+	}
 
-    public String getName() {
-        return name;
-    }
+	public User(int id, String name, String email) {
+		this.id = id;
+		this.name = name;
+		this.email = email;
+	}
 
-    public void setName( String name ) {
-        this.name = name;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public void setEmail( String email ) {
-        this.email = email;
-    }
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 }

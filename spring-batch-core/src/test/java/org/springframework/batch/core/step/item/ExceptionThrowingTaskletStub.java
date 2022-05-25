@@ -61,9 +61,10 @@ public class ExceptionThrowingTaskletStub implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		committed.add(1);
-		if (committed.size()>=maxTries) {
+		if (committed.size() >= maxTries) {
 			return RepeatStatus.FINISHED;
 		}
 		throw exception.newInstance("Expected exception");
 	}
+
 }

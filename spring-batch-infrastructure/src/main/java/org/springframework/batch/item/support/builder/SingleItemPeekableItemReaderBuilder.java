@@ -24,7 +24,6 @@ import org.springframework.util.Assert;
  * Creates a fully qualified SingleItemPeekeableItemReader.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 public class SingleItemPeekableItemReaderBuilder<T> {
@@ -35,7 +34,6 @@ public class SingleItemPeekableItemReaderBuilder<T> {
 	 * The item reader to use as a delegate. Items are read from the delegate and passed
 	 * to the caller in
 	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
-	 *
 	 * @param delegate the delegate to set
 	 * @return this instance for method chaining
 	 * @see SingleItemPeekableItemReader#setDelegate(ItemReader)
@@ -48,7 +46,6 @@ public class SingleItemPeekableItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link SingleItemPeekableItemReader}.
-	 *
 	 * @return a new {@link SingleItemPeekableItemReader}
 	 */
 	public SingleItemPeekableItemReader<T> build() {
@@ -58,4 +55,5 @@ public class SingleItemPeekableItemReaderBuilder<T> {
 		reader.setDelegate(this.delegate);
 		return reader;
 	}
+
 }

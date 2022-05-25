@@ -43,12 +43,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * The Sybase official jdbc driver is not freely available. This test uses the non-official jTDS driver.
- * There is no official public Docker image for Sybase neither. This test uses the non-official Docker image by Jetbrains.
- * Sybase in not supported in testcontainers. Sysbase support is tested manually for the moment:
- *  1. Run `docker run -d -t -p 5000:5000 -eSYBASE_USER=sa -eSYBASE_PASSWORD=sa -eSYBASE_DB=test datagrip/sybase:16.0`
- *  2. Update the datasource configuration with the IP of the container
- *  3. Run the test `testJobExecution`
+ * The Sybase official jdbc driver is not freely available. This test uses the
+ * non-official jTDS driver. There is no official public Docker image for Sybase neither.
+ * This test uses the non-official Docker image by Jetbrains. Sybase in not supported in
+ * testcontainers. Sysbase support is tested manually for the moment: 1. Run `docker run
+ * -d -t -p 5000:5000 -eSYBASE_USER=sa -eSYBASE_PASSWORD=sa -eSYBASE_DB=test
+ * datagrip/sybase:16.0` 2. Update the datasource configuration with the IP of the
+ * container 3. Run the test `testJobExecution`
  *
  * @author Mahmoud Ben Hassine
  */
@@ -59,11 +60,13 @@ public class SybaseJobRepositoryIntegrationTests {
 
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
-		
+
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
@@ -75,7 +78,7 @@ public class SybaseJobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -88,7 +91,8 @@ public class SybaseJobRepositoryIntegrationTests {
 	@EnableBatchProcessing
 	static class TestConfiguration {
 
-		// FIXME Configuration parameters are hard-coded for the moment, to update once testcontainers support is available
+		// FIXME Configuration parameters are hard-coded for the moment, to update once
+		// testcontainers support is available
 		@Bean
 		public DataSource dataSource() throws Exception {
 			JtdsDataSource dataSource = new JtdsDataSource();
@@ -103,11 +107,10 @@ public class SybaseJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

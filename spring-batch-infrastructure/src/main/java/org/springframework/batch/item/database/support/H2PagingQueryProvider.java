@@ -17,7 +17,9 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * H2 implementation of a {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
+ * H2 implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
  *
  * @author Dave Syer
  * @author Henning Pöttker
@@ -43,10 +45,9 @@ public class H2PagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 
-		String limitClause = new StringBuilder().append("OFFSET ")
-				.append(offset).append(" ROWS FETCH NEXT 1 ROWS ONLY")
+		String limitClause = new StringBuilder().append("OFFSET ").append(offset).append(" ROWS FETCH NEXT 1 ROWS ONLY")
 				.toString();
 		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}

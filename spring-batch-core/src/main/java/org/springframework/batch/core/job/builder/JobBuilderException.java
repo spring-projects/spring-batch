@@ -17,7 +17,6 @@ package org.springframework.batch.core.job.builder;
 
 /**
  * @author Dave Syer
- * 
  * @since 2.2
  *
  */

@@ -26,7 +26,7 @@ import org.springframework.util.FileSystemUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
-	
+
 	@BeforeClass
 	public static void clear() {
 		FileSystemUtils.deleteRecursively(new File("activemq-data"));
@@ -40,8 +40,8 @@ public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	public void testFailedStep() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("unsupported"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("unsupported"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -51,8 +51,8 @@ public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	public void testFailedStepOnError() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("error"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("error"))));
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -62,8 +62,8 @@ public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	public void testSunnyDayFaultTolerant() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParameters(Collections.singletonMap("item.three",
-				new JobParameter("3"))));
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParameters(Collections.singletonMap("item.three", new JobParameter("3"))));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
@@ -72,12 +72,13 @@ public class RemoteChunkFaultTolerantStepJmsIntegrationTests {
 
 	@Test
 	public void testSkipsInWriter() throws Exception {
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("item.three", "fail")
-				.addLong("run.id", 1L).toJobParameters());
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addString("item.three", "fail").addLong("run.id", 1L).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
 		assertEquals(9, stepExecution.getReadCount());
 		assertEquals(7, stepExecution.getWriteCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());
 	}
+
 }

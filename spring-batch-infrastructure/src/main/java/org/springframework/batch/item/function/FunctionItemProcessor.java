@@ -27,12 +27,12 @@ import org.springframework.util.Assert;
  * @author Michael Minella
  * @since 4.0
  */
-public class FunctionItemProcessor<I, O> implements ItemProcessor<I, O>{
+public class FunctionItemProcessor<I, O> implements ItemProcessor<I, O> {
 
 	private final Function<I, O> function;
 
 	/**
-	 * @param function the delegate.  Must not be null
+	 * @param function the delegate. Must not be null
 	 */
 	public FunctionItemProcessor(Function<I, O> function) {
 		Assert.notNull(function, "A function is required");
@@ -44,4 +44,5 @@ public class FunctionItemProcessor<I, O> implements ItemProcessor<I, O>{
 	public O process(I item) throws Exception {
 		return this.function.apply(item);
 	}
+
 }

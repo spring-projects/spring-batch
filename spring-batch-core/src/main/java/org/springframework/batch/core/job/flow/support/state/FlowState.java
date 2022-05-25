@@ -56,7 +56,9 @@ public class FlowState extends AbstractState implements FlowHolder {
 		return flow.start(executor).getStatus();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
 	@Override

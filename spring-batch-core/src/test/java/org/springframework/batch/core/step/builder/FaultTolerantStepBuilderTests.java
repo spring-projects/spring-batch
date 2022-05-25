@@ -21,9 +21,10 @@ import static org.junit.Assert.assertEquals;
 
 public class FaultTolerantStepBuilderTests {
 
-    @Test
-    public void faultTolerantReturnsSameInstance() {
-        FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(new StepBuilder("test"));
-        assertEquals(builder, builder.faultTolerant());
-    }
+	@Test
+	public void faultTolerantReturnsSameInstance() {
+		FaultTolerantStepBuilder<Object, Object> builder = new FaultTolerantStepBuilder<>(new StepBuilder("test"));
+		assertEquals(builder, builder.faultTolerant());
+	}
+
 }

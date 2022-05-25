@@ -34,10 +34,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
- * Batch domain object representing a job. Job is an explicit abstraction
- * representing the configuration of a job specified by a developer. It should
- * be noted that restart policy is applied to the job as a whole and not to a
- * step.
+ * Batch domain object representing a job. Job is an explicit abstraction representing the
+ * configuration of a job specified by a developer. It should be noted that restart policy
+ * is applied to the job as a whole and not to a step.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -63,9 +62,7 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	}
 
 	/**
-	 * Convenience constructor to immediately add name (which is mandatory but
-	 * not final).
-	 *
+	 * Convenience constructor to immediately add name (which is mandatory but not final).
 	 * @param name
 	 */
 	public JobSupport(String name) {
@@ -74,11 +71,11 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of
-	 * the callbacks in a Spring container the name property will be set first
-	 * if it is present. Care is needed with bean definition inheritance - if a
-	 * parent bean has a name, then its children need an explicit name as well,
-	 * otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of the
+	 * callbacks in a Spring container the name property will be set first if it is
+	 * present. Care is needed with bean definition inheritance - if a parent bean has a
+	 * name, then its children need an explicit name as well, otherwise they will not be
+	 * unique.
 	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -90,8 +87,8 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object
-	 * is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object is a
+	 * Spring bean.
 	 *
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -157,8 +154,7 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.domain.Job#run(org.springframework.batch
+	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch
 	 * .core.domain.JobExecution)
 	 */
 	@Override
@@ -197,8 +193,10 @@ public class JobSupport implements BeanNameAware, Job, StepLocator {
 	public Step getStep(String stepName) throws NoSuchStepException {
 		final Step step = steps.get(stepName);
 		if (step == null) {
-			throw new NoSuchStepException("Step ["+stepName+"] does not exist for job with name ["+getName()+"]");
+			throw new NoSuchStepException(
+					"Step [" + stepName + "] does not exist for job with name [" + getName() + "]");
 		}
 		return step;
 	}
+
 }

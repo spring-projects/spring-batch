@@ -31,20 +31,21 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class SqlServerSequenceMaxValueIncrementerTests {
 
-    @Mock
-    private DataSource dataSource;
+	@Mock
+	private DataSource dataSource;
 
-    private SqlServerSequenceMaxValueIncrementer incrementer;
+	private SqlServerSequenceMaxValueIncrementer incrementer;
 
-    @Test
-    public void testGetSequenceQuery() {
-        // given
-        this.incrementer = new SqlServerSequenceMaxValueIncrementer(this.dataSource, "BATCH_JOB_SEQ");
+	@Test
+	public void testGetSequenceQuery() {
+		// given
+		this.incrementer = new SqlServerSequenceMaxValueIncrementer(this.dataSource, "BATCH_JOB_SEQ");
 
-        // when
-        String sequenceQuery = this.incrementer.getSequenceQuery();
+		// when
+		String sequenceQuery = this.incrementer.getSequenceQuery();
 
-        // then
-        Assert.assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
-    }
+		// then
+		Assert.assertEquals("select next value for BATCH_JOB_SEQ", sequenceQuery);
+	}
+
 }

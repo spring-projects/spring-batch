@@ -35,7 +35,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Common scenarios for testing {@link ItemReader} implementations which read data from database.
+ * Common scenarios for testing {@link ItemReader} implementations which read data from
+ * database.
  *
  * @author Lucas Ward
  * @author Robert Kasanicky
@@ -45,7 +46,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	protected ItemReader<Foo> itemReader;
 
 	protected ExecutionContext executionContext;
-	
+
 	protected abstract ItemReader<Foo> createItemReader() throws Exception;
 
 	protected DataSource dataSource;
@@ -59,21 +60,22 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	}
 
 	@Before
-	public void onSetUp()throws Exception{
+	public void onSetUp() throws Exception {
 		itemReader = createItemReader();
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		executionContext = new ExecutionContext();
 	}
 
 	@After
-	public void onTearDown()throws Exception {
+	public void onTearDown() throws Exception {
 		getAsDisposableBean(itemReader).destroy();
 	}
 
 	/*
 	 * Regular scenario - read all rows and eventually return null.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		getAsItemStream(itemReader).open(executionContext);
@@ -99,7 +101,8 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	/*
 	 * Restart scenario.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testRestart() throws Exception {
 		getAsItemStream(itemReader).open(executionContext);
 		Foo foo1 = itemReader.read();
@@ -121,7 +124,8 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	/*
 	 * Reading from an input source and then trying to restore causes an error.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testInvalidRestore() throws Exception {
 
 		getAsItemStream(itemReader).open(executionContext);
@@ -152,7 +156,8 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 	/*
 	 * Empty restart data should be handled gracefully.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext();
 		getAsItemStream(itemReader).open(streamContext);

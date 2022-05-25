@@ -76,10 +76,9 @@ public class StoredProcedureItemReaderBuilder<T> {
 	private String name;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -93,7 +92,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -106,7 +104,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -119,7 +116,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -132,7 +128,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * The {@link DataSource} to read from
-	 *
 	 * @param dataSource a relational data base
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setDataSource(DataSource)
@@ -145,7 +140,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * A hint to the driver as to how many rows to return with each fetch.
-	 *
 	 * @param fetchSize the hint
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setFetchSize(int)
@@ -158,7 +152,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * The max number of rows the {@link java.sql.ResultSet} can contain
-	 *
 	 * @param maxRows the max
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setMaxRows(int)
@@ -171,7 +164,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * The time in milliseconds for the query to timeout
-	 *
 	 * @param queryTimeout timeout
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setQueryTimeout(int)
@@ -184,7 +176,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Indicates if SQL warnings should be ignored or if an exception should be thrown.
-	 *
 	 * @param ignoreWarnings indicator. Defaults to true
 	 * @return this instance for method chaining
 	 * @see AbstractCursorItemReader#setIgnoreWarnings(boolean)
@@ -197,9 +188,8 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Indicates if the reader should verify the current position of the
-	 * {@link java.sql.ResultSet} after being passed to the {@link RowMapper}.  Defaults
-	 * to true.
-	 *
+	 * {@link java.sql.ResultSet} after being passed to the {@link RowMapper}. Defaults to
+	 * true.
 	 * @param verifyCursorPosition indicator
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setVerifyCursorPosition(boolean)
@@ -213,7 +203,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	/**
 	 * Indicates if the JDBC driver supports setting the absolute row on the
 	 * {@link java.sql.ResultSet}.
-	 *
 	 * @param driverSupportsAbsolute indicator
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setDriverSupportsAbsolute(boolean)
@@ -227,7 +216,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 	/**
 	 * Indicates that the connection used for the cursor is being used by all other
 	 * processing, therefor part of the same transaction.
-	 *
 	 * @param useSharedExtendedConnection indicator
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setUseSharedExtendedConnection(boolean)
@@ -241,12 +229,12 @@ public class StoredProcedureItemReaderBuilder<T> {
 	/**
 	 * Configures the provided {@link PreparedStatementSetter} to be used to populate any
 	 * arguments in the SQL query to be executed for the reader.
-	 *
 	 * @param preparedStatementSetter setter
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setPreparedStatementSetter(PreparedStatementSetter)
 	 */
-	public StoredProcedureItemReaderBuilder<T> preparedStatementSetter(PreparedStatementSetter preparedStatementSetter) {
+	public StoredProcedureItemReaderBuilder<T> preparedStatementSetter(
+			PreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 
 		return this;
@@ -254,7 +242,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * The {@link RowMapper} used to map the results of the cursor to each item.
-	 *
 	 * @param rowMapper {@link RowMapper}
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setRowMapper(RowMapper)
@@ -267,7 +254,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * The name of the stored procedure to execute
-	 *
 	 * @param procedureName name of the procedure
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setProcedureName(String)
@@ -280,7 +266,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * SQL parameters to be set when executing the stored procedure
-	 *
 	 * @param parameters parameters to be set
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setParameters(SqlParameter[])
@@ -293,7 +278,6 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Indicates the stored procedure is a function
-	 *
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setFunction(boolean)
 	 */
@@ -304,9 +288,8 @@ public class StoredProcedureItemReaderBuilder<T> {
 	}
 
 	/**
-	 * The parameter position of the REF CURSOR.  Only used for Oracle and PostgreSQL that
-	 * use REF CURSORs.  For any other database, this should remain as the default (0).
-	 *
+	 * The parameter position of the REF CURSOR. Only used for Oracle and PostgreSQL that
+	 * use REF CURSORs. For any other database, this should remain as the default (0).
 	 * @param refCursorPosition the parameter position
 	 * @return this instance for method chaining
 	 * @see StoredProcedureItemReader#setRefCursorPosition(int)
@@ -319,13 +302,11 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 	/**
 	 * Validates configuration and builds a new reader instance
-	 *
 	 * @return a fully constructed {@link StoredProcedureItemReader}
 	 */
 	public StoredProcedureItemReader<T> build() {
-		if(this.saveState) {
-			Assert.hasText(this.name,
-					"A name is required when saveSate is set to true");
+		if (this.saveState) {
+			Assert.hasText(this.name, "A name is required when saveSate is set to true");
 		}
 
 		Assert.notNull(this.procedureName, "The name of the stored procedure must be provided");
@@ -334,7 +315,7 @@ public class StoredProcedureItemReaderBuilder<T> {
 
 		StoredProcedureItemReader<T> itemReader = new StoredProcedureItemReader<>();
 
-		if(StringUtils.hasText(this.name)) {
+		if (StringUtils.hasText(this.name)) {
 			itemReader.setName(this.name);
 		}
 

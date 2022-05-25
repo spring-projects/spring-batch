@@ -21,6 +21,7 @@ import org.springframework.batch.core.JobExecutionException;
 
 /**
  * Interface for handling a {@link JobLaunchRequest} and returning a {@link JobExecution}.
+ *
  * @author Dave Syer
  *
  */

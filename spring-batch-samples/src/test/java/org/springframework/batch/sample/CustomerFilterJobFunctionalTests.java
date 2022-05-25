@@ -41,12 +41,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/customerFilterJob.xml", "/job-runner-context.xml" })
 public class CustomerFilterJobFunctionalTests {
+
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
+
 	private List<Customer> customers;
+
 	private int activeRow = 0;
+
 	private JdbcTemplate jdbcTemplate;
+
 	private Map<String, Double> credits = new HashMap<>();
 
 	@Autowired
@@ -61,7 +67,7 @@ public class CustomerFilterJobFunctionalTests {
 	public void onSetUp() throws Exception {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
-        jdbcTemplate.update("update CUSTOMER set credit=100000");
+		jdbcTemplate.update("update CUSTOMER set credit=100000");
 
 		List<Map<String, Object>> list = jdbcTemplate.queryForList("select name, CREDIT from CUSTOMER");
 
@@ -72,20 +78,21 @@ public class CustomerFilterJobFunctionalTests {
 
 	@After
 	public void tearDown() throws Exception {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
-        JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "CUSTOMER", "ID > 4");
 	}
 
 	@Test
 	public void testFilterJob() throws Exception {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
-		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))), new Customer("customer2",
-				(credits.get("customer2"))), new Customer("customer3", 100500), new Customer("customer4", credits
-				.get("customer4")), new Customer("customer5", 32345), new Customer("customer6", 123456));
+		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1"))),
+				new Customer("customer2", (credits.get("customer2"))), new Customer("customer3", 100500),
+				new Customer("customer4", credits.get("customer4")), new Customer("customer5", 32345),
+				new Customer("customer6", 123456));
 
 		activeRow = 0;
-        jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
@@ -108,7 +115,9 @@ public class CustomerFilterJobFunctionalTests {
 	}
 
 	private static class Customer {
+
 		private String name;
+
 		private double credit;
 
 		public Customer(String name, double credit) {
@@ -170,5 +179,7 @@ public class CustomerFilterJobFunctionalTests {
 				return false;
 			return true;
 		}
+
 	}
+
 }

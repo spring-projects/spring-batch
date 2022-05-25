@@ -53,7 +53,6 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 	/**
 	 * Configure the {@link DataSource} to be used.
-	 *
 	 * @param dataSource the DataSource
 	 * @return The current instance of the builder for chaining.
 	 * @see JdbcBatchItemWriter#setDataSource(DataSource)
@@ -66,8 +65,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 	/**
 	 * If set to true, confirms that every insert results in the update of at least one
-	 * row in the database.  Defaults to true.
-	 *
+	 * row in the database. Defaults to true.
 	 * @param assertUpdates boolean indicator
 	 * @return The current instance of the builder for chaining
 	 * @see JdbcBatchItemWriter#setAssertUpdates(boolean)
@@ -79,9 +77,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Set the SQL statement to be used for each item's updates.  This is a required
-	 * field.
-	 *
+	 * Set the SQL statement to be used for each item's updates. This is a required field.
 	 * @param sql SQL string
 	 * @return The current instance of the builder for chaining
 	 * @see JdbcBatchItemWriter#setSql(String)
@@ -93,41 +89,41 @@ public class JdbcBatchItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Configures a {@link ItemPreparedStatementSetter} for use by the writer.  This
-	 * should only be used if {@link #columnMapped()} isn't called.
-	 *
+	 * Configures a {@link ItemPreparedStatementSetter} for use by the writer. This should
+	 * only be used if {@link #columnMapped()} isn't called.
 	 * @param itemPreparedStatementSetter The {@link ItemPreparedStatementSetter}
 	 * @return The current instance of the builder for chaining
 	 * @see JdbcBatchItemWriter#setItemPreparedStatementSetter(ItemPreparedStatementSetter)
 	 */
-	public JdbcBatchItemWriterBuilder<T> itemPreparedStatementSetter(ItemPreparedStatementSetter<T> itemPreparedStatementSetter) {
+	public JdbcBatchItemWriterBuilder<T> itemPreparedStatementSetter(
+			ItemPreparedStatementSetter<T> itemPreparedStatementSetter) {
 		this.itemPreparedStatementSetter = itemPreparedStatementSetter;
 
 		return this;
 	}
 
 	/**
-	 * Configures a {@link ItemSqlParameterSourceProvider} for use by the writer.  This
+	 * Configures a {@link ItemSqlParameterSourceProvider} for use by the writer. This
 	 * should only be used if {@link #beanMapped()} isn't called.
-	 *
 	 * @param itemSqlParameterSourceProvider The {@link ItemSqlParameterSourceProvider}
 	 * @return The current instance of the builder for chaining
 	 * @see JdbcBatchItemWriter#setItemSqlParameterSourceProvider(ItemSqlParameterSourceProvider)
 	 */
-	public JdbcBatchItemWriterBuilder<T> itemSqlParameterSourceProvider(ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
+	public JdbcBatchItemWriterBuilder<T> itemSqlParameterSourceProvider(
+			ItemSqlParameterSourceProvider<T> itemSqlParameterSourceProvider) {
 		this.itemSqlParameterSourceProvider = itemSqlParameterSourceProvider;
 
 		return this;
 	}
 
 	/**
-	 * The {@link NamedParameterJdbcOperations} instance to use.  If one isn't provided,
-	 * a {@link DataSource} is required.
-	 *
+	 * The {@link NamedParameterJdbcOperations} instance to use. If one isn't provided, a
+	 * {@link DataSource} is required.
 	 * @param namedParameterJdbcOperations The template
 	 * @return The current instance of the builder for chaining
 	 */
-	public JdbcBatchItemWriterBuilder<T> namedParametersJdbcTemplate(NamedParameterJdbcOperations namedParameterJdbcOperations) {
+	public JdbcBatchItemWriterBuilder<T> namedParametersJdbcTemplate(
+			NamedParameterJdbcOperations namedParameterJdbcOperations) {
 		this.namedParameterJdbcTemplate = namedParameterJdbcOperations;
 
 		return this;
@@ -139,7 +135,6 @@ public class JdbcBatchItemWriterBuilder<T> {
 	 *
 	 * NOTE: The item type for this {@link org.springframework.batch.item.ItemWriter} must
 	 * be castable to <code>Map&lt;String,Object&gt;&gt;</code>.
-	 *
 	 * @return The current instance of the builder for chaining
 	 * @see ColumnMapItemPreparedStatementSetter
 	 */
@@ -152,7 +147,6 @@ public class JdbcBatchItemWriterBuilder<T> {
 	/**
 	 * Creates a {@link BeanPropertyItemSqlParameterSourceProvider} to be used as your
 	 * {@link ItemSqlParameterSourceProvider}.
-	 *
 	 * @return The current instance of the builder for chaining
 	 * @see BeanPropertyItemSqlParameterSourceProvider
 	 */
@@ -164,7 +158,6 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 	/**
 	 * Validates configuration and builds the {@link JdbcBatchItemWriter}.
-	 *
 	 * @return a {@link JdbcBatchItemWriter}
 	 */
 	@SuppressWarnings("unchecked")
@@ -174,8 +167,7 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 		Assert.notNull(this.sql, "A SQL statement is required");
 		int mappedValue = this.mapped.intValue();
-		Assert.state(mappedValue != 3,
-				"Either an item can be mapped via db column or via bean spec, can't be both");
+		Assert.state(mappedValue != 3, "Either an item can be mapped via db column or via bean spec, can't be both");
 
 		JdbcBatchItemWriter<T> writer = new JdbcBatchItemWriter<>();
 		writer.setSql(this.sql);
@@ -183,13 +175,15 @@ public class JdbcBatchItemWriterBuilder<T> {
 		writer.setItemSqlParameterSourceProvider(this.itemSqlParameterSourceProvider);
 		writer.setItemPreparedStatementSetter(this.itemPreparedStatementSetter);
 
-		if(mappedValue == 1) {
-			((JdbcBatchItemWriter<Map<String,Object>>)writer).setItemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter());
-		} else if(mappedValue == 2) {
+		if (mappedValue == 1) {
+			((JdbcBatchItemWriter<Map<String, Object>>) writer)
+					.setItemPreparedStatementSetter(new ColumnMapItemPreparedStatementSetter());
+		}
+		else if (mappedValue == 2) {
 			writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
 		}
 
-		if(this.dataSource != null) {
+		if (this.dataSource != null) {
 			this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(this.dataSource);
 		}
 
@@ -197,4 +191,5 @@ public class JdbcBatchItemWriterBuilder<T> {
 
 		return writer;
 	}
+
 }

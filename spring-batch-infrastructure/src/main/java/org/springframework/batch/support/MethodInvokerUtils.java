@@ -30,7 +30,7 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * Utility methods for create MethodInvoker instances.
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  */
@@ -38,11 +38,10 @@ public class MethodInvokerUtils {
 
 	/**
 	 * Create a {@link MethodInvoker} using the provided method name to search.
-	 * 
 	 * @param object to be invoked
 	 * @param methodName of the method to be invoked
-	 * @param paramsRequired boolean indicating whether the parameters are
-	 * required, if false, a no args version of the method will be searched for.
+	 * @param paramsRequired boolean indicating whether the parameters are required, if
+	 * false, a no args version of the method will be searched for.
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
@@ -65,7 +64,6 @@ public class MethodInvokerUtils {
 
 	/**
 	 * Create a String representation of the array of parameter types.
-	 * 
 	 * @param paramTypes types of the parameters to be used
 	 * @return String a String representation of those types
 	 */
@@ -81,9 +79,8 @@ public class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create a {@link MethodInvoker} using the provided interface, and method
-	 * name from that interface.
-	 * 
+	 * Create a {@link MethodInvoker} using the provided interface, and method name from
+	 * that interface.
 	 * @param cls the interface to search for the method named
 	 * @param methodName of the method to be invoked
 	 * @param object to be invoked
@@ -102,9 +99,8 @@ public class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create a MethodInvoker from the delegate based on the annotationType.
-	 * Ensure that the annotated method has a valid set of parameters.
-	 * 
+	 * Create a MethodInvoker from the delegate based on the annotationType. Ensure that
+	 * the annotated method has a valid set of parameters.
 	 * @param annotationType the annotation to scan for
 	 * @param target the target object
 	 * @param expectedParamTypes the expected parameter types for the method
@@ -113,8 +109,8 @@ public class MethodInvokerUtils {
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
 			final Object target, final Class<?>... expectedParamTypes) {
 		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
-		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
-				.getTargetClass() : target.getClass();
+		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource().getTargetClass()
+				: target.getClass();
 		if (mi != null) {
 			ReflectionUtils.doWithMethods(targetClass, method -> {
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
@@ -138,11 +134,9 @@ public class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create {@link MethodInvoker} for the method with the provided annotation
-	 * on the provided object. Annotations that cannot be applied to methods
-	 * (i.e. that aren't annotated with an element type of METHOD) will cause an
-	 * exception to be thrown.
-	 * 
+	 * Create {@link MethodInvoker} for the method with the provided annotation on the
+	 * provided object. Annotations that cannot be applied to methods (i.e. that aren't
+	 * annotated with an element type of METHOD) will cause an exception to be thrown.
 	 * @param annotationType to be searched for
 	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
@@ -151,10 +145,11 @@ public class MethodInvokerUtils {
 			final Object target) {
 		Assert.notNull(target, "Target must not be null");
 		Assert.notNull(annotationType, "AnnotationType must not be null");
-		Assert.isTrue(ObjectUtils.containsElement(annotationType.getAnnotation(Target.class).value(),
-				ElementType.METHOD), "Annotation [" + annotationType + "] is not a Method-level annotation.");
-		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
-				.getTargetClass() : target.getClass();
+		Assert.isTrue(
+				ObjectUtils.containsElement(annotationType.getAnnotation(Target.class).value(), ElementType.METHOD),
+				"Annotation [" + annotationType + "] is not a Method-level annotation.");
+		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource().getTargetClass()
+				: target.getClass();
 		if (targetClass == null) {
 			// Proxy with no target cannot have annotations
 			return null;
@@ -163,9 +158,9 @@ public class MethodInvokerUtils {
 		ReflectionUtils.doWithMethods(targetClass, method -> {
 			Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 			if (annotation != null) {
-				Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
-						+ targetClass.getSimpleName() + "] with the annotation type ["
-						+ annotationType.getSimpleName() + "].");
+				Assert.isNull(annotatedMethod.get(),
+						"found more than one method on target class [" + targetClass.getSimpleName()
+								+ "] with the annotation type [" + annotationType.getSimpleName() + "].");
 				annotatedMethod.set(method);
 			}
 		});
@@ -179,9 +174,7 @@ public class MethodInvokerUtils {
 	}
 
 	/**
-	 * Create a {@link MethodInvoker} for the delegate from a single public
-	 * method.
-	 * 
+	 * Create a {@link MethodInvoker} for the delegate from a single public method.
 	 * @param target an object to search for an appropriate method.
 	 * @param <C> the class.
 	 * @param <T> the type.
@@ -203,4 +196,5 @@ public class MethodInvokerUtils {
 		Method method = methodHolder.get();
 		return new SimpleMethodInvoker(target, method);
 	}
+
 }

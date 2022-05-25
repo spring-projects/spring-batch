@@ -91,8 +91,7 @@ public class CompositeItemProcessorBuilderTests {
 				"The delegates list must have one or more delegates.");
 		validateExceptionMessage(new CompositeItemProcessorBuilder<>().delegates(),
 				"The delegates list must have one or more delegates.");
-		validateExceptionMessage(new CompositeItemProcessorBuilder<>(),
-				"A list of delegates is required.");
+		validateExceptionMessage(new CompositeItemProcessorBuilder<>(), "A list of delegates is required.");
 	}
 
 	private void validateExceptionMessage(CompositeItemProcessorBuilder<?, ?> builder, String message) {
@@ -105,4 +104,5 @@ public class CompositeItemProcessorBuilderTests {
 					iae.getMessage());
 		}
 	}
+
 }

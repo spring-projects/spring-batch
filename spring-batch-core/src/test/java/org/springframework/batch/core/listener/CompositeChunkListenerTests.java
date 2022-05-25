@@ -31,7 +31,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 public class CompositeChunkListenerTests {
 
 	ChunkListener listener;
+
 	CompositeChunkListener compositeListener;
+
 	ChunkContext chunkContext;
 
 	@Before
@@ -43,22 +45,23 @@ public class CompositeChunkListenerTests {
 	}
 
 	@Test
-	public void testBeforeChunk(){
+	public void testBeforeChunk() {
 		listener.beforeChunk(chunkContext);
 		compositeListener.beforeChunk(chunkContext);
 	}
 
 	@Test
-	public void testAfterChunk(){
+	public void testAfterChunk() {
 
 		listener.afterChunk(chunkContext);
 		compositeListener.afterChunk(chunkContext);
 	}
 
 	@Test
-	public void testAfterChunkFailed(){
+	public void testAfterChunkFailed() {
 		ChunkContext context = new ChunkContext(null);
 		listener.afterChunkError(context);
 		compositeListener.afterChunkError(context);
 	}
+
 }

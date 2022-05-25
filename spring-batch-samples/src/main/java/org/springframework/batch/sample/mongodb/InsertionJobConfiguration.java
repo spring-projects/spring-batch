@@ -32,15 +32,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- *  This job will copy documents from collection "person_in" into collection
- *  "person_out" using {@link MongoItemReader} and {@link MongoItemWriter}.
+ * This job will copy documents from collection "person_in" into collection "person_out"
+ * using {@link MongoItemReader} and {@link MongoItemWriter}.
  *
- *  @author Mahmoud Ben Hassine
+ * @author Mahmoud Ben Hassine
  */
 @EnableBatchProcessing
 public class InsertionJobConfiguration {
 
 	private JobBuilderFactory jobBuilderFactory;
+
 	private StepBuilderFactory stepBuilderFactory;
 
 	public InsertionJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
@@ -52,38 +53,24 @@ public class InsertionJobConfiguration {
 	public MongoItemReader<Person> mongoItemReader(MongoTemplate mongoTemplate) {
 		Map<String, Sort.Direction> sortOptions = new HashMap<>();
 		sortOptions.put("name", Sort.Direction.DESC);
-		return new MongoItemReaderBuilder<Person>()
-				.name("personItemReader")
-				.collection("person_in")
-				.targetType(Person.class)
-				.template(mongoTemplate)
-				.jsonQuery("{}")
-				.sorts(sortOptions)
-				.build();
+		return new MongoItemReaderBuilder<Person>().name("personItemReader").collection("person_in")
+				.targetType(Person.class).template(mongoTemplate).jsonQuery("{}").sorts(sortOptions).build();
 	}
 
 	@Bean
 	public MongoItemWriter<Person> mongoItemWriter(MongoTemplate mongoTemplate) {
-		return new MongoItemWriterBuilder<Person>()
-				.template(mongoTemplate)
-				.collection("person_out")
-				.build();
+		return new MongoItemWriterBuilder<Person>().template(mongoTemplate).collection("person_out").build();
 	}
 
 	@Bean
 	public Step step(MongoItemReader<Person> mongoItemReader, MongoItemWriter<Person> mongoItemWriter) {
-		return this.stepBuilderFactory.get("step")
-				.<Person, Person>chunk(2)
-				.reader(mongoItemReader)
-				.writer(mongoItemWriter)
-				.build();
+		return this.stepBuilderFactory.get("step").<Person, Person>chunk(2).reader(mongoItemReader)
+				.writer(mongoItemWriter).build();
 	}
 
 	@Bean
 	public Job insertionJob(Step step) {
-		return this.jobBuilderFactory.get("insertionJob")
-				.start(step)
-				.build();
+		return this.jobBuilderFactory.get("insertionJob").start(step).build();
 	}
 
 }

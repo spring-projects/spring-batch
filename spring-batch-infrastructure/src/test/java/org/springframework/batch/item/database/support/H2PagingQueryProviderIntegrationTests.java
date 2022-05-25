@@ -72,31 +72,23 @@ public class H2PagingQueryProviderIntegrationTests {
 			sortKeys.put("ID", Order.ASCENDING);
 			queryProvider.setSortKeys(sortKeys);
 
-			List<String> firstPage = jdbcTemplate.queryForList(
-					queryProvider.generateFirstPageQuery(2),
-					String.class
-			);
-			assertArrayEquals("firstPage", new String[]{"Spring", "Batch"}, firstPage.toArray());
+			List<String> firstPage = jdbcTemplate.queryForList(queryProvider.generateFirstPageQuery(2), String.class);
+			assertArrayEquals("firstPage", new String[] { "Spring", "Batch" }, firstPage.toArray());
 
-			List<String> secondPage = jdbcTemplate.queryForList(
-					queryProvider.generateRemainingPagesQuery(2),
-					String.class,
-					2
-			);
-			assertArrayEquals("secondPage", new String[]{"Infrastructure"}, secondPage.toArray());
+			List<String> secondPage = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(2),
+					String.class, 2);
+			assertArrayEquals("secondPage", new String[] { "Infrastructure" }, secondPage.toArray());
 
-			Integer secondItem = jdbcTemplate.queryForObject(
-					queryProvider.generateJumpToItemQuery(3, 2),
-					Integer.class
-			);
+			Integer secondItem = jdbcTemplate.queryForObject(queryProvider.generateJumpToItemQuery(3, 2),
+					Integer.class);
 			assertEquals(Integer.valueOf(2), secondItem);
 		});
 	}
 
 	@Parameters
 	public static List<Object[]> data() throws Exception {
-		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values())
-				.map(mode -> new Object[]{mode.toString()})
+		return Arrays.stream(org.h2.engine.Mode.ModeEnum.values()).map(mode -> new Object[] { mode.toString() })
 				.collect(Collectors.toList());
 	}
+
 }

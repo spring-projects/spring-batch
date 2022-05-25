@@ -21,10 +21,11 @@ import java.util.List;
 
 /**
  * An XML order.
- * 
+ *
  * This is a complex type.
  */
 public class Order {
+
 	private Customer customer;
 
 	private Date date;
@@ -42,11 +43,11 @@ public class Order {
 	}
 
 	public Date getDate() {
-		return (Date)date.clone();
+		return (Date) date.clone();
 	}
 
 	public void setDate(Date date) {
-		this.date = date == null ? null : (Date)date.clone();
+		this.date = date == null ? null : (Date) date.clone();
 	}
 
 	public List<LineItem> getLineItems() {

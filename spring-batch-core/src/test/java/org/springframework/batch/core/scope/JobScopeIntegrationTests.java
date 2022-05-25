@@ -80,8 +80,8 @@ public class JobScopeIntegrationTests {
 		String collaborator = (String) TestJob.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
 		assertEquals("bar", collaborator);
-		assertTrue("Scoped proxy not created", ((String) TestJob.getContext().getAttribute("collaborator.class"))
-				.matches(PROXY_TO_STRING_REGEX));
+		assertTrue("Scoped proxy not created",
+				((String) TestJob.getContext().getAttribute("collaborator.class")).matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test
@@ -94,8 +94,8 @@ public class JobScopeIntegrationTests {
 		String parent = (String) TestJob.getContext().getAttribute("parent");
 		assertNotNull(parent);
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created", ((String) TestJob.getContext().getAttribute("parent.class"))
-				.matches(PROXY_TO_STRING_REGEX));
+		assertTrue("Scoped proxy not created",
+				((String) TestJob.getContext().getAttribute("parent.class")).matches(PROXY_TO_STRING_REGEX));
 	}
 
 	@Test

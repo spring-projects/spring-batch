@@ -25,8 +25,11 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
  * @since 2.0
  */
 public class CustomerCreditFieldSetMapper implements FieldSetMapper<CustomerCredit> {
+
 	public static final int ID_COLUMN = 0;
+
 	public static final int NAME_COLUMN = 1;
+
 	public static final int CREDIT_COLUMN = 2;
 
 	@Override
@@ -38,4 +41,5 @@ public class CustomerCreditFieldSetMapper implements FieldSetMapper<CustomerCred
 
 		return trade;
 	}
+
 }

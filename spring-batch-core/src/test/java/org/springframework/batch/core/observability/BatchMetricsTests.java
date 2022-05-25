@@ -62,11 +62,8 @@ public class BatchMetricsTests {
 	@Test
 	public void testCalculateDuration() {
 		LocalDateTime startTime = LocalDateTime.now();
-		LocalDateTime endTime = startTime
-				.plus(2, ChronoUnit.HOURS)
-				.plus(31, ChronoUnit.MINUTES)
-				.plus(12, ChronoUnit.SECONDS)
-				.plus(42, ChronoUnit.MILLIS);
+		LocalDateTime endTime = startTime.plus(2, ChronoUnit.HOURS).plus(31, ChronoUnit.MINUTES)
+				.plus(12, ChronoUnit.SECONDS).plus(42, ChronoUnit.MILLIS);
 
 		Duration duration = BatchMetrics.calculateDuration(toDate(startTime), toDate(endTime));
 		Duration expectedDuration = Duration.ofMillis(42).plusSeconds(12).plusMinutes(31).plusHours(2);
@@ -154,127 +151,114 @@ public class BatchMetricsTests {
 		// Job metrics
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.job")
-					.tag("spring.batch.job.name", "job")
-					.tag("spring.batch.job.status", "COMPLETED")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.job " +
-					"registered in the global registry: " + e.getMessage());
+			Metrics.globalRegistry.get("spring.batch.job").tag("spring.batch.job.name", "job")
+					.tag("spring.batch.job.status", "COMPLETED").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.job " + "registered in the global registry: "
+					+ e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.job.active")
-					.tag("spring.batch.job.active.name", "job")
+			Metrics.globalRegistry.get("spring.batch.job.active").tag("spring.batch.job.active.name", "job")
 					.longTaskTimer();
-		} catch (Exception e) {
-			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active" +
-					" registered in the global registry: " + e.getMessage());
 		}
-		
+		catch (Exception e) {
+			fail("There should be a meter of type LONG_TASK_TIMER named spring.batch.job.active"
+					+ " registered in the global registry: " + e.getMessage());
+		}
+
 		// Step 1 (tasklet) metrics
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("spring.batch.step.name", "step1")
-					.tag("spring.batch.step.job.name", "job")
-					.tag("spring.batch.step.status", "COMPLETED")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.step" +
-					" registered in the global registry: " + e.getMessage());
+			Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step1")
+					.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer();
 		}
-		
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step"
+					+ " registered in the global registry: " + e.getMessage());
+		}
+
 		// Step 2 (simple chunk-oriented) metrics
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("spring.batch.step.name", "step2")
-					.tag("spring.batch.step.job.name", "job")
-					.tag("spring.batch.step.status", "COMPLETED")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.step" +
-					" registered in the global registry: " + e.getMessage());
+			Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step2")
+					.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.item.read")
-					.tag("spring.batch.item.read.job.name", "job")
-					.tag("spring.batch.item.read.step.name", "step2")
-					.tag("spring.batch.item.read.status", "SUCCESS")
+			Metrics.globalRegistry.get("spring.batch.item.read").tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step2").tag("spring.batch.item.read.status", "SUCCESS")
 					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.item.read" +
-					" registered in the global registry: " + e.getMessage());
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.read"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.item.process")
-					.tag("spring.batch.item.process.job.name", "job")
+			Metrics.globalRegistry.get("spring.batch.item.process").tag("spring.batch.item.process.job.name", "job")
 					.tag("spring.batch.item.process.step.name", "step2")
-					.tag("spring.batch.item.process.status", "SUCCESS")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.item.process" +
-					" registered in the global registry: " + e.getMessage());
+					.tag("spring.batch.item.process.status", "SUCCESS").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.process"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.chunk.write")
-					.tag("spring.batch.chunk.write.job.name", "job")
+			Metrics.globalRegistry.get("spring.batch.chunk.write").tag("spring.batch.chunk.write.job.name", "job")
 					.tag("spring.batch.chunk.write.step.name", "step2")
-					.tag("spring.batch.chunk.write.status", "SUCCESS")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
-					" registered in the global registry: " + e.getMessage());
+					.tag("spring.batch.chunk.write.status", "SUCCESS").timer();
 		}
-		
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.chunk.write"
+					+ " registered in the global registry: " + e.getMessage());
+		}
+
 		// Step 3 (fault-tolerant chunk-oriented) metrics
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.step")
-					.tag("spring.batch.step.name", "step3")
-					.tag("spring.batch.step.job.name", "job")
-					.tag("spring.batch.step.status", "COMPLETED")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.step" +
-					" registered in the global registry: " + e.getMessage());
+			Metrics.globalRegistry.get("spring.batch.step").tag("spring.batch.step.name", "step3")
+					.tag("spring.batch.step.job.name", "job").tag("spring.batch.step.status", "COMPLETED").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.step"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.item.read")
-					.tag("spring.batch.item.read.job.name", "job")
-					.tag("spring.batch.item.read.step.name", "step3")
-					.tag("spring.batch.item.read.status", "SUCCESS")
+			Metrics.globalRegistry.get("spring.batch.item.read").tag("spring.batch.item.read.job.name", "job")
+					.tag("spring.batch.item.read.step.name", "step3").tag("spring.batch.item.read.status", "SUCCESS")
 					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.item.read" +
-					" registered in the global registry: " + e.getMessage());
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.read"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.item.process")
-					.tag("spring.batch.item.process.job.name", "job")
+			Metrics.globalRegistry.get("spring.batch.item.process").tag("spring.batch.item.process.job.name", "job")
 					.tag("spring.batch.item.process.step.name", "step3")
-					.tag("spring.batch.item.process.status", "SUCCESS")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.item.process" +
-					" registered in the global registry: " + e.getMessage());
+					.tag("spring.batch.item.process.status", "SUCCESS").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.item.process"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 
 		try {
-			Metrics.globalRegistry.get("spring.batch.chunk.write")
-					.tag("spring.batch.chunk.write.job.name", "job")
+			Metrics.globalRegistry.get("spring.batch.chunk.write").tag("spring.batch.chunk.write.job.name", "job")
 					.tag("spring.batch.chunk.write.step.name", "step3")
-					.tag("spring.batch.chunk.write.status", "SUCCESS")
-					.timer();
-		} catch (Exception e) {
-			fail("There should be a meter of type TIMER named spring.batch.chunk.write" +
-					" registered in the global registry: " + e.getMessage());
+					.tag("spring.batch.chunk.write.status", "SUCCESS").timer();
+		}
+		catch (Exception e) {
+			fail("There should be a meter of type TIMER named spring.batch.chunk.write"
+					+ " registered in the global registry: " + e.getMessage());
 		}
 	}
 
@@ -284,6 +268,7 @@ public class BatchMetricsTests {
 	static class MyJobConfiguration {
 
 		private JobBuilderFactory jobBuilderFactory;
+
 		private StepBuilderFactory stepBuilderFactory;
 
 		public MyJobConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
@@ -293,51 +278,41 @@ public class BatchMetricsTests {
 
 		@Bean
 		public Step step1() {
-			return stepBuilderFactory.get("step1")
-					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
+			return stepBuilderFactory.get("step1").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
 					.build();
 		}
 
 		@Bean
 		public Step step2() {
-			return stepBuilderFactory.get("step2")
-					.<Integer, Integer>chunk(2)
+			return stepBuilderFactory.get("step2").<Integer, Integer>chunk(2)
 					.reader(new ListItemReader<>(Arrays.asList(1, 2, 3, 4, 5)))
-					.writer(items -> items.forEach(System.out::println))
-					.build();
+					.writer(items -> items.forEach(System.out::println)).build();
 		}
 
 		@Bean
 		public Step step3() {
-			return stepBuilderFactory.get("step3")
-					.<Integer, Integer>chunk(2)
+			return stepBuilderFactory.get("step3").<Integer, Integer>chunk(2)
 					.reader(new ListItemReader<>(Arrays.asList(6, 7, 8, 9, 10)))
-					.writer(items -> items.forEach(System.out::println))
-					.faultTolerant()
-					.skip(Exception.class)
-					.skipLimit(3)
-					.build();
+					.writer(items -> items.forEach(System.out::println)).faultTolerant().skip(Exception.class)
+					.skipLimit(3).build();
 		}
 
 		@Bean
 		public Job job() {
-			return jobBuilderFactory.get("job")
-					.start(step1())
-					.next(step2())
-					.next(step3())
-					.build();
+			return jobBuilderFactory.get("job").start(step1()).next(step2()).next(step3()).build();
 		}
+
 	}
 
 	@Configuration
 	static class DataSoourceConfiguration {
+
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
+
 	}
+
 }

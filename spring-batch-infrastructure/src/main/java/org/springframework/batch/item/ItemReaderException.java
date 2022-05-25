@@ -18,7 +18,7 @@ package org.springframework.batch.item;
 
 /**
  * A base exception class that all exceptions thrown from an {@link ItemReader} extend.
- * 
+ *
  * @author Ben Hale
  */
 @SuppressWarnings("serial")
@@ -26,7 +26,6 @@ public abstract class ItemReaderException extends RuntimeException {
 
 	/**
 	 * Create a new {@link ItemReaderException} based on a message and another exception.
-	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
@@ -36,7 +35,6 @@ public abstract class ItemReaderException extends RuntimeException {
 
 	/**
 	 * Create a new {@link ItemReaderException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public ItemReaderException(String message) {

@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link ItemReaderAdapter}.
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,7 +44,8 @@ public class ItemReaderAdapterTests {
 	private FooService fooService;
 
 	/*
-	 * Regular usage scenario - items are retrieved from the service injected invoker points to.
+	 * Regular usage scenario - items are retrieved from the service injected invoker
+	 * points to.
 	 */
 	@Test
 	public void testNext() throws Exception {

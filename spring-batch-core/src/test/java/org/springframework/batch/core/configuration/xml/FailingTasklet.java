@@ -22,8 +22,8 @@ import org.springframework.lang.Nullable;
 
 /**
  * This tasklet will call
- * {@link NameStoringTasklet#execute(StepContribution, ChunkContext)} and then
- * throw an exception.
+ * {@link NameStoringTasklet#execute(StepContribution, ChunkContext)} and then throw an
+ * exception.
  *
  * @author Dan Garrette
  * @since 2.0

@@ -46,15 +46,14 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 /**
- * Base class for item writers that write data to a file or stream.
- * This class provides common features like restart, force sync, append etc.
- * The location of the output file is defined by a {@link WritableResource} which must
- * represent a writable file.<br>
- * 
+ * Base class for item writers that write data to a file or stream. This class provides
+ * common features like restart, force sync, append etc. The location of the output file
+ * is defined by a {@link WritableResource} which must represent a writable file.<br>
+ *
  * Uses buffered writer to improve performance.<br>
- * 
+ *
  * The implementation is <b>not</b> thread-safe.
- * 
+ *
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
@@ -63,7 +62,6 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @author Glenn Renfro
  * @author Remi Kaeffer
- *
  * @since 4.1
  */
 public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWriter<T>
@@ -106,12 +104,10 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	protected boolean append = false;
 
 	/**
-	 * Flag to indicate that changes should be force-synced to disk on flush.
-	 * Defaults to false, which means that even with a local disk changes could
-	 * be lost if the OS crashes in between a write and a cache flush. Setting
-	 * to true may result in slower performance for usage patterns involving many
-	 * frequent writes.
-	 * 
+	 * Flag to indicate that changes should be force-synced to disk on flush. Defaults to
+	 * false, which means that even with a local disk changes could be lost if the OS
+	 * crashes in between a write and a cache flush. Setting to true may result in slower
+	 * performance for usage patterns involving many frequent writes.
 	 * @param forceSync the flag value to set
 	 */
 	public void setForceSync(boolean forceSync) {
@@ -129,7 +125,6 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	/**
 	 * Setter for a writable resource. Represents a file that can be written.
-	 * 
 	 * @param resource the resource to be written to
 	 */
 	@Override
@@ -139,21 +134,19 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 	/**
 	 * Sets encoding for output template.
-	 *
-	 * @param newEncoding {@link String} containing the encoding to be used for
-	 * the writer.
+	 * @param newEncoding {@link String} containing the encoding to be used for the
+	 * writer.
 	 */
 	public void setEncoding(String newEncoding) {
 		this.encoding = newEncoding;
 	}
 
 	/**
-	 * Flag to indicate that the target file should be deleted if it already
-	 * exists, otherwise it will be created. Defaults to true, so no appending
-	 * except on restart. If set to false and {@link #setAppendAllowed(boolean)
-	 * appendAllowed} is also false then there will be an exception when the
-	 * stream is opened to prevent existing data being potentially corrupted.
-	 * 
+	 * Flag to indicate that the target file should be deleted if it already exists,
+	 * otherwise it will be created. Defaults to true, so no appending except on restart.
+	 * If set to false and {@link #setAppendAllowed(boolean) appendAllowed} is also false
+	 * then there will be an exception when the stream is opened to prevent existing data
+	 * being potentially corrupted.
 	 * @param shouldDeleteIfExists the flag value to set
 	 */
 	public void setShouldDeleteIfExists(boolean shouldDeleteIfExists) {
@@ -161,12 +154,10 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Flag to indicate that the target file should be appended if it already
-	 * exists. If this flag is set then the flag
-	 * {@link #setShouldDeleteIfExists(boolean) shouldDeleteIfExists} is
-	 * automatically set to false, so that flag should not be set explicitly.
-	 * Defaults value is false.
-	 * 
+	 * Flag to indicate that the target file should be appended if it already exists. If
+	 * this flag is set then the flag {@link #setShouldDeleteIfExists(boolean)
+	 * shouldDeleteIfExists} is automatically set to false, so that flag should not be set
+	 * explicitly. Defaults value is false.
 	 * @param append the flag value to set
 	 */
 	public void setAppendAllowed(boolean append) {
@@ -174,9 +165,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Flag to indicate that the target file should be deleted if no lines have
-	 * been written (other than header and footer) on close. Defaults to false.
-	 * 
+	 * Flag to indicate that the target file should be deleted if no lines have been
+	 * written (other than header and footer) on close. Defaults to false.
 	 * @param shouldDeleteIfEmpty the flag value to set
 	 */
 	public void setShouldDeleteIfEmpty(boolean shouldDeleteIfEmpty) {
@@ -184,11 +174,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Set the flag indicating whether or not state should be saved in the
-	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
-	 * update. Setting this to false means that it will always start at the
-	 * beginning on a restart.
-	 * 
+	 * Set the flag indicating whether or not state should be saved in the provided
+	 * {@link ExecutionContext} during the {@link ItemStream} call to update. Setting this
+	 * to false means that it will always start at the beginning on a restart.
 	 * @param saveState if true, state will be persisted
 	 */
 	public void setSaveState(boolean saveState) {
@@ -196,9 +184,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * headerCallback will be called before writing the first item to file.
-	 * Newline will be automatically appended after the header is written.
-	 *
+	 * headerCallback will be called before writing the first item to file. Newline will
+	 * be automatically appended after the header is written.
 	 * @param headerCallback {@link FlatFileHeaderCallback} to generate the header
 	 *
 	 */
@@ -207,9 +194,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * footerCallback will be called after writing the last item to file, but
-	 * before the file is closed.
-	 *
+	 * footerCallback will be called after writing the last item to file, but before the
+	 * file is closed.
 	 * @param footerCallback {@link FlatFileFooterCallback} to generate the footer
 	 *
 	 */
@@ -218,9 +204,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Flag to indicate that writing to the buffer should be delayed if a
-	 * transaction is active. Defaults to true.
-	 *
+	 * Flag to indicate that writing to the buffer should be delayed if a transaction is
+	 * active. Defaults to true.
 	 * @param transactional true if writing to buffer should be delayed.
 	 *
 	 */
@@ -229,9 +214,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Writes out a string followed by a "new line", where the format of the new
-	 * line separator is determined by the underlying operating system.
-	 * 
+	 * Writes out a string followed by a "new line", where the format of the new line
+	 * separator is determined by the underlying operating system.
 	 * @param items list of items to be written to output stream
 	 * @throws Exception if an error occurs while writing items to the output stream
 	 */
@@ -297,9 +281,9 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Initialize the reader. This method may be called multiple times before
-	 * close is called.
-	 * 
+	 * Initialize the reader. This method may be called multiple times before close is
+	 * called.
+	 *
 	 * @see ItemStream#open(ExecutionContext)
 	 */
 	@Override
@@ -382,8 +366,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 	}
 
 	/**
-	 * Encapsulates the runtime state of the writer. All state changing
-	 * operations on the writer go through this class.
+	 * Encapsulates the runtime state of the writer. All state changing operations on the
+	 * writer go through this class.
 	 */
 	protected class OutputState {
 
@@ -413,8 +397,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		private boolean appending = false;
 
 		/**
-		 * Return the byte offset position of the cursor in the output file as a
-		 * long integer.
+		 * Return the byte offset position of the cursor in the output file as a long
+		 * integer.
 		 * @return the byte offset position of the cursor in the output file
 		 * @throws IOException If unable to get the offset position
 		 */
@@ -449,10 +433,12 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 			lastMarkedByteOffsetPosition = executionContext.getLong(getExecutionContextKey(RESTART_DATA_NAME));
 			linesWritten = executionContext.getLong(getExecutionContextKey(WRITTEN_STATISTICS_NAME));
 			if (shouldDeleteIfEmpty && linesWritten == 0) {
-				// previous execution deleted the output file because no items were written
+				// previous execution deleted the output file because no items were
+				// written
 				restarted = false;
 				lastMarkedByteOffsetPosition = 0;
-			} else {
+			}
+			else {
 				restarted = true;
 			}
 		}
@@ -537,7 +523,6 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 
 		/**
 		 * Truncate the output at the last known good point.
-		 * 
 		 * @throws IOException if unable to work with file
 		 */
 		public void truncate() throws IOException {
@@ -546,8 +531,8 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		}
 
 		/**
-		 * Creates the buffered writer for the output file channel based on
-		 * configuration information.
+		 * Creates the buffered writer for the output file channel based on configuration
+		 * information.
 		 * @throws IOException if unable to initialize buffer
 		 */
 		private void initializeBufferedWriter() throws IOException {
@@ -570,8 +555,7 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 				}
 			}
 
-			Assert.state(outputBufferedWriter != null,
-					"Unable to initialize buffered writer");
+			Assert.state(outputBufferedWriter != null, "Unable to initialize buffered writer");
 			// in case of restarting reset position to last committed point
 			if (restarted) {
 				checkFileSize();
@@ -586,14 +570,15 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		}
 
 		/**
-		 * Returns the buffered writer opened to the beginning of the file
-		 * specified by the absolute path name contained in absoluteFileName.
+		 * Returns the buffered writer opened to the beginning of the file specified by
+		 * the absolute path name contained in absoluteFileName.
 		 */
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
 				final FileChannel channel = fileChannel;
 				if (transactional) {
-					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel, () -> closeStream());
+					TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(channel,
+							() -> closeStream());
 
 					writer.setEncoding(encoding);
 					writer.setForceSync(forceSync);
@@ -619,10 +604,10 @@ public abstract class AbstractFileItemWriter<T> extends AbstractItemStreamItemWr
 		}
 
 		/**
-		 * Checks (on setState) to make sure that the current output file's size
-		 * is not smaller than the last saved commit point. If it is, then the
-		 * file has been damaged in some way and whole task must be started over
-		 * again from the beginning.
+		 * Checks (on setState) to make sure that the current output file's size is not
+		 * smaller than the last saved commit point. If it is, then the file has been
+		 * damaged in some way and whole task must be started over again from the
+		 * beginning.
 		 * @throws IOException if there is an IO problem
 		 */
 		private void checkFileSize() throws IOException {

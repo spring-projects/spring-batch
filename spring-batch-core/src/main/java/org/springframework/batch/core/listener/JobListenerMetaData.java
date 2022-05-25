@@ -39,10 +39,12 @@ public enum JobListenerMetaData implements ListenerMetaData {
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
 	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
 
-
 	private final String methodName;
+
 	private final String propertyName;
+
 	private final Class<? extends Annotation> annotation;
+
 	private static final Map<String, JobListenerMetaData> propertyMap;
 
 	JobListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation) {
@@ -51,9 +53,9 @@ public enum JobListenerMetaData implements ListenerMetaData {
 		this.annotation = annotation;
 	}
 
-	static{
+	static {
 		propertyMap = new HashMap<>();
-		for(JobListenerMetaData metaData : values()){
+		for (JobListenerMetaData metaData : values()) {
 			propertyMap.put(metaData.getPropertyName(), metaData);
 		}
 	}
@@ -80,17 +82,17 @@ public enum JobListenerMetaData implements ListenerMetaData {
 
 	@Override
 	public Class<?>[] getParamTypes() {
-		return new Class<?>[]{ JobExecution.class };
+		return new Class<?>[] { JobExecution.class };
 	}
 
 	/**
 	 * Return the relevant meta data for the provided property name.
-	 *
 	 * @param propertyName name of the property to retrieve.
 	 * @return meta data with supplied property name, {@code null} if none exists.
 	 */
 	@Nullable
-	public static JobListenerMetaData fromPropertyName(String propertyName){
+	public static JobListenerMetaData fromPropertyName(String propertyName) {
 		return propertyMap.get(propertyName);
 	}
+
 }

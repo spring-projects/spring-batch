@@ -19,29 +19,26 @@ package org.springframework.batch.repeat;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * Base interface for context which controls the state and completion /
- * termination of a batch step. A new context is created for each call to the
- * {@link RepeatOperations}. Within a batch callback code can communicate via
- * the {@link AttributeAccessor} interface.
- * 
+ * Base interface for context which controls the state and completion / termination of a
+ * batch step. A new context is created for each call to the {@link RepeatOperations}.
+ * Within a batch callback code can communicate via the {@link AttributeAccessor}
+ * interface.
+ *
  * @author Dave Syer
- * 
  * @see RepeatOperations#iterate(RepeatCallback)
- * 
+ *
  */
 public interface RepeatContext extends AttributeAccessor {
 
 	/**
-	 * If batches are nested, then the inner batch will be created with the
-	 * outer one as a parent. This is an accessor for the parent if it exists.
-	 * 
+	 * If batches are nested, then the inner batch will be created with the outer one as a
+	 * parent. This is an accessor for the parent if it exists.
 	 * @return the parent context or null if there is none
 	 */
 	RepeatContext getParent();
 
 	/**
 	 * Public access to a counter for the number of operations attempted.
-	 * 
 	 * @return the number of batch operations started.
 	 */
 	int getStartedCount();
@@ -54,41 +51,36 @@ public interface RepeatContext extends AttributeAccessor {
 
 	/**
 	 * Public accessor for the complete flag.
-	 *
 	 * @return indicator if the repeat is complete
 	 */
 	boolean isCompleteOnly();
 
 	/**
-	 * Signal to the framework that the current batch should complete
-	 * abnormally, independent of the current {@link CompletionPolicy}.
+	 * Signal to the framework that the current batch should complete abnormally,
+	 * independent of the current {@link CompletionPolicy}.
 	 */
 	void setTerminateOnly();
 
 	/**
-	 * Public accessor for the termination flag. If this flag is set then the
-	 * complete flag will also be.
-	 *
+	 * Public accessor for the termination flag. If this flag is set then the complete
+	 * flag will also be.
 	 * @return indicates if the repeat should terminate
 	 */
 	boolean isTerminateOnly();
 
 	/**
-	 * Register a callback to be executed on close, associated with the
-	 * attribute having the given name. The {@link Runnable} callback should not
-	 * throw any exceptions.
-	 * 
-	 * @param name the name of the attribute to associated this callback with.
-	 * If this attribute is removed the callback should never be called.
+	 * Register a callback to be executed on close, associated with the attribute having
+	 * the given name. The {@link Runnable} callback should not throw any exceptions.
+	 * @param name the name of the attribute to associated this callback with. If this
+	 * attribute is removed the callback should never be called.
 	 * @param callback a {@link Runnable} to execute when the context is closed.
 	 */
 	void registerDestructionCallback(String name, Runnable callback);
 
 	/**
-	 * Allow resources to be cleared, especially in destruction callbacks.
-	 * Implementations should ensure that any registered destruction callbacks
-	 * are executed here, as long as the corresponding attribute is still
-	 * available.
+	 * Allow resources to be cleared, especially in destruction callbacks. Implementations
+	 * should ensure that any registered destruction callbacks are executed here, as long
+	 * as the corresponding attribute is still available.
 	 */
 	void close();
 

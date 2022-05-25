@@ -19,7 +19,7 @@ import org.springframework.batch.core.Job;
 
 /**
  * Strategy for creating a single job.
- * 
+ *
  * @author Dave Syer
  *
  */
@@ -27,7 +27,6 @@ public interface JobFactory {
 
 	/**
 	 * Create a new instance of {@link Job}.
-	 *
 	 * @return The {@link Job}.
 	 */
 	Job createJob();

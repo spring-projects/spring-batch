@@ -23,7 +23,7 @@ import org.springframework.batch.core.job.JobSupport;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class GroupAwareJobTests {
 
@@ -46,4 +46,5 @@ public class GroupAwareJobTests {
 		GroupAwareJob result = new GroupAwareJob("jobs", job);
 		assertEquals("JobSupport: [name=jobs.foo]", result.toString());
 	}
+
 }

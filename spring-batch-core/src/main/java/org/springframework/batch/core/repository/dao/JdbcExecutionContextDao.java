@@ -47,8 +47,8 @@ import org.springframework.util.Assert;
 /**
  * JDBC DAO for {@link ExecutionContext}.
  *
- * Stores execution context data related to both Step and Job using
- * a different table for each.
+ * Stores execution context data related to both Step and Job using a different table for
+ * each.
  *
  * @author Lucas Ward
  * @author Robert Kasanicky
@@ -89,7 +89,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	/**
 	 * Setter for {@link Serializer} implementation
-	 *
 	 * @param serializer {@link ExecutionContextSerializer} instance to use.
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -98,13 +97,12 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	/**
-	 * The maximum size that an execution context can have and still be stored
-	 * completely in short form in the column <code>SHORT_CONTEXT</code>.
-	 * Anything longer than this will overflow into large-object storage, and
-	 * the first part only will be retained in the short form for readability.
-	 * Default value is 2500. Clients using multi-bytes charsets on the database
-	 * server may need to reduce this value to as little as half the value of
-	 * the column size.
+	 * The maximum size that an execution context can have and still be stored completely
+	 * in short form in the column <code>SHORT_CONTEXT</code>. Anything longer than this
+	 * will overflow into large-object storage, and the first part only will be retained
+	 * in the short form for readability. Default value is 2500. Clients using multi-bytes
+	 * charsets on the database server may need to reduce this value to as little as half
+	 * the value of the column size.
 	 * @param shortContextLength int max length of the short context.
 	 */
 	public void setShortContextLength(int shortContextLength) {
@@ -112,8 +110,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	}
 
 	/**
-	 * Set the {@link Charset} to use when serializing/deserializing the execution context.
-	 * Must not be {@code null}. Defaults to "UTF-8".
+	 * Set the {@link Charset} to use when serializing/deserializing the execution
+	 * context. Must not be {@code null}. Defaults to "UTF-8".
 	 * @param charset to use when serializing/deserializing the execution context.
 	 * @since 5.0
 	 */
@@ -269,41 +267,43 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @param sql with parameters (shortContext, longContext, executionId)
 	 */
 	private void persistSerializedContexts(final Map<Long, String> serializedContexts, String sql) {
-        if (!serializedContexts.isEmpty()) {
-            final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
+		if (!serializedContexts.isEmpty()) {
+			final Iterator<Long> executionIdIterator = serializedContexts.keySet().iterator();
 
-            getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Long executionId = executionIdIterator.next();
-                    String serializedContext = serializedContexts.get(executionId);
-                    String shortContext;
-                    String longContext;
-                    if (serializedContext.length() > shortContextLength) {
-                        // Overestimate length of ellipsis to be on the safe side with
-                        // 2-byte chars
-                        shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
-                        longContext = serializedContext;
-                    } else {
-                        shortContext = serializedContext;
-                        longContext = null;
-                    }
-                    ps.setString(1, shortContext);
-                    if (longContext != null) {
-                        lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-                    } else {
-                        ps.setNull(2, getClobTypeToUse());
-                    }
-                    ps.setLong(3, executionId);
-                }
+			getJdbcTemplate().batchUpdate(getQuery(sql), new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					Long executionId = executionIdIterator.next();
+					String serializedContext = serializedContexts.get(executionId);
+					String shortContext;
+					String longContext;
+					if (serializedContext.length() > shortContextLength) {
+						// Overestimate length of ellipsis to be on the safe side with
+						// 2-byte chars
+						shortContext = serializedContext.substring(0, shortContextLength - 8) + " ...";
+						longContext = serializedContext;
+					}
+					else {
+						shortContext = serializedContext;
+						longContext = null;
+					}
+					ps.setString(1, shortContext);
+					if (longContext != null) {
+						lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+					}
+					else {
+						ps.setNull(2, getClobTypeToUse());
+					}
+					ps.setLong(3, executionId);
+				}
 
-                @Override
-                public int getBatchSize() {
-                    return serializedContexts.size();
-                }
-            });
-        }
-    }
+				@Override
+				public int getBatchSize() {
+					return serializedContexts.size();
+				}
+			});
+		}
+	}
 
 	private String serializeContext(ExecutionContext ctx) {
 		Map<String, Object> m = new HashMap<>();
@@ -348,6 +348,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			}
 			return executionContext;
 		}
+
 	}
 
 }

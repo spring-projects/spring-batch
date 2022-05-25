@@ -27,21 +27,20 @@ import org.springframework.classify.Classifier;
 
 /**
  * <p>
- * {@link SkipPolicy} that determines whether or not reading should continue
- * based upon how many items have been skipped. This is extremely useful
- * behavior, as it allows you to skip records, but will throw a
- * {@link SkipLimitExceededException} if a set limit has been exceeded. For
- * example, it is generally advisable to skip {@link FlatFileParseException}s,
- * however, if the vast majority of records are causing exceptions, the file is
- * likely bad.
+ * {@link SkipPolicy} that determines whether or not reading should continue based upon
+ * how many items have been skipped. This is extremely useful behavior, as it allows you
+ * to skip records, but will throw a {@link SkipLimitExceededException} if a set limit has
+ * been exceeded. For example, it is generally advisable to skip
+ * {@link FlatFileParseException}s, however, if the vast majority of records are causing
+ * exceptions, the file is likely bad.
  * </p>
  *
  * <p>
  * Furthermore, it is also likely that you only want to skip certain exceptions.
- * {@link FlatFileParseException} is a good example of an exception you will
- * likely want to skip, but a {@link FileNotFoundException} should cause
- * immediate termination of the {@link Step}. A {@link Classifier} is used to
- * determine whether a particular exception is skippable or not.
+ * {@link FlatFileParseException} is a good example of an exception you will likely want
+ * to skip, but a {@link FileNotFoundException} should cause immediate termination of the
+ * {@link Step}. A {@link Classifier} is used to determine whether a particular exception
+ * is skippable or not.
  * </p>
  *
  * @author Ben Hale
@@ -61,24 +60,21 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	 * Convenience constructor that assumes all exception types are fatal.
 	 */
 	public LimitCheckingItemSkipPolicy() {
-		this(0, Collections.<Class<? extends Throwable>, Boolean> emptyMap());
+		this(0, Collections.<Class<? extends Throwable>, Boolean>emptyMap());
 	}
 
 	/**
-	 * @param skipLimit the number of skippable exceptions that are allowed to
-	 * be skipped
-	 * @param skippableExceptions exception classes that can be skipped
-	 * (non-critical)
+	 * @param skipLimit the number of skippable exceptions that are allowed to be skipped
+	 * @param skippableExceptions exception classes that can be skipped (non-critical)
 	 */
 	public LimitCheckingItemSkipPolicy(int skipLimit, Map<Class<? extends Throwable>, Boolean> skippableExceptions) {
 		this(skipLimit, new BinaryExceptionClassifier(skippableExceptions));
 	}
 
 	/**
-	 * @param skipLimit the number of skippable exceptions that are allowed to
-	 * be skipped
-	 * @param skippableExceptionClassifier exception classifier for those that
-	 * can be skipped (non-critical)
+	 * @param skipLimit the number of skippable exceptions that are allowed to be skipped
+	 * @param skippableExceptionClassifier exception classifier for those that can be
+	 * skipped (non-critical)
 	 */
 	public LimitCheckingItemSkipPolicy(int skipLimit, Classifier<Throwable, Boolean> skippableExceptionClassifier) {
 		this.skipLimit = skipLimit;
@@ -86,9 +82,8 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	}
 
 	/**
-	 * The absolute number of skips (of skippable exceptions) that can be
-	 * tolerated before a failure.
-	 *
+	 * The absolute number of skips (of skippable exceptions) that can be tolerated before
+	 * a failure.
 	 * @param skipLimit the skip limit to set
 	 */
 	public void setSkipLimit(long skipLimit) {
@@ -96,20 +91,17 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	}
 
 	/**
-	 * The classifier that will be used to decide on skippability. If an
-	 * exception classifies as "true" then it is skippable, and otherwise not.
-	 *
-	 * @param skippableExceptionClassifier the skippableExceptionClassifier to
-	 * set
+	 * The classifier that will be used to decide on skippability. If an exception
+	 * classifies as "true" then it is skippable, and otherwise not.
+	 * @param skippableExceptionClassifier the skippableExceptionClassifier to set
 	 */
 	public void setSkippableExceptionClassifier(Classifier<Throwable, Boolean> skippableExceptionClassifier) {
 		this.skippableExceptionClassifier = skippableExceptionClassifier;
 	}
 
 	/**
-	 * Set up the classifier through a convenient map from throwable class to
-	 * boolean (true if skippable).
-	 *
+	 * Set up the classifier through a convenient map from throwable class to boolean
+	 * (true if skippable).
 	 * @param skippableExceptions the skippable exceptions to set
 	 */
 	public void setSkippableExceptionMap(Map<Class<? extends Throwable>, Boolean> skippableExceptions) {
@@ -117,12 +109,11 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	}
 
 	/**
-	 * Given the provided exception and skip count, determine whether or not
-	 * processing should continue for the given exception. If the exception is
-	 * not classified as skippable in the classifier, false will be returned. If
-	 * the exception is classified as skippable and {@link StepExecution}
-	 * skipCount is greater than the skipLimit, then a
-	 * {@link SkipLimitExceededException} will be thrown.
+	 * Given the provided exception and skip count, determine whether or not processing
+	 * should continue for the given exception. If the exception is not classified as
+	 * skippable in the classifier, false will be returned. If the exception is classified
+	 * as skippable and {@link StepExecution} skipCount is greater than the skipLimit,
+	 * then a {@link SkipLimitExceededException} will be thrown.
 	 */
 	@Override
 	public boolean shouldSkip(Throwable t, long skipCount) {

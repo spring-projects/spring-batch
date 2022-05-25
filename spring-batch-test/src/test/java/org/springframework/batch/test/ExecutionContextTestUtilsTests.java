@@ -26,7 +26,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
 public class ExecutionContextTestUtilsTests {
-	
+
 	@Test
 	public void testFromJob() throws Exception {
 		Date date = new Date();
@@ -39,17 +39,19 @@ public class ExecutionContextTestUtilsTests {
 	@Test
 	public void testFromStepInJob() throws Exception {
 		Date date = new Date();
-		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L, Arrays.asList("foo", "bar"));
+		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L,
+				Arrays.asList("foo", "bar"));
 		StepExecution stepExecution = jobExecution.createStepExecution("spam");
 		stepExecution.getExecutionContext().put("foo", date);
 		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
 		assertEquals(date, result);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testFromStepInJobNoSuchStep() throws Exception {
 		Date date = new Date();
-		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L, Arrays.asList("foo", "bar"));
+		JobExecution jobExecution = MetaDataInstanceFactory.createJobExecutionWithStepExecutions(123L,
+				Arrays.asList("foo", "bar"));
 		Date result = ExecutionContextTestUtils.getValueFromStepInJob(jobExecution, "spam", "foo");
 		assertEquals(date, result);
 	}

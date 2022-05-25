@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.repeat.support;
 
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -60,20 +59,21 @@ public class ResultHolderResultQueueTests {
 			this.result = result;
 		}
 
-        @Override
+		@Override
 		public RepeatContext getContext() {
 			return null;
 		}
 
-        @Override
+		@Override
 		public Throwable getError() {
 			return error;
 		}
 
-        @Override
+		@Override
 		public RepeatStatus getResult() {
 			return result;
 		}
+
 	}
 
 }

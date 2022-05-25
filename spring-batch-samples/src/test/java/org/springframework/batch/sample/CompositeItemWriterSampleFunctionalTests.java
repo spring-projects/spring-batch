@@ -40,9 +40,12 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/compositeItemWriterSampleJob.xml",
+		"/job-runner-context.xml" })
 public class CompositeItemWriterSampleFunctionalTests {
+
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM TRADE order by isin";
+
 	private static final String EXPECTED_OUTPUT_FILE = "Trade: [isin=UK21341EAH41,quantity=211,price=31.11,customer=customer1]"
 			+ "Trade: [isin=UK21341EAH42,quantity=212,price=32.11,customer=customer2]"
 			+ "Trade: [isin=UK21341EAH43,quantity=213,price=33.11,customer=customer3]"
@@ -61,7 +64,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 		int before = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 
 		jobLauncherTestUtils.launchJob();
@@ -87,7 +90,7 @@ public class CompositeItemWriterSampleFunctionalTests {
 
 		assertEquals(before + 5, after);
 
-        jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 			private int activeRow = 0;
 
 			@Override
@@ -114,4 +117,5 @@ public class CompositeItemWriterSampleFunctionalTests {
 
 		assertEquals(EXPECTED_OUTPUT_FILE, output);
 	}
+
 }

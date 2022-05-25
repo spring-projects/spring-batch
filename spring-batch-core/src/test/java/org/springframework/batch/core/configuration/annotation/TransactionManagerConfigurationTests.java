@@ -43,13 +43,18 @@ public abstract class TransactionManagerConfigurationTests {
 	protected static PlatformTransactionManager transactionManager2;
 
 	/*
-	 * The transaction manager set on JobRepositoryFactoryBean in DefaultBatchConfigurer.createJobRepository
-	 * ends up in the TransactionInterceptor advise applied to the (proxied) JobRepository.
-	 * This method extracts the advise from the proxy and returns the transaction manager.
+	 * The transaction manager set on JobRepositoryFactoryBean in
+	 * DefaultBatchConfigurer.createJobRepository ends up in the TransactionInterceptor
+	 * advise applied to the (proxied) JobRepository. This method extracts the advise from
+	 * the proxy and returns the transaction manager.
 	 */
 	PlatformTransactionManager getTransactionManagerSetOnJobRepository(JobRepository jobRepository) throws Exception {
-		TargetSource targetSource = ((Advised) jobRepository).getTargetSource(); // proxy created in SimpleBatchConfiguration.createLazyProxy
-		Advised target = (Advised) targetSource.getTarget(); // initial proxy created in AbstractJobRepositoryFactoryBean.initializeProxy
+		TargetSource targetSource = ((Advised) jobRepository).getTargetSource(); // proxy
+																					// created
+																					// in
+																					// SimpleBatchConfiguration.createLazyProxy
+		Advised target = (Advised) targetSource.getTarget(); // initial proxy created in
+																// AbstractJobRepositoryFactoryBean.initializeProxy
 		Advisor[] advisors = target.getAdvisors();
 		for (Advisor advisor : advisors) {
 			if (advisor.getAdvice() instanceof TransactionInterceptor) {
@@ -63,8 +68,8 @@ public abstract class TransactionManagerConfigurationTests {
 	static DataSource createDataSource() {
 		return new EmbeddedDatabaseBuilder()
 				.addScript("classpath:org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql")
-				.generateUniqueName(true)
+				.addScript("classpath:org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true)
 				.build();
 	}
+
 }

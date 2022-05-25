@@ -51,4 +51,5 @@ public class DummyNamespaceHandler implements NamespaceHandler {
 		builder.addPropertyValue("name", LABEL);
 		return builder.getBeanDefinition();
 	}
+
 }

@@ -33,13 +33,12 @@ public class SimpleChunkProviderTests {
 
 	private SimpleChunkProvider<String> provider;
 
-	private StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(
-			new JobInstance(123L, "job"), new JobParameters())));
+	private StepContribution contribution = new StepContribution(
+			new StepExecution("foo", new JobExecution(new JobInstance(123L, "job"), new JobParameters())));
 
 	@Test
 	public void testProvide() throws Exception {
-		provider = new SimpleChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")),
-				new RepeatTemplate());
+		provider = new SimpleChunkProvider<>(new ListItemReader<>(Arrays.asList("foo", "bar")), new RepeatTemplate());
 		Chunk<String> chunk = provider.provide(contribution);
 		assertNotNull(chunk);
 		assertEquals(2, chunk.getItems().size());
@@ -50,8 +49,8 @@ public class SimpleChunkProviderTests {
 		provider = new SimpleChunkProvider<String>(new ListItemReader<>(Arrays.asList("foo", "bar")),
 				new RepeatTemplate()) {
 			@Override
-			protected String read(StepContribution contribution, Chunk<String> chunk) throws SkipOverflowException,
-			Exception {
+			protected String read(StepContribution contribution, Chunk<String> chunk)
+					throws SkipOverflowException, Exception {
 				chunk.skip(new RuntimeException("Planned"));
 				throw new SkipOverflowException("Overflow");
 			}

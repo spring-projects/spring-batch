@@ -53,21 +53,22 @@ public class SimpleFlowTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testEmptySteps() throws Exception {
-		flow.setStateTransitions(Collections.<StateTransition> emptyList());
+		flow.setStateTransitions(Collections.<StateTransition>emptyList());
 		flow.afterPropertiesSet();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoNextStepSpecified() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createStateTransition(new StateSupport(
-				"step"), "foo")));
+		flow.setStateTransitions(
+				Collections.singletonList(StateTransition.createStateTransition(new StateSupport("step"), "foo")));
 		flow.afterPropertiesSet();
 	}
 
 	@Test
 	public void testStepLoop() throws Exception {
-		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StateSupport("step"),
-				ExitStatus.FAILED.getExitCode(), "step"), StateTransition.createEndStateTransition(new StateSupport("step"))));
+		flow.setStateTransitions(
+				collect(StateTransition.createStateTransition(new StateSupport("step"), ExitStatus.FAILED.getExitCode(),
+						"step"), StateTransition.createEndStateTransition(new StateSupport("step"))));
 		flow.afterPropertiesSet();
 		FlowExecution execution = flow.start(executor);
 		assertEquals(FlowExecutionStatus.COMPLETED, execution.getStatus());
@@ -76,8 +77,8 @@ public class SimpleFlowTests {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoEndStep() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createStateTransition(new StateSupport(
-				"step"), ExitStatus.FAILED.getExitCode(), "step")));
+		flow.setStateTransitions(Collections.singletonList(StateTransition
+				.createStateTransition(new StateSupport("step"), ExitStatus.FAILED.getExitCode(), "step")));
 		flow.afterPropertiesSet();
 	}
 
@@ -109,8 +110,8 @@ public class SimpleFlowTests {
 
 	@Test
 	public void testOneStep() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
-				"step1"))));
+		flow.setStateTransitions(
+				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
 		FlowExecution execution = flow.start(executor);
 		assertEquals(FlowExecutionStatus.COMPLETED, execution.getStatus());
@@ -119,8 +120,8 @@ public class SimpleFlowTests {
 
 	@Test
 	public void testOneStepWithListenerCallsClose() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
-				"step1"))));
+		flow.setStateTransitions(
+				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
 		final List<FlowExecution> list = new ArrayList<>();
 		executor = new JobFlowExecutorSupport() {
@@ -137,8 +138,9 @@ public class SimpleFlowTests {
 
 	@Test
 	public void testExplicitStartStep() throws Exception {
-		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step"),
-				ExitStatus.FAILED.getExitCode(), "step"), StateTransition.createEndStateTransition(new StubState("step"))));
+		flow.setStateTransitions(collect(
+				StateTransition.createStateTransition(new StubState("step"), ExitStatus.FAILED.getExitCode(), "step"),
+				StateTransition.createEndStateTransition(new StubState("step"))));
 		flow.afterPropertiesSet();
 		FlowExecution execution = flow.start(executor);
 		assertEquals(FlowExecutionStatus.COMPLETED, execution.getStatus());
@@ -182,9 +184,10 @@ public class SimpleFlowTests {
 	@Test
 	public void testBranching() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1"), "step2"),
-				StateTransition.createStateTransition(new StubState("step1"), ExitStatus.COMPLETED.getExitCode(), "step3"),
-				StateTransition.createEndStateTransition(new StubState("step2")), StateTransition
-				.createEndStateTransition(new StubState("step3"))));
+				StateTransition.createStateTransition(new StubState("step1"), ExitStatus.COMPLETED.getExitCode(),
+						"step3"),
+				StateTransition.createEndStateTransition(new StubState("step2")),
+				StateTransition.createEndStateTransition(new StubState("step3"))));
 		flow.setStateTransitionComparator(new DefaultStateTransitionComparator());
 		flow.afterPropertiesSet();
 		FlowExecution execution = flow.start(executor);
@@ -194,8 +197,8 @@ public class SimpleFlowTests {
 
 	@Test
 	public void testGetStateExists() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
-				"step1"))));
+		flow.setStateTransitions(
+				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
 		State state = flow.getState("step1");
 		assertNotNull(state);
@@ -204,8 +207,8 @@ public class SimpleFlowTests {
 
 	@Test
 	public void testGetStateDoesNotExist() throws Exception {
-		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
-				"step1"))));
+		flow.setStateTransitions(
+				Collections.singletonList(StateTransition.createEndStateTransition(new StubState("step1"))));
 		flow.afterPropertiesSet();
 		State state = flow.getState("bar");
 		assertNull(state);

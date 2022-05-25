@@ -23,6 +23,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
 public class CustomerCreditUpdateWriter implements ItemWriter<CustomerCredit> {
+
 	private double creditFilter = 800;
 
 	private CustomerCreditDao dao;
@@ -43,4 +44,5 @@ public class CustomerCreditUpdateWriter implements ItemWriter<CustomerCredit> {
 	public void setDao(CustomerCreditDao dao) {
 		this.dao = dao;
 	}
+
 }

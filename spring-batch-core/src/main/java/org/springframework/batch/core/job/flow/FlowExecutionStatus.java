@@ -84,7 +84,6 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 		return name.startsWith(FAILED.getName());
 	}
 
-
 	/**
 	 * @return true if this status represents the end of a flow
 	 */
@@ -98,12 +97,12 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	private boolean isComplete() {
 		return name.startsWith(COMPLETED.getName());
 	}
+
 	/**
-	 * Create an ordering on {@link FlowExecutionStatus} instances by comparing
-	 * their statuses.
+	 * Create an ordering on {@link FlowExecutionStatus} instances by comparing their
+	 * statuses.
 	 *
 	 * @see Comparable#compareTo(Object)
-	 *
 	 * @param other instance of {@link FlowExecutionStatus} to compare this instance with.
 	 * @return negative, zero or positive as per the contract
 	 */

@@ -25,12 +25,12 @@ import org.springframework.jms.support.JmsHeaders;
  *
  */
 public class JmsRedeliveredExtractor {
-	
+
 	private static final Log logger = LogFactory.getLog(JmsRedeliveredExtractor.class);
-	
+
 	public ChunkResponse extract(ChunkResponse input, @Header(JmsHeaders.REDELIVERED) boolean redelivered) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Extracted redelivered flag for response, value="+redelivered);
+			logger.debug("Extracted redelivered flag for response, value=" + redelivered);
 		}
 		return new ChunkResponse(input, redelivered);
 	}

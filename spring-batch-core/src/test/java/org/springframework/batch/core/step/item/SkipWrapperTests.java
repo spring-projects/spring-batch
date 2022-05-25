@@ -39,7 +39,8 @@ public class SkipWrapperTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Throwable)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.step.item.SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Throwable)}.
 	 */
 	@Test
 	public void testItemWrapperTException() {
@@ -49,7 +50,8 @@ public class SkipWrapperTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.SkipWrapper#toString()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.step.item.SkipWrapper#toString()}.
 	 */
 	@Test
 	public void testToString() {

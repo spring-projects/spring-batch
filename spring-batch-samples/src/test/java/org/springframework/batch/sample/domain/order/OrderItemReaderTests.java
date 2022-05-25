@@ -31,7 +31,9 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.internal.OrderItemReader;
 
 public class OrderItemReaderTests {
+
 	private OrderItemReader provider;
+
 	private ItemReader<FieldSet> input;
 
 	@Before
@@ -44,14 +46,13 @@ public class OrderItemReaderTests {
 	}
 
 	/*
-	 * OrderItemProvider is responsible for retrieving validated value object
-	 * from input source. OrderItemProvider.next(): - reads lines from the input
-	 * source - returned as fieldsets - pass fieldsets to the mapper - mapper
-	 * will create value object - pass value object to validator - returns
-	 * validated object
-	 * 
-	 * In testNext method we are going to test these responsibilities. So we
-	 * need create mock objects for input source, mapper and validator.
+	 * OrderItemProvider is responsible for retrieving validated value object from input
+	 * source. OrderItemProvider.next(): - reads lines from the input source - returned as
+	 * fieldsets - pass fieldsets to the mapper - mapper will create value object - pass
+	 * value object to validator - returns validated object
+	 *
+	 * In testNext method we are going to test these responsibilities. So we need create
+	 * mock objects for input source, mapper and validator.
 	 */
 	@Test
 	@SuppressWarnings("unchecked")
@@ -63,11 +64,11 @@ public class OrderItemReaderTests {
 		FieldSet billingInfoFS = new DefaultFieldSet(new String[] { BillingInfo.LINE_ID_BILLING_INFO });
 		FieldSet shippingInfoFS = new DefaultFieldSet(new String[] { ShippingInfo.LINE_ID_SHIPPING_INFO });
 		FieldSet itemFS = new DefaultFieldSet(new String[] { LineItem.LINE_ID_ITEM });
-		FieldSet footerFS = new DefaultFieldSet(new String[] { Order.LINE_ID_FOOTER, "100", "3", "3" }, new String[] {
-				"ID", "TOTAL_PRICE", "TOTAL_LINE_ITEMS", "TOTAL_ITEMS" });
+		FieldSet footerFS = new DefaultFieldSet(new String[] { Order.LINE_ID_FOOTER, "100", "3", "3" },
+				new String[] { "ID", "TOTAL_PRICE", "TOTAL_LINE_ITEMS", "TOTAL_ITEMS" });
 
-		when(input.read()).thenReturn(headerFS, customerFS, billingFS, shippingFS, billingInfoFS,
-				shippingInfoFS, itemFS, itemFS, itemFS, footerFS, null);
+		when(input.read()).thenReturn(headerFS, customerFS, billingFS, shippingFS, billingInfoFS, shippingInfoFS,
+				itemFS, itemFS, itemFS, footerFS, null);
 
 		Order order = new Order();
 		Customer customer = new Customer();
@@ -115,4 +116,5 @@ public class OrderItemReaderTests {
 
 		assertNull(provider.read());
 	}
+
 }

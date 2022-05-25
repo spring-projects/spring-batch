@@ -24,7 +24,9 @@ import org.springframework.batch.sample.domain.order.internal.mapper.HeaderField
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
+
 	private static final long ORDER_ID = 1;
+
 	private static final String DATE = "2007-01-01";
 
 	@Override
@@ -50,4 +52,5 @@ public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	protected FieldSetMapper<Order> fieldSetMapper() {
 		return new HeaderFieldSetMapper();
 	}
+
 }

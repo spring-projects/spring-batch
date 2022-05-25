@@ -12,12 +12,12 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.util.Assert;
 
 /**
- * A {@link StepLocator} implementation that just looks in its enclosing bean
- * factory for components of type {@link Step}.
- * 
+ * A {@link StepLocator} implementation that just looks in its enclosing bean factory for
+ * components of type {@link Step}.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class BeanFactoryStepLocator implements StepLocator, BeanFactoryAware {
 

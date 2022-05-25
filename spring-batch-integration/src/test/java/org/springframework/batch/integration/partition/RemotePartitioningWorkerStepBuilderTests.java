@@ -39,7 +39,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.inputChannel(null));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.inputChannel(null));
 
 		// then
 		assertThat(expectedException).hasMessage("inputChannel must not be null");
@@ -51,7 +52,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.outputChannel(null));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.outputChannel(null));
 
 		// then
 		assertThat(expectedException).hasMessage("outputChannel must not be null");
@@ -63,7 +65,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.jobExplorer(null));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.jobExplorer(null));
 
 		// then
 		assertThat(expectedException).hasMessage("jobExplorer must not be null");
@@ -75,7 +78,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.stepLocator(null));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.stepLocator(null));
 
 		// then
 		assertThat(expectedException).hasMessage("stepLocator must not be null");
@@ -87,7 +91,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.beanFactory(null));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.beanFactory(null));
 
 		// then
 		assertThat(expectedException).hasMessage("beanFactory must not be null");
@@ -99,7 +104,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 		final RemotePartitioningWorkerStepBuilder builder = new RemotePartitioningWorkerStepBuilder("step");
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.tasklet(this.tasklet));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.tasklet(this.tasklet));
 
 		// then
 		assertThat(expectedException).hasMessage("An InputChannel must be provided");
@@ -113,7 +119,8 @@ public class RemotePartitioningWorkerStepBuilderTests {
 				.inputChannel(inputChannel);
 
 		// when
-		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, () -> builder.tasklet(this.tasklet));
+		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class,
+				() -> builder.tasklet(this.tasklet));
 
 		// then
 		assertThat(expectedException).hasMessage("A JobExplorer must be provided");

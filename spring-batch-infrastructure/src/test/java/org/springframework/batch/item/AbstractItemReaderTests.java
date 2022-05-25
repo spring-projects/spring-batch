@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.springframework.batch.item.sample.Foo;
 
 /**
- * Common tests for {@link ItemReader} implementations. Expected input is five
- * {@link Foo} objects with values 1 to 5.
+ * Common tests for {@link ItemReader} implementations. Expected input is five {@link Foo}
+ * objects with values 1 to 5.
  */
 public abstract class AbstractItemReaderTests {
 
@@ -65,8 +65,7 @@ public abstract class AbstractItemReaderTests {
 	}
 
 	/**
-	 * Empty input should be handled gracefully - null is returned on first
-	 * read.
+	 * Empty input should be handled gracefully - null is returned on first read.
 	 */
 	@Test
 	public void testEmptyInput() throws Exception {
@@ -76,13 +75,10 @@ public abstract class AbstractItemReaderTests {
 	}
 
 	/**
-	 * Point the reader to empty input (close and open if necessary for the new
-	 * settings to apply).
-	 * 
-	 * @param tested
-	 *            the reader
+	 * Point the reader to empty input (close and open if necessary for the new settings
+	 * to apply).
+	 * @param tested the reader
 	 */
-	protected abstract void pointToEmptyInput(ItemReader<Foo> tested)
-			throws Exception;
+	protected abstract void pointToEmptyInput(ItemReader<Foo> tested) throws Exception;
 
 }

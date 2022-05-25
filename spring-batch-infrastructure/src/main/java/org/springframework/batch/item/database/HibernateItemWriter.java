@@ -28,16 +28,15 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * {@link ItemWriter} that uses a Hibernate session to save or update entities
- * that are not part of the current Hibernate session. It will also flush the
- * session after writing (i.e. at chunk boundaries if used in a Spring Batch
- * TaskletStep). It will also clear the session on write
- * default (see {@link #setClearSession(boolean) clearSession} property).<br>
+ * {@link ItemWriter} that uses a Hibernate session to save or update entities that are
+ * not part of the current Hibernate session. It will also flush the session after writing
+ * (i.e. at chunk boundaries if used in a Spring Batch TaskletStep). It will also clear
+ * the session on write default (see {@link #setClearSession(boolean) clearSession}
+ * property).<br>
  * <br>
  *
- * The writer is thread-safe once properties are set (normal singleton behavior)
- * if a {@link CurrentSessionContext} that uses only one session per thread is
- * used.
+ * The writer is thread-safe once properties are set (normal singleton behavior) if a
+ * {@link CurrentSessionContext} that uses only one session per thread is used.
  *
  * @author Dave Syer
  * @author Thomas Risberg
@@ -47,19 +46,16 @@ import org.springframework.util.Assert;
  */
 public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
-	protected static final Log logger = LogFactory
-			.getLog(HibernateItemWriter.class);
+	protected static final Log logger = LogFactory.getLog(HibernateItemWriter.class);
 
 	private SessionFactory sessionFactory;
 
 	private boolean clearSession = true;
 
 	/**
-	 * Flag to indicate that the session should be cleared and flushed at the
-	 * end of the write (default true).
-	 *
-	 * @param clearSession
-	 *            the flag value to set
+	 * Flag to indicate that the session should be cleared and flushed at the end of the
+	 * write (default true).
+	 * @param clearSession the flag value to set
 	 */
 	public void setClearSession(boolean clearSession) {
 		this.clearSession = clearSession;
@@ -67,7 +63,6 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	/**
 	 * Set the Hibernate SessionFactory to be used internally.
-	 *
 	 * @param sessionFactory session factory to be used by the writer
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -79,13 +74,12 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() {
-		Assert.state(sessionFactory != null,
-				"SessionFactory must be provided");
+		Assert.state(sessionFactory != null, "SessionFactory must be provided");
 	}
 
 	/**
-	 * Save or update any entities not in the current hibernate session and then
-	 * flush the hibernate session.
+	 * Save or update any entities not in the current hibernate session and then flush the
+	 * hibernate session.
 	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
@@ -93,22 +87,20 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	public void write(List<? extends T> items) {
 		doWrite(sessionFactory, items);
 		sessionFactory.getCurrentSession().flush();
-		if(clearSession) {
+		if (clearSession) {
 			sessionFactory.getCurrentSession().clear();
 		}
 	}
 
 	/**
-	 * Do perform the actual write operation using Hibernate's API.
-	 * This can be overridden in a subclass if necessary.
-	 *
+	 * Do perform the actual write operation using Hibernate's API. This can be overridden
+	 * in a subclass if necessary.
 	 * @param sessionFactory Hibernate SessionFactory to be used
 	 * @param items the list of items to use for the write
 	 */
 	protected void doWrite(SessionFactory sessionFactory, List<? extends T> items) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Writing to Hibernate with " + items.size()
-					+ " items.");
+			logger.debug("Writing to Hibernate with " + items.size() + " items.");
 		}
 
 		Session currentSession = sessionFactory.getCurrentSession();
@@ -123,8 +115,7 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 			if (logger.isDebugEnabled()) {
 				logger.debug(saveOrUpdateCount + " entities saved/updated.");
-				logger.debug((items.size() - saveOrUpdateCount)
-						+ " entities found in session.");
+				logger.debug((items.size() - saveOrUpdateCount) + " entities found in session.");
 			}
 		}
 	}

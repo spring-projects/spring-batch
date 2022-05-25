@@ -27,24 +27,22 @@ import org.springframework.util.Assert;
 
 /**
  * <p>
- * A {@link CompletionPolicy} that picks up a commit interval from
- * {@link JobParameters} by listening to the start of a step. Use anywhere that
- * a {@link CompletionPolicy} can be used (usually at the chunk level in a
- * step), and inject as a {@link StepExecutionListener} into the surrounding
- * step. N.B. only after the step has started will the completion policy be
- * usable.
+ * A {@link CompletionPolicy} that picks up a commit interval from {@link JobParameters}
+ * by listening to the start of a step. Use anywhere that a {@link CompletionPolicy} can
+ * be used (usually at the chunk level in a step), and inject as a
+ * {@link StepExecutionListener} into the surrounding step. N.B. only after the step has
+ * started will the completion policy be usable.
  * </p>
  *
  * <p>
- * It is easier and probably preferable to simply declare the chunk with a
- * commit-interval that is a late-binding expression (e.g.
- * <code>#{jobParameters['commit.interval']}</code>). That feature is available
- * from of Spring Batch 2.1.7.
+ * It is easier and probably preferable to simply declare the chunk with a commit-interval
+ * that is a late-binding expression (e.g.
+ * <code>#{jobParameters['commit.interval']}</code>). That feature is available from of
+ * Spring Batch 2.1.7.
  * </p>
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- *
  * @see CompletionPolicy
  */
 public class StepExecutionSimpleCompletionPolicy implements StepExecutionListener, CompletionPolicy {
@@ -54,9 +52,8 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	private String keyName = "commit.interval";
 
 	/**
-	 * Public setter for the key name of a Long value in the
-	 * {@link JobParameters} that will contain a commit interval. Defaults to
-	 * "commit.interval".
+	 * Public setter for the key name of a Long value in the {@link JobParameters} that
+	 * will contain a commit interval. Defaults to "commit.interval".
 	 * @param keyName the keyName to set
 	 */
 	public void setKeyName(String keyName) {
@@ -64,10 +61,9 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	}
 
 	/**
-	 * Set up a {@link SimpleCompletionPolicy} with a commit interval taken from
-	 * the {@link JobParameters}. If there is a Long parameter with the given
-	 * key name, the intValue of this parameter is used. If not an exception
-	 * will be thrown.
+	 * Set up a {@link SimpleCompletionPolicy} with a commit interval taken from the
+	 * {@link JobParameters}. If there is a Long parameter with the given key name, the
+	 * intValue of this parameter is used. If not an exception will be thrown.
 	 *
 	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
@@ -80,8 +76,8 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	}
 
 	/**
-	 * @return true if the commit interval has been reached or the result
-	 * indicates completion
+	 * @return true if the commit interval has been reached or the result indicates
+	 * completion
 	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
 	 */
 	@Override
@@ -124,8 +120,8 @@ public class StepExecutionSimpleCompletionPolicy implements StepExecutionListene
 	}
 
 	/**
-	 * Delegates to the wrapped {@link CompletionPolicy} if set, otherwise
-	 * returns the value of {@link #setKeyName(String)}.
+	 * Delegates to the wrapped {@link CompletionPolicy} if set, otherwise returns the
+	 * value of {@link #setKeyName(String)}.
 	 */
 	@Override
 	public String toString() {

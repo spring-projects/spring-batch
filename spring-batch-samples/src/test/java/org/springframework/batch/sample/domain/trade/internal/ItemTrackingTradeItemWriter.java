@@ -27,8 +27,11 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
+
 	private List<Trade> items = new ArrayList<>();
+
 	private String writeFailureISIN;
+
 	private JdbcOperations jdbcTemplate;
 
 	public void setDataSource(DataSource dataSource) {
@@ -55,11 +58,12 @@ public class ItemTrackingTradeItemWriter implements ItemWriter<Trade> {
 			newItems.add(t);
 
 			if (jdbcTemplate != null) {
-				jdbcTemplate.update("UPDATE TRADE set VERSION=? where ID=? and version=?", t.getVersion() + 1, t
-						.getId(), t.getVersion());
+				jdbcTemplate.update("UPDATE TRADE set VERSION=? where ID=? and version=?", t.getVersion() + 1,
+						t.getId(), t.getVersion());
 			}
 		}
 
 		this.items.addAll(newItems);
 	}
+
 }

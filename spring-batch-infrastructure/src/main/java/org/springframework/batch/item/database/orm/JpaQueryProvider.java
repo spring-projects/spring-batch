@@ -22,29 +22,31 @@ import jakarta.persistence.Query;
 import org.springframework.batch.item.ItemReader;
 
 /**
- * <p>Interface defining the functionality to be provided for generating queries 
- * for use with JPA {@link ItemReader}s or other custom built artifacts.</p>
- * 
+ * <p>
+ * Interface defining the functionality to be provided for generating queries for use with
+ * JPA {@link ItemReader}s or other custom built artifacts.
+ * </p>
+ *
  * @author Anatoly Polinsky
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.1
- * 
+ *
  */
 public interface JpaQueryProvider {
 
-    /**
-     * <p>Create the query object.</p>
-     * 
-     * @return created query
-     */
+	/**
+	 * <p>
+	 * Create the query object.
+	 * </p>
+	 * @return created query
+	 */
 	public Query createQuery();
-	
-    /**
-     * Provide an {@link EntityManager} for the query to be built.
-     * 
-     * @param entityManager to be used by the {@link JpaQueryProvider}.
-     */
-    void setEntityManager(EntityManager entityManager);
+
+	/**
+	 * Provide an {@link EntityManager} for the query to be built.
+	 * @param entityManager to be used by the {@link JpaQueryProvider}.
+	 */
+	void setEntityManager(EntityManager entityManager);
 
 }

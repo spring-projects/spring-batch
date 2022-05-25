@@ -44,7 +44,7 @@ public class SkippableExceptionDuringReadSample {
 	private final StepBuilderFactory stepBuilderFactory;
 
 	public SkippableExceptionDuringReadSample(JobBuilderFactory jobBuilderFactory,
-											  StepBuilderFactory stepBuilderFactory) {
+			StepBuilderFactory stepBuilderFactory) {
 		this.jobBuilderFactory = jobBuilderFactory;
 		this.stepBuilderFactory = stepBuilderFactory;
 	}
@@ -85,22 +85,14 @@ public class SkippableExceptionDuringReadSample {
 
 	@Bean
 	public Step step() {
-		return this.stepBuilderFactory.get("step")
-				.<Integer, Integer>chunk(3)
-				.reader(itemReader())
-				.processor(itemProcessor())
-				.writer(itemWriter())
-				.faultTolerant()
-				.skip(IllegalArgumentException.class)
-				.skipLimit(3)
-				.build();
+		return this.stepBuilderFactory.get("step").<Integer, Integer>chunk(3).reader(itemReader())
+				.processor(itemProcessor()).writer(itemWriter()).faultTolerant().skip(IllegalArgumentException.class)
+				.skipLimit(3).build();
 	}
 
 	@Bean
 	public Job job() {
-		return this.jobBuilderFactory.get("job")
-				.start(step())
-				.build();
+		return this.jobBuilderFactory.get("job").start(step()).build();
 	}
 
 }

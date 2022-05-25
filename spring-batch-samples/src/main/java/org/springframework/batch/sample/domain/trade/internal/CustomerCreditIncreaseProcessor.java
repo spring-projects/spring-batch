@@ -24,10 +24,11 @@ import org.springframework.lang.Nullable;
 
 /**
  * Increases customer's credit by a fixed amount.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class CustomerCreditIncreaseProcessor implements ItemProcessor<CustomerCredit, CustomerCredit> {
+
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("5");
 
 	@Nullable
@@ -35,4 +36,5 @@ public class CustomerCreditIncreaseProcessor implements ItemProcessor<CustomerCr
 	public CustomerCredit process(CustomerCredit item) throws Exception {
 		return item.increaseCreditBy(FIXED_AMOUNT);
 	}
+
 }

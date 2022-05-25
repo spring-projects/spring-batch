@@ -8,10 +8,10 @@ import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.lang.Nullable;
 
 public class JobSupport implements Job {
-	
+
 	String name;
-	
-	public JobSupport(String name){
+
+	public JobSupport(String name) {
 		this.name = name;
 	}
 
@@ -25,12 +25,12 @@ public class JobSupport implements Job {
 	public boolean isRestartable() {
 		return false;
 	}
-	
+
 	@Nullable
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return null;
 	}
-	
+
 	public JobParametersValidator getJobParametersValidator() {
 		return new DefaultJobParametersValidator();
 	}

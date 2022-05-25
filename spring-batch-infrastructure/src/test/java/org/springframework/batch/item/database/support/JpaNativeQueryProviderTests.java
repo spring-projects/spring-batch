@@ -57,4 +57,5 @@ public class JpaNativeQueryProviderTests {
 		jpaQueryProvider.setEntityManager(entityManager);
 		Assert.notNull(jpaQueryProvider.createQuery(), "Query was null");
 	}
+
 }

@@ -29,9 +29,9 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
- * Simple implementation of {@link JobParametersExtractor} which pulls
- * parameters with named keys out of the step execution context and the job
- * parameters of the surrounding job.
+ * Simple implementation of {@link JobParametersExtractor} which pulls parameters with
+ * named keys out of the step execution context and the job parameters of the surrounding
+ * job.
  *
  * @author Dave Syer
  * @author Will Schipp
@@ -44,16 +44,15 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 	private boolean useAllParentParameters = true;
 
 	/**
-	 * The key names to pull out of the execution context or job parameters, if
-	 * they exist. If a key doesn't exist in the execution context then the job
-	 * parameters from the enclosing job execution are tried, and if there is
-	 * nothing there either then no parameter is extracted. Key names ending
-	 * with <code>(long)</code>, <code>(int)</code>, <code>(double)</code>,
-	 * <code>(date)</code> or <code>(string)</code> will be assumed to refer to
-	 * values of the respective type and assigned to job parameters accordingly
-	 * (there will be an error if they are not of the right type). Without a
-	 * special suffix in that form a parameter is assumed to be of type String.
-	 *
+	 * The key names to pull out of the execution context or job parameters, if they
+	 * exist. If a key doesn't exist in the execution context then the job parameters from
+	 * the enclosing job execution are tried, and if there is nothing there either then no
+	 * parameter is extracted. Key names ending with <code>(long)</code>,
+	 * <code>(int)</code>, <code>(double)</code>, <code>(date)</code> or
+	 * <code>(string)</code> will be assumed to refer to values of the respective type and
+	 * assigned to job parameters accordingly (there will be an error if they are not of
+	 * the right type). Without a special suffix in that form a parameter is assumed to be
+	 * of type String.
 	 * @param keys the keys to set
 	 */
 	public void setKeys(String[] keys) {
@@ -133,13 +132,11 @@ public class DefaultJobParametersExtractor implements JobParametersExtractor {
 
 	/**
 	 * setter to support switching off all parent parameters
-	 *
-	 * @param useAllParentParameters if false do not include parent parameters.
-	 * True if all parent parameters need to be included.
+	 * @param useAllParentParameters if false do not include parent parameters. True if
+	 * all parent parameters need to be included.
 	 */
 	public void setUseAllParentParameters(boolean useAllParentParameters) {
 		this.useAllParentParameters = useAllParentParameters;
 	}
 
-	
 }

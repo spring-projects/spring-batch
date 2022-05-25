@@ -21,10 +21,11 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Strategy interface for users to provide as a factory for custom components needed by a Batch system.
- * 
+ * Strategy interface for users to provide as a factory for custom components needed by a
+ * Batch system.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public interface BatchConfigurer {
 
@@ -51,4 +52,5 @@ public interface BatchConfigurer {
 	 * @throws Exception The {@link Exception} thrown if an error occurs.
 	 */
 	JobExplorer getJobExplorer() throws Exception;
+
 }

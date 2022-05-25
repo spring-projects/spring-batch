@@ -24,11 +24,12 @@ import org.springframework.core.io.FileSystemResource;
 
 /**
  * This class can be used to assert that two files are the same.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  */
 public class AssertFileTests {
+
 	private static final String DIRECTORY = "src/test/resources/data/input/";
 
 	@Test
@@ -97,12 +98,13 @@ public class AssertFileTests {
 	}
 
 	private void executeAssertEquals(String expected, String actual) throws Exception {
-		AssertFile.assertFileEquals(new FileSystemResource(DIRECTORY + expected), new FileSystemResource(DIRECTORY
-				+ actual));
+		AssertFile.assertFileEquals(new FileSystemResource(DIRECTORY + expected),
+				new FileSystemResource(DIRECTORY + actual));
 	}
 
 	@Test
 	public void testAssertLineCount() throws Exception {
 		AssertFile.assertLineCount(5, new FileSystemResource(DIRECTORY + "input1.txt"));
 	}
+
 }

@@ -22,26 +22,25 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 
 /**
- * Default implementation of the {@link ItemListenerSupport} class that
- * writes all exceptions via commons logging. Since generics can't be used to
- * ensure the list contains exceptions, any non exceptions will be logged out by
- * calling toString on the object.
- * 
+ * Default implementation of the {@link ItemListenerSupport} class that writes all
+ * exceptions via commons logging. Since generics can't be used to ensure the list
+ * contains exceptions, any non exceptions will be logged out by calling toString on the
+ * object.
+ *
  * @author Lucas Ward
- * 
+ *
  */
-public class DefaultItemFailureHandler extends ItemListenerSupport<Object,Object> {
+public class DefaultItemFailureHandler extends ItemListenerSupport<Object, Object> {
 
-	protected static final Log logger = LogFactory
-			.getLog(DefaultItemFailureHandler.class);
+	protected static final Log logger = LogFactory.getLog(DefaultItemFailureHandler.class);
 
 	@Override
 	public void onReadError(Exception ex) {
 		try {
 			logger.error("Error encountered while reading", ex);
-		} catch (Exception exception) {
-			logger.error("Invalid type for logging: [" + exception.toString()
-					+ "]");
+		}
+		catch (Exception exception) {
+			logger.error("Invalid type for logging: [" + exception.toString() + "]");
 		}
 	}
 
@@ -49,9 +48,9 @@ public class DefaultItemFailureHandler extends ItemListenerSupport<Object,Object
 	public void onWriteError(Exception ex, List<? extends Object> item) {
 		try {
 			logger.error("Error encountered while writing item: [ " + item + "]", ex);
-		} catch (Exception exception) {
-			logger.error("Invalid type for logging: [" + exception.toString()
-					+ "]");
+		}
+		catch (Exception exception) {
+			logger.error("Invalid type for logging: [" + exception.toString() + "]");
 		}
 	}
 

@@ -31,11 +31,14 @@ import org.springframework.util.Assert;
  * @since 4.0
  */
 public class CompositeItemProcessorBuilder<I, O> {
+
 	private List<? extends ItemProcessor<?, ?>> delegates;
 
 	/**
-	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be processed.
-	 * @param delegates list of {@link ItemProcessor} delegates that will work on the item.
+	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be
+	 * processed.
+	 * @param delegates list of {@link ItemProcessor} delegates that will work on the
+	 * item.
 	 * @return this instance for method chaining.
 	 * @see CompositeItemProcessor#setDelegates(List)
 	 */
@@ -46,7 +49,8 @@ public class CompositeItemProcessorBuilder<I, O> {
 	}
 
 	/**
-	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be processed.
+	 * Establishes the {@link ItemProcessor} delegates that will work on the item to be
+	 * processed.
 	 * @param delegates the {@link ItemProcessor} delegates that will work on the item.
 	 * @return this instance for method chaining.
 	 * @see CompositeItemProcessorBuilder#delegates(List)
@@ -57,7 +61,6 @@ public class CompositeItemProcessorBuilder<I, O> {
 
 	/**
 	 * Returns a fully constructed {@link CompositeItemProcessor}.
-	 *
 	 * @return a new {@link CompositeItemProcessor}
 	 */
 	public CompositeItemProcessor<I, O> build() {
@@ -68,4 +71,5 @@ public class CompositeItemProcessorBuilder<I, O> {
 		processor.setDelegates(this.delegates);
 		return processor;
 	}
+
 }

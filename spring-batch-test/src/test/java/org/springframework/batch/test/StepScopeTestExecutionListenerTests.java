@@ -91,6 +91,7 @@ public class StepScopeTestExecutionListenerTests {
 
 	@SuppressWarnings("unused")
 	private static class WithStepExecutionFactory {
+
 		public StepExecution getStepExecution() {
 			JobExecution jobExecution = MetaDataInstanceFactory.createJobExecution("job", 11L, 123L,
 					new JobParametersBuilder().addString("foo", "spam").toJobParameters());
@@ -98,6 +99,7 @@ public class StepScopeTestExecutionListenerTests {
 			stepExecution.getExecutionContext().putString("foo", "bar");
 			return stepExecution;
 		}
+
 	}
 
 	private TestContext getTestContext(Object target) throws Exception {

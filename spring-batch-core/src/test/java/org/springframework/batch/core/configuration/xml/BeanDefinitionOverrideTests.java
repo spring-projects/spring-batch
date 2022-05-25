@@ -24,10 +24,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * </p>
  */
 public class BeanDefinitionOverrideTests {
+
 	@Test
 	public void testAllowBeanOverride() {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
-		applicationContext.setConfigLocation("org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml");
+		applicationContext.setConfigLocation(
+				"org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml");
 		applicationContext.refresh();
 	}
 
@@ -35,7 +37,9 @@ public class BeanDefinitionOverrideTests {
 	public void testAllowBeanOverrideFalse() {
 		ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
 		applicationContext.setAllowBeanDefinitionOverriding(false);
-		applicationContext.setConfigLocation("org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml");
+		applicationContext.setConfigLocation(
+				"org/springframework/batch/core/configuration/xml/BeanDefinitionOverrideTests-context.xml");
 		applicationContext.refresh();
 	}
+
 }

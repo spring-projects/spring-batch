@@ -37,8 +37,8 @@ public class MetaDataInstanceFactoryTests {
 
 	private String jobParametersString = "foo=bar";
 
-	private JobParameters jobParameters = new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-			.stringToProperties(jobParametersString));
+	private JobParameters jobParameters = new DefaultJobParametersConverter()
+			.getJobParameters(PropertiesConverter.stringToProperties(jobParametersString));
 
 	private Long executionId = 4321L;
 
@@ -47,8 +47,7 @@ public class MetaDataInstanceFactoryTests {
 	private Long stepExecutionId = 11L;
 
 	/**
-	 * Test method for
-	 * {@link MetaDataInstanceFactory#createJobInstance(String, Long)} .
+	 * Test method for {@link MetaDataInstanceFactory#createJobInstance(String, Long)} .
 	 */
 	@Test
 	public void testCreateJobInstanceStringLong() {
@@ -72,8 +71,7 @@ public class MetaDataInstanceFactoryTests {
 	}
 
 	/**
-	 * Test method for {@link MetaDataInstanceFactory#createJobExecution(Long)}
-	 * .
+	 * Test method for {@link MetaDataInstanceFactory#createJobExecution(Long)} .
 	 */
 	@Test
 	public void testCreateJobExecutionLong() {
@@ -91,12 +89,12 @@ public class MetaDataInstanceFactoryTests {
 
 	/**
 	 * Test method for
-	 * {@link MetaDataInstanceFactory#createJobExecution(String, Long, Long, String)}
-	 * .
+	 * {@link MetaDataInstanceFactory#createJobExecution(String, Long, Long, String)} .
 	 */
 	@Test
 	public void testCreateJobExecutionStringLongLongString() {
-		assertNotNull(MetaDataInstanceFactory.createJobExecution(jobName, instanceId, executionId, jobParametersString));
+		assertNotNull(
+				MetaDataInstanceFactory.createJobExecution(jobName, instanceId, executionId, jobParametersString));
 	}
 
 	/**
@@ -118,8 +116,7 @@ public class MetaDataInstanceFactoryTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link MetaDataInstanceFactory#createStepExecution(String, Long)} .
+	 * Test method for {@link MetaDataInstanceFactory#createStepExecution(String, Long)} .
 	 */
 	@Test
 	public void testCreateStepExecutionStringLong() {
@@ -128,8 +125,7 @@ public class MetaDataInstanceFactoryTests {
 
 	/**
 	 * Test method for
-	 * {@link MetaDataInstanceFactory#createStepExecution(JobExecution, String, Long)}
-	 * .
+	 * {@link MetaDataInstanceFactory#createStepExecution(JobExecution, String, Long)} .
 	 */
 	@Test
 	public void testCreateStepExecutionJobExecutionStringLong() {
@@ -143,7 +139,8 @@ public class MetaDataInstanceFactoryTests {
 	 */
 	@Test
 	public void testCreateJobExecutionWithStepExecutions() {
-		assertNotNull(MetaDataInstanceFactory.createJobExecutionWithStepExecutions(executionId, Arrays.asList(stepName)));
+		assertNotNull(
+				MetaDataInstanceFactory.createJobExecutionWithStepExecutions(executionId, Arrays.asList(stepName)));
 	}
 
 }

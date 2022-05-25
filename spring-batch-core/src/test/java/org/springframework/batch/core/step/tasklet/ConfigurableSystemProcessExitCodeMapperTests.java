@@ -79,9 +79,10 @@ public class ConfigurableSystemProcessExitCodeMapperTests {
 			// expected
 		}
 
-		Map<Object, ExitStatus> containsElse = Collections.<Object, ExitStatus> singletonMap(
-				ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.FAILED);
+		Map<Object, ExitStatus> containsElse = Collections
+				.<Object, ExitStatus>singletonMap(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.FAILED);
 		// no error expected now
 		mapper.setMappings(containsElse);
 	}
+
 }

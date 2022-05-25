@@ -1,10 +1,10 @@
 /*
  * Copyright 2017-2022 the original author or authors.
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *          https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
@@ -39,6 +39,7 @@ import org.springframework.util.StringUtils;
  * @see MongoItemReader
  */
 public class MongoItemReaderBuilder<T> {
+
 	private MongoOperations template;
 
 	private String jsonQuery;
@@ -68,10 +69,9 @@ public class MongoItemReaderBuilder<T> {
 	private Query query;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -85,7 +85,6 @@ public class MongoItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -98,7 +97,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -111,7 +109,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -125,7 +122,6 @@ public class MongoItemReaderBuilder<T> {
 	/**
 	 * Used to perform operations against the MongoDB instance. Also handles the mapping
 	 * of documents to objects.
-	 *
 	 * @param template the MongoOperations instance to use
 	 * @see MongoOperations
 	 * @return The current instance of the builder
@@ -138,10 +134,9 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * A JSON formatted MongoDB jsonQuery. Parameterization of the provided jsonQuery is allowed
-	 * via ?&lt;index&gt; placeholders where the &lt;index&gt; indicates the index of the
-	 * parameterValue to substitute.
-	 *
+	 * A JSON formatted MongoDB jsonQuery. Parameterization of the provided jsonQuery is
+	 * allowed via ?&lt;index&gt; placeholders where the &lt;index&gt; indicates the index
+	 * of the parameterValue to substitute.
 	 * @param query JSON formatted Mongo jsonQuery
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setQuery(String)
@@ -154,7 +149,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * The type of object to be returned for each {@link MongoItemReader#read()} call.
-	 *
 	 * @param targetType the type of object to return
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setTargetType(Class)
@@ -168,7 +162,6 @@ public class MongoItemReaderBuilder<T> {
 	/**
 	 * {@link List} of values to be substituted in for each of the parameters in the
 	 * query.
-	 *
 	 * @param parameterValues values
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setParameterValues(List)
@@ -181,7 +174,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * Values to be substituted in for each of the parameters in the query.
-	 *
 	 * @param parameterValues values
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setParameterValues(List)
@@ -192,7 +184,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * JSON defining the fields to be returned from the matching documents by MongoDB.
-	 *
 	 * @param fields JSON string that identifies the fields to sort by.
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setFields(String)
@@ -207,7 +198,6 @@ public class MongoItemReaderBuilder<T> {
 	 * {@link Map} of property
 	 * names/{@link org.springframework.data.domain.Sort.Direction} values to sort the
 	 * input by.
-	 *
 	 * @param sorts map of properties and direction to sort each.
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setSort(Map)
@@ -220,7 +210,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * Establish an optional collection that can be queried.
-	 *
 	 * @param collection Mongo collection to be queried.
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setCollection(String)
@@ -233,7 +222,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * JSON String telling MongoDB what index to use.
-	 *
 	 * @param hint string indicating what index to use.
 	 * @return The current instance of the builder
 	 * @see MongoItemReader#setHint(String)
@@ -246,7 +234,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * The number of items to be read with each page.
-	 *
 	 * @param pageSize the number of items
 	 * @return this instance for method chaining
 	 * @see MongoItemReader#setPageSize(int)
@@ -258,9 +245,8 @@ public class MongoItemReaderBuilder<T> {
 	}
 
 	/**
-	 * Provide a Spring Data Mongo {@link Query}.  This will take precedence over a JSON
+	 * Provide a Spring Data Mongo {@link Query}. This will take precedence over a JSON
 	 * configured query.
-	 *
 	 * @param query Query to execute
 	 * @return this instance for method chaining
 	 * @see MongoItemReader#setQuery(Query)
@@ -273,7 +259,6 @@ public class MongoItemReaderBuilder<T> {
 
 	/**
 	 * Validates and builds a {@link MongoItemReader}.
-	 *
 	 * @return a {@link MongoItemReader}
 	 */
 	public MongoItemReader<T> build() {
@@ -307,4 +292,5 @@ public class MongoItemReaderBuilder<T> {
 
 		return reader;
 	}
+
 }

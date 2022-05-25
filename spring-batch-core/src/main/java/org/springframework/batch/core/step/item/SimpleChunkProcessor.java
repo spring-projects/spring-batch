@@ -33,9 +33,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the {@link ChunkProcessor} interface that handles
- * basic item writing and processing. Any exceptions encountered will be
- * rethrown.
+ * Simple implementation of the {@link ChunkProcessor} interface that handles basic item
+ * writing and processing. Any exceptions encountered will be rethrown.
  *
  * @see ChunkOrientedTasklet
  */
@@ -55,7 +54,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		this(null, null);
 	}
 
-	public SimpleChunkProcessor(@Nullable ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
+	public SimpleChunkProcessor(@Nullable ItemProcessor<? super I, ? extends O> itemProcessor,
+			ItemWriter<? super O> itemWriter) {
 		this.itemProcessor = itemProcessor;
 		this.itemWriter = itemWriter;
 	}
@@ -89,9 +89,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Register some {@link StepListener}s with the handler. Each will get the
-	 * callbacks in the order specified at the correct stage.
-	 *
+	 * Register some {@link StepListener}s with the handler. Each will get the callbacks
+	 * in the order specified at the correct stage.
 	 * @param listeners list of {@link StepListener} instances.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -102,7 +101,6 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Register a listener for callbacks at the appropriate stages in a process.
-	 *
 	 * @param listener a {@link StepListener}
 	 */
 	public void registerListener(StepListener listener) {
@@ -144,7 +142,6 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Surrounds the actual write call with listener callbacks.
-	 *
 	 * @param items list of items to be written.
 	 * @throws Exception thrown if error occurs.
 	 */
@@ -168,7 +165,6 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 	/**
 	 * Call the listener's after write method.
-	 *
 	 * @param items list of items that were just written.
 	 */
 	protected final void doAfterWrite(List<O> items) {
@@ -219,14 +215,12 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Extension point for subclasses to allow them to memorise the contents of
-	 * the inputs, in case they are needed for accounting purposes later. The
-	 * default implementation sets up some user data to remember the original
-	 * size of the inputs. If this method is overridden then some or all of
-	 * {@link #isComplete(Chunk)}, {@link #getFilterCount(Chunk, Chunk)} and
-	 * {@link #getAdjustedOutputs(Chunk, Chunk)} might also need to be, to
-	 * ensure that the user data is handled consistently.
-	 *
+	 * Extension point for subclasses to allow them to memorise the contents of the
+	 * inputs, in case they are needed for accounting purposes later. The default
+	 * implementation sets up some user data to remember the original size of the inputs.
+	 * If this method is overridden then some or all of {@link #isComplete(Chunk)},
+	 * {@link #getFilterCount(Chunk, Chunk)} and {@link #getAdjustedOutputs(Chunk, Chunk)}
+	 * might also need to be, to ensure that the user data is handled consistently.
 	 * @param inputs the inputs for the process
 	 */
 	protected void initializeUserData(Chunk<I> inputs) {
@@ -234,12 +228,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Extension point for subclasses to calculate the filter count. Defaults to
-	 * the difference between input size and output size.
-	 *
+	 * Extension point for subclasses to calculate the filter count. Defaults to the
+	 * difference between input size and output size.
 	 * @param inputs the inputs after transformation
 	 * @param outputs the outputs after transformation
-	 *
 	 * @return the difference in sizes
 	 *
 	 * @see #initializeUserData(Chunk)
@@ -249,9 +241,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Extension point for subclasses that want to store additional data in the
-	 * inputs. Default just checks if inputs are empty.
-	 *
+	 * Extension point for subclasses that want to store additional data in the inputs.
+	 * Default just checks if inputs are empty.
 	 * @param inputs the input chunk
 	 * @return true if it is empty
 	 *
@@ -262,10 +253,9 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Extension point for subclasses that want to adjust the outputs based on
-	 * additional saved data in the inputs. Default implementation just returns
-	 * the outputs unchanged.
-	 *
+	 * Extension point for subclasses that want to adjust the outputs based on additional
+	 * saved data in the inputs. Default implementation just returns the outputs
+	 * unchanged.
 	 * @param inputs the inputs for the transformation
 	 * @param outputs the result of the transformation
 	 * @return the outputs unchanged
@@ -277,11 +267,10 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
-	 * Simple implementation delegates to the {@link #doWrite(List)} method and
-	 * increments the write count in the contribution. Subclasses can handle
-	 * more complicated scenarios, e.g.with fault tolerance. If output items are
-	 * skipped they should be removed from the inputs as well.
-	 *
+	 * Simple implementation delegates to the {@link #doWrite(List)} method and increments
+	 * the write count in the contribution. Subclasses can handle more complicated
+	 * scenarios, e.g.with fault tolerance. If output items are skipped they should be
+	 * removed from the inputs as well.
 	 * @param contribution the current step contribution
 	 * @param inputs the inputs that gave rise to the outputs
 	 * @param outputs the outputs to write
@@ -295,8 +284,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		}
 		catch (Exception e) {
 			/*
-			 * For a simple chunk processor (no fault tolerance) we are done
-			 * here, so prevent any more processing of these inputs.
+			 * For a simple chunk processor (no fault tolerance) we are done here, so
+			 * prevent any more processing of these inputs.
 			 */
 			inputs.clear();
 			status = BatchMetrics.STATUS_FAILURE;
@@ -320,8 +309,8 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			}
 			catch (Exception e) {
 				/*
-				 * For a simple chunk processor (no fault tolerance) we are done
-				 * here, so prevent any more processing of these inputs.
+				 * For a simple chunk processor (no fault tolerance) we are done here, so
+				 * prevent any more processing of these inputs.
 				 */
 				inputs.clear();
 				status = BatchMetrics.STATUS_FAILURE;
@@ -340,13 +329,14 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		return outputs;
 	}
 
-	protected void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status, String description) {
+	protected void stopTimer(Timer.Sample sample, StepExecution stepExecution, String metricName, String status,
+			String description) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + metricName;
 		sample.stop(BatchMetrics.createTimer(metricName, description + " duration",
-				Tag.of(fullyQualifiedMetricName + ".job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+				Tag.of(fullyQualifiedMetricName + ".job.name",
+						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),
-				Tag.of(fullyQualifiedMetricName + ".status", status)
-		));
+				Tag.of(fullyQualifiedMetricName + ".status", status)));
 	}
 
 }

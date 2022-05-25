@@ -41,27 +41,26 @@ import org.springframework.lang.Nullable;
 
 /**
  * <p>
- * Utility class for testing batch jobs. It provides methods for launching an
- * entire {@link AbstractJob}, allowing for end to end testing of individual
- * steps, without having to run every step in the job. Any test classes using
- * this utility can set up an instance in the {@link ApplicationContext} as part
- * of the Spring test framework.
+ * Utility class for testing batch jobs. It provides methods for launching an entire
+ * {@link AbstractJob}, allowing for end to end testing of individual steps, without
+ * having to run every step in the job. Any test classes using this utility can set up an
+ * instance in the {@link ApplicationContext} as part of the Spring test framework.
  * </p>
- * 
+ *
  * <p>
- * This class also provides the ability to run {@link Step}s from a
- * {@link FlowJob} or {@link SimpleJob} individually. By launching {@link Step}s
- * within a {@link Job} on their own, end to end testing of individual steps can
- * be performed without having to run every step in the job.
+ * This class also provides the ability to run {@link Step}s from a {@link FlowJob} or
+ * {@link SimpleJob} individually. By launching {@link Step}s within a {@link Job} on
+ * their own, end to end testing of individual steps can be performed without having to
+ * run every step in the job.
  * </p>
- * 
+ *
  * <p>
  * It should be noted that using any of the methods that don't contain
- * {@link JobParameters} in their signature, will result in one being created
- * with a random number of type {@code long} as a parameter. This will ensure
- * restartability when no parameters are provided.
+ * {@link JobParameters} in their signature, will result in one being created with a
+ * random number of type {@code long} as a parameter. This will ensure restartability when
+ * no parameters are provided.
  * </p>
- * 
+ *
  * @author Lucas Ward
  * @author Dan Garrette
  * @author Dave Syer
@@ -85,7 +84,6 @@ public class JobLauncherTestUtils {
 
 	/**
 	 * The Job instance that can be manipulated (e.g. launched) in this utility.
-	 * 
 	 * @param job the {@link AbstractJob} to use
 	 */
 	@Autowired
@@ -94,9 +92,7 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * The {@link JobRepository} to use for creating new {@link JobExecution}
-	 * instances.
-	 * 
+	 * The {@link JobRepository} to use for creating new {@link JobExecution} instances.
 	 * @param jobRepository a {@link JobRepository}
 	 */
 	@Autowired
@@ -120,7 +116,6 @@ public class JobLauncherTestUtils {
 
 	/**
 	 * A {@link JobLauncher} instance that can be used to launch jobs.
-	 * 
 	 * @param jobLauncher a job launcher
 	 */
 	@Autowired
@@ -137,7 +132,6 @@ public class JobLauncherTestUtils {
 
 	/**
 	 * Launch the entire job, including all steps.
-	 * 
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception thrown if error occurs launching the job.
 	 */
@@ -147,7 +141,6 @@ public class JobLauncherTestUtils {
 
 	/**
 	 * Launch the entire job, including all steps
-	 * 
 	 * @param jobParameters instance of {@link JobParameters}.
 	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception thrown if error occurs launching the job.
@@ -157,8 +150,8 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * @return a new JobParameters object containing only a parameter with a
-	 * random number of type {@code long}, to ensure that the job instance will be unique.
+	 * @return a new JobParameters object containing only a parameter with a random number
+	 * of type {@code long}, to ensure that the job instance will be unique.
 	 */
 	public JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<>();
@@ -166,18 +159,17 @@ public class JobLauncherTestUtils {
 		return new JobParameters(parameters);
 	}
 
-    /**
-     * @return a new JobParametersBuilder object containing only a parameter with a
-     * random number of type {@code long}, to ensure that the job instance will be unique.
-     */
-    public JobParametersBuilder getUniqueJobParametersBuilder() {
-        return new JobParametersBuilder(this.getUniqueJobParameters());
-    }
+	/**
+	 * @return a new JobParametersBuilder object containing only a parameter with a random
+	 * number of type {@code long}, to ensure that the job instance will be unique.
+	 */
+	public JobParametersBuilder getUniqueJobParametersBuilder() {
+		return new JobParametersBuilder(this.getUniqueJobParameters());
+	}
 
 	/**
-	 * Convenient method for subclasses to grab a {@link StepRunner} for running
-	 * steps by name.
-	 * 
+	 * Convenient method for subclasses to grab a {@link StepRunner} for running steps by
+	 * name.
 	 * @return a {@link StepRunner}
 	 */
 	protected StepRunner getStepRunner() {
@@ -188,10 +180,9 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. A unique set of JobParameters
-	 * will automatically be generated. An IllegalStateException is thrown if
-	 * there is no Step with the given name.
-	 * 
+	 * Launch just the specified step in the job. A unique set of JobParameters will
+	 * automatically be generated. An IllegalStateException is thrown if there is no Step
+	 * with the given name.
 	 * @param stepName The name of the step to launch
 	 * @return JobExecution
 	 */
@@ -200,13 +191,12 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. A unique set of JobParameters
-	 * will automatically be generated. An IllegalStateException is thrown if
-	 * there is no Step with the given name.
-	 * 
+	 * Launch just the specified step in the job. A unique set of JobParameters will
+	 * automatically be generated. An IllegalStateException is thrown if there is no Step
+	 * with the given name.
 	 * @param stepName The name of the step to launch
-	 * @param jobExecutionContext An ExecutionContext whose values will be
-	 * loaded into the Job ExecutionContext prior to launching the step.
+	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
+	 * Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName, ExecutionContext jobExecutionContext) {
@@ -214,9 +204,8 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is
-	 * thrown if there is no Step with the given name.
-	 * 
+	 * Launch just the specified step in the job. An IllegalStateException is thrown if
+	 * there is no Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @param jobParameters The JobParameters to use during the launch
 	 * @return JobExecution
@@ -226,16 +215,16 @@ public class JobLauncherTestUtils {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is
-	 * thrown if there is no Step with the given name.
-	 * 
+	 * Launch just the specified step in the job. An IllegalStateException is thrown if
+	 * there is no Step with the given name.
 	 * @param stepName The name of the step to launch
 	 * @param jobParameters The JobParameters to use during the launch
-	 * @param jobExecutionContext An ExecutionContext whose values will be
-	 * loaded into the Job ExecutionContext prior to launching the step.
+	 * @param jobExecutionContext An ExecutionContext whose values will be loaded into the
+	 * Job ExecutionContext prior to launching the step.
 	 * @return JobExecution
 	 */
-	public JobExecution launchStep(String stepName, JobParameters jobParameters, @Nullable ExecutionContext jobExecutionContext) {
+	public JobExecution launchStep(String stepName, JobParameters jobParameters,
+			@Nullable ExecutionContext jobExecutionContext) {
 		if (!(job instanceof StepLocator)) {
 			throw new UnsupportedOperationException("Cannot locate step from a Job that is not a StepLocator: job="
 					+ job.getName() + " does not implement StepLocator");
@@ -250,4 +239,5 @@ public class JobLauncherTestUtils {
 		}
 		return getStepRunner().launchStep(step, jobParameters, jobExecutionContext);
 	}
+
 }

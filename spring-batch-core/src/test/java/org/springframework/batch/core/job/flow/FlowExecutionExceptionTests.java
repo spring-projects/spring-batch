@@ -36,7 +36,8 @@ public class FlowExecutionExceptionTests {
 	}
 
 	/**
-	 * Test method for {@link FlowExecutionException#FlowExecutionException(String, Throwable)}.
+	 * Test method for
+	 * {@link FlowExecutionException#FlowExecutionException(String, Throwable)}.
 	 */
 	@Test
 	public void testFlowExecutionExceptionStringThrowable() {

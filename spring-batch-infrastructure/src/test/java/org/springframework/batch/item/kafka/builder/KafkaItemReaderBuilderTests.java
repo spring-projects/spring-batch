@@ -61,8 +61,7 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testNullConsumerProperties() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
 				.consumerProperties(null);
 
 		// when
@@ -75,58 +74,47 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testConsumerPropertiesValidation() {
 		try {
-			new KafkaItemReaderBuilder<>()
-					.name("kafkaItemReader")
-					.consumerProperties(new Properties())
-					.build();
+			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(new Properties()).build();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("bootstrap.servers property must be provided", exception.getMessage());
 		}
 
 		Properties consumerProperties = new Properties();
 		consumerProperties.put("bootstrap.servers", "foo");
 		try {
-			new KafkaItemReaderBuilder<>()
-					.name("kafkaItemReader")
-					.consumerProperties(consumerProperties)
-					.build();
+			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("group.id property must be provided", exception.getMessage());
 		}
 
 		consumerProperties.put("group.id", "1");
 		try {
-			new KafkaItemReaderBuilder<>()
-					.name("kafkaItemReader")
-					.consumerProperties(consumerProperties)
-					.build();
+			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("key.deserializer property must be provided", exception.getMessage());
 		}
 
 		consumerProperties.put("key.deserializer", StringDeserializer.class.getName());
 		try {
-			new KafkaItemReaderBuilder<>()
-					.name("kafkaItemReader")
-					.consumerProperties(consumerProperties)
-					.build();
+			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).build();
 			fail("Expected exception was not thrown");
-		} catch (IllegalArgumentException exception) {
+		}
+		catch (IllegalArgumentException exception) {
 			assertEquals("value.deserializer property must be provided", exception.getMessage());
 		}
 
 		consumerProperties.put("value.deserializer", StringDeserializer.class.getName());
 		try {
-			new KafkaItemReaderBuilder<>()
-					.name("kafkaItemReader")
-					.consumerProperties(consumerProperties)
-					.topic("test")
-					.partitions(0, 1)
-					.build();
-		} catch (Exception exception) {
+			new KafkaItemReaderBuilder<>().name("kafkaItemReader").consumerProperties(consumerProperties).topic("test")
+					.partitions(0, 1).build();
+		}
+		catch (Exception exception) {
 			fail("Must not throw an exception when configuration is valid");
 		}
 	}
@@ -134,10 +122,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testNullTopicName() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic(null);
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic(null);
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -149,10 +135,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testEmptyTopicName() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic("");
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic("");
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -164,11 +148,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testNullPollTimeout() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic("test")
-				.pollTimeout(null);
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(null);
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -180,11 +161,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testNegativePollTimeout() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic("test")
-				.pollTimeout(Duration.ofSeconds(-1));
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(-1));
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -196,11 +174,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testZeroPollTimeout() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic("test")
-				.pollTimeout(Duration.ZERO);
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ZERO);
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -212,11 +187,8 @@ public class KafkaItemReaderBuilderTests {
 	@Test
 	public void testEmptyPartitions() {
 		// given
-		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic("test")
-				.pollTimeout(Duration.ofSeconds(10));
+		final KafkaItemReaderBuilder<Object, Object> builder = new KafkaItemReaderBuilder<>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic("test").pollTimeout(Duration.ofSeconds(10));
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -238,29 +210,26 @@ public class KafkaItemReaderBuilderTests {
 		partitionOffsets.put(new TopicPartition(topic, partitions.get(1)), 15L);
 
 		// when
-		KafkaItemReader<String, String> reader = new KafkaItemReaderBuilder<String, String>()
-				.name("kafkaItemReader")
-				.consumerProperties(this.consumerProperties)
-				.topic(topic)
-				.partitions(partitions)
-				.partitionOffsets(partitionOffsets)
-				.pollTimeout(pollTimeout)
-				.saveState(saveState)
-				.build();
+		KafkaItemReader<String, String> reader = new KafkaItemReaderBuilder<String, String>().name("kafkaItemReader")
+				.consumerProperties(this.consumerProperties).topic(topic).partitions(partitions)
+				.partitionOffsets(partitionOffsets).pollTimeout(pollTimeout).saveState(saveState).build();
 
 		// then
 		assertNotNull(reader);
 		assertFalse((Boolean) ReflectionTestUtils.getField(reader, "saveState"));
 		assertEquals(pollTimeout, ReflectionTestUtils.getField(reader, "pollTimeout"));
-		List<TopicPartition> topicPartitions = (List<TopicPartition>) ReflectionTestUtils.getField(reader, "topicPartitions");
+		List<TopicPartition> topicPartitions = (List<TopicPartition>) ReflectionTestUtils.getField(reader,
+				"topicPartitions");
 		assertEquals(2, topicPartitions.size());
 		assertEquals(topic, topicPartitions.get(0).topic());
 		assertEquals(partitions.get(0).intValue(), topicPartitions.get(0).partition());
 		assertEquals(topic, topicPartitions.get(1).topic());
 		assertEquals(partitions.get(1).intValue(), topicPartitions.get(1).partition());
-		Map<TopicPartition, Long> partitionOffsetsMap = (Map<TopicPartition, Long>) ReflectionTestUtils.getField(reader, "partitionOffsets");
+		Map<TopicPartition, Long> partitionOffsetsMap = (Map<TopicPartition, Long>) ReflectionTestUtils.getField(reader,
+				"partitionOffsets");
 		assertEquals(2, partitionOffsetsMap.size());
 		assertEquals(Long.valueOf(10L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(0))));
 		assertEquals(Long.valueOf(15L), partitionOffsetsMap.get(new TopicPartition(topic, partitions.get(1))));
 	}
+
 }

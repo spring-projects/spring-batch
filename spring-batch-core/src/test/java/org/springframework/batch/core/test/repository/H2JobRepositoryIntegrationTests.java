@@ -48,6 +48,7 @@ public class H2JobRepositoryIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
 
@@ -55,7 +56,7 @@ public class H2JobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -70,21 +71,17 @@ public class H2JobRepositoryIntegrationTests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.setType(EmbeddedDatabaseType.H2)
-					.addScript("/org/springframework/batch/core/schema-h2.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+					.addScript("/org/springframework/batch/core/schema-h2.sql").generateUniqueName(true).build();
 		}
 
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

@@ -70,8 +70,7 @@ public class StepBuilderTests {
 	public void setUp() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(embeddedDatabase);
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
@@ -82,8 +81,8 @@ public class StepBuilderTests {
 
 	@Test
 	public void test() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution(
-				"step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
@@ -94,15 +93,13 @@ public class StepBuilderTests {
 
 	@Test
 	public void testListeners() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		TaskletStepBuilder builder = new StepBuilder("step")
-											 .repository(jobRepository)
-											 .transactionManager(transactionManager)
-											 .listener(new InterfaceBasedStepExecutionListener())
-											 .listener(new AnnotationBasedStepExecutionListener())
-											 .tasklet((contribution, chunkContext) -> null);
+		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).listener(new InterfaceBasedStepExecutionListener())
+				.listener(new AnnotationBasedStepExecutionListener()).tasklet((contribution, chunkContext) -> null);
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, InterfaceBasedStepExecutionListener.beforeStepCount);
@@ -115,13 +112,12 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForTaskletStep() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		TaskletStepBuilder builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.tasklet((contribution, chunkContext) -> null)
+		TaskletStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).tasklet((contribution, chunkContext) -> null)
 				.listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -131,16 +127,13 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForSimpleTaskletStep() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.chunk(5)
-				.reader(new DummyItemReader())
-				.writer(new DummyItemWriter())
-				.listener(new AnnotationBasedChunkListener());
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
+				.writer(new DummyItemWriter()).listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
@@ -149,17 +142,17 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForFaultTolerantTaskletStep() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.chunk(5)
-				.reader(new DummyItemReader())
-				.writer(new DummyItemWriter())
-				.faultTolerant()
-				.listener(new AnnotationBasedChunkListener()); // TODO should this return FaultTolerantStepBuilder?
+		SimpleStepBuilder<Object, Object> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).chunk(5).reader(new DummyItemReader())
+				.writer(new DummyItemWriter()).faultTolerant().listener(new AnnotationBasedChunkListener()); // TODO
+																												// should
+																												// this
+																												// return
+																												// FaultTolerantStepBuilder?
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		assertEquals(1, AnnotationBasedChunkListener.beforeChunkCount);
@@ -168,27 +161,27 @@ public class StepBuilderTests {
 
 	@Test
 	public void testAnnotationBasedChunkListenerForJobStepBuilder() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 		SimpleJob job = new SimpleJob("job");
 		job.setJobRepository(jobRepository);
-		JobStepBuilder builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.job(job)
-				.listener(new AnnotationBasedChunkListener());
+		JobStepBuilder builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).job(job).listener(new AnnotationBasedChunkListener());
 		builder.build().execute(execution);
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 
-		// it makes no sense to register a ChunkListener on a step which is not of type tasklet, so it should not be invoked
+		// it makes no sense to register a ChunkListener on a step which is not of type
+		// tasklet, so it should not be invoked
 		assertEquals(0, AnnotationBasedChunkListener.beforeChunkCount);
 		assertEquals(0, AnnotationBasedChunkListener.afterChunkCount);
 	}
 
 	@Test
 	public void testItemListeners() throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -196,14 +189,10 @@ public class StepBuilderTests {
 
 		ItemReader<String> reader = new ListItemReader<>(items);
 
-		SimpleStepBuilder<String, String> builder = new StepBuilder("step")
-											 .repository(jobRepository)
-											 .transactionManager(transactionManager)
-											 .<String, String>chunk(3)
-										     .reader(reader)
-											 .processor(new PassThroughItemProcessor<>())
-											 .writer(new DummyItemWriter())
-											 .listener(new AnnotationBasedStepExecutionListener());
+		SimpleStepBuilder<String, String> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).<String, String>chunk(3).reader(reader)
+				.processor(new PassThroughItemProcessor<>()).writer(new DummyItemWriter())
+				.listener(new AnnotationBasedStepExecutionListener());
 		builder.build().execute(execution);
 
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
@@ -230,7 +219,8 @@ public class StepBuilderTests {
 	}
 
 	private void assertStepFunctions(boolean faultTolerantStep) throws Exception {
-		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters()).createStepExecution("step");
+		StepExecution execution = jobRepository.createJobExecution("foo", new JobParameters())
+				.createStepExecution("step");
 		jobRepository.add(execution);
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -239,14 +229,9 @@ public class StepBuilderTests {
 		ItemReader<Long> reader = new ListItemReader<>(items);
 
 		ListItemWriter<String> itemWriter = new ListItemWriter<>();
-		SimpleStepBuilder<Object, String> builder = new StepBuilder("step")
-				.repository(jobRepository)
-				.transactionManager(transactionManager)
-				.<Object, String>chunk(3)
-				.reader(reader)
-				.processor(Object::toString)
-				.writer(itemWriter)
-				.listener(new AnnotationBasedStepExecutionListener());
+		SimpleStepBuilder<Object, String> builder = new StepBuilder("step").repository(jobRepository)
+				.transactionManager(transactionManager).<Object, String>chunk(3).reader(reader)
+				.processor(Object::toString).writer(itemWriter).listener(new AnnotationBasedStepExecutionListener());
 
 		if (faultTolerantStep) {
 			builder = builder.faultTolerant();
@@ -277,6 +262,7 @@ public class StepBuilderTests {
 			afterStepCount++;
 			return stepExecution.getExitStatus();
 		}
+
 	}
 
 	@SuppressWarnings("unused")
@@ -356,6 +342,7 @@ public class StepBuilderTests {
 		public void afterChunk() {
 			afterChunkCount++;
 		}
+
 	}
 
 	public static class AnnotationBasedChunkListener {
@@ -384,5 +371,7 @@ public class StepBuilderTests {
 		public void afterChunkError() {
 			afterChunkErrorCount++;
 		}
+
 	}
+
 }

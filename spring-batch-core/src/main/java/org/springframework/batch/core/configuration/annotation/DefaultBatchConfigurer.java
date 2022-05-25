@@ -37,15 +37,18 @@ import org.springframework.util.Assert;
 public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	private DataSource dataSource;
+
 	private PlatformTransactionManager transactionManager;
+
 	private JobRepository jobRepository;
+
 	private JobLauncher jobLauncher;
+
 	private JobExplorer jobExplorer;
 
 	/**
-	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This constructor
-	 * will configure a default {@link DataSourceTransactionManager}.
-	 *
+	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource. This
+	 * constructor will configure a default {@link DataSourceTransactionManager}.
 	 * @param dataSource to use for the job repository and job explorer
 	 */
 	public DefaultBatchConfigurer(DataSource dataSource) {
@@ -53,7 +56,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	/**
-	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource and transaction manager.
+	 * Create a new {@link DefaultBatchConfigurer} with the passed datasource and
+	 * transaction manager.
 	 * @param dataSource to use for the job repository and job explorer
 	 * @param transactionManager to use for the job repository
 	 */
@@ -66,7 +70,6 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	/**
 	 * Sets the dataSource.
-	 *
 	 * @param dataSource The data source to use. Must not be {@code null}.
 	 */
 	public void setDataSource(DataSource dataSource) {
@@ -80,7 +83,6 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	public DataSource getDataSource() {
 		return this.dataSource;
 	}
-
 
 	@Override
 	public JobRepository getJobRepository() {
@@ -103,7 +105,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 	}
 
 	/**
-	 * Initialize the {@link DefaultBatchConfigurer} with the {@link JobRepository}, {@link JobExplorer}, and {@link JobLauncher}.
+	 * Initialize the {@link DefaultBatchConfigurer} with the {@link JobRepository},
+	 * {@link JobExplorer}, and {@link JobLauncher}.
 	 */
 	@PostConstruct
 	public void initialize() {
@@ -111,14 +114,16 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 			this.jobRepository = createJobRepository();
 			this.jobExplorer = createJobExplorer();
 			this.jobLauncher = createJobLauncher();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new BatchConfigurationException(e);
 		}
 	}
 
 	/**
 	 * @return An instance of {@link JobLauncher}.
-	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobLauncher}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while
+	 * creating the {@link JobLauncher}.
 	 */
 	protected JobLauncher createJobLauncher() throws Exception {
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
@@ -129,7 +134,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	/**
 	 * @return An instance of {@link JobRepository}.
-	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobRepository}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while
+	 * creating the {@link JobRepository}.
 	 */
 	protected JobRepository createJobRepository() throws Exception {
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
@@ -141,7 +147,8 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 
 	/**
 	 * @return An instance of {@link JobExplorer}.
-	 * @throws Exception The {@link Exception} that is thrown if an error occurs while creating the {@link JobExplorer}.
+	 * @throws Exception The {@link Exception} that is thrown if an error occurs while
+	 * creating the {@link JobExplorer}.
 	 */
 	protected JobExplorer createJobExplorer() throws Exception {
 		JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
@@ -149,4 +156,5 @@ public class DefaultBatchConfigurer implements BatchConfigurer {
 		jobExplorerFactoryBean.afterPropertiesSet();
 		return jobExplorerFactoryBean.getObject();
 	}
+
 }

@@ -19,22 +19,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
- * This interface should be implemented to map {@link LdapAttributes LdapAttributes} objects to POJOs. The resulting
- * implementations can be used in the {@link MappingLdifReader MappingLdifReader}.
+ * This interface should be implemented to map {@link LdapAttributes LdapAttributes}
+ * objects to POJOs. The resulting implementations can be used in the
+ * {@link MappingLdifReader MappingLdifReader}.
  *
  * @author Keith Barlow
  * @author Mahmoud Ben Hassine
- *
  * @param <T> type the record will be mapped to
  */
 public interface RecordMapper<T> {
 
 	/**
 	 * Maps an {@link LdapAttributes LdapAttributes} object to the specified type.
-	 *
 	 * @param attributes attributes
-	 * @return object of type T or {@code null} if unable to map the record to
-	 * an object.
+	 * @return object of type T or {@code null} if unable to map the record to an object.
 	 */
 	@Nullable
 	T mapRecord(LdapAttributes attributes);

@@ -42,11 +42,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/applicationContext-test2.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test2.xml" })
 public class MappingLdifReaderTests {
+
 	private static Logger log = LoggerFactory.getLogger(MappingLdifReaderTests.class);
 
 	private Resource expected;
+
 	private Resource actual;
 
 	@Autowired
@@ -74,10 +76,11 @@ public class MappingLdifReaderTests {
 	public void testValidRun() throws Exception {
 		JobExecution jobExecution = launcher.run(job1, new JobParameters());
 
-		//Ensure job completed successfully.
-		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED), "Step Execution did not complete normally: " + jobExecution.getExitStatus());
+		// Ensure job completed successfully.
+		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED),
+				"Step Execution did not complete normally: " + jobExecution.getExitStatus());
 
-		//Check output.
+		// Check output.
 		Assert.isTrue(actual.exists(), "Actual does not exist.");
 		Assert.isTrue(compareFiles(expected.getFile(), actual.getFile()), "Files were not equal");
 	}
@@ -86,10 +89,12 @@ public class MappingLdifReaderTests {
 	public void testResourceNotExists() throws Exception {
 		JobExecution jobExecution = launcher.run(job2, new JobParameters());
 
-		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"), "The job exit status is not FAILED.");
-		Assert.isTrue(jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
+		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"),
+				"The job exit status is not FAILED.");
+		Assert.isTrue(
+				jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"),
+				"The job failed for the wrong reason.");
 	}
-
 
 	private boolean compareFiles(File expected, File actual) throws Exception {
 		boolean equal = true;
@@ -97,19 +102,19 @@ public class MappingLdifReaderTests {
 		FileInputStream expectedStream = new FileInputStream(expected);
 		FileInputStream actualStream = new FileInputStream(actual);
 
-		//Construct BufferedReader from InputStreamReader
+		// Construct BufferedReader from InputStreamReader
 		BufferedReader expectedReader = new BufferedReader(new InputStreamReader(expectedStream));
 		BufferedReader actualReader = new BufferedReader(new InputStreamReader(actualStream));
 
 		String line = null;
 		while ((line = expectedReader.readLine()) != null) {
-			if(!line.equals(actualReader.readLine())) {
+			if (!line.equals(actualReader.readLine())) {
 				equal = false;
 				break;
 			}
 		}
 
-		if(actualReader.readLine() != null) {
+		if (actualReader.readLine() != null) {
 			equal = false;
 		}
 
@@ -117,4 +122,5 @@ public class MappingLdifReaderTests {
 
 		return equal;
 	}
+
 }

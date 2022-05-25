@@ -22,9 +22,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
- * An implementation of the {@link ResultQueue} that throttles the number of
- * expected results, limiting it to a maximum at any given time.
- * 
+ * An implementation of the {@link ResultQueue} that throttles the number of expected
+ * results, limiting it to a maximum at any given time.
+ *
  * @author Dave Syer
  */
 public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
@@ -40,40 +40,39 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 	private volatile int count = 0;
 
 	/**
-	 * @param throttleLimit the maximum number of results that can be expected
-	 * at any given time.
+	 * @param throttleLimit the maximum number of results that can be expected at any
+	 * given time.
 	 */
 	public ThrottleLimitResultQueue(int throttleLimit) {
 		results = new LinkedBlockingQueue<>();
 		waits = new Semaphore(throttleLimit);
 	}
 
-    @Override
+	@Override
 	public boolean isEmpty() {
 		return results.isEmpty();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.support.ResultQueue#isExpecting()
 	 */
-    @Override
+	@Override
 	public boolean isExpecting() {
 		// Base the decision about whether we expect more results on a
 		// counter of the number of expected results actually collected.
-		// Do not synchronize!  Otherwise put and expect can deadlock.
+		// Do not synchronize! Otherwise put and expect can deadlock.
 		return count > 0;
 	}
 
 	/**
-	 * Tell the queue to expect one more result. Blocks until a new result is
-	 * available if already expecting too many (as determined by the throttle
-	 * limit).
-	 * 
+	 * Tell the queue to expect one more result. Blocks until a new result is available if
+	 * already expecting too many (as determined by the throttle limit).
+	 *
 	 * @see ResultQueue#expect()
 	 */
-    @Override
+	@Override
 	public void expect() throws InterruptedException {
 		synchronized (lock) {
 			waits.acquire();
@@ -81,7 +80,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		}
 	}
 
-    @Override
+	@Override
 	public void put(T holder) throws IllegalArgumentException {
 		if (!isExpecting()) {
 			throw new IllegalArgumentException("Not expecting a result.  Call expect() before put().");
@@ -93,7 +92,7 @@ public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		waits.release();
 	}
 
-    @Override
+	@Override
 	public T take() throws NoSuchElementException, InterruptedException {
 		if (!isExpecting()) {
 			throw new NoSuchElementException("Not expecting a result.  Call expect() before take().");

@@ -23,12 +23,11 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * Convenient aspect to wrap a single threaded step execution, where the
- * implementation of the {@link Step} is not step scope aware (i.e. not the ones
- * provided by the framework).
- * 
+ * Convenient aspect to wrap a single threaded step execution, where the implementation of
+ * the {@link Step} is not step scope aware (i.e. not the ones provided by the framework).
+ *
  * @author Dave Syer
- * 
+ *
  */
 @Aspect
 public class StepScopeManager {

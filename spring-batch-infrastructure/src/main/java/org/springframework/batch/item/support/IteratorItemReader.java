@@ -23,9 +23,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * An {@link ItemReader} that pulls data from a {@link Iterator} or
- * {@link Iterable} using the constructors.
- * 
+ * An {@link ItemReader} that pulls data from a {@link Iterator} or {@link Iterable} using
+ * the constructors.
+ *
  * @author Juliusz Brzostek
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -38,11 +38,10 @@ public class IteratorItemReader<T> implements ItemReader<T> {
 	private final Iterator<T> iterator;
 
 	/**
-	 * Construct a new reader from this iterable (could be a collection), by
-	 * extracting an instance of {@link Iterator} from it.
-	 * 
+	 * Construct a new reader from this iterable (could be a collection), by extracting an
+	 * instance of {@link Iterator} from it.
 	 * @param iterable in instance of {@link Iterable}
-	 * 
+	 *
 	 * @see Iterable#iterator()
 	 */
 	public IteratorItemReader(Iterable<T> iterable) {
@@ -60,10 +59,10 @@ public class IteratorItemReader<T> implements ItemReader<T> {
 	}
 
 	/**
-	 * Implementation of {@link ItemReader#read()} that just iterates over the
-	 * iterator provided.
+	 * Implementation of {@link ItemReader#read()} that just iterates over the iterator
+	 * provided.
 	 */
-    @Nullable
+	@Nullable
 	@Override
 	public T read() {
 		if (iterator.hasNext())

@@ -26,6 +26,7 @@ import org.springframework.batch.core.StepExecution;
 public class StepSupport implements Step {
 
 	private String name;
+
 	private int startLimit = 1;
 
 	/**
@@ -36,27 +37,36 @@ public class StepSupport implements Step {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.StepExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.Step#execute(org.springframework.batch.core.
+	 * StepExecution)
 	 */
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.Step#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.Step#getStartLimit()
 	 */
 	public int getStartLimit() {
 		return startLimit;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.Step#isAllowStartIfComplete()
 	 */
 	public boolean isAllowStartIfComplete() {

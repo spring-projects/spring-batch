@@ -37,15 +37,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * <ul>
  * <li>Registers a {@link JobLauncherTestUtils} bean with the
  * {@link BatchTestContextCustomizer#JOB_LAUNCHER_TEST_UTILS_BEAN_NAME} which can be used
- * in tests for launching jobs and steps.
- * </li>
- * <li>Registers a {@link JobRepositoryTestUtils} bean
- * with the {@link BatchTestContextCustomizer#JOB_REPOSITORY_TEST_UTILS_BEAN_NAME}
- * which can be used in tests setup to create or remove job executions.
- * </li>
- * <li>Registers the {@link StepScopeTestExecutionListener} and {@link JobScopeTestExecutionListener}
- * as test execution listeners which are required to test step/job scoped beans.
- * </li>
+ * in tests for launching jobs and steps.</li>
+ * <li>Registers a {@link JobRepositoryTestUtils} bean with the
+ * {@link BatchTestContextCustomizer#JOB_REPOSITORY_TEST_UTILS_BEAN_NAME} which can be
+ * used in tests setup to create or remove job executions.</li>
+ * <li>Registers the {@link StepScopeTestExecutionListener} and
+ * {@link JobScopeTestExecutionListener} as test execution listeners which are required to
+ * test step/job scoped beans.</li>
  * </ul>
  * <p>
  * A typical usage of this annotation with JUnit 4 is like:
@@ -113,22 +111,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  *       // then
  *       Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
  *    }
- * 
+ *
  * }
  * </pre>
- * 
- * <p><strong>
- * It should be noted that {@link JobLauncherTestUtils} requires a 
- * {@link org.springframework.batch.core.Job} bean and that
- * {@link JobRepositoryTestUtils} requires a {@link javax.sql.DataSource} bean.
- * Since this annotation registers a {@link JobLauncherTestUtils} and a 
- * {@link JobRepositoryTestUtils} in the test context, it is expected that the
- * test context contains a single autowire candidate for a 
- * {@link org.springframework.batch.core.Job} and a {@link javax.sql.DataSource}
- * (either a single bean definition or one that is
- * annotated with {@link org.springframework.context.annotation.Primary}).
- * </strong></p>
- * 
+ *
+ * <p>
+ * <strong> It should be noted that {@link JobLauncherTestUtils} requires a
+ * {@link org.springframework.batch.core.Job} bean and that {@link JobRepositoryTestUtils}
+ * requires a {@link javax.sql.DataSource} bean. Since this annotation registers a
+ * {@link JobLauncherTestUtils} and a {@link JobRepositoryTestUtils} in the test context,
+ * it is expected that the test context contains a single autowire candidate for a
+ * {@link org.springframework.batch.core.Job} and a {@link javax.sql.DataSource} (either a
+ * single bean definition or one that is annotated with
+ * {@link org.springframework.context.annotation.Primary}). </strong>
+ * </p>
+ *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  * @see JobLauncherTestUtils
@@ -140,10 +137,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@TestExecutionListeners(
-		listeners = {StepScopeTestExecutionListener.class, JobScopeTestExecutionListener.class},
-		mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
-)
+@TestExecutionListeners(listeners = { StepScopeTestExecutionListener.class, JobScopeTestExecutionListener.class },
+		mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 @ExtendWith(SpringExtension.class)
 public @interface SpringBatchTest {
+
 }

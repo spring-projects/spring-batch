@@ -45,16 +45,15 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
- * A {@link FactoryBean} that automates the creation of a
- * {@link SimpleJobExplorer} using JDBC DAO implementations. Requires the user
- * to describe what kind of database they are using.
+ * A {@link FactoryBean} that automates the creation of a {@link SimpleJobExplorer} using
+ * JDBC DAO implementations. Requires the user to describe what kind of database they are
+ * using.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
  */
-public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
-implements InitializingBean {
+public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
 
 	private DataSource dataSource;
 
@@ -76,10 +75,10 @@ implements InitializingBean {
 	private Charset charset = StandardCharsets.UTF_8;
 
 	/**
-	 * A custom implementation of the {@link ExecutionContextSerializer}.
-	 * The default, if not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
-	 *
-	 * @param serializer used to serialize/deserialize an {@link org.springframework.batch.item.ExecutionContext}
+	 * A custom implementation of the {@link ExecutionContextSerializer}. The default, if
+	 * not injected, is the {@link Jackson2ExecutionContextStringSerializer}.
+	 * @param serializer used to serialize/deserialize an
+	 * {@link org.springframework.batch.item.ExecutionContext}
 	 * @see ExecutionContextSerializer
 	 */
 	public void setSerializer(ExecutionContextSerializer serializer) {
@@ -88,26 +87,24 @@ implements InitializingBean {
 
 	/**
 	 * Public setter for the {@link DataSource}.
-	 *
-	 * @param dataSource
-	 *            a {@link DataSource}
+	 * @param dataSource a {@link DataSource}
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	/**
-	 * Public setter for the {@link JdbcOperations}. If this property is not set explicitly,
-	 * a new {@link JdbcTemplate} will be created for the configured DataSource by default.
+	 * Public setter for the {@link JdbcOperations}. If this property is not set
+	 * explicitly, a new {@link JdbcTemplate} will be created for the configured
+	 * DataSource by default.
 	 * @param jdbcOperations a {@link JdbcOperations}
 	 */
 	public void setJdbcOperations(JdbcOperations jdbcOperations) {
 		this.jdbcOperations = jdbcOperations;
-	}	
+	}
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
-	 *
 	 * @param tablePrefix prefix for the batch meta-data tables
 	 */
 	public void setTablePrefix(String tablePrefix) {
@@ -115,18 +112,18 @@ implements InitializingBean {
 	}
 
 	/**
-	 * The lob handler to use when saving {@link ExecutionContext} instances.
-	 * Defaults to null which works for most databases.
-	 *
-	 * @param lobHandler Large object handler for saving {@link org.springframework.batch.item.ExecutionContext}
+	 * The lob handler to use when saving {@link ExecutionContext} instances. Defaults to
+	 * null which works for most databases.
+	 * @param lobHandler Large object handler for saving
+	 * {@link org.springframework.batch.item.ExecutionContext}
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
 
 	/**
-	 * Set the {@link Charset} to use when deserializing the execution context.
-	 * Defaults to "UTF-8". Must not be {@code null}.
+	 * Set the {@link Charset} to use when deserializing the execution context. Defaults
+	 * to "UTF-8". Must not be {@code null}.
 	 * @param charset to use when deserializing the execution context.
 	 * @see JdbcExecutionContextDao#setCharset(Charset)
 	 * @since 5.0
@@ -143,16 +140,15 @@ implements InitializingBean {
 
 		if (jdbcOperations == null) {
 			jdbcOperations = new JdbcTemplate(dataSource);
-		}	
+		}
 
-		if(serializer == null) {
+		if (serializer == null) {
 			serializer = new Jackson2ExecutionContextStringSerializer();
 		}
 	}
 
 	private JobExplorer getTarget() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(),
-				createJobExecutionDao(), createStepExecutionDao(),
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
 	}
 
@@ -202,4 +198,5 @@ implements InitializingBean {
 	public JobExplorer getObject() throws Exception {
 		return getTarget();
 	}
+
 }

@@ -22,20 +22,18 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  * <p>
- * Listener interface for the writing of items. Implementations
- * of this interface are notified before, after, and in case
- * of any exception thrown while writing a list of items.
+ * Listener interface for the writing of items. Implementations of this interface are
+ * notified before, after, and in case of any exception thrown while writing a list of
+ * items.
  * </p>
  *
  * <p>
- * <em>Note: </em> This listener is designed to work around the
- * lifecycle of an item. This means that each method should be
- * called once within the lifecycle of an item and that, in fault-tolerant
- * scenarios, any transactional work that is done in
- * one of these methods is rolled back and not re-applied.
- * Because of this, it is recommended to not perform any logic
- * that participates in a transaction when using this listener.
- *</p>
+ * <em>Note: </em> This listener is designed to work around the lifecycle of an item. This
+ * means that each method should be called once within the lifecycle of an item and that,
+ * in fault-tolerant scenarios, any transactional work that is done in one of these
+ * methods is rolled back and not re-applied. Because of this, it is recommended to not
+ * perform any logic that participates in a transaction when using this listener.
+ * </p>
  *
  * @author Lucas Ward
  * @author Mahmoud Ben Hassine
@@ -45,31 +43,28 @@ public interface ItemWriteListener<S> extends StepListener {
 
 	/**
 	 * Called before {@link ItemWriter#write(java.util.List)}
-	 *
 	 * @param items to be written
 	 */
 	default void beforeWrite(List<? extends S> items) {
 	}
 
 	/**
-	 * Called after {@link ItemWriter#write(java.util.List)}. This is
-	 * called before any transaction is committed, and before
+	 * Called after {@link ItemWriter#write(java.util.List)}. This is called before any
+	 * transaction is committed, and before
 	 * {@link ChunkListener#afterChunk(ChunkContext)}.
-	 *
 	 * @param items written items
 	 */
 	default void afterWrite(List<? extends S> items) {
 	}
 
 	/**
-	 * Called if an error occurs while trying to write. Called inside a
-	 * transaction, but the transaction will normally be rolled back. There is
-	 * no way to identify from this callback which of the items (if any) caused
-	 * the error.
-	 *
+	 * Called if an error occurs while trying to write. Called inside a transaction, but
+	 * the transaction will normally be rolled back. There is no way to identify from this
+	 * callback which of the items (if any) caused the error.
 	 * @param exception thrown from {@link ItemWriter}
 	 * @param items attempted to be written.
 	 */
 	default void onWriteError(Exception exception, List<? extends S> items) {
 	}
+
 }

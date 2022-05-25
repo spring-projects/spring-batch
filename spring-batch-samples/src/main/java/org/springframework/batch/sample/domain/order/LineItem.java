@@ -19,80 +19,88 @@ package org.springframework.batch.sample.domain.order;
 import java.math.BigDecimal;
 
 public class LineItem {
-    public static final String LINE_ID_ITEM = "LIT";
 
-    private long itemId;
-    private BigDecimal price;
-    private BigDecimal discountPerc;
-    private BigDecimal discountAmount;
-    private BigDecimal shippingPrice;
-    private BigDecimal handlingPrice;
-    private int quantity;
-    private BigDecimal totalPrice;
+	public static final String LINE_ID_ITEM = "LIT";
 
-    public BigDecimal getDiscountAmount() {
-        return discountAmount;
-    }
+	private long itemId;
 
-    public void setDiscountAmount(BigDecimal discountAmount) {
-        this.discountAmount = discountAmount;
-    }
+	private BigDecimal price;
 
-    public BigDecimal getDiscountPerc() {
-        return discountPerc;
-    }
+	private BigDecimal discountPerc;
 
-    public void setDiscountPerc(BigDecimal discountPerc) {
-        this.discountPerc = discountPerc;
-    }
+	private BigDecimal discountAmount;
 
-    public BigDecimal getHandlingPrice() {
-        return handlingPrice;
-    }
+	private BigDecimal shippingPrice;
 
-    public void setHandlingPrice(BigDecimal handlingPrice) {
-        this.handlingPrice = handlingPrice;
-    }
+	private BigDecimal handlingPrice;
 
-    public long getItemId() {
-        return itemId;
-    }
+	private int quantity;
 
-    public void setItemId(long itemId) {
-        this.itemId = itemId;
-    }
+	private BigDecimal totalPrice;
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+	public BigDecimal getDiscountAmount() {
+		return discountAmount;
+	}
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+	public void setDiscountAmount(BigDecimal discountAmount) {
+		this.discountAmount = discountAmount;
+	}
 
-    public int getQuantity() {
-        return quantity;
-    }
+	public BigDecimal getDiscountPerc() {
+		return discountPerc;
+	}
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+	public void setDiscountPerc(BigDecimal discountPerc) {
+		this.discountPerc = discountPerc;
+	}
 
-    public BigDecimal getShippingPrice() {
-        return shippingPrice;
-    }
+	public BigDecimal getHandlingPrice() {
+		return handlingPrice;
+	}
 
-    public void setShippingPrice(BigDecimal shippingPrice) {
-        this.shippingPrice = shippingPrice;
-    }
+	public void setHandlingPrice(BigDecimal handlingPrice) {
+		this.handlingPrice = handlingPrice;
+	}
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
+	public long getItemId() {
+		return itemId;
+	}
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
+	public void setItemId(long itemId) {
+		this.itemId = itemId;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public BigDecimal getShippingPrice() {
+		return shippingPrice;
+	}
+
+	public void setShippingPrice(BigDecimal shippingPrice) {
+		this.shippingPrice = shippingPrice;
+	}
+
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 
 	@Override
 	public String toString() {
@@ -134,4 +142,5 @@ public class LineItem {
 
 		return true;
 	}
+
 }

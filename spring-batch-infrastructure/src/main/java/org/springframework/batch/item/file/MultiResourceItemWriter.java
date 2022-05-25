@@ -28,17 +28,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Wraps a {@link ResourceAwareItemWriterItemStream} and creates a new output
- * resource when the count of items written in current resource exceeds
- * {@link #setItemCountLimitPerResource(int)}. Suffix creation can be customized
- * with {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
- * 
- * Note that new resources are created only at chunk boundaries i.e. the number
- * of items written into one resource is between the limit set by
+ * Wraps a {@link ResourceAwareItemWriterItemStream} and creates a new output resource
+ * when the count of items written in current resource exceeds
+ * {@link #setItemCountLimitPerResource(int)}. Suffix creation can be customized with
+ * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
+ *
+ * Note that new resources are created only at chunk boundaries i.e. the number of items
+ * written into one resource is between the limit set by
  * {@link #setItemCountLimitPerResource(int)} and (limit + chunk size).
- * 
+ *
  * @param <T> item type
- * 
  * @author Robert Kasanicky
  */
 public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> {
@@ -67,7 +66,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		this.setExecutionContextName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
 
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 		if (!opened) {
 			File file = setResourceToDelegate();
@@ -89,9 +88,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	}
 
 	/**
-	 * Allows customization of the suffix of the created resources based on the
-	 * index.
-	 *
+	 * Allows customization of the suffix of the created resources based on the index.
 	 * @param suffixCreator {@link ResourceSuffixCreator} to be used by the writer.
 	 */
 	public void setResourceSuffixCreator(ResourceSuffixCreator suffixCreator) {
@@ -99,9 +96,8 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 	}
 
 	/**
-	 * After this limit is exceeded the next chunk will be written into newly
-	 * created resource.
-	 *
+	 * After this limit is exceeded the next chunk will be written into newly created
+	 * resource.
 	 * @param itemCountLimitPerResource int item threshold used to determine when a new
 	 * resource should be created.
 	 */
@@ -111,37 +107,32 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 
 	/**
 	 * Delegate used for actual writing of the output.
-	 *
-	 * @param delegate {@link ResourceAwareItemWriterItemStream} that will be used
-	 * to write the output.
+	 * @param delegate {@link ResourceAwareItemWriterItemStream} that will be used to
+	 * write the output.
 	 */
 	public void setDelegate(ResourceAwareItemWriterItemStream<? super T> delegate) {
 		this.delegate = delegate;
 	}
 
 	/**
-	 * Prototype for output resources. Actual output files will be created in
-	 * the same directory and use the same name as this prototype with appended
-	 * suffix (according to
-	 * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
-	 *
+	 * Prototype for output resources. Actual output files will be created in the same
+	 * directory and use the same name as this prototype with appended suffix (according
+	 * to {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
 	 * @param resource The prototype resource.
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
 
-
 	/**
 	 * Indicates that the state of the reader will be saved after each commit.
-	 *
 	 * @param saveState true the state is saved.
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
 
-    @Override
+	@Override
 	public void close() throws ItemStreamException {
 		super.close();
 		resourceIndex = 1;
@@ -151,7 +142,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
-    @Override
+	@Override
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		super.open(executionContext);
 		resourceIndex = executionContext.getInt(getExecutionContextKey(RESOURCE_INDEX_KEY), 1);
@@ -174,7 +165,7 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		}
 	}
 
-    @Override
+	@Override
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
 		if (saveState) {
@@ -195,4 +186,5 @@ public class MultiResourceItemWriter<T> extends AbstractItemStreamItemWriter<T> 
 		delegate.setResource(new FileSystemResource(file));
 		return file;
 	}
+
 }

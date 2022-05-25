@@ -25,12 +25,12 @@ public class RepeatSynchronizationManagerTests extends TestCase {
 
 	private RepeatContext context = new RepeatContextSupport(null);
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}
-	
-    @Override
+
+	@Override
 	protected void tearDown() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}

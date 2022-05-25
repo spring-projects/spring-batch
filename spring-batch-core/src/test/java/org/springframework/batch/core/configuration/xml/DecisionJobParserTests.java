@@ -59,10 +59,12 @@ public class DecisionJobParserTests {
 	}
 
 	public static class TestDecider implements JobExecutionDecider {
+
 		@Override
 		public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution) {
 			return new FlowExecutionStatus("FOO");
 		}
+
 	}
 
 }

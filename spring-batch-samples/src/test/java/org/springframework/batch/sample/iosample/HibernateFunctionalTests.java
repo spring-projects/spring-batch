@@ -27,7 +27,7 @@ public class HibernateFunctionalTests extends AbstractIoSampleTests {
 
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
-		// no-op 
+		// no-op
 	}
 
-}	
+}

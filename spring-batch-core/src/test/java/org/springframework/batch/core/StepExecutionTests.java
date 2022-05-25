@@ -45,8 +45,6 @@ public class StepExecutionTests {
 
 	private ExecutionContext foobarEc = new ExecutionContext();
 
-
-
 	@Before
 	public void setUp() throws Exception {
 		foobarEc.put("foo", "bar");
@@ -59,12 +57,11 @@ public class StepExecutionTests {
 
 	@Test
 	public void testStepExecutionWithNullId() {
-		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null,"foo"), null)).getId());
+		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null, "foo"), null)).getId());
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
+	 * Test method for {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
 	@Test
 	public void testGetEndTime() {
@@ -74,8 +71,7 @@ public class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link StepExecution#getCreateTime()}.
+	 * Test method for {@link StepExecution#getCreateTime()}.
 	 */
 	@Test
 	public void testGetCreateTime() {
@@ -85,8 +81,7 @@ public class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
 	@Test
 	public void testGetStatus() {
@@ -96,8 +91,7 @@ public class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
+	 * Test method for {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	@Test
 	public void testGetJobId() {
@@ -192,8 +186,8 @@ public class StepExecutionTests {
 	@Test
 	public void testEqualsWithSameName() throws Exception {
 		Step step = new StepSupport("stepName");
-		Entity stepExecution1 = newStepExecution(step,11L,4L);
-		Entity stepExecution2 = newStepExecution(step,11L,5L);
+		Entity stepExecution1 = newStepExecution(step, 11L, 4L);
+		Entity stepExecution2 = newStepExecution(step, 11L, 5L);
 		assertFalse(stepExecution1.equals(stepExecution2));
 	}
 
@@ -251,8 +245,8 @@ public class StepExecutionTests {
 
 	@Test
 	public void testHashCodeWithNullIds() throws Exception {
-		assertTrue("Hash code not same as parent", new Entity(execution.getId()).hashCode() != blankExecution
-				.hashCode());
+		assertTrue("Hash code not same as parent",
+				new Entity(execution.getId()).hashCode() != blankExecution.hashCode());
 	}
 
 	@Test
@@ -280,7 +274,7 @@ public class StepExecutionTests {
 	}
 
 	@Test
-	public void testAddException() throws Exception{
+	public void testAddException() throws Exception {
 
 		RuntimeException exception = new RuntimeException();
 		assertEquals(0, execution.getFailureExceptions().size());
@@ -290,8 +284,7 @@ public class StepExecutionTests {
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 * Test method for {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
 	@Test
 	public void testDowngradeStatus() {
@@ -306,7 +299,8 @@ public class StepExecutionTests {
 
 	private StepExecution newStepExecution(Step step, Long jobExecutionId, long stepExecutionId) {
 		JobInstance job = new JobInstance(3L, "testJob");
-		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, jobExecutionId, new JobParameters()), stepExecutionId);
+		StepExecution execution = new StepExecution(step.getName(),
+				new JobExecution(job, jobExecutionId, new JobParameters()), stepExecutionId);
 		return execution;
 	}
 

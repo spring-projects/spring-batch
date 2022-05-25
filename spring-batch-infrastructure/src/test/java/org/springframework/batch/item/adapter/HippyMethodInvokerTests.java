@@ -82,12 +82,15 @@ public class HippyMethodInvokerTests {
 		invoker.setTargetMethod("foo");
 		@SuppressWarnings("unused")
 		class OverloadingPojo {
+
 			public Class<?> foo(List<?> arg) {
 				return List.class;
 			}
+
 			public Class<?> foo(Set<?> arg) {
 				return Set.class;
 			}
+
 		}
 
 		TreeSet<Object> arg = new TreeSet<>();
@@ -108,12 +111,15 @@ public class HippyMethodInvokerTests {
 		invoker.setTargetMethod("foo");
 		@SuppressWarnings("unused")
 		class OverloadingPojo {
+
 			public Class<?> foo(String arg1, Number arg2) {
 				return Number.class;
 			}
+
 			public Class<?> foo(String arg1, List<?> arg2) {
 				return List.class;
 			}
+
 		}
 
 		String exactArg = "string";
@@ -129,6 +135,7 @@ public class HippyMethodInvokerTests {
 	}
 
 	public static class PlainPojo {
+
 		public String handle(double value, String input) {
 			return value + "." + input;
 		}
@@ -148,15 +155,18 @@ public class HippyMethodInvokerTests {
 		public String empty() {
 			return ".";
 		}
+
 	}
 
 	public static interface Service {
+
 		String getMessage(double value, String input);
+
 	}
 
 	public static class TestMethodAdapter extends AbstractMethodInvokingDelegator<String> implements Service {
 
-	    @Override
+		@Override
 		public String getMessage(double value, String input) {
 			try {
 				return invokeDelegateMethodWithArguments(new Object[] { value, input });

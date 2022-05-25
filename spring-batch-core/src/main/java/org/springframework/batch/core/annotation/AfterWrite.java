@@ -26,9 +26,9 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Marks a method to be called after an item is passed to an {@link ItemWriter}.
- * Note that this annotation takes a {@link List} because Spring Batch
- * generally processes a group of items (for the sake of efficiency).<br>
+ * Marks a method to be called after an item is passed to an {@link ItemWriter}. Note that
+ * this annotation takes a {@link List} because Spring Batch generally processes a group
+ * of items (for the sake of efficiency).<br>
  * <br>
  * Expected signature: void afterWrite({@link List}&lt;? extends S&gt; items)
  *
@@ -37,7 +37,7 @@ import org.springframework.batch.item.ItemWriter;
  * @see ItemWriteListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface AfterWrite {
 
 }

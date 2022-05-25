@@ -36,8 +36,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.lang.Nullable;
 
 /**
- * Simple implementation of the ChunkProvider interface that does basic chunk
- * providing from an {@link ItemReader}.
+ * Simple implementation of the ChunkProvider interface that does basic chunk providing
+ * from an {@link ItemReader}.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -60,9 +60,8 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	}
 
 	/**
-	 * Register some {@link StepListener}s with the handler. Each will get the
-	 * callbacks in the order specified at the correct stage.
-	 *
+	 * Register some {@link StepListener}s with the handler. Each will get the callbacks
+	 * in the order specified at the correct stage.
 	 * @param listeners list of {@link StepListener}s.
 	 */
 	public void setListeners(List<? extends StepListener> listeners) {
@@ -73,7 +72,6 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 
 	/**
 	 * Register a listener for callbacks at the appropriate stages in a process.
-	 *
 	 * @param listener a {@link StepListener}
 	 */
 	public void registerListener(StepListener listener) {
@@ -97,7 +95,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 		try {
 			listener.beforeRead();
 			I item = itemReader.read();
-			if(item != null) {
+			if (item != null) {
 				listener.afterRead(item);
 			}
 			return item;
@@ -152,10 +150,10 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	private void stopTimer(Timer.Sample sample, StepExecution stepExecution, String status) {
 		String fullyQualifiedMetricName = BatchMetrics.METRICS_PREFIX + "item.read";
 		sample.stop(BatchMetrics.createTimer("item.read", "Item reading duration",
-				Tag.of(fullyQualifiedMetricName + ".job.name", stepExecution.getJobExecution().getJobInstance().getJobName()),
+				Tag.of(fullyQualifiedMetricName + ".job.name",
+						stepExecution.getJobExecution().getJobInstance().getJobName()),
 				Tag.of(fullyQualifiedMetricName + ".step.name", stepExecution.getStepName()),
-				Tag.of(fullyQualifiedMetricName + ".status", status)
-		));
+				Tag.of(fullyQualifiedMetricName + ".status", status)));
 	}
 
 	@Override
@@ -164,16 +162,13 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	}
 
 	/**
-	 * Delegates to {@link #doRead()}. Subclasses can add additional behaviour
-	 * (e.g. exception handling).
-	 *
+	 * Delegates to {@link #doRead()}. Subclasses can add additional behaviour (e.g.
+	 * exception handling).
 	 * @param contribution the current step execution contribution
 	 * @param chunk the current chunk
 	 * @return a new item for processing or {@code null} if the data source is exhausted
-	 *
-	 * @throws SkipOverflowException if specifically the chunk is accumulating
-	 * too much data (e.g. skips) and it wants to force a commit.
-	 *
+	 * @throws SkipOverflowException if specifically the chunk is accumulating too much
+	 * data (e.g. skips) and it wants to force a commit.
 	 * @throws Exception if there is a generic issue
 	 */
 	@Nullable

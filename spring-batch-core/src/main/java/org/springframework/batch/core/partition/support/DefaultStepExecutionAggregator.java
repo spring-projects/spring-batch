@@ -24,8 +24,8 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 
 /**
- * Convenience class for aggregating a set of {@link StepExecution} instances
- * into a single result.
+ * Convenience class for aggregating a set of {@link StepExecution} instances into a
+ * single result.
  *
  * @author Dave Syer
  * @since 2.1
@@ -33,8 +33,8 @@ import java.util.Collection;
 public class DefaultStepExecutionAggregator implements StepExecutionAggregator {
 
 	/**
-	 * Aggregates the input executions into the result {@link StepExecution}.
-	 * The aggregated fields are
+	 * Aggregates the input executions into the result {@link StepExecution}. The
+	 * aggregated fields are
 	 * <ul>
 	 * <li>status - choosing the highest value using
 	 * {@link BatchStatus#max(BatchStatus, BatchStatus)}</li>

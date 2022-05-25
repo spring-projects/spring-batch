@@ -25,8 +25,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Composite {@link JobParametersValidator} that passes the job parameters through a sequence of
- * injected <code>JobParametersValidator</code>s
+ * Composite {@link JobParametersValidator} that passes the job parameters through a
+ * sequence of injected <code>JobParametersValidator</code>s
  *
  * @author Morten Andersen-Gott
  * @author Mahmoud Ben Hassine
@@ -39,7 +39,6 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 	/**
 	 * Validates the JobParameters according to the injected JobParameterValidators
 	 * Validation stops and exception is thrown on first validation error
-	 *
 	 * @param parameters some {@link JobParameters}
 	 * @throws JobParametersInvalidException if the parameters are invalid
 	 */
@@ -52,7 +51,8 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 
 	/**
 	 * Public setter for the validators
-	 * @param validators list of validators to be used by the CompositeJobParametersValidator.
+	 * @param validators list of validators to be used by the
+	 * CompositeJobParametersValidator.
 	 */
 	public void setValidators(List<JobParametersValidator> validators) {
 		this.validators = validators;
@@ -63,7 +63,5 @@ public class CompositeJobParametersValidator implements JobParametersValidator, 
 		Assert.notNull(validators, "The 'validators' may not be null");
 		Assert.notEmpty(validators, "The 'validators' may not be empty");
 	}
-
-
 
 }

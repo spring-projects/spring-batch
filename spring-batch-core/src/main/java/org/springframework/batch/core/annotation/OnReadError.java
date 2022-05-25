@@ -24,8 +24,7 @@ import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.item.ItemReader;
 
 /**
- * Marks a method to be called if an exception is thrown by an
- * {@link ItemReader}. <br>
+ * Marks a method to be called if an exception is thrown by an {@link ItemReader}. <br>
  * <br>
  * Expected signature: void onReadError({@link Exception} ex)
  *
@@ -34,7 +33,7 @@ import org.springframework.batch.item.ItemReader;
  * @see ItemReadListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface OnReadError {
 
 }

@@ -28,28 +28,28 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Checks that expected number of items have been processed.
- * 
+ *
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/retrySample.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/retrySample.xml", "/job-runner-context.xml" })
 public class RetrySampleFunctionalTests {
 
 	@Autowired
 	private GeneratingTradeItemReader itemGenerator;
-	
+
 	@Autowired
 	private RetrySampleItemWriter<?> itemProcessor;
-	
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Test
 	public void testLaunchJob() throws Exception {
 		jobLauncherTestUtils.launchJob();
-		//items processed = items read + 2 exceptions
-		assertEquals(itemGenerator.getLimit()+2, itemProcessor.getCounter());
+		// items processed = items read + 2 exceptions
+		assertEquals(itemGenerator.getLimit() + 2, itemProcessor.getCounter());
 	}
-	
+
 }

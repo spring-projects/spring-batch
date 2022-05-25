@@ -67,13 +67,9 @@ public class StoredProcedureItemReaderBuilderTests {
 
 	@Test
 	public void testSunnyScenario() throws Exception {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>()
-				.name("foo_reader")
-				.dataSource(this.dataSource)
-				.procedureName("read_foos")
-				.rowMapper(new FooRowMapper())
-				.verifyCursorPosition(false)
-				.build();
+		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().name("foo_reader")
+				.dataSource(this.dataSource).procedureName("read_foos").rowMapper(new FooRowMapper())
+				.verifyCursorPosition(false).build();
 
 		reader.open(new ExecutionContext());
 
@@ -91,25 +87,12 @@ public class StoredProcedureItemReaderBuilderTests {
 
 		SqlParameter[] parameters = new SqlParameter[0];
 
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>()
-				.name("foo_reader")
-				.dataSource(this.dataSource)
-				.procedureName("read_foos")
-				.rowMapper(new FooRowMapper())
-				.verifyCursorPosition(false)
-				.refCursorPosition(3)
-				.useSharedExtendedConnection(true)
-				.preparedStatementSetter(preparedStatementSetter)
-				.parameters(parameters)
-				.function()
-				.fetchSize(5)
-				.driverSupportsAbsolute(true)
-				.currentItemCount(6)
-				.ignoreWarnings(false)
-				.maxItemCount(7)
-				.queryTimeout(8)
-				.maxRows(9)
-				.build();
+		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().name("foo_reader")
+				.dataSource(this.dataSource).procedureName("read_foos").rowMapper(new FooRowMapper())
+				.verifyCursorPosition(false).refCursorPosition(3).useSharedExtendedConnection(true)
+				.preparedStatementSetter(preparedStatementSetter).parameters(parameters).function().fetchSize(5)
+				.driverSupportsAbsolute(true).currentItemCount(6).ignoreWarnings(false).maxItemCount(7).queryTimeout(8)
+				.maxRows(9).build();
 
 		assertEquals(3, ReflectionTestUtils.getField(reader, "refCursorPosition"));
 		assertEquals(preparedStatementSetter, ReflectionTestUtils.getField(reader, "preparedStatementSetter"));
@@ -127,12 +110,8 @@ public class StoredProcedureItemReaderBuilderTests {
 
 	@Test
 	public void testNoSaveState() throws Exception {
-		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>()
-				.dataSource(this.dataSource)
-				.procedureName("read_foos")
-				.rowMapper(new FooRowMapper())
-				.verifyCursorPosition(false)
-				.saveState(false)
+		StoredProcedureItemReader<Foo> reader = new StoredProcedureItemReaderBuilder<Foo>().dataSource(this.dataSource)
+				.procedureName("read_foos").rowMapper(new FooRowMapper()).verifyCursorPosition(false).saveState(false)
 				.build();
 
 		ExecutionContext executionContext = new ExecutionContext();
@@ -151,53 +130,40 @@ public class StoredProcedureItemReaderBuilderTests {
 	@Test
 	public void testValidation() {
 		try {
-			new StoredProcedureItemReaderBuilder<Foo>()
-					.build();
+			new StoredProcedureItemReaderBuilder<Foo>().build();
 
 			fail("Exception was not thrown for missing the name");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("A name is required when saveSate is set to true",
-					iae.getMessage());
+			assertEquals("A name is required when saveSate is set to true", iae.getMessage());
 		}
 
 		try {
-			new StoredProcedureItemReaderBuilder<Foo>()
-					.saveState(false)
-					.build();
+			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).build();
 
 			fail("Exception was not thrown for missing the stored procedure name");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("The name of the stored procedure must be provided",
-					iae.getMessage());
+			assertEquals("The name of the stored procedure must be provided", iae.getMessage());
 		}
 
 		try {
-			new StoredProcedureItemReaderBuilder<Foo>()
-					.saveState(false)
-					.procedureName("read_foos")
-					.build();
+			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos").build();
 
 			fail("Exception was not thrown for missing the DataSource");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("A datasource is required",
-					iae.getMessage());
+			assertEquals("A datasource is required", iae.getMessage());
 		}
 
 		try {
-			new StoredProcedureItemReaderBuilder<Foo>()
-					.saveState(false)
-					.procedureName("read_foos")
-					.dataSource(this.dataSource)
-					.build();
+			new StoredProcedureItemReaderBuilder<Foo>().saveState(false).procedureName("read_foos")
+					.dataSource(this.dataSource).build();
 
 			fail("Exception was not thrown for missing the RowMapper");
 		}
 		catch (IllegalArgumentException iae) {
-			assertEquals("A rowmapper is required",
-					iae.getMessage());
+			assertEquals("A rowmapper is required", iae.getMessage());
 		}
 	}
 
@@ -236,14 +202,14 @@ public class StoredProcedureItemReaderBuilderTests {
 			DataSourceInitializer initializer = new DataSourceInitializer();
 
 			initializer.setDataSource(dataSource);
-			initializer.setInitScripts(new ClassPathResource[]{
-					new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-derby.sql")
-			});
-			initializer.setDestroyScripts(new ClassPathResource[]{
-					new ClassPathResource("org/springframework/batch/item/database/drop-foo-schema-derby.sql")
-			});
+			initializer.setInitScripts(new ClassPathResource[] {
+					new ClassPathResource("org/springframework/batch/item/database/init-foo-schema-derby.sql") });
+			initializer.setDestroyScripts(new ClassPathResource[] {
+					new ClassPathResource("org/springframework/batch/item/database/drop-foo-schema-derby.sql") });
 
 			return initializer;
 		}
+
 	}
+
 }

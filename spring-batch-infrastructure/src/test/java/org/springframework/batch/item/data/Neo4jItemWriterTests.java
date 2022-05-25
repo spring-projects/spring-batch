@@ -41,20 +41,23 @@ public class Neo4jItemWriterTests {
 
 	@Mock
 	private SessionFactory sessionFactory;
+
 	@Mock
 	private Session session;
 
 	@Test
-	public void testAfterPropertiesSet() throws Exception{
+	public void testAfterPropertiesSet() throws Exception {
 
 		writer = new Neo4jItemWriter<>();
 
 		try {
 			writer.afterPropertiesSet();
 			fail("SessionFactory was not set but exception was not thrown.");
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			assertEquals("A SessionFactory is required", iae.getMessage());
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			fail("Wrong exception was thrown.");
 		}
 
@@ -145,4 +148,5 @@ public class Neo4jItemWriterTests {
 		verify(this.session).delete("foo");
 		verify(this.session).delete("bar");
 	}
+
 }

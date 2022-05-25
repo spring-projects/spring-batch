@@ -17,9 +17,8 @@ package org.springframework.batch.core.step.builder;
 
 /**
  * Utility exception thrown by builders when they encounter unexpected checked exceptions.
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.2
  */
 @SuppressWarnings("serial")

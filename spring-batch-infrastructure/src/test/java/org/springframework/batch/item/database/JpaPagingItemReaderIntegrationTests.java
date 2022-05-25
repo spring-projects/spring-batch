@@ -32,7 +32,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
  */
 public class JpaPagingItemReaderIntegrationTests extends AbstractGenericDataSourceItemReaderIntegrationTests {
 
-    @Override
+	@Override
 	protected ItemReader<Foo> createItemReader() throws Exception {
 		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 		factoryBean.setDataSource(dataSource);

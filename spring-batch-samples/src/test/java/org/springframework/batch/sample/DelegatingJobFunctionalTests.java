@@ -27,7 +27,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/delegatingJob.xml", "/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/delegatingJob.xml", "/job-runner-context.xml" })
 public class DelegatingJobFunctionalTests {
 
 	@Autowired
@@ -35,15 +36,15 @@ public class DelegatingJobFunctionalTests {
 
 	@Autowired
 	private PersonService personService;
-	
+
 	@Test
 	public void testLaunchJob() throws Exception {
-		
+
 		jobLauncherTestUtils.launchJob();
-		
+
 		assertTrue(personService.getReturnedCount() > 0);
 		assertEquals(personService.getReturnedCount(), personService.getReceivedCount());
-		
+
 	}
-	
+
 }

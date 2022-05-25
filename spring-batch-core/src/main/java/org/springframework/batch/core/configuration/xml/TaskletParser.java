@@ -34,11 +34,10 @@ import org.w3c.dom.Element;
 
 /**
  * Parse a tasklet element for a step.
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.1
- * 
+ *
  */
 public class TaskletParser {
 
@@ -90,8 +89,8 @@ public class TaskletParser {
 			}
 			else if (beanElements.size() == 1) {
 				Element beanElement = beanElements.get(0);
-				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
-						beanElement, bd);
+				BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate()
+						.parseBeanDefinitionElement(beanElement, bd);
 				parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 				bme = beanDefinitionHolder;
 			}
@@ -168,10 +167,10 @@ public class TaskletParser {
 		}
 
 		if (error != null) {
-			parserContext.getReaderContext().error(
-					"The <" + taskletElement.getTagName() + "/> element " + error + " one of: '" + TASKLET_REF_ATTR
-							+ "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE + "/> attribute, or <"
-							+ REF_ELE + "/> element.  Found: " + found + ".", taskletElement);
+			parserContext.getReaderContext()
+					.error("The <" + taskletElement.getTagName() + "/> element " + error + " one of: '"
+							+ TASKLET_REF_ATTR + "' attribute, <" + CHUNK_ELE + "/> element, <" + BEAN_ELE
+							+ "/> attribute, or <" + REF_ELE + "/> element.  Found: " + found + ".", taskletElement);
 		}
 	}
 
@@ -217,14 +216,14 @@ public class TaskletParser {
 			propertyValues.addPropertyValue(propertyName, list);
 		}
 		else if (children.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The <" + exceptionListName + "/> element may not appear more than once in a single <"
-							+ element.getNodeName() + "/>.", element);
+			parserContext.getReaderContext().error("The <" + exceptionListName
+					+ "/> element may not appear more than once in a single <" + element.getNodeName() + "/>.",
+					element);
 		}
 	}
 
-	private void addExceptionClasses(String elementName, Element exceptionClassesElement, ManagedList<TypedStringValue> list,
-			ParserContext parserContext) {
+	private void addExceptionClasses(String elementName, Element exceptionClassesElement,
+			ManagedList<TypedStringValue> list, ParserContext parserContext) {
 		for (Element child : DomUtils.getChildElementsByTagName(exceptionClassesElement, elementName)) {
 			String className = child.getAttribute("class");
 			list.add(new TypedStringValue(className, Class.class));

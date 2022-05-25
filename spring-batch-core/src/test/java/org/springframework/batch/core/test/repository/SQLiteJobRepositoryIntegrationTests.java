@@ -49,6 +49,7 @@ public class SQLiteJobRepositoryIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private Job job;
 
@@ -56,7 +57,7 @@ public class SQLiteJobRepositoryIntegrationTests {
 	public void testJobExecution() throws Exception {
 		// given
 		JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
 
@@ -74,7 +75,8 @@ public class SQLiteJobRepositoryIntegrationTests {
 			SQLiteDataSource dataSource = new SQLiteDataSource();
 			dataSource.setUrl("jdbc:sqlite:target/spring-batch.sqlite");
 			ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-			databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sqlite.sql"));
+			databasePopulator
+					.addScript(new ClassPathResource("/org/springframework/batch/core/schema-drop-sqlite.sql"));
 			databasePopulator.addScript(new ClassPathResource("/org/springframework/batch/core/schema-sqlite.sql"));
 			databasePopulator.execute(dataSource);
 			return dataSource;
@@ -83,11 +85,10 @@ public class SQLiteJobRepositoryIntegrationTests {
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
 			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 	}
+
 }

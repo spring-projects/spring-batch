@@ -40,8 +40,12 @@ class SqliteMaxValueIncrementer extends AbstractColumnMaxValueIncrementer {
 		super(dataSource, incrementerName, columnName);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer#getNextKey()
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer#
+	 * getNextKey()
 	 */
 	@Override
 	protected long getNextKey() {
@@ -67,4 +71,5 @@ class SqliteMaxValueIncrementer extends AbstractColumnMaxValueIncrementer {
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
+
 }

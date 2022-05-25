@@ -26,9 +26,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
- * Marks a method to be called before a {@link Step} is executed, which comes
- * after a {@link StepExecution} is created and persisted but before the first
- * item is read. <br>
+ * Marks a method to be called before a {@link Step} is executed, which comes after a
+ * {@link StepExecution} is created and persisted but before the first item is read. <br>
  * <br>
  * Expected signature: void beforeStep({@link StepExecution} stepExecution)
  *
@@ -37,7 +36,7 @@ import org.springframework.batch.core.StepExecutionListener;
  * @see StepExecutionListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface BeforeStep {
 
 }

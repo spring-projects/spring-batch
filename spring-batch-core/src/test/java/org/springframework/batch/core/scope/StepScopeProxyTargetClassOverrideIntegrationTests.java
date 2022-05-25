@@ -41,9 +41,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFactoryAware {
-	
-	private static final String JDK_PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";	
-	
+
+	private static final String JDK_PROXY_TO_STRING_REGEX = "class .*\\$Proxy\\d+";
+
 	private static final String CGLIB_PROXY_TO_STRING_REGEX = "class .*\\$EnhancerBySpringCGLIB.*";
 
 	@Autowired
@@ -57,7 +57,7 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 	@Autowired
 	@Qualifier("simpleProxyTargetClassFalse")
 	private Collaborator simpleProxyTargetClassFalse;
-	
+
 	@Autowired
 	@Qualifier("nested")
 	private Step nested;
@@ -116,13 +116,13 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 		assertTrue(AopUtils.isCglibProxy(simpleProxyTargetClassTrue));
 		assertEquals("bar", simpleProxyTargetClassTrue.getName());
 	}
-	
+
 	@Test
 	public void testSimpleProxyTargetClassFalse() throws Exception {
 		assertTrue(AopUtils.isJdkDynamicProxy(simpleProxyTargetClassFalse));
 		assertEquals("bar", simpleProxyTargetClassFalse.getName());
 	}
-	
+
 	@Test
 	public void testNested() throws Exception {
 		nested.execute(new StepExecution("foo", new JobExecution(11L), 31L));
@@ -133,26 +133,26 @@ public class StepScopeProxyTargetClassOverrideIntegrationTests implements BeanFa
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertNotNull(parent);
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
-				.matches(CGLIB_PROXY_TO_STRING_REGEX));
+		assertTrue("Scoped proxy not created",
+				((String) TestStep.getContext().getAttribute("parent.class")).matches(CGLIB_PROXY_TO_STRING_REGEX));
 	}
-	
+
 	@Test
 	public void testNestedProxyTargetClassTrue() throws Exception {
 		nestedProxyTargetClassTrue.execute(new StepExecution("foo", new JobExecution(11L), 31L));
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
-				.matches(CGLIB_PROXY_TO_STRING_REGEX));
-	}	
+		assertTrue("Scoped proxy not created",
+				((String) TestStep.getContext().getAttribute("parent.class")).matches(CGLIB_PROXY_TO_STRING_REGEX));
+	}
 
 	@Test
 	public void testNestedProxyTargetClassFalse() throws Exception {
 		nestedProxyTargetClassFalse.execute(new StepExecution("foo", new JobExecution(11L), 31L));
 		String parent = (String) TestStep.getContext().getAttribute("parent");
 		assertEquals("bar", parent);
-		assertTrue("Scoped proxy not created", ((String) TestStep.getContext().getAttribute("parent.class"))
-				.matches(JDK_PROXY_TO_STRING_REGEX));
-	}	
+		assertTrue("Scoped proxy not created",
+				((String) TestStep.getContext().getAttribute("parent.class")).matches(JDK_PROXY_TO_STRING_REGEX));
+	}
 
 }

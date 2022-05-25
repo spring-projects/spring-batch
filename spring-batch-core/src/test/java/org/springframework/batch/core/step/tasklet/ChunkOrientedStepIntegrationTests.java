@@ -91,18 +91,16 @@ public class ChunkOrientedStepIntegrationTests {
 	@Ignore
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setTasklet(new TestingChunkOrientedTasklet<>(
-				getReader(new String[]{"a", "b", "c"}),
+		step.setTasklet(new TestingChunkOrientedTasklet<>(getReader(new String[] { "a", "b", "c" }),
 				data -> TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 					@Override
 					public void beforeCommit(boolean readOnly) {
 						throw new RuntimeException("Simulate commit failure");
 					}
-				}),
-				chunkOperations));
+				}), chunkOperations));
 
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters(Collections
-				.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
+				new JobParameters(Collections.singletonMap("run.id", new JobParameter(getClass().getName() + ".1"))));
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		stepExecution.setExecutionContext(new ExecutionContext() {
@@ -115,8 +113,8 @@ public class ChunkOrientedStepIntegrationTests {
 		step.execute(stepExecution);
 		// Exception on commit is not necessarily fatal: it should fail and rollback
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName());
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(),
+				step.getName());
 		assertEquals(lastStepExecution, stepExecution);
 		assertFalse(lastStepExecution == stepExecution);
 

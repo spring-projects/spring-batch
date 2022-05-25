@@ -20,11 +20,11 @@ import org.springframework.core.AttributeAccessor;
 import org.springframework.core.AttributeAccessorSupport;
 
 /**
- * An {@link AttributeAccessor} that synchronizes on a mutex (not this) before
- * modifying or accessing the underlying attributes.
- * 
+ * An {@link AttributeAccessor} that synchronizes on a mutex (not this) before modifying
+ * or accessing the underlying attributes.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
@@ -36,13 +36,15 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 		 * Generated serial UID.
 		 */
 		private static final long serialVersionUID = -7664290016506582290L;
+
 	};
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.core.AttributeAccessor#attributeNames()
 	 */
-    @Override
+	@Override
 	public String[] attributeNames() {
 		synchronized (support) {
 			return support.attributeNames();
@@ -51,9 +53,10 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-    @Override
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
@@ -75,9 +78,10 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.core.AttributeAccessor#getAttribute(java.lang.String)
 	 */
-    @Override
+	@Override
 	public Object getAttribute(String name) {
 		synchronized (support) {
 			return support.getAttribute(name);
@@ -86,9 +90,10 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.core.AttributeAccessor#hasAttribute(java.lang.String)
 	 */
-    @Override
+	@Override
 	public boolean hasAttribute(String name) {
 		synchronized (support) {
 			return support.hasAttribute(name);
@@ -97,18 +102,20 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
-    @Override
+	@Override
 	public int hashCode() {
 		return support.hashCode();
 	}
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.core.AttributeAccessor#removeAttribute(java.lang.String)
 	 */
-    @Override
+	@Override
 	public Object removeAttribute(String name) {
 		synchronized (support) {
 			return support.removeAttribute(name);
@@ -117,10 +124,11 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.core.AttributeAccessor#setAttribute(java.lang.String,
 	 * java.lang.Object)
 	 */
-    @Override
+	@Override
 	public void setAttribute(String name, Object value) {
 		synchronized (support) {
 			support.setAttribute(name, value);
@@ -131,8 +139,7 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 	 * Additional support for atomic put if absent.
 	 * @param name the key for the attribute name
 	 * @param value the value of the attribute
-	 * @return null if the attribute was not already set, the existing value
-	 * otherwise.
+	 * @return null if the attribute was not already set, the existing value otherwise.
 	 */
 	public Object setAttributeIfAbsent(String name, Object value) {
 		synchronized (support) {
@@ -147,9 +154,10 @@ public class SynchronizedAttributeAccessor implements AttributeAccessor {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#toString()
 	 */
-    @Override
+	@Override
 	public String toString() {
 		StringBuilder buffer = new StringBuilder("SynchronizedAttributeAccessor: [");
 		synchronized (support) {

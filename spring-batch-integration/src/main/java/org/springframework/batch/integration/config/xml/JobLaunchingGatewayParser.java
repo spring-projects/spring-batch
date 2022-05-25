@@ -28,9 +28,8 @@ import org.w3c.dom.Element;
 
 /**
  * The parser for the Job-Launching Gateway, which will instantiate a
- * {@link JobLaunchingGatewayParser}. If no {@link JobLauncher} reference has
- * been provided, this parse will use the use the globally registered bean
- * 'jobLauncher'.
+ * {@link JobLaunchingGatewayParser}. If no {@link JobLauncher} reference has been
+ * provided, this parse will use the use the globally registered bean 'jobLauncher'.
  *
  * @author Gunnar Hillert
  * @since 1.3
@@ -48,8 +47,8 @@ public class JobLaunchingGatewayParser extends AbstractConsumerEndpointParser {
 	@Override
 	protected BeanDefinitionBuilder parseHandler(Element element, ParserContext parserContext) {
 
-		final BeanDefinitionBuilder jobLaunchingGatewayBuilder =
-			BeanDefinitionBuilder.genericBeanDefinition(JobLaunchingGateway.class);
+		final BeanDefinitionBuilder jobLaunchingGatewayBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition(JobLaunchingGateway.class);
 
 		final String jobLauncher = element.getAttribute("job-launcher");
 
@@ -63,7 +62,8 @@ public class JobLaunchingGatewayParser extends AbstractConsumerEndpointParser {
 			jobLaunchingGatewayBuilder.addConstructorArgReference("jobLauncher");
 		}
 
-		IntegrationNamespaceUtils.setValueIfAttributeDefined(jobLaunchingGatewayBuilder, element, "reply-timeout", "sendTimeout");
+		IntegrationNamespaceUtils.setValueIfAttributeDefined(jobLaunchingGatewayBuilder, element, "reply-timeout",
+				"sendTimeout");
 
 		final String replyChannel = element.getAttribute("reply-channel");
 

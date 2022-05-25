@@ -67,13 +67,13 @@ public class JobRepositoryTestUtilsTests {
 		beforeSteps = JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryProperties() throws Exception {
 		utils = new JobRepositoryTestUtils();
 		utils.afterPropertiesSet();
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryDataSource() throws Exception {
 		utils = new JobRepositoryTestUtils();
 		utils.setJobRepository(jobRepository);
@@ -110,7 +110,7 @@ public class JobRepositoryTestUtilsTests {
 	@Test
 	public void testCreateJobExecutionsByName() throws Exception {
 		utils = new JobRepositoryTestUtils(jobRepository, dataSource);
-		List<JobExecution> list = utils.createJobExecutions("foo",new String[] {"bar", "spam"}, 3);
+		List<JobExecution> list = utils.createJobExecutions("foo", new String[] { "bar", "spam" }, 3);
 		assertEquals(3, list.size());
 		assertEquals(beforeJobs + 3, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 		assertEquals(beforeSteps + 6, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_STEP_EXECUTION"));
@@ -137,7 +137,7 @@ public class JobRepositoryTestUtilsTests {
 		utils.setJobParametersIncrementer(new JobParametersIncrementer() {
 			@Override
 			public JobParameters getNext(@Nullable JobParameters parameters) {
-				return new JobParametersBuilder().addString("foo","bar").toJobParameters();
+				return new JobParametersBuilder().addString("foo", "bar").toJobParameters();
 			}
 		});
 		List<JobExecution> list = utils.createJobExecutions(1);
@@ -146,4 +146,5 @@ public class JobRepositoryTestUtilsTests {
 		utils.removeJobExecutions(list);
 		assertEquals(beforeJobs, JdbcTestUtils.countRowsInTable(jdbcTemplate, "BATCH_JOB_EXECUTION"));
 	}
+
 }

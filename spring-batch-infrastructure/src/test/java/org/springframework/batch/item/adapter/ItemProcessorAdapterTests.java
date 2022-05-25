@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Tests for {@link ItemProcessorAdapter}.
- * 
+ *
  * @author Dave Syer
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -34,11 +34,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ItemProcessorAdapterTests {
 
 	@Autowired
-	private ItemProcessorAdapter<Foo,String> processor;
+	private ItemProcessorAdapter<Foo, String> processor;
 
 	@Test
 	public void testProcess() throws Exception {
-		Foo item = new Foo(0,"foo",1);
+		Foo item = new Foo(0, "foo", 1);
 		assertEquals("foo", processor.process(item));
 	}
 

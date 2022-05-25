@@ -40,8 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/data-source-context.xml" })
 public class JdbcPlayerSummaryDaoIntegrationTests {
+
 	private JdbcPlayerSummaryDao playerSummaryDao;
+
 	private PlayerSummary summary;
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -80,4 +83,5 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 		assertEquals(summary, testSummary);
 	}
+
 }

@@ -42,6 +42,7 @@ public class HibernateItemWriterTests {
 	HibernateItemWriter<Object> writer;
 
 	SessionFactory factory;
+
 	Session currentSession;
 
 	@Before
@@ -56,7 +57,6 @@ public class HibernateItemWriterTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -75,7 +75,6 @@ public class HibernateItemWriterTests {
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.item.database.HibernateItemWriter#afterPropertiesSet()}
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -144,4 +143,5 @@ public class HibernateItemWriterTests {
 			assertEquals("ERROR", e.getMessage());
 		}
 	}
+
 }

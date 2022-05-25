@@ -36,16 +36,18 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Convenient factory bean for a chunk handler that also converts an existing chunk-oriented step into a remote chunk
- * manager. The idea is to lift the existing chunk processor out of a Step that works locally, and replace it with a one
- * that writes chunks into a message channel. The existing step hands its business chunk processing responsibility over
- * to the handler produced by the factory, which then needs to be set up as a worker on the other end of the channel the
- * chunks are being sent to. Once this chunk handler is installed the application is playing the role of both the manager
- * and the worker listeners in the Remote Chunking pattern for the Step in question.
- * 
+ * Convenient factory bean for a chunk handler that also converts an existing
+ * chunk-oriented step into a remote chunk manager. The idea is to lift the existing chunk
+ * processor out of a Step that works locally, and replace it with a one that writes
+ * chunks into a message channel. The existing step hands its business chunk processing
+ * responsibility over to the handler produced by the factory, which then needs to be set
+ * up as a worker on the other end of the channel the chunks are being sent to. Once this
+ * chunk handler is installed the application is playing the role of both the manager and
+ * the worker listeners in the Remote Chunking pattern for the Step in question.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandler<T>> {
 
@@ -59,7 +61,6 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 
 	/**
 	 * The local step that is to be converted to a remote chunk manager.
-	 * 
 	 * @param step the step to set
 	 */
 	public void setStep(TaskletStep step) {
@@ -67,9 +68,9 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * The item writer to be injected into the step. Its responsibility is to send chunks of items to remote workers.
-	 * Usually in practice it will be a {@link ChunkMessageChannelItemWriter}.
-	 * 
+	 * The item writer to be injected into the step. Its responsibility is to send chunks
+	 * of items to remote workers. Usually in practice it will be a
+	 * {@link ChunkMessageChannelItemWriter}.
 	 * @param chunkWriter the chunk writer to set
 	 */
 	public void setChunkWriter(ItemWriter<T> chunkWriter) {
@@ -78,8 +79,8 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 
 	/**
 	 * A source of {@link StepContribution} instances coming back from remote workers.
-	 * 
-	 * @param stepContributionSource the step contribution source to set (defaults to the chunk writer)
+	 * @param stepContributionSource the step contribution source to set (defaults to the
+	 * chunk writer)
 	 */
 	public void setStepContributionSource(StepContributionSource stepContributionSource) {
 		this.stepContributionSource = stepContributionSource;
@@ -87,7 +88,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 
 	/**
 	 * The type of object created by this factory. Returns {@link ChunkHandler} class.
-	 * 
+	 *
 	 * @see FactoryBean#getObjectType()
 	 */
 	public Class<?> getObjectType() {
@@ -96,7 +97,7 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 
 	/**
 	 * Optimization for the bean factory (always returns true).
-	 * 
+	 *
 	 * @see FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {
@@ -104,10 +105,10 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Builds a {@link ChunkHandler} from the {@link ChunkProcessor} extracted from the {@link #setStep(TaskletStep)
-	 * step} provided. Also modifies the step to send chunks to the chunk handler via the
-	 * {@link #setChunkWriter(ItemWriter) chunk writer}.
-	 * 
+	 * Builds a {@link ChunkHandler} from the {@link ChunkProcessor} extracted from the
+	 * {@link #setStep(TaskletStep) step} provided. Also modifies the step to send chunks
+	 * to the chunk handler via the {@link #setChunkWriter(ItemWriter) chunk writer}.
+	 *
 	 * @see FactoryBean#getObject()
 	 */
 	public ChunkHandler<T> getObject() throws Exception {
@@ -124,8 +125,8 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 		}
 
 		Tasklet tasklet = getTasklet(step);
-		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>, "Tasklet must be ChunkOrientedTasklet in step="
-				+ step.getName());
+		Assert.state(tasklet instanceof ChunkOrientedTasklet<?>,
+				"Tasklet must be ChunkOrientedTasklet in step=" + step.getName());
 
 		ChunkProcessor<T> chunkProcessor = getChunkProcessor((ChunkOrientedTasklet<?>) tasklet);
 		Assert.state(chunkProcessor != null, "ChunkProcessor must be accessible in Tasklet in step=" + step.getName());
@@ -161,35 +162,37 @@ public class RemoteChunkHandlerFactoryBean<T> implements FactoryBean<ChunkHandle
 	}
 
 	/**
-	 * Replace the chunk processor in the tasklet provided with one that can act as a manager in the Remote Chunking
-	 * pattern.
-	 * 
+	 * Replace the chunk processor in the tasklet provided with one that can act as a
+	 * manager in the Remote Chunking pattern.
 	 * @param tasklet a ChunkOrientedTasklet
 	 * @param chunkWriter an ItemWriter that can send the chunks to remote workers
-	 * @param stepContributionSource a StepContributionSource used to gather results from the workers
+	 * @param stepContributionSource a StepContributionSource used to gather results from
+	 * the workers
 	 */
 	private void replaceChunkProcessor(ChunkOrientedTasklet<?> tasklet, ItemWriter<T> chunkWriter,
 			final StepContributionSource stepContributionSource) {
-		setField(tasklet, "chunkProcessor", new SimpleChunkProcessor<T, T>(new PassThroughItemProcessor<>(),
-				chunkWriter) {
-			@Override
-			protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs) throws Exception {
-				doWrite(outputs.getItems());
-				// Do not update the step contribution until the chunks are
-				// actually processed
-				updateStepContribution(contribution, stepContributionSource);
-			}
-		});
+		setField(tasklet, "chunkProcessor",
+				new SimpleChunkProcessor<T, T>(new PassThroughItemProcessor<>(), chunkWriter) {
+					@Override
+					protected void write(StepContribution contribution, Chunk<T> inputs, Chunk<T> outputs)
+							throws Exception {
+						doWrite(outputs.getItems());
+						// Do not update the step contribution until the chunks are
+						// actually processed
+						updateStepContribution(contribution, stepContributionSource);
+					}
+				});
 	}
 
 	/**
-	 * Update a StepContribution with all the data from a StepContributionSource. The filter and write counts plus the
-	 * exit status will be updated to reflect the data in the source.
-	 * 
+	 * Update a StepContribution with all the data from a StepContributionSource. The
+	 * filter and write counts plus the exit status will be updated to reflect the data in
+	 * the source.
 	 * @param contribution the current contribution
 	 * @param stepContributionSource a source of StepContributions
 	 */
-	protected void updateStepContribution(StepContribution contribution, StepContributionSource stepContributionSource) {
+	protected void updateStepContribution(StepContribution contribution,
+			StepContributionSource stepContributionSource) {
 		for (StepContribution result : stepContributionSource.getStepContributions()) {
 			contribution.incrementFilterCount(result.getFilterCount());
 			contribution.incrementWriteCount(result.getWriteCount());

@@ -20,11 +20,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface allowing for programmatic access to the decision on what the status
- * of a flow should be.  For example, if some condition that's stored in the 
- * database indicates that the job should stop for a manual check, a decider
- * implementation could check that value to determine the status of the flow. 
- * 
+ * Interface allowing for programmatic access to the decision on what the status of a flow
+ * should be. For example, if some condition that's stored in the database indicates that
+ * the job should stop for a manual check, a decider implementation could check that value
+ * to determine the status of the flow.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
  * @since 2.0
@@ -33,9 +33,8 @@ public interface JobExecutionDecider {
 
 	/**
 	 * Strategy for branching an execution based on the state of an ongoing
-	 * {@link JobExecution}. The return value will be used as a status to
-	 * determine the next step in the job.
-	 * 
+	 * {@link JobExecution}. The return value will be used as a status to determine the
+	 * next step in the job.
 	 * @param jobExecution a job execution
 	 * @param stepExecution the latest step execution (may be {@code null})
 	 * @return the exit status code

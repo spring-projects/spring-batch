@@ -46,7 +46,7 @@ public class JmsItemWriterBuilderTests {
 		assertEquals("Expected foo", "foo", argCaptor.getAllValues().get(0));
 		assertEquals("Expected bar", "bar", argCaptor.getAllValues().get(1));
 	}
-	
+
 	@Test
 	public void testNullJmsTemplate() {
 		try {
@@ -58,4 +58,5 @@ public class JmsItemWriterBuilderTests {
 					"jmsTemplate is required.", ise.getMessage());
 		}
 	}
+
 }

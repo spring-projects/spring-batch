@@ -24,17 +24,16 @@ import org.springframework.util.Assert;
 import java.util.Iterator;
 
 /**
- * A base class that handles basic reading logic based on the paginated
- * semantics of Spring Data's paginated facilities.  It also handles the
- * semantics required for restartability based on those facilities.
- * 
+ * A base class that handles basic reading logic based on the paginated semantics of
+ * Spring Data's paginated facilities. It also handles the semantics required for
+ * restartability based on those facilities.
+ *
  * @author Michael Minella
  * @author Glenn Renfro
  * @since 2.2
  * @param <T> Type of item to be read
  */
-public abstract class AbstractPaginatedDataItemReader<T> extends
-AbstractItemCountingItemStreamItemReader<T> {
+public abstract class AbstractPaginatedDataItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
 
 	protected volatile int page = 0;
 
@@ -46,8 +45,7 @@ AbstractItemCountingItemStreamItemReader<T> {
 
 	/**
 	 * The number of items to be read with each page.
-	 * 
-	 * @param pageSize the number of items.  pageSize must be greater than zero.
+	 * @param pageSize the number of items. pageSize must be greater than zero.
 	 */
 	public void setPageSize(int pageSize) {
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
@@ -59,19 +57,18 @@ AbstractItemCountingItemStreamItemReader<T> {
 	protected T doRead() throws Exception {
 
 		synchronized (lock) {
-			if(results == null || !results.hasNext()) {
+			if (results == null || !results.hasNext()) {
 
 				results = doPageRead();
 
-				page ++;
+				page++;
 
-				if(results == null || !results.hasNext()) {
+				if (results == null || !results.hasNext()) {
 					return null;
 				}
 			}
 
-
-			if(results.hasNext()) {
+			if (results.hasNext()) {
 				return results.next();
 			}
 			else {
@@ -81,15 +78,12 @@ AbstractItemCountingItemStreamItemReader<T> {
 	}
 
 	/**
-	 * Method this {@link ItemStreamReader} delegates to
-	 * for the actual work of reading a page.  Each time
-	 * this method is called, the resulting {@link Iterator}
-	 * should contain the items read within the next page.
-	 * <br><br>
-	 * If the {@link Iterator} is empty or null when it is
-	 * returned, this {@link ItemReader} will assume that the
-	 * input has been exhausted.
-	 * 
+	 * Method this {@link ItemStreamReader} delegates to for the actual work of reading a
+	 * page. Each time this method is called, the resulting {@link Iterator} should
+	 * contain the items read within the next page. <br>
+	 * <br>
+	 * If the {@link Iterator} is empty or null when it is returned, this
+	 * {@link ItemReader} will assume that the input has been exhausted.
 	 * @return an {@link Iterator} containing the items within a page.
 	 */
 	protected abstract Iterator<T> doPageRead();
@@ -110,9 +104,10 @@ AbstractItemCountingItemStreamItemReader<T> {
 
 			Iterator<T> initialPage = doPageRead();
 
-			for(; current >= 0; current--) {
+			for (; current >= 0; current--) {
 				initialPage.next();
 			}
 		}
 	}
+
 }

@@ -22,11 +22,9 @@ import java.util.Collection;
 import org.springframework.batch.core.StepContribution;
 
 /**
- * Encapsulation of a chunk of items to be processed remotely as part of a step
- * execution.
- * 
+ * Encapsulation of a chunk of items to be processed remotely as part of a step execution.
+ *
  * @author Dave Syer
- * 
  * @param <T> the type of the items to process
  */
 public class ChunkRequest<T> implements Serializable {

@@ -1,6 +1,6 @@
 /**
- * Support classes for implementations of the batch APIs. Things like converters and resource location and management
- * concerns.
+ * Support classes for implementations of the batch APIs. Things like converters and
+ * resource location and management concerns.
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine

@@ -45,12 +45,14 @@ public class Neo4jItemWriterBuilderTests {
 
 	@Mock
 	private SessionFactory sessionFactory;
+
 	@Mock
 	private Session session;
 
 	@Test
-	public void testBasicWriter() throws Exception{
-		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().sessionFactory(this.sessionFactory).build();
+	public void testBasicWriter() throws Exception {
+		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().sessionFactory(this.sessionFactory)
+				.build();
 		List<String> items = new ArrayList<>();
 		items.add("foo");
 		items.add("bar");
@@ -65,8 +67,9 @@ public class Neo4jItemWriterBuilderTests {
 	}
 
 	@Test
-	public void testBasicDelete() throws Exception{
-		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().delete(true).sessionFactory(this.sessionFactory).build();
+	public void testBasicDelete() throws Exception {
+		Neo4jItemWriter<String> writer = new Neo4jItemWriterBuilder<String>().delete(true)
+				.sessionFactory(this.sessionFactory).build();
 		List<String> items = new ArrayList<>();
 		items.add("foo");
 		items.add("bar");
@@ -85,7 +88,8 @@ public class Neo4jItemWriterBuilderTests {
 		try {
 			new Neo4jItemWriterBuilder<String>().build();
 			fail("SessionFactory was not set but exception was not thrown.");
-		} catch (IllegalArgumentException iae) {
+		}
+		catch (IllegalArgumentException iae) {
 			assertEquals("sessionFactory is required.", iae.getMessage());
 		}
 	}

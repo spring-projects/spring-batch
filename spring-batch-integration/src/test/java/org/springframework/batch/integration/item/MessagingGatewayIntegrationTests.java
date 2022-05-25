@@ -34,12 +34,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test case showing the use of a MessagingGateway to provide an ItemWriter or
- * ItemProcessor to Spring Batch that is hooked directly into a Spring
- * Integration MessageChannel.
- * 
+ * ItemProcessor to Spring Batch that is hooked directly into a Spring Integration
+ * MessageChannel.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -78,17 +78,17 @@ public class MessagingGatewayIntegrationTests {
 	}
 
 	/**
-	 * This service is wrapped into an ItemProcessor and used to transform
-	 * items. This is where the main business processing could take place in a
-	 * real application. To suppress output the service activator can just
-	 * return null (same as an ItemProcessor) but remember to set the reply
-	 * timeout in the gateway.
-	 * 
+	 * This service is wrapped into an ItemProcessor and used to transform items. This is
+	 * where the main business processing could take place in a real application. To
+	 * suppress output the service activator can just return null (same as an
+	 * ItemProcessor) but remember to set the reply timeout in the gateway.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	@MessageEndpoint
 	public static class Activator {
+
 		private int count;
 
 		@ServiceActivator
@@ -98,19 +98,20 @@ public class MessagingGatewayIntegrationTests {
 			}
 			return input + ": " + (count++);
 		}
+
 	}
 
 	/**
-	 * The Splitter is wrapped into an ItemWriter and used to relay items to its
-	 * output channel. This one is completely trivial, it just passes the items
-	 * on as they are. More complex splitters might filter or enhance the items
-	 * before passing them on.
-	 * 
+	 * The Splitter is wrapped into an ItemWriter and used to relay items to its output
+	 * channel. This one is completely trivial, it just passes the items on as they are.
+	 * More complex splitters might filter or enhance the items before passing them on.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	@MessageEndpoint
 	public static class SplitService {
+
 		// Just for assertions in the test case
 		private int count;
 
@@ -119,18 +120,20 @@ public class MessagingGatewayIntegrationTests {
 			count += input.size();
 			return input;
 		}
+
 	}
 
 	/**
-	 * This is just used to trap the messages sent by the ItemWriter and make an
-	 * assertion about them in the test case. In a real application this
-	 * would be the output stage and/or business processing.
-	 * 
+	 * This is just used to trap the messages sent by the ItemWriter and make an assertion
+	 * about them in the test case. In a real application this would be the output stage
+	 * and/or business processing.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	@MessageEndpoint
 	public static class EndService {
+
 		private int count;
 
 		@ServiceActivator
@@ -138,6 +141,7 @@ public class MessagingGatewayIntegrationTests {
 			count++;
 			return;
 		}
+
 	}
 
 }

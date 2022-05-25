@@ -53,17 +53,16 @@ import org.springframework.util.Assert;
 import java.util.concurrent.Semaphore;
 
 /**
- * Simple implementation of executing the step as a call to a {@link Tasklet},
- * possibly repeated, and each call surrounded by a transaction. The structure
- * is therefore that of a loop with transaction boundary inside the loop. The
- * loop is controlled by the step operations (
- * {@link #setStepOperations(RepeatOperations)}).<br>
+ * Simple implementation of executing the step as a call to a {@link Tasklet}, possibly
+ * repeated, and each call surrounded by a transaction. The structure is therefore that of
+ * a loop with transaction boundary inside the loop. The loop is controlled by the step
+ * operations ( {@link #setStepOperations(RepeatOperations)}).<br>
  * <br>
  *
- * Clients can use interceptors in the step operations to intercept or listen to
- * the iteration on a step-wide basis, for instance to get a callback when the
- * step is complete. Those that want callbacks at the level of an individual
- * tasks, can specify interceptors for the chunk operations.
+ * Clients can use interceptors in the step operations to intercept or listen to the
+ * iteration on a step-wide basis, for instance to get a callback when the step is
+ * complete. Those that want callbacks at the level of an individual tasks, can specify
+ * interceptors for the chunk operations.
  *
  * @author Dave Syer
  * @author Lucas Ward
@@ -119,8 +118,7 @@ public class TaskletStep extends AbstractStep {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
+	 * @see org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -130,7 +128,6 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
-	 *
 	 * @param transactionManager the transaction manager to set
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -139,7 +136,6 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link TransactionAttribute}.
-	 *
 	 * @param transactionAttribute the {@link TransactionAttribute} to set
 	 */
 	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
@@ -148,7 +144,6 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Public setter for the {@link Tasklet}.
-	 *
 	 * @param tasklet the {@link Tasklet} to set
 	 */
 	public void setTasklet(Tasklet tasklet) {
@@ -159,9 +154,8 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Register a chunk listener for callbacks at the appropriate stages in a
-	 * step execution.
-	 *
+	 * Register a chunk listener for callbacks at the appropriate stages in a step
+	 * execution.
 	 * @param listener a {@link ChunkListener}
 	 */
 	public void registerChunkListener(ChunkListener listener) {
@@ -170,7 +164,6 @@ public class TaskletStep extends AbstractStep {
 
 	/**
 	 * Register each of the objects as listeners.
-	 *
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setChunkListeners(ChunkListener[] listeners) {
@@ -180,14 +173,12 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the streams for callbacks at the appropriate time in the
-	 * step. The {@link ItemReader} and {@link ItemWriter} are automatically
-	 * registered, but it doesn't hurt to also register them here. Injected
-	 * dependencies of the reader and writer are not automatically registered,
-	 * so if you implement {@link ItemWriter} using delegation to another object
-	 * which itself is a {@link ItemStream}, you need to register the delegate
-	 * here.
-	 *
+	 * Register each of the streams for callbacks at the appropriate time in the step. The
+	 * {@link ItemReader} and {@link ItemWriter} are automatically registered, but it
+	 * doesn't hurt to also register them here. Injected dependencies of the reader and
+	 * writer are not automatically registered, so if you implement {@link ItemWriter}
+	 * using delegation to another object which itself is a {@link ItemStream}, you need
+	 * to register the delegate here.
 	 * @param streams an array of {@link ItemStream} objects.
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -197,9 +188,7 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Register a single {@link ItemStream} for callbacks to the stream
-	 * interface.
-	 *
+	 * Register a single {@link ItemStream} for callbacks to the stream interface.
 	 * @param stream instance of {@link ItemStream}
 	 */
 	public void registerStream(ItemStream stream) {
@@ -207,10 +196,9 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the outer loop of the batch
-	 * processing. Should be set up by the caller through a factory. Defaults to
-	 * a plain {@link RepeatTemplate}.
-	 *
+	 * The {@link RepeatOperations} to use for the outer loop of the batch processing.
+	 * Should be set up by the caller through a factory. Defaults to a plain
+	 * {@link RepeatTemplate}.
 	 * @param stepOperations a {@link RepeatOperations} instance.
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
@@ -218,10 +206,8 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
-	 * check whether an external request has been made to interrupt the job
-	 * execution.
-	 *
+	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to check whether
+	 * an external request has been made to interrupt the job execution.
 	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
@@ -229,17 +215,15 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Process the step and update its context so that progress can be monitored
-	 * by the caller. The step is broken down into chunks, each one executing in
-	 * a transaction. The step and its execution and execution context are all
-	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
-	 * used to store the result. Various reporting information are also added to
-	 * the current context governing the step execution, which would normally be
-	 * available to the caller through the step's {@link ExecutionContext}.<br>
-	 *
+	 * Process the step and update its context so that progress can be monitored by the
+	 * caller. The step is broken down into chunks, each one executing in a transaction.
+	 * The step and its execution and execution context are all given an up to date
+	 * {@link BatchStatus}, and the {@link JobRepository} is used to store the result.
+	 * Various reporting information are also added to the current context governing the
+	 * step execution, which would normally be available to the caller through the step's
+	 * {@link ExecutionContext}.<br>
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
-	 * @throws RuntimeException if there is an exception during a chunk
-	 * execution
+	 * @throws RuntimeException if there is an exception during a chunk execution
 	 *
 	 */
 	@Override
@@ -269,7 +253,7 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result;
 				try {
 					result = new TransactionTemplate(transactionManager, transactionAttribute)
-					.execute(new ChunkTransactionCallback(chunkContext, semaphore));
+							.execute(new ChunkTransactionCallback(chunkContext, semaphore));
 				}
 				catch (UncheckedTransactionException e) {
 					// Allow checked exceptions to be thrown inside callback
@@ -291,9 +275,8 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Extension point mainly for test purposes so that the behaviour of the
-	 * lock can be manipulated to simulate various pathologies.
-	 *
+	 * Extension point mainly for test purposes so that the behaviour of the lock can be
+	 * manipulated to simulate various pathologies.
 	 * @return a semaphore for locking access to the JobRepository
 	 */
 	protected Semaphore createSemaphore() {
@@ -319,10 +302,10 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * A callback for the transactional work inside a chunk. Also detects
-	 * failures in the transaction commit and rollback, only panicking if the
-	 * transaction status is unknown (i.e. if a commit failure leads to a clean
-	 * rollback then we assume the state is consistent).
+	 * A callback for the transactional work inside a chunk. Also detects failures in the
+	 * transaction commit and rollback, only panicking if the transaction status is
+	 * unknown (i.e. if a commit failure leads to a clean rollback then we assume the
+	 * state is consistent).
 	 *
 	 * @author Dave Syer
 	 *
@@ -506,4 +489,5 @@ public class TaskletStep extends AbstractStep {
 		}
 
 	}
+
 }

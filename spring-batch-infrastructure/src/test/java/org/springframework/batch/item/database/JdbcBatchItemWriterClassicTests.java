@@ -53,8 +53,8 @@ public class JdbcBatchItemWriterClassicTests {
 	public void setUp() throws Exception {
 		ps = mock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
-            @Override
-            public <T> T execute(String sql, PreparedStatementCallback<T> action) throws DataAccessException {
+			@Override
+			public <T> T execute(String sql, PreparedStatementCallback<T> action) throws DataAccessException {
 				list.add(sql);
 				try {
 					return action.doInPreparedStatement(ps);
@@ -67,7 +67,7 @@ public class JdbcBatchItemWriterClassicTests {
 		writer.setSql("SQL");
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
-            @Override
+			@Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}
@@ -91,7 +91,8 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain ' NamedParameterJdbcTemplate'.", message.indexOf("NamedParameterJdbcTemplate") >= 0);
+			assertTrue("Message does not contain ' NamedParameterJdbcTemplate'.",
+					message.indexOf("NamedParameterJdbcTemplate") >= 0);
 		}
 		writer.setJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate));
 		try {
@@ -111,16 +112,15 @@ public class JdbcBatchItemWriterClassicTests {
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'ItemPreparedStatementSetter'.", message.indexOf("ItemPreparedStatementSetter") >= 0);
+			assertTrue("Message does not contain 'ItemPreparedStatementSetter'.",
+					message.indexOf("ItemPreparedStatementSetter") >= 0);
 		}
-		writer.setItemPreparedStatementSetter(
-				new ItemPreparedStatementSetter<String>() {
-                    @Override
-					public void setValues(String item, PreparedStatement ps)
-							throws SQLException {
-					}
-					
-				});
+		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+			@Override
+			public void setValues(String item, PreparedStatement ps) throws SQLException {
+			}
+
+		});
 		writer.afterPropertiesSet();
 	}
 
@@ -154,7 +154,7 @@ public class JdbcBatchItemWriterClassicTests {
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
-            @Override
+			@Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 				throw ex;
@@ -171,7 +171,7 @@ public class JdbcBatchItemWriterClassicTests {
 		}
 		assertEquals(2, list.size());
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
-            @Override
+			@Override
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}

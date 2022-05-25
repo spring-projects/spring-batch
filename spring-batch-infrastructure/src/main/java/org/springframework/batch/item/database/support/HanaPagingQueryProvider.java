@@ -20,7 +20,8 @@ import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.util.StringUtils;
 
 /**
- * SAP HANA implementation of a {@link PagingQueryProvider} using database specific features.
+ * SAP HANA implementation of a {@link PagingQueryProvider} using database specific
+ * features.
  *
  * @author Jonathan Bregler
  * @since 5.0
@@ -34,7 +35,7 @@ public class HanaPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
 		}
 		else {
@@ -50,7 +51,7 @@ public class HanaPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 		String limitClause = new StringBuilder().append("LIMIT 1 OFFSET ").append(offset).toString();
 		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}

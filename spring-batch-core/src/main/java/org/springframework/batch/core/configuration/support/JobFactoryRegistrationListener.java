@@ -24,11 +24,10 @@ import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 
 /**
- * Generic service that can bind and unbind a {@link JobFactory} in a
- * {@link JobRegistry}.
- * 
+ * Generic service that can bind and unbind a {@link JobFactory} in a {@link JobRegistry}.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobFactoryRegistrationListener {
 
@@ -37,9 +36,7 @@ public class JobFactoryRegistrationListener {
 	private JobRegistry jobRegistry;
 
 	/**
-	 * Public setter for a {@link JobRegistry} to use for all the bind and
-	 * unbind events.
-	 * 
+	 * Public setter for a {@link JobRegistry} to use for all the bind and unbind events.
 	 * @param jobRegistry {@link JobRegistry}
 	 */
 	public void setJobRegistry(JobRegistry jobRegistry) {
@@ -47,8 +44,7 @@ public class JobFactoryRegistrationListener {
 	}
 
 	/**
-	 * Take the {@link JobFactory} provided and register it with the
-	 * {@link JobRegistry}.
+	 * Take the {@link JobFactory} provided and register it with the {@link JobRegistry}.
 	 * @param jobFactory a {@link JobFactory}
 	 * @param params not needed by this listener.
 	 * @throws Exception if there is a problem

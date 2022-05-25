@@ -25,24 +25,24 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.lang.Nullable;
 
 /**
- * An {@link ItemReader} that delivers a list as its item, storing up objects
- * from the injected {@link ItemReader} until they are ready to be packed out as
- * a collection. This class must be used as a wrapper for a custom
- * {@link ItemReader} that can identify the record boundaries. The custom reader
- * should mark the beginning and end of records by returning an
- * {@link AggregateItem} which responds true to its query methods
- * <code>is*()</code>.<br><br>
- * 
- * This class is thread-safe (it can be used concurrently by multiple threads)
- * as long as the {@link ItemReader} is also thread-safe.
- * 
+ * An {@link ItemReader} that delivers a list as its item, storing up objects from the
+ * injected {@link ItemReader} until they are ready to be packed out as a collection. This
+ * class must be used as a wrapper for a custom {@link ItemReader} that can identify the
+ * record boundaries. The custom reader should mark the beginning and end of records by
+ * returning an {@link AggregateItem} which responds true to its query methods
+ * <code>is*()</code>.<br>
+ * <br>
+ *
+ * This class is thread-safe (it can be used concurrently by multiple threads) as long as
+ * the {@link ItemReader} is also thread-safe.
+ *
  * @see AggregateItem#isHeader()
  * @see AggregateItem#isFooter()
- * 
  * @author Dave Syer
- * 
+ *
  */
 public class AggregateItemReader<T> implements ItemReader<List<T>> {
+
 	private static final Log LOG = LogFactory.getLog(AggregateItemReader.class);
 
 	private ItemReader<AggregateItem<T>> itemReader;
@@ -102,14 +102,15 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	}
 
 	/**
-	 * Private class for temporary state management while item is being
-	 * collected.
-	 * 
+	 * Private class for temporary state management while item is being collected.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private class ResultHolder {
+
 		private List<T> records = new ArrayList<>();
+
 		private boolean exhausted = false;
 
 		public List<T> getRecords() {
@@ -127,5 +128,7 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 		public void setExhausted(boolean exhausted) {
 			this.exhausted = exhausted;
 		}
+
 	}
+
 }

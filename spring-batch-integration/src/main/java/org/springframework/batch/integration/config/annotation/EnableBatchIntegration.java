@@ -29,24 +29,25 @@ import org.springframework.context.annotation.Import;
 import org.springframework.integration.config.EnableIntegration;
 
 /**
- * Enable Spring Batch Integration features and provide a base configuration for
- * setting up remote chunking or partitioning infrastructure beans.
+ * Enable Spring Batch Integration features and provide a base configuration for setting
+ * up remote chunking or partitioning infrastructure beans.
  *
- * By adding this annotation on a {@link org.springframework.context.annotation.Configuration}
- * class, it will be possible to autowire the following beans:
+ * By adding this annotation on a
+ * {@link org.springframework.context.annotation.Configuration} class, it will be possible
+ * to autowire the following beans:
  *
  * <ul>
- *     <li>{@link RemoteChunkingManagerStepBuilderFactory}:
- *     used to create a manager step of a remote chunking setup by automatically
- *     setting the job repository and transaction manager.</li>
- *     <li>{@link RemoteChunkingWorkerBuilder}: used to create the integration
- *     flow on the worker side of a remote chunking setup.</li>
- *     <li>{@link RemotePartitioningManagerStepBuilderFactory}: used to create
- *     a manager step of a remote partitioning setup by automatically setting
- *     the job repository, job explorer, bean factory and transaction manager.</li>
- *     <li>{@link RemotePartitioningWorkerStepBuilderFactory}: used to create
- *     a worker step of a remote partitioning setup by automatically setting
- *     the job repository, job explorer, bean factory and transaction manager.</li>
+ * <li>{@link RemoteChunkingManagerStepBuilderFactory}: used to create a manager step of a
+ * remote chunking setup by automatically setting the job repository and transaction
+ * manager.</li>
+ * <li>{@link RemoteChunkingWorkerBuilder}: used to create the integration flow on the
+ * worker side of a remote chunking setup.</li>
+ * <li>{@link RemotePartitioningManagerStepBuilderFactory}: used to create a manager step
+ * of a remote partitioning setup by automatically setting the job repository, job
+ * explorer, bean factory and transaction manager.</li>
+ * <li>{@link RemotePartitioningWorkerStepBuilderFactory}: used to create a worker step of
+ * a remote partitioning setup by automatically setting the job repository, job explorer,
+ * bean factory and transaction manager.</li>
  * </ul>
  *
  * For remote chunking, an example of a configuration class would be:
@@ -140,4 +141,5 @@ import org.springframework.integration.config.EnableIntegration;
 @EnableIntegration
 @Import(BatchIntegrationConfiguration.class)
 public @interface EnableBatchIntegration {
+
 }

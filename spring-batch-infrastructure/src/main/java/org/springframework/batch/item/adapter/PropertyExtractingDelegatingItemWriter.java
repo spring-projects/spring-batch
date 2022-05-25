@@ -25,22 +25,20 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.Assert;
 
 /**
- * Delegates processing to a custom method - extracts property values from item
- * object and uses them as arguments for the delegate method.
+ * Delegates processing to a custom method - extracts property values from item object and
+ * uses them as arguments for the delegate method.
  *
  * @see ItemWriterAdapter
- *
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T> implements
-ItemWriter<T> {
+public class PropertyExtractingDelegatingItemWriter<T> extends AbstractMethodInvokingDelegator<T>
+		implements ItemWriter<T> {
 
 	private String[] fieldsUsedAsTargetMethodArguments;
 
 	/**
-	 * Extracts values from item's fields named in
-	 * fieldsUsedAsTargetMethodArguments and passes them as arguments to the
-	 * delegate method.
+	 * Extracts values from item's fields named in fieldsUsedAsTargetMethodArguments and
+	 * passes them as arguments to the delegate method.
 	 */
 	@Override
 	public void write(List<? extends T> items) throws Exception {
@@ -66,13 +64,13 @@ ItemWriter<T> {
 	}
 
 	/**
-	 * @param fieldsUsedAsMethodArguments the values of the these item's fields
-	 * will be used as arguments for the delegate method. Nested property values
-	 * are supported, e.g. <code>address.city</code>
+	 * @param fieldsUsedAsMethodArguments the values of the these item's fields will be
+	 * used as arguments for the delegate method. Nested property values are supported,
+	 * e.g. <code>address.city</code>
 	 */
 	public void setFieldsUsedAsTargetMethodArguments(String[] fieldsUsedAsMethodArguments) {
-		this.fieldsUsedAsTargetMethodArguments = Arrays.asList(fieldsUsedAsMethodArguments).toArray(
-				new String[fieldsUsedAsMethodArguments.length]);
+		this.fieldsUsedAsTargetMethodArguments = Arrays.asList(fieldsUsedAsMethodArguments)
+				.toArray(new String[fieldsUsedAsMethodArguments.length]);
 	}
 
 }

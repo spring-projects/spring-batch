@@ -18,7 +18,9 @@ import org.springframework.context.annotation.Configuration;
 public class Job2Configuration {
 
 	private Random random;
+
 	private JobBuilderFactory jobs;
+
 	private StepBuilderFactory steps;
 
 	public Job2Configuration(JobBuilderFactory jobs, StepBuilderFactory steps) {
@@ -29,18 +31,12 @@ public class Job2Configuration {
 
 	@Bean
 	public Job job2() {
-		return jobs.get("job2")
-				.start(step())
-				.build();
+		return jobs.get("job2").start(step()).build();
 	}
 
 	@Bean
 	public Step step() {
-		return steps.get("step1")
-				.<Integer, Integer>chunk(3)
-				.reader(itemReader())
-				.writer(itemWriter())
-				.build();
+		return steps.get("step1").<Integer, Integer>chunk(3).reader(itemReader()).writer(itemWriter()).build();
 	}
 
 	@Bean

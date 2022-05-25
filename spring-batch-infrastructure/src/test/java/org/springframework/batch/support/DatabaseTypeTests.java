@@ -37,10 +37,9 @@ import static org.springframework.batch.support.DatabaseType.HANA;
 import static org.springframework.batch.support.DatabaseType.fromProductName;
 
 /**
- * 
  * @author Lucas Ward
  * @author Will Schipp
- * 
+ *
  */
 public class DatabaseTypeTests {
 
@@ -144,14 +143,14 @@ public class DatabaseTypeTests {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Adaptive Server Enterprise");
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
 	}
-	
+
 	@Test
 	public void testFromMetaDataForHana() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HDB");
 		assertEquals(HANA, DatabaseType.fromMetaData(ds));
 	}
 
-	@Test(expected=MetaDataAccessException.class)
+	@Test(expected = MetaDataAccessException.class)
 	public void testBadMetaData() throws Exception {
 		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));

@@ -22,7 +22,7 @@ import org.springframework.batch.core.annotation.AfterWrite;
 public class TestPojoListener extends AbstractTestComponent {
 
 	@AfterWrite
-	public void after(List<Object> items){
+	public void after(List<Object> items) {
 		executed = true;
 	}
 

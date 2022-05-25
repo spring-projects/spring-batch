@@ -40,18 +40,26 @@ public class JdbcParameterUtilsTests {
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders(":parameter", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The \"big\" :parameter 'bad wolf'", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The big :parameter :parameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter :newpar :parameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, :newpar, :parameter bad wolf", null));
+		assertEquals(2,
+				JdbcParameterUtils.countParameterPlaceholders("The big :parameter :newpar :parameter bad wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big :parameter, :newpar, :parameter bad wolf", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The \"big:\" 'ba''ad:p' :parameter wolf", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("&parameter", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The \"big\" &parameter 'bad wolf'", null));
 		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The big &parameter &parameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big &parameter &newparameter &parameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big &parameter, &newparameter, &parameter bad wolf", null));
-		assertEquals(1, JdbcParameterUtils.countParameterPlaceholders("The \"big &x  \" 'ba''ad&p' &parameter wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, &newparameter, &parameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, &sameparameter, &sameparameter bad wolf", null));
-		assertEquals(2, JdbcParameterUtils.countParameterPlaceholders("The big :parameter, :sameparameter, :sameparameter bad wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big &parameter &newparameter &parameter bad wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big &parameter, &newparameter, &parameter bad wolf", null));
+		assertEquals(1,
+				JdbcParameterUtils.countParameterPlaceholders("The \"big &x  \" 'ba''ad&p' &parameter wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big :parameter, &newparameter, &parameter bad wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big :parameter, &sameparameter, &sameparameter bad wolf", null));
+		assertEquals(2, JdbcParameterUtils
+				.countParameterPlaceholders("The big :parameter, :sameparameter, :sameparameter bad wolf", null));
 		assertEquals(0, JdbcParameterUtils.countParameterPlaceholders("xxx & yyy", null));
 		List<String> l = new ArrayList<>();
 		assertEquals(3, JdbcParameterUtils.countParameterPlaceholders("select :par1, :par2 :par3", l));

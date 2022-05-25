@@ -62,9 +62,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	private boolean embedSchema = true;
 
-
 	/**
-	 *
 	 * @param resource a {@link WritableResource} to which the objects will be serialized.
 	 * @param schema a {@link Resource} containing the Avro schema.
 	 * @param clazz the data type to be serialized.
@@ -77,7 +75,6 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 
 	/**
 	 * This constructor will create an ItemWriter that does not embedded Avro schema.
-	 *
 	 * @param resource a {@link WritableResource} to which the objects will be serialized.
 	 * @param clazz the data type to be serialized.
 	 */
@@ -111,7 +108,8 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		super.open(executionContext);
 		try {
 			initializeWriter();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new ItemStreamException(e.getMessage(), e);
 		}
 	}
@@ -131,7 +129,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 		}
 	}
 
-	private void  initializeWriter() throws IOException {
+	private void initializeWriter() throws IOException {
 		Assert.notNull(this.resource, "'resource' is required.");
 		Assert.notNull(this.clazz, "'class' is required.");
 
@@ -142,12 +140,14 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 			Schema schema;
 			try {
 				schema = new Schema.Parser().parse(this.schemaResource.getInputStream());
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new IllegalArgumentException(e.getMessage(), e);
 			}
 			this.dataFileWriter = new DataFileWriter<>(datumWriterForClass(this.clazz));
 			this.dataFileWriter.create(schema, this.resource.getOutputStream());
-		} else {
+		}
+		else {
 			this.outputStreamWriter = createOutputStreamWriter(this.resource.getOutputStream(),
 					datumWriterForClass(this.clazz));
 		}
@@ -155,7 +155,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	}
 
 	private static <T> DatumWriter<T> datumWriterForClass(Class<T> clazz) {
-		if (SpecificRecordBase.class.isAssignableFrom(clazz)){
+		if (SpecificRecordBase.class.isAssignableFrom(clazz)) {
 			return new SpecificDatumWriter<>(clazz);
 		}
 		if (GenericRecord.class.isAssignableFrom(clazz)) {
@@ -170,6 +170,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 	}
 
 	private static class OutputStreamWriter<T> {
+
 		private final DatumWriter<T> datumWriter;
 
 		private final BinaryEncoder binaryEncoder;
@@ -195,5 +196,7 @@ public class AvroItemWriter<T> extends AbstractItemStreamItemWriter<T> {
 				throw new ItemStreamException(e.getMessage(), e);
 			}
 		}
+
 	}
+
 }

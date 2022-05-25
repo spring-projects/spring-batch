@@ -37,7 +37,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -55,7 +55,7 @@ public class JobParserValidatorTests {
 	@Qualifier("job3")
 	private Job job3;
 
-	@Test(expected=JobParametersInvalidException.class)
+	@Test(expected = JobParametersInvalidException.class)
 	public void testValidatorAttribute() throws Exception {
 		assertNotNull(job1);
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job1,
@@ -64,7 +64,7 @@ public class JobParserValidatorTests {
 		validator.validate(new JobParameters());
 	}
 
-	@Test(expected=JobParametersInvalidException.class)
+	@Test(expected = JobParametersInvalidException.class)
 	public void testValidatorRef() throws Exception {
 		assertNotNull(job2);
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job2,
@@ -73,7 +73,7 @@ public class JobParserValidatorTests {
 		validator.validate(new JobParameters());
 	}
 
-	@Test(expected=JobParametersInvalidException.class)
+	@Test(expected = JobParametersInvalidException.class)
 	public void testValidatorBean() throws Exception {
 		assertNotNull(job3);
 		JobParametersValidator validator = (JobParametersValidator) ReflectionTestUtils.getField(job3,

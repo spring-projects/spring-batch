@@ -25,7 +25,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * An {@link ItemReader} that pulls data from a list. Useful for testing.
- * 
+ *
  * @author Dave Syer
  * @author jojoldu
  *
@@ -45,7 +45,7 @@ public class ListItemReader<T> implements ItemReader<T> {
 		}
 	}
 
-    @Nullable
+	@Nullable
 	@Override
 	public T read() {
 		if (!list.isEmpty()) {

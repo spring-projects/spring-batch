@@ -26,10 +26,10 @@ import org.springframework.util.Assert;
  * Creates a fully qualified MappingLdifReader.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
-public class MappingLdifReaderBuilder<T>  {
+public class MappingLdifReaderBuilder<T> {
+
 	private Resource resource;
 
 	private int recordsToSkip = 0;
@@ -49,10 +49,9 @@ public class MappingLdifReaderBuilder<T>  {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -66,7 +65,6 @@ public class MappingLdifReaderBuilder<T>  {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -79,7 +77,6 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -92,7 +89,6 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -107,7 +103,6 @@ public class MappingLdifReaderBuilder<T>  {
 	 * In strict mode the reader will throw an exception on
 	 * {@link MappingLdifReader#open(org.springframework.batch.item.ExecutionContext)} if
 	 * the input resource does not exist.
-	 *
 	 * @param strict true by default
 	 * @return this instance for method chaining.
 	 * @see MappingLdifReader#setStrict(boolean)
@@ -121,7 +116,6 @@ public class MappingLdifReaderBuilder<T>  {
 	/**
 	 * {@link RecordCallbackHandler RecordCallbackHandler} implementations can be used to
 	 * take action on skipped records.
-	 *
 	 * @param skippedRecordsCallback will be called for each one of the initial skipped
 	 * lines before any items are read.
 	 * @return this instance for method chaining.
@@ -137,7 +131,6 @@ public class MappingLdifReaderBuilder<T>  {
 	 * Public setter for the number of lines to skip at the start of a file. Can be used
 	 * if the file contains a header without useful (column name) information, and without
 	 * a comment delimiter at the beginning of the lines.
-	 *
 	 * @param recordsToSkip the number of lines to skip
 	 * @return this instance for method chaining.
 	 * @see MappingLdifReader#setRecordsToSkip(int)
@@ -150,7 +143,6 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Establishes the resource that will be used as the input for the MappingLdifReader.
-	 *
 	 * @param resource the resource that will be read.
 	 * @return this instance for method chaining.
 	 * @see MappingLdifReader#setResource(Resource)
@@ -163,7 +155,6 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Setter for object mapper. This property is required to be set.
-	 *
 	 * @param recordMapper maps record to an object
 	 * @return this instance for method chaining.
 	 */
@@ -175,7 +166,6 @@ public class MappingLdifReaderBuilder<T>  {
 
 	/**
 	 * Returns a fully constructed {@link MappingLdifReader}.
-	 *
 	 * @return a new {@link org.springframework.batch.item.ldif.MappingLdifReader}
 	 */
 	public MappingLdifReader<T> build() {
@@ -199,4 +189,5 @@ public class MappingLdifReaderBuilder<T>  {
 
 		return reader;
 	}
+
 }

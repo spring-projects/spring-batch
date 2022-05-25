@@ -40,17 +40,17 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Wrapper for a {@link DataSource} that can run scripts on start up and shut
- * down.  Us as a bean definition <br><br>
- * 
- * Run this class to initialize a database in a running server process.
- * Make sure the server is running first by launching the "hsql-server" from the
- * <code>hsql.server</code> project. Then you can right click in Eclipse and
- * Run As -&gt; Java Application. Do the same any time you want to wipe the
- * database and start again.
- * 
+ * Wrapper for a {@link DataSource} that can run scripts on start up and shut down. Us as
+ * a bean definition <br>
+ * <br>
+ *
+ * Run this class to initialize a database in a running server process. Make sure the
+ * server is running first by launching the "hsql-server" from the
+ * <code>hsql.server</code> project. Then you can right click in Eclipse and Run As -&gt;
+ * Java Application. Do the same any time you want to wipe the database and start again.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
@@ -68,7 +68,6 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 
 	/**
 	 * Main method as convenient entry point.
-	 * 
 	 * @param args
 	 */
 	@SuppressWarnings("resource")
@@ -81,21 +80,22 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 	 * @throws Throwable
 	 * @see java.lang.Object#finalize()
 	 */
-    @Override
+	@Override
 	protected void finalize() throws Throwable {
 		logger.debug("finalize called for " + dataSource);
 		super.finalize();
 		initialized = false;
 	}
 
-    @Override
+	@Override
 	public void destroy() {
 		logger.info("destroy called for " + dataSource);
 		doDestroy();
 	}
 
 	public void doDestroy() {
-		if (destroyScripts==null) return;
+		if (destroyScripts == null)
+			return;
 		for (int i = 0; i < destroyScripts.length; i++) {
 			Resource destroyScript = destroyScripts[i];
 			try {
@@ -112,7 +112,7 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		}
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "A DataSource is required");
 		initialize();
@@ -139,13 +139,13 @@ public class DataSourceInitializer implements InitializingBean, DisposableBean {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback<Void>() {
 
-            @Override
+			@Override
 			@SuppressWarnings("unchecked")
 			public Void doInTransaction(TransactionStatus status) {
 				String[] scripts;
 				try {
-					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-							.getInputStream(), "UTF-8")), ";");
+					scripts = StringUtils.delimitedListToStringArray(
+							stripComments(IOUtils.readLines(scriptResource.getInputStream(), "UTF-8")), ";");
 				}
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);

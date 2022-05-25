@@ -34,28 +34,31 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@link ApplicationContextFactory} implementation that takes a parent context and a path to the context to create.
- * When createApplicationContext method is called, the child {@link ApplicationContext} will be returned. The child
- * context is not re-created every time it is requested, it is lazily initialized and cached. Clients should ensure that
+ * {@link ApplicationContextFactory} implementation that takes a parent context and a path
+ * to the context to create. When createApplicationContext method is called, the child
+ * {@link ApplicationContext} will be returned. The child context is not re-created every
+ * time it is requested, it is lazily initialized and cached. Clients should ensure that
  * it is closed when it is no longer needed.
- * 
+ *
  */
 public class GenericApplicationContextFactory extends AbstractApplicationContextFactory {
 
 	/**
-	 * Create an application context factory for the resource specified. The resource can be an actual {@link Resource},
-	 * in which case it will be interpreted as an XML file, or it can be a &#64;Configuration class, or a package name.
-	 * All types must be the same (mixing XML with a java package for example is not allowed and will result in an
-	 * {@link java.lang.IllegalArgumentException}).
-	 * 
-	 * @param resources some resources (XML configuration files, &#064;Configuration classes or java packages to scan)
+	 * Create an application context factory for the resource specified. The resource can
+	 * be an actual {@link Resource}, in which case it will be interpreted as an XML file,
+	 * or it can be a &#64;Configuration class, or a package name. All types must be the
+	 * same (mixing XML with a java package for example is not allowed and will result in
+	 * an {@link java.lang.IllegalArgumentException}).
+	 * @param resources some resources (XML configuration files, &#064;Configuration
+	 * classes or java packages to scan)
 	 */
 	public GenericApplicationContextFactory(Object... resources) {
 		super(resources);
 	}
 
 	/**
-	 * @see AbstractApplicationContextFactory#createApplicationContext(ConfigurableApplicationContext, Object...)
+	 * @see AbstractApplicationContextFactory#createApplicationContext(ConfigurableApplicationContext,
+	 * Object...)
 	 */
 	@Override
 	protected ConfigurableApplicationContext createApplicationContext(ConfigurableApplicationContext parent,
@@ -63,23 +66,26 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 		ConfigurableApplicationContext context;
 
 		if (allObjectsOfType(resources, Resource.class)) {
-			 context = new ResourceXmlApplicationContext(parent, resources);
-		} else if (allObjectsOfType(resources, Class.class)) {
-			 context =  new ResourceAnnotationApplicationContext(parent, resources);
-		} else if (allObjectsOfType(resources, String.class)) {
-			 context = new ResourceAnnotationApplicationContext(parent, resources);
-		} else {
+			context = new ResourceXmlApplicationContext(parent, resources);
+		}
+		else if (allObjectsOfType(resources, Class.class)) {
+			context = new ResourceAnnotationApplicationContext(parent, resources);
+		}
+		else if (allObjectsOfType(resources, String.class)) {
+			context = new ResourceAnnotationApplicationContext(parent, resources);
+		}
+		else {
 			List<Class<?>> types = new ArrayList<>();
 			for (Object resource : resources) {
 				types.add(resource.getClass());
 			}
-			throw new IllegalArgumentException("No application context could be created for resource types: "
-													   + Arrays.toString(types.toArray()));
+			throw new IllegalArgumentException(
+					"No application context could be created for resource types: " + Arrays.toString(types.toArray()));
 		}
 
 		return context;
 	}
-	
+
 	private boolean allObjectsOfType(Object[] objects, Class<?> type) {
 		for (Object object : objects) {
 			if (!type.isInstance(object)) {
@@ -140,29 +146,32 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 
 			class ResourceXmlApplicationContextHelper extends ApplicationContextHelper {
 
-				ResourceXmlApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+				ResourceXmlApplicationContextHelper(ConfigurableApplicationContext parent,
+						GenericApplicationContext context, Object... config) {
 					super(parent, context, config);
 				}
 
 				@Override
 				protected String generateId(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
-  					try {
- 						List<String> uris = new ArrayList<>();
- 						for (Resource resource : resources) {
- 							uris.add(resource.getURI().toString());
- 						}
- 						return StringUtils.collectionToCommaDelimitedString(uris);
-  					}
-  					catch (IOException e) {
- 						return Arrays.toString(resources);
-  					}
+					try {
+						List<String> uris = new ArrayList<>();
+						for (Resource resource : resources) {
+							uris.add(resource.getURI().toString());
+						}
+						return StringUtils.collectionToCommaDelimitedString(uris);
+					}
+					catch (IOException e) {
+						return Arrays.toString(resources);
+					}
 				}
+
 				@Override
 				protected void loadConfiguration(Object... configs) {
 					Resource[] resources = Arrays.copyOfRange(configs, 0, configs.length, Resource[].class);
 					load(resources);
 				}
+
 			}
 			helper = new ResourceXmlApplicationContextHelper(parent, this, resources);
 			refresh();
@@ -189,7 +198,8 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 
 			class ResourceAnnotationApplicationContextHelper extends ApplicationContextHelper {
 
-				public ResourceAnnotationApplicationContextHelper(ConfigurableApplicationContext parent, GenericApplicationContext context, Object... config) {
+				public ResourceAnnotationApplicationContextHelper(ConfigurableApplicationContext parent,
+						GenericApplicationContext context, Object... config) {
 					super(parent, context, config);
 				}
 
@@ -207,6 +217,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 						return Arrays.toString(configs);
 					}
 				}
+
 				@Override
 				protected void loadConfiguration(Object... configs) {
 					if (allObjectsOfType(configs, Class.class)) {
@@ -218,6 +229,7 @@ public class GenericApplicationContextFactory extends AbstractApplicationContext
 						scan(pkgs);
 					}
 				}
+
 			}
 			helper = new ResourceAnnotationApplicationContextHelper(parent, this, resources);
 			refresh();

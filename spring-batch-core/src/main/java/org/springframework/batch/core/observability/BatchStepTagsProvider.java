@@ -30,4 +30,5 @@ public interface BatchStepTagsProvider extends Observation.KeyValuesProvider<Bat
 	default boolean supportsContext(Observation.Context context) {
 		return context instanceof BatchStepContext;
 	}
+
 }

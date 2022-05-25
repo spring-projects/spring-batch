@@ -57,17 +57,19 @@ public class ReflectionUtilsTests {
 
 		String name = iterator.next().getName();
 
-		if(name.equals("toString")) {
+		if (name.equals("toString")) {
 			toStringFound = true;
-		} else if(name.equals("methodOne")) {
+		}
+		else if (name.equals("methodOne")) {
 			methodOneFound = true;
 		}
 
 		name = iterator.next().getName();
 
-		if(name.equals("toString")) {
+		if (name.equals("toString")) {
 			toStringFound = true;
-		} else if(name.equals("methodOne")) {
+		}
+		else if (name.equals("methodOne")) {
 			methodOneFound = true;
 		}
 
@@ -84,6 +86,7 @@ public class ReflectionUtilsTests {
 		public String toString() {
 			return "AnnotatedClass";
 		}
+
 	}
 
 	public static class AnnotatedSubClass extends AnnotatedClass {
@@ -92,5 +95,7 @@ public class ReflectionUtilsTests {
 		public void methodOne() {
 			System.err.println("This is method 1 in the sub class");
 		}
+
 	}
+
 }

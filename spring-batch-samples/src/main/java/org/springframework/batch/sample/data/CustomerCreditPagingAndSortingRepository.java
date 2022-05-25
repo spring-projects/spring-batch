@@ -22,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface CustomerCreditPagingAndSortingRepository extends PagingAndSortingRepository<CustomerCredit, Long>{
+public interface CustomerCreditPagingAndSortingRepository extends PagingAndSortingRepository<CustomerCredit, Long> {
+
 	Page<CustomerCredit> findByCreditGreaterThan(BigDecimal credit, Pageable request);
+
 }

@@ -24,18 +24,22 @@ import org.aopalliance.intercept.MethodInvocation;
  */
 public class RuntimeExceptionTranslator implements MethodInterceptor {
 
-	/* (non-Javadoc)
-	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.
+	 * MethodInvocation)
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		try {
 			return invocation.proceed();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (e.getClass().getName().startsWith("java")) {
 				throw e;
 			}
-			throw new RuntimeException(e.getClass().getSimpleName()+ ": " + e.getMessage());
+			throw new RuntimeException(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}
 

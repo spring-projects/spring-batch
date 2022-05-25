@@ -21,16 +21,17 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import java.util.Collections;
 
-public class XStreamMarshallingTests extends
-		AbstractStaxEventWriterItemWriterTests {
+public class XStreamMarshallingTests extends AbstractStaxEventWriterItemWriterTests {
 
 	@Override
 	protected Marshaller getMarshaller() throws Exception {
 		XStreamMarshaller marshaller = new XStreamMarshaller();
-//		marshaller.addAlias("trade", Trade.class);
+		// marshaller.addAlias("trade", Trade.class);
 		marshaller.setAliases(Collections.singletonMap("trade", Trade.class));
-		//in XStreamMarshaller.marshalSaxHandlers() method is used SaxWriter, which is configured
-		//to include enclosing document (SaxWriter.includeEnclosingDocument is always set to TRUE) 
+		// in XStreamMarshaller.marshalSaxHandlers() method is used SaxWriter, which is
+		// configured
+		// to include enclosing document (SaxWriter.includeEnclosingDocument is always set
+		// to TRUE)
 		return marshaller;
 	}
 

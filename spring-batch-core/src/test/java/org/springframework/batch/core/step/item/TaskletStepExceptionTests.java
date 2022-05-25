@@ -348,7 +348,7 @@ public class TaskletStepExceptionTests {
 			}
 
 		});
-		
+
 		taskletStep.setTransactionManager(new FailingRollbackTransactionManager());
 
 		jobRepository.setFailOnUpdateExecutionContext(true);
@@ -415,7 +415,7 @@ public class TaskletStepExceptionTests {
 			}
 
 		});
-		
+
 		taskletStep.setTransactionManager(new FailingRollbackTransactionManager());
 
 		jobRepository.setFailOnUpdateStepExecution(1);
@@ -478,6 +478,7 @@ public class TaskletStepExceptionTests {
 		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			throw taskletException;
 		}
+
 	}
 
 	private static class InterruptionListener implements StepExecutionListener {
@@ -486,6 +487,7 @@ public class TaskletStepExceptionTests {
 		public void beforeStep(StepExecution stepExecution) {
 			stepExecution.setTerminateOnly();
 		}
+
 	}
 
 	private static class UpdateCountingJobRepository implements JobRepository {
@@ -579,21 +581,21 @@ public class TaskletStepExceptionTests {
 		}
 
 		@Override
-		public JobInstance createJobInstance(String jobName,
-				JobParameters jobParameters) {
+		public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 			return null;
 		}
 
 	}
-	
+
 	@SuppressWarnings("serial")
 	private static class FailingRollbackTransactionManager extends ResourcelessTransactionManager {
-		
+
 		@Override
 		protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 			super.doRollback(status);
 			throw new RuntimeException("Expected exception in rollback");
-		}		
+		}
+
 	}
 
 }

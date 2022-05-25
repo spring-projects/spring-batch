@@ -45,66 +45,66 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = JpaPagingItemReaderNativeQueryIntegrationTests.JpaConfiguration.class)
 public class JpaPagingItemReaderNativeQueryIntegrationTests extends AbstractPagingItemReaderParameterTests {
-    
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
 
-    @Override
-    protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
 
-        String sqlQuery = "select * from T_FOOS where value >= :limit";
+	@Override
+	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
-        JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
-        
-        //creating a native query provider as it would be created in configuration
-        JpaNativeQueryProvider<Foo> queryProvider= new JpaNativeQueryProvider<>();
-        queryProvider.setSqlQuery(sqlQuery);
-        queryProvider.setEntityClass(Foo.class);
-        queryProvider.afterPropertiesSet();
-        
-        reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
-        reader.setEntityManagerFactory(entityManagerFactory);
-        reader.setPageSize(3);
-        reader.setQueryProvider(queryProvider);
-        reader.afterPropertiesSet();
-        reader.setSaveState(true);
+		String sqlQuery = "select * from T_FOOS where value >= :limit";
 
-        return reader;
-    }
+		JpaPagingItemReader<Foo> reader = new JpaPagingItemReader<>();
 
-    @Configuration
-    public static class JpaConfiguration {
+		// creating a native query provider as it would be created in configuration
+		JpaNativeQueryProvider<Foo> queryProvider = new JpaNativeQueryProvider<>();
+		queryProvider.setSqlQuery(sqlQuery);
+		queryProvider.setEntityClass(Foo.class);
+		queryProvider.afterPropertiesSet();
 
-        @Bean
-        public DataSource dataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.HSQL)
-                    .addScript("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql")
-                    .generateUniqueName(true)
-                    .build();
-        }
+		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 2));
+		reader.setEntityManagerFactory(entityManagerFactory);
+		reader.setPageSize(3);
+		reader.setQueryProvider(queryProvider);
+		reader.afterPropertiesSet();
+		reader.setSaveState(true);
 
-        @Bean
-        public PersistenceUnitManager persistenceUnitManager() {
-            DefaultPersistenceUnitManager persistenceUnitManager = new DefaultPersistenceUnitManager();
-            persistenceUnitManager.setDefaultDataSource(dataSource());
-            persistenceUnitManager.afterPropertiesSet();
-            return persistenceUnitManager;
-        }
+		return reader;
+	}
 
-        @Bean
-        public EntityManagerFactory entityManagerFactory() {
-            LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-            factoryBean.setDataSource(dataSource());
-            factoryBean.setPersistenceUnitManager(persistenceUnitManager());
-            factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-            factoryBean.afterPropertiesSet();
-            return factoryBean.getObject();
-        }
+	@Configuration
+	public static class JpaConfiguration {
 
-        @Bean
-        public PlatformTransactionManager transactionManager() {
-            return new JpaTransactionManager(entityManagerFactory());
-        }
-    }
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
+					.addScript("org/springframework/batch/item/database/init-foo-schema-hsqldb.sql")
+					.generateUniqueName(true).build();
+		}
+
+		@Bean
+		public PersistenceUnitManager persistenceUnitManager() {
+			DefaultPersistenceUnitManager persistenceUnitManager = new DefaultPersistenceUnitManager();
+			persistenceUnitManager.setDefaultDataSource(dataSource());
+			persistenceUnitManager.afterPropertiesSet();
+			return persistenceUnitManager;
+		}
+
+		@Bean
+		public EntityManagerFactory entityManagerFactory() {
+			LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+			factoryBean.setDataSource(dataSource());
+			factoryBean.setPersistenceUnitManager(persistenceUnitManager());
+			factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+			factoryBean.afterPropertiesSet();
+			return factoryBean.getObject();
+		}
+
+		@Bean
+		public PlatformTransactionManager transactionManager() {
+			return new JpaTransactionManager(entityManagerFactory());
+		}
+
+	}
+
 }

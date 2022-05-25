@@ -33,26 +33,35 @@ import org.springframework.util.Assert;
 public class JsonFileItemWriterBuilder<T> {
 
 	private WritableResource resource;
+
 	private JsonObjectMarshaller<T> jsonObjectMarshaller;
+
 	private FlatFileHeaderCallback headerCallback;
+
 	private FlatFileFooterCallback footerCallback;
 
 	private String name;
+
 	private String encoding = JsonFileItemWriter.DEFAULT_CHARSET;
+
 	private String lineSeparator = JsonFileItemWriter.DEFAULT_LINE_SEPARATOR;
 
 	private boolean append = false;
+
 	private boolean forceSync = false;
+
 	private boolean saveState = true;
+
 	private boolean shouldDeleteIfExists = true;
+
 	private boolean shouldDeleteIfEmpty = false;
+
 	private boolean transactional = JsonFileItemWriter.DEFAULT_TRANSACTIONAL;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -66,7 +75,6 @@ public class JsonFileItemWriterBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -78,9 +86,8 @@ public class JsonFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * A flag indicating that changes should be force-synced to disk on flush.  Defaults
-	 * to false.
-	 *
+	 * A flag indicating that changes should be force-synced to disk on flush. Defaults to
+	 * false.
 	 * @param forceSync value to set the flag to
 	 * @return The current instance of the builder.
 	 * @see JsonFileItemWriter#setForceSync(boolean)
@@ -92,9 +99,8 @@ public class JsonFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * String used to separate lines in output.  Defaults to the System property
+	 * String used to separate lines in output. Defaults to the System property
 	 * <code>line.separator</code>.
-	 *
 	 * @param lineSeparator value to use for a line separator
 	 * @return The current instance of the builder.
 	 * @see JsonFileItemWriter#setLineSeparator(String)
@@ -107,7 +113,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * Set the {@link JsonObjectMarshaller} to use to marshal objects to json.
-	 *
 	 * @param jsonObjectMarshaller to use
 	 * @return The current instance of the builder.
 	 * @see JsonFileItemWriter#setJsonObjectMarshaller(JsonObjectMarshaller)
@@ -120,7 +125,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * The {@link WritableResource} to be used as output.
-	 *
 	 * @param resource the output of the writer.
 	 * @return The current instance of the builder.
 	 * @see JsonFileItemWriter#setResource(WritableResource)
@@ -133,7 +137,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * Encoding used for output.
-	 *
 	 * @param encoding encoding type.
 	 * @return The current instance of the builder.
 	 * @see JsonFileItemWriter#setEncoding(String)
@@ -147,7 +150,6 @@ public class JsonFileItemWriterBuilder<T> {
 	/**
 	 * If set to true, once the step is complete, if the resource previously provided is
 	 * empty, it will be deleted.
-	 *
 	 * @param shouldDelete defaults to false
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setShouldDeleteIfEmpty(boolean)
@@ -161,7 +163,6 @@ public class JsonFileItemWriterBuilder<T> {
 	/**
 	 * If set to true, upon the start of the step, if the resource already exists, it will
 	 * be deleted and recreated.
-	 *
 	 * @param shouldDelete defaults to true
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setShouldDeleteIfExists(boolean)
@@ -175,7 +176,6 @@ public class JsonFileItemWriterBuilder<T> {
 	/**
 	 * If set to true and the file exists, the output will be appended to the existing
 	 * file.
-	 *
 	 * @param append defaults to false
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setAppendAllowed(boolean)
@@ -188,7 +188,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * A callback for header processing.
-	 *
 	 * @param callback {@link FlatFileHeaderCallback} implementation
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setHeaderCallback(FlatFileHeaderCallback)
@@ -201,7 +200,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * A callback for footer processing.
-	 *
 	 * @param callback {@link FlatFileFooterCallback} implementation
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setFooterCallback(FlatFileFooterCallback)
@@ -213,8 +211,8 @@ public class JsonFileItemWriterBuilder<T> {
 	}
 
 	/**
-	 * If set to true, the flushing of the buffer is delayed while a transaction is active.
-	 *
+	 * If set to true, the flushing of the buffer is delayed while a transaction is
+	 * active.
 	 * @param transactional defaults to true
 	 * @return The current instance of the builder
 	 * @see JsonFileItemWriter#setTransactional(boolean)
@@ -227,7 +225,6 @@ public class JsonFileItemWriterBuilder<T> {
 
 	/**
 	 * Validate the configuration and build a new {@link JsonFileItemWriter}.
-	 *
 	 * @return a new instance of the {@link JsonFileItemWriter}
 	 */
 	public JsonFileItemWriter<T> build() {
@@ -258,4 +255,5 @@ public class JsonFileItemWriterBuilder<T> {
 
 		return jsonFileItemWriter;
 	}
+
 }

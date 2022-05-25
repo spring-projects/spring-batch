@@ -26,15 +26,14 @@ import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.util.ClassUtils;
 
 /**
- * A re-usable {@link PropertyEditorRegistrar} that can be used wherever one
- * needs to register custom {@link PropertyEditor} instances with a
- * {@link PropertyEditorRegistry} (like a bean wrapper, or a type converter). It
- * is <b>not</b> thread safe, but useful where one is confident that binding or
- * initialisation can only be single threaded (e.g in a standalone application
- * with no threads).
- * 
+ * A re-usable {@link PropertyEditorRegistrar} that can be used wherever one needs to
+ * register custom {@link PropertyEditor} instances with a {@link PropertyEditorRegistry}
+ * (like a bean wrapper, or a type converter). It is <b>not</b> thread safe, but useful
+ * where one is confident that binding or initialisation can only be single threaded (e.g
+ * in a standalone application with no threads).
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
@@ -42,10 +41,10 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	/**
 	 * Register the custom editors with the given registry.
-	 * 
+	 *
 	 * @see org.springframework.beans.PropertyEditorRegistrar#registerCustomEditors(org.springframework.beans.PropertyEditorRegistry)
 	 */
-    @Override
+	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		if (this.customEditors != null) {
 			for (Entry<Class<?>, PropertyEditor> entry : customEditors.entrySet()) {
@@ -56,8 +55,6 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 	/**
 	 * Specify the {@link PropertyEditor custom editors} to register.
-	 * 
-	 * 
 	 * @param customEditors a map of Class to PropertyEditor (or class name to
 	 * PropertyEditor).
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
@@ -75,8 +72,8 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 				requiredType = ClassUtils.resolveClassName(className, getClass().getClassLoader());
 			}
 			else {
-				throw new IllegalArgumentException("Invalid key [" + key
-						+ "] for custom editor: needs to be Class or String.");
+				throw new IllegalArgumentException(
+						"Invalid key [" + key + "] for custom editor: needs to be Class or String.");
 			}
 			PropertyEditor value = entry.getValue();
 			this.customEditors.put(requiredType, value);

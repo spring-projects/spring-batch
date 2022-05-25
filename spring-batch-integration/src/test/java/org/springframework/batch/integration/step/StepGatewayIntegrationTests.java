@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @ContextConfiguration()
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,19 +42,19 @@ public class StepGatewayIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
-	
+
 	@Autowired
 	@Qualifier("job")
 	private Job job;
-	
+
 	@Autowired
 	private TestTasklet tasklet;
-	
+
 	@After
 	public void clear() {
 		tasklet.setFail(false);
 	}
-	
+
 	@Test
 	public void testLaunchJob() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
@@ -65,7 +65,8 @@ public class StepGatewayIntegrationTests {
 	@Test
 	public void testLaunchFailedJob() throws Exception {
 		tasklet.setFail(true);
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("run.id", 2L).toJobParameters());
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 	}

@@ -25,7 +25,6 @@ public class SmokeTests {
 	@Autowired
 	private PollableChannel smokeout;
 
-
 	@Test
 	public void testDummyWithSimpleAssert() throws Exception {
 		assertTrue(true);
@@ -43,12 +42,12 @@ public class SmokeTests {
 
 	@MessageEndpoint
 	static class AnnotatedEndpoint {
-		
+
 		// This has to be static because Spring Integration registers the handler
 		// more than once (every time a test instance is created), but only one of
 		// them will get the message.
 		private volatile static int count = 0;
-		
+
 		@ServiceActivator(inputChannel = "smokein", outputChannel = "smokeout")
 		public String process(String message) {
 			count++;

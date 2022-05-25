@@ -306,9 +306,9 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 	@Test
 	public void testNoRollbackFatalNoRollbackException() throws Exception {
 		// User has asked for no rollback on a fatal exception. What should the
-		// outcome be?  As per BATCH-1333 it is interpreted as not skippable, but
-		// retryable if requested.  Here it was not requested to be retried, but
-		// it was marked as no-rollback.  As per BATCH-1334 this has to be ignored
+		// outcome be? As per BATCH-1333 it is interpreted as not skippable, but
+		// retryable if requested. Here it was not requested to be retried, but
+		// it was marked as no-rollback. As per BATCH-1334 this has to be ignored
 		// so that the failed item can be isolated.
 		writer.setExceptionType(FatalRuntimeException.class);
 		StepExecution stepExecution = launchStep("noRollbackFatal");
@@ -348,8 +348,8 @@ public class FaultTolerantExceptionClassesTests implements ApplicationContextAwa
 		stepsToExecute.add((Step) applicationContext.getBean(stepName));
 		job.setSteps(stepsToExecute);
 
-		JobExecution jobExecution = jobLauncher.run(job, new JobParametersBuilder().addString("uuid",
-				UUID.randomUUID().toString()).toJobParameters());
+		JobExecution jobExecution = jobLauncher.run(job,
+				new JobParametersBuilder().addString("uuid", UUID.randomUUID().toString()).toJobParameters());
 		return jobExecution.getStepExecutions().iterator().next();
 	}
 

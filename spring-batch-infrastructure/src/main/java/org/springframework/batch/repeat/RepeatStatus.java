@@ -21,7 +21,7 @@ public enum RepeatStatus {
 	/**
 	 * Indicates that processing can continue.
 	 */
-	CONTINUABLE(true), 
+	CONTINUABLE(true),
 	/**
 	 * Indicates that processing is finished (either successful or unsuccessful)
 	 */

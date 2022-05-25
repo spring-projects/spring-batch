@@ -32,34 +32,33 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Restartable {@link ItemReader} that reads objects from the graph database Neo4j
- * via a paging technique.
+ * Restartable {@link ItemReader} that reads objects from the graph database Neo4j via a
+ * paging technique.
  * </p>
  *
  * <p>
- * It executes cypher queries built from the statement fragments provided to
- * retrieve the requested data.  The query is executed using paged requests of
- * a size specified in {@link #setPageSize(int)}.  Additional pages are requested
- * as needed when the {@link #read()} method is called.  On restart, the reader
- * will begin again at the same number item it left off at.
+ * It executes cypher queries built from the statement fragments provided to retrieve the
+ * requested data. The query is executed using paged requests of a size specified in
+ * {@link #setPageSize(int)}. Additional pages are requested as needed when the
+ * {@link #read()} method is called. On restart, the reader will begin again at the same
+ * number item it left off at.
  * </p>
  *
  * <p>
- * Performance is dependent on your Neo4J configuration (embedded or remote) as
- * well as page size.  Setting a fairly large page size and using a commit
- * interval that matches the page size should provide better performance.
+ * Performance is dependent on your Neo4J configuration (embedded or remote) as well as
+ * page size. Setting a fairly large page size and using a commit interval that matches
+ * the page size should provide better performance.
  * </p>
  *
  * <p>
  * This implementation is thread-safe between calls to
- * {@link #open(org.springframework.batch.item.ExecutionContext)}, however you
- * should set <code>saveState=false</code> if used in a multi-threaded
- * environment (no restart available).
+ * {@link #open(org.springframework.batch.item.ExecutionContext)}, however you should set
+ * <code>saveState=false</code> if used in a multi-threaded environment (no restart
+ * available).
  * </p>
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- *
  * @deprecated since 5.0 in favor of the item reader from
  * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  */
@@ -71,9 +70,13 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	private SessionFactory sessionFactory;
 
 	private String startStatement;
+
 	private String returnStatement;
+
 	private String matchStatement;
+
 	private String whereStatement;
+
 	private String orderByStatement;
 
 	private Class<T> targetType;
@@ -82,7 +85,6 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 
 	/**
 	 * Optional parameters to be used in the cypher query.
-	 *
 	 * @param parameterValues the parameter values to be used in the cypher query
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
@@ -94,10 +96,8 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
-	 * The start segment of the cypher query.  START is prepended
-	 * to the statement provided and should <em>not</em> be
-	 * included.
-	 *
+	 * The start segment of the cypher query. START is prepended to the statement provided
+	 * and should <em>not</em> be included.
 	 * @param startStatement the start fragment of the cypher query.
 	 */
 	public void setStartStatement(String startStatement) {
@@ -105,10 +105,8 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
-	 * The return statement of the cypher query.  RETURN is prepended
-	 * to the statement provided and should <em>not</em> be
-	 * included
-	 *
+	 * The return statement of the cypher query. RETURN is prepended to the statement
+	 * provided and should <em>not</em> be included
 	 * @param returnStatement the return fragment of the cypher query.
 	 */
 	public void setReturnStatement(String returnStatement) {
@@ -116,10 +114,8 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
-	 * An optional match fragment of the cypher query.  MATCH is
-	 * prepended to the statement provided and should <em>not</em>
-	 * be included.
-	 *
+	 * An optional match fragment of the cypher query. MATCH is prepended to the statement
+	 * provided and should <em>not</em> be included.
 	 * @param matchStatement the match fragment of the cypher query
 	 */
 	public void setMatchStatement(String matchStatement) {
@@ -127,10 +123,8 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
-	 * An optional where fragment of the cypher query.  WHERE is
-	 * prepended to the statement provided and should <em>not</em>
-	 * be included.
-	 *
+	 * An optional where fragment of the cypher query. WHERE is prepended to the statement
+	 * provided and should <em>not</em> be included.
 	 * @param whereStatement where fragment of the cypher query
 	 */
 	public void setWhereStatement(String whereStatement) {
@@ -138,11 +132,9 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	}
 
 	/**
-	 * A list of properties to order the results by.  This is
-	 * required so that subsequent page requests pull back the
-	 * segment of results correctly.  ORDER BY is prepended to
+	 * A list of properties to order the results by. This is required so that subsequent
+	 * page requests pull back the segment of results correctly. ORDER BY is prepended to
 	 * the statement provided and should <em>not</em> be included.
-	 *
 	 * @param orderByStatement order by fragment of the cypher query.
 	 */
 	public void setOrderByStatement(String orderByStatement) {
@@ -163,7 +155,6 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 
 	/**
 	 * The object type to be returned from each call to {@link #read()}
-	 *
 	 * @param targetType the type of object to return.
 	 */
 	public void setTargetType(Class<T> targetType) {
@@ -201,7 +192,7 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Assert.state(sessionFactory != null,"A SessionFactory is required");
+		Assert.state(sessionFactory != null, "A SessionFactory is required");
 		Assert.state(targetType != null, "The type to be returned is required");
 		Assert.state(StringUtils.hasText(startStatement), "A START statement is required");
 		Assert.state(StringUtils.hasText(returnStatement), "A RETURN statement is required");
@@ -213,15 +204,14 @@ public class Neo4jItemReader<T> extends AbstractPaginatedDataItemReader<T> imple
 	protected Iterator<T> doPageRead() {
 		Session session = getSessionFactory().openSession();
 
-		Iterable<T> queryResults = session.query(getTargetType(),
-				generateLimitCypherQuery(),
-				getParameterValues());
+		Iterable<T> queryResults = session.query(getTargetType(), generateLimitCypherQuery(), getParameterValues());
 
-		if(queryResults != null) {
+		if (queryResults != null) {
 			return queryResults.iterator();
 		}
 		else {
 			return new ArrayList<T>().iterator();
 		}
 	}
+
 }

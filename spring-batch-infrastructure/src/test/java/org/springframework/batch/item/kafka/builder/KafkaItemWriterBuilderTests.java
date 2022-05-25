@@ -54,7 +54,8 @@ public class KafkaItemWriterBuilderTests {
 	@Test
 	public void testNullKafkaTemplate() {
 		// given
-		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>().itemKeyMapper(this.itemKeyMapper);
+		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
+				.itemKeyMapper(this.itemKeyMapper);
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -66,7 +67,8 @@ public class KafkaItemWriterBuilderTests {
 	@Test
 	public void testNullItemKeyMapper() {
 		// given
-		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>().kafkaTemplate(this.kafkaTemplate);
+		final KafkaItemWriterBuilder<String, String> builder = new KafkaItemWriterBuilder<String, String>()
+				.kafkaTemplate(this.kafkaTemplate);
 
 		// when
 		final Exception expectedException = Assert.assertThrows(IllegalArgumentException.class, builder::build);
@@ -83,10 +85,7 @@ public class KafkaItemWriterBuilderTests {
 
 		// when
 		KafkaItemWriter<String, String> writer = new KafkaItemWriterBuilder<String, String>()
-				.kafkaTemplate(this.kafkaTemplate)
-				.itemKeyMapper(this.itemKeyMapper)
-				.delete(delete)
-				.timeout(timeout)
+				.kafkaTemplate(this.kafkaTemplate).itemKeyMapper(this.itemKeyMapper).delete(delete).timeout(timeout)
 				.build();
 
 		// then
@@ -102,6 +101,7 @@ public class KafkaItemWriterBuilderTests {
 		public String convert(String source) {
 			return source;
 		}
+
 	}
 
 }

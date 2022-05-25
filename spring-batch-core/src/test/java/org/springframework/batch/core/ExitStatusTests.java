@@ -55,7 +55,6 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -76,7 +75,6 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -86,7 +84,6 @@ public class ExitStatusTests {
 
 	/**
 	 * Test equality of exit statuses.
-	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -141,8 +138,8 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomCompletedAddedToCompleted() {
-		assertEquals("COMPLETED_CUSTOM", ExitStatus.COMPLETED.and(
-				ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
+		assertEquals("COMPLETED_CUSTOM",
+				ExitStatus.COMPLETED.and(ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
 	}
 
 	/**
@@ -199,8 +196,8 @@ public class ExitStatusTests {
 		ExitStatus status = ExitStatus.EXECUTING.addExitDescription(new RuntimeException("Foo"));
 		assertTrue(ExitStatus.EXECUTING != status);
 		String description = status.getExitDescription();
-		assertTrue("Wrong description: "+description, description.contains("Foo"));
-		assertTrue("Wrong description: "+description, description.contains("RuntimeException"));
+		assertTrue("Wrong description: " + description, description.contains("Foo"));
+		assertTrue("Wrong description: " + description, description.contains("RuntimeException"));
 	}
 
 	@Test
@@ -212,7 +209,7 @@ public class ExitStatusTests {
 
 	@Test
 	public void testAddEmptyExitDescription() throws Exception {
-		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription((String)null);
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription((String) null);
 		assertEquals("Foo", status.getExitDescription());
 	}
 
@@ -237,4 +234,5 @@ public class ExitStatusTests {
 		ExitStatus restored = (ExitStatus) object;
 		assertEquals(status.getExitCode(), restored.getExitCode());
 	}
+
 }

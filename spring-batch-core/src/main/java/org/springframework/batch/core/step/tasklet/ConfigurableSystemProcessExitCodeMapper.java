@@ -22,10 +22,10 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
- * Maps exit codes to {@link org.springframework.batch.core.ExitStatus}
- * according to injected map. The injected map is required to contain a value
- * for 'else' key, this value will be returned if the injected map
- * does not contain value for the exit code returned by the system process.
+ * Maps exit codes to {@link org.springframework.batch.core.ExitStatus} according to
+ * injected map. The injected map is required to contain a value for 'else' key, this
+ * value will be returned if the injected map does not contain value for the exit code
+ * returned by the system process.
  *
  * @author Robert Kasanicky
  */
@@ -35,12 +35,13 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 
 	private Map<Object, ExitStatus> mappings;
 
-    @Override
+	@Override
 	public ExitStatus getExitStatus(int exitCode) {
 		ExitStatus exitStatus = mappings.get(exitCode);
 		if (exitStatus != null) {
 			return exitStatus;
-		} else {
+		}
+		else {
 			return mappings.get(ELSE_KEY);
 		}
 	}

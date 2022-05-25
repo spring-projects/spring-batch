@@ -45,47 +45,43 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration
 public class InlineDataSourceDefinitionTests {
 
-    @Test
-    public void testInlineDataSourceDefinition() throws Exception {
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
-        Job job = applicationContext.getBean(Job.class);
-        JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
-        JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-        Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-    }
+	@Test
+	public void testInlineDataSourceDefinition() throws Exception {
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MyJobConfiguration.class);
+		Job job = applicationContext.getBean(Job.class);
+		JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
+		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
+		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+	}
 
-    @Configuration
-    @EnableBatchProcessing
-    static class MyJobConfiguration {
+	@Configuration
+	@EnableBatchProcessing
+	static class MyJobConfiguration {
 
-        private JobBuilderFactory jobs;
-        private StepBuilderFactory steps;
+		private JobBuilderFactory jobs;
 
-        public MyJobConfiguration(JobBuilderFactory jobs, StepBuilderFactory steps) {
-            this.jobs = jobs;
-            this.steps = steps;
-        }
+		private StepBuilderFactory steps;
 
-        @Bean
-        public Job job() {
-            return jobs.get("job")
-                    .start(steps.get("step")
-                            .tasklet((contribution, chunkContext) -> {
-                                System.out.println("hello world");
-                                return RepeatStatus.FINISHED;
-                            })
-                            .build())
-                    .build();
-        }
+		public MyJobConfiguration(JobBuilderFactory jobs, StepBuilderFactory steps) {
+			this.jobs = jobs;
+			this.steps = steps;
+		}
 
-        @Bean
-        public DataSource dataSource() {
-            return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .addScript("/org/springframework/batch/core/schema-drop-h2.sql")
-                    .addScript("/org/springframework/batch/core/schema-h2.sql")
-                    .generateUniqueName(true)
-                    .build();
-        }
-    }
+		@Bean
+		public Job job() {
+			return jobs.get("job").start(steps.get("step").tasklet((contribution, chunkContext) -> {
+				System.out.println("hello world");
+				return RepeatStatus.FINISHED;
+			}).build()).build();
+		}
+
+		@Bean
+		public DataSource dataSource() {
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
+					.addScript("/org/springframework/batch/core/schema-drop-h2.sql")
+					.addScript("/org/springframework/batch/core/schema-h2.sql").generateUniqueName(true).build();
+		}
+
+	}
+
 }

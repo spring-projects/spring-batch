@@ -24,13 +24,13 @@ import org.springframework.lang.Nullable;
 
 /**
  * Generates configurable number of {@link Trade} items.
- * 
+ *
  * @author Robert Kasanicky
  */
 public class GeneratingTradeItemReader implements ItemReader<Trade> {
 
 	private int limit = 1;
-	
+
 	private int counter = 0;
 
 	@Nullable
@@ -38,18 +38,14 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 	public Trade read() throws Exception {
 		if (counter < limit) {
 			counter++;
-			return new Trade(
-					"isin" + counter, 
-					counter, 
-					new BigDecimal(counter), 
-					"customer" + counter);
+			return new Trade("isin" + counter, counter, new BigDecimal(counter), "customer" + counter);
 		}
 		return null;
 	}
 
 	/**
-	 * @param limit number of items that will be generated
-	 * (null returned on consecutive calls).
+	 * @param limit number of items that will be generated (null returned on consecutive
+	 * calls).
 	 */
 	public void setLimit(int limit) {
 		this.limit = limit;
@@ -63,8 +59,8 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 		return limit;
 	}
 
-	public void resetCounter()
-	{
+	public void resetCounter() {
 		this.counter = 0;
 	}
+
 }

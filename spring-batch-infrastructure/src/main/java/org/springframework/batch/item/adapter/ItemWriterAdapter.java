@@ -20,13 +20,11 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
 
-
 /**
- * Delegates item processing to a custom method -
- * passes the item as an argument for the delegate method.
+ * Delegates item processing to a custom method - passes the item as an argument for the
+ * delegate method.
  *
  * @see PropertyExtractingDelegatingItemWriter
- *
  * @author Robert Kasanicky
  */
 public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemWriter<T> {
@@ -39,4 +37,3 @@ public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> imp
 	}
 
 }
-

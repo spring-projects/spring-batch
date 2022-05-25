@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class RecursiveCollectionItemTransformerTests extends TestCase {
 
@@ -34,7 +34,7 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 
 	public void testSetDelegateAndPassInString() throws Exception {
 		aggregator.setDelegate(new LineAggregator<String>() {
-            @Override
+			@Override
 			public String aggregate(String item) {
 				return "bar";
 			}

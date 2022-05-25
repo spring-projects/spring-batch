@@ -20,7 +20,7 @@ import io.micrometer.observation.Observation;
 
 /**
  * {@link Observation.KeyValuesProvider} for {@link BatchJobContext}.
- * 
+ *
  * @author Marcin Grzejszczak
  * @since 5.0
  */
@@ -30,4 +30,5 @@ public interface BatchJobKeyValuesProvider extends Observation.KeyValuesProvider
 	default boolean supportsContext(Observation.Context context) {
 		return context instanceof BatchJobContext;
 	}
+
 }

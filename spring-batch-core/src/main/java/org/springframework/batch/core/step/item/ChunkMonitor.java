@@ -25,10 +25,10 @@ import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
- * Manage the offset data between the last successful commit and updates made to
- * an input chunk. Only works with single threaded steps because it has to use a
- * {@link ThreadLocal} to manage the state and coordinate between the caller
- * and the wrapped {@link ItemStream}.
+ * Manage the offset data between the last successful commit and updates made to an input
+ * chunk. Only works with single threaded steps because it has to use a
+ * {@link ThreadLocal} to manage the state and coordinate between the caller and the
+ * wrapped {@link ItemStream}.
  *
  * @author Dave Syer
  * @since 2.0
@@ -40,6 +40,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 	private boolean streamsRegistered = false;
 
 	public static class ChunkMonitorData {
+
 		public int offset;
 
 		public int chunkSize;
@@ -48,6 +49,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 			this.offset = offset;
 			this.chunkSize = chunkSize;
 		}
+
 	}
 
 	private static final String OFFSET = "OFFSET";
@@ -79,7 +81,7 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	public void incrementOffset() {
 		ChunkMonitorData data = getData();
-		data.offset ++;
+		data.offset++;
 		if (data.offset >= data.chunkSize) {
 			resetOffset();
 		}
@@ -150,11 +152,11 @@ public class ChunkMonitor extends ItemStreamSupport {
 
 	private ChunkMonitorData getData() {
 		ChunkMonitorData data = holder.get();
-		if (data==null) {
+		if (data == null) {
 			if (streamsRegistered) {
 				logger.warn("ItemStream was opened in a different thread.  Restart data could be compromised.");
 			}
-			data = new ChunkMonitorData(0,0);
+			data = new ChunkMonitorData(0, 0);
 			holder.set(data);
 		}
 		return data;

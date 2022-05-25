@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 public class ItemRecoveryHandlerTests extends TestCase {
 
 	MethodInvocationRecoverer<String> recoverer = new MethodInvocationRecoverer<String>() {
-        @Override
+		@Override
 		public String recover(Object[] data, Throwable cause) {
 			return null;
 		}
@@ -31,9 +31,11 @@ public class ItemRecoveryHandlerTests extends TestCase {
 
 	public void testRecover() throws Exception {
 		try {
-			recoverer.recover(new Object[]{"foo"}, null);
-		} catch (Exception e) {
+			recoverer.recover(new Object[] { "foo" }, null);
+		}
+		catch (Exception e) {
 			fail("Unexpected Exception");
 		}
 	}
+
 }

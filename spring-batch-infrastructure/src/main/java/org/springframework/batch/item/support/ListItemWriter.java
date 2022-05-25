@@ -35,4 +35,5 @@ public class ListItemWriter<T> implements ItemWriter<T> {
 	public List<? extends T> getWrittenItems() {
 		return this.writtenItems;
 	}
+
 }

@@ -18,8 +18,8 @@ package org.springframework.batch.core;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for a {@link Job} to use in validating its parameters for
- * an execution.
+ * Strategy interface for a {@link Job} to use in validating its parameters for an
+ * execution.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -28,9 +28,8 @@ import org.springframework.lang.Nullable;
 public interface JobParametersValidator {
 
 	/**
-	 * Check that the parameters meet whatever requirements are appropriate, and
-	 * throw an exception if not.
-	 *
+	 * Check that the parameters meet whatever requirements are appropriate, and throw an
+	 * exception if not.
 	 * @param parameters some {@link JobParameters} (can be {@code null})
 	 * @throws JobParametersInvalidException if the parameters are invalid
 	 */

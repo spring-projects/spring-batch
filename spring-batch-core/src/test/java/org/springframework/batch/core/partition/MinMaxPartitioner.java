@@ -31,10 +31,10 @@ public class MinMaxPartitioner extends SimplePartitioner {
 	public Map<String, ExecutionContext> partition(int gridSize) {
 		Map<String, ExecutionContext> partition = super.partition(gridSize);
 		int total = 8; // The number of items in the ExampleItemReader
-		int range = total/gridSize;
+		int range = total / gridSize;
 		int i = 0;
 		for (ExecutionContext context : partition.values()) {
-			int min = (i++)*range;
+			int min = (i++) * range;
 			int max = Math.min(total, i * range);
 			context.putInt("min", min);
 			context.putInt("max", max);

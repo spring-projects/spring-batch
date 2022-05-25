@@ -19,29 +19,29 @@ package org.springframework.batch.item.file.separator;
 import org.springframework.util.StringUtils;
 
 /**
- * JSON-based record separator. Waits for a valid JSON object before returning a
- * complete line. A valid object has balanced braces ({}), possibly nested, and
- * ends with a closing brace. This separator can be used to split a stream into
- * JSON objects, even if those objects are spread over multiple lines, e.g.
- * 
+ * JSON-based record separator. Waits for a valid JSON object before returning a complete
+ * line. A valid object has balanced braces ({}), possibly nested, and ends with a closing
+ * brace. This separator can be used to split a stream into JSON objects, even if those
+ * objects are spread over multiple lines, e.g.
+ *
  * <pre>
  * {"foo": "bar",
  *  "value": { "spam": 2 }}
  *  {"foo": "rab",
  *  "value": { "spam": 3, "foo": "bar" }}
  * </pre>
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JsonRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	/**
 	 * True if the line can be parsed to a JSON object.
-	 * 
+	 *
 	 * @see RecordSeparatorPolicy#isEndOfRecord(String)
 	 */
-    @Override
+	@Override
 	public boolean isEndOfRecord(String line) {
 		return StringUtils.countOccurrencesOf(line, "{") == StringUtils.countOccurrencesOf(line, "}")
 				&& line.trim().endsWith("}");

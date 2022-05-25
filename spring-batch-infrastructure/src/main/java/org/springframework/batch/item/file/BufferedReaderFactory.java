@@ -24,23 +24,20 @@ import org.springframework.core.io.Resource;
 /**
  * A factory strategy for custom extensions of {@link BufferedReader} allowing
  * customisation of the standard behaviour of the <code>java.io</code> variety.
- * 
+ *
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public interface BufferedReaderFactory {
 
 	/**
-	 * Create a {@link BufferedReader} for reading String items from the
-	 * provided resource.
-	 * 
+	 * Create a {@link BufferedReader} for reading String items from the provided
+	 * resource.
 	 * @param resource a {@link Resource} containing the data to be read
-	 * @param encoding the encoding required for converting binary data to
-	 * String
+	 * @param encoding the encoding required for converting binary data to String
 	 * @return a {@link BufferedReader}
-	 * @throws UnsupportedEncodingException if the encoding is not supported by
-	 * the platform
+	 * @throws UnsupportedEncodingException if the encoding is not supported by the
+	 * platform
 	 * @throws IOException if there is a problem creating the reader
 	 */
 	BufferedReader create(Resource resource, String encoding) throws UnsupportedEncodingException, IOException;

@@ -61,8 +61,8 @@ public class NonAbstractStepTests {
 	 */
 	final List<String> events = new ArrayList<>();
 
-	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(1L,
-			"jobName"), new JobParameters()));
+	final StepExecution execution = new StepExecution(tested.getName(),
+			new JobExecution(new JobInstance(1L, "jobName"), new JobParameters()));
 
 	/**
 	 * Fills the events list when abstract methods are called.
@@ -89,10 +89,12 @@ public class NonAbstractStepTests {
 		protected void close(ExecutionContext ctx) throws Exception {
 			events.add("close");
 		}
+
 	}
 
 	/**
-	 * Fills the events list when listener methods are called, prefixed with the name of the listener.
+	 * Fills the events list when listener methods are called, prefixed with the name of
+	 * the listener.
 	 */
 	private class EventTrackingListener implements StepExecutionListener {
 
@@ -207,8 +209,11 @@ public class NonAbstractStepTests {
 				repository.saved.containsKey("afterStep"));
 
 		// Observability
-		MeterRegistryAssert.assertThat(Metrics.globalRegistry)
-				.hasTimerWithNameAndTags(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"), Tag.of("spring.batch.step.name", "eventTrackingStep"), Tag.of("spring.batch.step.status", "COMPLETED")));
+		MeterRegistryAssert.assertThat(Metrics.globalRegistry).hasTimerWithNameAndTags(
+				BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
+				Tags.of(Tag.of("error", "none"), Tag.of("spring.batch.step.job.name", "jobName"),
+						Tag.of("spring.batch.step.name", "eventTrackingStep"),
+						Tag.of("spring.batch.step.status", "COMPLETED")));
 	}
 
 	@After

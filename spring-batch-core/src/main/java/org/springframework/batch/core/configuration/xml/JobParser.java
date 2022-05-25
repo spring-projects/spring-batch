@@ -32,11 +32,11 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the &lt;job/&gt; element in the Batch namespace. Sets up and returns
- * a bean definition for a {@link org.springframework.batch.core.Job}.
- * 
+ * Parser for the &lt;job/&gt; element in the Batch namespace. Sets up and returns a bean
+ * definition for a {@link org.springframework.batch.core.Job}.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
 
@@ -57,9 +57,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
 	 * Create a bean definition for a
-	 * {@link org.springframework.batch.core.job.flow.FlowJob}. Nested step
-	 * elements are delegated to an {@link InlineStepParser}.
-	 * 
+	 * {@link org.springframework.batch.core.job.flow.FlowJob}. Nested step elements are
+	 * delegated to an {@link InlineStepParser}.
+	 *
 	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext,
 	 * BeanDefinitionBuilder)
 	 */
@@ -68,9 +68,10 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 
 		if (!CoreNamespaceUtils.namespaceMatchesVersion(element)) {
 			parserContext.getReaderContext().error(
-					"You are using a version of the spring-batch XSD that is not compatible with Spring Batch 3.0." +
-							"  Please upgrade your schema declarations (or use the spring-batch.xsd alias if you are " +
-							"feeling lucky).", element);
+					"You are using a version of the spring-batch XSD that is not compatible with Spring Batch 3.0."
+							+ "  Please upgrade your schema declarations (or use the spring-batch.xsd alias if you are "
+							+ "feeling lucky).",
+					element);
 			return;
 		}
 
@@ -110,9 +111,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		if (isAbstract) {
 			for (String tagName : Arrays.asList("step", "decision", "split")) {
 				if (!DomUtils.getChildElementsByTagName(element, tagName).isEmpty()) {
-					parserContext.getReaderContext().error(
-							"The <" + tagName + "/> element may not appear on a <job/> with abstract=\"true\" ["
-									+ jobName + "]", element);
+					parserContext.getReaderContext().error("The <" + tagName
+							+ "/> element may not appear on a <job/> with abstract=\"true\" [" + jobName + "]",
+							element);
 				}
 			}
 		}
@@ -144,15 +145,14 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			parserContext.popAndRegisterContainingComponent();
 		}
 		else if (listenersElements.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The '<listeners/>' element may not appear more than once in a single <job/>.", element);
+			parserContext.getReaderContext()
+					.error("The '<listeners/>' element may not appear more than once in a single <job/>.", element);
 		}
 
 	}
 
 	/**
 	 * Parse the element to retrieve {@link BeanMetadataElement}.
-	 *
 	 * @param element The {@link Element} to be parsed.
 	 * @param parserContext The {@link ParserContext}.
 	 * @return The {@link BeanMetadataElement} extracted from the element parameter.
@@ -166,8 +166,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			return new RuntimeBeanReference(refAttribute);
 		}
 		else if (beanElement != null) {
-			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate().parseBeanDefinitionElement(
-					beanElement);
+			BeanDefinitionHolder beanDefinitionHolder = parserContext.getDelegate()
+					.parseBeanDefinitionElement(beanElement);
 			parserContext.getDelegate().decorateBeanDefinitionIfRequired(beanElement, beanDefinitionHolder);
 			return beanDefinitionHolder;
 		}
@@ -175,8 +175,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			return (BeanMetadataElement) parserContext.getDelegate().parsePropertySubElement(refElement, null);
 		}
 
-		parserContext.getReaderContext().error(
-				"One of ref attribute or a nested bean definition or ref element must be specified", element);
+		parserContext.getReaderContext()
+				.error("One of ref attribute or a nested bean definition or ref element must be specified", element);
 		return null;
 	}
 

@@ -27,11 +27,13 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
 
 /**
  * JMX notification broadcaster
- * 
+ *
  * @author Dave Syer
  * @since 1.0
  */
-public class JobExecutionNotificationPublisher implements ApplicationListener<SimpleMessageApplicationEvent>, NotificationPublisherAware {
+public class JobExecutionNotificationPublisher
+		implements ApplicationListener<SimpleMessageApplicationEvent>, NotificationPublisherAware {
+
 	private static final Log LOG = LogFactory.getLog(JobExecutionNotificationPublisher.class);
 
 	private NotificationPublisher notificationPublisher;
@@ -40,7 +42,7 @@ public class JobExecutionNotificationPublisher implements ApplicationListener<Si
 
 	/**
 	 * Injection setter.
-	 * 
+	 *
 	 * @see org.springframework.jmx.export.notification.NotificationPublisherAware#setNotificationPublisher(org.springframework.jmx.export.notification.NotificationPublisher)
 	 */
 	@Override
@@ -49,11 +51,10 @@ public class JobExecutionNotificationPublisher implements ApplicationListener<Si
 	}
 
 	/**
-	 * If the event is a {@link SimpleMessageApplicationEvent} for open and
-	 * close we log the event at INFO level and send a JMX notification if we
-	 * are also an MBean.
-	 * 
-	 * @see ApplicationListener#onApplicationEvent(ApplicationEvent) 
+	 * If the event is a {@link SimpleMessageApplicationEvent} for open and close we log
+	 * the event at INFO level and send a JMX notification if we are also an MBean.
+	 *
+	 * @see ApplicationListener#onApplicationEvent(ApplicationEvent)
 	 */
 	@Override
 	public void onApplicationEvent(SimpleMessageApplicationEvent applicationEvent) {
@@ -64,7 +65,6 @@ public class JobExecutionNotificationPublisher implements ApplicationListener<Si
 
 	/**
 	 * Publish the provided message to an external listener if there is one.
-	 * 
 	 * @param message the message to publish
 	 */
 	private void publish(String message) {
@@ -72,13 +72,13 @@ public class JobExecutionNotificationPublisher implements ApplicationListener<Si
 			Notification notification = new Notification("JobExecutionApplicationEvent", this, notificationCount++,
 					message);
 			/*
-			 * We can't create a notification with a null source, but we can set
-			 * it to null after creation(!). We want it to be null so that
-			 * Spring will replace it automatically with the ObjectName (in
-			 * ModelMBeanNotificationPublisher).
+			 * We can't create a notification with a null source, but we can set it to
+			 * null after creation(!). We want it to be null so that Spring will replace
+			 * it automatically with the ObjectName (in ModelMBeanNotificationPublisher).
 			 */
 			notification.setSource(null);
 			notificationPublisher.sendNotification(notification);
 		}
 	}
+
 }

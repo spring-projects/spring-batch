@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
 
 /**
  * Batch domain object representation for the execution of a step. Unlike
- * {@link JobExecution}, additional properties are related to the processing
- * of items, such as commit count and others.
+ * {@link JobExecution}, additional properties are related to the processing of items,
+ * such as commit count and others.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -81,7 +81,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Constructor with mandatory properties.
-	 *
 	 * @param stepName The step to which this execution belongs.
 	 * @param jobExecution The current job execution.
 	 * @param id The ID of this execution.
@@ -96,7 +95,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Constructor that substitutes null for the execution ID.
-	 *
 	 * @param stepName The step to which this execution belongs.
 	 * @param jobExecution The current job execution.
 	 */
@@ -108,10 +106,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Constructor that requires only a stepName. Intended only to be
-	 * used over serialization libraries to address the circular
-	 * reference between {@link JobExecution} and StepExecution.
-	 *
+	 * Constructor that requires only a stepName. Intended only to be used over
+	 * serialization libraries to address the circular reference between
+	 * {@link JobExecution} and StepExecution.
 	 * @param stepName The name of the executed step.
 	 */
 	@SuppressWarnings("unused")
@@ -124,7 +121,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the {@link ExecutionContext} for this execution.
-	 *
 	 * @return the attributes.
 	 */
 	public ExecutionContext getExecutionContext() {
@@ -133,7 +129,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the {@link ExecutionContext} for this execution.
-	 *
 	 * @param executionContext The attributes.
 	 */
 	public void setExecutionContext(ExecutionContext executionContext) {
@@ -142,7 +137,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current number of commits for this execution.
-	 *
 	 * @return the current number of commits.
 	 */
 	public long getCommitCount() {
@@ -151,7 +145,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the current number of commits for this execution.
-	 *
 	 * @param commitCount The current number of commits.
 	 */
 	public void setCommitCount(long commitCount) {
@@ -160,7 +153,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the time when this execution ended or {@code null} if the step is running.
-	 *
 	 * @return the time when this execution ended or {@code null} if the step is running.
 	 */
 	@Nullable
@@ -170,7 +162,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the time when this execution ended.
-	 *
 	 * @param endTime The time when this execution ended.
 	 */
 	public void setEndTime(Date endTime) {
@@ -179,7 +170,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current number of items read for this execution.
-	 *
 	 * @return the current number of items read for this execution.
 	 */
 	public long getReadCount() {
@@ -188,7 +178,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the current number of read items for this execution.
-	 *
 	 * @param readCount The current number of read items for this execution.
 	 */
 	public void setReadCount(long readCount) {
@@ -197,7 +186,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current number of items written for this execution.
-	 *
 	 * @return The current number of items written for this execution.
 	 */
 	public long getWriteCount() {
@@ -206,7 +194,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the current number of written items for this execution.
-	 *
 	 * @param writeCount The current number of written items for this execution.
 	 */
 	public void setWriteCount(long writeCount) {
@@ -215,7 +202,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current number of rollbacks for this execution.
-	 *
 	 * @return the current number of rollbacks for this execution.
 	 */
 	public long getRollbackCount() {
@@ -224,7 +210,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current number of items filtered out of this execution.
-	 *
 	 * @return the current number of items filtered out of this execution.
 	 */
 	public long getFilterCount() {
@@ -233,9 +218,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the number of items filtered out of this execution.
-	 *
-	 * @param filterCount The number of items filtered out of this execution to
-	 * set.
+	 * @param filterCount The number of items filtered out of this execution to set.
 	 */
 	public void setFilterCount(long filterCount) {
 		this.filterCount = filterCount;
@@ -243,7 +226,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the number of rollbacks for this execution.
-	 *
 	 * @param rollbackCount {@code long} the number of rollbacks.
 	 */
 	public void setRollbackCount(long rollbackCount) {
@@ -252,7 +234,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Gets the time this execution was created
-	 *
 	 * @return the time when this execution was created.
 	 */
 	public Date getCreateTime() {
@@ -261,7 +242,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the time this execution was created
-	 *
 	 * @param createTime creation time of this execution.
 	 */
 	public void setCreateTime(Date createTime) {
@@ -270,7 +250,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Gets the time when this execution started.
-	 *
 	 * @return the time when this execution started.
 	 */
 	@Nullable
@@ -280,7 +259,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the time when this execution started.
-	 *
 	 * @param startTime The time when this execution started.
 	 */
 	public void setStartTime(Date startTime) {
@@ -289,7 +267,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Returns the current status of this step.
-	 *
 	 * @return the current status of this step.
 	 */
 	public BatchStatus getStatus() {
@@ -298,7 +275,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the current status of this step.
-	 *
 	 * @param status The current status of this step.
 	 */
 	public void setStatus(BatchStatus status) {
@@ -306,10 +282,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Upgrade the status field if the provided value is greater than the
-	 * existing one. Clients using this method to set the status can be sure
-	 * that they do not overwrite a failed status with a successful one.
-	 *
+	 * Upgrade the status field if the provided value is greater than the existing one.
+	 * Clients using this method to set the status can be sure that they do not overwrite
+	 * a failed status with a successful one.
 	 * @param status The new status value,
 	 */
 	public void upgradeStatus(BatchStatus status) {
@@ -325,7 +300,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Accessor for the job execution ID.
-	 *
 	 * @return the {@code jobExecutionId}.
 	 */
 	public Long getJobExecutionId() {
@@ -336,7 +310,8 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @param exitStatus The {@link ExitStatus} instance used to establish the exit status.
+	 * @param exitStatus The {@link ExitStatus} instance used to establish the exit
+	 * status.
 	 */
 	public void setExitStatus(ExitStatus exitStatus) {
 		this.exitStatus = exitStatus;
@@ -351,9 +326,7 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Accessor for the execution context information of the enclosing job.
-	 *
-	 * @return the {@link JobExecution} that was used to start this step
-	 * execution.
+	 * @return the {@link JobExecution} that was used to start this step execution.
 	 */
 	public JobExecution getJobExecution() {
 		return jobExecution;
@@ -361,7 +334,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Factory method for {@link StepContribution}.
-	 *
 	 * @return a new {@link StepContribution}
 	 */
 	public StepContribution createStepContribution() {
@@ -370,10 +342,9 @@ public class StepExecution extends Entity {
 
 	/**
 	 * This method should be called on successful execution just before a chunk commit.
-	 * Synchronizes access to the {@link StepExecution} so that changes
-	 * are atomic.
-	 *
-	 * @param contribution The {@link StepContribution} instance used to update the {@code StepExecution} state.
+	 * Synchronizes access to the {@link StepExecution} so that changes are atomic.
+	 * @param contribution The {@link StepContribution} instance used to update the
+	 * {@code StepExecution} state.
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		readSkipCount += contribution.getReadSkipCount();
@@ -386,8 +357,8 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Increments the rollback count.
-	 * Should be used on unsuccessful execution after a chunk has rolled back.
+	 * Increments the rollback count. Should be used on unsuccessful execution after a
+	 * chunk has rolled back.
 	 */
 	public synchronized void incrementRollbackCount() {
 		rollbackCount++;
@@ -401,8 +372,8 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Sets a flag that signals to an execution environment that this
-	 * execution (and its surrounding job) wishes to exit.
+	 * Sets a flag that signals to an execution environment that this execution (and its
+	 * surrounding job) wishes to exit.
 	 */
 	public void setTerminateOnly() {
 		this.terminateOnly = true;
@@ -424,9 +395,8 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Convenience method to get the current job parameters.
-	 *
-	 * @return the {@link JobParameters} from the enclosing job or empty if
-	 * that is {@code null}.
+	 * @return the {@link JobParameters} from the enclosing job or empty if that is
+	 * {@code null}.
 	 */
 	public JobParameters getJobParameters() {
 		if (jobExecution == null) {
@@ -451,8 +421,8 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Set the number of records skipped on read.
-	 *
-	 * @param readSkipCount A {@code long} containing the read skip count to be used for the step execution.
+	 * @param readSkipCount A {@code long} containing the read skip count to be used for
+	 * the step execution.
 	 */
 	public void setReadSkipCount(long readSkipCount) {
 		this.readSkipCount = readSkipCount;
@@ -460,8 +430,8 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Set the number of records skipped on write.
-	 *
-	 * @param writeSkipCount A {@code long} containing write skip count to be used for the step execution.
+	 * @param writeSkipCount A {@code long} containing write skip count to be used for the
+	 * step execution.
 	 */
 	public void setWriteSkipCount(long writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
@@ -476,8 +446,8 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the number of records skipped during processing.
-	 *
-	 * @param processSkipCount A {@code long} containing the process skip count to be used for the step execution.
+	 * @param processSkipCount A {@code long} containing the process skip count to be used
+	 * for the step execution.
 	 */
 	public void setProcessSkipCount(long processSkipCount) {
 		this.processSkipCount = processSkipCount;
@@ -493,9 +463,8 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Sets the time when the {@code StepExecution} was last updated before persisting.
-	 *
-	 * @param lastUpdated the {@link Date} instance used to establish the last
-	 * updated date for the {@code StepExecution}.
+	 * @param lastUpdated the {@link Date} instance used to establish the last updated
+	 * date for the {@code StepExecution}.
 	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
@@ -510,7 +479,6 @@ public class StepExecution extends Entity {
 
 	/**
 	 * Add a {@link Throwable} to failure exceptions.
-	 *
 	 * @param throwable The {@link Throwable} to add to failure exceptions.
 	 */
 	public void addFailureException(Throwable throwable) {
@@ -520,8 +488,7 @@ public class StepExecution extends Entity {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see
-	 * org.springframework.batch.container.common.domain.Entity#equals(java.
+	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.
 	 * lang.Object)
 	 */
 	@Override
@@ -538,11 +505,8 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Deserialize and ensure transient fields are re-instantiated when read
-	 * back.
-	 *
+	 * Deserialize and ensure transient fields are re-instantiated when read back.
 	 * @param stream An instance of {@link ObjectInputStream}.
-	 *
 	 * @throws IOException If an error occurs during read.
 	 * @throws ClassNotFoundException If the class is not found.
 	 */
@@ -560,8 +524,8 @@ public class StepExecution extends Entity {
 	public int hashCode() {
 		Object jobExecutionId = getJobExecutionId();
 		Long id = getId();
-		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
-				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0) + 59 * (id != null ? id.hashCode() : 0);
+		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0)
+				+ 91 * (jobExecutionId != null ? jobExecutionId.hashCode() : 0) + 59 * (id != null ? id.hashCode() : 0);
 	}
 
 	@Override
@@ -570,15 +534,14 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @return  The {@link String} containing a summary of the step execution.
+	 * @return The {@link String} containing a summary of the step execution.
 	 */
 	public String getSummary() {
-		return super.toString()
-				+ String.format(
-						", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-								+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d", stepName, status,
-								exitStatus.getExitCode(), readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
-								processSkipCount, commitCount, rollbackCount);
+		return super.toString() + String.format(
+				", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+						+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d",
+				stepName, status, exitStatus.getExitCode(), readCount, filterCount, writeCount, readSkipCount,
+				writeSkipCount, processSkipCount, commitCount, rollbackCount);
 	}
 
 }

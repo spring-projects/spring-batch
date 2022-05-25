@@ -30,22 +30,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Abstract SQL Paging Query Provider to serve as a base class for all provided
- * SQL paging query providers.
- * 
- * Any implementation must provide a way to specify the select clause, from
- * clause and optionally a where clause. In addition a way to specify a single
- * column sort key must also be provided. This sort key will be used to provide
- * the paging functionality. It is recommended that there should be an index for
- * the sort key to provide better performance.
- * 
- * Provides properties and preparation for the mandatory "selectClause" and
- * "fromClause" as well as for the optional "whereClause". Also provides
- * property for the mandatory "sortKeys".  <b>Note:</b> The columns that make up 
- * the sort key must be a true key and not just a column to order by. It is important
- * to have a unique key constraint on the sort key to guarantee that no data is lost
- * between executions.
- * 
+ * Abstract SQL Paging Query Provider to serve as a base class for all provided SQL paging
+ * query providers.
+ *
+ * Any implementation must provide a way to specify the select clause, from clause and
+ * optionally a where clause. In addition a way to specify a single column sort key must
+ * also be provided. This sort key will be used to provide the paging functionality. It is
+ * recommended that there should be an index for the sort key to provide better
+ * performance.
+ *
+ * Provides properties and preparation for the mandatory "selectClause" and "fromClause"
+ * as well as for the optional "whereClause". Also provides property for the mandatory
+ * "sortKeys". <b>Note:</b> The columns that make up the sort key must be a true key and
+ * not just a column to order by. It is important to have a unique key constraint on the
+ * sort key to guarantee that no data is lost between executions.
+ *
  * @author Thomas Risberg
  * @author Dave Syer
  * @author Michael Minella
@@ -60,7 +59,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String fromClause;
 
 	private String whereClause;
-	
+
 	private Map<String, Order> sortKeys = new LinkedHashMap<>();
 
 	private String groupClause;
@@ -68,10 +67,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private int parameterCount;
 
 	private boolean usingNamedParameters;
-	
+
 	/**
 	 * The setter for the group by clause
-	 * 
 	 * @param groupClause SQL GROUP BY clause part of the SQL query string
 	 */
 	public void setGroupClause(String groupClause) {
@@ -82,10 +80,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 			this.groupClause = null;
 		}
 	}
-	
+
 	/**
 	 * The getter for the group by clause
-	 * 
 	 * @return SQL GROUP BY clause part of the SQL query string
 	 */
 	public String getGroupClause() {
@@ -100,7 +97,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * 
 	 * @return SQL SELECT clause part of SQL query string
 	 */
 	protected String getSelectClause() {
@@ -115,7 +111,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * 
 	 * @return SQL FROM clause part of SQL query string
 	 */
 	protected String getFromClause() {
@@ -135,7 +130,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * 
 	 * @return SQL WHERE clause part of SQL query string
 	 */
 	protected String getWhereClause() {
@@ -150,32 +144,31 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * A Map&lt;String, Boolean&gt; of sort columns as the key and boolean for ascending/descending (ascending = true).
-	 * 
+	 * A Map&lt;String, Boolean&gt; of sort columns as the key and boolean for
+	 * ascending/descending (ascending = true).
 	 * @return sortKey key to use to sort and limit page content
 	 */
-    @Override
+	@Override
 	public Map<String, Order> getSortKeys() {
 		return sortKeys;
 	}
 
-    @Override
+	@Override
 	public int getParameterCount() {
 		return parameterCount;
 	}
 
-    @Override
+	@Override
 	public boolean isUsingNamedParameters() {
 		return usingNamedParameters;
 	}
 
 	/**
-	 * The sort key placeholder will vary depending on whether named parameters
-	 * or traditional placeholders are used in query strings.
-	 * 
+	 * The sort key placeholder will vary depending on whether named parameters or
+	 * traditional placeholders are used in query strings.
 	 * @return place holder for sortKey.
 	 */
-    @Override
+	@Override
 	public String getSortKeyPlaceHolder(String keyName) {
 		return usingNamedParameters ? ":_" + keyName : "?";
 	}
@@ -184,7 +177,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void init(DataSource dataSource) throws Exception {
 		Assert.notNull(dataSource, "A DataSource is required");
 		Assert.hasLength(selectClause, "selectClause must be specified");
@@ -196,7 +189,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		if (whereClause != null) {
 			sql.append(" WHERE ").append(whereClause);
 		}
-		if(groupClause != null) {
+		if (groupClause != null) {
 			sql.append(" GROUP BY ").append(groupClause);
 		}
 		List<String> namedParameters = new ArrayList<>();
@@ -211,40 +204,38 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * Method generating the query string to be used for retrieving the first
-	 * page. This method must be implemented in sub classes.
-	 * 
+	 * Method generating the query string to be used for retrieving the first page. This
+	 * method must be implemented in sub classes.
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
-    @Override
+	@Override
 	public abstract String generateFirstPageQuery(int pageSize);
 
 	/**
-	 * Method generating the query string to be used for retrieving the pages
-	 * following the first page. This method must be implemented in sub classes.
-	 * 
+	 * Method generating the query string to be used for retrieving the pages following
+	 * the first page. This method must be implemented in sub classes.
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
-    @Override
+	@Override
 	public abstract String generateRemainingPagesQuery(int pageSize);
 
 	/**
-	 * Method generating the query string to be used for jumping to a specific
-	 * item position. This method must be implemented in sub classes.
-	 * 
+	 * Method generating the query string to be used for jumping to a specific item
+	 * position. This method must be implemented in sub classes.
 	 * @param itemIndex the index of the item to jump to
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
-    @Override
+	@Override
 	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
 
 	private String removeKeyWord(String keyWord, String clause) {
 		String temp = clause.trim();
 		int length = keyWord.length();
-		if (temp.toLowerCase().startsWith(keyWord) && Character.isWhitespace(temp.charAt(length)) && temp.length() > length + 1) {
+		if (temp.toLowerCase().startsWith(keyWord) && Character.isWhitespace(temp.charAt(length))
+				&& temp.length() > length + 1) {
 			return temp.substring(length + 1);
 		}
 		else {
@@ -253,7 +244,6 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 *
 	 * @return sortKey key to use to sort and limit page content (without alias)
 	 */
 	@Override
@@ -268,11 +258,13 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 				if (columnIndex < key.length()) {
 					sortKeysWithoutAliases.put(key.substring(columnIndex), sortKeyEntry.getValue());
 				}
-			} else {
+			}
+			else {
 				sortKeysWithoutAliases.put(sortKeyEntry.getKey(), sortKeyEntry.getValue());
 			}
 		}
 
 		return sortKeysWithoutAliases;
 	}
+
 }

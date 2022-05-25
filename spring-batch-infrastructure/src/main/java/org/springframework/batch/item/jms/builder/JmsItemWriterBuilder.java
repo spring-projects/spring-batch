@@ -24,7 +24,6 @@ import org.springframework.util.Assert;
  * Creates a fully qualified JmsItemWriter.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 public class JmsItemWriterBuilder<T> {
@@ -33,7 +32,6 @@ public class JmsItemWriterBuilder<T> {
 
 	/**
 	 * Establish the JMS template that will be used by the {@link JmsItemWriter}.
-	 *
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 * @return this instance for method chaining.
 	 * @see JmsItemWriter#setJmsTemplate(JmsOperations)
@@ -46,7 +44,6 @@ public class JmsItemWriterBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link JmsItemWriter}.
-	 *
 	 * @return a new {@link JmsItemWriter}
 	 */
 	public JmsItemWriter<T> build() {
@@ -56,4 +53,5 @@ public class JmsItemWriterBuilder<T> {
 		jmsItemWriter.setJmsTemplate(this.jmsTemplate);
 		return jmsItemWriter;
 	}
+
 }

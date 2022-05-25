@@ -46,57 +46,52 @@ import org.springframework.validation.DataBinder;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
- * {@link FieldSet} to be mapped should have field name meta data corresponding
- * to bean property paths in an instance of the desired type. The instance is
- * created and initialized either by referring to a prototype object by bean
- * name in the enclosing BeanFactory, or by providing a class to instantiate
- * reflectively.<br>
+ * {@link FieldSet} to be mapped should have field name meta data corresponding to bean
+ * property paths in an instance of the desired type. The instance is created and
+ * initialized either by referring to a prototype object by bean name in the enclosing
+ * BeanFactory, or by providing a class to instantiate reflectively.<br>
  * <br>
- * 
- * Nested property paths, including indexed properties in maps and collections,
- * can be referenced by the {@link FieldSet} names. They will be converted to
- * nested bean properties inside the prototype. The {@link FieldSet} and the
- * prototype are thus tightly coupled by the fields that are available and those
- * that can be initialized. If some of the nested properties are optional (e.g.
- * collection members) they need to be removed by a post processor.<br>
+ *
+ * Nested property paths, including indexed properties in maps and collections, can be
+ * referenced by the {@link FieldSet} names. They will be converted to nested bean
+ * properties inside the prototype. The {@link FieldSet} and the prototype are thus
+ * tightly coupled by the fields that are available and those that can be initialized. If
+ * some of the nested properties are optional (e.g. collection members) they need to be
+ * removed by a post processor.<br>
  * <br>
- * 
- * To customize the way that {@link FieldSet} values are converted to the
- * desired type for injecting into the prototype there are several choices. You
- * can inject {@link PropertyEditor} instances directly through the
- * {@link #setCustomEditors(Map) customEditors} property, or you can override
- * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
- * methods, or you can provide a custom {@link FieldSet} implementation.
- * You can also use a {@link ConversionService} to convert to the desired type
- * through the {@link #setConversionService(ConversionService) conversionService}
- * property.
+ *
+ * To customize the way that {@link FieldSet} values are converted to the desired type for
+ * injecting into the prototype there are several choices. You can inject
+ * {@link PropertyEditor} instances directly through the {@link #setCustomEditors(Map)
+ * customEditors} property, or you can override the {@link #createBinder(Object)} and
+ * {@link #initBinder(DataBinder)} methods, or you can provide a custom {@link FieldSet}
+ * implementation. You can also use a {@link ConversionService} to convert to the desired
+ * type through the {@link #setConversionService(ConversionService) conversionService}
+ * property. <br>
  * <br>
- * <br>
- * 
- * Property name matching is "fuzzy" in the sense that it tolerates close
- * matches, as long as the match is unique. For instance:
- * 
+ *
+ * Property name matching is "fuzzy" in the sense that it tolerates close matches, as long
+ * as the match is unique. For instance:
+ *
  * <ul>
  * <li>Quantity = quantity (field names can be capitalised)</li>
- * <li>ISIN = isin (acronyms can be lower case bean property names, as per Java
- * Beans recommendations)</li>
+ * <li>ISIN = isin (acronyms can be lower case bean property names, as per Java Beans
+ * recommendations)</li>
  * <li>DuckPate = duckPate (capitalisation including camel casing)</li>
- * <li>ITEM_ID = itemId (capitalisation and replacing word boundary with
- * underscore)</li>
- * <li>ORDER.CUSTOMER_ID = order.customerId (nested paths are recursively
- * checked)</li>
+ * <li>ITEM_ID = itemId (capitalisation and replacing word boundary with underscore)</li>
+ * <li>ORDER.CUSTOMER_ID = order.customerId (nested paths are recursively checked)</li>
  * </ul>
- * 
- * The algorithm used to match a property name is to start with an exact match
- * and then search successively through more distant matches until precisely one
- * match is found. If more than one match is found there will be an error.
- * 
+ *
+ * The algorithm used to match a property name is to start with an exact match and then
+ * search successively through more distant matches until precisely one match is found. If
+ * more than one match is found there will be an error.
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
-public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
-		BeanFactoryAware, InitializingBean {
+public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
+		implements FieldSetMapper<T>, BeanFactoryAware, InitializingBean {
 
 	private String name;
 
@@ -116,21 +111,19 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
+	 *
+	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
 	 * .springframework.beans.factory.BeanFactory)
 	 */
-    @Override
+	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 	}
 
 	/**
-	 * The maximum difference that can be tolerated in spelling between input
-	 * key names and bean property names. Defaults to 5, but could be set lower
-	 * if the field names match the bean names.
-	 * 
+	 * The maximum difference that can be tolerated in spelling between input key names
+	 * and bean property names. Defaults to 5, but could be set lower if the field names
+	 * match the bean names.
 	 * @param distanceLimit the distance limit to set
 	 */
 	public void setDistanceLimit(int distanceLimit) {
@@ -138,14 +131,11 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * The bean name (id) for an object that can be populated from the field set
-	 * that will be passed into {@link #mapFieldSet(FieldSet)}. Typically a
-	 * prototype scoped bean so that a new instance is returned for each field
-	 * set mapped.
-	 * 
-	 * Either this property or the type property must be specified, but not
-	 * both.
-	 * 
+	 * The bean name (id) for an object that can be populated from the field set that will
+	 * be passed into {@link #mapFieldSet(FieldSet)}. Typically a prototype scoped bean so
+	 * that a new instance is returned for each field set mapped.
+	 *
+	 * Either this property or the type property must be specified, but not both.
 	 * @param name the name of a prototype bean in the enclosing BeanFactory
 	 */
 	public void setPrototypeBeanName(String name) {
@@ -153,13 +143,11 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * Public setter for the type of bean to create instead of using a prototype
-	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapFieldSet(FieldSet)}.<br>
-	 * 
-	 * Either this property or the prototype bean name must be specified, but
-	 * not both.
-	 * 
+	 * Public setter for the type of bean to create instead of using a prototype bean. An
+	 * object of this type will be created from its default constructor for every call to
+	 * {@link #mapFieldSet(FieldSet)}.<br>
+	 *
+	 * Either this property or the prototype bean name must be specified, but not both.
 	 * @param type the type to set
 	 */
 	public void setTargetType(Class<? extends T> type) {
@@ -168,32 +156,28 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * Check that precisely one of type or prototype bean name is specified.
-	 * 
-	 * @throws IllegalStateException if neither is set or both properties are
-	 * set.
-	 * 
+	 * @throws IllegalStateException if neither is set or both properties are set.
+	 *
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(name != null || type != null, "Either name or type must be provided.");
 		Assert.state(name == null || type == null, "Both name and type cannot be specified together.");
-		Assert.state(!this.isCustomEditorsSet || this.conversionService == null, "Both customEditor and conversionService cannot be specified together.");
+		Assert.state(!this.isCustomEditorsSet || this.conversionService == null,
+				"Both customEditor and conversionService cannot be specified together.");
 	}
 
 	/**
-	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
-	 * context, or to a new instance of the required type if no prototype is
-	 * available.
-	 * @throws BindException if there is a type conversion or other error (if
-	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
-	 * after binding).
-	 * 
-	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
-	 * field that cannot be mapped to a bean property.
+	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring context,
+	 * or to a new instance of the required type if no prototype is available.
+	 * @throws BindException if there is a type conversion or other error (if the
+	 * {@link DataBinder} from {@link #createBinder(Object)} has errors after binding).
+	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a field that
+	 * cannot be mapped to a bean property.
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
 	 */
-    @Override
+	@Override
 	public T mapFieldSet(FieldSet fs) throws BindException {
 		T copy = getBean();
 		DataBinder binder = createBinder(copy);
@@ -205,31 +189,28 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * Create a binder for the target object. The binder will then be used to
-	 * bind the properties form a field set into the target object. This
-	 * implementation creates a new {@link DataBinder} and calls out to
-	 * {@link #initBinder(DataBinder)} and
+	 * Create a binder for the target object. The binder will then be used to bind the
+	 * properties form a field set into the target object. This implementation creates a
+	 * new {@link DataBinder} and calls out to {@link #initBinder(DataBinder)} and
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
-	 * 
 	 * @param target Object to bind to
-	 * @return a {@link DataBinder} that can be used to bind properties to the
-	 * target.
+	 * @return a {@link DataBinder} that can be used to bind properties to the target.
 	 */
 	protected DataBinder createBinder(Object target) {
 		DataBinder binder = new DataBinder(target);
 		binder.setIgnoreUnknownFields(!this.strict);
 		initBinder(binder);
 		registerCustomEditors(binder);
-		if(this.conversionService != null) {
+		if (this.conversionService != null) {
 			binder.setConversionService(this.conversionService);
 		}
 		return binder;
 	}
 
 	/**
-	 * Initialize a new binder instance. This hook allows customization of
-	 * binder settings such as the {@link DataBinder#initDirectFieldAccess()
-	 * direct field access}. Called by {@link #createBinder(Object)}.
+	 * Initialize a new binder instance. This hook allows customization of binder settings
+	 * such as the {@link DataBinder#initDirectFieldAccess() direct field access}. Called
+	 * by {@link #createBinder(Object)}.
 	 * <p>
 	 * Note that registration of custom property editors can be done in
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}.
@@ -287,14 +268,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 			if (name != null) {
 				if (matches.containsValue(name)) {
-					throw new NotWritablePropertyException(
-							cls,
-							name,
-							"Duplicate match with distance <= "
-									+ distanceLimit
-									+ " found for this property in input keys: "
-									+ keys
-									+ ". (Consider reducing the distance limit or changing the input key names to get a closer match.)");
+					throw new NotWritablePropertyException(cls, name, "Duplicate match with distance <= "
+							+ distanceLimit + " found for this property in input keys: " + keys
+							+ ". (Consider reducing the distance limit or changing the input key names to get a closer match.)");
 				}
 				matches.put(key, name);
 				switchPropertyNames(properties, key, name);
@@ -373,7 +349,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				nestedValue = wrapper.getPropertyType(nestedName).getDeclaredConstructor().newInstance();
 				wrapper.setPropertyValue(nestedName, nestedValue);
 			}
-			catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+			catch (InstantiationException | IllegalAccessException | NoSuchMethodException
+					| InvocationTargetException e) {
 				ReflectionUtils.handleReflectionException(e);
 			}
 		}
@@ -388,20 +365,17 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * Public setter for the 'strict' property. If true, then
-	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields
-	 * that cannot be mapped to the bean.
-	 * 
+	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields that
+	 * cannot be mapped to the bean.
 	 * @param strict indicator
 	 */
 	public void setStrict(boolean strict) {
 		this.strict = strict;
 	}
 
-
 	/**
-	 * Public setter for the 'conversionService' property.
-	 * {@link #createBinder(Object)} will use it if not null.
-	 *
+	 * Public setter for the 'conversionService' property. {@link #createBinder(Object)}
+	 * will use it if not null.
 	 * @param conversionService {@link ConversionService} to be used for type conversions
 	 */
 	public void setConversionService(ConversionService conversionService) {
@@ -410,8 +384,6 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * Specify the {@link PropertyEditor custom editors} to register.
-	 *
-	 *
 	 * @param customEditors a map of Class to PropertyEditor (or class name to
 	 * PropertyEditor).
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
@@ -423,6 +395,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	private static class DistanceHolder {
+
 		private final Class<?> cls;
 
 		private final int distance;
@@ -461,6 +434,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 				return false;
 			return true;
 		}
+
 	}
 
 }

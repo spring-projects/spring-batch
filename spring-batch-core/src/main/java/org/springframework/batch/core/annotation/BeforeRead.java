@@ -27,13 +27,13 @@ import org.springframework.batch.item.ItemReader;
  * Marks a method to be called before an item is read from an {@link ItemReader} <br>
  * <br>
  * Expected signature: void beforeRead()
- * 
+ *
  * @author Lucas Ward
  * @since 2.0
  * @see ItemReadListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface BeforeRead {
 
 }

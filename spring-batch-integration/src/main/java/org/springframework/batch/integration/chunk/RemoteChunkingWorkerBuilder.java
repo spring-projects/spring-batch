@@ -28,18 +28,16 @@ import org.springframework.util.Assert;
  * Builder for a worker in a remote chunking setup. This builder:
  *
  * <ul>
- *     <li>creates a {@link ChunkProcessorChunkHandler} with the provided
- *     item processor and writer. If no item processor is provided, a
- *     {@link PassThroughItemProcessor} will be used</li>
- *     <li>creates an {@link IntegrationFlow} with the
- *     {@link ChunkProcessorChunkHandler} as a service activator which listens
- *     to incoming requests on <code>inputChannel</code> and sends replies
- *     on <code>outputChannel</code></li>
+ * <li>creates a {@link ChunkProcessorChunkHandler} with the provided item processor and
+ * writer. If no item processor is provided, a {@link PassThroughItemProcessor} will be
+ * used</li>
+ * <li>creates an {@link IntegrationFlow} with the {@link ChunkProcessorChunkHandler} as a
+ * service activator which listens to incoming requests on <code>inputChannel</code> and
+ * sends replies on <code>outputChannel</code></li>
  * </ul>
  *
  * @param <I> type of input items
  * @param <O> type of output items
- *
  * @since 4.1
  * @author Mahmoud Ben Hassine
  */
@@ -48,14 +46,15 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 	private static final String SERVICE_ACTIVATOR_METHOD_NAME = "handleChunk";
 
 	private ItemProcessor<I, O> itemProcessor;
+
 	private ItemWriter<O> itemWriter;
+
 	private MessageChannel inputChannel;
+
 	private MessageChannel outputChannel;
 
 	/**
-	 * Set the {@link ItemProcessor} to use to process items sent by the manager
-	 * step.
-	 *
+	 * Set the {@link ItemProcessor} to use to process items sent by the manager step.
 	 * @param itemProcessor to use
 	 * @return this builder instance for fluent chaining
 	 */
@@ -67,7 +66,6 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 
 	/**
 	 * Set the {@link ItemWriter} to use to write items sent by the manager step.
-	 *
 	 * @param itemWriter to use
 	 * @return this builder instance for fluent chaining
 	 */
@@ -79,7 +77,6 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 
 	/**
 	 * Set the input channel on which items sent by the manager are received.
-	 *
 	 * @param inputChannel the input channel
 	 * @return this builder instance for fluent chaining
 	 */
@@ -91,7 +88,6 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 
 	/**
 	 * Set the output channel on which replies will be sent to the manager step.
-	 *
 	 * @param outputChannel the output channel
 	 * @return this builder instance for fluent chaining
 	 */
@@ -103,18 +99,17 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 
 	/**
 	 * Create an {@link IntegrationFlow} with a {@link ChunkProcessorChunkHandler}
-	 * configured as a service activator listening to the input channel and replying
-	 * on the output channel.
-	 *
+	 * configured as a service activator listening to the input channel and replying on
+	 * the output channel.
 	 * @return the integration flow
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IntegrationFlow build() {
 		Assert.notNull(this.itemWriter, "An ItemWriter must be provided");
 		Assert.notNull(this.inputChannel, "An InputChannel must be provided");
 		Assert.notNull(this.outputChannel, "An OutputChannel must be provided");
 
-		if(this.itemProcessor == null) {
+		if (this.itemProcessor == null) {
 			this.itemProcessor = new PassThroughItemProcessor();
 		}
 		SimpleChunkProcessor<I, O> chunkProcessor = new SimpleChunkProcessor<>(this.itemProcessor, this.itemWriter);
@@ -122,11 +117,8 @@ public class RemoteChunkingWorkerBuilder<I, O> {
 		ChunkProcessorChunkHandler<I> chunkProcessorChunkHandler = new ChunkProcessorChunkHandler<>();
 		chunkProcessorChunkHandler.setChunkProcessor(chunkProcessor);
 
-		return IntegrationFlows
-				.from(this.inputChannel)
-				.handle(chunkProcessorChunkHandler, SERVICE_ACTIVATOR_METHOD_NAME)
-				.channel(this.outputChannel)
-				.get();
+		return IntegrationFlows.from(this.inputChannel)
+				.handle(chunkProcessorChunkHandler, SERVICE_ACTIVATOR_METHOD_NAME).channel(this.outputChannel).get();
 	}
 
 }

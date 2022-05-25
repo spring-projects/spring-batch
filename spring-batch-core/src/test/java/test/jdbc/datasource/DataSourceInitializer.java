@@ -39,14 +39,14 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Wrapper for a {@link DataSource} that can run scripts on start up and shut
- * down.  Us as a bean definition <br><br>
+ * Wrapper for a {@link DataSource} that can run scripts on start up and shut down. Us as
+ * a bean definition <br>
+ * <br>
  *
- * Run this class to initialize a database in a running server process.
- * Make sure the server is running first by launching the "hsql-server" from the
- * <code>hsql.server</code> project. Then you can right click in Eclipse and
- * Run As -&gt; Java Application. Do the same any time you want to wipe the
- * database and start again.
+ * Run this class to initialize a database in a running server process. Make sure the
+ * server is running first by launching the "hsql-server" from the
+ * <code>hsql.server</code> project. Then you can right click in Eclipse and Run As -&gt;
+ * Java Application. Do the same any time you want to wipe the database and start again.
  *
  * @author Dave Syer
  *
@@ -65,7 +65,6 @@ public class DataSourceInitializer implements InitializingBean {
 
 	/**
 	 * Main method as convenient entry point.
-	 *
 	 * @param args
 	 */
 	@SuppressWarnings("resource")
@@ -106,8 +105,8 @@ public class DataSourceInitializer implements InitializingBean {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
 				try {
-					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
-							.getInputStream(), "UTF-8")), ";");
+					scripts = StringUtils.delimitedListToStringArray(
+							stripComments(IOUtils.readLines(scriptResource.getInputStream(), "UTF-8")), ";");
 				}
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);

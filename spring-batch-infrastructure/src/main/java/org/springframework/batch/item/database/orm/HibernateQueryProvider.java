@@ -23,15 +23,14 @@ import org.springframework.batch.item.ItemReader;
 
 /**
  * <p>
- * Interface defining the functionality to be provided for generating queries
- * for use with Hibernate {@link ItemReader}s or other custom built artifacts.
+ * Interface defining the functionality to be provided for generating queries for use with
+ * Hibernate {@link ItemReader}s or other custom built artifacts.
  * </p>
- * 
+ *
  * @author Anatoly Polinsky
  * @author Dave Syer
- * 
  * @since 2.1
- * 
+ *
  */
 public interface HibernateQueryProvider<T> {
 
@@ -40,37 +39,33 @@ public interface HibernateQueryProvider<T> {
 	 * Create the query object which type will be determined by the underline
 	 * implementation (e.g. Hibernate, JPA, etc.)
 	 * </p>
-	 * 
 	 * @return created query
 	 */
 	Query<T> createQuery();
 
 	/**
 	 * <p>
-	 * Inject a {@link Session} that can be used as a factory for queries. The
-	 * state of the session is controlled by the caller (i.e. it should be
-	 * closed if necessary).
+	 * Inject a {@link Session} that can be used as a factory for queries. The state of
+	 * the session is controlled by the caller (i.e. it should be closed if necessary).
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Use either this method or {@link #setStatelessSession(StatelessSession)}
 	 * </p>
-	 * 
 	 * @param session the {@link Session} to set
 	 */
 	void setSession(Session session);
 
 	/**
 	 * <p>
-	 * Inject a {@link StatelessSession} that can be used as a factory for
-	 * queries. The state of the session is controlled by the caller (i.e. it
-	 * should be closed if necessary).
+	 * Inject a {@link StatelessSession} that can be used as a factory for queries. The
+	 * state of the session is controlled by the caller (i.e. it should be closed if
+	 * necessary).
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Use either this method or {@link #setSession(Session)}
 	 * </p>
-	 * 
 	 * @param session the {@link StatelessSession} to set
 	 */
 	void setStatelessSession(StatelessSession session);

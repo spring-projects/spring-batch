@@ -17,7 +17,7 @@ package org.springframework.batch.item;
 
 /**
  * Exception indicating that an {@link ItemReader} needed to be opened before read.
- * 
+ *
  * @author Ben Hale
  */
 @SuppressWarnings("serial")
@@ -25,7 +25,6 @@ public class ReaderNotOpenException extends ItemReaderException {
 
 	/**
 	 * Create a new {@link ReaderNotOpenException} based on a message.
-	 * 
 	 * @param message the message for this exception
 	 */
 	public ReaderNotOpenException(String message) {
@@ -33,12 +32,13 @@ public class ReaderNotOpenException extends ItemReaderException {
 	}
 
 	/**
-	 * Create a new {@link ReaderNotOpenException} based on a message and another exception.
-	 * 
+	 * Create a new {@link ReaderNotOpenException} based on a message and another
+	 * exception.
 	 * @param msg the message for this exception
 	 * @param nested the other exception
 	 */
 	public ReaderNotOpenException(String msg, Throwable nested) {
 		super(msg, nested);
 	}
+
 }

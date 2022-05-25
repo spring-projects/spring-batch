@@ -74,4 +74,5 @@ public class SkipProcessorStub<T> extends AbstractExceptionThrowingItemHandlerSt
 		}
 		return item;
 	}
+
 }

@@ -36,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -47,7 +47,7 @@ public class PollingIntegrationTests {
 
 	@Autowired
 	private Job job;
-	
+
 	@Autowired
 	private JobExplorer jobExplorer;
 
@@ -62,8 +62,8 @@ public class PollingIntegrationTests {
 		assertNotNull(jobLauncher.run(job, new JobParameters()));
 		List<JobInstance> jobInstances = jobExplorer.getJobInstances(job.getName(), 0, 100);
 		int after = jobInstances.size();
-		assertEquals(1, after-before);
-		JobExecution jobExecution = jobExplorer.getJobExecutions(jobInstances.get(jobInstances.size()-1)).get(0);
+		assertEquals(1, after - before);
+		JobExecution jobExecution = jobExplorer.getJobExecutions(jobInstances.get(jobInstances.size() - 1)).get(0);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(3, jobExecution.getStepExecutions().size());
 	}

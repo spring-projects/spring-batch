@@ -25,8 +25,8 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.item.ItemReader;
 
 /**
- * Marks a method to be called when an item is skipped due to an exception
- * thrown in the {@link ItemReader}. <br>
+ * Marks a method to be called when an item is skipped due to an exception thrown in the
+ * {@link ItemReader}. <br>
  * <br>
  * Expected signature: void onSkipInRead({@link Throwable} t)
  *
@@ -35,7 +35,7 @@ import org.springframework.batch.item.ItemReader;
  * @see SkipListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface OnSkipInRead {
 
 }

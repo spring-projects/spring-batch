@@ -62,7 +62,7 @@ public class TransactionalStaxEventItemWriterTests {
 
 	// test item for writing to output
 	private Object item = new Object() {
-        @Override
+		@Override
 		public String toString() {
 			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
@@ -87,12 +87,12 @@ public class TransactionalStaxEventItemWriterTests {
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
 				}
-				catch ( Exception e) {
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 				return null;
@@ -108,9 +108,9 @@ public class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeaderAfterRollback() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback(){
+		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -120,14 +120,14 @@ public class TransactionalStaxEventItemWriterTests {
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
 				}
-				
+
 			}
-			
+
 		});
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -146,7 +146,7 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.close();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -168,9 +168,9 @@ public class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback(){
+		writer.setHeaderCallback(new StaxWriterCallback() {
 
-            @Override
+			@Override
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
 				try {
@@ -180,13 +180,13 @@ public class TransactionalStaxEventItemWriterTests {
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
 				}
-				
+
 			}
-			
+
 		});
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-            @Override
+			@Override
 			public Void doInTransaction(TransactionStatus status) {
 				try {
 					writer.write(items);
@@ -202,7 +202,7 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback<Void>() {
-                @Override
+				@Override
 				public Void doInTransaction(TransactionStatus status) {
 					try {
 						writer.write(items);
@@ -228,27 +228,30 @@ public class TransactionalStaxEventItemWriterTests {
 	 * @return output file content as String
 	 */
 	private String outputFileContent() throws IOException {
-		return FileUtils.readFileToString(resource.getFile(), (String)null);
+		return FileUtils.readFileToString(resource.getFile(), (String) null);
 	}
 
 	/**
 	 * Writes object's toString representation as XML comment.
 	 */
 	private static class SimpleMarshaller implements Marshaller {
-        @Override
+
+		@Override
 		public void marshal(Object graph, Result result) throws XmlMappingException, IOException {
 			try {
-				StaxTestUtils.getXmlEventWriter(result).add(XMLEventFactory.newInstance().createComment(graph.toString()));
+				StaxTestUtils.getXmlEventWriter(result)
+						.add(XMLEventFactory.newInstance().createComment(graph.toString()));
 			}
-			catch ( Exception e) {
+			catch (Exception e) {
 				throw new RuntimeException("Exception while writing to output file", e);
 			}
 		}
 
-        @Override
+		@Override
 		public boolean supports(Class<?> clazz) {
 			return true;
 		}
+
 	}
 
 	/**
@@ -271,4 +274,5 @@ public class TransactionalStaxEventItemWriterTests {
 
 		return source;
 	}
+
 }

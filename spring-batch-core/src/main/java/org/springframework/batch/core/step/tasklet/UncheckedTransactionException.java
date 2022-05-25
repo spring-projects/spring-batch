@@ -16,8 +16,8 @@
 package org.springframework.batch.core.step.tasklet;
 
 /**
- * Convenience wrapper for a checked exception so that it can cause a
- * rollback and be extracted afterwards.
+ * Convenience wrapper for a checked exception so that it can cause a rollback and be
+ * extracted afterwards.
  *
  * @author Dave Syer
  *
@@ -28,4 +28,5 @@ public class UncheckedTransactionException extends RuntimeException {
 	public UncheckedTransactionException(Exception e) {
 		super(e);
 	}
+
 }

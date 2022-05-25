@@ -102,4 +102,5 @@ public enum BatchJobObservation implements DocumentedObservation {
 		}
 
 	}
+
 }

@@ -34,11 +34,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 
 /**
- * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a
- * {@link org.springframework.batch.core.Step} and goes on to (optionally) list
- * a set of transitions from that step to others with &lt;next on="pattern"
- * to="stepName"/&gt;. Used by the {@link JobParser}.
+ * Internal parser for the &lt;step/&gt; elements inside a job. A step element references
+ * a bean definition for a {@link org.springframework.batch.core.Step} and goes on to
+ * (optionally) list a set of transitions from that step to others with &lt;next
+ * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
  *
  * @author Dave Syer
  * @author Thomas Risberg
@@ -56,7 +55,7 @@ public abstract class AbstractStepParser {
 	private static final String PARENT_ATTR = "parent";
 
 	private static final String REF_ATTR = "ref";
-	
+
 	private static final String ALLOW_START_ATTR = "allow-start-if-complete";
 
 	private static final String TASKLET_ELE = "tasklet";
@@ -89,13 +88,14 @@ public abstract class AbstractStepParser {
 
 	private static final String JOB_REPO_ATTR = "job-repository";
 
-	private static final StepListenerParser stepListenerParser = new StepListenerParser(StepListenerMetaData.stepExecutionListenerMetaData());
+	private static final StepListenerParser stepListenerParser = new StepListenerParser(
+			StepListenerMetaData.stepExecutionListenerMetaData());
 
 	/**
-	 * @param stepElement   The &lt;step/&gt; element
+	 * @param stepElement The &lt;step/&gt; element
 	 * @param parserContext instance of {@link ParserContext}.
-	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 *                      from the enclosing tag. Use 'null' if unknown.
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean} from the
+	 * enclosing tag. Use 'null' if unknown.
 	 * @return {@link AbstractBeanDefinition} for the stepElement.
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
@@ -105,7 +105,7 @@ public abstract class AbstractStepParser {
 
 		// look at all nested elements
 		NodeList children = stepElement.getChildNodes();
-		
+
 		for (int i = 0; i < children.getLength(); i++) {
 			Node nd = children.item(i);
 
@@ -142,7 +142,8 @@ public abstract class AbstractStepParser {
 					// Spring NS
 					if ((ns == null && name.equals(BeanDefinitionParserDelegate.BEAN_ELEMENT))
 							|| ns.equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
-						BeanDefinitionHolder holder = parserContext.getDelegate().parseBeanDefinitionElement(nestedElement);
+						BeanDefinitionHolder holder = parserContext.getDelegate()
+								.parseBeanDefinitionElement(nestedElement);
 						value = parserContext.getDelegate().decorateBeanDefinitionIfRequired(nestedElement, holder);
 					}
 					// Spring Batch transitions
@@ -154,7 +155,7 @@ public abstract class AbstractStepParser {
 					else {
 						value = parserContext.getDelegate().parseCustomElement(nestedElement);
 					}
-					
+
 					if (!skip) {
 						bd.setBeanClass(StepParserStepFactoryBean.class);
 						bd.setAttribute("isNamespaceStep", true);
@@ -183,21 +184,22 @@ public abstract class AbstractStepParser {
 			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
-		//add the allow parser here
+		// add the allow parser here
 		String isAllowStart = stepElement.getAttribute(ALLOW_START_ATTR);
 		if (StringUtils.hasText(isAllowStart)) {
-			//check if the value is already set from an inner element
+			// check if the value is already set from an inner element
 			if (!bd.getPropertyValues().contains("allowStartIfComplete")) {
-				//set the value as a property
+				// set the value as a property
 				bd.getPropertyValues().add("allowStartIfComplete", Boolean.valueOf(isAllowStart));
-			}//end if
+			} // end if
 		}
-		
+
 		stepListenerParser.handleListenersElement(stepElement, bd, parserContext);
 		return bd;
 	}
 
-	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified, String jobFactoryRef ) {
+	private void parsePartition(Element stepElement, Element partitionElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified, String jobFactoryRef) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -215,7 +217,7 @@ public abstract class AbstractStepParser {
 
 		propertyValues.addPropertyValue("partitioner", new RuntimeBeanReference(partitionerRef));
 		if (StringUtils.hasText(aggregatorRef)) {
-			propertyValues.addPropertyValue("stepExecutionAggregator", new RuntimeBeanReference(aggregatorRef));			
+			propertyValues.addPropertyValue("stepExecutionAggregator", new RuntimeBeanReference(aggregatorRef));
 		}
 
 		boolean customHandler = false;
@@ -231,7 +233,8 @@ public abstract class AbstractStepParser {
 					propertyValues.addPropertyValue("gridSize", new TypedStringValue(gridSize));
 				}
 			}
-		} else {
+		}
+		else {
 			customHandler = true;
 			BeanDefinition partitionHandler = BeanDefinitionBuilder.genericBeanDefinition().getRawBeanDefinition();
 			partitionHandler.setParentName(handlerRef);
@@ -246,15 +249,17 @@ public abstract class AbstractStepParser {
 
 		if (StringUtils.hasText(stepRef)) {
 			propertyValues.addPropertyValue("step", new RuntimeBeanReference(stepRef));
-		} else if( inlineStepElement!=null) {
+		}
+		else if (inlineStepElement != null) {
 			AbstractBeanDefinition stepDefinition = parseStep(inlineStepElement, parserContext, jobFactoryRef);
 			stepDefinition.getPropertyValues().addPropertyValue("name", stepElement.getAttribute(ID_ATTR));
-			propertyValues.addPropertyValue("step", stepDefinition );
+			propertyValues.addPropertyValue("step", stepDefinition);
 		}
 
 	}
 
-	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd, ParserContext parserContext, boolean stepUnderspecified) {
+	private void parseJob(Element stepElement, Element jobElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);
@@ -280,9 +285,8 @@ public abstract class AbstractStepParser {
 
 	}
 
-
 	private void parseFlow(Element stepElement, Element flowElement, AbstractBeanDefinition bd,
-	                       ParserContext parserContext, boolean stepUnderspecified) {
+			ParserContext parserContext, boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 		bd.setAttribute("isNamespaceStep", true);

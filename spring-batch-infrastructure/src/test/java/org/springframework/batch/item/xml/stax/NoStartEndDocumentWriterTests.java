@@ -28,7 +28,7 @@ import static org.mockito.Mockito.times;
 
 /**
  * Tests for {@link NoStartEndDocumentStreamWriter}
- * 
+ *
  * @author Robert Kasanicky
  * @author Will Schipp
  */
@@ -41,15 +41,14 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		wrappedWriter = mock(XMLEventWriter.class);
 		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
 	}
 
 	/**
-	 * StartDocument and EndDocument events are not passed to the wrapped
-	 * writer.
+	 * StartDocument and EndDocument events are not passed to the wrapped writer.
 	 */
 	public void testNoStartEnd() throws Exception {
 		XMLEvent event = eventFactory.createComment("testEvent");
@@ -62,14 +61,16 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 		writer.add(eventFactory.createEndDocument());
 
 	}
-	
+
 	/**
-	 * Close is not delegated to the wrapped writer. Instead, the wrapped writer is flushed.
+	 * Close is not delegated to the wrapped writer. Instead, the wrapped writer is
+	 * flushed.
 	 */
 	public void testClose() throws Exception {
 		writer.close();
-		
+
 		verify(wrappedWriter, times(1)).flush();
 		verify(wrappedWriter, never()).close();
 	}
+
 }

@@ -20,9 +20,9 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemStreamSupport;
 
-
 /**
  * Base class for {@link ItemReader} implementations.
+ *
  * @author Dave Syer
  *
  */

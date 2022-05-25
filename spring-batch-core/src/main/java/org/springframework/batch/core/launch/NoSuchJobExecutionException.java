@@ -19,18 +19,16 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
- * Checked exception to indicate that a required {@link JobExecution} is not
- * available.
- * 
+ * Checked exception to indicate that a required {@link JobExecution} is not available.
+ *
  * @author Dave Syer
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class NoSuchJobExecutionException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
-	 *
 	 * @param msg the error message.
 	 */
 	public NoSuchJobExecutionException(String msg) {
@@ -44,4 +42,5 @@ public class NoSuchJobExecutionException extends JobExecutionException {
 	public NoSuchJobExecutionException(String msg, Throwable e) {
 		super(msg, e);
 	}
+
 }

@@ -27,7 +27,7 @@ import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class CompositeItemStreamTests extends TestCase {
 
@@ -37,9 +37,9 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
-                    @Override
+			@Override
 			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+				super.open(executionContext);
 				list.add("bar");
 			}
 		};
@@ -50,9 +50,9 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testRegisterTwice() {
 		ItemStreamSupport stream = new ItemStreamSupport() {
-            @Override
+			@Override
 			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+				super.open(executionContext);
 				list.add("bar");
 			}
 		};
@@ -64,9 +64,9 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testMark() {
 		manager.register(new ItemStreamSupport() {
-                    @Override 
+			@Override
 			public void update(ExecutionContext executionContext) {
-                                super.update(executionContext);
+				super.update(executionContext);
 				list.add("bar");
 			}
 		});
@@ -76,9 +76,9 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
-                    @Override
+			@Override
 			public void close() {
-                                super.close();
+				super.close();
 				list.add("bar");
 			}
 		});
@@ -88,9 +88,9 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testCloseDoesNotUnregister() {
 		manager.setStreams(new ItemStream[] { new ItemStreamSupport() {
-                    @Override 
+			@Override
 			public void open(ExecutionContext executionContext) {
-                                super.open(executionContext);
+				super.open(executionContext);
 				list.add("bar");
 			}
 		} });

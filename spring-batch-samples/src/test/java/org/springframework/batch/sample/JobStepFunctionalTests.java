@@ -40,8 +40,10 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class JobStepFunctionalTests {
+
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -51,13 +53,14 @@ public class JobStepFunctionalTests {
 
 	@Test
 	public void testJobLaunch() throws Exception {
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "TRADE");
 
-		jobLauncherTestUtils.launchJob(new DefaultJobParametersConverter()
-				.getJobParameters(PropertiesConverter
-						.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+		jobLauncherTestUtils
+				.launchJob(new DefaultJobParametersConverter().getJobParameters(PropertiesConverter.stringToProperties(
+						"run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 
 		int after = JdbcTestUtils.countRowsInTable(jdbcTemplate, "TRADE");
 		assertEquals(5, after);
 	}
+
 }

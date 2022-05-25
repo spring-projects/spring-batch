@@ -29,11 +29,12 @@ import org.springframework.lang.Nullable;
  *
  */
 public class SingleItemPeekableItemReaderTests {
-	
+
 	private SingleItemPeekableItemReader<String> reader = new SingleItemPeekableItemReader<>();
-	
+
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
+	 * Test method for
+	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#read()}.
 	 */
 	@Test
 	public void testRead() throws Exception {
@@ -44,7 +45,8 @@ public class SingleItemPeekableItemReaderTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#peek()}.
+	 * Test method for
+	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#peek()}.
 	 */
 	@Test
 	public void testPeek() throws Exception {
@@ -57,7 +59,8 @@ public class SingleItemPeekableItemReaderTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
+	 * Test method for
+	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
 	 */
 	@Test
 	public void testCloseAndOpenNoPeek() throws Exception {
@@ -67,11 +70,12 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
+	 * Test method for
+	 * {@link org.springframework.batch.item.support.SingleItemPeekableItemReader#close()}.
 	 */
 	@Test
 	public void testCloseAndOpenWithPeek() throws Exception {
@@ -82,7 +86,7 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 	}
 
 	@Test
@@ -94,20 +98,20 @@ public class SingleItemPeekableItemReaderTests {
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("b", reader.read());		
+		assertEquals("b", reader.read());
 		assertEquals("c", reader.peek());
 		reader.update(executionContext);
 		reader.close();
 		reader.open(executionContext);
-		assertEquals("c", reader.read());		
+		assertEquals("c", reader.read());
 	}
 
 	public static class CountingListItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> {
-		
+
 		private final List<T> list;
-		
+
 		private int counter = 0;
-		
+
 		public CountingListItemReader(List<T> list) {
 			this.list = list;
 			setName("foo");
@@ -126,12 +130,12 @@ public class SingleItemPeekableItemReaderTests {
 		@Nullable
 		@Override
 		protected T doRead() throws Exception {
-			if (counter>=list.size()) {
+			if (counter >= list.size()) {
 				return null;
 			}
 			return list.get(counter++);
 		}
-		
+
 	}
 
 }

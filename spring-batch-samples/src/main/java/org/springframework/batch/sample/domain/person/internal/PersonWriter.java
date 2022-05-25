@@ -24,12 +24,14 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.person.Person;
 
 public class PersonWriter implements ItemWriter<Person> {
-    private static Log log = LogFactory.getLog(PersonWriter.class);
- 
-    @Override
+
+	private static Log log = LogFactory.getLog(PersonWriter.class);
+
+	@Override
 	public void write(List<? extends Person> data) {
-        if (log.isDebugEnabled()) {
-            log.debug("Processing: " + data);
-        }
-    }
+		if (log.isDebugEnabled()) {
+			log.debug("Processing: " + data);
+		}
+	}
+
 }

@@ -25,24 +25,24 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link FlatFileItemReader}.
  */
-public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderTests{
+public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
-	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
-	
+	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n";
+
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		FlatFileItemReader<Foo> tested = new FlatFileItemReader<>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
 		tested.setLineMapper(new LineMapper<Foo>() {
-            @Override
+			@Override
 			public Foo mapLine(String line, int lineNumber) {
 				Foo foo = new Foo();
 				foo.setValue(Integer.valueOf(line.trim()));
 				return foo;
 			}
 		});
-		
+
 		tested.setSaveState(true);
 		tested.afterPropertiesSet();
 		return tested;
@@ -52,14 +52,12 @@ public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderT
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		FlatFileItemReader<Foo> reader = (FlatFileItemReader<Foo>) tested;
 		reader.close();
-		
+
 		reader.setResource(new ByteArrayResource("".getBytes()));
 		reader.afterPropertiesSet();
-		
+
 		reader.open(new ExecutionContext());
-		
+
 	}
 
-	
-	
 }

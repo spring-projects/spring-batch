@@ -26,15 +26,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Marks the input row as 'processed'. (This change will rollback if there is
- * problem later)
+ * Marks the input row as 'processed'. (This change will rollback if there is problem
+ * later)
  *
  * @param <T> item type
- *
  * @see StagingItemReader
  * @see StagingItemWriter
  * @see ProcessIndicatorItemWrapper
- *
  * @author Robert Kasanicky
  */
 public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorItemWrapper<T>, T>, InitializingBean {
@@ -55,8 +53,8 @@ public class StagingItemProcessor<T> implements ItemProcessor<ProcessIndicatorIt
 	}
 
 	/**
-	 * Use the technical identifier to mark the input row as processed and
-	 * return unwrapped item.
+	 * Use the technical identifier to mark the input row as processed and return
+	 * unwrapped item.
 	 */
 	@Nullable
 	@Override

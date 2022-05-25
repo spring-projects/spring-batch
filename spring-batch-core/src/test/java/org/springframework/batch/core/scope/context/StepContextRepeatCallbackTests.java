@@ -29,14 +29,16 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class StepContextRepeatCallbackTests {
-	
+
 	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
+
 	private boolean addedAttribute = false;
+
 	private boolean removedAttribute = false;
-	
+
 	@After
 	public void cleanUpStepContext() {
 		StepSynchronizationManager.close();
@@ -51,7 +53,7 @@ public class StepContextRepeatCallbackTests {
 				return RepeatStatus.FINISHED;
 			}
 		};
-		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));		
+		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));
 		assertEquals(ExitStatus.EXECUTING, stepExecution.getExitStatus());
 	}
 
@@ -64,14 +66,15 @@ public class StepContextRepeatCallbackTests {
 				if (addedAttribute) {
 					removedAttribute = chunkContext.hasAttribute("foo");
 					chunkContext.removeAttribute("foo");
-				} else {
+				}
+				else {
 					addedAttribute = true;
 					chunkContext.setAttribute("foo", "bar");
 				}
 				return RepeatStatus.FINISHED;
 			}
 		};
-		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));		
+		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));
 		assertTrue(addedAttribute);
 		callback.doInIteration(null);
 		assertTrue(removedAttribute);

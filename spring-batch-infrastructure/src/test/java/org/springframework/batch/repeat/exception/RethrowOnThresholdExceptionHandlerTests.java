@@ -59,7 +59,7 @@ public class RethrowOnThresholdExceptionHandlerTests {
 
 	@Test
 	public void testNotRethrownWithThreshold() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		AtomicInteger counter = (AtomicInteger) context.getAttribute(context.attributeNames()[0]);
@@ -69,7 +69,7 @@ public class RethrowOnThresholdExceptionHandlerTests {
 
 	@Test
 	public void testRethrowOnThreshold() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 2));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 2));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -84,7 +84,7 @@ public class RethrowOnThresholdExceptionHandlerTests {
 
 	@Test
 	public void testNotUseParent() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
@@ -99,7 +99,7 @@ public class RethrowOnThresholdExceptionHandlerTests {
 
 	@Test
 	public void testUseParent() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer>singletonMap(Exception.class, 1));
 		handler.setUseParent(true);
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));

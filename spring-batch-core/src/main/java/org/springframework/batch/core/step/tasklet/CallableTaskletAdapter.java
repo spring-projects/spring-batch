@@ -25,8 +25,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Adapts a {@link Callable}&lt;{@link RepeatStatus}&gt; to the {@link Tasklet}
- * interface.
+ * Adapts a {@link Callable}&lt;{@link RepeatStatus}&gt; to the {@link Tasklet} interface.
  *
  * @author Dave Syer
  *
@@ -54,8 +53,8 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	}
 
 	/**
-	 * Execute the provided Callable and return its {@link RepeatStatus}. Ignores
-	 * the {@link StepContribution} and the attributes.
+	 * Execute the provided Callable and return its {@link RepeatStatus}. Ignores the
+	 * {@link StepContribution} and the attributes.
 	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
 	@Nullable

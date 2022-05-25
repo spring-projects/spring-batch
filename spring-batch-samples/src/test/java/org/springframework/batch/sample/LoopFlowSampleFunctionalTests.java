@@ -27,13 +27,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Checks that expected number of items have been processed.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml",
-		"/job-runner-context.xml" })
+@ContextConfiguration(
+		locations = { "/simple-job-launcher-context.xml", "/jobs/loopFlowSample.xml", "/job-runner-context.xml" })
 public class LoopFlowSampleFunctionalTests {
 
 	@Autowired
@@ -41,7 +41,7 @@ public class LoopFlowSampleFunctionalTests {
 
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
-	
+
 	@Test
 	public void testJobLaunch() throws Exception {
 		jobLauncherTestUtils.launchJob();

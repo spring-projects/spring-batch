@@ -18,9 +18,9 @@ package org.springframework.batch.item.database.support;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
- * Factory for creating {@link DataFieldMaxValueIncrementer} implementations
- * based upon a provided string.
- * 
+ * Factory for creating {@link DataFieldMaxValueIncrementer} implementations based upon a
+ * provided string.
+ *
  * @author Lucas Ward
  *
  */
@@ -28,29 +28,28 @@ public interface DataFieldMaxValueIncrementerFactory {
 
 	/**
 	 * Return the {@link DataFieldMaxValueIncrementer} for the provided database type.
-	 * 
 	 * @param databaseType string represented database type
 	 * @param incrementerName incrementer name to create. In many cases this may be the
-	 *  sequence name
+	 * sequence name
 	 * @return incrementer
-	 * @throws IllegalArgumentException if databaseType is invalid type, or incrementerName
-	 * is null.
+	 * @throws IllegalArgumentException if databaseType is invalid type, or
+	 * incrementerName is null.
 	 */
 	public DataFieldMaxValueIncrementer getIncrementer(String databaseType, String incrementerName);
-	
+
 	/**
 	 * Returns boolean indicated whether or not the provided string is supported by this
 	 * factory.
-	 *
 	 * @param databaseType {@link String} containing the database type.
-	 * @return true if the incrementerType is supported by this database type. Else false is returned.
+	 * @return true if the incrementerType is supported by this database type. Else false
+	 * is returned.
 	 */
 	public boolean isSupportedIncrementerType(String databaseType);
 
 	/**
 	 * Returns the list of supported database incrementer types
-	 *
-	 * @return  an array of {@link String}s containing the supported incrementer types.
+	 * @return an array of {@link String}s containing the supported incrementer types.
 	 */
 	public String[] getSupportedIncrementerTypes();
+
 }

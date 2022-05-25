@@ -57,4 +57,5 @@ public class SkipWriterStub<T> extends AbstractExceptionThrowingItemHandlerStub<
 			checkFailure(item);
 		}
 	}
+
 }

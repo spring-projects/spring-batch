@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.domain.order;
 
-
 public class Customer {
+
 	public static final String LINE_ID_BUSINESS_CUST = "BCU";
 
 	public static final String LINE_ID_NON_BUSINESS_CUST = "NCU";

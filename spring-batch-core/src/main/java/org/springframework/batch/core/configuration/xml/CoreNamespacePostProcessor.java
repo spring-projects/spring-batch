@@ -31,13 +31,13 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Post-process jobs and steps defined using the batch namespace to inject
- * dependencies.
+ * Post-process jobs and steps defined using the batch namespace to inject dependencies.
  *
  * @author Dan Garrette
  * @since 2.0.1
  */
-public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactoryPostProcessor, ApplicationContextAware {
+public class CoreNamespacePostProcessor
+		implements BeanPostProcessor, BeanFactoryPostProcessor, ApplicationContextAware {
 
 	private static final String DEFAULT_JOB_REPOSITORY_NAME = "jobRepository";
 
@@ -58,9 +58,8 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	}
 
 	/**
-	 * Automatically inject job-repository from a job into its steps. Only
-	 * inject if the step is an AbstractStep or StepParserStepFactoryBean.
-	 *
+	 * Automatically inject job-repository from a job into its steps. Only inject if the
+	 * step is an AbstractStep or StepParserStepFactoryBean.
 	 * @param beanName
 	 * @param beanFactory
 	 */
@@ -87,16 +86,13 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 
 	/**
 	 * If any of the beans in the parent hierarchy is a &lt;step/&gt; with a
-	 * &lt;tasklet/&gt;, then the bean class must be
-	 * {@link StepParserStepFactoryBean}.
-	 *
+	 * &lt;tasklet/&gt;, then the bean class must be {@link StepParserStepFactoryBean}.
 	 * @param beanName
 	 * @param beanFactory
 	 */
 	private void overrideStepClass(String beanName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
-		Object isNamespaceStep = BeanDefinitionUtils
-				.getAttribute(beanName, "isNamespaceStep", beanFactory);
+		Object isNamespaceStep = BeanDefinitionUtils.getAttribute(beanName, "isNamespaceStep", beanFactory);
 		if (isNamespaceStep != null && (Boolean) isNamespaceStep) {
 			((AbstractBeanDefinition) bd).setBeanClass(StepParserStepFactoryBean.class);
 		}
@@ -110,12 +106,11 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	/**
 	 * Inject defaults into factory beans.
 	 * <ul>
-	 * <li>Inject "jobRepository" into any {@link JobParserJobFactoryBean}
-	 * without a jobRepository.
-	 * <li>Inject "transactionManager" into any
-	 * {@link StepParserStepFactoryBean} without a transactionManager.
+	 * <li>Inject "jobRepository" into any {@link JobParserJobFactoryBean} without a
+	 * jobRepository.
+	 * <li>Inject "transactionManager" into any {@link StepParserStepFactoryBean} without
+	 * a transactionManager.
 	 * </ul>
-	 *
 	 * @param bean
 	 * @return
 	 */
@@ -126,7 +121,8 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 			if (jobRepository == null) {
 				fb.setJobRepository((JobRepository) applicationContext.getBean(DEFAULT_JOB_REPOSITORY_NAME));
 			}
-		} else if (bean instanceof StepParserStepFactoryBean) {
+		}
+		else if (bean instanceof StepParserStepFactoryBean) {
 			StepParserStepFactoryBean<?, ?> fb = (StepParserStepFactoryBean<?, ?>) bean;
 			JobRepository jobRepository = fb.getJobRepository();
 			if (jobRepository == null) {
@@ -134,8 +130,8 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 			}
 			PlatformTransactionManager transactionManager = fb.getTransactionManager();
 			if (transactionManager == null && fb.requiresTransactionManager()) {
-				fb.setTransactionManager((PlatformTransactionManager) applicationContext
-						.getBean(DEFAULT_TRANSACTION_MANAGER_NAME));
+				fb.setTransactionManager(
+						(PlatformTransactionManager) applicationContext.getBean(DEFAULT_TRANSACTION_MANAGER_NAME));
 			}
 		}
 		return bean;
@@ -150,4 +146,5 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
+
 }

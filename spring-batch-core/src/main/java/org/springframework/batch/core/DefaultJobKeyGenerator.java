@@ -25,10 +25,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.DigestUtils;
 
 /**
- * Default implementation of the {@link JobKeyGenerator} interface.
- * This implementation provides a single hash value based on the {@link JobParameters} object
- * passed in. Only identifying parameters (as per {@link JobParameter#isIdentifying()})
- * are used in the calculation of the key.
+ * Default implementation of the {@link JobKeyGenerator} interface. This implementation
+ * provides a single hash value based on the {@link JobParameters} object passed in. Only
+ * identifying parameters (as per {@link JobParameter#isIdentifying()}) are used in the
+ * calculation of the key.
  *
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -50,16 +50,17 @@ public class DefaultJobKeyGenerator implements JobKeyGenerator<JobParameters> {
 		Collections.sort(keys);
 		for (String key : keys) {
 			JobParameter jobParameter = props.get(key);
-			if(jobParameter.isIdentifying()) {
-				String value = jobParameter.getValue()==null ? "" : jobParameter.toString();
+			if (jobParameter.isIdentifying()) {
+				String value = jobParameter.getValue() == null ? "" : jobParameter.toString();
 				stringBuffer.append(key).append("=").append(value).append(";");
 			}
 		}
 		try {
 			return DigestUtils.md5DigestAsHex(stringBuffer.toString().getBytes("UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(
-					"UTF-8 encoding not available.  Fatal (should be in the JDK).");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
 		}
 	}
+
 }

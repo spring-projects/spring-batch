@@ -65,8 +65,8 @@ public class FileToMessagesJobIntegrationTests implements MessageHandler {
 	@Test
 	public void testFileSent() throws Exception {
 
-		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().addLong("time.stamp",
-				System.currentTimeMillis()).toJobParameters());
+		JobExecution execution = jobLauncher.run(job,
+				new JobParametersBuilder().addLong("time.stamp", System.currentTimeMillis()).toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		// 2 chunks sent to channel (5 items and commit-interval=3)
 		assertEquals(2, count);

@@ -28,7 +28,6 @@ import org.springframework.util.StringUtils;
  * @author Mahmoud Ben Hassine
  * @author Parikshit Dutta
  * @since 4.3
- *
  * @param <E> entity returned by executing the query
  */
 public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
@@ -61,4 +60,5 @@ public class JpaNamedQueryProvider<E> extends AbstractJpaQueryProvider {
 		Assert.isTrue(StringUtils.hasText(this.namedQuery), "Named query cannot be empty");
 		Assert.notNull(this.entityClass, "Entity class cannot be NULL");
 	}
+
 }

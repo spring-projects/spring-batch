@@ -67,15 +67,16 @@ public class JdbcPagingQueryIntegrationTests {
 	private int itemCount = 9;
 
 	private int pageSize = 2;
-	
+
 	@Before
 	public void testInit() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
-		String[] names = {"Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz"};
-		String[] codes = {"A",   "B",   "A",   "B",   "B",   "B",   "A",   "B",   "A"};
+		String[] names = { "Foo", "Bar", "Baz", "Foo", "Bar", "Baz", "Foo", "Bar", "Baz" };
+		String[] codes = { "A", "B", "A", "B", "B", "B", "A", "B", "A" };
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "T_FOOS");
-		for(int i = 0; i < names.length; i++) {
-			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i], codes[i], i);
+		for (int i = 0; i < names.length; i++) {
+			jdbcTemplate.update("INSERT into T_FOOS (ID,NAME, CODE, VALUE) values (?, ?, ?, ?)", maxId, names[i],
+					codes[i], i);
 			maxId++;
 		}
 		assertEquals(itemCount, JdbcTestUtils.countRowsInTable(jdbcTemplate, "T_FOOS"));
@@ -104,26 +105,26 @@ public class JdbcPagingQueryIntegrationTests {
 		Map<String, Object> oldValues = null;
 
 		while (count < pages * pageSize) {
-			Map<String, Object> startAfterValues = getStartAfterValues(
-					queryProvider, list);
+			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
 			assertNotSame(oldValues, startAfterValues);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), getParameterList(null, startAfterValues).toArray());
+			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
+					getParameterList(null, startAfterValues).toArray());
 			assertEquals(pageSize, list.size());
 			count += pageSize;
 			oldValues = startAfterValues;
 		}
 
 		if (count < total) {
-			Map<String, Object> startAfterValues = getStartAfterValues(
-					queryProvider, list);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), getParameterList(null, startAfterValues).toArray());
+			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
+			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
+					getParameterList(null, startAfterValues).toArray());
 			assertEquals(total - pages * pageSize, list.size());
 			count += list.size();
 		}
 
 		assertEquals(total, count);
 	}
-	
+
 	@Test
 	public void testQueryFromStartWithGroupBy() throws Exception {
 		AbstractSqlPagingQueryProvider queryProvider = (AbstractSqlPagingQueryProvider) getPagingQueryProvider();
@@ -144,13 +145,13 @@ public class JdbcPagingQueryIntegrationTests {
 		Map<String, Object> oldValues = null;
 
 		while (count < total) {
-			Map<String, Object> startAfterValues = getStartAfterValues(
-					queryProvider, list);
+			Map<String, Object> startAfterValues = getStartAfterValues(queryProvider, list);
 			assertNotSame(oldValues, startAfterValues);
-			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize), getParameterList(null, startAfterValues).toArray());
+			list = jdbcTemplate.queryForList(queryProvider.generateRemainingPagesQuery(pageSize),
+					getParameterList(null, startAfterValues).toArray());
 			count += list.size();
-			
-			if(list.size() < pageSize) {
+
+			if (list.size() < pageSize) {
 				assertEquals(1, list.size());
 			}
 			else {
@@ -162,8 +163,7 @@ public class JdbcPagingQueryIntegrationTests {
 		assertEquals(total, count);
 	}
 
-	private Map<String, Object> getStartAfterValues(
-			PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
+	private Map<String, Object> getStartAfterValues(PagingQueryProvider queryProvider, List<Map<String, Object>> list) {
 		Map<String, Object> startAfterValues = new LinkedHashMap<>();
 		for (Map.Entry<String, Order> sortKey : queryProvider.getSortKeys().entrySet()) {
 			startAfterValues.put(sortKey.getKey(), list.get(list.size() - 1).get(sortKey.getKey()));
@@ -202,7 +202,7 @@ public class JdbcPagingQueryIntegrationTests {
 		return factory.getObject();
 
 	}
-	
+
 	private List<Object> getParameterList(Map<String, Object> values, Map<String, Object> sortKeyValue) {
 		SortedMap<String, Object> sm = new TreeMap<>();
 		if (values != null) {
@@ -213,18 +213,19 @@ public class JdbcPagingQueryIntegrationTests {
 		if (sortKeyValue != null && sortKeyValue.size() > 0) {
 			List<Map.Entry<String, Object>> keys = new ArrayList<>(sortKeyValue.entrySet());
 
-			for(int i = 0; i < keys.size(); i++) {
-				for(int j = 0; j < i; j++) {
+			for (int i = 0; i < keys.size(); i++) {
+				for (int j = 0; j < i; j++) {
 					parameterList.add(keys.get(j).getValue());
 				}
 
 				parameterList.add(keys.get(i).getValue());
 			}
 		}
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using parameterList:" + parameterList);
 		}
 		return parameterList;
 	}
+
 }

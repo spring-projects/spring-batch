@@ -29,8 +29,8 @@ import org.springframework.batch.core.step.StepHolder;
 import org.springframework.batch.core.step.StepLocator;
 
 /**
- * {@link State} implementation that delegates to a {@link FlowExecutor} to
- * execute the specified {@link Step}.
+ * {@link State} implementation that delegates to a {@link FlowExecutor} to execute the
+ * specified {@link Step}.
  *
  * @author Dave Syer
  * @author Michael Minella
@@ -61,8 +61,8 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		/*
-		 * On starting a new step, possibly upgrade the last execution to make
-		 * sure it is abandoned on restart if it failed.
+		 * On starting a new step, possibly upgrade the last execution to make sure it is
+		 * abandoned on restart if it failed.
 		 */
 		executor.abandonStepExecution();
 		return new FlowExecutionStatus(executor.executeStep(step));
@@ -73,7 +73,9 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return step;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
 	@Override
@@ -81,7 +83,9 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.step.StepLocator#getStepNames()
 	 */
 	@Override
@@ -90,26 +94,30 @@ public class StepState extends AbstractState implements StepLocator, StepHolder 
 
 		names.add(step.getName());
 
-		if(step instanceof StepLocator) {
-			names.addAll(((StepLocator)step).getStepNames());
+		if (step instanceof StepLocator) {
+			names.addAll(((StepLocator) step).getStepNames());
 		}
 
 		return names;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.step.StepLocator#getStep(java.lang.String)
 	 */
 	@Override
 	public Step getStep(String stepName) throws NoSuchStepException {
 		Step result = null;
 
-		if(step.getName().equals(stepName)) {
+		if (step.getName().equals(stepName)) {
 			result = step;
-		} else if(step instanceof StepLocator) {
+		}
+		else if (step instanceof StepLocator) {
 			result = ((StepLocator) step).getStep(stepName);
 		}
 
 		return result;
 	}
+
 }

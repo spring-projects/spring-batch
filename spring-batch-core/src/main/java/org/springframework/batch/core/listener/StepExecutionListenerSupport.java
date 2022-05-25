@@ -22,14 +22,17 @@ import org.springframework.lang.Nullable;
 
 /**
  * @author Dave Syer
- *
- * @deprecated as of 5.0, in favor of the default methods on the {@link StepExecutionListener}
+ * @deprecated as of 5.0, in favor of the default methods on the
+ * {@link StepExecutionListener}
  */
 @Deprecated
 public class StepExecutionListenerSupport implements StepExecutionListener {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
+	 * stepExecution)
 	 */
 	@Nullable
 	@Override
@@ -37,8 +40,12 @@ public class StepExecutionListenerSupport implements StepExecutionListener {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.item.ExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#open(org.springframework.batch.
+	 * item.ExecutionContext)
 	 */
 	@Override
 	public void beforeStep(StepExecution stepExecution) {

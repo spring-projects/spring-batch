@@ -38,9 +38,9 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 	private Map<String, Set<Runnable>> callbacks = new HashMap<>();
 
 	/**
-	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but
-	 * should be set to the enclosing repeat context if there is one, e.g. if
-	 * this context is an inner loop.
+	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but should be
+	 * set to the enclosing repeat context if there is one, e.g. if this context is an
+	 * inner loop.
 	 * @param parent {@link RepeatContext} to be used as the parent context.
 	 */
 	public RepeatContextSupport(RepeatContext parent) {
@@ -50,40 +50,40 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#isCompleteOnly()
 	 */
-    @Override
+	@Override
 	public boolean isCompleteOnly() {
 		return completeOnly;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#setCompleteOnly()
 	 */
-    @Override
+	@Override
 	public void setCompleteOnly() {
 		completeOnly = true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#isTerminateOnly()
 	 */
-    @Override
+	@Override
 	public boolean isTerminateOnly() {
 		return terminateOnly;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#setTerminateOnly()
 	 */
-    @Override
+	@Override
 	public void setTerminateOnly() {
 		terminateOnly = true;
 		setCompleteOnly();
@@ -91,10 +91,10 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#getParent()
 	 */
-    @Override
+	@Override
 	public RepeatContext getParent() {
 		return parent;
 	}
@@ -108,22 +108,21 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#getStartedCount()
 	 */
-    @Override
+	@Override
 	public synchronized int getStartedCount() {
 		return count;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.repeat.RepeatContext#registerDestructionCallback
+	 *
+	 * @see org.springframework.batch.repeat.RepeatContext#registerDestructionCallback
 	 * (java.lang.String, java.lang.Runnable)
 	 */
-    @Override
+	@Override
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
 			Set<Runnable> set = callbacks.get(name);
@@ -137,10 +136,10 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.RepeatContext#close()
 	 */
-    @Override
+	@Override
 	public void close() {
 
 		List<RuntimeException> errors = new ArrayList<>();
@@ -155,16 +154,15 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 			for (Runnable callback : entry.getValue()) {
 				/*
-				 * Potentially we could check here if there is an attribute with
-				 * the given name - if it has been removed, maybe the callback
-				 * is invalid. On the other hand it is less surprising for the
-				 * callback register if it is always executed.
+				 * Potentially we could check here if there is an attribute with the given
+				 * name - if it has been removed, maybe the callback is invalid. On the
+				 * other hand it is less surprising for the callback register if it is
+				 * always executed.
 				 */
 				if (callback != null) {
 					/*
-					 * The documentation of the interface says that these
-					 * callbacks must not throw exceptions, but we don't trust
-					 * them necessarily...
+					 * The documentation of the interface says that these callbacks must
+					 * not throw exceptions, but we don't trust them necessarily...
 					 */
 					try {
 						callback.run();

@@ -30,7 +30,6 @@ import org.springframework.util.Assert;
  * @author Mahmoud Ben Hassine
  * @since 4.0
  * @see Neo4jItemReader
- *
  * @deprecated since 5.0 in favor of the item reader builder from
  * https://github.com/spring-projects/spring-batch-extensions/blob/main/spring-batch-neo4j
  */
@@ -64,10 +63,9 @@ public class Neo4jItemReaderBuilder<T> {
 	private int currentItemCount;
 
 	/**
-	 * Configure if the state of the {@link org.springframework.batch.item.ItemStreamSupport}
-	 * should be persisted within the {@link org.springframework.batch.item.ExecutionContext}
-	 * for restart purposes.
-	 *
+	 * Configure if the state of the
+	 * {@link org.springframework.batch.item.ItemStreamSupport} should be persisted within
+	 * the {@link org.springframework.batch.item.ExecutionContext} for restart purposes.
 	 * @param saveState defaults to true
 	 * @return The current instance of the builder.
 	 */
@@ -81,7 +79,6 @@ public class Neo4jItemReaderBuilder<T> {
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link #saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -94,7 +91,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * Configure the max number of items to be read.
-	 *
 	 * @param maxItemCount the max items to be read
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setMaxItemCount(int)
@@ -107,7 +103,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * Index for the current item. Used on restarts to indicate where to start from.
-	 *
 	 * @param currentItemCount current index
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader#setCurrentItemCount(int)
@@ -132,7 +127,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * The number of items to be read with each page.
-	 *
 	 * @param pageSize the number of items
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setPageSize(int)
@@ -145,7 +139,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * Optional parameters to be used in the cypher query.
-	 *
 	 * @param parameterValues the parameter values to be used in the cypher query
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setParameterValues(Map)
@@ -159,7 +152,6 @@ public class Neo4jItemReaderBuilder<T> {
 	/**
 	 * The start segment of the cypher query. START is prepended to the statement provided
 	 * and should <em>not</em> be included.
-	 *
 	 * @param startStatement the start fragment of the cypher query.
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setStartStatement(String)
@@ -173,7 +165,6 @@ public class Neo4jItemReaderBuilder<T> {
 	/**
 	 * The return statement of the cypher query. RETURN is prepended to the statement
 	 * provided and should <em>not</em> be included
-	 *
 	 * @param returnStatement the return fragment of the cypher query.
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setReturnStatement(String)
@@ -187,7 +178,6 @@ public class Neo4jItemReaderBuilder<T> {
 	/**
 	 * An optional match fragment of the cypher query. MATCH is prepended to the statement
 	 * provided and should <em>not</em> be included.
-	 *
 	 * @param matchStatement the match fragment of the cypher query
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setMatchStatement(String)
@@ -201,7 +191,6 @@ public class Neo4jItemReaderBuilder<T> {
 	/**
 	 * An optional where fragment of the cypher query. WHERE is prepended to the statement
 	 * provided and should <em>not</em> be included.
-	 *
 	 * @param whereStatement where fragment of the cypher query
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setWhereStatement(String)
@@ -216,7 +205,6 @@ public class Neo4jItemReaderBuilder<T> {
 	 * A list of properties to order the results by. This is required so that subsequent
 	 * page requests pull back the segment of results correctly. ORDER BY is prepended to
 	 * the statement provided and should <em>not</em> be included.
-	 *
 	 * @param orderByStatement order by fragment of the cypher query.
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setOrderByStatement(String)
@@ -229,7 +217,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * The object type to be returned from each call to {@link Neo4jItemReader#read()}
-	 *
 	 * @param targetType the type of object to return.
 	 * @return this instance for method chaining
 	 * @see Neo4jItemReader#setTargetType(Class)
@@ -242,7 +229,6 @@ public class Neo4jItemReaderBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link Neo4jItemReader}.
-	 *
 	 * @return a new {@link Neo4jItemReader}
 	 */
 	public Neo4jItemReader<T> build() {
@@ -256,7 +242,7 @@ public class Neo4jItemReaderBuilder<T> {
 		Assert.hasText(this.orderByStatement, "orderByStatement is required.");
 		Assert.isTrue(this.pageSize > 0, "pageSize must be greater than zero");
 		Assert.isTrue(this.maxItemCount > 0, "maxItemCount must be greater than zero");
-		Assert.isTrue(this.maxItemCount > this.currentItemCount , "maxItemCount must be greater than currentItemCount");
+		Assert.isTrue(this.maxItemCount > this.currentItemCount, "maxItemCount must be greater than currentItemCount");
 
 		Neo4jItemReader<T> reader = new Neo4jItemReader<>();
 		reader.setMatchStatement(this.matchStatement);

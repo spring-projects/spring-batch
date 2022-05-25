@@ -28,16 +28,15 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.Assert;
 
 /**
- * A {@link MethodInterceptor} that can be used to automatically repeat calls to
- * a method on a service. The injected {@link RepeatOperations} is used to
- * control the completion of the loop. Independent of the completion policy in
- * the {@link RepeatOperations} the loop will repeat until the target method
- * returns null or false. Be careful when injecting a bespoke
- * {@link RepeatOperations} that the loop will actually terminate, because the
- * default policy for a vanilla {@link RepeatTemplate} will never complete if
- * the return type of the target method is void (the value returned is always
- * not-null, representing the {@link Void#TYPE}).
- * 
+ * A {@link MethodInterceptor} that can be used to automatically repeat calls to a method
+ * on a service. The injected {@link RepeatOperations} is used to control the completion
+ * of the loop. Independent of the completion policy in the {@link RepeatOperations} the
+ * loop will repeat until the target method returns null or false. Be careful when
+ * injecting a bespoke {@link RepeatOperations} that the loop will actually terminate,
+ * because the default policy for a vanilla {@link RepeatTemplate} will never complete if
+ * the return type of the target method is void (the value returned is always not-null,
+ * representing the {@link Void#TYPE}).
+ *
  * @author Dave Syer
  */
 public class RepeatOperationsInterceptor implements MethodInterceptor {
@@ -46,7 +45,6 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 
 	/**
 	 * Setter for the {@link RepeatOperations}.
-	 * 
 	 * @param batchTemplate template to be used
 	 * @throws IllegalArgumentException if the argument is null.
 	 */
@@ -56,12 +54,12 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Invoke the proceeding method call repeatedly, according to the properties
-	 * of the injected {@link RepeatOperations}.
-	 * 
+	 * Invoke the proceeding method call repeatedly, according to the properties of the
+	 * injected {@link RepeatOperations}.
+	 *
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
 	 */
-    @Override
+	@Override
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
 		final ResultHolder result = new ResultHolder();
@@ -76,7 +74,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		try {
 			repeatOperations.iterate(new RepeatCallback() {
 
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					try {
 
@@ -138,14 +136,15 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Simple wrapper exception class to enable nasty errors to be passed out of
-	 * the scope of the repeat operations and handled by the caller.
-	 * 
+	 * Simple wrapper exception class to enable nasty errors to be passed out of the scope
+	 * of the repeat operations and handled by the caller.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	@SuppressWarnings("serial")
 	private static class RepeatOperationsInterceptorException extends RepeatException {
+
 		/**
 		 * @param message
 		 * @param e
@@ -153,15 +152,17 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		public RepeatOperationsInterceptorException(String message, Throwable e) {
 			super(message, e);
 		}
+
 	}
 
 	/**
 	 * Simple wrapper object for the result from a method invocation.
-	 * 
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class ResultHolder {
+
 		private Object value = null;
 
 		private boolean ready = false;
@@ -201,6 +202,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		public boolean isReady() {
 			return ready;
 		}
+
 	}
 
 }

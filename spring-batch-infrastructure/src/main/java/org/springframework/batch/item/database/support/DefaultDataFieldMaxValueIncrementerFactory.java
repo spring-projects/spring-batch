@@ -48,12 +48,12 @@ import static org.springframework.batch.support.DatabaseType.SQLSERVER;
 import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 /**
- * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
- * interface. Valid database types are given by the {@link DatabaseType} enum.
+ * Default implementation of the {@link DataFieldMaxValueIncrementerFactory} interface.
+ * Valid database types are given by the {@link DatabaseType} enum.
  *
  * Note: For MySql databases, the
  * {@link MySQLMaxValueIncrementer#setUseNewConnection(boolean)} will be set to true.
- * 
+ *
  * @author Lucas Ward
  * @author Michael Minella
  * @author Drummond Dawson
@@ -67,11 +67,10 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	private String incrementerColumnName = "ID";
 
 	/**
-	 * Public setter for the column name (defaults to "ID") in the incrementer.
-	 * Only used by some platforms (Derby, HSQL, MySQL, SQL Server and Sybase),
-	 * and should be fine for use with Spring Batch meta data as long as the
-	 * default batch schema hasn't been changed.
-	 * 
+	 * Public setter for the column name (defaults to "ID") in the incrementer. Only used
+	 * by some platforms (Derby, HSQL, MySQL, SQL Server and Sybase), and should be fine
+	 * for use with Spring Batch meta data as long as the default batch schema hasn't been
+	 * changed.
 	 * @param incrementerColumnName the primary key column name to set
 	 */
 	public void setIncrementerColumnName(String incrementerColumnName) {
@@ -105,7 +104,8 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 			return new HanaSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == MYSQL) {
-			MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
+			MySQLMaxValueIncrementer mySQLMaxValueIncrementer = new MySQLMaxValueIncrementer(dataSource,
+					incrementerName, incrementerColumnName);
 			mySQLMaxValueIncrementer.setUseNewConnection(true);
 			return mySQLMaxValueIncrementer;
 		}
@@ -126,8 +126,8 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		}
 		throw new IllegalArgumentException("databaseType argument was not on the approved list");
 	}
-	
-    @Override
+
+	@Override
 	public boolean isSupportedIncrementerType(String incrementerType) {
 		for (DatabaseType type : DatabaseType.values()) {
 			if (type.name().equalsIgnoreCase(incrementerType)) {
@@ -138,7 +138,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		return false;
 	}
 
-    @Override
+	@Override
 	public String[] getSupportedIncrementerTypes() {
 
 		List<String> types = new ArrayList<>();
@@ -149,4 +149,5 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 
 		return types.toArray(new String[types.size()]);
 	}
+
 }

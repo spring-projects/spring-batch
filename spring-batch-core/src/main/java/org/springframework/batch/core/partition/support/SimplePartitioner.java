@@ -22,10 +22,10 @@ import java.util.Map;
 import org.springframework.batch.item.ExecutionContext;
 
 /**
- * Simplest possible implementation of {@link Partitioner}. Just creates a set
- * of empty {@link ExecutionContext} instances, and labels them as
- * <code>{partition0, partition1, ..., partitionN}</code>, where <code>N</code> is the grid
- * size.
+ * Simplest possible implementation of {@link Partitioner}. Just creates a set of empty
+ * {@link ExecutionContext} instances, and labels them as
+ * <code>{partition0, partition1, ..., partitionN}</code>, where <code>N</code> is the
+ * grid size.
  *
  * @author Dave Syer
  * @since 2.0

@@ -26,7 +26,7 @@ import org.springframework.core.io.Resource;
 
 /**
  * This class can be used to assert that two files are the same.
- * 
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -73,4 +73,5 @@ public abstract class AssertFile {
 	public static void assertLineCount(int expectedLineCount, Resource resource) throws Exception {
 		assertLineCount(expectedLineCount, resource.getFile());
 	}
+
 }

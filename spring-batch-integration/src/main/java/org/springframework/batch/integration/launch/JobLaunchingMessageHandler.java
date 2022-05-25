@@ -24,7 +24,9 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.integration.annotation.ServiceActivator;
 
 /**
- * Message handler which uses strategies to convert a Message into a job and a set of job parameters
+ * Message handler which uses strategies to convert a Message into a job and a set of job
+ * parameters
+ *
  * @author Jonas Partner
  * @author Dave Syer
  * @author Gunnar Hillert
@@ -35,7 +37,8 @@ public class JobLaunchingMessageHandler implements JobLaunchRequestHandler {
 	private final JobLauncher jobLauncher;
 
 	/**
-	 * @param jobLauncher {@link org.springframework.batch.core.launch.JobLauncher} used to execute Spring Batch jobs
+	 * @param jobLauncher {@link org.springframework.batch.core.launch.JobLauncher} used
+	 * to execute Spring Batch jobs
 	 */
 	public JobLaunchingMessageHandler(JobLauncher jobLauncher) {
 		super();

@@ -32,14 +32,16 @@ public class DefaultBatchStepTagsProvider implements BatchStepTagsProvider {
 	public KeyValues getLowCardinalityKeyValues(BatchStepContext context) {
 		StepExecution execution = context.getStepExecution();
 		return KeyValues.of(BatchStepObservation.StepLowCardinalityTags.STEP_NAME.of(execution.getStepName()),
-				BatchStepObservation.StepLowCardinalityTags.JOB_NAME.of(execution.getJobExecution().getJobInstance().getJobName()),
+				BatchStepObservation.StepLowCardinalityTags.JOB_NAME
+						.of(execution.getJobExecution().getJobInstance().getJobName()),
 				BatchStepObservation.StepLowCardinalityTags.STEP_STATUS.of(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
 	public KeyValues getHighCardinalityKeyValues(BatchStepContext context) {
 		StepExecution execution = context.getStepExecution();
-		return KeyValues.of(BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID.of(String.valueOf(execution.getId())));
+		return KeyValues.of(
+				BatchStepObservation.StepHighCardinalityTags.STEP_EXECUTION_ID.of(String.valueOf(execution.getId())));
 	}
 
 }

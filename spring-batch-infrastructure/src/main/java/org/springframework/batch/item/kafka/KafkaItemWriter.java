@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
- * An {@link ItemWriter} implementation for Apache Kafka using a
- * {@link KafkaTemplate} with default topic configured.
+ * An {@link ItemWriter} implementation for Apache Kafka using a {@link KafkaTemplate}
+ * with default topic configured.
  * </p>
  *
  * @author Mathieu Ouellet
@@ -41,7 +41,9 @@ import java.util.concurrent.TimeUnit;
 public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	protected KafkaTemplate<K, T> kafkaTemplate;
+
 	private final List<ListenableFuture<SendResult<K, T>>> listenableFutures = new ArrayList<>();
+
 	private long timeout = -1;
 
 	@Override
@@ -55,9 +57,9 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 	}
 
 	@Override
-	protected void flush() throws Exception{
+	protected void flush() throws Exception {
 		this.kafkaTemplate.flush();
-		for(ListenableFuture<SendResult<K,T>> future: this.listenableFutures){
+		for (ListenableFuture<SendResult<K, T>> future : this.listenableFutures) {
 			if (this.timeout >= 0) {
 				future.get(this.timeout, TimeUnit.MILLISECONDS);
 			}
@@ -84,7 +86,6 @@ public class KafkaItemWriter<K, T> extends KeyValueItemWriter<K, T> {
 
 	/**
 	 * The time limit to wait when flushing items to Kafka.
-	 *
 	 * @param timeout milliseconds to wait, defaults to -1 (no timeout).
 	 * @since 4.3.2
 	 */

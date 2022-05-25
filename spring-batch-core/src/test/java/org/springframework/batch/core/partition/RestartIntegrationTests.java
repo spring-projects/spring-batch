@@ -39,7 +39,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @ContextConfiguration(locations = "launch-context.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -52,7 +52,7 @@ public class RestartIntegrationTests {
 	private Job job;
 
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -76,12 +76,14 @@ public class RestartIntegrationTests {
 		ExampleItemReader.fail = true;
 		JobParameters jobParameters = new JobParametersBuilder().addString("restart", "yes").toJobParameters();
 
-		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
-		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
+		int beforeManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME='step1:manager'");
+		int beforePartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME like 'step1:partition%'");
 
 		ExampleItemWriter.clear();
 		JobExecution execution = jobLauncher.run(job, jobParameters);
-		assertEquals(BatchStatus.FAILED,execution.getStatus());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		// Only 4 because the others were in the failed step execution
 		assertEquals(4, ExampleItemWriter.getItems().size());
 
@@ -90,13 +92,15 @@ public class RestartIntegrationTests {
 		// Only 4 because the others were processed in the first attempt
 		assertEquals(4, ExampleItemWriter.getItems().size());
 
-		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME='step1:manager'");
-		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION", "STEP_NAME like 'step1:partition%'");
+		int afterManager = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME='step1:manager'");
+		int afterPartition = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "BATCH_STEP_EXECUTION",
+				"STEP_NAME like 'step1:partition%'");
 
 		// Two attempts
-		assertEquals(2, afterManager-beforeManager);
+		assertEquals(2, afterManager - beforeManager);
 		// One failure and two successes
-		assertEquals(3, afterPartition-beforePartition);
+		assertEquals(3, afterPartition - beforePartition);
 
 	}
 

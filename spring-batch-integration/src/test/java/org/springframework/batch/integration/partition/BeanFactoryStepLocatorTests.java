@@ -9,12 +9,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
-
 public class BeanFactoryStepLocatorTests {
-	
+
 	private BeanFactoryStepLocator stepLocator = new BeanFactoryStepLocator();
+
 	private DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-	
+
 	@Test
 	public void testGetStep() throws Exception {
 		beanFactory.registerSingleton("foo", new StubStep("foo"));
@@ -33,7 +33,7 @@ public class BeanFactoryStepLocatorTests {
 	private static final class StubStep implements Step {
 
 		private String name;
-		
+
 		public StubStep(String name) {
 			this.name = name;
 		}
@@ -52,6 +52,7 @@ public class BeanFactoryStepLocatorTests {
 		public boolean isAllowStartIfComplete() {
 			return false;
 		}
+
 	}
 
 }

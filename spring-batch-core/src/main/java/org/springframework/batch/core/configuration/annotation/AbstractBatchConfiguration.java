@@ -40,9 +40,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
- * Base {@code Configuration} class providing common structure for enabling and using Spring Batch.
- * Customization is available by implementing the {@link BatchConfigurer} interface.
- * 
+ * Base {@code Configuration} class providing common structure for enabling and using
+ * Spring Batch. Customization is available by implementing the {@link BatchConfigurer}
+ * interface.
+ *
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
@@ -64,7 +65,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link JobBuilderFactory} for the batch execution.
-	 *
 	 * @return The instance of the {@link JobBuilderFactory}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -75,7 +75,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link StepBuilderFactory} for the batch execution.
-	 *
 	 * @return The instance of the {@link StepBuilderFactory}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -86,7 +85,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link JobRepository} for the batch execution.
-	 *
 	 * @return The instance of the {@link JobRepository}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -95,7 +93,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link JobLauncher} for the batch execution.
-	 *
 	 * @return The instance of the {@link JobLauncher}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -104,7 +101,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link JobExplorer} for the batch execution.
-	 *
 	 * @return The instance of the {@link JobExplorer}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -113,7 +109,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link JobRegistry} for the batch execution.
-	 *
 	 * @return The instance of the {@link JobRegistry}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -124,7 +119,6 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	/**
 	 * Establish the {@link PlatformTransactionManager} for the batch execution.
-	 *
 	 * @return The instance of the {@link PlatformTransactionManager}.
 	 * @throws Exception The {@link Exception} thrown if error occurs.
 	 */
@@ -132,8 +126,8 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 
 	@Override
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
-		Map<String, Object> annotationAttributes =
-				importMetadata.getAnnotationAttributes(EnableBatchProcessing.class.getName(), false);
+		Map<String, Object> annotationAttributes = importMetadata
+				.getAnnotationAttributes(EnableBatchProcessing.class.getName(), false);
 		AnnotationAttributes enabled = AnnotationAttributes.fromMap(annotationAttributes);
 		String message = "@EnableBatchProcessing is not present on importing class " + importMetadata.getClassName();
 		Assert.notNull(enabled, message);
@@ -146,10 +140,12 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 	}
 
 	/**
-	 * If a {@link BatchConfigurer} exists, return it. If the configurers list is empty, create a {@link DefaultBatchConfigurer}.
-	 * If more than one configurer is present in the list, an {@link IllegalStateException} is thrown.
+	 * If a {@link BatchConfigurer} exists, return it. If the configurers list is empty,
+	 * create a {@link DefaultBatchConfigurer}. If more than one configurer is present in
+	 * the list, an {@link IllegalStateException} is thrown.
 	 * @param configurers The {@link Collection} of configurers to review.
-	 * @return The {@link BatchConfigurer} that was in the configurers collection or the one created.
+	 * @return The {@link BatchConfigurer} that was in the configurers collection or the
+	 * one created.
 	 */
 	protected BatchConfigurer getConfigurer(Collection<BatchConfigurer> configurers) {
 		if (this.configurer != null) {
@@ -175,12 +171,14 @@ public abstract class AbstractBatchConfiguration implements ImportAware, Initial
 		DataSource dataSource;
 		try {
 			dataSource = this.context.getBean(DataSource.class);
-		}  catch (NoUniqueBeanDefinitionException exception) {
+		}
+		catch (NoUniqueBeanDefinitionException exception) {
 			throw new IllegalStateException(
-					"Multiple data sources are defined in the application context and no primary candidate was found. " +
-					"To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
+					"Multiple data sources are defined in the application context and no primary candidate was found. "
+							+ "To use the default BatchConfigurer, one of the data sources should be annotated with '@Primary'.",
 					exception);
-		} catch (NoSuchBeanDefinitionException exception) {
+		}
+		catch (NoSuchBeanDefinitionException exception) {
 			throw new IllegalStateException(
 					"To use the default BatchConfigurer, the application context must contain at least one data source.",
 					exception);

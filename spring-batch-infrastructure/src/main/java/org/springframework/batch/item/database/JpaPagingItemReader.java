@@ -34,49 +34,46 @@ import org.springframework.util.ClassUtils;
 
 /**
  * <p>
- * {@link org.springframework.batch.item.ItemReader} for reading database
- * records built on top of JPA.
+ * {@link org.springframework.batch.item.ItemReader} for reading database records built on
+ * top of JPA.
  * </p>
  *
  * <p>
- * It executes the JPQL {@link #setQueryString(String)} to retrieve requested
- * data. The query is executed using paged requests of a size specified in
+ * It executes the JPQL {@link #setQueryString(String)} to retrieve requested data. The
+ * query is executed using paged requests of a size specified in
  * {@link #setPageSize(int)}. Additional pages are requested when needed as
- * {@link #read()} method is called, returning an object corresponding to
- * current position.
+ * {@link #read()} method is called, returning an object corresponding to current
+ * position.
  * </p>
  *
  * <p>
- * The performance of the paging depends on the JPA implementation and its use
- * of database specific features to limit the number of returned rows.
+ * The performance of the paging depends on the JPA implementation and its use of database
+ * specific features to limit the number of returned rows.
  * </p>
  *
  * <p>
- * Setting a fairly large page size and using a commit interval that matches the
- * page size should provide better performance.
+ * Setting a fairly large page size and using a commit interval that matches the page size
+ * should provide better performance.
  * </p>
  *
  * <p>
- * In order to reduce the memory usage for large results the persistence context
- * is flushed and cleared after each page is read. This causes any entities read
- * to be detached. If you make changes to the entities and want the changes
- * persisted then you must explicitly merge the entities.
+ * In order to reduce the memory usage for large results the persistence context is
+ * flushed and cleared after each page is read. This causes any entities read to be
+ * detached. If you make changes to the entities and want the changes persisted then you
+ * must explicitly merge the entities.
  * </p>
  *
  * <p>
- * The reader must be configured with an
- * {@link jakarta.persistence.EntityManagerFactory}. All entity access is
- * performed within a new transaction, independent of any existing Spring
- * managed transactions.
+ * The reader must be configured with an {@link jakarta.persistence.EntityManagerFactory}.
+ * All entity access is performed within a new transaction, independent of any existing
+ * Spring managed transactions.
  * </p>
  *
  * <p>
- * The implementation is thread-safe in between calls to
- * {@link #open(ExecutionContext)}, but remember to use
- * <code>saveState=false</code> if used in a multi-threaded client (no restart
- * available).
+ * The implementation is thread-safe in between calls to {@link #open(ExecutionContext)},
+ * but remember to use <code>saveState=false</code> if used in a multi-threaded client (no
+ * restart available).
  * </p>
- *
  *
  * @author Thomas Risberg
  * @author Dave Syer
@@ -97,8 +94,8 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	private JpaQueryProvider queryProvider;
 
 	private Map<String, Object> parameterValues;
-	
-	private boolean transacted = true;//default value
+
+	private boolean transacted = true;// default value
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
@@ -123,25 +120,24 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	/**
 	 * The parameter values to be used for the query execution.
-	 *
-	 * @param parameterValues the values keyed by the parameter named used in
-	 * the query string.
+	 * @param parameterValues the values keyed by the parameter named used in the query
+	 * string.
 	 */
 	public void setParameterValues(Map<String, Object> parameterValues) {
 		this.parameterValues = parameterValues;
 	}
-	
+
 	/**
-	 * By default (true) the EntityTransaction will be started and committed around the read.  
-	 * Can be overridden (false) in cases where the JPA implementation doesn't support a 
-	 * particular transaction.  (e.g. Hibernate with a JTA transaction).  NOTE: may cause 
-	 * problems in guaranteeing the object consistency in the EntityManagerFactory.
-	 * 
+	 * By default (true) the EntityTransaction will be started and committed around the
+	 * read. Can be overridden (false) in cases where the JPA implementation doesn't
+	 * support a particular transaction. (e.g. Hibernate with a JTA transaction). NOTE:
+	 * may cause problems in guaranteeing the object consistency in the
+	 * EntityManagerFactory.
 	 * @param transacted indicator
 	 */
 	public void setTransacted(boolean transacted) {
 		this.transacted = transacted;
-	}	
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -188,14 +184,14 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	protected void doReadPage() {
 
 		EntityTransaction tx = null;
-		
+
 		if (transacted) {
 			tx = entityManager.getTransaction();
 			tx.begin();
-			
+
 			entityManager.flush();
 			entityManager.clear();
-		}//end if
+		} // end if
 
 		Query query = createQuery().setFirstResult(getPage() * getPageSize()).setMaxResults(getPageSize());
 
@@ -211,17 +207,18 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		else {
 			results.clear();
 		}
-		
+
 		if (!transacted) {
 			List<T> queryResult = query.getResultList();
 			for (T entity : queryResult) {
 				entityManager.detach(entity);
 				results.add(entity);
-			}//end if
-		} else {
+			} // end if
+		}
+		else {
 			results.addAll(query.getResultList());
 			tx.commit();
-		}//end if
+		} // end if
 	}
 
 	@Override

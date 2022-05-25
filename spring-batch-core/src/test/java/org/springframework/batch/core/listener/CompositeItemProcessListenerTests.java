@@ -26,7 +26,7 @@ import org.springframework.batch.core.ItemProcessListener;
 /**
  * @author Dave Syer
  * @author Will Schipp
- * 
+ *
  */
 public class CompositeItemProcessListenerTests {
 
@@ -67,8 +67,8 @@ public class CompositeItemProcessListenerTests {
 
 	@Test
 	public void testSetListeners() throws Exception {
-		compositeListener.setListeners(Collections
-				.<ItemProcessListener<? super Object, ? super Object>> singletonList(listener));
+		compositeListener
+				.setListeners(Collections.<ItemProcessListener<? super Object, ? super Object>>singletonList(listener));
 		listener.beforeProcess(null);
 		compositeListener.beforeProcess(null);
 	}

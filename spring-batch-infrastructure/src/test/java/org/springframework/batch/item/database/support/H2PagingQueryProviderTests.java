@@ -39,22 +39,25 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateRemainingPagesQuery() {
 		String sql = "SELECT id, name, age FROM foo WHERE (bar = 1) AND ((id > ?)) "
-        + "ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
+				+ "ORDER BY id ASC FETCH NEXT 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQuery() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 99 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		assertEquals(sql, s);
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateJumpToItemQueryForFirstPage() {
 		String sql = "SELECT id FROM foo WHERE bar = 1 ORDER BY id ASC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
@@ -118,4 +121,5 @@ public class H2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderTe
 	public String getJumpToItemQueryForFirstPageWithMultipleSortKeys() {
 		return "SELECT name, id FROM foo WHERE bar = 1 ORDER BY name ASC, id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY";
 	}
+
 }

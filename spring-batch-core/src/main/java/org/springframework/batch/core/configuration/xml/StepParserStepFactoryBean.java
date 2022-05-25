@@ -77,9 +77,11 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step} objects. Stores all of the
- * properties that are configurable on the &lt;step/&gt; (and its inner &lt;tasklet/&gt;). Based on which properties are
- * configured, the {@link #getObject()} method will delegate to the appropriate class for generating the {@link Step}.
+ * This {@link FactoryBean} is used by the batch namespace parser to create {@link Step}
+ * objects. Stores all of the properties that are configurable on the &lt;step/&gt; (and
+ * its inner &lt;tasklet/&gt;). Based on which properties are configured, the
+ * {@link #getObject()} method will delegate to the appropriate class for generating the
+ * {@link Step}.
  *
  * @author Dan Garrette
  * @author Josh Long
@@ -224,8 +226,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	@Override
 	public Step getObject() throws Exception {
 		if (hasChunkElement) {
-			Assert.isNull(tasklet, "Step [" + name
-					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
+			Assert.isNull(tasklet,
+					"Step [" + name + "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
 
 			validateFaultTolerantSettings();
 
@@ -269,7 +271,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		builder.repository(jobRepository);
 		builder.transactionManager(transactionManager);
 		for (Object listener : stepExecutionListeners) {
-			if(listener instanceof StepExecutionListener) {
+			if (listener instanceof StepExecutionListener) {
 				builder.listener((StepExecutionListener) listener);
 			}
 		}
@@ -277,7 +279,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Create a partition {@link Step}.
-	 *
 	 * @return The {@link Step}.
 	 */
 	protected Step createPartitionStep() {
@@ -307,7 +308,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Creates a fault tolerant {@link Step}.
-	 *
 	 * @return The {@link Step}.
 	 */
 	protected Step createFaultTolerantStep() {
@@ -341,7 +341,7 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 		if (skipPolicy != null) {
 			builder.skipPolicy(skipPolicy);
 		}
-		else if (skipLimit!=null) {
+		else if (skipLimit != null) {
 			builder.skipLimit(skipLimit);
 			for (Class<? extends Throwable> type : skippableExceptionClasses.keySet()) {
 				if (skippableExceptionClasses.get(type)) {
@@ -392,7 +392,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Creates a new {@link FaultTolerantStepBuilder}.
-	 *
 	 * @param stepName The name of the step used by the created builder.
 	 * @return The {@link FaultTolerantStepBuilder}.
 	 */
@@ -414,7 +413,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Creates a new {@link TaskletStep}.
-	 *
 	 * @return The {@link TaskletStep}.
 	 */
 	protected Step createSimpleStep() {
@@ -455,8 +453,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Set the state of the {@link AbstractTaskletStepBuilder} using the values that were established for the factory bean.
-	 *
+	 * Set the state of the {@link AbstractTaskletStepBuilder} using the values that were
+	 * established for the factory bean.
 	 * @param builder The {@link AbstractTaskletStepBuilder} to be modified.
 	 */
 	@SuppressWarnings("serial")
@@ -504,7 +502,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Create a new {@link org.springframework.batch.core.job.flow.FlowStep}.
-	 *
 	 * @return The {@link org.springframework.batch.core.job.flow.FlowStep}.
 	 */
 	protected Step createFlowStep() {
@@ -538,12 +535,13 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Check if a field is present then a second is also. If the twoWayDependency flag is set then the opposite must
-	 * also be true: if the second value is present, the first must also be.
-	 *
+	 * Check if a field is present then a second is also. If the twoWayDependency flag is
+	 * set then the opposite must also be true: if the second value is present, the first
+	 * must also be.
 	 * @param dependentName the name of the first field
 	 * @param dependentValue the value of the first field
-	 * @param name the name of the other field (which should be absent if the first is present)
+	 * @param name the name of the other field (which should be absent if the first is
+	 * present)
 	 * @param value the value of the other field
 	 * @param twoWayDependency true if both depend on each other
 	 * @throws IllegalArgumentException if either condition is violated
@@ -562,7 +560,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Is the object non-null (or if an Integer, non-zero)?
-	 *
 	 * @param o an object
 	 * @return true if the object has a value
 	 */
@@ -580,7 +577,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * @return true if the step is configured with any components that require fault tolerance
+	 * @return true if the step is configured with any components that require fault
+	 * tolerance
 	 */
 	protected boolean isFaultTolerant() {
 		return backOffPolicy != null || skipPolicy != null || retryPolicy != null || isPositive(skipLimit)
@@ -610,7 +608,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * Set the bean name property, which will become the name of the {@link Step} when it is created.
+	 * Set the bean name property, which will become the name of the {@link Step} when it
+	 * is created.
 	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -717,9 +716,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * Public setter for the flag to indicate that the step should be replayed on a restart, even if successful the
-	 * first time.
-	 *
+	 * Public setter for the flag to indicate that the step should be replayed on a
+	 * restart, even if successful the first time.
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -736,7 +734,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Public setter for {@link JobRepository}.
-	 *
 	 * @param jobRepository {@link JobRepository} instance to be used by the step.
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -745,8 +742,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * The number of times that the step should be allowed to start
-	 *
-	 * @param startLimit int containing the number of times a step should be allowed to start.
+	 * @param startLimit int containing the number of times a step should be allowed to
+	 * start.
 	 */
 	public void setStartLimit(int startLimit) {
 		this.startLimit = startLimit;
@@ -754,7 +751,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * A preconfigured {@link Tasklet} to use.
-	 *
 	 * @param tasklet {@link Tasklet} instance to be used by step.
 	 */
 	public void setTasklet(Tasklet tasklet) {
@@ -766,8 +762,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * @return transactionManager instance of {@link PlatformTransactionManager}
-	 * used by the step.
+	 * @return transactionManager instance of {@link PlatformTransactionManager} used by
+	 * the step.
 	 */
 	public PlatformTransactionManager getTransactionManager() {
 		return transactionManager;
@@ -785,9 +781,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener} can be used, and will then
-	 * receive callbacks at the appropriate stage in the step.
-	 *
+	 * The listeners to inject into the {@link Step}. Any instance of {@link StepListener}
+	 * can be used, and will then receive callbacks at the appropriate stage in the step.
 	 * @param listeners an array of listeners
 	 */
 	@SuppressWarnings("unchecked")
@@ -822,7 +817,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Exception classes that may not cause a rollback if encountered in the right place.
-	 *
 	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
 	 */
 	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
@@ -856,7 +850,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * A backoff policy to be applied to retry process.
-	 *
 	 * @param backOffPolicy the {@link BackOffPolicy} to set
 	 */
 	public void setBackOffPolicy(BackOffPolicy backOffPolicy) {
@@ -864,9 +857,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * A retry policy to apply when exceptions occur. If this is specified then the retry limit and retryable exceptions
-	 * will be ignored.
-	 *
+	 * A retry policy to apply when exceptions occur. If this is specified then the retry
+	 * limit and retryable exceptions will be ignored.
 	 * @param retryPolicy the {@link RetryPolicy} to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
@@ -881,9 +873,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * A key generator that can be used to compare items with previously recorded items in a retry. Only used if the
-	 * reader is a transactional queue.
-	 *
+	 * A key generator that can be used to compare items with previously recorded items in
+	 * a retry. Only used if the reader is a transactional queue.
 	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
@@ -895,14 +886,14 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	// =========================================================
 
 	/**
-	 * Public setter for the capacity of the cache in the retry policy. If more items than this fail without being
-	 * skipped or recovered an exception will be thrown. This is to guard against inadvertent infinite loops generated
-	 * by item identity problems.<br>
+	 * Public setter for the capacity of the cache in the retry policy. If more items than
+	 * this fail without being skipped or recovered an exception will be thrown. This is
+	 * to guard against inadvertent infinite loops generated by item identity
+	 * problems.<br>
 	 * <br>
-	 * The default value should be high enough and more for most purposes. To breach the limit in a single-threaded step
-	 * typically you have to have this many failures in a single transaction. Defaults to the value in the
-	 * {@link MapRetryContextCache}.<br>
-	 *
+	 * The default value should be high enough and more for most purposes. To breach the
+	 * limit in a single-threaded step typically you have to have this many failures in a
+	 * single transaction. Defaults to the value in the {@link MapRetryContextCache}.<br>
 	 * @param cacheCapacity the cache capacity to set (greater than 0 else ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
@@ -910,10 +901,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A transaction will be committed when
-	 * this policy decides to complete. Defaults to a {@link SimpleCompletionPolicy} with chunk size equal to the
-	 * commitInterval property.
-	 *
+	 * Public setter for the {@link CompletionPolicy} applying to the chunk level. A
+	 * transaction will be committed when this policy decides to complete. Defaults to a
+	 * {@link SimpleCompletionPolicy} with chunk size equal to the commitInterval
+	 * property.
 	 * @param chunkCompletionPolicy the chunkCompletionPolicy to set
 	 */
 	public void setChunkCompletionPolicy(CompletionPolicy chunkCompletionPolicy) {
@@ -922,7 +913,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Set the commit interval. Either set this or the chunkCompletionPolicy but not both.
-	 *
 	 * @param commitInterval 1 by default
 	 */
 	public void setCommitInterval(int commitInterval) {
@@ -937,9 +927,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that items are re-presented after a
-	 * rollback. The default is false and readers are assumed to be forward-only.
-	 *
+	 * Flag to signal that the reader is transactional (usually a JMS consumer) so that
+	 * items are re-presented after a rollback. The default is false and readers are
+	 * assumed to be forward-only.
 	 * @param isReaderTransactionalQueue the value of the flag
 	 */
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
@@ -947,9 +937,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Flag to signal that the processor is transactional, in which case it should be called for every item in every
-	 * transaction. If false then we can cache the processor results between transactions in the case of a rollback.
-	 *
+	 * Flag to signal that the processor is transactional, in which case it should be
+	 * called for every item in every transaction. If false then we can cache the
+	 * processor results between transactions in the case of a rollback.
 	 * @param processorTransactional the value to set
 	 */
 	public void setProcessorTransactional(Boolean processorTransactional) {
@@ -957,9 +947,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for the retry limit. Each item can be retried up to this limit. Note this limit includes the
-	 * initial attempt to process the item, therefore <code>retryLimit == 1</code> by default.
-	 *
+	 * Public setter for the retry limit. Each item can be retried up to this limit. Note
+	 * this limit includes the initial attempt to process the item, therefore
+	 * <code>retryLimit == 1</code> by default.
 	 * @param retryLimit the retry limit to set, must be greater or equal to 1.
 	 */
 	public void setRetryLimit(int retryLimit) {
@@ -967,10 +957,10 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for a limit that determines skip policy. If this value is positive then an exception in chunk
-	 * processing will cause the item to be skipped and no exception propagated until the limit is reached. If it is
-	 * zero then all exceptions will be propagated from the chunk and cause the step to abort.
-	 *
+	 * Public setter for a limit that determines skip policy. If this value is positive
+	 * then an exception in chunk processing will cause the item to be skipped and no
+	 * exception propagated until the limit is reached. If it is zero then all exceptions
+	 * will be propagated from the chunk and cause the step to abort.
 	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
 	public void setSkipLimit(int skipLimit) {
@@ -978,8 +968,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for a skip policy. If this value is set then the skip limit and skippable exceptions are ignored.
-	 *
+	 * Public setter for a skip policy. If this value is set then the skip limit and
+	 * skippable exceptions are ignored.
 	 * @param skipPolicy the {@link SkipPolicy} to set
 	 */
 	public void setSkipPolicy(SkipPolicy skipPolicy) {
@@ -987,9 +977,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to execute the chunk processing
-	 * inside the {@link Step}.
-	 *
+	 * Public setter for the {@link TaskExecutor}. If this is set, then it will be used to
+	 * execute the chunk processing inside the {@link Step}.
 	 * @param taskExecutor the taskExecutor to set
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
@@ -997,9 +986,9 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for the throttle limit. This limits the number of tasks queued for concurrent processing to prevent
-	 * thread pools from being overwhelmed. Defaults to {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
-	 *
+	 * Public setter for the throttle limit. This limits the number of tasks queued for
+	 * concurrent processing to prevent thread pools from being overwhelmed. Defaults to
+	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
 	 * @param throttleLimit the throttle limit to set.
 	 */
 	public void setThrottleLimit(Integer throttleLimit) {
@@ -1033,7 +1022,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Public setter for the {@link RetryListener}s.
-	 *
 	 * @param retryListeners the {@link RetryListener}s to set
 	 */
 	public void setRetryListeners(RetryListener... retryListeners) {
@@ -1041,11 +1029,11 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * Public setter for exception classes that when raised won't crash the job but will result in transaction rollback
-	 * and the item which handling caused the exception will be skipped.
-	 *
-	 * @param exceptionClasses {@link Map} containing the {@link Throwable}s as
-	 * the keys and the values are {@link Boolean}s, that if true the item is skipped.
+	 * Public setter for exception classes that when raised won't crash the job but will
+	 * result in transaction rollback and the item which handling caused the exception
+	 * will be skipped.
+	 * @param exceptionClasses {@link Map} containing the {@link Throwable}s as the keys
+	 * and the values are {@link Boolean}s, that if true the item is skipped.
 	 */
 	public void setSkippableExceptionClasses(Map<Class<? extends Throwable>, Boolean> exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
@@ -1053,7 +1041,6 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 
 	/**
 	 * Public setter for exception classes that will retry the item when raised.
-	 *
 	 * @param retryableExceptionClasses the retryableExceptionClasses to set
 	 */
 	public void setRetryableExceptionClasses(Map<Class<? extends Throwable>, Boolean> retryableExceptionClasses) {
@@ -1061,9 +1048,8 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	}
 
 	/**
-	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can be used, and will then
-	 * receive callbacks at the appropriate stage in the step.
-	 *
+	 * The streams to inject into the {@link Step}. Any instance of {@link ItemStream} can
+	 * be used, and will then receive callbacks at the appropriate stage in the step.
 	 * @param streams an array of listeners
 	 */
 	public void setStreams(ItemStream[] streams) {
@@ -1101,4 +1087,5 @@ public class StepParserStepFactoryBean<I, O> implements FactoryBean<Step>, BeanN
 	protected boolean hasPartitionElement() {
 		return this.partitionHandler != null;
 	}
+
 }

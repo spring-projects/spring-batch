@@ -37,13 +37,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-
 /**
  * @author Dave Syer
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/META-INF/batch/parallelJob.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/META-INF/batch/parallelJob.xml" })
 public class ParallelJobIntegrationTests {
 
 	/** Logger */
@@ -51,17 +50,17 @@ public class ParallelJobIntegrationTests {
 
 	@Autowired
 	private JobLauncher jobLauncher;
-	
+
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private Job job;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
+
 	@Before
 	public void clear() {
 		JdbcTestUtils.deleteFromTables(jdbcTemplate, "PLAYER_SUMMARY", "GAMES", "PLAYERS");
@@ -72,7 +71,7 @@ public class ParallelJobIntegrationTests {
 		JobExecution execution = jobLauncher.run(job, new JobParametersBuilder().toJobParameters());
 		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
 		for (StepExecution stepExecution : execution.getStepExecutions()) {
-			logger.info("Processed: "+stepExecution);
+			logger.info("Processed: " + stepExecution);
 		}
 	}
 

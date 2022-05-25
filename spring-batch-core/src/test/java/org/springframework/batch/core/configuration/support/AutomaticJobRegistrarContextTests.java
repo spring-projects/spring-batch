@@ -29,8 +29,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 
- * 
  * @author Dave Syer
  *
  */
@@ -40,17 +38,17 @@ public class AutomaticJobRegistrarContextTests {
 
 	@Autowired
 	private JobRegistry registry;
-	
+
 	@Test
-	public void testLocateJob() throws Exception{
-		
+	public void testLocateJob() throws Exception {
+
 		Collection<String> names = registry.getJobNames();
 		assertEquals(2, names.size());
 		assertTrue(names.contains("test-job"));
-		
+
 		Job job = registry.getJob("test-job");
 		assertEquals("test-job", job.getName());
 
 	}
-	
+
 }

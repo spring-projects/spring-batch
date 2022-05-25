@@ -66,7 +66,6 @@ public class JobParametersTests {
 		return new JobParameters(parameterMap);
 	}
 
-
 	@Test
 	public void testGetString() {
 		assertEquals("value1", parameters.getString("string.key1"));
@@ -186,29 +185,28 @@ public class JobParametersTests {
 	public void testSerialization() {
 		JobParameters params = getNewParameters();
 
-		byte[] serialized =
-				SerializationUtils.serialize(params);
+		byte[] serialized = SerializationUtils.serialize(params);
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
 
 	@Test
-	public void testLongReturnsNullWhenKeyDoesntExit(){
+	public void testLongReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getLong("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testStringReturnsNullWhenKeyDoesntExit(){
+	public void testStringReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getString("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testDoubleReturnsNullWhenKeyDoesntExit(){
+	public void testDoubleReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getDouble("keythatdoesntexist"));
 	}
 
 	@Test
-	public void testDateReturnsNullWhenKeyDoesntExit(){
+	public void testDateReturnsNullWhenKeyDoesntExit() {
 		assertNull(new JobParameters().getDate("keythatdoesntexist"));
 	}
 

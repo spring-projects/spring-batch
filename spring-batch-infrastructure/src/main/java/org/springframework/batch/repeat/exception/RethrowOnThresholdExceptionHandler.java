@@ -29,13 +29,12 @@ import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Implementation of {@link ExceptionHandler} that rethrows when exceptions of a
- * given type reach a threshold. Requires an {@link Classifier} that maps
- * exception types to unique keys, and also a map from those keys to threshold
- * values (Integer type).
- * 
+ * Implementation of {@link ExceptionHandler} that rethrows when exceptions of a given
+ * type reach a threshold. Requires an {@link Classifier} that maps exception types to
+ * unique keys, and also a map from those keys to threshold values (Integer type).
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
@@ -48,20 +47,18 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	private boolean useParent = false;
 
 	/**
-	 * Flag to indicate the exception counters should be shared between
-	 * sibling contexts in a nested batch. Default is false.
-	 * 
-	 * @param useParent true if the parent context should be used to store the
-	 * counters.
+	 * Flag to indicate the exception counters should be shared between sibling contexts
+	 * in a nested batch. Default is false.
+	 * @param useParent true if the parent context should be used to store the counters.
 	 */
 	public void setUseParent(boolean useParent) {
 		this.useParent = useParent;
 	}
 
 	/**
-	 * Set up the exception handler. Creates a default exception handler and
-	 * threshold that maps all exceptions to a threshold of 0 - all exceptions
-	 * are rethrown by default.
+	 * Set up the exception handler. Creates a default exception handler and threshold
+	 * that maps all exceptions to a threshold of 0 - all exceptions are rethrown by
+	 * default.
 	 */
 	public RethrowOnThresholdExceptionHandler() {
 		super();
@@ -69,7 +66,6 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * A map from exception classes to a threshold value of type Integer.
-	 * 
 	 * @param thresholds the threshold value map.
 	 */
 	public void setThresholds(Map<Class<? extends Throwable>, Integer> thresholds) {
@@ -81,14 +77,13 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Classify the throwables and decide whether to re-throw based on the
-	 * result. The context is used to accumulate the number of exceptions of the
-	 * same type according to the classifier.
-	 * 
+	 * Classify the throwables and decide whether to re-throw based on the result. The
+	 * context is used to accumulate the number of exceptions of the same type according
+	 * to the classifier.
 	 * @throws Throwable is thrown if number of exceptions exceeds threshold.
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
-    @Override
+	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		IntegerHolder key = exceptionClassifier.classify(throwable);
@@ -111,7 +106,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private static class IntegerHolder {
 
@@ -134,7 +129,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Object#toString()
 		 */
 		@Override

@@ -98,18 +98,18 @@ public class JmsItemReaderTests {
 		assertEquals(message, itemReader.read());
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTemplateWithNoDefaultDestination() throws Exception {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setReceiveTimeout(100L);
-		itemReader.setJmsTemplate(jmsTemplate);		
+		itemReader.setJmsTemplate(jmsTemplate);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testTemplateWithNoTimeout() throws Exception {
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setDefaultDestinationName("foo");
-		itemReader.setJmsTemplate(jmsTemplate);		
+		itemReader.setJmsTemplate(jmsTemplate);
 	}
 
 }

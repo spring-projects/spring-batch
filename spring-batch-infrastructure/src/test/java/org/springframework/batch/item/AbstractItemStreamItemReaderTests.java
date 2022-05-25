@@ -23,9 +23,8 @@ import org.junit.After;
 import org.junit.Test;
 
 /**
- * Common tests for readers implementing both {@link ItemReader} and
- * {@link ItemStream}. Expected input is five {@link Foo} objects with values 1
- * to 5.
+ * Common tests for readers implementing both {@link ItemReader} and {@link ItemStream}.
+ * Expected input is five {@link Foo} objects with values 1 to 5.
  */
 public abstract class AbstractItemStreamItemReaderTests extends AbstractItemReaderTests {
 
@@ -38,7 +37,7 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 		return (ItemStream) tested;
 	}
 
-    @Override
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -51,9 +50,9 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	}
 
 	/**
-	 * Restart scenario - read items, update execution context, create new
-	 * reader and restore from restart data - the new input source should
-	 * continue where the old one finished.
+	 * Restart scenario - read items, update execution context, create new reader and
+	 * restore from restart data - the new input source should continue where the old one
+	 * finished.
 	 */
 	@Test
 	public void testRestart() throws Exception {
@@ -80,9 +79,9 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 	}
 
 	/**
-	 * Restart scenario - read items, rollback to last marked position, update
-	 * execution context, create new reader and restore from restart data - the
-	 * new input source should continue where the old one finished.
+	 * Restart scenario - read items, rollback to last marked position, update execution
+	 * context, create new reader and restore from restart data - the new input source
+	 * should continue where the old one finished.
 	 */
 	@Test
 	public void testResetAndRestart() throws Exception {
@@ -94,9 +93,9 @@ public abstract class AbstractItemStreamItemReaderTests extends AbstractItemRead
 
 		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
-		
+
 		testedAsStream().update(executionContext);
-		
+
 		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
 

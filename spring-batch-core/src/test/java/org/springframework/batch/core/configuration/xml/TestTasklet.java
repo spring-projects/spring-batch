@@ -27,8 +27,7 @@ public class TestTasklet extends AbstractTestComponent implements Tasklet {
 
 	@Nullable
 	@Override
-	public RepeatStatus execute(StepContribution contribution,
-			ChunkContext chunkContext) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		executed = true;
 		return RepeatStatus.FINISHED;
 	}
@@ -40,4 +39,5 @@ public class TestTasklet extends AbstractTestComponent implements Tasklet {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }

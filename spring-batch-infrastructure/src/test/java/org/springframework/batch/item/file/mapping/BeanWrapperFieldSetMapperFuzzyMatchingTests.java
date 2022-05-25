@@ -64,6 +64,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTests {
 	}
 
 	public static class GreenBean {
+
 		private String green;
 
 		public String getGreen() {
@@ -77,6 +78,7 @@ public class BeanWrapperFieldSetMapperFuzzyMatchingTests {
 	}
 
 	public static class BlueBean {
+
 		private String blue;
 
 		private String bleu;

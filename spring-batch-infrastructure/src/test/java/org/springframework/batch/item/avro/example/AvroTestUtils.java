@@ -35,46 +35,45 @@ import org.springframework.core.io.Resource;
  */
 class AvroTestUtils {
 
-     public static void main(String... args) {
-        try {
-           createTestDataWithNoEmbeddedSchema();
-           createTestData();
-        } catch (Exception e) {
-           e.printStackTrace();
-        }
-     }
+	public static void main(String... args) {
+		try {
+			createTestDataWithNoEmbeddedSchema();
+			createTestData();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-     static void createTestDataWithNoEmbeddedSchema() throws Exception {
+	static void createTestDataWithNoEmbeddedSchema() throws Exception {
 
-        DatumWriter<User> userDatumWriter = new SpecificDatumWriter<>(User.class);
+		DatumWriter<User> userDatumWriter = new SpecificDatumWriter<>(User.class);
 
-        FileOutputStream fileOutputStream =  new FileOutputStream("user-data-no-schema.avro");
+		FileOutputStream fileOutputStream = new FileOutputStream("user-data-no-schema.avro");
 
-        Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream,null);
-        userDatumWriter.write(new User("David", 20, "blue"), encoder);
-        userDatumWriter.write(new User("Sue", 4, "red"), encoder);
-        userDatumWriter.write(new User("Alana", 13, "yellow"), encoder);
-        userDatumWriter.write(new User("Joe", 1, "pink"), encoder);
+		Encoder encoder = EncoderFactory.get().binaryEncoder(fileOutputStream, null);
+		userDatumWriter.write(new User("David", 20, "blue"), encoder);
+		userDatumWriter.write(new User("Sue", 4, "red"), encoder);
+		userDatumWriter.write(new User("Alana", 13, "yellow"), encoder);
+		userDatumWriter.write(new User("Joe", 1, "pink"), encoder);
 
-        encoder.flush();
-        fileOutputStream.flush();
-        fileOutputStream.close();
-    }
+		encoder.flush();
+		fileOutputStream.flush();
+		fileOutputStream.close();
+	}
 
+	static void createTestData() throws Exception {
 
-   static void createTestData() throws Exception {
+		Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
 
-        Resource schemaResource = new ClassPathResource("org/springframework/batch/item/avro/user-schema.json");
-
-        DatumWriter<User> userDatumWriter = new SpecificDatumWriter<>(User.class);
-        DataFileWriter<User> dataFileWriter = new DataFileWriter<>(userDatumWriter);
-        dataFileWriter.create(new Schema.Parser().parse(schemaResource.getInputStream()), new File("users.avro"));
-        dataFileWriter.append(new User("David", 20, "blue"));
-        dataFileWriter.append(new User("Sue", 4, "red"));
-        dataFileWriter.append(new User("Alana", 13, "yellow"));
-        dataFileWriter.append(new User("Joe", 1, "pink"));
-        dataFileWriter.close();
-    }
-
+		DatumWriter<User> userDatumWriter = new SpecificDatumWriter<>(User.class);
+		DataFileWriter<User> dataFileWriter = new DataFileWriter<>(userDatumWriter);
+		dataFileWriter.create(new Schema.Parser().parse(schemaResource.getInputStream()), new File("users.avro"));
+		dataFileWriter.append(new User("David", 20, "blue"));
+		dataFileWriter.append(new User("Sue", 4, "red"));
+		dataFileWriter.append(new User("Alana", 13, "yellow"));
+		dataFileWriter.append(new User("Joe", 1, "pink"));
+		dataFileWriter.close();
+	}
 
 }

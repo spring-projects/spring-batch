@@ -28,9 +28,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
- * Marks a method to be called before a {@link Job} is executed, which comes
- * after a {@link JobExecution} is created and persisted but before the first
- * {@link Step} is executed. <br>
+ * Marks a method to be called before a {@link Job} is executed, which comes after a
+ * {@link JobExecution} is created and persisted but before the first {@link Step} is
+ * executed. <br>
  * <br>
  * Expected signature: void beforeJob({@link JobExecution} jobExecution)
  *
@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @see JobExecutionListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Qualifier("JobExecutionListener")
 public @interface BeforeJob {
 

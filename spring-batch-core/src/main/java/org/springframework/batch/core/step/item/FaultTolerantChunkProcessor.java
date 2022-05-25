@@ -46,8 +46,8 @@ import org.springframework.retry.RetryException;
 import org.springframework.retry.support.DefaultRetryState;
 
 /**
- * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
- * allows for skipping or retry of items that cause exceptions during writing.
+ * FaultTolerant implementation of the {@link ChunkProcessor} interface, that allows for
+ * skipping or retry of items that cause exceptions during writing.
  *
  */
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
@@ -71,10 +71,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private boolean processorTransactional = true;
 
 	/**
-	 * The {@link KeyGenerator} to use to identify failed items across rollback.
-	 * Not used in the case of the {@link #setBuffering(boolean) buffering flag}
-	 * being true (the default).
-	 *
+	 * The {@link KeyGenerator} to use to identify failed items across rollback. Not used
+	 * in the case of the {@link #setBuffering(boolean) buffering flag} being true (the
+	 * default).
 	 * @param keyGenerator the {@link KeyGenerator} to set
 	 */
 	public void setKeyGenerator(KeyGenerator keyGenerator) {
@@ -96,9 +95,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * A classifier that can distinguish between exceptions that cause rollback
-	 * (return true) or not (return false).
-	 *
+	 * A classifier that can distinguish between exceptions that cause rollback (return
+	 * true) or not (return false).
 	 * @param rollbackClassifier classifier
 	 */
 	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
@@ -113,11 +111,10 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * A flag to indicate that items have been buffered and therefore will
-	 * always come back as a chunk after a rollback. Otherwise things are more
-	 * complicated because after a rollback the new chunk might or might not
-	 * contain items from the previous failed chunk.
-	 *
+	 * A flag to indicate that items have been buffered and therefore will always come
+	 * back as a chunk after a rollback. Otherwise things are more complicated because
+	 * after a rollback the new chunk might or might not contain items from the previous
+	 * failed chunk.
 	 * @param buffering true if items will be buffered
 	 */
 	public void setBuffering(boolean buffering) {
@@ -125,10 +122,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * Flag to say that the {@link ItemProcessor} is transactional (defaults to
-	 * true). If false then the processor is only called once per item per
-	 * chunk, even if there are rollbacks with retries and skips.
-	 *
+	 * Flag to say that the {@link ItemProcessor} is transactional (defaults to true). If
+	 * false then the processor is only called once per item per chunk, even if there are
+	 * rollbacks with retries and skips.
 	 * @param processorTransactional the flag value to set
 	 */
 	public void setProcessorTransactional(boolean processorTransactional) {
@@ -169,12 +165,12 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	protected boolean isComplete(Chunk<I> inputs) {
 
 		/*
-		 * Need to remember the write skips across transactions, otherwise they
-		 * keep coming back. Since we register skips with the inputs they will
-		 * not be processed again but the output skips need to be saved for
-		 * registration later with the listeners. The inputs are going to be the
-		 * same for all transactions processing the same chunk, but the outputs
-		 * are not, so we stash them in user data on the inputs.
+		 * Need to remember the write skips across transactions, otherwise they keep
+		 * coming back. Since we register skips with the inputs they will not be processed
+		 * again but the output skips need to be saved for registration later with the
+		 * listeners. The inputs are going to be the same for all transactions processing
+		 * the same chunk, but the outputs are not, so we stash them in user data on the
+		 * inputs.
 		 */
 
 		@SuppressWarnings("unchecked")
@@ -234,7 +230,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 							output = doProcess(item);
 							if (output == null) {
 								data.incrementFilterCount();
-							} else if (!processorTransactional && !data.scanning()) {
+							}
+							else if (!processorTransactional && !data.scanning()) {
 								cache.add(output);
 							}
 						}
@@ -300,15 +297,15 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(
-					getInputKey(item), rollbackClassifier));
+			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback,
+					new DefaultRetryState(getInputKey(item), rollbackClassifier));
 			if (output != null) {
 				outputs.add(output);
 			}
 
 			/*
-			 * We only want to process the first item if there is a scan for a
-			 * failed item.
+			 * We only want to process the first item if there is a scan for a failed
+			 * item.
 			 */
 			if (data.scanning()) {
 				while (cacheIterator != null && cacheIterator.hasNext()) {
@@ -348,10 +345,9 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 							throw e;
 						}
 						/*
-						 * If the exception is marked as no-rollback, we need to
-						 * override that, otherwise there's no way to write the
-						 * rest of the chunk or to honour the skip listener
-						 * contract.
+						 * If the exception is marked as no-rollback, we need to override
+						 * that, otherwise there's no way to write the rest of the chunk
+						 * or to honour the skip listener contract.
 						 */
 						throw new ForceRollbackForWriteSkipException(
 								"Force rollback on skippable exception so that skipped item can be located.", e);
@@ -414,9 +410,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				@Override
 				public Object recover(RetryContext context) throws Exception {
 					/*
-					 * If the last exception was not skippable we don't need to
-					 * do any scanning. We can just bomb out with a retry
-					 * exhausted.
+					 * If the last exception was not skippable we don't need to do any
+					 * scanning. We can just bomb out with a retry exhausted.
 					 */
 					if (!shouldSkip(itemWriteSkipPolicy, context.getLastThrowable(), -1)) {
 						throw new ExhaustedRetryException(
@@ -436,16 +431,15 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				logger.debug("Attempting to write: " + inputs);
 			}
 			try {
-				batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
-						rollbackClassifier));
+				batchRetryTemplate.execute(retryCallback, recoveryCallback,
+						new DefaultRetryState(inputs, rollbackClassifier));
 			}
 			catch (Exception e) {
 				RetryContext context = contextHolder.get();
 				if (!batchRetryTemplate.canRetry(context)) {
 					/*
-					 * BATCH-1761: we need advance warning of the scan about to
-					 * start in the next transaction, so we can change the
-					 * processing behaviour.
+					 * BATCH-1761: we need advance warning of the scan about to start in
+					 * the next transaction, so we can change the processing behaviour.
 					 */
 					data.scanning(true);
 				}
@@ -486,9 +480,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * Convenience method for calling process skip listener, so that it can be
-	 * called from multiple places.
-	 *
+	 * Convenience method for calling process skip listener, so that it can be called from
+	 * multiple places.
 	 * @param item the item that is skipped
 	 * @param e the cause of the skip
 	 */
@@ -502,9 +495,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	}
 
 	/**
-	 * Convenience method for calling process skip policy, so that it can be
-	 * called from multiple places.
-	 *
+	 * Convenience method for calling process skip policy, so that it can be called from
+	 * multiple places.
 	 * @param policy the skip policy
 	 * @param e the cause of the skip
 	 * @param skipCount the current skip count
@@ -615,7 +607,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			}
 			finally {
 				Throwable cause = e;
-				if(e instanceof StepListenerFailedException) {
+				if (e instanceof StepListenerFailedException) {
 					cause = e.getCause();
 				}
 

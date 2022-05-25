@@ -59,7 +59,6 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Create the beans based on the content of the source.
-	 *
 	 * @param parserContext The parser context to be used.
 	 * @param source The source for the auto registration.
 	 */
@@ -72,7 +71,8 @@ public class CoreNamespaceUtils {
 	}
 
 	private static void checkForStepScope(ParserContext parserContext, Object source) {
-		checkForScope(parserContext, source, XML_CONFIG_STEP_SCOPE_PROCESSOR_CLASS_NAME, STEP_SCOPE_PROCESSOR_BEAN_NAME);
+		checkForScope(parserContext, source, XML_CONFIG_STEP_SCOPE_PROCESSOR_CLASS_NAME,
+				STEP_SCOPE_PROCESSOR_BEAN_NAME);
 	}
 
 	private static void checkForJobScope(ParserContext parserContext, Object source) {
@@ -85,14 +85,14 @@ public class CoreNamespaceUtils {
 		String[] beanNames = parserContext.getRegistry().getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = parserContext.getRegistry().getBeanDefinition(beanName);
-			if (scopeClassName.equals(bd.getBeanClassName()) || JAVA_CONFIG_SCOPE_CLASS_NAME.equals(bd.getBeanClassName())) {
+			if (scopeClassName.equals(bd.getBeanClassName())
+					|| JAVA_CONFIG_SCOPE_CLASS_NAME.equals(bd.getBeanClassName())) {
 				foundScope = true;
 				break;
 			}
 		}
 		if (!foundScope) {
-			BeanDefinitionBuilder stepScopeBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition(scopeClassName);
+			BeanDefinitionBuilder stepScopeBuilder = BeanDefinitionBuilder.genericBeanDefinition(scopeClassName);
 			AbstractBeanDefinition abd = stepScopeBuilder.getBeanDefinition();
 			abd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			abd.setSource(source);
@@ -102,15 +102,15 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Register a {@link Comparator} to be used to sort {@link StateTransition}s
-	 *
 	 * @param parserContext
 	 */
 	private static void addStateTransitionComparator(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!stateTransitionComparatorAlreadyDefined(registry)) {
-			AbstractBeanDefinition defaultStateTransitionComparator = BeanDefinitionBuilder.genericBeanDefinition(
-					DefaultStateTransitionComparator.class).getBeanDefinition();
-			registry.registerBeanDefinition(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR, defaultStateTransitionComparator);
+			AbstractBeanDefinition defaultStateTransitionComparator = BeanDefinitionBuilder
+					.genericBeanDefinition(DefaultStateTransitionComparator.class).getBeanDefinition();
+			registry.registerBeanDefinition(DefaultStateTransitionComparator.STATE_TRANSITION_COMPARATOR,
+					defaultStateTransitionComparator);
 		}
 	}
 
@@ -120,14 +120,13 @@ public class CoreNamespaceUtils {
 
 	/**
 	 * Register a RangePropertyEditor if one does not already exist.
-	 *
 	 * @param parserContext
 	 */
 	private static void addRangePropertyEditor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!rangeArrayEditorAlreadyDefined(registry)) {
-			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder.genericBeanDefinition(
-					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
+			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder
+					.genericBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			ManagedMap<String, String> editors = new ManagedMap<>();
 			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
@@ -166,8 +165,8 @@ public class CoreNamespaceUtils {
 	private static void addCoreNamespacePostProcessor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!coreNamespaceBeanPostProcessorAlreadyDefined(registry)) {
-			AbstractBeanDefinition postProcessorBeanDef = BeanDefinitionBuilder.genericBeanDefinition(
-					CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME).getBeanDefinition();
+			AbstractBeanDefinition postProcessorBeanDef = BeanDefinitionBuilder
+					.genericBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME).getBeanDefinition();
 			postProcessorBeanDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME, postProcessorBeanDef);
 		}
@@ -184,9 +183,8 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Should this element be treated as incomplete? If it has a parent or is
-	 * abstract, then it may not have all properties.
-	 *
+	 * Should this element be treated as incomplete? If it has a parent or is abstract,
+	 * then it may not have all properties.
 	 * @param element to be evaluated.
 	 * @return TRUE if the element is abstract or has a parent
 	 */
@@ -204,12 +202,11 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Check that the schema location declared in the source file being parsed
-	 * matches the Spring Batch version. (The old 2.0 schema is not 100%
-	 * compatible with the new parser, so it is an error to explicitly define
-	 * 2.0. It might be an error to declare spring-batch.xsd as an alias, but
-	 * you are only going to find that out when one of the sub parses breaks.)
-	 *
+	 * Check that the schema location declared in the source file being parsed matches the
+	 * Spring Batch version. (The old 2.0 schema is not 100% compatible with the new
+	 * parser, so it is an error to explicitly define 2.0. It might be an error to declare
+	 * spring-batch.xsd as an alias, but you are only going to find that out when one of
+	 * the sub parses breaks.)
 	 * @param element the element that is to be parsed next
 	 * @return true if we find a schema declaration that matches
 	 */

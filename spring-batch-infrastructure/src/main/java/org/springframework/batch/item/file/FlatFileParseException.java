@@ -18,11 +18,9 @@ package org.springframework.batch.item.file;
 import org.springframework.batch.item.ParseException;
 
 /**
- * Exception thrown when errors are encountered
- * parsing flat files.  The original input, typically
- * a line, can be passed in, so that latter catches
- * can write out the original input to a log, or
- * an error table.
+ * Exception thrown when errors are encountered parsing flat files. The original input,
+ * typically a line, can be passed in, so that latter catches can write out the original
+ * input to a log, or an error table.
  *
  * @author Lucas Ward
  * @author Ben Hale
@@ -31,7 +29,7 @@ import org.springframework.batch.item.ParseException;
 public class FlatFileParseException extends ParseException {
 
 	private String input;
-	
+
 	private int lineNumber;
 
 	public FlatFileParseException(String message, String input) {
@@ -57,5 +55,6 @@ public class FlatFileParseException extends ParseException {
 
 	public int getLineNumber() {
 		return lineNumber;
-	}	
+	}
+
 }

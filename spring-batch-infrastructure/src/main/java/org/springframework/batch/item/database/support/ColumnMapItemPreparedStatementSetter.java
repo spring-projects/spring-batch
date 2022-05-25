@@ -27,11 +27,13 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * <p>Implementation of the {@link ItemPreparedStatementSetter} interface that assumes all
- * keys are contained within a {@link Map} with the column name as the key.  It assumes nothing 
- * about ordering, and assumes that the order the entry set can be iterated over is the same as
- * the PreparedStatement should be set.</p>
- * 
+ * <p>
+ * Implementation of the {@link ItemPreparedStatementSetter} interface that assumes all
+ * keys are contained within a {@link Map} with the column name as the key. It assumes
+ * nothing about ordering, and assumes that the order the entry set can be iterated over
+ * is the same as the PreparedStatement should be set.
+ * </p>
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @see ItemPreparedStatementSetter
@@ -39,11 +41,11 @@ import java.util.Map;
  */
 public class ColumnMapItemPreparedStatementSetter implements ItemPreparedStatementSetter<Map<String, Object>> {
 
-    @Override
+	@Override
 	public void setValues(Map<String, Object> item, PreparedStatement ps) throws SQLException {
 		Assert.isInstanceOf(Map.class, item, "Input to map PreparedStatement parameters must be of type Map.");
 		int counter = 1;
-		for(Object value : item.values()){
+		for (Object value : item.values()) {
 			StatementCreatorUtils.setParameterValue(ps, counter, SqlTypeValue.TYPE_UNKNOWN, value);
 			counter++;
 		}

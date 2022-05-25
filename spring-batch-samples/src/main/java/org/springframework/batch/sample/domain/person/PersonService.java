@@ -25,15 +25,17 @@ import org.springframework.batch.sample.domain.order.Address;
  * Custom class that contains logic that would normally be be contained in
  * {@link org.springframework.batch.item.ItemReader} and
  * {@link org.springframework.batch.item.ItemWriter}.
- * 
+ *
  * @author tomas.slanina
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
 public class PersonService {
+
 	private static final int GENERATION_LIMIT = 10;
 
 	private int generatedCounter = 0;
+
 	private int processedCounter = 0;
 
 	public Person getData() {
@@ -62,8 +64,8 @@ public class PersonService {
 	}
 
 	/*
-	 * Badly designed method signature which accepts multiple implicitly related
-	 * arguments instead of a single Person argument.
+	 * Badly designed method signature which accepts multiple implicitly related arguments
+	 * instead of a single Person argument.
 	 */
 	public void processPerson(String name, String city) {
 		processedCounter++;
@@ -76,4 +78,5 @@ public class PersonService {
 	public int getReceivedCount() {
 		return processedCounter;
 	}
+
 }

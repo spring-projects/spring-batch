@@ -9,12 +9,12 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.util.Assert;
 
-
 /**
- * A {@link ChannelInterceptor} that turns a pollable channel into a "pass-thru channel": if a client calls
- * <code>receive()</code> on the channel it will delegate to a {@link MessageSource} to pull the message directly from
- * an external source. This is particularly useful in combination with a message channel in thread scope, in which case
- * the <code>receive()</code> can join a transaction which was started by the caller.
+ * A {@link ChannelInterceptor} that turns a pollable channel into a "pass-thru channel":
+ * if a client calls <code>receive()</code> on the channel it will delegate to a
+ * {@link MessageSource} to pull the message directly from an external source. This is
+ * particularly useful in combination with a message channel in thread scope, in which
+ * case the <code>receive()</code> can join a transaction which was started by the caller.
  *
  * @author Dave Syer
  *
@@ -41,9 +41,8 @@ public class MessageSourcePollerInterceptor implements ChannelInterceptor, Initi
 	}
 
 	/**
-	 * Optional MessageChannel for injecting the message received from the source (defaults to the channel intercepted
-	 * in {@link #preReceive(MessageChannel)}).
-	 *
+	 * Optional MessageChannel for injecting the message received from the source
+	 * (defaults to the channel intercepted in {@link #preReceive(MessageChannel)}).
 	 * @param channel the channel to set
 	 */
 	public void setChannel(MessageChannel channel) {
@@ -66,8 +65,8 @@ public class MessageSourcePollerInterceptor implements ChannelInterceptor, Initi
 	}
 
 	/**
-	 * Receive from the {@link MessageSource} and send immediately to the input channel, so that the call that we are
-	 * intercepting always a message to receive.
+	 * Receive from the {@link MessageSource} and send immediately to the input channel,
+	 * so that the call that we are intercepting always a message to receive.
 	 *
 	 * @see ChannelInterceptor#preReceive(MessageChannel)
 	 */

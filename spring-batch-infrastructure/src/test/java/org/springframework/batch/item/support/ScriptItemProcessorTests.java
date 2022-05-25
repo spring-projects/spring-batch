@@ -40,6 +40,7 @@ import static org.junit.Assume.assumeTrue;
  * @since 3.1
  */
 public class ScriptItemProcessorTests {
+
 	private static List<String> availableLanguages = new ArrayList<>();
 
 	@BeforeClass
@@ -67,7 +68,8 @@ public class ScriptItemProcessorTests {
 		assumeTrue(languageExists("javascript"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", "javascript");
+		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);",
+				"javascript");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -111,7 +113,8 @@ public class ScriptItemProcessorTests {
 		assumeTrue(languageExists("bsh"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);", "bsh");
+		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);",
+				"bsh");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -133,7 +136,8 @@ public class ScriptItemProcessorTests {
 		assumeTrue(languageExists("groovy"));
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)", "groovy");
+		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)",
+				"groovy");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -188,7 +192,8 @@ public class ScriptItemProcessorTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void testScriptSourceWithNoLanguage() throws Exception {
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
-		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);", null);
+		scriptItemProcessor.setScriptSource("function process(item) { return item.toUpperCase(); } process(item);",
+				null);
 		scriptItemProcessor.afterPropertiesSet();
 	}
 
@@ -198,7 +203,8 @@ public class ScriptItemProcessorTests {
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<>();
 		scriptItemProcessor.setItemBindingVariableName("someOtherVarName");
-		scriptItemProcessor.setScriptSource("function process(param) { return param.toUpperCase(); } process(someOtherVarName);", "javascript");
+		scriptItemProcessor.setScriptSource(
+				"function process(param) { return param.toUpperCase(); } process(someOtherVarName);", "javascript");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -210,7 +216,8 @@ public class ScriptItemProcessorTests {
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
 		scriptItemProcessor.setScriptEvaluator(new BshScriptEvaluator());
-		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);", "bsh");
+		scriptItemProcessor.setScriptSource("String process(String item) { return item.toUpperCase(); } process(item);",
+				"bsh");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -222,7 +229,8 @@ public class ScriptItemProcessorTests {
 
 		ScriptItemProcessor<String, Object> scriptItemProcessor = new ScriptItemProcessor<String, Object>();
 		scriptItemProcessor.setScriptEvaluator(new GroovyScriptEvaluator());
-		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)", "groovy");
+		scriptItemProcessor.setScriptSource("def process(item) { return item.toUpperCase() } \n process(item)",
+				"groovy");
 		scriptItemProcessor.afterPropertiesSet();
 
 		assertEquals("Incorrect transformed value", "SS", scriptItemProcessor.process("ss"));
@@ -231,4 +239,5 @@ public class ScriptItemProcessorTests {
 	private boolean languageExists(String engineName) {
 		return availableLanguages.contains(engineName);
 	}
+
 }

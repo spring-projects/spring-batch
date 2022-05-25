@@ -25,20 +25,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * 
- * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read() 
+ *
+ * This is a simple ItemStreamReader decorator with a synchronized ItemReader.read()
  * method - which makes a non-thread-safe ItemReader thread-safe.
- * 
+ *
  * However, if reprocessing an item is problematic then using this will make a job not
  * restartable.
- * 
- * Here are some links about the motivation behind this class:
- * - https://projects.spring.io/spring-batch/faq.html#threading-reader}
- * - https://stackoverflow.com/a/20002493/2910265}
- * 
+ *
+ * Here are some links about the motivation behind this class: -
+ * https://projects.spring.io/spring-batch/faq.html#threading-reader} -
+ * https://stackoverflow.com/a/20002493/2910265}
+ *
  * @author Matthew Ouyang
  * @since 3.0.4
- *
  * @param <T> type of object being read
  */
 public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, InitializingBean {
@@ -53,7 +52,8 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	 * This delegates to the read method of the <code>delegate</code>
 	 */
 	@Nullable
-	public synchronized T read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+	public synchronized T read()
+			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 		return this.delegate.read();
 	}
 
@@ -73,4 +73,5 @@ public class SynchronizedItemStreamReader<T> implements ItemStreamReader<T>, Ini
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.delegate, "A delegate item reader is required");
 	}
+
 }

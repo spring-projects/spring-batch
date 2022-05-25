@@ -64,7 +64,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		template.setTaskExecutor(taskExecutor);
 		try {
 			template.iterate(new RepeatCallback() {
-                @Override
+				@Override
 				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo!");
@@ -91,13 +91,13 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		template.setTaskExecutor(taskExecutor);
 
 		template.setExceptionHandler(new ExceptionHandler() {
-            @Override
+			@Override
 			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 				count++;
 			}
 		});
 		template.iterate(new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				throw new IllegalStateException("foo!");
 			}
@@ -115,7 +115,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		RepeatTemplate inner = new RepeatTemplate();
 
 		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -124,7 +124,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 				return RepeatStatus.FINISHED;
 			}
 		}) {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				assertNotNull(context);
@@ -139,10 +139,9 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	/**
-	 * Run a batch with a single template that itself has an async task
-	 * executor. The result is a batch that runs in multiple threads (up to the
-	 * throttle limit of the template).
-	 * 
+	 * Run a batch with a single template that itself has an async task executor. The
+	 * result is a batch that runs in multiple threads (up to the throttle limit of the
+	 * template).
 	 * @throws Exception
 	 */
 	@Test
@@ -152,7 +151,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final Set<String> threadNames = new HashSet<>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -188,7 +187,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final List<String> items = new ArrayList<>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				Trade item = provider.read();
@@ -220,9 +219,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 	}
 
 	/**
-	 * Wrap an otherwise synchronous batch in a callback to an asynchronous
-	 * template.
-	 * 
+	 * Wrap an otherwise synchronous batch in a callback to an asynchronous template.
 	 * @throws Exception
 	 */
 	@Test
@@ -237,7 +234,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 		final Set<String> threadNames = new HashSet<>();
 
 		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
@@ -250,7 +247,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBa
 			}
 		};
 		RepeatCallback jobCallback = new RepeatCallback() {
-            @Override
+			@Override
 			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				stepTemplate.iterate(stepCallback);
 				return RepeatStatus.FINISHED;

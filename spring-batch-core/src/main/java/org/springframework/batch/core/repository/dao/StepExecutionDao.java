@@ -27,38 +27,34 @@ public interface StepExecutionDao {
 
 	/**
 	 * Save the given StepExecution.
-	 * 
+	 *
 	 * Preconditions: Id must be null.
-	 * 
+	 *
 	 * Postconditions: Id will be set to a unique Long.
-	 * 
 	 * @param stepExecution {@link StepExecution} instance to be saved.
 	 */
 	void saveStepExecution(StepExecution stepExecution);
 
 	/**
 	 * Save the given collection of StepExecution as a batch.
-	 * 
+	 *
 	 * Preconditions: StepExecution Id must be null.
-	 * 
+	 *
 	 * Postconditions: StepExecution Id will be set to a unique Long.
-	 * 
 	 * @param stepExecutions a collection of {@link JobExecution} instances to be saved.
 	 */
 	void saveStepExecutions(Collection<StepExecution> stepExecutions);
 
 	/**
 	 * Update the given StepExecution
-	 * 
+	 *
 	 * Preconditions: Id must not be null.
-	 * 
 	 * @param stepExecution {@link StepExecution} instance to be updated.
 	 */
 	void updateStepExecution(StepExecution stepExecution);
 
 	/**
 	 * Retrieve a {@link StepExecution} from its id.
-	 * 
 	 * @param jobExecution the parent {@link JobExecution}
 	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
@@ -67,9 +63,8 @@ public interface StepExecutionDao {
 	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
 
 	/**
-	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance}
-	 * ordered by creation time and then id.
-	 *
+	 * Retrieve the last {@link StepExecution} for a given {@link JobInstance} ordered by
+	 * creation time and then id.
 	 * @param jobInstance the parent {@link JobInstance}
 	 * @param stepName the name of the step
 	 * @return a {@link StepExecution}
@@ -81,14 +76,12 @@ public interface StepExecutionDao {
 
 	/**
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
-	 * 
 	 * @param jobExecution the parent job execution
 	 */
 	void addStepExecutions(JobExecution jobExecution);
 
 	/**
 	 * Counts all the {@link StepExecution} for a given step name.
-	 *
 	 * @param jobInstance the parent {@link JobInstance}
 	 * @param stepName the name of the step
 	 * @since 4.3
@@ -97,4 +90,5 @@ public interface StepExecutionDao {
 	default int countStepExecutions(JobInstance jobInstance, String stepName) {
 		throw new UnsupportedOperationException();
 	}
+
 }

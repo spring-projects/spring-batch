@@ -17,9 +17,9 @@ package org.springframework.batch.core.launch.support;
 
 /**
  * Implementation of the {@link SystemExiter} interface that calls the standards
- * System.exit method. It should be noted that there will be no unit tests for
- * this class, since there is only one line of actual code, that would only be
- * testable by mocking System or Runtime.
+ * System.exit method. It should be noted that there will be no unit tests for this class,
+ * since there is only one line of actual code, that would only be testable by mocking
+ * System or Runtime.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -28,9 +28,8 @@ package org.springframework.batch.core.launch.support;
 public class JvmSystemExiter implements SystemExiter {
 
 	/**
-	 * Delegate call to System.exit() with the argument provided. This should only
-	 * be used in a scenario where a particular status needs to be returned to
-	 * a Batch scheduler.
+	 * Delegate call to System.exit() with the argument provided. This should only be used
+	 * in a scenario where a particular status needs to be returned to a Batch scheduler.
 	 *
 	 * @see org.springframework.batch.core.launch.support.SystemExiter#exit(int)
 	 */

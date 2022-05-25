@@ -50,8 +50,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * A {@link Step} implementation that provides common behavior to subclasses, including registering and calling
- * listeners.
+ * A {@link Step} implementation that provides common behavior to subclasses, including
+ * registering and calling listeners.
  *
  * @author Dave Syer
  * @author Ben Hale
@@ -60,7 +60,8 @@ import org.springframework.util.ClassUtils;
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
-public abstract class AbstractStep implements Step, InitializingBean, BeanNameAware, Observation.KeyValuesProviderAware<BatchStepTagsProvider> {
+public abstract class AbstractStep
+		implements Step, InitializingBean, BeanNameAware, Observation.KeyValuesProviderAware<BatchStepTagsProvider> {
 
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
@@ -95,7 +96,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property. Always overrides the default value if this object is a Spring bean.
+	 * Set the name property. Always overrides the default value if this object is a
+	 * Spring bean.
 	 * @param name the name of the {@link Step}.
 	 * @see #setBeanName(java.lang.String)
 	 */
@@ -104,9 +106,11 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Set the name property if it is not already set. Because of the order of the callbacks in a Spring container the
-	 * name property will be set first if it is present. Care is needed with bean definition inheritance - if a parent
-	 * bean has a name, then its children need an explicit name as well, otherwise they will not be unique.
+	 * Set the name property if it is not already set. Because of the order of the
+	 * callbacks in a Spring container the name property will be set first if it is
+	 * present. Care is needed with bean definition inheritance - if a parent bean has a
+	 * name, then its children need an explicit name as well, otherwise they will not be
+	 * unique.
 	 *
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -124,7 +128,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Public setter for the startLimit.
-	 *
 	 * @param startLimit the startLimit to set
 	 */
 	public void setStartLimit(int startLimit) {
@@ -137,9 +140,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Public setter for flag that determines whether the step should start again if it is already complete. Defaults to
-	 * false.
-	 *
+	 * Public setter for flag that determines whether the step should start again if it is
+	 * already complete. Defaults to false.
 	 * @param allowStartIfComplete the value of the flag to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
@@ -148,7 +150,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Convenient constructor for setting only the name property.
-	 *
 	 * @param name Name of the step
 	 */
 	public AbstractStep(String name) {
@@ -156,18 +157,16 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Extension point for subclasses to execute business logic. Subclasses should set the {@link ExitStatus} on the
-	 * {@link StepExecution} before returning.
-	 *
+	 * Extension point for subclasses to execute business logic. Subclasses should set the
+	 * {@link ExitStatus} on the {@link StepExecution} before returning.
 	 * @param stepExecution the current step context
 	 * @throws Exception checked exception thrown by implementation
 	 */
 	protected abstract void doExecute(StepExecution stepExecution) throws Exception;
 
 	/**
-	 * Extension point for subclasses to provide callbacks to their collaborators at the beginning of a step, to open or
-	 * acquire resources. Does nothing by default.
-	 *
+	 * Extension point for subclasses to provide callbacks to their collaborators at the
+	 * beginning of a step, to open or acquire resources. Does nothing by default.
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception checked exception thrown by implementation
 	 */
@@ -175,9 +174,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Extension point for subclasses to provide callbacks to their collaborators at the end of a step (right at the end
-	 * of the finally block), to close or release resources. Does nothing by default.
-	 *
+	 * Extension point for subclasses to provide callbacks to their collaborators at the
+	 * end of a step (right at the end of the finally block), to close or release
+	 * resources. Does nothing by default.
 	 * @param ctx the {@link ExecutionContext} to use
 	 * @throws Exception checked exception thrown by implementation
 	 */
@@ -185,13 +184,14 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Template method for step execution logic - calls abstract methods for resource initialization (
-	 * {@link #open(ExecutionContext)}), execution logic ({@link #doExecute(StepExecution)}) and resource closing (
+	 * Template method for step execution logic - calls abstract methods for resource
+	 * initialization ( {@link #open(ExecutionContext)}), execution logic
+	 * ({@link #doExecute(StepExecution)}) and resource closing (
 	 * {@link #close(ExecutionContext)}).
 	 */
 	@Override
-	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
-	UnexpectedJobExecutionException {
+	public final void execute(StepExecution stepExecution)
+			throws JobInterruptedException, UnexpectedJobExecutionException {
 
 		Assert.notNull(stepExecution, "stepExecution must not be null");
 
@@ -200,10 +200,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		}
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		Observation observation = BatchMetrics.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(), new BatchStepContext(stepExecution))
-				.contextualName(stepExecution.getStepName())
-				.keyValuesProvider(this.keyValuesProvider)
-				.start();
+		Observation observation = BatchMetrics
+				.createObservation(BatchStepObservation.BATCH_STEP_OBSERVATION.getName(),
+						new BatchStepContext(stepExecution))
+				.contextualName(stepExecution.getStepName()).keyValuesProvider(this.keyValuesProvider).start();
 		getJobRepository().update(stepExecution);
 
 		// Start with a default value that will be trumped by anything
@@ -239,13 +239,15 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = exitStatus.and(getDefaultExitStatusForFailure(e));
 			stepExecution.addFailureException(e);
 			if (stepExecution.getStatus() == BatchStatus.STOPPED) {
-				logger.info(String.format("Encountered interruption executing step %s in job %s : %s", name, stepExecution.getJobExecution().getJobInstance().getJobName(), e.getMessage()));
+				logger.info(String.format("Encountered interruption executing step %s in job %s : %s", name,
+						stepExecution.getJobExecution().getJobInstance().getJobName(), e.getMessage()));
 				if (logger.isDebugEnabled()) {
 					logger.debug("Full exception", e);
 				}
 			}
 			else {
-				logger.error(String.format("Encountered an error executing step %s in job %s", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+				logger.error(String.format("Encountered an error executing step %s in job %s", name,
+						stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 		}
 		finally {
@@ -258,7 +260,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}
 			catch (Exception e) {
-				logger.error(String.format("Exception in afterStep callback in step %s in job %s", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+				logger.error(String.format("Exception in afterStep callback in step %s in job %s", name,
+						stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
 			try {
@@ -268,15 +271,19 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
 				stepExecution.addFailureException(e);
-				logger.error(String.format("Encountered an error saving batch meta data for step %s in job %s. "
-						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+				logger.error(String.format(
+						"Encountered an error saving batch meta data for step %s in job %s. "
+								+ "This job is now in an unknown state and should not be restarted.",
+						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 			stopObservation(stepExecution, observation);
 			stepExecution.setEndTime(new Date());
 			stepExecution.setExitStatus(exitStatus);
-			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(), stepExecution.getEndTime());
+			Duration stepExecutionDuration = BatchMetrics.calculateDuration(stepExecution.getStartTime(),
+					stepExecution.getEndTime());
 			if (logger.isInfoEnabled()) {
-				logger.info("Step: [" + stepExecution.getStepName() + "] executed in " + BatchMetrics.formatDuration(stepExecutionDuration));
+				logger.info("Step: [" + stepExecution.getStepName() + "] executed in "
+						+ BatchMetrics.formatDuration(stepExecutionDuration));
 			}
 			try {
 				getJobRepository().update(stepExecution);
@@ -285,15 +292,18 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				stepExecution.setExitStatus(exitStatus.and(ExitStatus.UNKNOWN));
 				stepExecution.addFailureException(e);
-				logger.error(String.format("Encountered an error saving batch meta data for step %s in job %s. "
-						+ "This job is now in an unknown state and should not be restarted.", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+				logger.error(String.format(
+						"Encountered an error saving batch meta data for step %s in job %s. "
+								+ "This job is now in an unknown state and should not be restarted.",
+						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 			}
 
 			try {
 				close(stepExecution.getExecutionContext());
 			}
 			catch (Exception e) {
-				logger.error(String.format("Exception while closing step execution resources in step %s in job %s", name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
+				logger.error(String.format("Exception while closing step execution resources in step %s in job %s",
+						name, stepExecution.getJobExecution().getJobInstance().getJobName()), e);
 				stepExecution.addFailureException(e);
 			}
 
@@ -327,7 +337,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Registers the {@link StepExecution} for property resolution via {@link StepScope}
-	 *
 	 * @param stepExecution StepExecution to use when hydrating the StepScoped beans
 	 */
 	protected void doExecutionRegistration(StepExecution stepExecution) {
@@ -347,8 +356,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Register a step listener for callbacks at the appropriate stages in a step execution.
-	 *
+	 * Register a step listener for callbacks at the appropriate stages in a step
+	 * execution.
 	 * @param listener a {@link StepExecutionListener}
 	 */
 	public void registerStepExecutionListener(StepExecutionListener listener) {
@@ -357,7 +366,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Register each of the objects as listeners.
-	 *
 	 * @param listeners an array of listener objects of known types.
 	 */
 	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
@@ -375,7 +383,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	/**
 	 * Public setter for {@link JobRepository}.
-	 *
 	 * @param jobRepository is a mandatory dependence (no default).
 	 */
 	public void setJobRepository(JobRepository jobRepository) {
@@ -392,9 +399,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify the exit code using a
-	 * {@link StepExecutionListener}.
-	 *
+	 * Default mapping from throwable to {@link ExitStatus}. Clients can modify the exit
+	 * code using a {@link StepExecutionListener}.
 	 * @param ex the cause of the failure
 	 * @return an {@link ExitStatus}
 	 */
@@ -417,4 +423,5 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	public void setKeyValuesProvider(BatchStepTagsProvider keyValuesProvider) {
 		this.keyValuesProvider = keyValuesProvider;
 	}
+
 }

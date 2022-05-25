@@ -24,10 +24,10 @@ public class StartLimitExceededException extends RuntimeException {
 
 	/**
 	 * Constructor that sets the message for the exception.
-	 *
 	 * @param message The message for the exception.
 	 */
 	public StartLimitExceededException(String message) {
 		super(message);
 	}
+
 }

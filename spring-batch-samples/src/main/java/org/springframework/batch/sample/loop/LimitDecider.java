@@ -22,9 +22,9 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.lang.Nullable;
 
 /**
- * This decider will return "CONTINUE" until the limit it reached, at which
- * point it will return "COMPLETE".
- * 
+ * This decider will return "CONTINUE" until the limit it reached, at which point it will
+ * return "COMPLETE".
+ *
  * @author Dan Garrette
  * @since 2.0
  */
@@ -50,4 +50,5 @@ public class LimitDecider implements JobExecutionDecider {
 	public void setLimit(int limit) {
 		this.limit = limit;
 	}
+
 }

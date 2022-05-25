@@ -36,6 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JdbcPagingItemReaderEmptyResultSetTests {
 
 	private static final int PAGE_SIZE = 2;
+
 	private static final int EMPTY_READS = PAGE_SIZE + 1;
 
 	@Autowired
@@ -65,4 +66,5 @@ public class JdbcPagingItemReaderEmptyResultSetTests {
 
 		return reader;
 	}
+
 }

@@ -40,7 +40,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepListenerMethodAttributeParserTests {
-	
+
 	@Autowired
 	@Qualifier("s1")
 	private Step step1;
@@ -57,8 +57,8 @@ public class StepListenerMethodAttributeParserTests {
 
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
-		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(
-				composite, "list");
+		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils
+				.getField(composite, "list");
 		List<Object> r = new ArrayList<>();
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {

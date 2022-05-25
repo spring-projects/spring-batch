@@ -18,8 +18,8 @@ package org.springframework.batch.item.ldif;
 import org.springframework.ldap.core.LdapAttributes;
 
 /**
- * This interface can be used to operate on skipped records during open in the {@link LdifReader LdifReader} and the
- * {@link MappingLdifReader MappingLdifReader}.
+ * This interface can be used to operate on skipped records during open in the
+ * {@link LdifReader LdifReader} and the {@link MappingLdifReader MappingLdifReader}.
  *
  * @author Keith Barlow
  *
@@ -28,7 +28,6 @@ public interface RecordCallbackHandler {
 
 	/**
 	 * Execute operations on the supplied record.
-	 *
 	 * @param attributes represents the record
 	 */
 	void handleRecord(LdapAttributes attributes);

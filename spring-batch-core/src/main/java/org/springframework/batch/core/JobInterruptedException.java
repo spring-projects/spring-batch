@@ -16,13 +16,11 @@
 
 package org.springframework.batch.core;
 
-
 /**
- * Exception to indicate the job has been interrupted. The exception state
- * indicated is not normally recoverable by batch application clients, but
- * it is used internally to force a check. The exception is often wrapped
- * in a runtime exception (usually {@link UnexpectedJobExecutionException}) before
- * reaching the client.
+ * Exception to indicate the job has been interrupted. The exception state indicated is
+ * not normally recoverable by batch application clients, but it is used internally to
+ * force a check. The exception is often wrapped in a runtime exception (usually
+ * {@link UnexpectedJobExecutionException}) before reaching the client.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -35,7 +33,6 @@ public class JobInterruptedException extends JobExecutionException {
 
 	/**
 	 * Constructor that sets the message for the exception.
-	 *
 	 * @param msg The message for the exception.
 	 */
 	public JobInterruptedException(String msg) {
@@ -44,9 +41,9 @@ public class JobInterruptedException extends JobExecutionException {
 
 	/**
 	 * Constructor that sets the message for the exception.
-	 *
 	 * @param msg The message for the exception.
-	 * @param status The desired {@link BatchStatus} of the surrounding execution after interruption.
+	 * @param status The desired {@link BatchStatus} of the surrounding execution after
+	 * interruption.
 	 */
 	public JobInterruptedException(String msg, BatchStatus status) {
 		super(msg);
@@ -55,10 +52,10 @@ public class JobInterruptedException extends JobExecutionException {
 
 	/**
 	 * The desired status of the surrounding execution after the interruption.
-	 *
 	 * @return the status of the interruption (default STOPPED)
 	 */
 	public BatchStatus getStatus() {
 		return status;
 	}
+
 }

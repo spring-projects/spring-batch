@@ -42,14 +42,19 @@ import org.springframework.util.Assert;
  * Builder for a manager step in a remote partitioning setup. This builder creates and
  * sets a {@link MessageChannelPartitionHandler} on the manager step.
  *
- * <p>If no {@code messagingTemplate} is provided through
- * {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)},
- * this builder will create one and set its default channel to the {@code outputChannel}
- * provided through {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)}.</p>
+ * <p>
+ * If no {@code messagingTemplate} is provided through
+ * {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)}, this
+ * builder will create one and set its default channel to the {@code outputChannel}
+ * provided through
+ * {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)}.
+ * </p>
  *
- * <p>If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
+ * <p>
+ * If a {@code messagingTemplate} is provided, it is assumed that it is fully configured
  * and that its default channel is set to an output channel on which requests to workers
- * will be sent.</p>
+ * will be sent.
+ * </p>
  *
  * @since 4.2
  * @author Mahmoud Ben Hassine
@@ -57,14 +62,21 @@ import org.springframework.util.Assert;
 public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 
 	private static final long DEFAULT_POLL_INTERVAL = 10000L;
+
 	private static final long DEFAULT_TIMEOUT = -1L;
 
 	private MessagingTemplate messagingTemplate;
+
 	private MessageChannel inputChannel;
+
 	private MessageChannel outputChannel;
+
 	private JobExplorer jobExplorer;
+
 	private BeanFactory beanFactory;
+
 	private long pollInterval = DEFAULT_POLL_INTERVAL;
+
 	private long timeout = DEFAULT_TIMEOUT;
 
 	/**
@@ -87,12 +99,14 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the output channel on which requests to workers will be sent. By using
-	 * this setter, a default messaging template will be created and the output
-	 * channel will be set as its default channel.
-	 * <p>Use either this setter or {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)}
-	 * to provide a fully configured messaging template.</p>
-	 *
+	 * Set the output channel on which requests to workers will be sent. By using this
+	 * setter, a default messaging template will be created and the output channel will be
+	 * set as its default channel.
+	 * <p>
+	 * Use either this setter or
+	 * {@link RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)}
+	 * to provide a fully configured messaging template.
+	 * </p>
 	 * @param outputChannel the output channel.
 	 * @return this builder instance for fluent chaining
 	 * @see RemotePartitioningManagerStepBuilder#messagingTemplate(MessagingTemplate)
@@ -104,12 +118,14 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * Set the {@link MessagingTemplate} to use to send data to workers.
-	 * <strong>The default channel of the messaging template must be set</strong>.
-	 * <p>Use either this setter to provide a fully configured messaging template or
-	 * provide an output channel through {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)}
-	 * and a default messaging template will be created.</p>
-	 *
+	 * Set the {@link MessagingTemplate} to use to send data to workers. <strong>The
+	 * default channel of the messaging template must be set</strong>.
+	 * <p>
+	 * Use either this setter to provide a fully configured messaging template or provide
+	 * an output channel through
+	 * {@link RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)} and a
+	 * default messaging template will be created.
+	 * </p>
 	 * @param messagingTemplate the messaging template to use
 	 * @return this builder instance for fluent chaining
 	 * @see RemotePartitioningManagerStepBuilder#outputChannel(MessageChannel)
@@ -132,7 +148,8 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * How often to poll the job repository for the status of the workers. Defaults to 10 seconds.
+	 * How often to poll the job repository for the status of the workers. Defaults to 10
+	 * seconds.
 	 * @param pollInterval the poll interval value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
@@ -143,7 +160,8 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * When using job repository polling, the time limit to wait. Defaults to -1 (no timeout).
+	 * When using job repository polling, the time limit to wait. Defaults to -1 (no
+	 * timeout).
 	 * @param timeout the timeout value in milliseconds
 	 * @return this builder instance for fluent chaining
 	 */
@@ -189,15 +207,10 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 		else {
 			PollableChannel replies = new QueueChannel();
 			partitionHandler.setReplyChannel(replies);
-			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows
-					.from(this.inputChannel)
-					.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler))
-					.channel(replies)
-					.get();
+			StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(this.inputChannel)
+					.aggregate(aggregatorSpec -> aggregatorSpec.processor(partitionHandler)).channel(replies).get();
 			IntegrationFlowContext integrationFlowContext = this.beanFactory.getBean(IntegrationFlowContext.class);
-			integrationFlowContext.registration(standardIntegrationFlow)
-					.autoStartup(false)
-					.register();
+			integrationFlowContext.registration(standardIntegrationFlow).autoStartup(false).register();
 		}
 
 		try {
@@ -282,24 +295,23 @@ public class RemotePartitioningManagerStepBuilder extends PartitionStepBuilder {
 	}
 
 	/**
-	 * This method will throw a {@link UnsupportedOperationException} since
-	 * the partition handler of the manager step will be automatically set to an
-	 * instance of {@link MessageChannelPartitionHandler}.
+	 * This method will throw a {@link UnsupportedOperationException} since the partition
+	 * handler of the manager step will be automatically set to an instance of
+	 * {@link MessageChannelPartitionHandler}.
 	 *
-	 * When building a manager step for remote partitioning using this builder,
-	 * no partition handler must be provided.
-	 *
+	 * When building a manager step for remote partitioning using this builder, no
+	 * partition handler must be provided.
 	 * @param partitionHandler a partition handler
 	 * @return this builder instance for fluent chaining
 	 * @throws UnsupportedOperationException if a partition handler is provided
 	 */
 	@Override
-	public RemotePartitioningManagerStepBuilder partitionHandler(PartitionHandler partitionHandler) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("When configuring a manager step " +
-				"for remote partitioning using the RemotePartitioningManagerStepBuilder, " +
-				"the partition handler will be automatically set to an instance " +
-				"of MessageChannelPartitionHandler. The partition handler must " +
-				"not be provided in this case.");
+	public RemotePartitioningManagerStepBuilder partitionHandler(PartitionHandler partitionHandler)
+			throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("When configuring a manager step "
+				+ "for remote partitioning using the RemotePartitioningManagerStepBuilder, "
+				+ "the partition handler will be automatically set to an instance "
+				+ "of MessageChannelPartitionHandler. The partition handler must " + "not be provided in this case.");
 	}
 
 }

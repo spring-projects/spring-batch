@@ -36,13 +36,21 @@ import org.w3c.dom.Element;
  * @since 3.1
  */
 public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
+
 	private static final String MESSAGE_TEMPLATE_ATTRIBUTE = "message-template";
+
 	private static final String STEP_ATTRIBUTE = "step";
+
 	private static final String REPLY_CHANNEL_ATTRIBUTE = "reply-channel";
+
 	private static final String MESSAGING_OPERATIONS_PROPERTY = "messagingOperations";
+
 	private static final String REPLY_CHANNEL_PROPERTY = "replyChannel";
+
 	private static final String CHUNK_WRITER_PROPERTY = "chunkWriter";
+
 	private static final String STEP_PROPERTY = "step";
+
 	private static final String CHUNK_HANDLER_BEAN_NAME_PREFIX = "remoteChunkHandlerFactoryBean_";
 
 	@Override
@@ -61,24 +69,22 @@ public class RemoteChunkingManagerParser extends AbstractBeanDefinitionParser {
 
 		BeanDefinitionRegistry beanDefinitionRegistry = parserContext.getRegistry();
 
-		BeanDefinition chunkMessageChannelItemWriter =
-				BeanDefinitionBuilder
-						.genericBeanDefinition(ChunkMessageChannelItemWriter.class)
-						.addPropertyReference(MESSAGING_OPERATIONS_PROPERTY, messageTemplate)
-						.addPropertyReference(REPLY_CHANNEL_PROPERTY, replyChannel)
-						.getBeanDefinition();
+		BeanDefinition chunkMessageChannelItemWriter = BeanDefinitionBuilder
+				.genericBeanDefinition(ChunkMessageChannelItemWriter.class)
+				.addPropertyReference(MESSAGING_OPERATIONS_PROPERTY, messageTemplate)
+				.addPropertyReference(REPLY_CHANNEL_PROPERTY, replyChannel).getBeanDefinition();
 
 		beanDefinitionRegistry.registerBeanDefinition(id, chunkMessageChannelItemWriter);
 
-		BeanDefinition remoteChunkHandlerFactoryBean =
-				BeanDefinitionBuilder
-						.genericBeanDefinition(RemoteChunkHandlerFactoryBean.class)
-						.addPropertyValue(CHUNK_WRITER_PROPERTY, chunkMessageChannelItemWriter)
-						.addPropertyValue(STEP_PROPERTY, step)
-						.getBeanDefinition();
+		BeanDefinition remoteChunkHandlerFactoryBean = BeanDefinitionBuilder
+				.genericBeanDefinition(RemoteChunkHandlerFactoryBean.class)
+				.addPropertyValue(CHUNK_WRITER_PROPERTY, chunkMessageChannelItemWriter)
+				.addPropertyValue(STEP_PROPERTY, step).getBeanDefinition();
 
-		beanDefinitionRegistry.registerBeanDefinition(CHUNK_HANDLER_BEAN_NAME_PREFIX + step, remoteChunkHandlerFactoryBean);
+		beanDefinitionRegistry.registerBeanDefinition(CHUNK_HANDLER_BEAN_NAME_PREFIX + step,
+				remoteChunkHandlerFactoryBean);
 
 		return null;
 	}
+
 }

@@ -20,22 +20,22 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-
 /**
  * @author Dave Syer
  */
 public class TaskExecutorRepeatTemplateTests extends SimpleRepeatTemplateTests {
 
-    @Override
+	@Override
 	public RepeatTemplate getRepeatTemplate() {
 		return new TaskExecutorRepeatTemplate();
 	}
-	
+
 	@Test
 	public void testSetThrottleLimit() throws Exception {
 		try {
 			new TaskExecutorRepeatTemplate().setThrottleLimit(-1);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// unexpected - no check for illegal values
 			fail("Unexpected Exception setting throttle limit");
 		}

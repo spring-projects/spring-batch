@@ -28,17 +28,16 @@ import org.springframework.util.Assert;
 import jakarta.jms.Message;
 
 /**
- * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template
- * should have a default destination, which will be used to provide items in
- * {@link #read()}.<br>
+ * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template should have a
+ * default destination, which will be used to provide items in {@link #read()}.<br>
  * <br>
- * 
- * The implementation is thread-safe after its properties are set (normal
- * singleton behavior).
- * 
+ *
+ * The implementation is thread-safe after its properties are set (normal singleton
+ * behavior).
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 
@@ -50,7 +49,6 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 
 	/**
 	 * Setter for JMS template.
-	 * 
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 */
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
@@ -65,20 +63,17 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 	}
 
 	/**
-	 * Set the expected type of incoming message payloads. Set this to
-	 * {@link Message} to receive the raw underlying message.
-	 * 
-	 * @param itemType the java class of the items to be delivered. Typically
-	 * the same as the class parameter
-	 * 
-	 * @throws IllegalStateException if the message payload is of the wrong
-	 * type.
+	 * Set the expected type of incoming message payloads. Set this to {@link Message} to
+	 * receive the raw underlying message.
+	 * @param itemType the java class of the items to be delivered. Typically the same as
+	 * the class parameter
+	 * @throws IllegalStateException if the message payload is of the wrong type.
 	 */
 	public void setItemType(Class<? extends T> itemType) {
 		this.itemType = itemType;
 	}
 
-    @Nullable
+	@Nullable
 	@Override
 	@SuppressWarnings("unchecked")
 	public T read() {
@@ -93,8 +88,9 @@ public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 		return (T) result;
 	}
 
-    @Override
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.jmsTemplate, "The 'jmsTemplate' is required.");
 	}
+
 }

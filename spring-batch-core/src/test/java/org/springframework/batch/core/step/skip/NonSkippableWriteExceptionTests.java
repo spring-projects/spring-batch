@@ -17,15 +17,18 @@ package org.springframework.batch.core.step.skip;
 
 import org.springframework.batch.core.AbstractExceptionWithCauseTests;
 
-
 /**
  * @author Dave Syer
  *
  */
 public class NonSkippableWriteExceptionTests extends AbstractExceptionWithCauseTests {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.listener.AbstractDoubleExceptionTests#getException(java.lang.String, java.lang.RuntimeException, java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.listener.AbstractDoubleExceptionTests#getException(
+	 * java.lang.String, java.lang.RuntimeException, java.lang.Throwable)
 	 */
 	@Override
 	public Exception getException(String msg, Throwable e) throws Exception {

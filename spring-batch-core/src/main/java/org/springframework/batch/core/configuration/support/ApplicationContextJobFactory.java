@@ -21,8 +21,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * A {@link JobFactory} that creates its own {@link ApplicationContext} and
- * pulls a bean out when asked to create a {@link Job}.
+ * A {@link JobFactory} that creates its own {@link ApplicationContext} and pulls a bean
+ * out when asked to create a {@link Job}.
  *
  * @author Dave Syer
  *
@@ -32,10 +32,9 @@ public class ApplicationContextJobFactory implements JobFactory {
 	private final Job job;
 
 	/**
-	 * @param jobName the id of the {@link Job} in the application context to be
-	 * created
-	 * @param applicationContextFactory a factory for an application context
-	 * containing a job with the job name provided
+	 * @param jobName the id of the {@link Job} in the application context to be created
+	 * @param applicationContextFactory a factory for an application context containing a
+	 * job with the job name provided
 	 */
 	public ApplicationContextJobFactory(String jobName, ApplicationContextFactory applicationContextFactory) {
 		@SuppressWarnings("resource")
@@ -44,8 +43,8 @@ public class ApplicationContextJobFactory implements JobFactory {
 	}
 
 	/**
-	 * Create an {@link ApplicationContext} from the factory provided and pull
-	 * out a bean with the name given during initialization.
+	 * Create an {@link ApplicationContext} from the factory provided and pull out a bean
+	 * with the name given during initialization.
 	 *
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */

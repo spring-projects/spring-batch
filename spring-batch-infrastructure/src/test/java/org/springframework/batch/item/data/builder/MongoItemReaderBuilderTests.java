@@ -51,6 +51,7 @@ public class MongoItemReaderBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private MongoOperations template;
 
@@ -82,9 +83,7 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testFields() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder()
-				.fields("{name : 1, age : 1, _id: 0}")
-				.build();
+		MongoItemReader<String> reader = getBasicBuilder().fields("{name : 1, age : 1, _id: 0}").build();
 
 		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -98,9 +97,7 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testHint() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder()
-				.hint("{ $natural : 1}")
-				.build();
+		MongoItemReader<String> reader = getBasicBuilder().hint("{ $natural : 1}").build();
 
 		when(this.template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -112,11 +109,8 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testCollection() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder()
-				.parameterValues(Collections.singletonList("foo"))
-				.jsonQuery("{ name : ?0 }")
-				.collection("collection")
-				.build();
+		MongoItemReader<String> reader = getBasicBuilder().parameterValues(Collections.singletonList("foo"))
+				.jsonQuery("{ name : ?0 }").collection("collection").build();
 
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
@@ -133,11 +127,8 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testVarargs() throws Exception {
-		MongoItemReader<String> reader = getBasicBuilder()
-				.parameterValues("foo")
-				.jsonQuery("{ name : ?0 }")
-				.collection("collection")
-				.build();
+		MongoItemReader<String> reader = getBasicBuilder().parameterValues("foo").jsonQuery("{ name : ?0 }")
+				.collection("collection").build();
 
 		ArgumentCaptor<String> collectionContainer = ArgumentCaptor.forClass(String.class);
 
@@ -155,12 +146,8 @@ public class MongoItemReaderBuilderTests {
 	@Test
 	public void testWithoutQueryLimit() throws Exception {
 		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.query(new Query())
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50)
-				.build();
+				.targetType(String.class).query(new Query()).sorts(this.sortOptions).name("mongoReaderTest")
+				.pageSize(50).build();
 
 		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -173,11 +160,7 @@ public class MongoItemReaderBuilderTests {
 	@Test
 	public void testWithoutQueryLimitAndPageSize() throws Exception {
 		MongoItemReader<String> reader = new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.query(new Query())
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.build();
+				.targetType(String.class).query(new Query()).sorts(this.sortOptions).name("mongoReaderTest").build();
 
 		when(template.find(this.queryContainer.capture(), eq(String.class))).thenReturn(new ArrayList<>());
 
@@ -189,56 +172,41 @@ public class MongoItemReaderBuilderTests {
 
 	@Test
 	public void testNullTemplate() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class)
-				.jsonQuery("{ }")
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "template is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().targetType(String.class).jsonQuery("{ }")
+				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "template is required.");
 	}
 
 	@Test
 	public void testNullTargetType() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
-				.jsonQuery("{ }")
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "targetType is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).jsonQuery("{ }")
+				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "targetType is required.");
 	}
 
 	@Test
 	public void testNullQuery() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50), "A query is required");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
+				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50), "A query is required");
 	}
 
 	@Test
 	public void testNullSortsWithQueryString() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.jsonQuery("{ }")
-				.name("mongoReaderTest")
-				.pageSize(50), "sorts map is required.");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
+				.jsonQuery("{ }").name("mongoReaderTest").pageSize(50), "sorts map is required.");
 	}
 
 	@Test
 	public void testNullSortsWithQuery() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.query(query(where("_id").is("10")))
-				.name("mongoReaderTest")
-				.pageSize(50), "sorts map is required.");
+		validateExceptionMessage(
+				new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
+						.query(query(where("_id").is("10"))).name("mongoReaderTest").pageSize(50),
+				"sorts map is required.");
 	}
 
 	@Test
 	public void testNullName() {
-		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.jsonQuery("{ }")
-				.sorts(this.sortOptions)
-				.pageSize(50), "A name is required when saveState is set to true");
+		validateExceptionMessage(new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class)
+				.jsonQuery("{ }").sorts(this.sortOptions).pageSize(50),
+				"A name is required when saveState is set to true");
 	}
 
 	private void validateExceptionMessage(MongoItemReaderBuilder<String> builder, String message) {
@@ -251,17 +219,13 @@ public class MongoItemReaderBuilderTests {
 					iae.getMessage());
 		}
 		catch (IllegalStateException ise) {
-			assertEquals("IllegalStateException message did not match the expected result.", message,
-					ise.getMessage());
+			assertEquals("IllegalStateException message did not match the expected result.", message, ise.getMessage());
 		}
 	}
 
 	private MongoItemReaderBuilder<String> getBasicBuilder() {
-		return new MongoItemReaderBuilder<String>().template(this.template)
-				.targetType(String.class)
-				.jsonQuery("{ }")
-				.sorts(this.sortOptions)
-				.name("mongoReaderTest")
-				.pageSize(50);
+		return new MongoItemReaderBuilder<String>().template(this.template).targetType(String.class).jsonQuery("{ }")
+				.sorts(this.sortOptions).name("mongoReaderTest").pageSize(50);
 	}
+
 }

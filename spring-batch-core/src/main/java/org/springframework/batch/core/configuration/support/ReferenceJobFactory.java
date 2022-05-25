@@ -19,8 +19,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobFactory;
 
 /**
- * A {@link JobFactory} that just keeps a reference to a {@link Job}. It never
- * modifies its {@link Job}.
+ * A {@link JobFactory} that just keeps a reference to a {@link Job}. It never modifies
+ * its {@link Job}.
  *
  * @author Dave Syer
  *

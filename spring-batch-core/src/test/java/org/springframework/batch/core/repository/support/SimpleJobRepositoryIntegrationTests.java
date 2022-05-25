@@ -58,8 +58,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	private JobParameters jobParameters = new JobParameters();
 
 	/*
-	 * Create two job executions for same job+parameters tuple. Check both
-	 * executions belong to the same job instance and job.
+	 * Create two job executions for same job+parameters tuple. Check both executions
+	 * belong to the same job instance and job.
 	 */
 	@Transactional
 	@Test
@@ -68,8 +68,8 @@ public class SimpleJobRepositoryIntegrationTests {
 		job.setRestartable(true);
 
 		JobParametersBuilder builder = new JobParametersBuilder();
-		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1).addDate(
-				"dateKey", new Date(1L));
+		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1)
+				.addDate("dateKey", new Date(1L));
 		JobParameters jobParams = builder.toJobParameters();
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);
@@ -88,8 +88,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	}
 
 	/*
-	 * Create two job executions for same job+parameters tuple. Check both
-	 * executions belong to the same job instance and job.
+	 * Create two job executions for same job+parameters tuple. Check both executions
+	 * belong to the same job instance and job.
 	 */
 	@Transactional
 	@Test
@@ -107,8 +107,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	}
 
 	/*
-	 * Save multiple StepExecutions for the same step and check the returned
-	 * count and last execution are correct.
+	 * Save multiple StepExecutions for the same step and check the returned count and
+	 * last execution are correct.
 	 */
 	@Transactional
 	@Test
@@ -140,7 +140,8 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.add(secondStepExec);
 
 		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
-		assertEquals(secondStepExec, jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step.getName()));
+		assertEquals(secondStepExec,
+				jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step.getName()));
 	}
 
 	/*
@@ -175,8 +176,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	}
 
 	/*
-	 * If JobExecution is already running, exception will be thrown in attempt
-	 * to create new execution.
+	 * If JobExecution is already running, exception will be thrown in attempt to create
+	 * new execution.
 	 */
 	@Transactional
 	@Test
@@ -184,7 +185,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		job.setRestartable(true);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
-		//simulating a running job execution
+		// simulating a running job execution
 		jobExecution.setStartTime(new Date());
 		jobRepository.update(jobExecution);
 
@@ -220,9 +221,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	@Transactional
 	@Test
 	public void testReExecuteWithSameJobParameters() throws Exception {
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addString("name", "foo", false)
-				.toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addString("name", "foo", false).toJobParameters();
 		JobExecution jobExecution1 = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExecution1.setStatus(BatchStatus.COMPLETED);
 		jobExecution1.setEndTime(new Date());

@@ -51,13 +51,13 @@ public class PatternMatchingCompositeLineMapperTests {
 	public void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -66,13 +66,13 @@ public class PatternMatchingCompositeLineMapperTests {
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
-            @Override
+			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}
 		});
 		fieldSetMappers.put("bar*", new FieldSetMapper<Name>() {
-            @Override
+			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(1), fs.readString(0), 0);
 			}
@@ -87,13 +87,13 @@ public class PatternMatchingCompositeLineMapperTests {
 	public void testMapperKeyNotFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<>();
 		tokenizers.put("foo*", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
 		tokenizers.put("bar*", new LineTokenizer() {
-            @Override
+			@Override
 			public FieldSet tokenize(@Nullable String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -102,7 +102,7 @@ public class PatternMatchingCompositeLineMapperTests {
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<>();
 		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
-            @Override
+			@Override
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}
@@ -112,4 +112,5 @@ public class PatternMatchingCompositeLineMapperTests {
 		Name name = mapper.mapLine("bar", 1);
 		assertEquals(new Name("d", "c", 0), name);
 	}
+
 }

@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.job.flow;
 
-
 /**
  * @author Dave Syer
  * @since 2.0
@@ -23,11 +22,13 @@ package org.springframework.batch.core.job.flow;
 public class FlowExecution implements Comparable<FlowExecution> {
 
 	private final String name;
+
 	private final FlowExecutionStatus status;
 
 	/**
 	 * @param name the flow name to be associated with the FlowExecution.
-	 * @param status the {@link FlowExecutionStatus} to be associated with the FlowExecution.
+	 * @param status the {@link FlowExecutionStatus} to be associated with the
+	 * FlowExecution.
 	 */
 	public FlowExecution(String name, FlowExecutionStatus status) {
 		this.name = name;
@@ -49,11 +50,9 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	}
 
 	/**
-	 * Create an ordering on {@link FlowExecution} instances by comparing their
-	 * statuses.
+	 * Create an ordering on {@link FlowExecution} instances by comparing their statuses.
 	 *
 	 * @see Comparable#compareTo(Object)
-	 *
 	 * @param other the {@link FlowExecution} instance to compare with this instance.
 	 * @return negative, zero or positive as per the contract
 	 */

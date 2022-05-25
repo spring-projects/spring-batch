@@ -41,8 +41,8 @@ public class StepExecutionSerializationUtilsTests {
 
 	@Test
 	public void testCycle() throws Exception {
-		StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(123L,
-				"job"), 321L, new JobParameters()), 11L);
+		StepExecution stepExecution = new StepExecution("step",
+				new JobExecution(new JobInstance(123L, "job"), 321L, new JobParameters()), 11L);
 		stepExecution.getExecutionContext().put("foo.bar.spam", 123);
 		StepExecution result = getCopy(stepExecution);
 		assertEquals(stepExecution, result);
@@ -78,19 +78,21 @@ public class StepExecutionSerializationUtilsTests {
 					count++;
 					try {
 						future.get();
-					} catch (Throwable e) {
-						throw new IllegalStateException("Failed on count="+count, e);
+					}
+					catch (Throwable e) {
+						throw new IllegalStateException("Failed on count=" + count, e);
 					}
 				}
 			}
 		}
-		while (count < threads*repeats) {
+		while (count < threads * repeats) {
 			Future<StepExecution> future = completionService.poll();
 			count++;
 			try {
 				future.get();
-			} catch (Throwable e) {
-				throw new IllegalStateException("Failed on count="+count, e);
+			}
+			catch (Throwable e) {
+				throw new IllegalStateException("Failed on count=" + count, e);
 			}
 		}
 	}

@@ -23,8 +23,8 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
 /**
- * Delegates actual writing to a custom DAO. 
- * 
+ * Delegates actual writing to a custom DAO.
+ *
  * @author Robert Kasanicky
  */
 public class CustomerCreditItemWriter implements ItemWriter<CustomerCredit> {

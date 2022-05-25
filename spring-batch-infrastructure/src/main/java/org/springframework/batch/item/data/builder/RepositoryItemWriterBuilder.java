@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.data.builder;
 
-
 import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
@@ -50,7 +49,6 @@ public class RepositoryItemWriterBuilder<T> {
 	/**
 	 * Specifies what method on the repository to call. This method must have the type of
 	 * object passed to this writer as the <em>sole</em> argument.
-	 *
 	 * @param methodName the name of the method to be used for saving the item.
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemWriter#setMethodName(String)
@@ -64,7 +62,6 @@ public class RepositoryItemWriterBuilder<T> {
 	/**
 	 * Set the {@link org.springframework.data.repository.CrudRepository} implementation
 	 * for persistence
-	 *
 	 * @param repository the Spring Data repository to be set
 	 * @return The current instance of the builder.
 	 * @see RepositoryItemWriter#setRepository(CrudRepository)
@@ -78,13 +75,12 @@ public class RepositoryItemWriterBuilder<T> {
 	/**
 	 * Specifies a repository and the type-safe method to call for the writer. The method
 	 * configured via this mechanism must take
-	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em>
-	 * argument. This method can be used in place of {@link #repository(CrudRepository)},
+	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
+	 * This method can be used in place of {@link #repository(CrudRepository)},
 	 * {@link #methodName(String)}}.
 	 *
 	 * Note: The repository that is used by the repositoryMethodReference must be
 	 * non-final.
-	 *
 	 * @param repositoryMethodReference of the used to get a repository and type-safe
 	 * method for use by the writer.
 	 * @return The current instance of the builder.
@@ -92,7 +88,8 @@ public class RepositoryItemWriterBuilder<T> {
 	 * @see RepositoryItemWriter#setRepository(CrudRepository)
 	 *
 	 */
-	public RepositoryItemWriterBuilder<T> repository(RepositoryItemWriterBuilder.RepositoryMethodReference repositoryMethodReference) {
+	public RepositoryItemWriterBuilder<T> repository(
+			RepositoryItemWriterBuilder.RepositoryMethodReference repositoryMethodReference) {
 		this.repositoryMethodReference = repositoryMethodReference;
 
 		return this;
@@ -100,7 +97,6 @@ public class RepositoryItemWriterBuilder<T> {
 
 	/**
 	 * Builds the {@link RepositoryItemWriter}.
-	 *
 	 * @return a {@link RepositoryItemWriter}
 	 */
 	public RepositoryItemWriter<T> build() {
@@ -116,7 +112,8 @@ public class RepositoryItemWriterBuilder<T> {
 		if (this.methodName != null) {
 			Assert.hasText(this.methodName, "methodName must not be empty.");
 			writer.setMethodName(this.methodName);
-		} else {
+		}
+		else {
 			logger.debug("No method name provided, CrudRepository.saveAll will be used.");
 		}
 		return writer;
@@ -125,10 +122,12 @@ public class RepositoryItemWriterBuilder<T> {
 	/**
 	 * Establishes a proxy that will capture a the Repository and the associated
 	 * methodName that will be used by the writer.
-	 * @param <T> The type of repository that will be used by the writer.  The class must
+	 *
+	 * @param <T> The type of repository that will be used by the writer. The class must
 	 * not be final.
 	 */
 	public static class RepositoryMethodReference<T> {
+
 		private RepositoryMethodInterceptor repositoryInvocationHandler;
 
 		private CrudRepository<?, ?> repository;
@@ -158,14 +157,15 @@ public class RepositoryItemWriterBuilder<T> {
 		String getMethodName() {
 			return this.repositoryInvocationHandler.getMethodName();
 		}
+
 	}
 
 	private static class RepositoryMethodInterceptor implements MethodInterceptor {
+
 		private String methodName;
 
 		@Override
-		public Object intercept(Object o, Method method, Object[] objects,
-				MethodProxy methodProxy) throws Throwable {
+		public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
 			this.methodName = method.getName();
 			return null;
 		}
@@ -175,4 +175,5 @@ public class RepositoryItemWriterBuilder<T> {
 		}
 
 	}
+
 }

@@ -31,14 +31,17 @@ public class DefaultBatchJobKeyValuesProvider implements BatchJobKeyValuesProvid
 	@Override
 	public KeyValues getLowCardinalityKeyValues(BatchJobContext context) {
 		JobExecution execution = context.getJobExecution();
-		return KeyValues.of(BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()),
+		return KeyValues.of(
+				BatchJobObservation.JobLowCardinalityTags.JOB_NAME.of(execution.getJobInstance().getJobName()),
 				BatchJobObservation.JobLowCardinalityTags.JOB_STATUS.of(execution.getExitStatus().getExitCode()));
 	}
 
 	@Override
 	public KeyValues getHighCardinalityKeyValues(BatchJobContext context) {
 		JobExecution execution = context.getJobExecution();
-		return KeyValues.of(BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID.of(String.valueOf(execution.getJobInstance().getInstanceId())),
+		return KeyValues.of(
+				BatchJobObservation.JobHighCardinalityTags.JOB_INSTANCE_ID
+						.of(String.valueOf(execution.getJobInstance().getInstanceId())),
 				BatchJobObservation.JobHighCardinalityTags.JOB_EXECUTION_ID.of(String.valueOf(execution.getId())));
 	}
 

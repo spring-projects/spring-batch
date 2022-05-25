@@ -19,7 +19,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.lang.Nullable;
 
 public class SleepingItemProcessor<I> implements ItemProcessor<I, I> {
-	
+
 	private long millisToSleep;
 
 	@Nullable
@@ -28,7 +28,7 @@ public class SleepingItemProcessor<I> implements ItemProcessor<I, I> {
 		Thread.sleep(millisToSleep);
 		return item;
 	}
-	
+
 	public void setMillisToSleep(long millisToSleep) {
 		this.millisToSleep = millisToSleep;
 	}

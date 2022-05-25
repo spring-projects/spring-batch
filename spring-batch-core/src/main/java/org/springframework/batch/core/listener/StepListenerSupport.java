@@ -27,7 +27,7 @@ import org.springframework.batch.core.StepListener;
  * @author Robert Kasanicky
  * @author Mahmoud Ben Hassine
  */
-public class StepListenerSupport<T,S> extends ItemListenerSupport<T, S>
-	implements StepExecutionListener, ChunkListener, SkipListener<T, S> {
+public class StepListenerSupport<T, S> extends ItemListenerSupport<T, S>
+		implements StepExecutionListener, ChunkListener, SkipListener<T, S> {
 
 }

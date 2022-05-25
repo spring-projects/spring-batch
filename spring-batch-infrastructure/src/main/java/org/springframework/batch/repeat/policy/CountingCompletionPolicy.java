@@ -21,14 +21,13 @@ import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
- * Abstract base class for policies that need to count the number of occurrences
- * of some event (e.g. an exception type in the context), and terminate based on
- * a limit for the counter. The value of the counter can be stored between
- * batches in a nested context, so that the termination decision is based on the
- * aggregate of a number of sibling batches.
- * 
+ * Abstract base class for policies that need to count the number of occurrences of some
+ * event (e.g. an exception type in the context), and terminate based on a limit for the
+ * counter. The value of the counter can be stored between batches in a nested context, so
+ * that the termination decision is based on the aggregate of a number of sibling batches.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public abstract class CountingCompletionPolicy extends DefaultResultCompletionPolicy {
 
@@ -42,12 +41,11 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 	private int maxCount = 0;
 
 	/**
-	 * Flag to indicate whether the count is at the level of the parent context,
-	 * or just local to the context. If true then the count is aggregated among
-	 * siblings in a nested batch.
-	 * 
-	 * @param useParent whether to use the parent context to cache the total
-	 * count. Default value is false.
+	 * Flag to indicate whether the count is at the level of the parent context, or just
+	 * local to the context. If true then the count is aggregated among siblings in a
+	 * nested batch.
+	 * @param useParent whether to use the parent context to cache the total count.
+	 * Default value is false.
 	 */
 	public void setUseParent(boolean useParent) {
 		this.useParent = useParent;
@@ -55,33 +53,28 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 
 	/**
 	 * Setter for maximum value of count before termination.
-	 * 
-	 * @param maxCount the maximum number of counts before termination. Default
-	 * 0 so termination is immediate.
+	 * @param maxCount the maximum number of counts before termination. Default 0 so
+	 * termination is immediate.
 	 */
 	public void setMaxCount(int maxCount) {
 		this.maxCount = maxCount;
 	}
 
 	/**
-	 * Extension point for subclasses. Obtain the value of the count in the
-	 * current context. Subclasses can count the number of attempts or
-	 * violations and store the result in their context. This policy base class
-	 * will take care of the termination contract and aggregating at the level
-	 * of the session if required.
-	 * 
+	 * Extension point for subclasses. Obtain the value of the count in the current
+	 * context. Subclasses can count the number of attempts or violations and store the
+	 * result in their context. This policy base class will take care of the termination
+	 * contract and aggregating at the level of the session if required.
 	 * @param context the current context, specific to the subclass.
 	 * @return the value of the counter in the context.
 	 */
 	protected abstract int getCount(RepeatContext context);
 
 	/**
-	 * Extension point for subclasses. Inspect the context and update the state
-	 * of a counter in whatever way is appropriate. This will be added to the
-	 * session-level counter if {@link #setUseParent(boolean)} is true.
-	 * 
+	 * Extension point for subclasses. Inspect the context and update the state of a
+	 * counter in whatever way is appropriate. This will be added to the session-level
+	 * counter if {@link #setUseParent(boolean)} is true.
 	 * @param context the current context.
-	 * 
 	 * @return the change in the value of the counter (default 0).
 	 */
 	protected int doUpdate(RepeatContext context) {
@@ -90,9 +83,12 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#isComplete(org.springframework.batch.repeat.BatchContext)
+	 *
+	 * @see
+	 * org.springframework.batch.repeat.policy.CompletionPolicySupport#isComplete(org.
+	 * springframework.batch.repeat.BatchContext)
 	 */
-    @Override
+	@Override
 	final public boolean isComplete(RepeatContext context) {
 		int count = ((CountingBatchContext) context).getCounter().getCount();
 		return count >= maxCount;
@@ -100,18 +96,22 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#start(org.springframework.batch.repeat.BatchContext)
+	 *
+	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#start(org.
+	 * springframework.batch.repeat.BatchContext)
 	 */
-    @Override
+	@Override
 	public RepeatContext start(RepeatContext parent) {
 		return new CountingBatchContext(parent);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#update(org.springframework.batch.repeat.BatchContext)
+	 *
+	 * @see org.springframework.batch.repeat.policy.CompletionPolicySupport#update(org.
+	 * springframework.batch.repeat.BatchContext)
 	 */
-    @Override
+	@Override
 	final public void update(RepeatContext context) {
 		super.update(context);
 		int delta = doUpdate(context);
@@ -132,4 +132,5 @@ public abstract class CountingCompletionPolicy extends DefaultResultCompletionPo
 		}
 
 	}
+
 }

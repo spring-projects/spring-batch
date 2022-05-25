@@ -47,12 +47,11 @@ import org.springframework.util.Assert;
 
 /**
  * JDBC implementation of {@link JobExecutionDao}. Uses sequences (via Spring's
- * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys
- * before inserting a new row. Objects are checked to ensure all mandatory
- * fields to be stored are not null. If any are found to be null, an
- * IllegalArgumentException will be thrown. This could be left to JdbcTemplate,
- * however, the exception will be fairly vague, and fails to highlight which
- * field caused the exception.
+ * {@link DataFieldMaxValueIncrementer} abstraction) to create all primary keys before
+ * inserting a new row. Objects are checked to ensure all mandatory fields to be stored
+ * are not null. If any are found to be null, an IllegalArgumentException will be thrown.
+ * This could be left to JdbcTemplate, however, the exception will be fairly vague, and
+ * fails to highlight which field caused the exception.
  *
  * @author Lucas Ward
  * @author Dave Syer
@@ -100,8 +99,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
 
 	/**
-	 * Public setter for the exit message length in database. Do not set this if
-	 * you haven't modified the schema.
+	 * Public setter for the exit message length in database. Do not set this if you
+	 * haven't modified the schema.
 	 * @param exitMessageLength the exitMessageLength to set
 	 */
 	public void setExitMessageLength(int exitMessageLength) {
@@ -109,9 +108,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
-	 * generating primary keys for {@link JobExecution} instances.
-	 *
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when generating primary
+	 * keys for {@link JobExecution} instances.
 	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
 	 */
 	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
@@ -135,13 +133,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/**
 	 *
-	 * SQL implementation using Sequences via the Spring incrementer
-	 * abstraction. Once a new id has been obtained, the JobExecution is saved
-	 * via a SQL INSERT statement.
+	 * SQL implementation using Sequences via the Spring incrementer abstraction. Once a
+	 * new id has been obtained, the JobExecution is saved via a SQL INSERT statement.
 	 *
 	 * @see JobExecutionDao#saveJobExecution(JobExecution)
-	 * @throws IllegalArgumentException if jobExecution is null, as well as any
-	 * of it's fields to be persisted.
+	 * @throws IllegalArgumentException if jobExecution is null, as well as any of it's
+	 * fields to be persisted.
 	 */
 	@Override
 	public void saveJobExecution(JobExecution jobExecution) {
@@ -151,22 +148,19 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		jobExecution.incrementVersion();
 
 		jobExecution.setId(jobExecutionIncrementer.nextLongValue());
-		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
-				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
+		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(), jobExecution.getStartTime(),
+				jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
 				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
-		getJdbcTemplate().update(
-				getQuery(SAVE_JOB_EXECUTION),
-				parameters,
-				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
-					Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
+		getJdbcTemplate().update(getQuery(SAVE_JOB_EXECUTION), parameters,
+				new int[] { Types.BIGINT, Types.BIGINT, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR,
+						Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 
 		insertJobParameters(jobExecution.getId(), jobExecution.getJobParameters());
 	}
 
 	/**
 	 * Validate JobExecution. At a minimum, JobId, Status, CreateTime cannot be null.
-	 *
 	 * @param jobExecution
 	 * @throws IllegalArgumentException
 	 */
@@ -179,10 +173,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * Update given JobExecution using a SQL UPDATE statement. The JobExecution
-	 * is first checked to ensure all fields are not null, and that it has an
-	 * ID. The database is then queried to ensure that the ID exists, which
-	 * ensures that it is valid.
+	 * Update given JobExecution using a SQL UPDATE statement. The JobExecution is first
+	 * checked to ensure all fields are not null, and that it has an ID. The database is
+	 * then queried to ensure that the ID exists, which ensures that it is valid.
 	 *
 	 * @see JobExecutionDao#updateJobExecution(JobExecution)
 	 */
@@ -221,19 +214,17 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 			}
 
-			int count = getJdbcTemplate().update(
-					getQuery(UPDATE_JOB_EXECUTION),
-					parameters,
+			int count = getJdbcTemplate().update(getQuery(UPDATE_JOB_EXECUTION), parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-						Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
+							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.BIGINT, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
-				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION), Integer.class,
-						new Object[] { jobExecution.getId() });
-				throw new OptimisticLockingFailureException("Attempt to update job execution id="
-						+ jobExecution.getId() + " with wrong version (" + jobExecution.getVersion()
-						+ "), where current version is " + currentVersion);
+				int currentVersion = getJdbcTemplate().queryForObject(getQuery(CURRENT_VERSION_JOB_EXECUTION),
+						Integer.class, new Object[] { jobExecution.getId() });
+				throw new OptimisticLockingFailureException(
+						"Attempt to update job execution id=" + jobExecution.getId() + " with wrong version ("
+								+ jobExecution.getVersion() + "), where current version is " + currentVersion);
 			}
 
 			jobExecution.incrementVersion();
@@ -313,45 +304,40 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	/**
-	 * Convenience method that inserts all parameters from the provided
-	 * JobParameters.
+	 * Convenience method that inserts all parameters from the provided JobParameters.
 	 *
 	 */
 	private void insertJobParameters(Long executionId, JobParameters jobParameters) {
 
-		for (Entry<String, JobParameter> entry : jobParameters.getParameters()
-				.entrySet()) {
+		for (Entry<String, JobParameter> entry : jobParameters.getParameters().entrySet()) {
 			JobParameter jobParameter = entry.getValue();
-			insertParameter(executionId, jobParameter.getType(), entry.getKey(),
-					jobParameter.getValue(), jobParameter.isIdentifying());
+			insertParameter(executionId, jobParameter.getType(), entry.getKey(), jobParameter.getValue(),
+					jobParameter.isIdentifying());
 		}
 	}
 
 	/**
-	 * Convenience method that inserts an individual records into the
-	 * JobParameters table.
+	 * Convenience method that inserts an individual records into the JobParameters table.
 	 */
-	private void insertParameter(Long executionId, ParameterType type, String key,
-			Object value, boolean identifying) {
+	private void insertParameter(Long executionId, ParameterType type, String key, Object value, boolean identifying) {
 
 		Object[] args = new Object[0];
-		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR,
-				Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP, Types.BIGINT,
-				Types.DOUBLE, Types.CHAR };
+		int[] argTypes = new int[] { Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.TIMESTAMP,
+				Types.BIGINT, Types.DOUBLE, Types.CHAR };
 
-		String identifyingFlag = identifying? "Y":"N";
+		String identifyingFlag = identifying ? "Y" : "N";
 
 		if (type == ParameterType.STRING) {
-			args = new Object[] { executionId, key, type, value, null,
-					0L, 0D, identifyingFlag};
-		} else if (type == ParameterType.LONG) {
-			args = new Object[] { executionId, key, type, "", null,
-					value, 0.0d, identifyingFlag};
-		} else if (type == ParameterType.DOUBLE) {
-			args = new Object[] { executionId, key, type, "", null, 0L,
-					value, identifyingFlag};
-		} else if (type == ParameterType.DATE) {
-			args = new Object[] { executionId, key, type, "", value, 0L, 0D, identifyingFlag};
+			args = new Object[] { executionId, key, type, value, null, 0L, 0D, identifyingFlag };
+		}
+		else if (type == ParameterType.LONG) {
+			args = new Object[] { executionId, key, type, "", null, value, 0.0d, identifyingFlag };
+		}
+		else if (type == ParameterType.DOUBLE) {
+			args = new Object[] { executionId, key, type, "", null, 0L, value, identifyingFlag };
+		}
+		else if (type == ParameterType.DATE) {
+			args = new Object[] { executionId, key, type, "", value, 0L, 0D, identifyingFlag };
 		}
 
 		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
@@ -371,11 +357,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 				if (type == ParameterType.STRING) {
 					value = new JobParameter(rs.getString(4), rs.getString(8).equalsIgnoreCase("Y"));
-				} else if (type == ParameterType.LONG) {
+				}
+				else if (type == ParameterType.LONG) {
 					value = new JobParameter(rs.getLong(6), rs.getString(8).equalsIgnoreCase("Y"));
-				} else if (type == ParameterType.DOUBLE) {
+				}
+				else if (type == ParameterType.DOUBLE) {
 					value = new JobParameter(rs.getDouble(7), rs.getString(8).equalsIgnoreCase("Y"));
-				} else if (type == ParameterType.DATE) {
+				}
+				else if (type == ParameterType.DATE) {
 					value = new JobParameter(rs.getTimestamp(5), rs.getString(8).equalsIgnoreCase("Y"));
 				}
 
@@ -434,4 +423,5 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 
 	}
+
 }

@@ -31,7 +31,8 @@ public class DecisionState extends AbstractState {
 	private final JobExecutionDecider decider;
 
 	/**
-	 * @param decider the {@link JobExecutionDecider} instance to make the status decision.
+	 * @param decider the {@link JobExecutionDecider} instance to make the status
+	 * decision.
 	 * @param name the name of the decision state.
 	 */
 	public DecisionState(JobExecutionDecider decider, String name) {
@@ -44,7 +45,9 @@ public class DecisionState extends AbstractState {
 		return decider.decide(executor.getJobExecution(), executor.getStepExecution());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
 	@Override

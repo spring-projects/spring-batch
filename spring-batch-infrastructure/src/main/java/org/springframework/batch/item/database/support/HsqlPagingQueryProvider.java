@@ -19,7 +19,9 @@ package org.springframework.batch.item.database.support;
 import org.springframework.util.StringUtils;
 
 /**
- * HSQLDB implementation of a {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
+ * HSQLDB implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
  *
  * @author Thomas Risberg
  * @author Michael Minella
@@ -34,7 +36,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateGroupedTopSqlQuery(this, true, buildTopClause(pageSize));
 		}
 		else {
@@ -50,7 +52,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 
 		String topClause = new StringBuilder().append("LIMIT ").append(offset).append(" 1").toString();
 		return SqlPagingQueryUtils.generateTopJumpToQuery(this, topClause);

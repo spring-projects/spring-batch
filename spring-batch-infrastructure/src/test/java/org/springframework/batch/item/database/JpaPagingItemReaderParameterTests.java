@@ -32,7 +32,7 @@ public class JpaPagingItemReaderParameterTests extends AbstractPagingItemReaderP
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-    @Override
+	@Override
 	protected AbstractPagingItemReader<Foo> getItemReader() throws Exception {
 
 		String jpqlQuery = "select f from Foo f where f.value >= :limit";

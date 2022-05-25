@@ -23,7 +23,6 @@ import jakarta.jms.Message;
 
 import org.junit.Test;
 
-
 /**
  * @author Dave Syer
  * @author Will Schipp
@@ -31,8 +30,8 @@ import org.junit.Test;
  *
  */
 public class JmsMethodArgumentsKeyGeneratorTests {
-	
-	private JmsMethodArgumentsKeyGenerator methodArgumentsKeyGenerator = new JmsMethodArgumentsKeyGenerator(); 
+
+	private JmsMethodArgumentsKeyGenerator methodArgumentsKeyGenerator = new JmsMethodArgumentsKeyGenerator();
 
 	@Test
 	public void testGetKeyFromMessage() throws Exception {
@@ -41,13 +40,13 @@ public class JmsMethodArgumentsKeyGeneratorTests {
 
 		JmsItemReader<Message> itemReader = new JmsItemReader<>();
 		itemReader.setItemType(Message.class);
-		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[]{message}));
+		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[] { message }));
 
 	}
 
 	@Test
 	public void testGetKeyFromNonMessage() throws Exception {
-		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[]{"foo"}));
+		assertEquals("foo", methodArgumentsKeyGenerator.getKey(new Object[] { "foo" }));
 	}
 
 }

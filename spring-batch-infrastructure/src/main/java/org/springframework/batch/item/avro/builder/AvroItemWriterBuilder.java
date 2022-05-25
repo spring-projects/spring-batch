@@ -30,16 +30,16 @@ import org.springframework.util.Assert;
  * @since 4.2
  */
 public class AvroItemWriterBuilder<T> {
+
 	private Class<T> type;
 
 	private WritableResource resource;
 
 	private Resource schema;
 
-	private String name  = AvroItemWriter.class.getSimpleName();
+	private String name = AvroItemWriter.class.getSimpleName();
 
 	/**
-	 *
 	 * @param resource the {@link WritableResource} used to write the serialized data.
 	 * @return The current instance of the builder.
 	 */
@@ -50,7 +50,6 @@ public class AvroItemWriterBuilder<T> {
 	}
 
 	/**
-	 *
 	 * @param schema the Resource containing the schema JSON used to serialize the output.
 	 * @return The current instance of the builder.
 	 */
@@ -61,10 +60,9 @@ public class AvroItemWriterBuilder<T> {
 		return this;
 	}
 
-
 	/**
-	 *
-	 * @param schemaString the String containing the schema JSON used to serialize the output.
+	 * @param schemaString the String containing the schema JSON used to serialize the
+	 * output.
 	 * @return The current instance of the builder.
 	 */
 	public AvroItemWriterBuilder<T> schema(String schemaString) {
@@ -73,9 +71,7 @@ public class AvroItemWriterBuilder<T> {
 		return this;
 	}
 
-
 	/**
-	 *
 	 * @param type the Class of objects to be serialized.
 	 * @return The current instance of the builder.
 	 */
@@ -88,7 +84,6 @@ public class AvroItemWriterBuilder<T> {
 	/**
 	 * The name used to calculate the key within the
 	 * {@link org.springframework.batch.item.ExecutionContext}.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see org.springframework.batch.item.ItemStreamSupport#setName(String)
@@ -101,7 +96,6 @@ public class AvroItemWriterBuilder<T> {
 
 	/**
 	 * Build an instance of {@link AvroItemWriter}.
-	 *
 	 * @return the instance;
 	 */
 	public AvroItemWriter<T> build() {
@@ -110,9 +104,9 @@ public class AvroItemWriterBuilder<T> {
 
 		Assert.notNull(this.type, "A 'type' is required.");
 
-		AvroItemWriter<T> avroItemWriter = this.schema != null ?
-				new AvroItemWriter<>(this.resource, this.schema, this.type):
-				new AvroItemWriter<>(this.resource, this.type);
+		AvroItemWriter<T> avroItemWriter = this.schema != null
+				? new AvroItemWriter<>(this.resource, this.schema, this.type)
+				: new AvroItemWriter<>(this.resource, this.type);
 		avroItemWriter.setName(this.name);
 		return avroItemWriter;
 	}

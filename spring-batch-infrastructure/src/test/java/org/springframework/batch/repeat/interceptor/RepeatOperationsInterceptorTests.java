@@ -42,7 +42,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	private ServiceImpl target;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		interceptor = new RepeatOperationsInterceptor();
@@ -69,7 +69,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testSetTemplate() throws Exception {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
-            @Override
+			@Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				try {
 					Object result = callback.doInIteration(null);
@@ -89,7 +89,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testCallbackNotExecuted() throws Exception {
 		final List<Object> calls = new ArrayList<>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
-            @Override
+			@Override
 			public RepeatStatus iterate(RepeatCallback callback) {
 				calls.add(null);
 				return RepeatStatus.FINISHED;
@@ -99,9 +99,10 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		try {
 			service.service();
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong exception message: "+message, message.toLowerCase().contains("no result available"));
+			assertTrue("Wrong exception message: " + message, message.toLowerCase().contains("no result available"));
 		}
 		assertEquals(1, calls.size());
 	}
@@ -162,7 +163,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		final List<Object> list = new ArrayList<>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
-            @Override
+			@Override
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");
 				return invocation.proceed();
@@ -179,7 +180,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testIllegalMethodInvocationType() throws Throwable {
 		try {
 			interceptor.invoke(new MethodInvocation() {
-                @Override
+				@Override
 				public Method getMethod() {
 					try {
 						return Object.class.getMethod("toString");
@@ -189,22 +190,22 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 					}
 				}
 
-                @Override
+				@Override
 				public Object[] getArguments() {
 					return null;
 				}
 
-                @Override
+				@Override
 				public AccessibleObject getStaticPart() {
 					return null;
 				}
 
-                @Override
+				@Override
 				public Object getThis() {
 					return null;
 				}
 
-                @Override
+				@Override
 				public Object proceed() throws Throwable {
 					return null;
 				}
@@ -212,12 +213,13 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			fail("IllegalStateException expected");
 		}
 		catch (IllegalStateException e) {
-			assertTrue("Exception message should contain MethodInvocation: " + e.getMessage(), e.getMessage().indexOf(
-					"MethodInvocation") >= 0);
+			assertTrue("Exception message should contain MethodInvocation: " + e.getMessage(),
+					e.getMessage().indexOf("MethodInvocation") >= 0);
 		}
 	}
 
 	private interface Service {
+
 		Object service() throws Exception;
 
 		void alternate() throws Exception;
@@ -227,15 +229,17 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		Object error() throws Exception;
 
 		boolean isContinuable() throws Exception;
+
 	}
 
 	private static class ServiceImpl implements Service {
+
 		private int count = 0;
 
 		private boolean complete;
 
 		private int maxService = 2;
-		
+
 		/**
 		 * Public setter for the maximum number of times to call service().
 		 * @param maxService the maxService to set
@@ -244,7 +248,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			this.maxService = maxService;
 		}
 
-        @Override
+		@Override
 		public Object service() throws Exception {
 			count++;
 			if (count <= maxService) {
@@ -259,26 +263,27 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 			this.complete = complete;
 		}
 
-        @Override
+		@Override
 		public void alternate() throws Exception {
 			count++;
 		}
 
-        @Override
+		@Override
 		public Object exception() throws Exception {
 			throw new RuntimeException("Duh! Stupid.");
 		}
 
-        @Override
+		@Override
 		public Object error() throws Exception {
 			throw new Error("Duh! Stupid error.");
 		}
 
-        @Override
+		@Override
 		public boolean isContinuable() throws Exception {
 			count++;
 			return !complete;
 		}
+
 	}
 
 }

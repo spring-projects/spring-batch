@@ -31,7 +31,8 @@ import org.springframework.test.context.ContextCustomizerFactory;
 public class BatchTestContextCustomizerFactory implements ContextCustomizerFactory {
 
 	@Override
-	public ContextCustomizer createContextCustomizer(Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
+	public ContextCustomizer createContextCustomizer(Class<?> testClass,
+			List<ContextConfigurationAttributes> configAttributes) {
 		if (AnnotatedElementUtils.hasAnnotation(testClass, SpringBatchTest.class)) {
 			return new BatchTestContextCustomizer();
 		}

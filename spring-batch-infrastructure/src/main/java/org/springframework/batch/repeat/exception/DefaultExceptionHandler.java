@@ -19,20 +19,21 @@ package org.springframework.batch.repeat.exception;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
- * Default implementation of {@link ExceptionHandler} - just re-throws the exception it encounters.
- * 
+ * Default implementation of {@link ExceptionHandler} - just re-throws the exception it
+ * encounters.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * Re-throw the throwable.
-	 * 
+	 *
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(RepeatContext,
-	 *      Throwable)
+	 * Throwable)
 	 */
-    @Override
+	@Override
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		throw throwable;
 	}

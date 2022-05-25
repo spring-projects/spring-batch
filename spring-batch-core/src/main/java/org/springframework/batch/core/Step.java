@@ -16,8 +16,9 @@
 package org.springframework.batch.core;
 
 /**
- * Batch domain interface representing the configuration of a step. As with a {@link Job}, a {@link Step} is meant to
- * explicitly represent the configuration of a step by a developer but also the ability to execute the step.
+ * Batch domain interface representing the configuration of a step. As with a {@link Job},
+ * a {@link Step} is meant to explicitly represent the configuration of a step by a
+ * developer but also the ability to execute the step.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -36,8 +37,8 @@ public interface Step {
 	String getName();
 
 	/**
-	 * @return {@code true} if a step that is already marked as complete can be started again.
-	 * Defaults to {@code false}.
+	 * @return {@code true} if a step that is already marked as complete can be started
+	 * again. Defaults to {@code false}.
 	 */
 	default boolean isAllowStartIfComplete() {
 		return false;
@@ -52,14 +53,13 @@ public interface Step {
 	}
 
 	/**
-	 * Process the step and assign progress and status meta information to the {@link StepExecution} provided. The
-	 * {@link Step} is responsible for setting the meta information and also saving it, if required by the
-	 * implementation.<br>
+	 * Process the step and assign progress and status meta information to the
+	 * {@link StepExecution} provided. The {@link Step} is responsible for setting the
+	 * meta information and also saving it, if required by the implementation.<br>
 	 *
-	 * It is not safe to reuse an instance of {@link Step} to process multiple concurrent executions.
-	 *
+	 * It is not safe to reuse an instance of {@link Step} to process multiple concurrent
+	 * executions.
 	 * @param stepExecution an entity representing the step to be executed.
-	 *
 	 * @throws JobInterruptedException if the step is interrupted externally.
 	 */
 	void execute(StepExecution stepExecution) throws JobInterruptedException;

@@ -24,7 +24,7 @@ import org.springframework.core.io.FileSystemResource;
 
 /**
  * Tests for {@link MultiResourceItemWriter}.
- * 
+ *
  * @see MultiResourceItemWriterFlatFileTests
  * @see MultiResourceItemReaderXmlTests
  */
@@ -68,4 +68,5 @@ public class AbstractMultiResourceItemWriterTests {
 		}
 		return result.toString();
 	}
+
 }

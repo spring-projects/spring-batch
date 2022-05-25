@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.flow.StateSupport;
 public class DefaultStateTransitionComparatorTests {
 
 	private State state = new StateSupport("state1");
+
 	private Comparator<StateTransition> comparator;
 
 	@Before
@@ -79,4 +80,5 @@ public class DefaultStateTransitionComparatorTests {
 		assertEquals(1, comparator.compare(transition, other));
 		assertEquals(-1, comparator.compare(other, transition));
 	}
+
 }

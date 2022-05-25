@@ -24,11 +24,11 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 
-    @Override
-	public Foo getFoo(Object key){
+	@Override
+	public Foo getFoo(Object key) {
 
-		RowMapper<Foo> fooMapper = new RowMapper<Foo>(){
-            @Override
+		RowMapper<Foo> fooMapper = new RowMapper<Foo>() {
+			@Override
 			public Foo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Foo foo = new Foo();
 				foo.setId(rs.getInt(1));
@@ -38,8 +38,8 @@ public class SingleKeyFooDao extends JdbcDaoSupport implements FooDao {
 			}
 		};
 
-		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ?",
-				fooMapper, key).get(0);
+		return getJdbcTemplate().query("SELECT ID, NAME, VALUE from T_FOOS where ID = ?", fooMapper, key).get(0);
 
 	}
+
 }

@@ -27,10 +27,9 @@ import org.springframework.batch.core.step.tasklet.SimpleSystemProcessExitCodeMa
 public class SimpleSystemProcessExitCodeMapperTests {
 
 	private SimpleSystemProcessExitCodeMapper mapper = new SimpleSystemProcessExitCodeMapper();
-	
+
 	/**
-	 * 0 	-> ExitStatus.FINISHED
-	 * else	-> ExitStatus.FAILED
+	 * 0 -> ExitStatus.FINISHED else -> ExitStatus.FAILED
 	 */
 	@Test
 	public void testMapping() {
@@ -38,4 +37,5 @@ public class SimpleSystemProcessExitCodeMapperTests {
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(1));
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(-1));
 	}
+
 }

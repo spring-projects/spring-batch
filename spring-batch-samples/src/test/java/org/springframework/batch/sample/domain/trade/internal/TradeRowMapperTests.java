@@ -28,8 +28,11 @@ import org.springframework.jdbc.core.RowMapper;
 public class TradeRowMapperTests extends AbstractRowMapperTests<Trade> {
 
 	private static final String ISIN = "jsgk342";
+
 	private static final long QUANTITY = 0;
+
 	private static final BigDecimal PRICE = new BigDecimal("1.1");
+
 	private static final String CUSTOMER = "Martin Hrancok";
 
 	@Override
@@ -57,4 +60,5 @@ public class TradeRowMapperTests extends AbstractRowMapperTests<Trade> {
 		when(rs.getString(TradeRowMapper.CUSTOMER_COLUMN)).thenReturn(CUSTOMER);
 		when(rs.getInt(TradeRowMapper.VERSION_COLUMN)).thenReturn(0);
 	}
+
 }

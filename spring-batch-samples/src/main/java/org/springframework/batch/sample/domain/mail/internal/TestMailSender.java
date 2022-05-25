@@ -31,7 +31,6 @@ import org.springframework.mail.SimpleMailMessage;
  * @author Dan Garrette
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.1
  */
 public class TestMailSender implements MailSender {

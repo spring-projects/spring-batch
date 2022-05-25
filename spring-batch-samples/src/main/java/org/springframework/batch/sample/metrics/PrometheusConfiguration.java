@@ -46,7 +46,9 @@ public class PrometheusConfiguration {
 	private String prometheusPushGatewayUrl;
 
 	private Map<String, String> groupingKey = new HashMap<>();
+
 	private PushGateway pushGateway;
+
 	private CollectorRegistry collectorRegistry;
 
 	@PostConstruct
@@ -62,7 +64,8 @@ public class PrometheusConfiguration {
 	public void pushMetrics() {
 		try {
 			pushGateway.pushAdd(collectorRegistry, prometheusJobName, groupingKey);
-		} catch (Throwable ex) {
+		}
+		catch (Throwable ex) {
 			LOGGER.error("Unable to push metrics to Prometheus Push Gateway", ex);
 		}
 	}

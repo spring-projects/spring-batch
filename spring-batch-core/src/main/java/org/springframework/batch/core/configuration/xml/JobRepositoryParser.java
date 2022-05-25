@@ -27,8 +27,8 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the &lt;job-repository/&gt; element in the Batch namespace. Sets up
- * and returns a JobRepositoryFactoryBean.
+ * Parser for the &lt;job-repository/&gt; element in the Batch namespace. Sets up and
+ * returns a JobRepositoryFactoryBean.
  *
  * @author Thomas Risberg
  * @since 2.0
@@ -65,7 +65,7 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, element);
 
 		String dataSource = element.getAttribute("data-source");
-		
+
 		String jdbcOperations = element.getAttribute("jdbc-operations");
 
 		String transactionManager = element.getAttribute("transaction-manager");
@@ -88,8 +88,8 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyReference("jdbcOperations", jdbcOperations);
 		}
 		if (StringUtils.hasText(isolationLevelForCreate)) {
-			builder.addPropertyValue("isolationLevelForCreate", DefaultTransactionDefinition.PREFIX_ISOLATION
-					+ isolationLevelForCreate);
+			builder.addPropertyValue("isolationLevelForCreate",
+					DefaultTransactionDefinition.PREFIX_ISOLATION + isolationLevelForCreate);
 		}
 		if (StringUtils.hasText(tablePrefix)) {
 			builder.addPropertyValue("tablePrefix", tablePrefix);
@@ -107,4 +107,5 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 		builder.setRole(BeanDefinition.ROLE_SUPPORT);
 
 	}
+
 }

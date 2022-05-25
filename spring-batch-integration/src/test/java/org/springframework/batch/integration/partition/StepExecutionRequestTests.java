@@ -46,7 +46,8 @@ public class StepExecutionRequestTests {
 	@Test
 	public void stepExecutionRequestShouldBeDeserializableWithJackson() throws IOException {
 		// when
-		StepExecutionRequest deserializedRequest = this.objectMapper.readValue(SERIALIZED_REQUEST, StepExecutionRequest.class);
+		StepExecutionRequest deserializedRequest = this.objectMapper.readValue(SERIALIZED_REQUEST,
+				StepExecutionRequest.class);
 
 		// then
 		Assert.assertNotNull(deserializedRequest);
@@ -54,4 +55,5 @@ public class StepExecutionRequestTests {
 		Assert.assertEquals(1L, deserializedRequest.getJobExecutionId().longValue());
 		Assert.assertEquals(1L, deserializedRequest.getStepExecutionId().longValue());
 	}
+
 }

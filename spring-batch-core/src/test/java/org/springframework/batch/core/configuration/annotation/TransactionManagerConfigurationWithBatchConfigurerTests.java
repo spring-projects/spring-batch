@@ -40,29 +40,35 @@ public class TransactionManagerConfigurationWithBatchConfigurerTests extends Tra
 
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndNoTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
-		DataSourceTransactionManager dataSourceTransactionManager = AopTestUtils.getTargetObject(platformTransactionManager);
+		DataSourceTransactionManager dataSourceTransactionManager = AopTestUtils
+				.getTargetObject(platformTransactionManager);
 		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), platformTransactionManager);
+		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+				platformTransactionManager);
 	}
 
 	@Test
 	public void testConfigurationWithDataSourceAndTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndTransactionManager.class);
 		BatchConfigurer batchConfigurer = applicationContext.getBean(BatchConfigurer.class);
 
 		PlatformTransactionManager platformTransactionManager = batchConfigurer.getTransactionManager();
 		Assert.assertSame(transactionManager, platformTransactionManager);
-		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)), transactionManager);
+		Assert.assertSame(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)),
+				transactionManager);
 	}
 
 	@Configuration
 	@EnableBatchProcessing
 	public static class BatchConfigurationWithDataSourceAndNoTransactionManager {
+
 		@Bean
 		public DataSource dataSource() {
 			return createDataSource();
@@ -72,6 +78,7 @@ public class TransactionManagerConfigurationWithBatchConfigurerTests extends Tra
 		public BatchConfigurer batchConfigurer(DataSource dataSource) {
 			return new DefaultBatchConfigurer(dataSource);
 		}
+
 	}
 
 	@Configuration

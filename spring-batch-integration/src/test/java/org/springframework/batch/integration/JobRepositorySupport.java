@@ -34,43 +34,64 @@ import org.springframework.lang.Nullable;
  */
 public class JobRepositorySupport implements JobRepository {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#createJobExecution(org.springframework.batch.core.Job, org.springframework.batch.core.JobParameters)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.repository.JobRepository#createJobExecution(org.
+	 * springframework.batch.core.Job, org.springframework.batch.core.JobParameters)
 	 */
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return new JobExecution(new JobInstance(0L, jobName), jobParameters);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.
+	 * springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
 	 */
 	@Nullable
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#getStepExecutionCount(org.springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.repository.JobRepository#getStepExecutionCount(org.
+	 * springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
 	 */
 	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.springframework.batch.core.JobExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.
+	 * springframework.batch.core.JobExecution)
 	 */
 	public void update(JobExecution jobExecution) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.springframework.batch.core.StepExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.
+	 * springframework.batch.core.StepExecution)
 	 */
 	public void saveOrUpdate(StepExecution stepExecution) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.StepExecution)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.springframework.batch.core.repository.JobRepository#
+	 * saveOrUpdateExecutionContext(org.springframework.batch.core.StepExecution)
 	 */
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
@@ -88,8 +109,12 @@ public class JobRepositorySupport implements JobRepository {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#getLastJobExecution(java.lang.String, org.springframework.batch.core.JobParameters)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.core.repository.JobRepository#getLastJobExecution(java.
+	 * lang.String, org.springframework.batch.core.JobParameters)
 	 */
 	@Nullable
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
@@ -97,16 +122,15 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public void addAll(Collection<StepExecution> stepExecutions) {
-		if(stepExecutions != null) {
+		if (stepExecutions != null) {
 			for (StepExecution stepExecution : stepExecutions) {
 				add(stepExecution);
 			}
 		}
 	}
 
-    public JobInstance createJobInstance(String jobName,
-            JobParameters jobParameters) {
-        return null;
-    }
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
+		return null;
+	}
 
 }

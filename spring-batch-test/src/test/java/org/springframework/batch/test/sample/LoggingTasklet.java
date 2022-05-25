@@ -25,18 +25,19 @@ import org.springframework.lang.Nullable;
 
 public class LoggingTasklet implements Tasklet {
 
-        protected static final Log logger = LogFactory.getLog(LoggingTasklet.class);
+	protected static final Log logger = LogFactory.getLog(LoggingTasklet.class);
 
-        private int id = 0;
+	private int id = 0;
 
-        public LoggingTasklet(int id) {
-                this.id = id;
-        }
+	public LoggingTasklet(int id) {
+		this.id = id;
+	}
 
-        @Nullable
-		@Override
-        public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                logger.info("tasklet executing: id=" + id);
-                return RepeatStatus.FINISHED;
-        }
+	@Nullable
+	@Override
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+		logger.info("tasklet executing: id=" + id);
+		return RepeatStatus.FINISHED;
+	}
+
 }

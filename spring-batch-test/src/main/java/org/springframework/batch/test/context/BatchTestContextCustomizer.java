@@ -27,8 +27,8 @@ import org.springframework.util.Assert;
 
 /**
  * {@link ContextCustomizer} implementation that adds batch test utility classes
- * ({@link JobLauncherTestUtils} and {@link JobRepositoryTestUtils}) as beans in
- * the test context.
+ * ({@link JobLauncherTestUtils} and {@link JobRepositoryTestUtils}) as beans in the test
+ * context.
  *
  * @author Mahmoud Ben Hassine
  * @since 4.1
@@ -36,6 +36,7 @@ import org.springframework.util.Assert;
 public class BatchTestContextCustomizer implements ContextCustomizer {
 
 	private static final String JOB_LAUNCHER_TEST_UTILS_BEAN_NAME = "jobLauncherTestUtils";
+
 	private static final String JOB_REPOSITORY_TEST_UTILS_BEAN_NAME = "jobRepositoryTestUtils";
 
 	@Override

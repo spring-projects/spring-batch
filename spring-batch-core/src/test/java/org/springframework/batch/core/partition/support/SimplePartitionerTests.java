@@ -27,19 +27,20 @@ import org.springframework.batch.item.ExecutionContext;
  */
 public class SimplePartitionerTests {
 
-    @Test
-    public void testPartition() {
-        // given
-        SimplePartitioner partitioner = new SimplePartitioner();
+	@Test
+	public void testPartition() {
+		// given
+		SimplePartitioner partitioner = new SimplePartitioner();
 
-        // when
-        Map<String, ExecutionContext> partitions = partitioner.partition(3);
+		// when
+		Map<String, ExecutionContext> partitions = partitioner.partition(3);
 
-        // then
-        Assert.assertNotNull(partitions);
-        Assert.assertEquals(3, partitions.size());
-        Assert.assertNotNull(partitions.get("partition0"));
-        Assert.assertNotNull(partitions.get("partition1"));
-        Assert.assertNotNull(partitions.get("partition2"));
-    }
+		// then
+		Assert.assertNotNull(partitions);
+		Assert.assertEquals(3, partitions.size());
+		Assert.assertNotNull(partitions.get("partition0"));
+		Assert.assertNotNull(partitions.get("partition1"));
+		Assert.assertNotNull(partitions.get("partition2"));
+	}
+
 }

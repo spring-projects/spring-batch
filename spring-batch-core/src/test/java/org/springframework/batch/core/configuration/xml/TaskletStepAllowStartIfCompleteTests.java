@@ -49,7 +49,7 @@ public class TaskletStepAllowStartIfCompleteTests {
 
 	@Test
 	public void test() throws Exception {
-		//retrieve the step from the context and see that it's allow is set
+		// retrieve the step from the context and see that it's allow is set
 		AbstractStep abstractStep = (AbstractStep) context.getBean("simpleJob.step1");
 		assertTrue(abstractStep.isAllowStartIfComplete());
 	}
@@ -68,4 +68,5 @@ public class TaskletStepAllowStartIfCompleteTests {
 		int count = jobRepository.getStepExecutionCount(jobExecution.getJobInstance(), "simpleJob.step1");
 		assertEquals(2, count);
 	}
+
 }

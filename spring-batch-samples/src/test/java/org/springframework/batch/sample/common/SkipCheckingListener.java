@@ -32,6 +32,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 public class SkipCheckingListener {
 
 	private static final Log logger = LogFactory.getLog(SkipCheckingListener.class);
+
 	private static int processSkips;
 
 	@AfterStep
@@ -44,7 +45,7 @@ public class SkipCheckingListener {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Convenience method for testing
 	 * @return the processSkips
@@ -75,4 +76,5 @@ public class SkipCheckingListener {
 	public void saveStepName(StepExecution stepExecution) {
 		stepExecution.getExecutionContext().put("stepName", stepExecution.getStepName());
 	}
+
 }

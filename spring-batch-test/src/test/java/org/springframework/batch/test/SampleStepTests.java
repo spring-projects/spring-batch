@@ -66,10 +66,11 @@ public class SampleStepTests implements ApplicationContextAware {
 	public void testTasklet() {
 		Step step = (Step) context.getBean("s2");
 		assertEquals(BatchStatus.COMPLETED, stepRunner.launchStep(step).getStatus());
-		assertEquals(2, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet2'", Integer.class).intValue());
+		assertEquals(2, jdbcTemplate.queryForObject("SELECT ID from TESTS where NAME = 'SampleTasklet2'", Integer.class)
+				.intValue());
 	}
 
-    @Override
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
 	}

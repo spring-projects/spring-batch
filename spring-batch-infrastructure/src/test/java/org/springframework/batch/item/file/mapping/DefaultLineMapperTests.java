@@ -32,37 +32,37 @@ public class DefaultLineMapperTests {
 
 	private DefaultLineMapper<String> tested = new DefaultLineMapper<>();
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryTokenizer() throws Exception {
 		tested.afterPropertiesSet();
 		tested.mapLine("foo", 1);
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryMapper() throws Exception {
 		tested.setLineTokenizer(new DelimitedLineTokenizer());
 		tested.afterPropertiesSet();
 		tested.mapLine("foo", 1);
 	}
-	
+
 	@Test
 	public void testMapping() throws Exception {
 		final String line = "TEST";
-		final FieldSet fs = new DefaultFieldSet(new String[]{"token1", "token2"});
+		final FieldSet fs = new DefaultFieldSet(new String[] { "token1", "token2" });
 		final String item = "ITEM";
-		
+
 		LineTokenizer tokenizer = mock(LineTokenizer.class);
 		when(tokenizer.tokenize(line)).thenReturn(fs);
-		
+
 		@SuppressWarnings("unchecked")
 		FieldSetMapper<String> fsMapper = mock(FieldSetMapper.class);
 		when(fsMapper.mapFieldSet(fs)).thenReturn(item);
-		
+
 		tested.setLineTokenizer(tokenizer);
 		tested.setFieldSetMapper(fsMapper);
-		
+
 		assertSame(item, tested.mapLine(line, 1));
-		
+
 	}
-	
+
 }

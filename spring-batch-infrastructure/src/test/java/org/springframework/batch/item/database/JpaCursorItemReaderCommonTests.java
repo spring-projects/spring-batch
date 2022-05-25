@@ -24,13 +24,11 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 /**
  * @author Mahmoud Ben Hassine
  */
-public class JpaCursorItemReaderCommonTests extends
-		AbstractDatabaseItemStreamItemReaderTests {
+public class JpaCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		LocalContainerEntityManagerFactoryBean factoryBean =
-				new LocalContainerEntityManagerFactoryBean();
+		LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 		factoryBean.setDataSource(getDataSource());
 		factoryBean.setPersistenceUnitName("bar");
 		factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
@@ -53,4 +51,5 @@ public class JpaCursorItemReaderCommonTests extends
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());
 	}
+
 }

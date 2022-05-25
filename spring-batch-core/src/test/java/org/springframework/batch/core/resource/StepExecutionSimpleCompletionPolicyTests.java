@@ -63,7 +63,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 
 	public void testToString() throws Exception {
 		String msg = policy.toString();
-		assertTrue("String does not contain chunk size", msg.indexOf("chunkSize=2")>=0);
+		assertTrue("String does not contain chunk size", msg.indexOf("chunkSize=2") >= 0);
 	}
 
 	public void testKeyName() throws Exception, IOException {

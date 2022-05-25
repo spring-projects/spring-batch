@@ -67,30 +67,27 @@ public class JobBuilderTests {
 	@Configuration
 	@EnableBatchProcessing
 	static class MyJobConfiguration {
+
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
-			return jobs.get("job")
-					.listener(new InterfaceBasedJobExecutionListener())
+			return jobs.get("job").listener(new InterfaceBasedJobExecutionListener())
 					.listener(new AnnotationBasedJobExecutionListener())
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
+					.start(steps.get("step").tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build())
 					.build();
 		}
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.generateUniqueName(true)
-					.build();
+			return new EmbeddedDatabaseBuilder().addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").generateUniqueName(true).build();
 		}
+
 	}
-	
+
 	static class InterfaceBasedJobExecutionListener implements JobExecutionListener {
 
 		public static int beforeJobCount = 0;
+
 		public static int afterJobCount = 0;
 
 		@Override
@@ -102,13 +99,15 @@ public class JobBuilderTests {
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCount++;
 		}
+
 	}
 
 	static class AnnotationBasedJobExecutionListener {
 
 		public static int beforeJobCount = 0;
+
 		public static int afterJobCount = 0;
-		
+
 		@BeforeJob
 		public void beforeJob(JobExecution jobExecution) {
 			beforeJobCount++;
@@ -118,6 +117,7 @@ public class JobBuilderTests {
 		public void afterJob(JobExecution jobExecution) {
 			afterJobCount++;
 		}
+
 	}
 
 }

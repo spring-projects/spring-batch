@@ -32,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- *
  * @author Gunnar Hillert
  * @since 1.3
  *
@@ -47,17 +46,20 @@ public class JobLaunchingGatewayParserTests {
 	public void testGatewayParser() throws Exception {
 		setUp("JobLaunchingGatewayParserTests-context.xml", getClass());
 
-		final AbstractMessageChannel inputChannel = TestUtils.getPropertyValue(this.consumer, "inputChannel", AbstractMessageChannel.class);
+		final AbstractMessageChannel inputChannel = TestUtils.getPropertyValue(this.consumer, "inputChannel",
+				AbstractMessageChannel.class);
 		assertEquals("requestChannel", inputChannel.getComponentName());
 
-		final JobLaunchingMessageHandler jobLaunchingMessageHandler = TestUtils.getPropertyValue(this.consumer, "handler.jobLaunchingMessageHandler", JobLaunchingMessageHandler.class);
+		final JobLaunchingMessageHandler jobLaunchingMessageHandler = TestUtils.getPropertyValue(this.consumer,
+				"handler.jobLaunchingMessageHandler", JobLaunchingMessageHandler.class);
 
 		assertNotNull(jobLaunchingMessageHandler);
 
-		final MessagingTemplate messagingTemplate = TestUtils.getPropertyValue(this.consumer, "handler.messagingTemplate", MessagingTemplate.class);
+		final MessagingTemplate messagingTemplate = TestUtils.getPropertyValue(this.consumer,
+				"handler.messagingTemplate", MessagingTemplate.class);
 		final Long sendTimeout = TestUtils.getPropertyValue(messagingTemplate, "sendTimeout", Long.class);
 
-		assertEquals("Wrong sendTimeout", Long.valueOf(123L),  sendTimeout);
+		assertEquals("Wrong sendTimeout", Long.valueOf(123L), sendTimeout);
 		assertFalse(this.consumer.isRunning());
 	}
 
@@ -66,10 +68,11 @@ public class JobLaunchingGatewayParserTests {
 		setUp("JobLaunchingGatewayParserTestsRunning-context.xml", getClass());
 		assertTrue(this.consumer.isRunning());
 
-		final MessagingTemplate messagingTemplate = TestUtils.getPropertyValue(this.consumer, "handler.messagingTemplate", MessagingTemplate.class);
+		final MessagingTemplate messagingTemplate = TestUtils.getPropertyValue(this.consumer,
+				"handler.messagingTemplate", MessagingTemplate.class);
 		final Long sendTimeout = TestUtils.getPropertyValue(messagingTemplate, "sendTimeout", Long.class);
 
-		assertEquals("Wrong sendTimeout", Long.valueOf(-1L),  sendTimeout);
+		assertEquals("Wrong sendTimeout", Long.valueOf(-1L), sendTimeout);
 	}
 
 	@Test
@@ -77,7 +80,7 @@ public class JobLaunchingGatewayParserTests {
 		try {
 			setUp("JobLaunchingGatewayParserTestsNoJobLauncher-context.xml", getClass());
 		}
-		catch(BeanCreationException e) {
+		catch (BeanCreationException e) {
 			assertEquals("No bean named 'jobLauncher' available", e.getCause().getMessage());
 			return;
 		}
@@ -88,24 +91,26 @@ public class JobLaunchingGatewayParserTests {
 	public void testJobLaunchingGatewayWithEnableBatchProcessing() throws Exception {
 
 		setUp("JobLaunchingGatewayParserTestsWithEnableBatchProcessing-context.xml", getClass());
-		final JobLaunchingMessageHandler jobLaunchingMessageHandler = TestUtils.getPropertyValue(this.consumer, "handler.jobLaunchingMessageHandler", JobLaunchingMessageHandler.class);
+		final JobLaunchingMessageHandler jobLaunchingMessageHandler = TestUtils.getPropertyValue(this.consumer,
+				"handler.jobLaunchingMessageHandler", JobLaunchingMessageHandler.class);
 		assertNotNull(jobLaunchingMessageHandler);
 
-		final JobLauncher jobLauncher = TestUtils.getPropertyValue(jobLaunchingMessageHandler, "jobLauncher", JobLauncher.class);
+		final JobLauncher jobLauncher = TestUtils.getPropertyValue(jobLaunchingMessageHandler, "jobLauncher",
+				JobLauncher.class);
 		assertNotNull(jobLauncher);
 
 	}
 
 	@After
-	public void tearDown(){
-		if(context != null){
+	public void tearDown() {
+		if (context != null) {
 			context.close();
 		}
 	}
 
-	public void setUp(String name, Class<?> cls){
-		context    = new ClassPathXmlApplicationContext(name, cls);
-		consumer   = this.context.getBean("batchjobExecutor", EventDrivenConsumer.class);
+	public void setUp(String name, Class<?> cls) {
+		context = new ClassPathXmlApplicationContext(name, cls);
+		consumer = this.context.getBean("batchjobExecutor", EventDrivenConsumer.class);
 	}
 
 }

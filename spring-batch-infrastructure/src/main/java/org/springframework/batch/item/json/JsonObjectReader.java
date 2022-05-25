@@ -20,11 +20,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for Json readers. Implementations are expected to use
- * a streaming API in order to read Json objects one at a time.
+ * Strategy interface for Json readers. Implementations are expected to use a streaming
+ * API in order to read Json objects one at a time.
  *
  * @param <T> type of the target object
- *
  * @author Mahmoud Ben Hassine
  * @since 4.1
  */
@@ -54,4 +53,5 @@ public interface JsonObjectReader<T> {
 	default void close() throws Exception {
 
 	}
+
 }

@@ -64,16 +64,19 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 
 	@ClassRule
 	public static MySQLContainer<?> mysql = new MySQLContainer<>(MYSQL_IMAGE);
-	
+
 	@Autowired
 	private DataSource dataSource;
+
 	@Autowired
 	private JobLauncher jobLauncher;
+
 	@Autowired
 	private JobOperator jobOperator;
+
 	@Autowired
 	private Job job;
-	
+
 	@Before
 	public void setUp() {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
@@ -83,15 +86,14 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 
 	/*
 	 * This test is for issue https://github.com/spring-projects/spring-batch/issues/2202:
-	 * A round trip from a `java.util.Date` JobParameter to the database and back
-	 * again should preserve fractional seconds precision, otherwise a different 
-	 * job instance is created while the existing one should be used.
-	 * 
-	 * This test ensures that round trip to the database with a `java.util.Date` 
-	 * parameter ends up with a single job instance (with two job executions)
-	 * being created and not two distinct job instances (with a job execution for 
-	 * each one).
-	 * 
+	 * A round trip from a `java.util.Date` JobParameter to the database and back again
+	 * should preserve fractional seconds precision, otherwise a different job instance is
+	 * created while the existing one should be used.
+	 *
+	 * This test ensures that round trip to the database with a `java.util.Date` parameter
+	 * ends up with a single job instance (with two job executions) being created and not
+	 * two distinct job instances (with a job execution for each one).
+	 *
 	 * Note the issue does not happen if the parameter is of type Long (when using
 	 * addLong("date", date.getTime()) for instance).
 	 */
@@ -99,13 +101,13 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 	public void testDateMillisecondPrecision() throws Exception {
 		// given
 		Date date = new Date();
-		JobParameters jobParameters = new JobParametersBuilder()
-				.addDate("date", date) 
-				.toJobParameters();
-		
+		JobParameters jobParameters = new JobParametersBuilder().addDate("date", date).toJobParameters();
+
 		// when
 		JobExecution jobExecution = this.jobLauncher.run(this.job, jobParameters);
-		this.jobOperator.restart(jobExecution.getId()); // should load the date parameter with fractional seconds precision here
+		this.jobOperator.restart(jobExecution.getId()); // should load the date parameter
+														// with fractional seconds
+														// precision here
 
 		// then
 		List<Long> jobInstances = this.jobOperator.getJobInstances("job", 0, 100);
@@ -130,22 +132,14 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 
 		@Bean
 		public Job job(JobBuilderFactory jobs, StepBuilderFactory steps) {
-			return jobs.get("job")
-					.start(steps.get("step")
-							.tasklet((contribution, chunkContext) -> {
-								throw new Exception("expected failure");
-							})
-							.build())
-					.build();
+			return jobs.get("job").start(steps.get("step").tasklet((contribution, chunkContext) -> {
+				throw new Exception("expected failure");
+			}).build()).build();
 		}
 
 		@Bean
-		public JobOperator jobOperator(
-				JobLauncher jobLauncher,
-				JobRegistry jobRegistry,
-				JobExplorer jobExplorer,
-				JobRepository jobRepository
-		) {
+		public JobOperator jobOperator(JobLauncher jobLauncher, JobRegistry jobRegistry, JobExplorer jobExplorer,
+				JobRepository jobRepository) {
 			SimpleJobOperator jobOperator = new SimpleJobOperator();
 			jobOperator.setJobExplorer(jobExplorer);
 			jobOperator.setJobLauncher(jobLauncher);
@@ -160,5 +154,7 @@ public class MySQLJdbcJobRepositoryIntegrationTests {
 			jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
 			return jobRegistryBeanPostProcessor;
 		}
+
 	}
+
 }

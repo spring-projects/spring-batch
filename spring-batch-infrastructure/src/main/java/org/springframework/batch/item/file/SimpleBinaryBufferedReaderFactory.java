@@ -24,14 +24,13 @@ import java.io.UnsupportedEncodingException;
 import org.springframework.core.io.Resource;
 
 /**
- * A {@link BufferedReaderFactory} useful for reading simple binary (or text)
- * files with no line endings, such as those produced by mainframe copy books.
- * The reader splits a stream up across fixed line endings (rather than the
- * usual convention based on plain text). The line endings are discarded, just
- * as with the default plain text implementation.
- * 
+ * A {@link BufferedReaderFactory} useful for reading simple binary (or text) files with
+ * no line endings, such as those produced by mainframe copy books. The reader splits a
+ * stream up across fixed line endings (rather than the usual convention based on plain
+ * text). The line endings are discarded, just as with the default plain text
+ * implementation.
+ *
  * @author Dave Syer
- * 
  * @since 2.1
  */
 public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory {
@@ -50,17 +49,17 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 		this.lineEnding = lineEnding;
 	}
 
-    @Override
+	@Override
 	public BufferedReader create(Resource resource, String encoding) throws UnsupportedEncodingException, IOException {
 		return new BinaryBufferedReader(new InputStreamReader(resource.getInputStream(), encoding), lineEnding);
 	}
 
 	/**
-	 * BufferedReader extension that splits lines based on a line ending, rather
-	 * than the usual plain text conventions.
-	 * 
+	 * BufferedReader extension that splits lines based on a line ending, rather than the
+	 * usual plain text conventions.
+	 *
 	 * @author Dave Syer
-	 * 
+	 *
 	 */
 	private final class BinaryBufferedReader extends BufferedReader {
 
@@ -105,7 +104,6 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 
 		/**
 		 * Check for end of line and accumulate a buffer for next time.
-		 * 
 		 * @param buffer the current line excluding the candidate ending
 		 * @param candidate a buffer containing accumulated state
 		 * @param next the next character (or -1 for end of file)
@@ -139,6 +137,7 @@ public class SimpleBinaryBufferedReaderFactory implements BufferedReaderFactory 
 			return end;
 
 		}
+
 	}
 
 }

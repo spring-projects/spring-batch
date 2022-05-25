@@ -74,9 +74,11 @@ public class ReprocessExceptionTests {
 
 			return transformedPerson;
 		}
+
 	}
 
 	public static class PersonItemWriter implements ItemWriter<Person> {
+
 		@Override
 		public void write(List<? extends Person> persons) throws Exception {
 			for (Person person : persons) {
@@ -86,10 +88,13 @@ public class ReprocessExceptionTests {
 				}
 			}
 		}
+
 	}
 
 	public static class Person {
+
 		private String lastName;
+
 		private String firstName;
 
 		public Person() {
@@ -121,5 +126,7 @@ public class ReprocessExceptionTests {
 		public String toString() {
 			return "firstName: " + firstName + ", lastName: " + lastName;
 		}
+
 	}
+
 }

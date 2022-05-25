@@ -17,9 +17,11 @@ package org.springframework.batch.item.database;
 
 /**
  * The direction of the sort in an ORDER BY clause.
- *  
+ *
  * @author Michael Minella
  */
 public enum Order {
+
 	ASCENDING, DESCENDING
+
 }

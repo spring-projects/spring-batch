@@ -42,7 +42,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	private RepeatContext context = null;
 
-    @Override
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		Logger logger = LoggerFactory.getLogger(LogOrRethrowExceptionHandler.class);
@@ -54,7 +54,8 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		rootLoggerConfig.getAppenders().forEach((name, appender) -> {
 			rootLoggerConfig.removeAppender(name);
 		});
-		Appender appender = WriterAppender.createAppender(PatternLayout.createDefaultLayout(), null, writer,"TESTWriter", false, false);
+		Appender appender = WriterAppender.createAppender(PatternLayout.createDefaultLayout(), null, writer,
+				"TESTWriter", false, false);
 		rootLoggerConfig.addAppender(appender, org.apache.logging.log4j.Level.DEBUG, null);
 	}
 
@@ -80,8 +81,8 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	@SuppressWarnings("serial")
 	public void testNotRethrownErrorLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-            @Override
+		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+			@Override
 			public Level classify(Throwable throwable) {
 				return Level.ERROR;
 			}
@@ -93,8 +94,8 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	@SuppressWarnings("serial")
 	public void testNotRethrownWarnLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-            @Override
+		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+			@Override
 			public Level classify(Throwable throwable) {
 				return Level.WARN;
 			}
@@ -106,8 +107,8 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	@SuppressWarnings("serial")
 	public void testNotRethrownDebugLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-            @Override
+		handler.setExceptionClassifier(new ClassifierSupport<Throwable, Level>(Level.RETHROW) {
+			@Override
 			public Level classify(Throwable throwable) {
 				return Level.DEBUG;
 			}

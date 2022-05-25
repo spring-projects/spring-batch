@@ -49,8 +49,9 @@ public class Trade {
 		return quantity;
 	}
 
-    @Override
+	@Override
 	public String toString() {
 		return "Trade: [isin=" + isin + ",quantity=" + quantity + ",price=" + price + "]";
 	}
+
 }

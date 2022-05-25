@@ -66,9 +66,8 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * The name used to calculate the key within the
-	 * {@link org.springframework.batch.item.ExecutionContext}.  Required if
+	 * {@link org.springframework.batch.item.ExecutionContext}. Required if
 	 * {@link StaxEventItemWriterBuilder#saveState(boolean)} is set to true.
-	 *
 	 * @param name name of the reader instance
 	 * @return The current instance of the builder.
 	 * @see StaxEventItemWriter#setName(String)
@@ -81,7 +80,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * The {@link WritableResource} to be used as output.
-	 *
 	 * @param resource the output from the writer
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setResource(WritableResource)
@@ -94,8 +92,7 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * The {@link Marshaller} implementation responsible for the serialization of the
-	 * items to XML.  This field is required.
-	 *
+	 * items to XML. This field is required.
 	 * @param marshaller the component used to generate XML
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setMarshaller(Marshaller)
@@ -108,7 +105,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * A {@link StaxWriterCallback} to provide any header elements
-	 *
 	 * @param headerCallback a {@link StaxWriterCallback}
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setHeaderCallback(StaxWriterCallback)
@@ -121,7 +117,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * A {@link StaxWriterCallback} to provide any footer elements
-	 *
 	 * @param footerCallback a {@link StaxWriterCallback}
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setFooterCallback(StaxWriterCallback)
@@ -135,8 +130,7 @@ public class StaxEventItemWriterBuilder<T> {
 	/**
 	 * The resulting writer is participating in a transaction and writes should be delayed
 	 * as late as possible.
-	 *
-	 * @param transactional indicates that the writer is transactional.  Defaults to false.
+	 * @param transactional indicates that the writer is transactional. Defaults to false.
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setTransactional(boolean)
 	 */
@@ -148,8 +142,7 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Flag to indicate that changes should be force-synced to disk on flush.
-	 *
-	 * @param forceSync indicates if force sync should occur.  Defaults to false.
+	 * @param forceSync indicates if force sync should occur. Defaults to false.
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setForceSync(boolean)
 	 */
@@ -161,8 +154,7 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Flag to indicate that the output file should be deleted if no results were written
-	 * to it.  Defaults to false.
-	 *
+	 * to it. Defaults to false.
 	 * @param shouldDelete indicator
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setShouldDeleteIfEmpty(boolean)
@@ -174,8 +166,7 @@ public class StaxEventItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Encoding for the file.  Defaults to UTF-8.
-	 *
+	 * Encoding for the file. Defaults to UTF-8.
 	 * @param encoding String encoding algorithm
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setEncoding(String)
@@ -187,9 +178,8 @@ public class StaxEventItemWriterBuilder<T> {
 	}
 
 	/**
-	 * Version of XML to be generated.  Must be supported by the {@link Marshaller}
+	 * Version of XML to be generated. Must be supported by the {@link Marshaller}
 	 * provided.
-	 *
 	 * @param version XML version
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setVersion(String)
@@ -202,7 +192,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Standalone document declaration for the output document. Defaults to {@code null}.
-	 *
 	 * @param standalone Boolean standalone document declaration
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setStandalone(Boolean)
@@ -217,7 +206,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * The name of the root tag for the output document.
-	 *
 	 * @param rootTagName tag name
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setRootTagName(String)
@@ -230,7 +218,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * A Map of attributes to be included in the document's root element.
-	 *
 	 * @param rootElementAttributes map fo attributes
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setRootElementAttributes(Map)
@@ -243,7 +230,6 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Indicates if an existing file should be overwritten if found. Defaults to true.
-	 *
 	 * @param overwriteOutput indicator
 	 * @return the current instance of the builder.
 	 * @see StaxEventItemWriter#setOverwriteOutput(boolean)
@@ -256,9 +242,8 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Indicates if the state of the writer should be saved in the
-	 * {@link org.springframework.batch.item.ExecutionContext}.  Setting this to false
-	 * will impact restartability.  Defaults to true.
-	 *
+	 * {@link org.springframework.batch.item.ExecutionContext}. Setting this to false will
+	 * impact restartability. Defaults to true.
 	 * @param saveState indicator
 	 * @return the current instance of the builder
 	 * @see StaxEventItemWriter#setSaveState(boolean)
@@ -271,13 +256,12 @@ public class StaxEventItemWriterBuilder<T> {
 
 	/**
 	 * Returns a configured {@link StaxEventItemWriter}
-	 *
 	 * @return a StaxEventItemWriter
 	 */
 	public StaxEventItemWriter<T> build() {
 		Assert.notNull(this.marshaller, "A marshaller is required");
 
-		if(this.saveState) {
+		if (this.saveState) {
 			Assert.notNull(this.name, "A name is required");
 		}
 
@@ -302,4 +286,4 @@ public class StaxEventItemWriterBuilder<T> {
 		return writer;
 	}
 
- }
+}

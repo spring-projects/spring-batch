@@ -35,8 +35,8 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 				if (fail) {
 					// Only fail once per flag setting...
 					fail = false;
-					logger.info(String.format("Throwing exception index=%s, item=%s, in (%s)", index, input[index],
-							this));
+					logger.info(
+							String.format("Throwing exception index=%s, item=%s, in (%s)", index, input[index], this));
 					index++;
 					throw new RuntimeException("Planned failure");
 				}

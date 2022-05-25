@@ -26,32 +26,35 @@ import java.util.List;
 
 /**
  * <p>
- * AMQP {@link ItemWriter} implementation using an {@link AmqpTemplate} to
- * send messages. Messages will be sent to the nameless exchange if not specified
- * on the provided {@link AmqpTemplate}.
+ * AMQP {@link ItemWriter} implementation using an {@link AmqpTemplate} to send messages.
+ * Messages will be sent to the nameless exchange if not specified on the provided
+ * {@link AmqpTemplate}.
  * </p>
  *
  * @author Chris Schaefer
  * @author Mahmoud Ben Hassine
  */
 public class AmqpItemWriter<T> implements ItemWriter<T> {
-    private final AmqpTemplate amqpTemplate;
-    private final Log log = LogFactory.getLog(getClass());
 
-    public AmqpItemWriter(final AmqpTemplate amqpTemplate) {
-        Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
+	private final AmqpTemplate amqpTemplate;
 
-        this.amqpTemplate = amqpTemplate;
-    }
+	private final Log log = LogFactory.getLog(getClass());
 
-    @Override
-    public void write(final List<? extends T> items) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Writing to AMQP with " + items.size() + " items.");
-        }
+	public AmqpItemWriter(final AmqpTemplate amqpTemplate) {
+		Assert.notNull(amqpTemplate, "AmqpTemplate must not be null");
 
-        for (T item : items) {
-            amqpTemplate.convertAndSend(item);
-        }
-    }
+		this.amqpTemplate = amqpTemplate;
+	}
+
+	@Override
+	public void write(final List<? extends T> items) throws Exception {
+		if (log.isDebugEnabled()) {
+			log.debug("Writing to AMQP with " + items.size() + " items.");
+		}
+
+		for (T item : items) {
+			amqpTemplate.convertAndSend(item);
+		}
+	}
+
 }

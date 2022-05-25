@@ -36,7 +36,7 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
 		}
 		else {
@@ -52,7 +52,7 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 
 		String limitClause = new StringBuilder().append("LIMIT ").append(offset).append(", 1").toString();
 		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);

@@ -43,16 +43,15 @@ import org.springframework.util.ReflectionUtils;
  * @author Dave Syer
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.1
- * 
+ *
  */
 public class MimeMessageItemWriterTests {
 
 	private MimeMessageItemWriter writer = new MimeMessageItemWriter();
 
 	private JavaMailSender mailSender = mock(JavaMailSender.class);
-	
+
 	private Session session = Session.getDefaultInstance(new Properties());
 
 	@Before
@@ -71,7 +70,6 @@ public class MimeMessageItemWriterTests {
 
 		writer.write(Arrays.asList(items));
 
-
 	}
 
 	@Test(expected = MailSendException.class)
@@ -82,14 +80,15 @@ public class MimeMessageItemWriterTests {
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
 		// Spring 4.1 changed the send method to be vargs instead of an array
-		if(ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
+		if (ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
 			mailSender.send(aryEq(items));
 		}
 		else {
 			mailSender.send(items);
 		}
 
-		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
+		when(mailSender).thenThrow(new MailSendException(
+				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 	}
@@ -99,7 +98,7 @@ public class MimeMessageItemWriterTests {
 
 		final AtomicReference<String> content = new AtomicReference<>();
 		writer.setMailErrorHandler(new MailErrorHandler() {
-            @Override
+			@Override
 			public void handle(MailMessage message, Exception exception) throws MailException {
 				content.set(exception.getMessage());
 			}
@@ -109,21 +108,20 @@ public class MimeMessageItemWriterTests {
 		MimeMessage bar = new MimeMessage(session);
 		MimeMessage[] items = new MimeMessage[] { foo, bar };
 
-
 		// Spring 4.1 changed the send method to be vargs instead of an array
-		if(ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
+		if (ReflectionUtils.findMethod(MailSender.class, "send", MimeMessage[].class) != null) {
 			mailSender.send(aryEq(items));
 		}
 		else {
 			mailSender.send(items);
 		}
 
-		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
+		when(mailSender).thenThrow(new MailSendException(
+				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 
 		assertEquals("FOO", content.get());
-
 
 	}
 

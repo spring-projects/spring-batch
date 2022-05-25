@@ -22,11 +22,10 @@ import java.util.Locale;
 import org.springframework.util.Assert;
 
 /**
- * A {@link LineAggregator} implementation which produces a String by
- * aggregating the provided item via the {@link Formatter} syntax.<br>
- * 
+ * A {@link LineAggregator} implementation which produces a String by aggregating the
+ * provided item via the {@link Formatter} syntax.<br>
+ *
  * @see Formatter
- * 
  * @author Dave Syer
  */
 public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
@@ -40,9 +39,8 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 	private int minimumLength = 0;
 
 	/**
-	 * Public setter for the minimum length of the formatted string. If this is
-	 * not set the default is to allow any length.
-	 * 
+	 * Public setter for the minimum length of the formatted string. If this is not set
+	 * the default is to allow any length.
 	 * @param minimumLength the minimum length to set
 	 */
 	public void setMinimumLength(int minimumLength) {
@@ -50,8 +48,8 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 	}
 
 	/**
-	 * Public setter for the maximum length of the formatted string. If this is
-	 * not set the default is to allow any length.
+	 * Public setter for the maximum length of the formatted string. If this is not set
+	 * the default is to allow any length.
 	 * @param maximumLength the maximum length to set
 	 */
 	public void setMaximumLength(int maximumLength) {
@@ -60,7 +58,6 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	/**
 	 * Set the format string used to aggregate items.
-	 *
 	 * @param format {@link String} containing the format to use.
 	 *
 	 * @see Formatter
@@ -85,15 +82,16 @@ public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 		String value = String.format(locale, format, fields);
 
 		if (maximumLength > 0) {
-			Assert.state(value.length() <= maximumLength, String.format("String overflowed in formatter -"
-					+ " longer than %d characters: [%s", maximumLength, value));
+			Assert.state(value.length() <= maximumLength, String.format(
+					"String overflowed in formatter -" + " longer than %d characters: [%s", maximumLength, value));
 		}
 
 		if (minimumLength > 0) {
-			Assert.state(value.length() >= minimumLength, String.format("String underflowed in formatter -"
-					+ " shorter than %d characters: [%s", minimumLength, value));
+			Assert.state(value.length() >= minimumLength, String.format(
+					"String underflowed in formatter -" + " shorter than %d characters: [%s", minimumLength, value));
 		}
 
 		return value;
 	}
+
 }

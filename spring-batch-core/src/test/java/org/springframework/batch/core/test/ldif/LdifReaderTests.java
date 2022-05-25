@@ -40,10 +40,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml", "/applicationContext-test1.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/applicationContext-test1.xml" })
 public class LdifReaderTests {
 
 	private Resource expected;
+
 	private Resource actual;
 
 	@Autowired
@@ -71,10 +72,11 @@ public class LdifReaderTests {
 	public void testValidRun() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job1, new JobParameters());
 
-		//Ensure job completed successfully.
-		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED), "Step Execution did not complete normally: " + jobExecution.getExitStatus());
+		// Ensure job completed successfully.
+		Assert.isTrue(jobExecution.getExitStatus().equals(ExitStatus.COMPLETED),
+				"Step Execution did not complete normally: " + jobExecution.getExitStatus());
 
-		//Check output.
+		// Check output.
 		Assert.isTrue(actual.exists(), "Actual does not exist.");
 		compareFiles(expected.getFile(), actual.getFile());
 	}
@@ -83,8 +85,11 @@ public class LdifReaderTests {
 	public void testResourceNotExists() throws Exception {
 		JobExecution jobExecution = jobLauncher.run(job2, new JobParameters());
 
-		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"), "The job exit status is not FAILED.");
-		Assert.isTrue(jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"), "The job failed for the wrong reason.");
+		Assert.isTrue(jobExecution.getExitStatus().getExitCode().equals("FAILED"),
+				"The job exit status is not FAILED.");
+		Assert.isTrue(
+				jobExecution.getAllFailureExceptions().get(0).getMessage().contains("Failed to initialize the reader"),
+				"The job failed for the wrong reason.");
 	}
 
 	private void compareFiles(File expected, File actual) throws Exception {
@@ -98,11 +103,13 @@ public class LdifReaderTests {
 			}
 
 			String actualLine = actualReader.readLine();
-			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null, actualLine);
+			assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
+					actualLine);
 		}
 		finally {
 			expectedReader.close();
 			actualReader.close();
 		}
 	}
+
 }

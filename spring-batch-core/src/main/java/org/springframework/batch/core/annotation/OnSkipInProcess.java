@@ -25,8 +25,8 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
- * Marks a method to be called when an item is skipped due to an exception
- * thrown in the {@link ItemProcessor}.<br>
+ * Marks a method to be called when an item is skipped due to an exception thrown in the
+ * {@link ItemProcessor}.<br>
  * <br>
  * Expected signature: void onSkipInProcess(T item, {@link Throwable} t)
  *
@@ -35,7 +35,7 @@ import org.springframework.batch.item.ItemProcessor;
  * @see SkipListener
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface OnSkipInProcess {
 
 }

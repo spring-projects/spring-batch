@@ -23,12 +23,19 @@ import org.springframework.batch.sample.domain.order.LineItem;
 public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {
 
 	public static final String TOTAL_PRICE_COLUMN = "TOTAL_PRICE";
+
 	public static final String QUANTITY_COLUMN = "QUANTITY";
+
 	public static final String HANDLING_PRICE_COLUMN = "HANDLING_PRICE";
+
 	public static final String SHIPPING_PRICE_COLUMN = "SHIPPING_PRICE";
+
 	public static final String DISCOUNT_AMOUNT_COLUMN = "DISCOUNT_AMOUNT";
+
 	public static final String DISCOUNT_PERC_COLUMN = "DISCOUNT_PERC";
+
 	public static final String PRICE_COLUMN = "PRICE";
+
 	public static final String ITEM_ID_COLUMN = "ITEM_ID";
 
 	@Override
@@ -46,4 +53,5 @@ public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {
 
 		return item;
 	}
+
 }

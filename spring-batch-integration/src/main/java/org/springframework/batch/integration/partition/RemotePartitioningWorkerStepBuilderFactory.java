@@ -24,8 +24,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * Convenient factory for a {@link RemotePartitioningWorkerStepBuilder} which sets
- * the {@link JobRepository}, {@link JobExplorer}, {@link BeanFactory} and
+ * Convenient factory for a {@link RemotePartitioningWorkerStepBuilder} which sets the
+ * {@link JobRepository}, {@link JobExplorer}, {@link BeanFactory} and
  * {@link PlatformTransactionManager} automatically.
  *
  * @since 4.1
@@ -34,10 +34,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class RemotePartitioningWorkerStepBuilderFactory implements BeanFactoryAware {
 
 	private BeanFactory beanFactory;
-	final private JobExplorer jobExplorer;
-	final private JobRepository jobRepository;
-	final private PlatformTransactionManager transactionManager;
 
+	final private JobExplorer jobExplorer;
+
+	final private JobRepository jobRepository;
+
+	final private PlatformTransactionManager transactionManager;
 
 	/**
 	 * Create a new {@link RemotePartitioningWorkerStepBuilderFactory}.
@@ -45,9 +47,8 @@ public class RemotePartitioningWorkerStepBuilderFactory implements BeanFactoryAw
 	 * @param jobExplorer the job explorer to use
 	 * @param transactionManager the transaction manager to use
 	 */
-	public RemotePartitioningWorkerStepBuilderFactory(JobRepository jobRepository,
-		JobExplorer jobExplorer,
-		PlatformTransactionManager transactionManager) {
+	public RemotePartitioningWorkerStepBuilderFactory(JobRepository jobRepository, JobExplorer jobExplorer,
+			PlatformTransactionManager transactionManager) {
 
 		this.jobExplorer = jobExplorer;
 		this.jobRepository = jobRepository;
@@ -66,10 +67,8 @@ public class RemotePartitioningWorkerStepBuilderFactory implements BeanFactoryAw
 	 * @return a {@link RemotePartitioningWorkerStepBuilder}
 	 */
 	public RemotePartitioningWorkerStepBuilder get(String name) {
-		return new RemotePartitioningWorkerStepBuilder(name)
-				.repository(this.jobRepository)
-				.jobExplorer(this.jobExplorer)
-				.beanFactory(this.beanFactory)
+		return new RemotePartitioningWorkerStepBuilder(name).repository(this.jobRepository)
+				.jobExplorer(this.jobExplorer).beanFactory(this.beanFactory)
 				.transactionManager(this.transactionManager);
 	}
 

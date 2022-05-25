@@ -41,7 +41,7 @@ import org.springframework.oxm.XmlMappingException;
 @RunWith(JUnit4.class)
 public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
 
-    @Override
+	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<>();
 
@@ -49,18 +49,17 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
 		reader.setFragmentRootElementName("foo");
 		reader.setUnmarshaller(new Unmarshaller() {
-            @Override
+			@Override
 			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-
 
 				Attribute attr;
 				try {
-					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source );
+					XMLEventReader eventReader = StaxTestUtils.getXmlEventReader(source);
 					assertTrue(eventReader.nextEvent().isStartDocument());
 					StartElement event = eventReader.nextEvent().asStartElement();
 					attr = (Attribute) event.getAttributes().next();
 				}
-				catch ( Exception e) {
+				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 				Foo foo = new Foo();
@@ -68,7 +67,7 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 				return foo;
 			}
 
-            @Override
+			@Override
 			public boolean supports(Class<?> clazz) {
 				return true;
 			}
@@ -86,7 +85,7 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
 		multiReader.setComparator(new Comparator<Resource>() {
-            @Override
+			@Override
 			public int compare(Resource arg0, Resource arg1) {
 				return 0; // preserve original ordering
 			}
@@ -94,13 +93,12 @@ public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReade
 
 		return multiReader;
 	}
-	
-    @Override
+
+	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close();
-		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
-				.getBytes()) });
+		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />".getBytes()) });
 		multiReader.open(new ExecutionContext());
 	}
 

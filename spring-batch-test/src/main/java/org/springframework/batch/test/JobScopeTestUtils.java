@@ -22,11 +22,10 @@ import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.core.scope.context.JobSynchronizationManager;
 
 /**
- * Utility class for creating and manipulating {@link JobScope} in unit tests.
- * This is useful when you want to use the Spring test support and inject
- * dependencies into your test case that happen to be job scoped in the
- * application context.
- * 
+ * Utility class for creating and manipulating {@link JobScope} in unit tests. This is
+ * useful when you want to use the Spring test support and inject dependencies into your
+ * test case that happen to be job scoped in the application context.
+ *
  * @author Dave Syer
  * @author Jimmy Praet
  */

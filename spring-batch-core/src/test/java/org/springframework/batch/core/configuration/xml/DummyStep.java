@@ -52,4 +52,5 @@ public class DummyStep implements Step, BeanNameAware {
 	public boolean isAllowStartIfComplete() {
 		return false;
 	}
+
 }

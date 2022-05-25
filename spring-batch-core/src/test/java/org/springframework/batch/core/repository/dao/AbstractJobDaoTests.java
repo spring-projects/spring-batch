@@ -51,8 +51,8 @@ public abstract class AbstractJobDaoTests {
 
 	protected JobExecutionDao jobExecutionDao;
 
-	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey").addLong("long",
-			(long) 1).addDate("date", new Date(7)).addDouble("double", 7.7).toJobParameters();
+	protected JobParameters jobParameters = new JobParametersBuilder().addString("job.key", "jobKey")
+			.addLong("long", (long) 1).addDate("date", new Date(7)).addDouble("double", 7.7).toJobParameters();
 
 	protected JobInstance jobInstance;
 
@@ -70,8 +70,8 @@ public abstract class AbstractJobDaoTests {
 	}
 
 	/*
-	 * Because AbstractTransactionalSpringContextTests is used, this method will
-	 * be called by Spring to set the JobRepository.
+	 * Because AbstractTransactionalSpringContextTests is used, this method will be called
+	 * by Spring to set the JobRepository.
 	 */
 	@Autowired
 	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
@@ -96,35 +96,41 @@ public abstract class AbstractJobDaoTests {
 		jobExecutionDao.saveJobExecution(jobExecution);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testVersionIsNotNullForJob() throws Exception {
-		int version = jdbcTemplate.queryForObject("select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID="
-				+ jobInstance.getId(), Integer.class);
+		int version = jdbcTemplate.queryForObject(
+				"select version from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=" + jobInstance.getId(), Integer.class);
 		assertEquals(0, version);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testVersionIsNotNullForJobExecution() throws Exception {
-		int version = jdbcTemplate.queryForObject("select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID="
-				+ jobExecution.getId(), Integer.class);
+		int version = jdbcTemplate.queryForObject(
+				"select version from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=" + jobExecution.getId(),
+				Integer.class);
 		assertEquals(0, version);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindNonExistentJob() {
 		// No job should be found since it hasn't been created.
 		JobInstance jobInstance = jobInstanceDao.getJobInstance("nonexistentJob", jobParameters);
 		assertNull(jobInstance);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindJob() {
 		JobInstance instance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		assertNotNull(instance);
 		assertTrue(jobInstance.equals(instance));
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindJobWithNullRuntime() {
 
 		try {
@@ -137,11 +143,12 @@ public abstract class AbstractJobDaoTests {
 	}
 
 	/**
-	 * Test that ensures that if you create a job with a given name, then find a
-	 * job with the same name, but other pieces of the identifier different, you
-	 * get no result, not the existing one.
+	 * Test that ensures that if you create a job with a given name, then find a job with
+	 * the same name, but other pieces of the identifier different, you get no result, not
+	 * the existing one.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateJobWithExistingName() {
 
 		String scheduledJob = "ScheduledJob";
@@ -160,7 +167,8 @@ public abstract class AbstractJobDaoTests {
 
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testUpdateJobExecution() {
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
@@ -174,7 +182,8 @@ public abstract class AbstractJobDaoTests {
 
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testSaveJobExecution() {
 
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
@@ -182,7 +191,8 @@ public abstract class AbstractJobDaoTests {
 		validateJobExecution(jobExecution, executions.get(0));
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testUpdateInvalidJobExecution() {
 
 		// id is invalid
@@ -197,7 +207,8 @@ public abstract class AbstractJobDaoTests {
 		}
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testUpdateNullIdJobExecution() {
 
 		JobExecution execution = new JobExecution(jobInstance, jobParameters);
@@ -210,23 +221,23 @@ public abstract class AbstractJobDaoTests {
 		}
 	}
 
-
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testJobWithSimpleJobIdentifier() throws Exception {
 
 		String testJob = "test";
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testJob, jobParameters);
 
-		List<Map<String, Object>> jobs = jdbcTemplate.queryForList(
-				"SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
-				jobInstance.getId());
+		List<Map<String, Object>> jobs = jdbcTemplate
+				.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", jobInstance.getId());
 		assertEquals(1, jobs.size());
 		assertEquals("test", jobs.get(0).get("JOB_NAME"));
 
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testJobWithDefaultJobIdentifier() throws Exception {
 
 		String testDefaultJob = "testDefault";
@@ -238,7 +249,8 @@ public abstract class AbstractJobDaoTests {
 		assertNotNull(instance);
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindJobExecutions() {
 
 		List<JobExecution> results = jobExecutionDao.findJobExecutions(jobInstance);
@@ -256,7 +268,8 @@ public abstract class AbstractJobDaoTests {
 		assertEquals(lhs.getExitStatus(), rhs.getExitStatus());
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testGetLastJobExecution() {
 		JobExecution lastExecution = new JobExecution(jobInstance, jobParameters);
 		lastExecution.setStatus(BatchStatus.STARTED);
@@ -273,7 +286,8 @@ public abstract class AbstractJobDaoTests {
 	/**
 	 * Trying to create instance twice for the same job+parameters causes error
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateDuplicateInstance() {
 
 		jobParameters = new JobParameters();
@@ -289,7 +303,8 @@ public abstract class AbstractJobDaoTests {
 		}
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreationAddsVersion() {
 
 		jobInstance = jobInstanceDao.createJobInstance("testCreationAddsVersion", new JobParameters());
@@ -297,7 +312,8 @@ public abstract class AbstractJobDaoTests {
 		assertNotNull(jobInstance.getVersion());
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testSaveAddsVersionAndId() {
 
 		JobExecution jobExecution = new JobExecution(jobInstance, jobParameters);
@@ -311,7 +327,8 @@ public abstract class AbstractJobDaoTests {
 		assertNotNull(jobExecution.getVersion());
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testUpdateIncrementsVersion() {
 		int version = jobExecution.getVersion();
 
@@ -319,4 +336,5 @@ public abstract class AbstractJobDaoTests {
 
 		assertEquals(version + 1, jobExecution.getVersion().intValue());
 	}
+
 }

@@ -28,11 +28,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0: https://github.com/spring-projects/spring-batch/issues/1287
+// FIXME this test fails when upgrading the batch xsd from 2.2 to 3.0:
+// https://github.com/spring-projects/spring-batch/issues/1287
 public class StopAndRestartJobParserTests extends AbstractJobParserTests {
 
 	@Test

@@ -20,11 +20,10 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowStep;
 
 /**
- * A step builder for {@link FlowStep} instances. A flow step delegates processing to a nested flow composed of other
- * steps.
- * 
+ * A step builder for {@link FlowStep} instances. A flow step delegates processing to a
+ * nested flow composed of other steps.
+ *
  * @author Dave Syer
- * 
  * @since 2.2
  */
 public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
@@ -32,8 +31,8 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 	private Flow flow;
 
 	/**
-	 * Create a new builder initialized with any properties in the parent. The parent is copied, so it can be re-used.
-	 * 
+	 * Create a new builder initialized with any properties in the parent. The parent is
+	 * copied, so it can be re-used.
 	 * @param parent a parent helper containing common step properties
 	 */
 	public FlowStepBuilder(StepBuilderHelper<?> parent) {
@@ -42,7 +41,6 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 
 	/**
 	 * Provide a flow to execute during the step.
-	 * 
 	 * @param flow the flow to execute
 	 * @return this for fluent chaining
 	 */
@@ -52,9 +50,9 @@ public class FlowStepBuilder extends StepBuilderHelper<FlowStepBuilder> {
 	}
 
 	/**
-	 * Build a step that executes the flow provided, normally composed of other steps. The flow is not executed in a
-	 * transaction because the individual steps are supposed to manage their own transaction state.
-	 * 
+	 * Build a step that executes the flow provided, normally composed of other steps. The
+	 * flow is not executed in a transaction because the individual steps are supposed to
+	 * manage their own transaction state.
 	 * @return a flow step
 	 */
 	public Step build() {

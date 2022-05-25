@@ -26,7 +26,6 @@ import org.springframework.util.Assert;
  *
  * @author Glenn Renfro
  * @author Mahmoud Ben Hassine
- *
  * @since 4.0
  */
 public class ClassifierCompositeItemWriterBuilder<T> {
@@ -36,7 +35,6 @@ public class ClassifierCompositeItemWriterBuilder<T> {
 	/**
 	 * Establish the classifier to be used for the selection of which {@link ItemWriter}
 	 * to use.
-	 *
 	 * @param classifier the classifier to set
 	 * @return this instance for method chaining
 	 * @see org.springframework.batch.item.support.ClassifierCompositeItemWriter#setClassifier(Classifier)
@@ -49,7 +47,6 @@ public class ClassifierCompositeItemWriterBuilder<T> {
 
 	/**
 	 * Returns a fully constructed {@link ClassifierCompositeItemWriter}.
-	 *
 	 * @return a new {@link ClassifierCompositeItemWriter}
 	 */
 	public ClassifierCompositeItemWriter<T> build() {

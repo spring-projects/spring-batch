@@ -42,8 +42,8 @@ public class Jaxb2NamespaceUnmarshallingTests {
 
 	private StaxEventItemReader<QualifiedTrade> reader = new StaxEventItemReader<>();
 
-	private Resource resource = new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(),
-			"domain/trades.xml"));
+	private Resource resource = new ClassPathResource(
+			ClassUtils.addResourcePathToPackagePath(getClass(), "domain/trades.xml"));
 
 	@Before
 	public void setUp() throws Exception {
@@ -56,8 +56,8 @@ public class Jaxb2NamespaceUnmarshallingTests {
 
 	@Test
 	public void testUnmarshal() throws Exception {
-		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller().unmarshal(
-				new StreamSource(new StringReader(TRADE_XML)));
+		QualifiedTrade trade = (QualifiedTrade) getUnmarshaller()
+				.unmarshal(new StreamSource(new StringReader(TRADE_XML)));
 		Assert.assertEquals("XYZ0001", trade.getIsin());
 		Assert.assertEquals(5, trade.getQuantity());
 		Assert.assertEquals(new BigDecimal("11.39"), trade.getPrice());
@@ -118,4 +118,5 @@ public class Jaxb2NamespaceUnmarshallingTests {
 	private static String TRADE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><trade xmlns=\"urn:org.springframework.batch.io.oxm.domain\">"
 			+ "<customer>Customer1</customer><isin>XYZ0001</isin><price>11.39</price><quantity>5</quantity>"
 			+ "</trade>";
+
 }

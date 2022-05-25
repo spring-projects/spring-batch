@@ -32,8 +32,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Internal shared state helper for hibernate readers managing sessions and
- * queries.
+ * Internal shared state helper for hibernate readers managing sessions and queries.
  *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
@@ -78,14 +77,12 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Can be set only in uninitialized state.
-	 *
-	 * @param useStatelessSession <code>true</code> to use
-	 * {@link StatelessSession} <code>false</code> to use standard hibernate
-	 * {@link Session}
+	 * @param useStatelessSession <code>true</code> to use {@link StatelessSession}
+	 * <code>false</code> to use standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(statefulSession == null && statelessSession == null,
-			"The useStatelessSession flag can only be set before a session is initialized.");
+				"The useStatelessSession flag can only be set before a session is initialized.");
 		this.useStatelessSession = useStatelessSession;
 	}
 
@@ -104,16 +101,14 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 		if (queryProvider == null) {
 			Assert.notNull(sessionFactory, "session factory must be set");
 			Assert.state(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
-				"queryString or queryName must be set");
+					"queryString or queryName must be set");
 		}
 	}
 
 	/**
 	 * Get a cursor over all of the results, with the forward-only flag set.
-	 *
 	 * @param fetchSize the fetch size to use retrieving the results
 	 * @param parameterValues the parameter values to use (or null if none).
-	 *
 	 * @return a forward-only {@link ScrollableResults}
 	 */
 	public ScrollableResults getForwardOnlyCursor(int fetchSize, Map<String, Object> parameterValues) {
@@ -126,7 +121,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Open appropriate type of hibernate session and create the query.
-	 *
 	 * @return a Hibernate Query
 	 */
 	@SuppressWarnings("unchecked") // Hibernate APIs do not use a typed Query
@@ -172,7 +166,6 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 
 	/**
 	 * Scroll through the results up to the item specified.
-	 *
 	 * @param cursor the results to scroll over
 	 * @param itemIndex index to scroll to
 	 * @param flushInterval the number of items to scroll past before flushing
@@ -201,17 +194,16 @@ public class HibernateItemReaderHelper<T> implements InitializingBean {
 	}
 
 	/**
-	 * Read a page of data, clearing the existing session (if necessary) first,
-	 * and creating a new session before executing the query.
-	 *
+	 * Read a page of data, clearing the existing session (if necessary) first, and
+	 * creating a new session before executing the query.
 	 * @param page the page to read (starting at 0)
 	 * @param pageSize the size of the page or maximum number of items to read
 	 * @param fetchSize the fetch size to use
-	 * @param parameterValues the parameter values to use (if any, otherwise
-	 * null)
+	 * @param parameterValues the parameter values to use (if any, otherwise null)
 	 * @return a collection of items
 	 */
-	public Collection<? extends T> readPage(int page, int pageSize, int fetchSize, Map<String, Object> parameterValues) {
+	public Collection<? extends T> readPage(int page, int pageSize, int fetchSize,
+			Map<String, Object> parameterValues) {
 
 		clear();
 

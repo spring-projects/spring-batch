@@ -28,7 +28,6 @@ import org.springframework.util.Assert;
  * Creates a fully qualified SimpleMailMessageItemWriter.
  *
  * @author Glenn Renfro
- *
  * @since 4.0
  */
 
@@ -41,7 +40,6 @@ public class SimpleMailMessageItemWriterBuilder {
 	/**
 	 * A {@link MailSender} to be used to send messages in
 	 * {@link SimpleMailMessageItemWriter#write(List)}.
-	 *
 	 * @param mailSender strategy for sending simple mails.
 	 * @return this instance for method chaining.
 	 * @see SimpleMailMessageItemWriter#setMailSender(MailSender)
@@ -53,7 +51,6 @@ public class SimpleMailMessageItemWriterBuilder {
 
 	/**
 	 * The handler for failed messages. Defaults to a {@link DefaultMailErrorHandler}.
-	 *
 	 * @param mailErrorHandler the mail error handler to set.
 	 * @return this instance for method chaining.
 	 * @see SimpleMailMessageItemWriter#setMailErrorHandler(MailErrorHandler)
@@ -65,7 +62,6 @@ public class SimpleMailMessageItemWriterBuilder {
 
 	/**
 	 * Returns a fully constructed {@link SimpleMailMessageItemWriter}.
-	 *
 	 * @return a new {@link SimpleMailMessageItemWriter}
 	 */
 	public SimpleMailMessageItemWriter build() {
@@ -79,4 +75,5 @@ public class SimpleMailMessageItemWriterBuilder {
 
 		return writer;
 	}
+
 }

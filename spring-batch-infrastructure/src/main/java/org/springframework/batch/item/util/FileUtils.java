@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 
 /**
  * Utility methods for files used in batch processing.
- * 
+ *
  * @author Peter Zozom
  * @author Mahmoud Ben Hassine
  */
@@ -35,15 +35,15 @@ public final class FileUtils {
 	}
 
 	/**
-	 * Set up output file for batch processing. This method implements common logic for handling output files when
-	 * starting or restarting file I/O. When starting output file processing, creates/overwrites new file. When
-	 * restarting output file processing, checks whether file is writable.
-	 * 
+	 * Set up output file for batch processing. This method implements common logic for
+	 * handling output files when starting or restarting file I/O. When starting output
+	 * file processing, creates/overwrites new file. When restarting output file
+	 * processing, checks whether file is writable.
 	 * @param file file to be set up
 	 * @param restarted true signals that we are restarting output file processing
 	 * @param append true signals input file may already exist (but doesn't have to)
-	 * @param overwriteOutputFile If set to true, output file will be overwritten (this flag is ignored when processing
-	 * is restart)
+	 * @param overwriteOutputFile If set to true, output file will be overwritten (this
+	 * flag is ignored when processing is restart)
 	 */
 	public static void setUpOutputFile(File file, boolean restarted, boolean append, boolean overwriteOutputFile) {
 
@@ -74,8 +74,8 @@ public final class FileUtils {
 							new File(file.getParent()).mkdirs();
 						}
 						if (!createNewFile(file)) {
-							throw new ItemStreamException("Output file was not created: [" + file.getAbsolutePath()
-									+ "]");
+							throw new ItemStreamException(
+									"Output file was not created: [" + file.getAbsolutePath() + "]");
 						}
 					}
 				}
@@ -92,12 +92,10 @@ public final class FileUtils {
 
 	/**
 	 * Create a new file if it doesn't already exist.
-	 * 
 	 * @param file the file to create on the filesystem
 	 * @return true if file was created else false.
-	 *
-	 * @throws IOException is thrown if error occurs during creation and file
-	 * does not exist.
+	 * @throws IOException is thrown if error occurs during creation and file does not
+	 * exist.
 	 */
 	public static boolean createNewFile(File file) throws IOException {
 

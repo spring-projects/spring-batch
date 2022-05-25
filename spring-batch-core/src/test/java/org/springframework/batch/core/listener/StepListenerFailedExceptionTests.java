@@ -19,8 +19,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-
-
 /**
  * @author Dave Syer
  * @author Michael Minella
@@ -33,4 +31,5 @@ public class StepListenerFailedExceptionTests {
 		Exception exception = new StepListenerFailedException("foo", new IllegalStateException("bar"));
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
+
 }

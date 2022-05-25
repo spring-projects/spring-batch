@@ -41,9 +41,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Dave Syer
  * @author Will Schipp
  * @author Mahmoud Ben Hassine
- * 
  * @since 2.1
- * 
+ *
  */
 public class SimpleMailMessageItemWriterTests {
 
@@ -66,7 +65,7 @@ public class SimpleMailMessageItemWriterTests {
 		writer.write(Arrays.asList(items));
 
 		// Spring 4.1 changed the send method to be vargs instead of an array
-		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+		if (ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
 			verify(mailSender).send(aryEq(items));
 		}
 		else {
@@ -82,14 +81,15 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
 		// Spring 4.1 changed the send method to be vargs instead of an array
-		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+		if (ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
 			mailSender.send(aryEq(items));
 		}
 		else {
 			mailSender.send(items);
 		}
 
-		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
+		when(mailSender).thenThrow(new MailSendException(
+				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 	}
@@ -99,7 +99,7 @@ public class SimpleMailMessageItemWriterTests {
 
 		final AtomicReference<String> content = new AtomicReference<>();
 		writer.setMailErrorHandler(new MailErrorHandler() {
-            @Override
+			@Override
 			public void handle(MailMessage message, Exception exception) throws MailException {
 				content.set(exception.getMessage());
 			}
@@ -110,14 +110,15 @@ public class SimpleMailMessageItemWriterTests {
 		SimpleMailMessage[] items = new SimpleMailMessage[] { foo, bar };
 
 		// Spring 4.1 changed the send method to be vargs instead of an array
-		if(ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
+		if (ReflectionUtils.findMethod(SimpleMailMessage.class, "send", SimpleMailMessage[].class) != null) {
 			mailSender.send(aryEq(items));
 		}
 		else {
 			mailSender.send(items);
 		}
 
-		when(mailSender).thenThrow(new MailSendException(Collections.singletonMap((Object)foo, (Exception)new MessagingException("FOO"))));
+		when(mailSender).thenThrow(new MailSendException(
+				Collections.singletonMap((Object) foo, (Exception) new MessagingException("FOO"))));
 
 		writer.write(Arrays.asList(items));
 

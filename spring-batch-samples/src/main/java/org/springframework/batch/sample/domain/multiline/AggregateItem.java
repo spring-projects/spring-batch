@@ -16,15 +16,15 @@
 package org.springframework.batch.sample.domain.multiline;
 
 /**
- * A wrapper type for an item that is used by {@link AggregateItemReader} to
- * identify the start and end of an aggregate record.
- * 
+ * A wrapper type for an item that is used by {@link AggregateItemReader} to identify the
+ * start and end of an aggregate record.
+ *
  * @see AggregateItemReader
- * 
  * @author Dave Syer
- * 
+ *
  */
 public class AggregateItem<T> {
+
 	@SuppressWarnings("rawtypes")
 	private static final AggregateItem FOOTER = new AggregateItem<Object>(false, true) {
 		@Override
@@ -81,7 +81,6 @@ public class AggregateItem<T> {
 
 	/**
 	 * Accessor for the wrapped item.
-	 * 
 	 * @return the wrapped item
 	 * @throws IllegalStateException if called on a record for which either
 	 * {@link #isHeader()} or {@link #isFooter()} answers true.

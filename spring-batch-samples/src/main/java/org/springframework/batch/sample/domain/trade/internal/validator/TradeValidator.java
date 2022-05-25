@@ -23,17 +23,19 @@ import org.springframework.batch.sample.domain.trade.Trade;
  * @author Michael Minella
  */
 public class TradeValidator implements Validator {
-    @Override
-    public boolean supports(Class<?> clazz) {
-        return clazz.equals(Trade.class);
-    }
 
-    @Override
-    public void validate(Object target, Errors errors) {
-        Trade trade = (Trade) target;
+	@Override
+	public boolean supports(Class<?> clazz) {
+		return clazz.equals(Trade.class);
+	}
 
-        if(trade.getIsin().length() >= 13) {
-            errors.rejectValue("isin", "isin_length");
-        }
-    }
+	@Override
+	public void validate(Object target, Errors errors) {
+		Trade trade = (Trade) target;
+
+		if (trade.getIsin().length() >= 13) {
+			errors.rejectValue("isin", "isin_length");
+		}
+	}
+
 }

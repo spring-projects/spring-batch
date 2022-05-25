@@ -28,10 +28,8 @@ import org.springframework.lang.Nullable;
 public interface JobParametersIncrementer {
 
 	/**
-	 * Increments the provided parameters. If the input is empty, this method
-	 * should return a bootstrap or initial value to be used on the first
-	 * instance of a job.
-	 *
+	 * Increments the provided parameters. If the input is empty, this method should
+	 * return a bootstrap or initial value to be used on the first instance of a job.
 	 * @param parameters the last value used
 	 * @return the next value to use (never {@code null})
 	 */

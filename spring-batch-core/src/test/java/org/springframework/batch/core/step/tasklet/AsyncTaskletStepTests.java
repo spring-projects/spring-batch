@@ -104,7 +104,7 @@ public class AsyncTaskletStepTests {
 
 			@Override
 			public void update(ExecutionContext executionContext) {
-                                super.update(executionContext);
+				super.update(executionContext);
 				executionContext.putInt("counter", count++);
 			}
 		});
@@ -128,8 +128,8 @@ public class AsyncTaskletStepTests {
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-//		assertEquals(25, stepExecution.getReadCount());
-//		assertEquals(25, processed.size());
+		// assertEquals(25, stepExecution.getReadCount());
+		// assertEquals(25, processed.size());
 		assertTrue(stepExecution.getReadCount() >= 25);
 		assertTrue(processed.size() >= 25);
 
@@ -179,7 +179,7 @@ public class AsyncTaskletStepTests {
 			@Nullable
 			@Override
 			public String process(String item) throws Exception {
-				logger.info("Item: "+item);
+				logger.info("Item: " + item);
 				processed.add(item);
 				if (item.equals("barf")) {
 					throw new RuntimeException("Planned processor error");

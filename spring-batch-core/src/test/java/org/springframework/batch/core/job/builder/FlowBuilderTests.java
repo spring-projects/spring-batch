@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  * @author Dave Syer
  * @author Michael Minella
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class FlowBuilderTests {
 
@@ -50,8 +50,8 @@ public class FlowBuilderTests {
 		JobExecution execution = jobRepository.createJobExecution("foo", new JobParameters());
 		builder.start(new StepSupport("step") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 			}
 		}).end().start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 	}
@@ -64,30 +64,28 @@ public class FlowBuilderTests {
 
 		StepSupport stepA = new StepSupport("stepA") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 				stepExecution.setExitStatus(new ExitStatus("FAILED"));
 			}
 		};
 
 		StepSupport stepB = new StepSupport("stepB") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 			}
 		};
 
 		StepSupport stepC = new StepSupport("stepC") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 			}
 		};
 
-		FlowExecution flowExecution = builder.start(stepA)
-				.on("*").to(stepB)
-				.from(stepA).on("FAILED").to(stepC)
-				.end().start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
+		FlowExecution flowExecution = builder.start(stepA).on("*").to(stepB).from(stepA).on("FAILED").to(stepC).end()
+				.start(new JobFlowExecutor(jobRepository, new SimpleStepHandler(jobRepository), execution));
 
 		Iterator<StepExecution> stepExecutions = execution.getStepExecutions().iterator();
 		StepExecution stepExecutionA = stepExecutions.next();
@@ -95,4 +93,5 @@ public class FlowBuilderTests {
 		StepExecution stepExecutionC = stepExecutions.next();
 		assertEquals(stepExecutionC.getStepName(), "stepC");
 	}
+
 }

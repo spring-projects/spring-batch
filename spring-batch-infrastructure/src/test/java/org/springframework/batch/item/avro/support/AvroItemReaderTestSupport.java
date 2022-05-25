@@ -44,4 +44,5 @@ public abstract class AvroItemReaderTestSupport extends AvroTestFixtures {
 
 		avroItemReader.close();
 	}
+
 }

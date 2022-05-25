@@ -69,9 +69,8 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT",
-				"BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS",
-				"BATCH_JOB_INSTANCE");
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, "BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT",
+				"BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_EXECUTION_PARAMS", "BATCH_JOB_INSTANCE");
 		return jobExecutionDao;
 	}
 
@@ -83,10 +82,10 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testSavedDateIsNullForNonDateTypeJobParams() {
-		final String FIND_DATE_PARAM_FROM_ID = "SELECT DATE_VAL " +
-				"from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = :JOB_EXECUTION_ID";
+		final String FIND_DATE_PARAM_FROM_ID = "SELECT DATE_VAL "
+				+ "from %PREFIX%JOB_EXECUTION_PARAMS where JOB_EXECUTION_ID = :JOB_EXECUTION_ID";
 
-		Map<String,JobParameter> parameters = new HashMap<>();
+		Map<String, JobParameter> parameters = new HashMap<>();
 		parameters.put("string-param", new JobParameter("value"));
 		parameters.put("long-param", new JobParameter(1L));
 		parameters.put("double-param", new JobParameter(1D));
@@ -103,12 +102,13 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		JdbcJobExecutionDao jdbcJobExecutionDao = (JdbcJobExecutionDao) jobExecutionDao;
 		String query = jdbcJobExecutionDao.getQuery(FIND_DATE_PARAM_FROM_ID);
 
-		SqlParameterSource namedParameters = new MapSqlParameterSource()
-				.addValue("JOB_EXECUTION_ID", savedJobExecution.getJobId());
+		SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("JOB_EXECUTION_ID",
+				savedJobExecution.getJobId());
 
 		List<Date> paramValues = namedParameterJdbcTemplate.queryForList(query, namedParameters, Date.class);
-		for (Date paramValue: paramValues) {
+		for (Date paramValue : paramValues) {
 			assertNull(paramValue);
 		}
 	}
+
 }

@@ -24,17 +24,16 @@ import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
-
 /**
  * @author Thomas Risberg
  */
 public class AutoRegisteringStepScopeTests {
-	
+
 	@Test
 	@SuppressWarnings("resource")
 	public void testJobElement() throws Exception {
-		ConfigurableApplicationContext ctx = 
-			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml");
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForJobElementTests-context.xml");
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}
@@ -42,8 +41,8 @@ public class AutoRegisteringStepScopeTests {
 	@Test
 	@SuppressWarnings("resource")
 	public void testStepElement() throws Exception {
-		ConfigurableApplicationContext ctx = 
-			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml");
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/AutoRegisteringStepScopeForStepElementTests-context.xml");
 		Map<String, StepScope> beans = ctx.getBeansOfType(StepScope.class);
 		assertTrue("StepScope not defined properly", beans.size() == 1);
 	}

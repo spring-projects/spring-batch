@@ -17,18 +17,18 @@
 package org.springframework.batch.core;
 
 /**
- * Indicates to the framework that a critical error has occurred and processing
- * should immediately stop.
+ * Indicates to the framework that a critical error has occurred and processing should
+ * immediately stop.
  *
  * @author Lucas Ward
  *
  */
 public class UnexpectedJobExecutionException extends RuntimeException {
+
 	private static final long serialVersionUID = 8838982304219248527L;
 
 	/**
 	 * Constructs a new instance with a message.
-	 *
 	 * @param msg The exception message.
 	 *
 	 */
@@ -38,7 +38,6 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 
 	/**
 	 * Constructs a new instance with a message.
-	 *
 	 * @param msg The exception message.
 	 * @param nested An instance of {@link Throwable} that is the cause of the exception.
 	 *

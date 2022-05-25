@@ -42,8 +42,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 
 	@Test(expected = IllegalStateException.class)
 	public void testConfigurationWithNoDataSourceAndNoTransactionManager() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
-		// beans created by `@EnableBatchProcessing` are lazy proxies, SimpleBatchConfiguration.initialize is only triggered
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithNoDataSourceAndNoTransactionManager.class);
+		// beans created by `@EnableBatchProcessing` are lazy proxies,
+		// SimpleBatchConfiguration.initialize is only triggered
 		// when a method is called on one of these proxies
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
@@ -51,8 +53,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 
 	@Test(expected = IllegalStateException.class)
 	public void testConfigurationWithNoDataSourceAndTransactionManager() {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(BatchConfigurationWithNoDataSourceAndTransactionManager.class);
-		// beans created by `@EnableBatchProcessing` are lazy proxies, SimpleBatchConfiguration.initialize is only triggered
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithNoDataSourceAndTransactionManager.class);
+		// beans created by `@EnableBatchProcessing` are lazy proxies,
+		// SimpleBatchConfiguration.initialize is only triggered
 		// when a method is called on one of these proxies
 		JobRepository jobRepository = context.getBean(JobRepository.class);
 		Assert.assertFalse(jobRepository.isJobInstanceExists("myJob", new JobParameters()));
@@ -60,8 +64,10 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 
 	@Test
 	public void testConfigurationWithDataSourceAndNoTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndNoTransactionManager.class);
-		PlatformTransactionManager platformTransactionManager = getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class));
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndNoTransactionManager.class);
+		PlatformTransactionManager platformTransactionManager = getTransactionManagerSetOnJobRepository(
+				applicationContext.getBean(JobRepository.class));
 		Assert.assertTrue(platformTransactionManager instanceof DataSourceTransactionManager);
 		DataSourceTransactionManager dataSourceTransactionManager = (DataSourceTransactionManager) platformTransactionManager;
 		Assert.assertEquals(applicationContext.getBean(DataSource.class), dataSourceTransactionManager.getDataSource());
@@ -69,22 +75,30 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 
 	@Test
 	public void testConfigurationWithDataSourceAndOneTransactionManager() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndOneTransactionManager.class);
-		PlatformTransactionManager platformTransactionManager = applicationContext.getBean(PlatformTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndOneTransactionManager.class);
+		PlatformTransactionManager platformTransactionManager = applicationContext
+				.getBean(PlatformTransactionManager.class);
 		Assert.assertSame(transactionManager, platformTransactionManager);
-		// In this case, the supplied transaction manager won't be used by batch and a DataSourceTransactionManager will be used instead.
+		// In this case, the supplied transaction manager won't be used by batch and a
+		// DataSourceTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
-		Assert.assertTrue(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
+		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
+				applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
 	}
 
 	@Test
 	public void testConfigurationWithDataSourceAndMultipleTransactionManagers() throws Exception {
-		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(BatchConfigurationWithDataSourceAndMultipleTransactionManagers.class);
-		PlatformTransactionManager platformTransactionManager = applicationContext.getBean(PlatformTransactionManager.class);
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+				BatchConfigurationWithDataSourceAndMultipleTransactionManagers.class);
+		PlatformTransactionManager platformTransactionManager = applicationContext
+				.getBean(PlatformTransactionManager.class);
 		Assert.assertSame(transactionManager2, platformTransactionManager);
-		// In this case, the supplied primary transaction manager won't be used by batch and a DataSourceTransactionManager will be used instead.
+		// In this case, the supplied primary transaction manager won't be used by batch
+		// and a DataSourceTransactionManager will be used instead.
 		// The user has to provide a custom BatchConfigurer.
-		Assert.assertTrue(getTransactionManagerSetOnJobRepository(applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
+		Assert.assertTrue(getTransactionManagerSetOnJobRepository(
+				applicationContext.getBean(JobRepository.class)) instanceof DataSourceTransactionManager);
 	}
 
 	@Configuration
@@ -101,6 +115,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		public PlatformTransactionManager transactionManager() {
 			return transactionManager;
 		}
+
 	}
 
 	@Configuration
@@ -111,6 +126,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		public DataSource dataSource() {
 			return createDataSource();
 		}
+
 	}
 
 	@Configuration
@@ -126,6 +142,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		public PlatformTransactionManager transactionManager() {
 			return transactionManager;
 		}
+
 	}
 
 	@Configuration
@@ -147,5 +164,7 @@ public class TransactionManagerConfigurationWithoutBatchConfigurerTests extends 
 		public PlatformTransactionManager transactionManager2() {
 			return transactionManager2;
 		}
+
 	}
+
 }

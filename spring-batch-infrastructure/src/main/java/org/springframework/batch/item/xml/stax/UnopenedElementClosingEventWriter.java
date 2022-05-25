@@ -30,8 +30,9 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.StringUtils;
 
 /**
- * Delegating XMLEventWriter, which writes EndElement events that match a given collection of QNames directly
- * to the underlying java.io.Writer instead of to the delegate XMLEventWriter.
+ * Delegating XMLEventWriter, which writes EndElement events that match a given collection
+ * of QNames directly to the underlying java.io.Writer instead of to the delegate
+ * XMLEventWriter.
  *
  * @author Jimmy Praet
  * @since 3.0
@@ -42,14 +43,19 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 
 	private Writer ioWriter;
 
-	public UnopenedElementClosingEventWriter(XMLEventWriter wrappedEventWriter, Writer ioWriter, List<QName> unopenedElements) {
+	public UnopenedElementClosingEventWriter(XMLEventWriter wrappedEventWriter, Writer ioWriter,
+			List<QName> unopenedElements) {
 		super(wrappedEventWriter);
 		this.unopenedElements = new LinkedList<>(unopenedElements);
 		this.ioWriter = ioWriter;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.stream.events.XMLEvent)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.springframework.batch.item.xml.stax.AbstractEventWriterWrapper#add(javax.xml.
+	 * stream.events.XMLEvent)
 	 */
 	@Override
 	public void add(XMLEvent event) throws XMLStreamException {
@@ -64,7 +70,8 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 			catch (IOException ioe) {
 				throw new DataAccessResourceFailureException("Unable to close tag: " + element, ioe);
 			}
-		} else {
+		}
+		else {
 			super.add(event);
 		}
 	}
@@ -72,9 +79,11 @@ public class UnopenedElementClosingEventWriter extends AbstractEventWriterWrappe
 	private boolean isUnopenedElementCloseEvent(XMLEvent event) {
 		if (unopenedElements.isEmpty()) {
 			return false;
-		} else if (!event.isEndElement()) {
+		}
+		else if (!event.isEndElement()) {
 			return false;
-		} else {
+		}
+		else {
 			return unopenedElements.getLast().equals(event.asEndElement().getName());
 		}
 	}

@@ -43,8 +43,8 @@ import java.util.List;
 /**
  *
  * <p>
- * Implementation of {@link JobRepository} that stores job instances,
- * job executions, and step executions using the injected DAOs.
+ * Implementation of {@link JobRepository} that stores job instances, job executions, and
+ * step executions using the injected DAOs.
  * </p>
  *
  * @author Lucas Ward
@@ -53,7 +53,6 @@ import java.util.List;
  * @author David Turanski
  * @author Mahmoud Ben Hassine
  * @author Baris Cubukcuoglu
- *
  * @see JobRepository
  * @see JobInstanceDao
  * @see JobExecutionDao
@@ -73,8 +72,8 @@ public class SimpleJobRepository implements JobRepository {
 	private ExecutionContextDao ecDao;
 
 	/**
-	 * Provide default constructor with low visibility in case user wants to use
-	 * use aop:proxy-target-class="true" for AOP interceptor.
+	 * Provide default constructor with low visibility in case user wants to use use
+	 * aop:proxy-target-class="true" for AOP interceptor.
 	 */
 	SimpleJobRepository() {
 	}
@@ -103,10 +102,9 @@ public class SimpleJobRepository implements JobRepository {
 		/*
 		 * Find all jobs matching the runtime information.
 		 *
-		 * If this method is transactional, and the isolation level is
-		 * REPEATABLE_READ or better, another launcher trying to start the same
-		 * job in another thread or process will block until this transaction
-		 * has finished.
+		 * If this method is transactional, and the isolation level is REPEATABLE_READ or
+		 * better, another launcher trying to start the same job in another thread or
+		 * process will block until this transaction has finished.
 		 */
 
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
@@ -124,8 +122,8 @@ public class SimpleJobRepository implements JobRepository {
 			// check for running executions and find the last started
 			for (JobExecution execution : executions) {
 				if (execution.isRunning() || execution.isStopping()) {
-					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
-							+ jobInstance);
+					throw new JobExecutionAlreadyRunningException(
+							"A job execution for this job is already running: " + jobInstance);
 				}
 				BatchStatus status = execution.getStatus();
 				if (status == BatchStatus.UNKNOWN) {
@@ -134,11 +132,13 @@ public class SimpleJobRepository implements JobRepository {
 							+ "so it may be dangerous to proceed. Manual intervention is probably necessary.");
 				}
 				Collection<JobParameter> allJobParameters = execution.getJobParameters().getParameters().values();
-				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying).count();
-				if (identifyingJobParametersCount > 0 && (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
+				long identifyingJobParametersCount = allJobParameters.stream().filter(JobParameter::isIdentifying)
+						.count();
+				if (identifyingJobParametersCount > 0
+						&& (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED)) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
-							+ ".  If you want to run this job again, change the parameters.");
+									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
 			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
@@ -247,11 +247,10 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Check to determine whether or not the JobExecution that is the parent of
-	 * the provided StepExecution has been interrupted. If, after synchronizing
-	 * the status with the database, the status has been updated to STOPPING,
-	 * then the job has been interrupted.
-	 *
+	 * Check to determine whether or not the JobExecution that is the parent of the
+	 * provided StepExecution has been interrupted. If, after synchronizing the status
+	 * with the database, the status has been updated to STOPPING, then the job has been
+	 * interrupted.
 	 * @param stepExecution
 	 */
 	private void checkForInterruption(StepExecution stepExecution) {

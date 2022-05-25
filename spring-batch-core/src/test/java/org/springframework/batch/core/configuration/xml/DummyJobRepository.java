@@ -100,8 +100,7 @@ public class DummyJobRepository implements JobRepository, BeanNameAware {
 	}
 
 	@Override
-	public JobInstance createJobInstance(String jobName,
-			JobParameters jobParameters) {
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

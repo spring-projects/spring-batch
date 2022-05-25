@@ -143,8 +143,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	}
 
 	/**
-	 * Update and retrieve job execution - check attributes have changed as
-	 * expected.
+	 * Update and retrieve job execution - check attributes have changed as expected.
 	 */
 	@Transactional
 	@Test
@@ -197,7 +196,7 @@ public abstract class AbstractJobExecutionDaoTests {
 	@Transactional
 	@Test
 	public void testFindRunningExecutions() {
-		//Normally completed JobExecution as EndTime is populated
+		// Normally completed JobExecution as EndTime is populated
 		JobExecution exec = new JobExecution(jobInstance, jobParameters);
 		exec.setCreateTime(new Date(0));
 		exec.setStartTime(new Date(1L));
@@ -205,14 +204,15 @@ public abstract class AbstractJobExecutionDaoTests {
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
-		//BATCH-2675
-		//Abnormal JobExecution as both StartTime and EndTime are null
-		//This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a TaskRejectedException
+		// BATCH-2675
+		// Abnormal JobExecution as both StartTime and EndTime are null
+		// This can occur when SimpleJobLauncher#run() submission to taskExecutor throws a
+		// TaskRejectedException
 		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 
-		//Running JobExecution as StartTime is populated but EndTime is null
+		// Running JobExecution as StartTime is populated but EndTime is null
 		exec = new JobExecution(jobInstance, jobParameters);
 		exec.setStartTime(new Date(2L));
 		exec.setLastUpdated(new Date(5L));
@@ -279,8 +279,8 @@ public abstract class AbstractJobExecutionDaoTests {
 	}
 
 	/**
-	 * Exception should be raised when the version of update argument doesn't
-	 * match the version of persisted entity.
+	 * Exception should be raised when the version of update argument doesn't match the
+	 * version of persisted entity.
 	 */
 	@Transactional
 	@Test
@@ -336,8 +336,8 @@ public abstract class AbstractJobExecutionDaoTests {
 	}
 
 	/**
-	 * UNKNOWN status won't be changed by synchronizeStatus, because it is the
-	 * 'largest' BatchStatus (will not downgrade).
+	 * UNKNOWN status won't be changed by synchronizeStatus, because it is the 'largest'
+	 * BatchStatus (will not downgrade).
 	 */
 	@Transactional
 	@Test
@@ -363,9 +363,9 @@ public abstract class AbstractJobExecutionDaoTests {
 	}
 
 	/*
-	 * Check to make sure the executions are equal. Normally, comparing the id's
-	 * is sufficient. However, for testing purposes, especially of a DAO, we
-	 * need to make sure all the fields are being stored/retrieved correctly.
+	 * Check to make sure the executions are equal. Normally, comparing the id's is
+	 * sufficient. However, for testing purposes, especially of a DAO, we need to make
+	 * sure all the fields are being stored/retrieved correctly.
 	 */
 
 	private void assertExecutionsAreEqual(JobExecution lhs, JobExecution rhs) {

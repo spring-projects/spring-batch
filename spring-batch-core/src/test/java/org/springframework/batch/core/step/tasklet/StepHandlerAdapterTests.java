@@ -33,17 +33,18 @@ import org.springframework.batch.core.StepExecution;
 public class StepHandlerAdapterTests {
 
 	private MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
+
 	private Object result = null;
 
-	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
-			"systemCommandJob"), new JobParameters()));
+	private StepExecution stepExecution = new StepExecution("systemCommandStep",
+			new JobExecution(new JobInstance(1L, "systemCommandJob"), new JobParameters()));
 
 	public ExitStatus execute() {
 		return ExitStatus.NOOP;
 	}
 
 	public Object process() {
-		return result ;
+		return result;
 	}
 
 	@Before
@@ -55,7 +56,7 @@ public class StepHandlerAdapterTests {
 	public void testExecuteWithExitStatus() throws Exception {
 		tasklet.setTargetMethod("execute");
 		StepContribution contribution = stepExecution.createStepContribution();
-		tasklet.execute(contribution,null);
+		tasklet.execute(contribution, null);
 		assertEquals(ExitStatus.NOOP, contribution.getExitStatus());
 	}
 
@@ -63,7 +64,7 @@ public class StepHandlerAdapterTests {
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		StepContribution contribution = stepExecution.createStepContribution();
-		tasklet.execute(contribution,null);
+		tasklet.execute(contribution, null);
 		assertEquals(ExitStatus.COMPLETED, contribution.getExitStatus());
 	}
 
@@ -72,7 +73,7 @@ public class StepHandlerAdapterTests {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
 		StepContribution contribution = stepExecution.createStepContribution();
-		tasklet.execute(contribution,null);
+		tasklet.execute(contribution, null);
 		assertEquals(ExitStatus.COMPLETED, contribution.getExitStatus());
 	}
 

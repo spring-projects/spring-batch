@@ -40,6 +40,7 @@ public class RepositoryItemWriterBuilderTests {
 
 	@Rule
 	public MockitoRule rule = MockitoJUnit.rule().silent();
+
 	@Mock
 	private TestRepository repository;
 
@@ -59,10 +60,7 @@ public class RepositoryItemWriterBuilderTests {
 	@Test
 	public void testEmptyMethodName() {
 		try {
-			new RepositoryItemWriterBuilder<String>()
-					.repository(this.repository)
-					.methodName("")
-					.build();
+			new RepositoryItemWriterBuilder<String>().repository(this.repository).methodName("").build();
 
 			fail("IllegalArgumentException should have been thrown");
 		}
@@ -74,10 +72,8 @@ public class RepositoryItemWriterBuilderTests {
 
 	@Test
 	public void testWriteItems() throws Exception {
-		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
-				.methodName("save")
-				.repository(this.repository)
-				.build();
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("save")
+				.repository(this.repository).build();
 
 		List<String> items = Collections.singletonList("foo");
 
@@ -88,10 +84,8 @@ public class RepositoryItemWriterBuilderTests {
 
 	@Test
 	public void testWriteItemsTestRepository() throws Exception {
-		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
-				.methodName("foo")
-				.repository(this.repository)
-				.build();
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
+				.repository(this.repository).build();
 
 		List<String> items = Collections.singletonList("foo");
 
@@ -102,15 +96,12 @@ public class RepositoryItemWriterBuilderTests {
 
 	@Test
 	public void testWriteItemsTestRepositoryMethodIs() throws Exception {
-		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository>
-				repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
+		RepositoryItemWriterBuilder.RepositoryMethodReference<TestRepository> repositoryMethodReference = new RepositoryItemWriterBuilder.RepositoryMethodReference<>(
 				this.repository);
 		repositoryMethodReference.methodIs().foo(null);
 
-		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>()
-				.methodName("foo")
-				.repository(repositoryMethodReference)
-				.build();
+		RepositoryItemWriter<String> writer = new RepositoryItemWriterBuilder<String>().methodName("foo")
+				.repository(repositoryMethodReference).build();
 
 		List<String> items = Collections.singletonList("foo");
 
@@ -124,4 +115,5 @@ public class RepositoryItemWriterBuilderTests {
 		Object foo(String arg1);
 
 	}
+
 }

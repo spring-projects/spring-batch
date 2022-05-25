@@ -94,8 +94,10 @@ public class JobRepositoryFactoryBeanTests {
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 
 		factory.afterPropertiesSet();
 		factory.getObject();
@@ -110,8 +112,10 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
 		factory.afterPropertiesSet();
@@ -128,8 +132,10 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
 		LobHandler lobHandler = new DefaultLobHandler();
@@ -149,12 +155,15 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
 		factory.afterPropertiesSet();
-		Serializer<Map<String, Object>> serializer = (Serializer<Map<String,Object>>) ReflectionTestUtils.getField(factory, "serializer");
+		Serializer<Map<String, Object>> serializer = (Serializer<Map<String, Object>>) ReflectionTestUtils
+				.getField(factory, "serializer");
 		assertTrue(serializer instanceof Jackson2ExecutionContextStringSerializer);
 	}
 
@@ -166,8 +175,10 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
 		ExecutionContextSerializer customSerializer = new DefaultExecutionContextSerializer();
@@ -176,7 +187,7 @@ public class JobRepositoryFactoryBeanTests {
 		factory.afterPropertiesSet();
 		assertEquals(customSerializer, ReflectionTestUtils.getField(factory, "serializer"));
 	}
-	
+
 	@Test
 	public void testDefaultJdbcOperations() throws Exception {
 
@@ -185,15 +196,17 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
 
 		factory.afterPropertiesSet();
-		
+
 		JdbcOperations jdbcOperations = (JdbcOperations) ReflectionTestUtils.getField(factory, "jdbcOperations");
 		assertTrue(jdbcOperations instanceof JdbcTemplate);
-	}	
+	}
 
 	@Test
 	public void testCustomJdbcOperations() throws Exception {
@@ -203,18 +216,20 @@ public class JobRepositoryFactoryBeanTests {
 		incrementerFactory = mock(DataFieldMaxValueIncrementerFactory.class);
 		when(incrementerFactory.isSupportedIncrementerType("ORACLE")).thenReturn(true);
 		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 		factory.setIncrementerFactory(incrementerFactory);
-		
+
 		JdbcOperations customJdbcOperations = mock(JdbcOperations.class);
 		factory.setJdbcOperations(customJdbcOperations);
-		
+
 		factory.afterPropertiesSet();
-		
+
 		assertEquals(customJdbcOperations, ReflectionTestUtils.getField(factory, "jdbcOperations"));
-	}	
-	
+	}
+
 	@Test
 	public void testMissingDataSource() throws Exception {
 
@@ -276,9 +291,12 @@ public class JobRepositoryFactoryBeanTests {
 
 		when(incrementerFactory.isSupportedIncrementerType("HSQL")).thenReturn(true);
 		when(incrementerFactory.getSupportedIncrementerTypes()).thenReturn(new String[0]);
-		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
-		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
+		when(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ"))
+				.thenReturn(new StubIncrementer());
 
 		factory.afterPropertiesSet();
 		factory.getObject();
@@ -354,7 +372,7 @@ public class JobRepositoryFactoryBeanTests {
 		}
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testInvalidCustomLobType() throws Exception {
 		factory.setClobType(Integer.MAX_VALUE);
 		testCreateRepository();

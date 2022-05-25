@@ -40,8 +40,8 @@ import org.springframework.util.MethodInvoker;
 
 /**
  * <p>
- * A {@link org.springframework.batch.item.ItemReader} that reads records utilizing
- * a {@link org.springframework.data.repository.PagingAndSortingRepository}.
+ * A {@link org.springframework.batch.item.ItemReader} that reads records utilizing a
+ * {@link org.springframework.data.repository.PagingAndSortingRepository}.
  * </p>
  *
  * <p>
@@ -51,20 +51,24 @@ import org.springframework.util.MethodInvoker;
  * </p>
  *
  * <p>
- * The reader must be configured with a {@link org.springframework.data.repository.PagingAndSortingRepository},
- * a {@link org.springframework.data.domain.Sort}, and a pageSize greater than 0.
+ * The reader must be configured with a
+ * {@link org.springframework.data.repository.PagingAndSortingRepository}, a
+ * {@link org.springframework.data.domain.Sort}, and a pageSize greater than 0.
  * </p>
  *
  * <p>
- * This implementation is thread-safe between calls to {@link #open(ExecutionContext)}, but remember to use
- * <code>saveState=false</code> if used in a multi-threaded client (no restart available).
+ * This implementation is thread-safe between calls to {@link #open(ExecutionContext)},
+ * but remember to use <code>saveState=false</code> if used in a multi-threaded client (no
+ * restart available).
  * </p>
  *
- * <p>It is important to note that this is a paging item reader and exceptions that are
+ * <p>
+ * It is important to note that this is a paging item reader and exceptions that are
  * thrown while reading the page itself (mapping results to objects, etc in the
  * {@link RepositoryItemReader#doPageRead()}) will not be skippable since this reader has
  * no way of knowing if an exception should be skipped and therefore will continue to read
- * the same page until the skip limit is exceeded.</p>
+ * the same page until the skip limit is exceeded.
+ * </p>
  *
  * <p>
  * NOTE: The {@code RepositoryItemReader} only reads Java Objects i.e. non primitives.
@@ -102,7 +106,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	/**
 	 * Arguments to be passed to the data providing method.
-	 *
 	 * @param arguments list of method arguments to be passed to the repository
 	 */
 	public void setArguments(List<?> arguments) {
@@ -111,7 +114,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	/**
 	 * Provides ordering of the results so that order is maintained between paged queries
-	 *
 	 * @param sorts the fields to sort by and the directions
 	 */
 	public void setSort(Map<String, Sort.Direction> sorts) {
@@ -128,7 +130,6 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	/**
 	 * The {@link org.springframework.data.repository.PagingAndSortingRepository}
 	 * implementation used to read input from.
-	 *
 	 * @param repository underlying repository for input to be read from.
 	 */
 	public void setRepository(PagingAndSortingRepository<?, ?> repository) {
@@ -136,9 +137,8 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * Specifies what method on the repository to call.  This method must take
+	 * Specifies what method on the repository to call. This method must take
 	 * {@link org.springframework.data.domain.Pageable} as the <em>last</em> argument.
-	 *
 	 * @param methodName name of the method to invoke
 	 */
 	public void setMethodName(String methodName) {
@@ -166,9 +166,9 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 				}
 
 				results = doPageRead();
-				page ++;
+				page++;
 
-				if(results.size() <= 0) {
+				if (results.size() <= 0) {
 					return null;
 				}
 
@@ -177,7 +177,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 				}
 			}
 
-			if(current < results.size()) {
+			if (current < results.size()) {
 				T curLine = results.get(current);
 				current++;
 				return curLine;
@@ -197,12 +197,11 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * Performs the actual reading of a page via the repository.
-	 * Available for overriding as needed.
-	 *
+	 * Performs the actual reading of a page via the repository. Available for overriding
+	 * as needed.
 	 * @return the list of items that make up the page
 	 * @throws Exception Based on what the underlying method throws or related to the
-	 * 			calling of the method
+	 * calling of the method
 	 */
 	@SuppressWarnings("unchecked")
 	protected List<T> doPageRead() throws Exception {
@@ -212,7 +211,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 		List<Object> parameters = new ArrayList<>();
 
-		if(arguments != null && arguments.size() > 0) {
+		if (arguments != null && arguments.size() > 0) {
 			parameters.addAll(arguments);
 		}
 
@@ -248,7 +247,7 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		return Sort.by(sortValues);
 	}
 
-	private Object doInvoke(MethodInvoker invoker) throws Exception{
+	private Object doInvoke(MethodInvoker invoker) throws Exception {
 		try {
 			invoker.prepare();
 		}
@@ -278,4 +277,5 @@ public class RepositoryItemReader<T> extends AbstractItemCountingItemStreamItemR
 		invoker.setTargetMethod(targetMethod);
 		return invoker;
 	}
+
 }

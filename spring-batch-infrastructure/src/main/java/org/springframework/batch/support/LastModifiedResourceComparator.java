@@ -23,22 +23,21 @@ import org.springframework.util.Assert;
 
 /**
  * Comparator to sort resources by the file last modified time.
- * 
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class LastModifiedResourceComparator implements Comparator<Resource> {
 
 	/**
-	 * Compare the two resources by last modified time, so that a sorted list of
-	 * resources will have oldest first.
-	 * 
-	 * @throws IllegalArgumentException if one of the resources doesn't exist or
-	 * its last modified date cannot be determined
-	 * 
+	 * Compare the two resources by last modified time, so that a sorted list of resources
+	 * will have oldest first.
+	 * @throws IllegalArgumentException if one of the resources doesn't exist or its last
+	 * modified date cannot be determined
+	 *
 	 * @see Comparator#compare(Object, Object)
 	 */
-    @Override
+	@Override
 	public int compare(Resource r1, Resource r2) {
 		Assert.isTrue(r1.exists(), "Resource does not exist: " + r1);
 		Assert.isTrue(r2.exists(), "Resource does not exist: " + r2);

@@ -28,8 +28,8 @@ public class FixedLengthTokenizerTests {
 	private String line = null;
 
 	/**
-	 * if null or empty string is tokenized, tokenizer returns empty fieldset
-	 * (with no tokens).
+	 * if null or empty string is tokenized, tokenizer returns empty fieldset (with no
+	 * tokens).
 	 */
 	@Test
 	public void testTokenizeEmptyString() {
@@ -154,7 +154,7 @@ public class FixedLengthTokenizerTests {
 
 	@Test
 	public void testLongerLinesNotStrict() throws Exception {
-		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26,30) });
+		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		line = "H1        12345678       1234567890";
 		tokenizer.setStrict(false);
 		FieldSet tokens = tokenizer.tokenize(line);
@@ -190,8 +190,8 @@ public class FixedLengthTokenizerTests {
 
 	@Test
 	public void testFillerAtEnd() throws Exception {
-		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 15), new Range(16, 25), new Range(26, 27),
-				new Range(34) });
+		tokenizer.setColumns(
+				new Range[] { new Range(1, 5), new Range(6, 15), new Range(16, 25), new Range(26, 27), new Range(34) });
 		// test another type of record
 		line = "H2   123456    12345     12-123456";
 		FieldSet tokens = tokenizer.tokenize(line);

@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
 public class JdbcCustomerDebitDaoTests {
+
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
@@ -50,7 +51,7 @@ public class JdbcCustomerDebitDaoTests {
 	@Test
 	@Transactional
 	public void testWrite() {
-        jdbcTemplate.execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
+		jdbcTemplate.execute("INSERT INTO CUSTOMER VALUES (99, 0, 'testName', 100)");
 
 		CustomerDebit customerDebit = new CustomerDebit();
 		customerDebit.setName("testName");
@@ -58,12 +59,12 @@ public class JdbcCustomerDebitDaoTests {
 
 		writer.write(customerDebit);
 
-        jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'",
-				new RowCallbackHandler() {
-					@Override
-					public void processRow(ResultSet rs) throws SQLException {
-						assertEquals(95, rs.getLong("credit"));
-					}
-				});
+		jdbcTemplate.query("SELECT name, credit FROM CUSTOMER WHERE name = 'testName'", new RowCallbackHandler() {
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				assertEquals(95, rs.getLong("credit"));
+			}
+		});
 	}
+
 }

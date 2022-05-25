@@ -32,8 +32,8 @@ import org.springframework.batch.sample.domain.trade.TradeDao;
 import org.springframework.util.Assert;
 
 /**
- * Delegates the actual writing to custom DAO delegate. Allows configurable
- * exception raising for testing skip and restart.
+ * Delegates the actual writing to custom DAO delegate. Allows configurable exception
+ * raising for testing skip and restart.
  */
 public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> {
 
@@ -56,7 +56,8 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 			dao.writeTrade(trade);
 
-			Assert.notNull(trade.getPrice(), "price must not be null"); // There must be a price to total
+			Assert.notNull(trade.getPrice(), "price must not be null"); // There must be a
+																		// price to total
 
 			if (this.failingCustomers.contains(trade.getCustomer())) {
 				throw new WriteFailedException("Something unexpected happened!");
@@ -100,10 +101,10 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	/**
 	 * Public setter for the customers on which failure should occur.
-	 * 
 	 * @param failingCustomers The customers to fail on
 	 */
 	public void setFailingCustomers(List<String> failingCustomers) {
 		this.failingCustomers = failingCustomers;
 	}
+
 }

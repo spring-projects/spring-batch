@@ -103,7 +103,8 @@ public class CompositeItemWriterBuilderTests {
 		if (!ignoreItemStream) {
 			openCount = 1;
 		}
-		// If user has set ignoreItemStream to true, then it is expected that they opened the delegate writer.
+		// If user has set ignoreItemStream to true, then it is expected that they opened
+		// the delegate writer.
 		verify(writer, times(openCount)).open(executionContext);
 		itemWriter.write(data);
 	}

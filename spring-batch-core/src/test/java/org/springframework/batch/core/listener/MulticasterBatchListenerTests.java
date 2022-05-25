@@ -402,7 +402,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInRead() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
@@ -419,7 +419,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInReadFails() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
@@ -445,7 +445,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWrite() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
@@ -462,7 +462,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWriteFails() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
@@ -488,7 +488,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInProcess() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
 				count++;
@@ -505,7 +505,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInProcessFails() {
-		multicast.register(new SkipListener<Object,Object>() {
+		multicast.register(new SkipListener<Object, Object>() {
 			@Override
 			public void onSkipInProcess(Object item, Throwable t) {
 				count++;
@@ -532,7 +532,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.beforeRead();
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -549,7 +550,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.afterRead(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -566,7 +568,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.beforeProcess(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -583,7 +586,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.afterProcess(null, null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -600,7 +604,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.beforeWrite(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -617,7 +622,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.afterWrite(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -634,7 +640,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.beforeChunk(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -651,7 +658,8 @@ public class MulticasterBatchListenerTests {
 		try {
 			multicast.afterChunk(null);
 			fail("Expected StepListenerFailedException");
-		} catch (StepListenerFailedException e) {
+		}
+		catch (StepListenerFailedException e) {
 			// expected
 			Throwable cause = e.getCause();
 			String message = cause.getMessage();
@@ -711,6 +719,7 @@ public class MulticasterBatchListenerTests {
 	 *
 	 */
 	private final class CountingStepListenerSupport extends StepListenerSupport<Integer, String> {
+
 		@Override
 		public void onReadError(Exception ex) {
 			count++;
@@ -723,9 +732,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#afterChunk
-		 * ()
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterChunk ()
 		 */
 		@Override
 		public void afterChunk(ChunkContext context) {
@@ -739,8 +746,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#afterRead
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterRead
 		 * (java.lang.Object)
 		 */
 		@Override
@@ -755,8 +761,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#afterStep
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterStep
 		 * (org.springframework.batch.core.StepExecution)
 		 */
 		@Nullable
@@ -772,9 +777,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#beforeChunk
-		 * ()
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeChunk ()
 		 */
 		@Override
 		public void beforeChunk(ChunkContext context) {
@@ -788,9 +791,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#beforeRead
-		 * ()
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeRead ()
 		 */
 		@Override
 		public void beforeRead() {
@@ -804,8 +805,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#beforeStep
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeStep
 		 * (org.springframework.batch.core.StepExecution)
 		 */
 		@Override
@@ -820,8 +820,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#afterWrite
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterWrite
 		 * (java.util.List)
 		 */
 		@Override
@@ -836,8 +835,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#beforeWrite
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeWrite
 		 * (java.util.List)
 		 */
 		@Override
@@ -852,8 +850,7 @@ public class MulticasterBatchListenerTests {
 		/*
 		 * (non-Javadoc)
 		 *
-		 * @see
-		 * org.springframework.batch.core.listener.StepListenerSupport#onWriteError
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#onWriteError
 		 * (java.lang.Exception, java.util.List)
 		 */
 		@Override

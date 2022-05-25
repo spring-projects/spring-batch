@@ -49,97 +49,102 @@ import static org.junit.Assert.assertTrue;
 public class SimpleMethodInvokerTests {
 
 	TestClass testClass;
+
 	String value = "foo";
+
 	@Before
-	public void setUp(){
+	public void setUp() {
 		testClass = new TestClass();
 	}
-	
+
 	@Test
-	public void testMethod() throws Exception{
-		
+	public void testMethod() throws Exception {
+
 		Method method = TestClass.class.getMethod("before");
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
 		methodInvoker.invokeMethod(value);
 		assertTrue(testClass.beforeCalled);
 	}
-	
+
 	@Test
-	public void testMethodByName() throws Exception{
-		
+	public void testMethodByName() throws Exception {
+
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "before", String.class);
 		methodInvoker.invokeMethod(value);
 		assertTrue(testClass.beforeCalled);
 	}
-	
+
 	@Test
-	public void testMethodWithExecution() throws Exception{
+	public void testMethodWithExecution() throws Exception {
 		Method method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
 		methodInvoker.invokeMethod(value);
 		assertTrue(testClass.beforeCalled);
 	}
-	
+
 	@Test
-	public void testMethodByNameWithExecution() throws Exception{
+	public void testMethodByNameWithExecution() throws Exception {
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeWithArgument", String.class);
 		methodInvoker.invokeMethod(value);
 		assertTrue(testClass.beforeCalled);
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testMethodWithTooManyArguments() throws Exception{
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testMethodWithTooManyArguments() throws Exception {
 		Method method = TestClass.class.getMethod("beforeWithTooManyArguments", String.class, int.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
 		methodInvoker.invokeMethod(value);
 		assertFalse(testClass.beforeCalled);
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testMethodByNameWithTooManyArguments() throws Exception{
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testMethodByNameWithTooManyArguments() throws Exception {
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeWithTooManyArguments", String.class);
 		methodInvoker.invokeMethod(value);
 		assertFalse(testClass.beforeCalled);
 	}
-	
+
 	@Test
-	public void testMethodWithArgument() throws Exception{
+	public void testMethodWithArgument() throws Exception {
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "argumentTest", Object.class);
 		methodInvoker.invokeMethod(new Object());
 		assertTrue(testClass.argumentTestCalled);
 	}
-	
+
 	@Test
-	public void testEquals() throws Exception{
+	public void testEquals() throws Exception {
 		Method method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
-		
+
 		method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker2 = new SimpleMethodInvoker(testClass, method);
 		assertEquals(methodInvoker, methodInvoker2);
 	}
-	
+
 	@SuppressWarnings("unused")
-	private class TestClass{
-		
+	private class TestClass {
+
 		boolean beforeCalled = false;
+
 		boolean argumentTestCalled = false;
-		
-		public void before(){
+
+		public void before() {
 			beforeCalled = true;
 		}
-		
-		public void beforeWithArgument(String value){
+
+		public void beforeWithArgument(String value) {
 			beforeCalled = true;
 		}
-		
-		public void beforeWithTooManyArguments(String value, int someInt){
+
+		public void beforeWithTooManyArguments(String value, int someInt) {
 			beforeCalled = true;
 		}
-		
-		public void argumentTest(Object object){
+
+		public void argumentTest(Object object) {
 			Assert.notNull(object, "Object must not be null");
 			argumentTestCalled = true;
 		}
+
 	}
+
 }

@@ -40,11 +40,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Simple implementation of the {@link MethodInvoker} interface that invokes a
- * method on an object. If the method has no arguments, but arguments are
- * provided, they are ignored and the method is invoked anyway. If there are
- * more arguments than there are provided, then an exception is thrown.
- * 
+ * Simple implementation of the {@link MethodInvoker} interface that invokes a method on
+ * an object. If the method has no arguments, but arguments are provided, they are ignored
+ * and the method is invoked anyway. If there are more arguments than there are provided,
+ * then an exception is thrown.
+ *
  * @author Lucas Ward
  * @since 2.0
  */
@@ -77,12 +77,11 @@ public class SimpleMethodInvoker implements MethodInvoker {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.configuration.util.MethodInvoker#invokeMethod
+	 *
+	 * @see org.springframework.batch.core.configuration.util.MethodInvoker#invokeMethod
 	 * (java.lang.Object[])
 	 */
-    @Nullable
+	@Nullable
 	@Override
 	public Object invokeMethod(Object... args) {
 
@@ -92,8 +91,8 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			invokeArgs = new Object[] {};
 		}
 		else if (parameterTypes.length != args.length) {
-			throw new IllegalArgumentException("Wrong number of arguments, expected no more than: ["
-					+ parameterTypes.length + "]");
+			throw new IllegalArgumentException(
+					"Wrong number of arguments, expected no more than: [" + parameterTypes.length + "]");
 		}
 		else {
 			invokeArgs = args;
@@ -152,4 +151,5 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		result = 31 * result + method.hashCode();
 		return result;
 	}
+
 }

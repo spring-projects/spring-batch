@@ -26,16 +26,15 @@ import org.springframework.util.Assert;
 import java.util.List;
 
 /**
- * An {@link ItemWriter} for JMS using a {@link JmsTemplate}. The template
- * should have a default destination, which will be used to send items in
- * {@link #write(List)}.<br>
+ * An {@link ItemWriter} for JMS using a {@link JmsTemplate}. The template should have a
+ * default destination, which will be used to send items in {@link #write(List)}.<br>
  * <br>
- * 
- * The implementation is thread-safe after its properties are set (normal
- * singleton behavior).
- * 
+ *
+ * The implementation is thread-safe after its properties are set (normal singleton
+ * behavior).
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class JmsItemWriter<T> implements ItemWriter<T> {
 
@@ -45,27 +44,23 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 
 	/**
 	 * Setter for JMS template.
-	 * 
-	 * @param jmsTemplate
-	 *            a {@link JmsOperations} instance
+	 * @param jmsTemplate a {@link JmsOperations} instance
 	 */
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
 		if (jmsTemplate instanceof JmsTemplate) {
 			JmsTemplate template = (JmsTemplate) jmsTemplate;
-			Assert
-					.isTrue(template.getDefaultDestination() != null
-							|| template.getDefaultDestinationName() != null,
-							"JmsTemplate must have a defaultDestination or defaultDestinationName!");
+			Assert.isTrue(template.getDefaultDestination() != null || template.getDefaultDestinationName() != null,
+					"JmsTemplate must have a defaultDestination or defaultDestinationName!");
 		}
 	}
 
 	/**
 	 * Send the items one-by-one to the default destination of the JMS template.
-	 * 
+	 *
 	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-    @Override
+	@Override
 	public void write(List<? extends T> items) throws Exception {
 
 		if (logger.isDebugEnabled()) {

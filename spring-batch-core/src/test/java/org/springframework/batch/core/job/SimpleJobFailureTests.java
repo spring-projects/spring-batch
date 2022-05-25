@@ -37,11 +37,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 
 /**
  * Test suite for various failure scenarios during job processing.
- * 
+ *
  * @author Lucas Ward
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public class SimpleJobFailureTests {
 
@@ -53,8 +53,7 @@ public class SimpleJobFailureTests {
 	public void init() throws Exception {
 		EmbeddedDatabase embeddedDatabase = new EmbeddedDatabaseBuilder()
 				.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-				.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-				.build();
+				.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
 		factory.setDataSource(embeddedDatabase);
 		factory.setTransactionManager(new DataSourceTransactionManager(embeddedDatabase));
@@ -66,17 +65,17 @@ public class SimpleJobFailureTests {
 
 	@Test
 	public void testStepFailure() throws Exception {
-		job.setSteps(Arrays.<Step> asList(new StepSupport("step")));
+		job.setSteps(Arrays.<Step>asList(new StepSupport("step")));
 		job.execute(execution);
 		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	@Test
 	public void testStepStatusUnknown() throws Exception {
-		job.setSteps(Arrays.<Step> asList(new StepSupport("step1") {
+		job.setSteps(Arrays.<Step>asList(new StepSupport("step1") {
 			@Override
-			public void execute(StepExecution stepExecution) throws JobInterruptedException,
-					UnexpectedJobExecutionException {
+			public void execute(StepExecution stepExecution)
+					throws JobInterruptedException, UnexpectedJobExecutionException {
 				// This is what happens if the repository meta-data cannot be updated
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				stepExecution.setTerminateOnly();

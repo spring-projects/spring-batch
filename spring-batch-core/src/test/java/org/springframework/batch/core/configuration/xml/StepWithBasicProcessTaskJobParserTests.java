@@ -36,7 +36,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-
 /**
  * @author Thomas Risberg
  *
@@ -65,7 +64,7 @@ public class StepWithBasicProcessTaskJobParserTests {
 	private TestWriter writer;
 
 	@Autowired
-	private StepParserStepFactoryBean<?,?> factory;
+	private StepParserStepFactoryBean<?, ?> factory;
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -74,9 +73,9 @@ public class StepWithBasicProcessTaskJobParserTests {
 		Object ci = ReflectionTestUtils.getField(factory, "commitInterval");
 		assertEquals("wrong chunk-size:", 10, ci);
 		Object listeners = ReflectionTestUtils.getField(factory, "stepExecutionListeners");
-		assertEquals("wrong number of listeners:", 2, ((Set<StepExecutionListener>)listeners).size());
+		assertEquals("wrong number of listeners:", 2, ((Set<StepExecutionListener>) listeners).size());
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
-		assertEquals("wrong number of streams:", 1, ((ItemStream[])streams).length);
+		assertEquals("wrong number of streams:", 1, ((ItemStream[]) streams).length);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -87,4 +86,5 @@ public class StepWithBasicProcessTaskJobParserTests {
 		assertTrue(writer.isExecuted());
 		assertTrue(listener.isExecuted());
 	}
+
 }

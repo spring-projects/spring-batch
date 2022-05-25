@@ -89,7 +89,7 @@ public class SpringBatchTestJUnit5Tests {
 	public void testJob() throws Exception {
 		// given
 		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
-		
+
 		// when
 		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
@@ -115,11 +115,9 @@ public class SpringBatchTestJUnit5Tests {
 
 		@Bean
 		public DataSource dataSource() {
-			return new EmbeddedDatabaseBuilder()
-					.setType(EmbeddedDatabaseType.HSQL)
+			return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL)
 					.addScript("/org/springframework/batch/core/schema-drop-hsqldb.sql")
-					.addScript("/org/springframework/batch/core/schema-hsqldb.sql")
-					.build();
+					.addScript("/org/springframework/batch/core/schema-hsqldb.sql").build();
 		}
 
 		@Bean
@@ -136,11 +134,10 @@ public class SpringBatchTestJUnit5Tests {
 
 		@Bean
 		public Job job(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
-			return jobBuilderFactory.get("job")
-					.start(stepBuilderFactory.get("step")
-							.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED)
-							.build())
-					.build();
+			return jobBuilderFactory.get("job").start(stepBuilderFactory.get("step")
+					.tasklet((contribution, chunkContext) -> RepeatStatus.FINISHED).build()).build();
 		}
+
 	}
+
 }

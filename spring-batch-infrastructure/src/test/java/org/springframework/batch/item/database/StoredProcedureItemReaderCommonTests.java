@@ -33,7 +33,7 @@ import org.springframework.jdbc.core.SqlParameter;
 @RunWith(JUnit4.class)
 public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
-    @Override
+	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		StoredProcedureItemReader<Foo> result = new StoredProcedureItemReader<>();
 		result.setDataSource(getDataSource());
@@ -44,9 +44,10 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		return result;
 	}
 
-    @Override
+	@Override
 	protected void initializeContext() throws Exception {
-		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/stored-procedure-context.xml");
+		ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/item/database/stored-procedure-context.xml");
 	}
 
 	@Test
@@ -60,37 +61,32 @@ public class StoredProcedureItemReaderCommonTests extends AbstractDatabaseItemSt
 		testRestart();
 	}
 
-    @Override
+	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		StoredProcedureItemReader<Foo> reader = (StoredProcedureItemReader<Foo>) tested;
 		reader.close();
 		reader.setDataSource(getDataSource());
 		reader.setProcedureName("read_some_foos");
-		reader.setParameters(
-				new SqlParameter[] {
-					new SqlParameter("from_id", Types.NUMERIC),
-					new SqlParameter("to_id", Types.NUMERIC)	
-				});
-		reader.setPreparedStatementSetter(
-				new PreparedStatementSetter() {
-                    @Override
-					public void setValues(PreparedStatement ps)
-							throws SQLException {
-						ps.setInt(1, 1000);
-						ps.setInt(2, 1001);
-					}
-				});
+		reader.setParameters(new SqlParameter[] { new SqlParameter("from_id", Types.NUMERIC),
+				new SqlParameter("to_id", Types.NUMERIC) });
+		reader.setPreparedStatementSetter(new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setInt(1, 1000);
+				ps.setInt(2, 1001);
+			}
+		});
 		reader.setRowMapper(new FooRowMapper());
 		reader.setVerifyCursorPosition(false);
 		reader.afterPropertiesSet();
-		reader.open(new ExecutionContext());		
+		reader.open(new ExecutionContext());
 	}
 
-	@Test(expected=ReaderNotOpenException.class)
+	@Test(expected = ReaderNotOpenException.class)
 	public void testReadBeforeOpen() throws Exception {
 		testedAsStream().close();
 		tested = getItemReader();
 		tested.read();
 	}
-	
+
 }

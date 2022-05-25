@@ -22,11 +22,17 @@ import java.util.List;
 import org.springframework.batch.sample.domain.order.Address;
 
 public class Person {
+
 	private String title = "";
+
 	private String firstName = "";
+
 	private String last_name = "";
+
 	private int age = 0;
+
 	private Address address = new Address();
+
 	private List<Child> children = new ArrayList<>();
 
 	public Person() {
@@ -206,4 +212,5 @@ public class Person {
 
 		return true;
 	}
+
 }

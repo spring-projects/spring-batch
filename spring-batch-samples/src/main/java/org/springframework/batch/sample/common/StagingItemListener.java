@@ -27,8 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
- * Thread-safe database {@link ItemReader} implementing the process indicator
- * pattern.
+ * Thread-safe database {@link ItemReader} implementing the process indicator pattern.
  */
 public class StagingItemListener extends StepListenerSupport<Long, Long> implements InitializingBean {
 

@@ -19,10 +19,13 @@ package org.springframework.batch.item.database.support;
 import org.springframework.util.StringUtils;
 
 /**
- * Postgres implementation of a  {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
- * 
- * When using the groupClause, this implementation expects all select fields not used in aggregate functions to be included in the 
- * groupClause (the provider does not add them for you).
+ * Postgres implementation of a
+ * {@link org.springframework.batch.item.database.PagingQueryProvider} using database
+ * specific features.
+ *
+ * When using the groupClause, this implementation expects all select fields not used in
+ * aggregate functions to be included in the groupClause (the provider does not add them
+ * for you).
  *
  * @author Thomas Risberg
  * @author Michael Minella
@@ -38,7 +41,7 @@ public class PostgresPagingQueryProvider extends AbstractSqlPagingQueryProvider 
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		if(StringUtils.hasText(getGroupClause())) {
+		if (StringUtils.hasText(getGroupClause())) {
 			return SqlPagingQueryUtils.generateLimitGroupedSqlQuery(this, buildLimitClause(pageSize));
 		}
 		else {
@@ -49,12 +52,12 @@ public class PostgresPagingQueryProvider extends AbstractSqlPagingQueryProvider 
 	private String buildLimitClause(int pageSize) {
 		return new StringBuilder().append("LIMIT ").append(pageSize).toString();
 	}
-	
+
 	@Override
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int offset = (page * pageSize) - 1;
-		offset = offset<0 ? 0 : offset;
+		offset = offset < 0 ? 0 : offset;
 		String limitClause = new StringBuilder().append("LIMIT 1 OFFSET ").append(offset).toString();
 		return SqlPagingQueryUtils.generateLimitJumpToQuery(this, limitClause);
 	}

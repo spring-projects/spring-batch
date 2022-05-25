@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class NoSuchBatchDomainObjectExceptionTests {
 
@@ -30,4 +30,5 @@ public class NoSuchBatchDomainObjectExceptionTests {
 		NoSuchObjectException e = new NoSuchObjectException("Foo");
 		assertEquals("Foo", e.getMessage());
 	}
+
 }

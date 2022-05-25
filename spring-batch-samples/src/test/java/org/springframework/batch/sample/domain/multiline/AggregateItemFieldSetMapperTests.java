@@ -26,6 +26,7 @@ import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 
 public class AggregateItemFieldSetMapperTests {
+
 	private AggregateItemFieldSetMapper<String> mapper = new AggregateItemFieldSetMapper<>();
 
 	@Test
@@ -73,4 +74,5 @@ public class AggregateItemFieldSetMapperTests {
 		});
 		assertEquals("foo", mapper.mapFieldSet(new DefaultFieldSet(new String[] { "FOO" })).getItem());
 	}
+
 }

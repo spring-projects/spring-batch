@@ -38,19 +38,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A special purpose retry template that deals specifically with multi-valued
- * stateful retry. This is useful in the case where the operation to be retried
- * operates on multiple items, and when it fails there is no way to decide which
- * (if any) of the items was responsible. The {@link RetryState} used in the
- * execute methods is composite, and when a failure occurs, all of the keys in
- * the composite are "tarred with the same brush". Subsequent attempts to
- * execute with any of the keys that have failed previously results in a new
- * attempt and the previous state is used to check the {@link RetryPolicy}. If
- * one of the failed items eventually succeeds then the others in the current
- * composite for that attempt will be cleared from the context cache (as
- * normal), but there may still be entries in the cache for the original failed
- * items. This might mean that an item that did not cause a failure is never
- * retried because other items in the same batch fail fatally first.
+ * A special purpose retry template that deals specifically with multi-valued stateful
+ * retry. This is useful in the case where the operation to be retried operates on
+ * multiple items, and when it fails there is no way to decide which (if any) of the items
+ * was responsible. The {@link RetryState} used in the execute methods is composite, and
+ * when a failure occurs, all of the keys in the composite are "tarred with the same
+ * brush". Subsequent attempts to execute with any of the keys that have failed previously
+ * results in a new attempt and the previous state is used to check the
+ * {@link RetryPolicy}. If one of the failed items eventually succeeds then the others in
+ * the current composite for that attempt will be cleared from the context cache (as
+ * normal), but there may still be entries in the cache for the original failed items.
+ * This might mean that an item that did not cause a failure is never retried because
+ * other items in the same batch fail fatally first.
  *
  * @author Dave Syer
  *
@@ -199,8 +198,8 @@ public class BatchRetryTemplate implements RetryOperations {
 
 	private RetryPolicy retryPolicy;
 
-	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, Collection<RetryState> states) throws E,
-	Exception {
+	public <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, Collection<RetryState> states)
+			throws E, Exception {
 		RetryState batchState = new BatchRetryState(states);
 		return delegate.execute(retryCallback, batchState);
 	}
@@ -212,19 +211,20 @@ public class BatchRetryTemplate implements RetryOperations {
 	}
 
 	@Override
-	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
-			RetryState retryState) throws E {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback,
+			RecoveryCallback<T> recoveryCallback, RetryState retryState) throws E {
 		return regular.execute(retryCallback, recoveryCallback, retryState);
 	}
 
 	@Override
-	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback) throws E {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback,
+			RecoveryCallback<T> recoveryCallback) throws E {
 		return regular.execute(retryCallback, recoveryCallback);
 	}
 
 	@Override
-	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RetryState retryState) throws E,
-	ExhaustedRetryException {
+	public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RetryState retryState)
+			throws E, ExhaustedRetryException {
 		return regular.execute(retryCallback, retryState);
 	}
 
@@ -276,7 +276,7 @@ public class BatchRetryTemplate implements RetryOperations {
 	}
 
 	public boolean canRetry(RetryContext context) {
-		return context==null ? true : retryPolicy.canRetry(context);
+		return context == null ? true : retryPolicy.canRetry(context);
 	}
 
 }

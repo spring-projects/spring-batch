@@ -22,26 +22,23 @@ import org.springframework.lang.Nullable;
 
 /**
  * Strategy for processing in a step.
- * 
+ *
  * @author Dave Syer
  * @author Mahmoud Ben Hassine
- * 
+ *
  */
 public interface Tasklet {
 
 	/**
-	 * Given the current context in the form of a step contribution, do whatever
-	 * is necessary to process this unit inside a transaction. Implementations
-	 * return {@link RepeatStatus#FINISHED} if finished. If not they return
+	 * Given the current context in the form of a step contribution, do whatever is
+	 * necessary to process this unit inside a transaction. Implementations return
+	 * {@link RepeatStatus#FINISHED} if finished. If not they return
 	 * {@link RepeatStatus#CONTINUABLE}. On failure throws an exception.
-	 * 
-	 * @param contribution mutable state to be passed back to update the current
-	 * step execution
-	 * @param chunkContext attributes shared between invocations but not between
-	 * restarts
-	 * @return an {@link RepeatStatus} indicating whether processing is
-	 * continuable. Returning {@code null} is interpreted as {@link RepeatStatus#FINISHED}
-	 *
+	 * @param contribution mutable state to be passed back to update the current step
+	 * execution
+	 * @param chunkContext attributes shared between invocations but not between restarts
+	 * @return an {@link RepeatStatus} indicating whether processing is continuable.
+	 * Returning {@code null} is interpreted as {@link RepeatStatus#FINISHED}
 	 * @throws Exception thrown if error occurs during execution.
 	 */
 	@Nullable

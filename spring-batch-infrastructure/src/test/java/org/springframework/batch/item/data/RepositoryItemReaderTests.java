@@ -58,8 +58,10 @@ public class RepositoryItemReaderTests {
 	public MockitoRule rule = MockitoJUnit.rule().silent();
 
 	private RepositoryItemReader<Object> reader;
+
 	@Mock
 	private PagingAndSortingRepository<Object, Integer> repository;
+
 	private Map<String, Sort.Direction> sorts;
 
 	@Before
@@ -77,7 +79,8 @@ public class RepositoryItemReaderTests {
 		try {
 			new RepositoryItemReader<>().afterPropertiesSet();
 			fail();
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 		}
 
@@ -86,7 +89,8 @@ public class RepositoryItemReaderTests {
 			reader.setRepository(repository);
 			reader.afterPropertiesSet();
 			fail();
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			// expected
 		}
 
@@ -96,7 +100,8 @@ public class RepositoryItemReaderTests {
 			reader.setPageSize(-1);
 			reader.afterPropertiesSet();
 			fail();
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			// expected
 		}
 
@@ -106,7 +111,8 @@ public class RepositoryItemReaderTests {
 			reader.setPageSize(1);
 			reader.afterPropertiesSet();
 			fail();
-		} catch (IllegalStateException iae) {
+		}
+		catch (IllegalStateException iae) {
 			// expected
 		}
 
@@ -137,9 +143,7 @@ public class RepositoryItemReaderTests {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
 
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(
-			result
-		)));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(result)));
 
 		assertEquals(result, reader.doRead());
 
@@ -154,11 +158,8 @@ public class RepositoryItemReaderTests {
 	public void testDoReadFirstReadSecondPage() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(
-			new Object()
-		))).thenReturn(new PageImpl<>(singletonList(
-			result
-		)));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
+				.thenReturn(new PageImpl<>(singletonList(result)));
 
 		assertFalse(reader.doRead() == result);
 		assertEquals(result, reader.doRead());
@@ -174,11 +175,8 @@ public class RepositoryItemReaderTests {
 	public void testDoReadFirstReadExhausted() throws Exception {
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
 		final Object result = new Object();
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(
-			new Object()
-		))).thenReturn(new PageImpl<>(singletonList(
-			result
-		))).thenReturn(new PageImpl<>(new ArrayList<>()));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(new Object())))
+				.thenReturn(new PageImpl<>(singletonList(result))).thenReturn(new PageImpl<>(new ArrayList<>()));
 
 		assertFalse(reader.doRead() == result);
 		assertEquals(result, reader.doRead());
@@ -196,9 +194,7 @@ public class RepositoryItemReaderTests {
 		reader.setPageSize(100);
 		final List<Object> objectList = fillWithNewObjects(100);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(
-				objectList
-		));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(objectList));
 
 		reader.jumpToItem(485);
 		// no page requested at this stage
@@ -220,9 +216,7 @@ public class RepositoryItemReaderTests {
 		reader.setPageSize(50);
 		final List<Object> objectList = fillWithNewObjects(50);
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(
-				objectList
-		));
+		when(repository.findAll(pageRequestContainer.capture())).thenReturn(new PageImpl<>(objectList));
 
 		reader.jumpToItem(150);
 		verify(repository, never()).findAll(any(Pageable.class));
@@ -250,7 +244,8 @@ public class RepositoryItemReaderTests {
 		try {
 			reader.doPageRead();
 			fail();
-		} catch (DynamicMethodInvocationException dmie) {
+		}
+		catch (DynamicMethodInvocationException dmie) {
 			assertTrue(dmie.getCause() instanceof NoSuchMethodException);
 		}
 	}
@@ -266,9 +261,8 @@ public class RepositoryItemReaderTests {
 		reader.setMethodName("findFirstNames");
 
 		ArgumentCaptor<PageRequest> pageRequestContainer = ArgumentCaptor.forClass(PageRequest.class);
-		when(differentRepository.findFirstNames(pageRequestContainer.capture())).thenReturn(new PageImpl<>(singletonList(
-			"result"
-		)));
+		when(differentRepository.findFirstNames(pageRequestContainer.capture()))
+				.thenReturn(new PageImpl<>(singletonList("result")));
 
 		assertEquals("result", reader.doRead());
 
@@ -282,20 +276,14 @@ public class RepositoryItemReaderTests {
 	@Test
 	public void testSettingCurrentItemCountExplicitly() throws Exception {
 		// Dataset : ("1" "2") | "3" "4" | "5" "6"
-		reader.setCurrentItemCount(3);  // item as index 3 is : "4"
+		reader.setCurrentItemCount(3); // item as index 3 is : "4"
 		reader.setPageSize(2);
 
 		PageRequest request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"3",
-			"4"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("3", "4")));
 
 		request = PageRequest.of(2, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"5",
-			"6"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("5", "6")));
 
 		reader.open(new ExecutionContext());
 
@@ -308,20 +296,14 @@ public class RepositoryItemReaderTests {
 
 	@Test
 	public void testSettingCurrentItemCountRestart() throws Exception {
-		reader.setCurrentItemCount(3);  // item as index 3 is : "4"
+		reader.setCurrentItemCount(3); // item as index 3 is : "4"
 		reader.setPageSize(2);
 
 		PageRequest request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"3",
-			"4"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("3", "4")));
 
 		request = PageRequest.of(2, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"5",
-			"6"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("5", "6")));
 
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.open(executionContext);
@@ -342,16 +324,10 @@ public class RepositoryItemReaderTests {
 		reader.setPageSize(2);
 
 		PageRequest request = PageRequest.of(0, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"1",
-			"2"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("1", "2")));
 
 		request = PageRequest.of(1, 2, Sort.by(Direction.ASC, "id"));
-		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object> asList(
-			"3",
-			"4"
-		)));
+		when(repository.findAll(request)).thenReturn(new PageImpl<>(Arrays.<Object>asList("3", "4")));
 
 		ExecutionContext executionContext = new ExecutionContext();
 		reader.open(executionContext);
@@ -368,11 +344,14 @@ public class RepositoryItemReaderTests {
 	}
 
 	public interface TestRepository extends PagingAndSortingRepository<Map, Long> {
+
 		Page<String> findFirstNames(Pageable pageable);
+
 	}
 
 	// Simple object for readability
 	private static class TestItem {
+
 		private final int myIndex;
 
 		TestItem(int myIndex) {
@@ -383,5 +362,7 @@ public class RepositoryItemReaderTests {
 		public String toString() {
 			return "TestItem at index " + myIndex;
 		}
+
 	}
+
 }

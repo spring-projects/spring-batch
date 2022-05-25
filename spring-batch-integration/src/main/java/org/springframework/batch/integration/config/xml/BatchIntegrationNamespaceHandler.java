@@ -26,14 +26,18 @@ import org.springframework.integration.config.xml.AbstractIntegrationNamespaceHa
  * @since 1.3
  */
 public class BatchIntegrationNamespaceHandler extends AbstractIntegrationNamespaceHandler {
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
 	 */
 	public void init() {
-		this.registerBeanDefinitionParser("job-launching-gateway",  new JobLaunchingGatewayParser());
+		this.registerBeanDefinitionParser("job-launching-gateway", new JobLaunchingGatewayParser());
 		RemoteChunkingManagerParser remoteChunkingManagerParser = new RemoteChunkingManagerParser();
 		this.registerBeanDefinitionParser("remote-chunking-manager", remoteChunkingManagerParser);
 		RemoteChunkingWorkerParser remoteChunkingWorkerParser = new RemoteChunkingWorkerParser();
 		this.registerBeanDefinitionParser("remote-chunking-worker", remoteChunkingWorkerParser);
 	}
+
 }

@@ -19,12 +19,11 @@ package org.springframework.batch.item.file.separator;
 import org.springframework.util.StringUtils;
 
 /**
- * A {@link RecordSeparatorPolicy} that treats all lines as record endings, as
- * long as they do not have unterminated quotes, and do not end in a
- * continuation marker.
- * 
+ * A {@link RecordSeparatorPolicy} that treats all lines as record endings, as long as
+ * they do not have unterminated quotes, and do not end in a continuation marker.
+ *
  * @author Dave Syer
- * 
+ *
  */
 public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
@@ -45,7 +44,6 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	/**
 	 * Convenient constructor with quote character as parameter.
-	 *
 	 * @param quoteCharacter value used to indicate a quoted string
 	 */
 	public DefaultRecordSeparatorPolicy(String quoteCharacter) {
@@ -53,9 +51,7 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Convenient constructor with quote character and continuation marker as
-	 * parameters.
-	 *
+	 * Convenient constructor with quote character and continuation marker as parameters.
 	 * @param quoteCharacter value used to indicate a quoted string
 	 * @param continuation value used to indicate a line continuation
 	 */
@@ -67,7 +63,6 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	/**
 	 * Public setter for the quoteCharacter. Defaults to double quote mark.
-	 * 
 	 * @param quoteCharacter the quoteCharacter to set
 	 */
 	public void setQuoteCharacter(String quoteCharacter) {
@@ -76,7 +71,6 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 
 	/**
 	 * Public setter for the continuation. Defaults to back slash.
-	 * 
 	 * @param continuation the continuation to set
 	 */
 	public void setContinuation(String continuation) {
@@ -84,25 +78,24 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Return true if the line does not have unterminated quotes (delimited by
-	 * "), and does not end with a continuation marker ('\'). The test for the
-	 * continuation marker ignores whitespace at the end of the line.
-	 * 
+	 * Return true if the line does not have unterminated quotes (delimited by "), and
+	 * does not end with a continuation marker ('\'). The test for the continuation marker
+	 * ignores whitespace at the end of the line.
+	 *
 	 * @see org.springframework.batch.item.file.separator.RecordSeparatorPolicy#isEndOfRecord(java.lang.String)
 	 */
-    @Override
+	@Override
 	public boolean isEndOfRecord(String line) {
 		return !isQuoteUnterminated(line) && !isContinued(line);
 	}
 
 	/**
-	 * If we are in an unterminated quote, add a line separator. Otherwise
-	 * remove the continuation marker (plus whitespace at the end) if it is
-	 * there.
-	 * 
+	 * If we are in an unterminated quote, add a line separator. Otherwise remove the
+	 * continuation marker (plus whitespace at the end) if it is there.
+	 *
 	 * @see org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy#preProcess(java.lang.String)
 	 */
-    @Override
+	@Override
 	public String preProcess(String line) {
 		if (isQuoteUnterminated(line)) {
 			return line + "\n";
@@ -114,10 +107,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Determine if the current line (or buffered concatenation of lines)
-	 * contains an unterminated quote, indicating that the record is continuing
-	 * onto the next line.
-	 * 
+	 * Determine if the current line (or buffered concatenation of lines) contains an
+	 * unterminated quote, indicating that the record is continuing onto the next line.
 	 * @param line
 	 * @return
 	 */
@@ -126,10 +117,8 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 	}
 
 	/**
-	 * Determine if the current line (or buffered concatenation of lines) ends
-	 * with the continuation marker, indicating that the record is continuing
-	 * onto the next line.
-	 * 
+	 * Determine if the current line (or buffered concatenation of lines) ends with the
+	 * continuation marker, indicating that the record is continuing onto the next line.
 	 * @param line
 	 * @return
 	 */
@@ -139,4 +128,5 @@ public class DefaultRecordSeparatorPolicy extends SimpleRecordSeparatorPolicy {
 		}
 		return line.trim().endsWith(continuation);
 	}
+
 }

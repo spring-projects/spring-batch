@@ -55,4 +55,5 @@ public class ScopeConfiguration {
 	public static JobScope jobScope() {
 		return jobScope;
 	}
+
 }
